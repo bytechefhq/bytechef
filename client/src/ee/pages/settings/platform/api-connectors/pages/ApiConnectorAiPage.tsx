@@ -29,7 +29,7 @@ const ApiConnectorAiPage = () => {
                 <div className="flex flex-col items-center justify-center py-12">
                     <LoadingIcon className="size-8" />
 
-                    <p className="mt-4 text-sm text-gray-600">Generating OpenAPI specification...</p>
+                    <p className="mt-4 text-sm text-content-neutral-secondary">Generating OpenAPI specification...</p>
 
                     <p className="mt-2 text-xs text-content-neutral-secondary">This may take a minute</p>
                 </div>

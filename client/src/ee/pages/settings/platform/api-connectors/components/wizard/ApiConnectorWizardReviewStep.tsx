@@ -63,7 +63,7 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
                                         <p className="text-xs text-content-neutral-secondary">{endpoint.path}</p>
 
                                         {endpoint.summary && (
-                                            <p className="text-xs text-gray-400">{endpoint.summary}</p>
+                                            <p className="text-xs text-content-neutral-tertiary">{endpoint.summary}</p>
                                         )}
                                     </div>
                                 </div>
@@ -86,7 +86,9 @@ const ApiConnectorWizardReviewStep = ({mode}: ApiConnectorWizardReviewStepProps)
                 <div>
                     <h4 className="mb-2 text-sm font-medium">Generated OpenAPI Specification</h4>
 
-                    <pre className="max-h-48 overflow-auto rounded-md bg-gray-100 p-3 text-xs">{specification}</pre>
+                    <pre className="max-h-48 overflow-auto rounded-md bg-surface-neutral-secondary p-3 text-xs">
+                        {specification}
+                    </pre>
                 </div>
             )}
         </div>

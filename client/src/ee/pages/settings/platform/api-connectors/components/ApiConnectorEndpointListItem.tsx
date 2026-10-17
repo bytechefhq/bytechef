@@ -46,7 +46,10 @@ const ApiConnectorEndpointListItem = ({
                 {lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                            <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
+                            <CalendarIcon
+                                aria-hidden="true"
+                                className="mr-0.5 size-3.5 shrink-0 text-content-neutral-tertiary"
+                            />
 
                             <span className="text-xs">
                                 {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
