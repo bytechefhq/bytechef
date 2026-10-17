@@ -191,8 +191,8 @@ class ComponentHandlerPolyglotEngineTest {
                         {
                             type: "OAUTH2_AUTHORIZATION_CODE",
                             authorizationUrl: "https://example.com/oauth/authorize",
-                            tokenUrl: function (connectionParameters) {
-                                return "https://" + connectionParameters.region + ".example.com/oauth/token";
+                            tokenUrl: function (connection) {
+                                return "https://" + connection.region + ".example.com/oauth/token";
                             }
                         }
                     ]
@@ -230,9 +230,9 @@ class ComponentHandlerPolyglotEngineTest {
                     authorizations: [
                         {
                             type: "CUSTOM",
-                            apply: function (connectionParameters) {
+                            apply: function (connection) {
                                 return {
-                                    headers: {"Authorization": "Bearer " + connectionParameters.accessToken},
+                                    headers: {"Authorization": "Bearer " + connection.accessToken},
                                     queryParameters: {"tenant": ["acme"]}
                                 };
                             }
@@ -274,7 +274,7 @@ class ComponentHandlerPolyglotEngineTest {
                     authorizations: [
                         {
                             type: "OAUTH2_AUTHORIZATION_CODE",
-                            tokenUrl: function (connectionParameters) {
+                            tokenUrl: function (connection) {
                                 return 42;
                             }
                         }
@@ -524,10 +524,10 @@ class ComponentHandlerPolyglotEngineTest {
                             {
                                 name: 'region',
                                 type: 'STRING',
-                                options: function (inputParameters, connectionParameters, searchText) {
+                                options: function (input, connection, searchText) {
                                     return [
                                         {label: 'EU ' + searchText, value: 'eu'},
-                                        {label: 'US ' + inputParameters.tenant, value: 'us'}
+                                        {label: 'US ' + input.tenant, value: 'us'}
                                     ];
                                 }
                             }
@@ -582,9 +582,9 @@ class ComponentHandlerPolyglotEngineTest {
                         type: 'POLLING',
                         properties: [{name: 'folder', type: 'STRING'}],
                         output: {type: 'OBJECT', properties: [{name: 'id', type: 'STRING'}]},
-                        poll: function (inputParameters, connectionParameters, closureParameters) {
+                        poll: function (input, connection, closureParameters) {
                             return {
-                                records: [{id: inputParameters.folder + '-1'}],
+                                records: [{id: input.folder + '-1'}],
                                 closureParameters: {cursor: (closureParameters.cursor || 0) + 1}
                             };
                         }
@@ -632,7 +632,7 @@ class ComponentHandlerPolyglotEngineTest {
                     {
                         name: 'onPush',
                         type: 'STATIC_WEBHOOK',
-                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                        webhookRequest: function (input, connection, request) {
                             return {event: request.body.event, method: request.method};
                         }
                     }
@@ -676,11 +676,11 @@ class ComponentHandlerPolyglotEngineTest {
                     {
                         name: 'onPush',
                         type: 'DYNAMIC_WEBHOOK',
-                        webhookEnable: function (inputParameters, connectionParameters, args) {
+                        webhookEnable: function (input, connection, args) {
                             return {subscriptionId: 'sub-for-' + args.webhookUrl};
                         },
                         webhookDisable: function () {},
-                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                        webhookRequest: function (input, connection, request) {
                             return request.body;
                         }
                     }
