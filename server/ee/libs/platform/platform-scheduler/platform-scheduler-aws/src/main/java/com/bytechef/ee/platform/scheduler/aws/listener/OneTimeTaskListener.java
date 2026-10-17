@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConsta
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +30,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * Resumes a job when its suspend deadline passes. A message with the suspend's resume id resumes the job only while the
  * job still waits on that suspend; while the job has not reached the suspend yet the listener fails, so SQS delivers
  * the message again. A message without a resume id, or one whose resume id cannot be checked because no local
- * {@link JobResumeFacade} is available, resumes the job unconditionally.
+ * {@link JobResumeFacade} is available, resumes the job unconditionally. A message runs in the tenant it carries; a
+ * message sent before the tenant was carried runs in the current tenant.
  *
  * @version ee
  *
@@ -62,9 +64,28 @@ public class OneTimeTaskListener {
             throw new IllegalArgumentException("Unexpected one-time task message: " + parts[0]);
         }
 
-        long jobId =
-            Long.parseLong(parts[0].substring(AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX.length()));
+        String target = parts[0].substring(AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX.length());
 
+        int separatorIndex = target.lastIndexOf(AwsTriggerSchedulerConstants.ONE_TIME_TASK_TENANT_SEPARATOR);
+
+        if (separatorIndex < 0) {
+            resume(Long.parseLong(target), parts);
+
+            return;
+        }
+
+        String currentTenantId = TenantContext.getCurrentTenantId();
+
+        try {
+            TenantContext.setCurrentTenantId(target.substring(0, separatorIndex));
+
+            resume(Long.parseLong(target.substring(separatorIndex + 1)), parts);
+        } finally {
+            TenantContext.setCurrentTenantId(currentTenantId);
+        }
+    }
+
+    private void resume(long jobId, String[] parts) {
         String jobResumeId = parts.length > 1 ? getJobResumeId(parts[1]) : null;
 
         if (jobResumeId != null && jobResumeFacade != null) {
