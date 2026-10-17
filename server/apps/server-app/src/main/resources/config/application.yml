@@ -36,6 +36,8 @@ info:
   ai:
     copilot:
       enabled: ${bytechef.ai.copilot.enabled}
+    hub:
+      enabled: ${bytechef.ai.hub.enabled:false}
     knowledgeBase:
       enabled: ${bytechef.ai.knowledge-base.enabled:false}
   analytics:
