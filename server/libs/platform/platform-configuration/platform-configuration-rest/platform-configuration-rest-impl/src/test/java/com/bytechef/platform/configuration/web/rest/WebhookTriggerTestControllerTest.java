@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -36,8 +38,10 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Ivica Cardic
@@ -64,6 +68,21 @@ class WebhookTriggerTestControllerTest {
 
         webhookTriggerTestController = new WebhookTriggerTestController(
             mock(EditorTempFileStorage.class), webhookTriggerTestFacade, workflowNodeTestOutputFacade);
+    }
+
+    @Test
+    void testExecuteWorkflowRejectsAnInvalidTenantIdWithBadRequest() {
+        String id = EncodingUtils.base64EncodeToString("bad'id:0:-1:workflow-uuid:trigger_1");
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("POST", "/webhooks/" + id);
+
+        assertThatThrownBy(
+            () -> webhookTriggerTestController.executeWorkflow(id, ENVIRONMENT_ID, mockHttpServletRequest))
+                .isInstanceOfSatisfying(
+                    ResponseStatusException.class,
+                    exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
+
+        verify(webhookTriggerTestFacade, never()).getWebhookTriggerFlags(any());
     }
 
     @Test
