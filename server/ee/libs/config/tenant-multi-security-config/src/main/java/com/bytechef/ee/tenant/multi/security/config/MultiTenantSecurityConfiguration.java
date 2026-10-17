@@ -19,6 +19,7 @@ import com.bytechef.tenant.service.TenantService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * @version ee
@@ -37,10 +38,11 @@ public class MultiTenantSecurityConfiguration {
 
     @Bean
     MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler(
-        TenantService tenantService,
+        RememberMeServices rememberMeServices, TenantService tenantService,
         ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
 
-        return new MultiTenantAuthenticationSuccessHandler(tenantService, twoFactorAuthenticationCustomizerProvider);
+        return new MultiTenantAuthenticationSuccessHandler(rememberMeServices, tenantService,
+            twoFactorAuthenticationCustomizerProvider);
     }
 
     @Bean
