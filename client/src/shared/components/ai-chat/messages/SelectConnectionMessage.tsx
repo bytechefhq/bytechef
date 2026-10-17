@@ -41,7 +41,10 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
         Boolean(connectionDefinition?.version) && currentWorkspaceId != null
     );
 
-    const connections = useMemo(() => existingConnections ?? [], [existingConnections]);
+    const selectableConnections = useMemo(
+        () => (existingConnections ?? []).filter((connection) => connection.id != null && connection.id > 0),
+        [existingConnections]
+    );
 
     useEffect(() => {
         const initialMessageCount = aui.thread.getState().messages.length;
@@ -57,7 +60,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
 
     const handleSelectChange = (value: string) => {
         const connectionId = Number(value);
-        const connection = (existingConnections ?? []).find((candidate) => candidate.id === connectionId);
+        const connection = selectableConnections.find((candidate) => candidate.id === connectionId);
 
         if (!connection || connection.id == null) {
             return;
@@ -83,7 +86,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
         );
     }
 
-    const isEmpty = (existingConnections?.length ?? 0) === 0;
+    const isEmpty = selectableConnections.length === 0;
 
     if (isEmpty) {
         return (
@@ -103,7 +106,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
                 </div>
 
                 <SelectContent>
-                    {connections.map((connection) => (
+                    {selectableConnections.map((connection) => (
                         <SelectItem key={connection.id} value={connection.id!.toString()}>
                             <div className="flex items-center space-x-1">
                                 <span>{connection.name}</span>
