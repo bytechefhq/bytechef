@@ -209,3 +209,41 @@ Fixtures are structured as:
 - **`workflowTest`** - Independent test object with `workflow` fixture (requires project)
 
 All fixtures are independent and can be combined in any order via `mergeTests`.
+
+## MCP Authentication Specs
+
+`tests/mcp/` covers the authentication cases of the management, automation and embedded MCP servers, the A2A
+servers and the built-in OAuth2 authorization server. Each test title starts with the case id posted on its
+ticket (#2197, #6139, #2446, #3213, #6140). The worker-scoped `mcpAuthenticationTest` fixture
+(`fixtures/mcpAuthentication.ts`) creates two workspaces, the servers, API keys, signing keys and connected users
+through the API and deletes them again when the worker ends. OAuth2 tokens are obtained the way an MCP client
+obtains them: dynamic client registration and PKCE over HTTP, sign-in and consent in the browser.
+
+The server must run the Enterprise Edition with the embedded authorization server enabled and its own issuer
+trusted:
+
+```
+BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF=true
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=<public URL>
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
+BYTECHEF_PUBLIC_URL=<public URL>
+```
+
+| Variable                                                     | Default                         | Purpose                                                                     |
+| ------------------------------------------------------------ | ------------------------------- | --------------------------------------------------------------------------- |
+| `PLAYWRIGHT_BASE_URL`                                        | `http://127.0.0.1:5173`         | Where requests are sent                                                     |
+| `BYTECHEF_E2E_PUBLIC_URL`                                    | `PLAYWRIGHT_BASE_URL`           | `BYTECHEF_PUBLIC_URL` of the server; discovery and token audiences name it  |
+| `BYTECHEF_E2E_ADMIN_EMAIL` / `BYTECHEF_E2E_ADMIN_PASSWORD`   | `admin@localhost.com` / `admin` | A tenant admin; on a multi-tenant server use an admin of a tenant           |
+| `BYTECHEF_E2E_EDITOR_EMAIL` / `BYTECHEF_E2E_EDITOR_PASSWORD` | -                               | An `EDITOR` of `BYTECHEF_E2E_MEMBER_WORKSPACE_ID` who is not a tenant admin |
+| `BYTECHEF_E2E_VIEWER_EMAIL` / `BYTECHEF_E2E_VIEWER_PASSWORD` | -                               | A `VIEWER` of `BYTECHEF_E2E_MEMBER_WORKSPACE_ID` who is not a tenant admin  |
+| `BYTECHEF_E2E_MEMBER_WORKSPACE_ID`                           | -                               | Used as workspace W1 when the member variables are set                      |
+
+Without the member variables the cases that need a workspace member are skipped. On a multi-tenant server a
+member signs in only when their login equals their email (#6334). The three audit cases are
+`fixme`: no API exposes the persisted audit events. On a multi-tenant server the API cannot delete OAuth2
+clients, so the clients the run registers stay behind (their grants are revoked).
+
+```bash
+npx playwright test test/playwright/tests/mcp --workers=1
+```
