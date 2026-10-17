@@ -416,7 +416,9 @@ export type A2aProjectWorkflowsByA2aProjectIdQueryVariables = Exact<{
 
 export type A2aProjectWorkflowsByA2aProjectIdQuery = { a2aProjectWorkflowsByA2aProjectId: Array<{ enabled: boolean, id: string, skillDescription: string | null, skillName: string | null, workflowId: string | null, workflowLabel: string | null } | null> | null };
 
-export type A2aProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+export type A2aProjectsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type A2aProjectsQuery = { a2aProjects: Array<{ a2aServerId: string, id: string, projectId: string | null } | null> | null };
@@ -428,12 +430,16 @@ export type A2aProjectsByServerIdQueryVariables = Exact<{
 
 export type A2aProjectsByServerIdQuery = { a2aProjectsByServerId: Array<{ id: string, lastModifiedDate: any, projectDeploymentId: string | null, projectId: string | null, projectVersion: number | null, workflowIds: Array<string> } | null> | null };
 
-export type A2aServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
+export type A2aServerTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type A2aServerTagsQuery = { a2aServerTags: Array<{ id: string, name: string } | null> | null };
 
-export type A2aServersQueryVariables = Exact<{ [key: string]: never; }>;
+export type A2aServersQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, lastModifiedDate: any, name: string, secretKey: string | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
@@ -3671,8 +3677,8 @@ export const useA2aProjectWorkflowsByA2aProjectIdQuery = <
     )};
 
 export const A2aProjectsDocument = new TypedDocumentString(`
-    query a2aProjects {
-  a2aProjects {
+    query a2aProjects($workspaceId: ID!) {
+  a2aProjects(workspaceId: $workspaceId) {
     a2aServerId
     id
     projectId
@@ -3684,13 +3690,13 @@ export const useA2aProjectsQuery = <
       TData = A2aProjectsQuery,
       TError = unknown
     >(
-      variables?: A2aProjectsQueryVariables,
+      variables: A2aProjectsQueryVariables,
       options?: Omit<UseQueryOptions<A2aProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aProjectsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<A2aProjectsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['a2aProjects'] : ['a2aProjects', variables],
+    queryKey: ['a2aProjects', variables],
     queryFn: fetcher<A2aProjectsQuery, A2aProjectsQueryVariables>(A2aProjectsDocument, variables),
     ...options
   }
@@ -3726,8 +3732,8 @@ export const useA2aProjectsByServerIdQuery = <
     )};
 
 export const A2aServerTagsDocument = new TypedDocumentString(`
-    query a2aServerTags {
-  a2aServerTags {
+    query a2aServerTags($workspaceId: ID!) {
+  a2aServerTags(workspaceId: $workspaceId) {
     id
     name
   }
@@ -3738,21 +3744,21 @@ export const useA2aServerTagsQuery = <
       TData = A2aServerTagsQuery,
       TError = unknown
     >(
-      variables?: A2aServerTagsQueryVariables,
+      variables: A2aServerTagsQueryVariables,
       options?: Omit<UseQueryOptions<A2aServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aServerTagsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<A2aServerTagsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['a2aServerTags'] : ['a2aServerTags', variables],
+    queryKey: ['a2aServerTags', variables],
     queryFn: fetcher<A2aServerTagsQuery, A2aServerTagsQueryVariables>(A2aServerTagsDocument, variables),
     ...options
   }
     )};
 
 export const A2aServersDocument = new TypedDocumentString(`
-    query a2aServers {
-  a2aServers {
+    query a2aServers($workspaceId: ID!) {
+  a2aServers(workspaceId: $workspaceId) {
     authenticationRequired
     description
     enabled
@@ -3773,13 +3779,13 @@ export const useA2aServersQuery = <
       TData = A2aServersQuery,
       TError = unknown
     >(
-      variables?: A2aServersQueryVariables,
+      variables: A2aServersQueryVariables,
       options?: Omit<UseQueryOptions<A2aServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<A2aServersQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<A2aServersQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['a2aServers'] : ['a2aServers', variables],
+    queryKey: ['a2aServers', variables],
     queryFn: fetcher<A2aServersQuery, A2aServersQueryVariables>(A2aServersDocument, variables),
     ...options
   }

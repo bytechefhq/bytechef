@@ -24,11 +24,23 @@ const useA2aServers = () => {
         type: tagId ? A2aServersFilterType.Tag : A2aServersFilterType.Project,
     };
 
-    const {data, error: a2aServersError, isLoading: a2aServersIsLoading} = useA2aServersQuery();
+    const {
+        data,
+        error: a2aServersError,
+        isLoading: a2aServersIsLoading,
+    } = useA2aServersQuery({workspaceId: currentWorkspaceId + ''});
 
-    const {data: tagsData, error: tagsError, isLoading: tagsIsLoading} = useA2aServerTagsQuery();
+    const {
+        data: tagsData,
+        error: tagsError,
+        isLoading: tagsIsLoading,
+    } = useA2aServerTagsQuery({
+        workspaceId: currentWorkspaceId + '',
+    });
 
-    const {data: a2aProjectsData, isLoading: a2aProjectsIsLoading} = useA2aProjectsQuery();
+    const {data: a2aProjectsData, isLoading: a2aProjectsIsLoading} = useA2aProjectsQuery({
+        workspaceId: currentWorkspaceId + '',
+    });
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
         apiCollections: false,

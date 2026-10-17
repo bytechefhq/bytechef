@@ -49,6 +49,7 @@ export type A2aServer = {
   name: Scalars['String']['output'];
   secretKey?: Maybe<Scalars['String']['output']>;
   tags?: Maybe<Array<Maybe<Tag>>>;
+  workspaceId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type ActionDefinition = {
@@ -808,6 +809,7 @@ export type CreateA2aServerInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type CreateApiConnectorInput = {
@@ -3156,8 +3158,23 @@ export type QueryA2aProjectWorkflowsByA2aProjectIdArgs = {
 };
 
 
+export type QueryA2aProjectsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryA2aProjectsByServerIdArgs = {
   a2aServerId: Scalars['ID']['input'];
+};
+
+
+export type QueryA2aServerTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryA2aServersArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 

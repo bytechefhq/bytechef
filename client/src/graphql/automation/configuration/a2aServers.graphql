@@ -1,5 +1,5 @@
-query a2aServers {
-    a2aServers {
+query a2aServers($workspaceId: ID!) {
+    a2aServers(workspaceId: $workspaceId) {
         authenticationRequired
         description
         enabled
