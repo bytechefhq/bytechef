@@ -33,17 +33,27 @@ public final class SimpleIntelligentToolDefinition implements IntelligentToolDef
     private final Set<IntelligentToolScope> panelScopes;
     private final Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction;
     private final Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory;
+    private final boolean askCapable;
 
     public SimpleIntelligentToolDefinition(
         String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
         Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction,
         Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory) {
 
+        this(name, agentType, panelScopes, chatClientFactoryFunction, toolCallbackFactory, true);
+    }
+
+    public SimpleIntelligentToolDefinition(
+        String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
+        Function<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoryFunction,
+        Function<IntelligentToolChatClientFactory, ToolCallback> toolCallbackFactory, boolean askCapable) {
+
         this.name = Objects.requireNonNull(name, "name");
         this.agentType = Objects.requireNonNull(agentType, "agentType");
         this.panelScopes = Set.copyOf(Objects.requireNonNull(panelScopes, "panelScopes"));
         this.chatClientFactoryFunction = Objects.requireNonNull(chatClientFactoryFunction, "chatClientFactoryFunction");
         this.toolCallbackFactory = Objects.requireNonNull(toolCallbackFactory, "toolCallbackFactory");
+        this.askCapable = askCapable;
     }
 
     @Override
@@ -70,5 +80,10 @@ public final class SimpleIntelligentToolDefinition implements IntelligentToolDef
     @Override
     public ToolCallback create(IntelligentToolChatClientFactory chatClientFactory) {
         return toolCallbackFactory.apply(chatClientFactory);
+    }
+
+    @Override
+    public boolean askCapable() {
+        return askCapable;
     }
 }

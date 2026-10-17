@@ -81,7 +81,7 @@ class CopilotIntelligentToolContributorConfiguration {
                 "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW, Set.of(IntelligentToolScope.PROJECT),
                 variant -> variant == IntelligentToolVariant.BUILD
                     ? converterBuildFactoryProvider.getIfAvailable() : null,
-                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver)),
+                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver), false),
             new SimpleIntelligentToolDefinition(
                 "configureClusterElement", CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT, Set.of(),
                 variant -> factoryForVariant(
