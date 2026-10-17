@@ -60,6 +60,7 @@ module.exports = {
                         primary: 'hsl(var(--content-neutral-primary))',
                         secondary: 'hsl(var(--content-neutral-secondary))',
                         'secondary-hover': 'hsl(var(--content-neutral-secondary-hover))',
+                        subtle: 'hsl(var(--content-neutral-subtle))',
                         tertiary: 'hsl(var(--content-neutral-tertiary))',
                     },
                     onbrand: 'hsl(var(--content-onbrand))',
@@ -67,6 +68,7 @@ module.exports = {
                         primary: 'hsl(var(--content-onsurface-primary))',
                         secondary: 'hsl(var(--content-onsurface-secondary))',
                     },
+                    ontooltip: 'hsl(var(--content-ontooltip))',
                     onwarning: 'hsl(var(--content-onwarning))',
                     success: {
                         DEFAULT: 'hsl(var(--content-success))',

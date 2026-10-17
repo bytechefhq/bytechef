@@ -286,7 +286,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
 
                                         {data.operationName && (
                                             <pre
-                                                className={twMerge('text-sm', isNestedClusterRoot && 'w-full truncate')}
+                                                className={twMerge(
+                                                    'text-sm text-content-neutral-subtle',
+                                                    isNestedClusterRoot && 'w-full truncate'
+                                                )}
                                             >
                                                 {data.operationName}
                                             </pre>
@@ -427,7 +430,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     {data.operationName && (
                         <pre
                             className={twMerge(
-                                'text-sm',
+                                'text-sm text-content-neutral-subtle',
                                 isClusterElement && 'text-xs',
                                 (isClusterElement || (isHorizontal && isRegularNode)) && 'w-full truncate'
                             )}
