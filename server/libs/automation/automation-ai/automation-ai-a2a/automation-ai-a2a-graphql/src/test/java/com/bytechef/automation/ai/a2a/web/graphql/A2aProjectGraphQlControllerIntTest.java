@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.facade.A2aProjectFacade;
-import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.a2a.web.graphql.config.AutomationA2aGraphQlTestConfiguration;
@@ -69,9 +68,6 @@ class A2aProjectGraphQlControllerIntTest {
     private A2aProjectFacade a2aProjectFacade;
 
     @Autowired
-    private A2aProjectService a2aProjectService;
-
-    @Autowired
     private A2aProjectWorkflowService a2aProjectWorkflowService;
 
     @Autowired
@@ -90,14 +86,14 @@ class A2aProjectGraphQlControllerIntTest {
 
         projectDeployment.setProjectId(42L);
 
-        when(a2aProjectService.getA2aProjects()).thenReturn(
+        when(a2aProjectFacade.getWorkspaceA2aProjects(1L)).thenReturn(
             List.of(createA2aProject(11L, 100L, 7L), createA2aProject(12L, 100L, 8L)));
         when(projectDeploymentService.getProjectDeployment(100L)).thenReturn(projectDeployment);
 
         graphQlTester
             .document("""
                 query {
-                    a2aProjects {
+                    a2aProjects(workspaceId: "1") {
                         a2aServerId
                         id
                         projectId
@@ -124,7 +120,7 @@ class A2aProjectGraphQlControllerIntTest {
         projectDeployment.setProjectId(42L);
         projectDeployment.setProjectVersion(3);
 
-        when(a2aProjectService.getA2aServerA2aProjects(7L)).thenReturn(List.of(createA2aProject(11L, 100L, 7L)));
+        when(a2aProjectFacade.getA2aServerA2aProjects(7L)).thenReturn(List.of(createA2aProject(11L, 100L, 7L)));
         when(projectDeploymentService.getProjectDeployment(100L)).thenReturn(projectDeployment);
 
         graphQlTester
@@ -148,13 +144,13 @@ class A2aProjectGraphQlControllerIntTest {
             .entity(Integer.class)
             .isEqualTo(3);
 
-        verify(a2aProjectService).getA2aServerA2aProjects(7L);
+        verify(a2aProjectFacade).getA2aServerA2aProjects(7L);
     }
 
     @Test
     @WithMockUser
     void testA2aProjectsByServerIdResolvesWorkflowIdsThroughTheDeploymentWorkflows() {
-        when(a2aProjectService.getA2aServerA2aProjects(7L)).thenReturn(List.of(createA2aProject(11L, 100L, 7L)));
+        when(a2aProjectFacade.getA2aServerA2aProjects(7L)).thenReturn(List.of(createA2aProject(11L, 100L, 7L)));
         when(a2aProjectWorkflowService.getA2aProjectA2aProjectWorkflows(11L))
             .thenReturn(List.of(new A2aProjectWorkflow(11L, 201L), new A2aProjectWorkflow(11L, 202L)));
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(201L))
@@ -183,7 +179,7 @@ class A2aProjectGraphQlControllerIntTest {
 
         a2aProject.setId(12L);
 
-        when(a2aProjectService.getA2aServerA2aProjects(7L)).thenReturn(List.of(a2aProject));
+        when(a2aProjectFacade.getA2aServerA2aProjects(7L)).thenReturn(List.of(a2aProject));
 
         graphQlTester
             .document("""
@@ -226,7 +222,7 @@ class A2aProjectGraphQlControllerIntTest {
             .path("a2aProjectsByServerId")
             .valueIsNull();
 
-        verifyNoInteractions(a2aProjectService);
+        verifyNoInteractions(a2aProjectFacade);
     }
 
     @Test

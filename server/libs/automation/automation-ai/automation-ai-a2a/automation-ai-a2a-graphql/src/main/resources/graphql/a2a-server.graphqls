@@ -1,6 +1,6 @@
 extend type Query {
-    a2aServers: [A2aServer]
-    a2aServerTags: [Tag]
+    a2aServers(workspaceId: ID!): [A2aServer]
+    a2aServerTags(workspaceId: ID!): [Tag]
 }
 
 extend type Mutation {
@@ -16,6 +16,7 @@ type A2aServer {
     description: String
     environmentId: ID!
     enabled: Boolean!
+    workspaceId: ID
     authenticationRequired: Boolean!
     secretKey: String
     lastModifiedDate: Long
@@ -27,6 +28,7 @@ input CreateA2aServerInput {
     description: String
     environmentId: ID!
     authenticationRequired: Boolean
+    workspaceId: ID!
 }
 
 input UpdateA2aServerInput {

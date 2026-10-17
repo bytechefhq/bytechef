@@ -54,14 +54,14 @@ public class A2aServerGraphQlController {
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public List<A2aServer> a2aServers() {
-        return a2aServerService.getA2aServers();
+    public List<A2aServer> a2aServers(@Argument long workspaceId) {
+        return a2aServerFacade.getWorkspaceA2aServers(workspaceId);
     }
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public List<Tag> a2aServerTags() {
-        return a2aServerFacade.getA2aServerTags();
+    public List<Tag> a2aServerTags(@Argument long workspaceId) {
+        return a2aServerFacade.getA2aServerTags(workspaceId);
     }
 
     @MutationMapping
@@ -74,34 +74,13 @@ public class A2aServerGraphQlController {
             a2aServer.setAuthenticationRequired(authenticationRequired);
         }
 
-        return a2aServerService.create(a2aServer);
+        return a2aServerFacade.createA2aServer(input.workspaceId(), a2aServer);
     }
 
     @MutationMapping
     public A2aServer updateA2aServer(@Argument long id, @Argument UpdateA2aServerInput input) {
-        A2aServer a2aServer = a2aServerService.getA2aServer(id);
-
-        if (input.name() != null) {
-            a2aServer.setName(input.name());
-        }
-
-        if (input.description() != null) {
-            a2aServer.setDescription(input.description());
-        }
-
-        Boolean enabled = input.enabled();
-
-        if (enabled != null) {
-            a2aServer.setEnabled(enabled);
-        }
-
-        Boolean authenticationRequired = input.authenticationRequired();
-
-        if (authenticationRequired != null) {
-            a2aServer.setAuthenticationRequired(authenticationRequired);
-        }
-
-        return a2aServerService.update(a2aServer);
+        return a2aServerFacade.updateA2aServer(
+            id, input.name(), input.description(), input.enabled(), input.authenticationRequired());
     }
 
     @MutationMapping
@@ -127,7 +106,7 @@ public class A2aServerGraphQlController {
 
     @MutationMapping
     public boolean deleteA2aServer(@Argument long id) {
-        a2aServerService.delete(id);
+        a2aServerFacade.deleteA2aServer(id);
 
         return true;
     }
@@ -159,8 +138,8 @@ public class A2aServerGraphQlController {
     }
 
     public record CreateA2aServerInput(
-        String name, @Nullable String description, long environmentId,
-        @Nullable Boolean authenticationRequired) {
+        String name, @Nullable String description, long environmentId, @Nullable Boolean authenticationRequired,
+        long workspaceId) {
     }
 
     public record UpdateA2aServerInput(
