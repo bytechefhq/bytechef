@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        One flagged AI Hub tool call waiting for (or already resolved by) a person's approval decision. No
+        foreign key to ai_hub_chat - the chat's delete path deletes approvals explicitly, matching how
+        ai_hub_chat_tool rows are cleaned.
+    -->
+    <changeSet id="20260902000002" author="Ivica Cardic">
+        <createTable tableName="ai_hub_tool_approval">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requested_by_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tool_kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tool_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_name" type="VARCHAR(255)"/>
+            <column name="component_version" type="INT"/>
+            <column name="connection_id" type="BIGINT"/>
+            <column name="arguments" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mode" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="llm_provider" type="VARCHAR(255)"/>
+            <column name="llm_model" type="VARCHAR(255)"/>
+            <column name="decided_by_user_id" type="BIGINT"/>
+            <column name="decided_at" type="TIMESTAMP"/>
+            <column name="comment" type="TEXT"/>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_error" type="TEXT"/>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="ai_hub_tool_approval" indexName="idx_ai_hub_tool_approval_chat_status">
+            <column name="chat_id"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
