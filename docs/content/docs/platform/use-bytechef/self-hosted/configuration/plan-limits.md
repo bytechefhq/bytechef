@@ -32,7 +32,7 @@ admission - so the Atlas engine stays limit-agnostic.
 | **Concurrency slots** | A bounded number of concurrently running async jobs per tenant. A slot is taken at admission and released on terminal job status. The rate check runs first, so a rate rejection never leaks a slot. | HTTP **429**. |
 | **Monthly cost cap** | A per-tenant spend ceiling over accumulated execution cost for the calendar month (UTC). Over-cap submissions are rejected unless the tenant's on-demand overage terms admit them. | HTTP **429**. |
 | **Quotas** | `maxWorkspaces`, `maxMembers` (pending invitations hold a seat), and `maxStorageBytes` (tenant-wide asset-file storage). | HTTP **403**, no `Retry-After` - a capacity ceiling is not retryable. |
-| **Run governance windows** | `syncRunTimeout` caps a synchronous run and can only tighten the configured default, never extend it; `asyncRunTimeout` fails over-long async runs; `logRetentionDays` drives execution-history purging. | See [Crash recovery and run governance](/platform/use-bytechef/self-hosted/management/crash-recovery). |
+| **Run governance windows** | `syncRunTimeout` caps a synchronous run and can only tighten the configured default, never extend it; `asyncRunTimeout` fails over-long async runs; `logRetentionDays` drives execution-history purging. | - |
 
 Synchronous submissions that bypass dispatch are deliberately ungated, to avoid leaking concurrency
 slots.
@@ -67,4 +67,3 @@ counter is a no-op when no meter registry is present.
 ## See also
 
 - [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#plan-limits-configuration) - every tier and override variable.
-- [Crash recovery and run governance](/platform/use-bytechef/self-hosted/management/crash-recovery) - the timeout and retention monitors that consume these limits.

@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**45 whole-page** (20 hidden) · **31 partial** pages (7 with a commented-out section)
+**44 whole-page** (20 hidden) · **31 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -89,7 +89,6 @@ Both are reversible and neither deletes anything.
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
-| Crash Recovery | [`/platform/use-bytechef/self-hosted/management/crash-recovery`](/platform/use-bytechef/self-hosted/management/crash-recovery) | CE | visible |
 
 ### Your Account
 
@@ -126,7 +125,7 @@ arriving soon was not helping a reader.
 | [`/platform/automation/build/workflows/workflows`](/platform/automation/build/workflows/workflows) | Multiple triggers; Stream data in bulk; Add Sticky Notes; Canvas Controls; Run, Test, and the Output panel; Test with Chat (**voice half commented out**) | **1 of 6 partly commented out** |
 | [`/platform/automation/data/data-tables`](/platform/automation/data/data-tables) | Storage limits | rendered |
 | [`/platform/automation/data/knowledge-base/add-documents`](/platform/automation/data/knowledge-base/add-documents) | Storage limits | rendered |
-| [`/platform/automation/monitor/workflow-executions`](/platform/automation/monitor/workflow-executions) | What the detail view shows; Retention; Reading executions programmatically | rendered |
+| [`/platform/automation/monitor/workflow-executions`](/platform/automation/monitor/workflow-executions) | What the detail view shows; Reading executions programmatically | rendered |
 | [`/platform/embedded/build/app-events`](/platform/embedded/build/app-events) | Firing an App Event from your application | rendered |
 | [`/platform/embedded/build/integrations`](/platform/embedded/build/integrations) | AI Copilot | rendered |
 | [`/platform/embedded/build/workflows`](/platform/embedded/build/workflows) | AI Copilot | rendered |
@@ -140,8 +139,8 @@ arriving soon was not helping a reader.
 | [`/platform/settings/notifications`](/platform/settings/notifications) | Delivery types | rendered |
 | [`/platform/settings/workspaces`](/platform/settings/workspaces) | Edit, manage members, or delete | rendered |
 | [`/platform/use-bytechef/self-hosted/architecture`](/platform/use-bytechef/self-hosted/architecture) | AI & Agents | **3 of 6 commented out** |
-| [`/platform/use-bytechef/self-hosted/configuration`](/platform/use-bytechef/self-hosted/configuration) | Rotation; Data retention | rendered |
-| [`/platform/use-bytechef/self-hosted/configuration/environment-variables`](/platform/use-bytechef/self-hosted/configuration/environment-variables) | AI Copilot Configuration; AI Brave Configuration; **AI Gateway Configuration**; AI Hub Configuration; AI Knowledge Base Configuration; AI MCP Server Configuration; Approval Configuration; **Context Store Configuration**; Component Configuration; Data Table Configuration; OAuth2 Configuration; Plan Limits Configuration; Execution Recovery; Code Workflow | **2 of 16 commented out** |
+| [`/platform/use-bytechef/self-hosted/configuration`](/platform/use-bytechef/self-hosted/configuration) | Rotation | rendered |
+| [`/platform/use-bytechef/self-hosted/configuration/environment-variables`](/platform/use-bytechef/self-hosted/configuration/environment-variables) | AI Copilot Configuration; AI Brave Configuration; **AI Gateway Configuration**; AI Hub Configuration; AI Knowledge Base Configuration; AI MCP Server Configuration; Approval Configuration; **Context Store Configuration**; Component Configuration; Data Table Configuration; OAuth2 Configuration; Plan Limits Configuration; Code Workflow | **2 of 15 commented out** |
 | [`/platform/use-bytechef/self-hosted/management/observability`](/platform/use-bytechef/self-hosted/management/observability) | **Datadog and Splunk (direct OTLP)** | **all commented out** |
 | [`/platform/your-account/profile`](/platform/your-account/profile) | Two-Factor Authentication; Linked Accounts | rendered |
 
