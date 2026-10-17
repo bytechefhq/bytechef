@@ -237,7 +237,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
                                 <WorkflowExecutionsTable className="p-0" workflowExecutions={workflowExecutions} />
                             ) : (
                                 <EmptyList
-                                    icon={<ActivityIcon className="size-24 text-gray-300" />}
+                                    icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
                                     message="This workflow has not been executed in this deployment yet."
                                     title="No Executions"
                                 />

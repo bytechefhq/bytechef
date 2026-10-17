@@ -97,7 +97,7 @@ export default function ApprovalTaskDetail() {
 
                                 <SelectItem value="in-progress">
                                     <div className="flex items-center gap-2">
-                                        <ClockIcon className="size-4 text-blue-500" />
+                                        <ClockIcon className="size-4 text-content-brand-primary" />
                                         In Progress
                                     </div>
                                 </SelectItem>

@@ -99,22 +99,22 @@ export const getStatusIcon = (status: string): ReactNode => {
         case 'completed':
             return <CheckCircle2Icon className="size-4 text-green-500" />;
         case 'in-progress':
-            return <ClockIcon className="size-4 text-blue-500" />;
+            return <ClockIcon className="size-4 text-content-brand-primary" />;
         default:
-            return <CircleIcon className="size-4 text-gray-400" />;
+            return <CircleIcon className="size-4 text-content-neutral-tertiary" />;
     }
 };
 
 export const getPriorityColor = (priority: string): string => {
     switch (priority) {
         case 'high':
-            return 'bg-red-100 text-red-800 border-red-200';
+            return 'bg-surface-destructive-secondary text-red-800 border-red-200';
         case 'medium':
             return 'bg-yellow-100 text-yellow-800 border-yellow-200';
         case 'low':
-            return 'bg-green-100 text-green-800 border-green-200';
+            return 'bg-surface-success-secondary text-green-800 border-green-200';
         default:
-            return 'bg-gray-100 text-gray-800 border-gray-200';
+            return 'bg-surface-neutral-secondary text-gray-800 border-stroke-neutral-secondary';
     }
 };
 
