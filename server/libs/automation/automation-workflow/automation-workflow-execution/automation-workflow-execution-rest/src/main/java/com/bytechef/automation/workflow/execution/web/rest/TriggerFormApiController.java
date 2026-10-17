@@ -24,10 +24,12 @@ import com.bytechef.automation.workflow.execution.web.rest.model.TriggerFormMode
 import com.bytechef.commons.util.HtmlSanitizerUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -43,6 +45,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
 public class TriggerFormApiController implements TriggerFormApi {
+
+    private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final ConversionService conversionService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -68,12 +72,31 @@ public class TriggerFormApiController implements TriggerFormApi {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, e);
         }
 
-        String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+        String tenantId = workflowExecutionId.getTenantId();
 
-        Workflow workflow = workflowService.getWorkflow(workflowId);
+        if (!TENANT_ID_PATTERN.matcher(tenantId)
+            .matches()) {
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id);
+        }
+
+        String previousTenantId = TenantContext.getCurrentTenantId();
+
+        String workflowId;
+        List<WorkflowTrigger> workflowTriggers;
+
+        TenantContext.setCurrentTenantId(tenantId);
+
+        try {
+            workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            workflowTriggers = WorkflowTrigger.of(workflow);
+        } finally {
+            TenantContext.setCurrentTenantId(previousTenantId);
+        }
 
         Map<String, Object> parameters = getParameters(workflowExecutionId, workflowId, workflowTriggers);
 
