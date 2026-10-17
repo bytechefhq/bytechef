@@ -30,12 +30,13 @@ import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowEditorStore, {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import {getDisabledNodeReferences} from '../utils/getDisabledNodeReferences';
 import {getTask} from '../utils/getTask';
 import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
+import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import handleDeleteTrigger from '../utils/handleDeleteTrigger';
 import pasteNode from '../utils/pasteNode';
@@ -46,10 +47,18 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
+import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
 type EffectiveDirectionType = Parameters<typeof mapHandlePosition>[1];
 type NodePositionType = {x: number; y: number} | undefined;
 
+/**
+ * Advisory tooltip for a node whose parameters reference a disabled node. Deliberately names the
+ * cause rather than a runtime outcome: a bare `${disabledName}` resolves to null, while
+ * `${disabledName.field}` is left as the raw expression string (SpEL cannot read a property off
+ * null and the evaluator returns the value unchanged), so "will resolve to null" would be wrong
+ * for half the cases.
+ */
 function getDisabledReferenceWarning(referencedDisabledNames: Array<string>): string {
     if (referencedDisabledNames.length > 1) {
         return `References disabled nodes ${referencedDisabledNames.join(', ')} — they will not run, so this value will not resolve`;
@@ -57,6 +66,7 @@ function getDisabledReferenceWarning(referencedDisabledNames: Array<string>): st
 
     return `References disabled node ${referencedDisabledNames[0]} — it will not run, so this value will not resolve`;
 }
+
 
 interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> {
     clusterElementTypesCount: number;
@@ -90,6 +100,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     setRenameValue: (value: string) => void;
     setSwitchPopoverOpen: (open: boolean) => void;
     switchPopoverOpen: boolean;
+    testNodeState?: WorkflowTestNodeStateI;
     workflowNodeDetailsPanelOpen: boolean;
 }
 
@@ -127,6 +138,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             setRenameValue,
             setSwitchPopoverOpen,
             switchPopoverOpen,
+            testNodeState,
             workflowNodeDetailsPanelOpen,
             ...rest
         },
@@ -212,7 +224,17 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                     !hasSavedClusterElementPosition &&
                                     'border-dashed',
                                 isDropzoneActive &&
-                                    'border-surface-brand-secondary-hover bg-surface-brand-secondary-hover hover:bg-surface-brand-secondary-hover'
+                                    'border-surface-brand-secondary-hover bg-surface-brand-secondary-hover hover:bg-surface-brand-secondary-hover',
+                                testNodeState && 'relative',
+                                getTestNodeStateBorderClassName(testNodeState),
+                                // Last, so it wins the twMerge conflict against the test-run border above:
+                                // a node that has been run keeps a status colour for the rest of the
+                                // session, and while selected the selection is what the border has to
+                                // say. The status is still on the badge in the corner, which nothing here
+                                // touches.
+                                isSelected &&
+                                    workflowNodeDetailsPanelOpen &&
+                                    'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary'
                             )}
                             data-dropzone-active={isDropzoneActive || undefined}
                             data-node-box
@@ -225,6 +247,8 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                       : undefined
                             }
                         >
+                            {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+
                             <div
                                 className={twMerge(
                                     (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4',
@@ -475,6 +499,26 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         style={effectiveDirection === 'TB' ? {left: '36px'} : undefined}
                         type="source"
                     />
+
+                    {/* Hidden anchors for `graphTransition` overlay edges — used when this node
+                        is a graph lane's first task (the lane's entry point). Kept separate from
+                        the default (id-less) handles above so the overlay edge never binds to the
+                        same connection point as the structural lane-chain edge. */}
+                    <Handle
+                        className={styles.handle}
+                        id={`${id}-graph-transition-target`}
+                        isConnectable={false}
+                        position={Position.Top}
+                        type="target"
+                    />
+
+                    <Handle
+                        className={styles.handle}
+                        id={`${id}-graph-transition-source`}
+                        isConnectable={false}
+                        position={Position.Bottom}
+                        type="source"
+                    />
                 </>
             )}
 
@@ -536,6 +580,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setCopiedWorkflowId,
         setRenamingNodeName,
         setRootClusterElementNodeData,
+        workflowTestNodeStates,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
@@ -549,6 +594,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             setCopiedWorkflowId: state.setCopiedWorkflowId,
             setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            workflowTestNodeStates: state.workflowTestNodeStates,
         }))
     );
 
@@ -956,6 +1002,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setRenameValue,
         setSwitchPopoverOpen,
         switchPopoverOpen,
+        testNodeState: workflowTestNodeStates[data.workflowNodeName],
         workflowNodeDetailsPanelOpen,
     } satisfies WorkflowNodeContentProps;
 
