@@ -19,7 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
-import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -61,7 +61,10 @@ public class ManagementMcpServerConfiguration {
             writeScript, authorSkill, debugWorkflowExecution, configureMcpServer) run an inner AI agent and \
             may take minutes — call them for judgment work, not for CRUD.
             To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
-            the workflowId and a plain-language instruction. To import an external workflow (n8n, Make, \
+            the workflowId and a plain-language instruction. createProjectWorkflow creates an EMPTY workflow \
+            (manual trigger, no tasks) from a name and description; no tool writes a whole workflow definition \
+            directly - buildWorkflow and importWorkflow are the only ways to author content. To import an \
+            external workflow (n8n, Make, \
             Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
             workflowId and the source definition — it has no project/workflow-creation tools of its own. \
             Each intelligent-tool call is independent and re-reads current state (e.g. the workflow) rather \
@@ -89,7 +92,7 @@ public class ManagementMcpServerConfiguration {
 
     private final ComponentTools componentTools;
     private final ProjectTools projectTools;
-    private final ProjectWorkflowTools projectWorkflowTools;
+    private final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools;
     private final TaskTools taskTools;
     private final TaskDispatcherTools taskDispatcherTools;
     private final ScriptTools scriptTools;
@@ -99,14 +102,15 @@ public class ManagementMcpServerConfiguration {
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools,
+        ComponentTools componentTools, ProjectTools projectTools,
+        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
         ClusterElementTools clusterElementTools, WorkspaceTools workspaceTools,
         List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors) {
 
         this.componentTools = componentTools;
         this.projectTools = projectTools;
-        this.projectWorkflowTools = projectWorkflowTools;
+        this.projectWorkflowLifecycleTools = projectWorkflowLifecycleTools;
         this.taskTools = taskTools;
         this.taskDispatcherTools = taskDispatcherTools;
         this.scriptTools = scriptTools;
@@ -151,7 +155,7 @@ public class ManagementMcpServerConfiguration {
 
     ToolCallbackProvider toolCallbackProvider() {
         List<Object> tools = List.of(
-            projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
+            projectTools, projectWorkflowLifecycleTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
             clusterElementTools, workspaceTools);
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(List.of(ToolCallbacks.from(tools.toArray())));
