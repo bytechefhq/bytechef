@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLoader;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
 import java.util.List;
@@ -87,6 +88,11 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
                             actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)));
             },
             OpenApiComponentHandler.class);
+    }
+
+    @Override
+    public ComponentHandlerLoaderKind getKind() {
+        return ComponentHandlerLoaderKind.OPEN_API;
     }
 
     @Override
