@@ -9,9 +9,11 @@ package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.security.sso.SsoTenantUserResolver;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,6 +23,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
@@ -36,6 +40,7 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
 
     private final IdentityProviderService identityProviderService;
     private final RememberMeServices rememberMeServices;
+    private final SsoTenantUserResolver ssoTenantUserResolver;
     private final TenantService tenantService;
     private final UserService userService;
 
@@ -46,6 +51,7 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
 
         this.identityProviderService = identityProviderService;
         this.rememberMeServices = rememberMeServices;
+        this.ssoTenantUserResolver = new SsoTenantUserResolver(tenantService, userService);
         this.tenantService = tenantService;
         this.userService = userService;
     }
@@ -85,24 +91,36 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
                 email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), autoProvision,
                 defaultAuthority);
         } catch (IllegalStateException illegalStateException) {
-            rejectUnprovisionedLogin(request, response);
+            rejectSignIn(request, response);
 
             return;
         }
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(email);
+        Optional<TenantUser> optionalTenantUser = ssoTenantUserResolver.resolveTenantUser(
+            email, authentication.getAuthorities());
 
-        HttpSession session = request.getSession();
+        if (optionalTenantUser.isEmpty()) {
+            rejectSignIn(request, response);
 
-        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantIds.getFirst());
+            return;
+        }
 
-        rememberMeServices.loginSuccess(request, response, authentication);
+        TenantUser tenantUser = optionalTenantUser.get();
+
+        if (tenantService.isMultiTenantEnabled()) {
+            HttpSession session = request.getSession();
+
+            session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantUser.getTenantId());
+        }
+
+        rememberMeServices.loginSuccess(
+            request, response,
+            UsernamePasswordAuthenticationToken.authenticated(tenantUser, null, authentication.getAuthorities()));
 
         response.sendRedirect("/oauth2/redirect");
     }
 
-    private void rejectUnprovisionedLogin(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
+    private void rejectSignIn(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         rememberMeServices.loginFail(request, response);
 

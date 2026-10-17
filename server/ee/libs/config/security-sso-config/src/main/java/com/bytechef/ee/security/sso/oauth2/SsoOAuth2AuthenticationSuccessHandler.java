@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.security.sso.oauth2;
 
-import com.bytechef.security.web.oauth2.CustomOAuth2User;
+import com.bytechef.ee.security.sso.SsoTenantUserResolver;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -15,10 +17,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
-import org.apache.commons.validator.routines.EmailValidator;
+import java.util.Optional;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 
@@ -30,13 +35,15 @@ import org.springframework.security.web.authentication.RememberMeServices;
 public class SsoOAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final RememberMeServices rememberMeServices;
+    private final SsoTenantUserResolver ssoTenantUserResolver;
     private final TenantService tenantService;
 
     @SuppressFBWarnings("EI")
     public SsoOAuth2AuthenticationSuccessHandler(
-        RememberMeServices rememberMeServices, TenantService tenantService) {
+        RememberMeServices rememberMeServices, TenantService tenantService, UserService userService) {
 
         this.rememberMeServices = rememberMeServices;
+        this.ssoTenantUserResolver = new SsoTenantUserResolver(tenantService, userService);
         this.tenantService = tenantService;
     }
 
@@ -45,22 +52,55 @@ public class SsoOAuth2AuthenticationSuccessHandler implements AuthenticationSucc
         HttpServletRequest request, HttpServletResponse response, Authentication authentication)
         throws IOException {
 
-        CustomOAuth2User oAuth2User = (CustomOAuth2User) Objects.requireNonNull(
-            authentication.getPrincipal(), "principal");
+        OAuth2User oAuth2User = (OAuth2User) Objects.requireNonNull(authentication.getPrincipal(), "principal");
 
-        String login = oAuth2User.getName();
+        Optional<TenantUser> optionalTenantUser = ssoTenantUserResolver.resolveTenantUser(
+            getIdentifier(oAuth2User), authentication.getAuthorities());
 
-        List<String> tenantIds = EmailValidator.getInstance()
-            .isValid(login)
-                ? tenantService.getTenantIdsByUserEmail(login)
-                : tenantService.getTenantIdsByUserLogin(login);
+        if (optionalTenantUser.isEmpty()) {
+            rejectSignIn(request, response);
 
-        HttpSession session = request.getSession();
+            return;
+        }
 
-        session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantIds.getFirst());
+        TenantUser tenantUser = optionalTenantUser.get();
 
-        rememberMeServices.loginSuccess(request, response, authentication);
+        if (tenantService.isMultiTenantEnabled()) {
+            HttpSession session = request.getSession();
+
+            session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantUser.getTenantId());
+        }
+
+        rememberMeServices.loginSuccess(
+            request, response,
+            UsernamePasswordAuthenticationToken.authenticated(tenantUser, null, authentication.getAuthorities()));
 
         response.sendRedirect("/oauth2/redirect");
+    }
+
+    private static String getIdentifier(OAuth2User oAuth2User) {
+        if (oAuth2User instanceof OidcUser oidcUser && oidcUser.getEmail() != null) {
+            return oidcUser.getEmail();
+        }
+
+        if (oAuth2User.getAttribute("email") instanceof String email) {
+            return email;
+        }
+
+        return oAuth2User.getName();
+    }
+
+    private void rejectSignIn(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        rememberMeServices.loginFail(request, response);
+
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        response.sendRedirect("/login?error=oauth2");
     }
 }
