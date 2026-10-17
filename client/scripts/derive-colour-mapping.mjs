@@ -313,10 +313,6 @@ const CANDIDATE_TOKEN_GROUPS = {
  * nothing.
  */
 const MANUAL_RESOLUTIONS = {
-    'bg-black': {
-        reason: '`VoiceModeLayout.tsx:114` — `bg-black text-white` is a deliberately dark stage for voice mode. It is dark in both themes by design, so it must not follow the active theme.',
-        set: 'E',
-    },
     'bg-black/80': {
         reason: '`DialogLoader.tsx` overlay scrim. Same reasoning as `bg-black/50`.',
         set: 'E',
@@ -325,35 +321,12 @@ const MANUAL_RESOLUTIONS = {
         reason: 'Both sites are identity colours: one entry of the `SKILL_COLORS` avatar palette in `getSkillColor.ts`, and the `Generation` span type in `SpanWaterfall.tsx`. Sibling entries are purple/pink/teal, which have no tokens at all — theming one member of a categorical palette would break the set.',
         set: 'E',
     },
-    'bg-emerald-400': {
-        reason: '`VoiceModeLayout.tsx` voice-orb ring on the deliberately dark stage. Part of the same un-themed surface as `bg-black`.',
-        set: 'E',
-    },
-    'bg-emerald-600': {
-        reason: '`VoiceModeLayout.tsx` voice-orb ring and connect button on the deliberately dark stage.',
-        set: 'E',
-    },
-    'bg-gray-400': {
-        crossFamilyNote:
-            'ACCEPTED — see set C. A `size-4 rounded-full` loading dot is a foreground mark that happens to be painted with background-color.',
-        family: 'content',
-        reason: '12 of 14 are `size-4 rounded-full` loading dots (`LoadingDots.tsx`, `DialogLoader.tsx`, `LazyLoadWrapper.tsx`). The class writes background-color, but a loading dot IS the foreground mark, so its role is content and it takes `--content-neutral-tertiary` — an exact match a same-family rule would have reported as 20 points of drift. SITE EXCEPTION: the 2 occurrences in `SpanWaterfall.tsx` are the `Span` entry of SPAN_TYPE_COLORS, a categorical identity colour; leave those literal.',
-        set: 'C',
-    },
-    'bg-gray-600': {
-        reason: '`VoiceModeLayout.tsx` idle voice-orb ring on the deliberately dark stage.',
-        set: 'E',
-    },
     'bg-orange-500': {
         reason: 'Identity colours only: a `SKILL_COLORS` avatar entry and the `ToolCall` span type in `SpanWaterfall.tsx`.',
         set: 'E',
     },
     'bg-slate-100': {
         reason: '`AiHubChatComposer.tsx` — the `task` kind badge. One member of a categorical badge palette whose siblings have no token counterpart.',
-        set: 'E',
-    },
-    'bg-slate-200': {
-        reason: '`Appearance.tsx` theme preview swatch (the Light card). Preview swatches must stay literal, otherwise every card renders in the active theme and the picker shows the same thing three times.',
         set: 'E',
     },
     'bg-slate-400': {
@@ -368,36 +341,13 @@ const MANUAL_RESOLUTIONS = {
         reason: '`Appearance.tsx` theme preview swatch (the Dark card backdrop). Must stay literal.',
         set: 'E',
     },
-    'bg-teal-500': {
-        reason: 'A `SKILL_COLORS` avatar entry in `getSkillColor.ts`. Categorical identity colour.',
-        set: 'E',
-    },
-    'bg-yellow-500': {
-        crossFamilyNote:
-            'Rejected. `AiGatewayDashboard.tsx` budget progress-bar fill — a filled region, which is exactly what the surface family is for. The content match is a lightness coincidence.',
-    },
-    'border-emerald-500/40': {
-        reason: '`VoiceModeLayout.tsx` status-chip border on the deliberately dark stage.',
-        set: 'E',
-    },
     'dark:text-black': {
         reason: 'A `@apply dark:text-black` rule in the vendored `CreatableSelect.css`. Already a hand-rolled dark override on third-party markup; it belongs to whoever owns that vendored widget.',
-        set: 'E',
-    },
-    'hover:bg-emerald-500': {
-        reason: '`VoiceModeLayout.tsx` connect-button hover on the deliberately dark stage.',
         set: 'E',
     },
     'text-blue-700': {
         crossFamilyNote:
             'Rejected. Text inside `bg-blue-50` alerts and the selected CadencePicker card. Body text on a filled chip.',
-    },
-    'text-emerald-400': {
-        reason: '`VoiceModeLayout.tsx` status-chip label on the deliberately dark stage.',
-        set: 'E',
-    },
-    'text-emerald-900': {
-        crossFamilyNote: 'Rejected. Badge text on a `bg-emerald-100` chip in the gateway experiment/dataset views.',
     },
     'text-green-800': {
         crossFamilyNote:
@@ -409,10 +359,6 @@ const MANUAL_RESOLUTIONS = {
     },
     'text-red-800': {
         crossFamilyNote: 'Rejected. Status and method badge text on a `bg-red-100` chip. Same shape as text-green-800.',
-    },
-    'text-slate-700': {
-        reason: '`AiHubChatComposer.tsx` — the `task` kind badge label, paired with `bg-slate-100`.',
-        set: 'E',
     },
     'text-white': {
         family: 'content',
@@ -490,35 +436,6 @@ const SITE_RESOLUTIONS = [];
  */
 const EXCEPTION_SITES = [
     {
-        path: 'src/pages/automation/ai-hub/composer/AiHubChatComposer.tsx',
-        ranges: [
-            {
-                end: 51,
-                expect: [
-                    'const KIND_BADGE_CLASSES',
-                    "apiCollection: 'bg-pink-100",
-                    "workflowExecution: 'bg-orange-100",
-                ],
-                start: 43,
-            },
-        ],
-        reason: 'KIND_BADGE_CLASSES — the resource-kind badge palette. Its 8 members are pink/green/blue/purple/cyan/slate/amber/orange; `bg-slate-100 text-slate-700` and the pink/purple/cyan members have no token counterpart, so theming the other four would leave a half-themed set. The ordinary `bg-red-100` and `bg-blue-50` badges elsewhere in this file are NOT covered.',
-    },
-    {
-        path: 'src/pages/automation/ai/gateway/components/traces/AiObservabilityTraceDetail.tsx',
-        ranges: [
-            {
-                end: 49,
-                expect: ['const SPAN_TYPE_CLASSES', 'const TRACE_STATUS_CLASSES', "ERROR: 'bg-red-100 text-red-800'"],
-                start: 38,
-            },
-            {end: 120, expect: ['SPAN_TYPE_CLASSES[span.type]'], start: 120},
-            {end: 142, expect: ["span.status === 'COMPLETED'", "'bg-blue-100 text-blue-800'"], start: 138},
-            {end: 505, expect: ['TRACE_STATUS_CLASSES[trace.status]'], start: 505},
-        ],
-        reason: "SPAN_TYPE_CLASSES and TRACE_STATUS_CLASSES, plus the inline `|| 'bg-gray-100 text-gray-800'` fallbacks and the status ternary that repeat the same strings. This is the same span-type semantic that makes `SpanWaterfall.tsx` a whole-file exception. The `hover:bg-green-50` / `hover:bg-red-50` buttons elsewhere in this file are NOT covered.",
-    },
-    {
         path: 'src/ee/pages/settings/platform/api-connectors/utils/httpMethod-utils.ts',
         ranges: [
             {
@@ -526,7 +443,7 @@ const EXCEPTION_SITES = [
                 expect: [
                     'getHttpMethodBadgeColor',
                     'case HttpMethod.Patch:',
-                    "return 'text-orange-700 dark:text-orange-400';",
+                    "return 'text-orange-700';",
                 ],
                 start: 7,
             },
@@ -541,7 +458,7 @@ const EXCEPTION_SITES = [
                 expect: [
                     'const httpMethodStyles',
                     "case 'PATCH':",
-                    "textColor: 'text-orange-700 dark:text-orange-400',",
+                    "textColor: 'text-orange-700',",
                 ],
                 start: 29,
             },
@@ -556,28 +473,12 @@ const EXCEPTION_SITES = [
                 expect: [
                     'const httpMethodStyles',
                     "case 'PATCH':",
-                    "textColor: 'text-orange-700 dark:text-orange-400',",
+                    "textColor: 'text-orange-700',",
                 ],
                 start: 106,
             },
         ],
         reason: 'Same HTTP-method identity map, third copy (API Collections endpoint list). Same PUT/PATCH collision if PATCH migrated; same `dark:text-orange-400` completion applied here too.',
-    },
-    {
-        path: 'src/pages/automation/connections/components/ConnectionScopeBadge.tsx',
-        ranges: [
-            {
-                end: 35,
-                expect: [
-                    "const VISIBILITY_CONFIG",
-                    "className: 'text-purple-500 dark:text-purple-400'",
-                    "className: 'text-gray-500 dark:text-gray-400'",
-                    "className: 'text-green-500 dark:text-green-400'",
-                ],
-                start: 13,
-            },
-        ],
-        reason: "VISIBILITY_CONFIG's three-member connection-scope identity map. ORGANIZATION's `text-purple-500` has no token counterpart (set E) and must stay literal; migrating PRIVATE/WORKSPACE alone would leave the set half-themed — in light mode the un-migrated purple sits roughly 30 lightness points brighter than its now-tokenised siblings, which is the same half-themed-set hazard KIND_BADGE_CLASSES and SPAN_TYPE_CLASSES exist to prevent. All three members left literal.",
     },
 ];
 
