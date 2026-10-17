@@ -33,11 +33,15 @@ import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matija Petanjek
  */
 public class NotificationJobStatusApplicationEventListener implements ApplicationEventListener {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationJobStatusApplicationEventListener.class);
 
     private final @Nullable JobExecutionCounter jobExecutionCounter;
     private final JobService jobService;
@@ -87,7 +91,13 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
                 NotificationHandler notificationHandler = notificationHandlerRegistry.getNotificationHandler(
                     eventType, notification.getType());
 
-                notificationSender.send(notification, notificationHandler, notificationHandlerContext);
+                try {
+                    notificationSender.send(notification, notificationHandler, notificationHandlerContext);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Notification id={} of type {} could not be sent for job id={}", notification.getId(),
+                        notification.getType(), job.getId(), exception);
+                }
             }
         }
     }
