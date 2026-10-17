@@ -30,6 +30,8 @@ public interface ApprovalTaskRepository extends CrudRepository<ApprovalTask, Lon
 
     List<ApprovalTask> findAllByEnvironment(int environment);
 
+    List<ApprovalTask> findAllByStatusIn(List<Integer> statuses);
+
     Optional<ApprovalTask> findByJobResumeId(String jobResumeId);
 
     Optional<ApprovalTask> findByNameIgnoreCase(String name);

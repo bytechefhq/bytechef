@@ -69,6 +69,16 @@ public class RemoteApprovalTaskServiceClient implements ApprovalTaskService {
     }
 
     @Override
+    public List<ApprovalTask> getUnresolvedApprovalTasks() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ApprovalTask resolve(ApprovalTask approvalTask) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ApprovalTask update(ApprovalTask approvalTask) {
         throw new UnsupportedOperationException();
     }
