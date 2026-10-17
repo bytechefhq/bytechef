@@ -36,6 +36,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +47,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -145,6 +147,9 @@ public final class TaskExecution
     @Column
     private int progress;
 
+    @Transient
+    private Set<String> removedMetadataKeys = Set.of();
+
     @Column("retry_attempts")
     private int retryAttempts;
 
@@ -165,6 +170,9 @@ public final class TaskExecution
 
     @Column("workflow_task")
     private WorkflowTask workflowTask;
+
+    @Version
+    private int version;
 
     @Transient
     private transient boolean handled;
@@ -335,6 +343,14 @@ public final class TaskExecution
         return Collections.unmodifiableMap(metadata.getMap());
     }
 
+    /**
+     * Returns the metadata keys removed with {@link #removeMetadata(String)}, so that a save of a stale copy can drop
+     * them from the stored metadata instead of restoring them.
+     */
+    public Set<String> getRemovedMetadataKeys() {
+        return removedMetadataKeys;
+    }
+
     @JsonIgnore
     public String getName() {
         return workflowTask.getName();
@@ -447,6 +463,10 @@ public final class TaskExecution
         return taskNumber;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     @JsonIgnore
     public String getTimeout() {
         return workflowTask.getTimeout();
@@ -471,6 +491,30 @@ public final class TaskExecution
         map.put(key, value);
 
         metadata = new MapWrapper(map);
+
+        if (removedMetadataKeys.contains(key)) {
+            Set<String> keys = new HashSet<>(removedMetadataKeys);
+
+            keys.remove(key);
+
+            removedMetadataKeys = Set.copyOf(keys);
+        }
+
+        return this;
+    }
+
+    public TaskExecution removeMetadata(String key) {
+        Map<String, Object> map = new HashMap<>(metadata.getMap());
+
+        map.remove(key);
+
+        metadata = new MapWrapper(map);
+
+        Set<String> keys = new HashSet<>(removedMetadataKeys);
+
+        keys.add(key);
+
+        removedMetadataKeys = Set.copyOf(keys);
 
         return this;
     }
@@ -551,8 +595,16 @@ public final class TaskExecution
         this.status = status.ordinal();
     }
 
+    public void setRemovedMetadataKeys(Set<String> removedMetadataKeys) {
+        this.removedMetadataKeys = removedMetadataKeys == null ? Set.of() : Set.copyOf(removedMetadataKeys);
+    }
+
     public void setTaskNumber(int taskNumber) {
         this.taskNumber = taskNumber;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public boolean isHandled() {
@@ -591,7 +643,8 @@ public final class TaskExecution
             + createdBy + '\'' + ", createdDate="
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + '}';
+            + lastModifiedDate + ", version="
+            + version + '}';
     }
 
     @SuppressFBWarnings("EI")

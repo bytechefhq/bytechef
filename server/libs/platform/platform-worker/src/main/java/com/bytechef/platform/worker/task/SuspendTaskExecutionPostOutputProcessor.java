@@ -23,7 +23,6 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -63,12 +62,10 @@ public class SuspendTaskExecutionPostOutputProcessor implements TaskExecutionPos
 
             taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
         } else {
-            Map<String, ?> metadata = new HashMap<>(taskExecution.getMetadata());
+            Map<String, ?> metadata = taskExecution.getMetadata();
 
             if (metadata.containsKey(MetadataConstants.JOB_RESUME_ID)) {
-                metadata.remove(MetadataConstants.JOB_RESUME_ID);
-
-                taskExecution.setMetadata(metadata);
+                taskExecution.removeMetadata(MetadataConstants.JOB_RESUME_ID);
             }
         }
 
