@@ -11,7 +11,7 @@ import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
 export const formSchema = z.object({
-    email: z.string().email().min(5, 'Email is required').max(254),
+    email: z.email().min(5, 'Email is required').max(191),
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Second name is required'),
 });
