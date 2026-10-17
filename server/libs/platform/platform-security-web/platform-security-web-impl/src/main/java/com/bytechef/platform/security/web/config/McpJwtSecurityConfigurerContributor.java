@@ -22,10 +22,13 @@ import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
 import com.bytechef.platform.security.web.mcp.oauth2.TenantAwareJwtAuthenticationFilter;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,22 +39,27 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Configuration
 public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
+    private final AuthorityService authorityService;
     private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider;
+    private final @Nullable String publicUrl;
     private final ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider;
     private final UserService userService;
 
     @SuppressFBWarnings("EI2")
     public McpJwtSecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        ObjectProvider<McpEndpoint> mcpEndpointProvider,
+        AuthorityService authorityService, ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
-        ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
+        ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider,
+        @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
 
+        this.authorityService = authorityService;
         this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifierProvider = mcpServerSecretVerifierProvider;
+        this.publicUrl = publicUrl;
         this.selfIssuedTokenRevocationCheckerProvider = selfIssuedTokenRevocationCheckerProvider;
         this.userService = userService;
     }
@@ -80,10 +88,10 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
         return (T) new McpJwtSecurityConfigurer(
             new TenantAwareJwtAuthenticationFilter(
                 new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
-                mcpEndpoints,
+                authorityService, mcpEndpoints,
                 mcpServerSecretVerifierProvider.orderedStream()
                     .toList(),
-                selfIssuedTokenRevocationChecker));
+                selfIssuedTokenRevocationChecker, publicUrl));
     }
 
     private boolean hasSelfIssuer() {

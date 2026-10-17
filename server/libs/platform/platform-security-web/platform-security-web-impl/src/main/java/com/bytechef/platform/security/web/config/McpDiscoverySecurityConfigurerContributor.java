@@ -25,7 +25,9 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -39,16 +41,18 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
     private final ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider;
     private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
+    private final @Nullable String publicUrl;
 
     @SuppressFBWarnings("EI2")
     public McpDiscoverySecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties,
         ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider,
-        ObjectProvider<McpEndpoint> mcpEndpointProvider) {
+        ObjectProvider<McpEndpoint> mcpEndpointProvider, @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
 
         this.mcpAuthenticationRequiredResolverProvider = mcpAuthenticationRequiredResolverProvider;
         this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -63,15 +67,17 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
             return (T) new DisabledMcpOAuth2ResourceServerConfigurer();
         }
 
+        McpEndpointRequestMatcher mcpEndpointRequestMatcher = new McpEndpointRequestMatcher(mcpEndpoints);
+
         McpAuthenticationEntryPoint mcpAuthenticationEntryPoint =
-            new McpTenantProtectedResourceMetadataAuthenticationEntryPoint();
+            new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(mcpEndpointRequestMatcher, publicUrl);
 
         McpAuthenticationRequiredPredicate mcpAuthenticationRequiredPredicate = new McpAuthenticationRequiredPredicate(
             mcpAuthenticationRequiredResolverProvider.orderedStream()
                 .toList());
 
         McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter = new McpDiscoveryAuthenticationFilter(
-            new McpEndpointRequestMatcher(mcpEndpoints), mcpAuthenticationEntryPoint,
+            mcpEndpointRequestMatcher, mcpAuthenticationEntryPoint,
             mcpAuthenticationRequiredPredicate);
 
         return (T) new McpDiscoverySecurityConfigurer(mcpDiscoveryAuthenticationFilter, mcpAuthenticationEntryPoint);
