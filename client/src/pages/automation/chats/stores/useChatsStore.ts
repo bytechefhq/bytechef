@@ -27,6 +27,7 @@ interface ChatStateI {
     setCurrentChatName: (name: string | null) => void;
     setIsRunning: (isRunning: boolean) => void;
     setLastAssistantMessageContent: (content: string) => void;
+    setLastEmptyAssistantMessage: (message: ThreadMessageLike) => void;
     setMessage: (message: ThreadMessageLike) => void;
     setResumeUrl: (resumeUrl: string | null) => void;
     switchChat: (workflowExecutionId: string) => void;
@@ -37,6 +38,10 @@ const generateId = () =>
         .fill(0)
         .map(() => Math.random().toString(36).charAt(2))
         .join('');
+
+const isEmptyAssistantMessage = (message: ThreadMessageLike | undefined) =>
+    message?.role === 'assistant' &&
+    (message.content === '' || (Array.isArray(message.content) && message.content.length === 0));
 
 const initialState = {
     activeWorkflowExecutionId: null as string | null,
@@ -82,6 +87,16 @@ export const useChatsStore = create<ChatStateI>()(
             set((state) => ({
                 messages: setContentHelper(state.messages, content),
             })),
+        setLastEmptyAssistantMessage: (message) =>
+            set((state) => {
+                const lastMessage = state.messages[state.messages.length - 1];
+
+                if (isEmptyAssistantMessage(lastMessage)) {
+                    return {messages: [...state.messages.slice(0, -1), message]};
+                }
+
+                return {messages: [...state.messages, message]};
+            }),
         setMessage: (message) =>
             set((state) => ({
                 messages: [...state.messages, message],

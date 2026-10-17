@@ -1,6 +1,7 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import useChat from '@/pages/automation/chats/hooks/useChat';
 import {ChatRuntimeProvider} from '@/pages/automation/chats/runtime-providers/ChatRuntimeProvider';
+import {aiChatDataComponents} from '@/shared/components/ai-chat/messages/aiChatDataComponents';
 
 const Chat = () => {
     const {effectiveWorkflowExecutionId, environmentName, sseStreamResponse} = useChat();
@@ -13,7 +14,7 @@ const Chat = () => {
                 workflowExecutionId={effectiveWorkflowExecutionId}
             >
                 <div className="relative flex size-full flex-col">
-                    <Thread />
+                    <Thread dataComponents={aiChatDataComponents} />
                 </div>
             </ChatRuntimeProvider>
         </div>

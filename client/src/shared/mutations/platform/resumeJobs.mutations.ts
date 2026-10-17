@@ -16,7 +16,29 @@ export const useResumeJobMutation = () =>
             });
 
             if (!response.ok) {
-                throw new Error(`Submission failed: ${response.statusText}`);
+                if (response.status === 410) {
+                    throw new Error(
+                        'This approval has expired or was already resolved, and can no longer be submitted.'
+                    );
+                }
+
+                if (response.status === 409) {
+                    throw new Error('Still preparing — try again in a moment.');
+                }
+
+                if (response.status === 400) {
+                    const problemDetail = await response.json().catch(() => null);
+
+                    if (problemDetail && typeof problemDetail.detail === 'string') {
+                        throw new Error(problemDetail.detail);
+                    }
+                }
+
+                if (response.status === 422) {
+                    throw new Error('The workflow failed, so this decision can no longer be applied.');
+                }
+
+                throw new Error(`Submission failed (HTTP ${response.status}).`);
             }
         },
     });
