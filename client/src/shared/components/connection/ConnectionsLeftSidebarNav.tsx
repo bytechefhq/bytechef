@@ -10,6 +10,10 @@ interface ConnectionsLeftSidebarNavTagI {
 
 interface ConnectionsLeftSidebarNavProps {
     componentDefinitions: ComponentDefinitionBasic[] | undefined;
+    /**
+     * The connections the component list is drawn from — the unfiltered set where a filter is active, so
+     * narrowing to one component does not empty the rail that offers the other components.
+     */
     connections: {componentName: string}[] | undefined;
     connectionsAreLoading?: boolean;
     currentComponentName?: string;
@@ -18,6 +22,11 @@ interface ConnectionsLeftSidebarNavProps {
     tagsIsLoading?: boolean;
 }
 
+/**
+ * The connections rail, shared by the automation and embedded Connections pages. Both filter the same way — by
+ * the component a connection belongs to, or by tag — so the rail lives here and each page passes its own
+ * query results in.
+ */
 const ConnectionsLeftSidebarNav = ({
     componentDefinitions,
     connections,

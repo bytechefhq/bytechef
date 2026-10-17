@@ -17,7 +17,12 @@ interface CategoryTagLeftSidebarNavProps {
     categoriesIsLoading?: boolean;
     currentCategoryId?: number;
     currentTagId?: number;
+    /** Groups appended after Tags, such as the embedded Unified API filters. */
     extraGroups?: ReactNode;
+    /**
+     * True when a filter outside these two groups is active, which stops "All Categories" from claiming to be
+     * the current one.
+     */
     otherFilterActive?: boolean;
     tags: CategoryTagLeftSidebarNavTagI[] | undefined;
     tagsClassName?: string;
@@ -25,6 +30,11 @@ interface CategoryTagLeftSidebarNavProps {
     tagsIsLoading?: boolean;
 }
 
+/**
+ * The category-and-tag rail shared by the pages that filter a catalog that way — automation Projects and
+ * embedded Integrations. They ask the same two questions of their data, so they ask them through one component
+ * rather than each keeping a copy of the markup.
+ */
 const CategoryTagLeftSidebarNav = ({
     categories,
     categoriesIsLoading = false,
