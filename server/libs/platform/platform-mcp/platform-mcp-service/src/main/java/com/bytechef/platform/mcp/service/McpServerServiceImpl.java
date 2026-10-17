@@ -69,7 +69,7 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public String getMcpServerSecretKey(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .map(McpServer::getSecretKey)
@@ -128,7 +128,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpServer rotateSecretKey(long mcpServerId) {
         McpServer mcpServer = mcpServerRepository.findById(mcpServerId)
             .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
