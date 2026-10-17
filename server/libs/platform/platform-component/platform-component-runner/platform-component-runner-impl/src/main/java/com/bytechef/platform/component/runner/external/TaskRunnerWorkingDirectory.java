@@ -25,11 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -42,7 +46,10 @@ public final class TaskRunnerWorkingDirectory implements AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(TaskRunnerWorkingDirectory.class);
 
+    public static final String CONNECTIONS_FILE_NAME = "connections.json";
+
     private static final String INPUT_FILE_NAME = "input.json";
+    private static final String OWNER_ONLY_PERMISSIONS = "rw-------";
     private static final String OUTPUT_DIRECTORY_NAME = "output";
 
     private final Path path;
@@ -98,6 +105,32 @@ public final class TaskRunnerWorkingDirectory implements AutoCloseable {
 
     public Path getPath() {
         return path;
+    }
+
+    public Path writeConnectionsFile(Map<String, ?> connections) throws IOException {
+        Path connectionsFilePath = path.resolve(CONNECTIONS_FILE_NAME);
+
+        if (Files.exists(connectionsFilePath, LinkOption.NOFOLLOW_LINKS)) {
+            throw new IllegalArgumentException(
+                "The input file '%s' collides with the file that carries the task's connections; rename it"
+                    .formatted(CONNECTIONS_FILE_NAME));
+        }
+
+        FileSystem fileSystem = path.getFileSystem();
+
+        Set<String> supportedFileAttributeViews = fileSystem.supportedFileAttributeViews();
+
+        if (supportedFileAttributeViews.contains("posix")) {
+            Files.createFile(
+                connectionsFilePath,
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(OWNER_ONLY_PERMISSIONS)));
+        } else {
+            Files.createFile(connectionsFilePath);
+        }
+
+        Files.writeString(connectionsFilePath, JsonUtils.write(connections), StandardCharsets.UTF_8);
+
+        return connectionsFilePath;
     }
 
     public Path writeSourceFile(String fileName, String content) throws IOException {
