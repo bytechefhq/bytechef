@@ -75,7 +75,7 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
 
                         {nodeIssues.map((issue) => (
                             <button
-                                className="flex items-start gap-2 rounded-md border-2 border-transparent bg-white px-2 py-1.5 text-left text-sm hover:border-blue-200"
+                                className="flex items-start gap-2 rounded-md border-2 border-transparent bg-surface-neutral-primary px-2 py-1.5 text-left text-sm hover:border-stroke-brand-secondary"
                                 key={getWorkflowIssueKey(issue)}
                                 onClick={() => handleIssueClick(nodeName)}
                                 type="button"
