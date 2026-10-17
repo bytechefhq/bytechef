@@ -21,6 +21,10 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.a2a.facade.A2aProjectFacade;
 import com.bytechef.automation.ai.a2a.facade.A2aProjectFacadeImpl;
+import com.bytechef.automation.ai.a2a.facade.A2aProjectWorkflowFacade;
+import com.bytechef.automation.ai.a2a.facade.A2aProjectWorkflowFacadeImpl;
+import com.bytechef.automation.ai.a2a.facade.A2aServerFacade;
+import com.bytechef.automation.ai.a2a.facade.A2aServerFacadeImpl;
 import com.bytechef.automation.ai.a2a.repository.A2aProjectWorkflowRepository;
 import com.bytechef.automation.ai.a2a.repository.A2aServerRepository;
 import com.bytechef.automation.ai.a2a.service.A2aProjectService;
@@ -38,6 +42,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.tag.service.TagService;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +70,21 @@ public class A2aMethodSecurityIntTestConfiguration {
             a2aProjectService, a2aProjectWorkflowService, a2aServerService, componentConnectionFacade,
             connectionService, projectDeploymentFacade, projectDeploymentService, projectDeploymentWorkflowService,
             projectService, projectWorkflowService, workflowService, workflowTestConfigurationService);
+    }
+
+    @Bean
+    A2aProjectWorkflowFacade a2aProjectWorkflowFacade(A2aProjectWorkflowService a2aProjectWorkflowService) {
+        return new A2aProjectWorkflowFacadeImpl(a2aProjectWorkflowService);
+    }
+
+    @Bean
+    A2aServerFacade a2aServerFacade(A2aServerService a2aServerService, TagService tagService) {
+        return new A2aServerFacadeImpl(a2aServerService, tagService);
+    }
+
+    @Bean
+    TagService tagService() {
+        return mock(TagService.class);
     }
 
     @Bean
