@@ -190,6 +190,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 ProjectDeploymentErrorType.INVALID_PROJECT_VERSION);
         }
 
+        normalizeProjectDeploymentWorkflowIds(
+            projectDeployment, projectDeploymentWorkflows, projectWorkflowService.getProjectWorkflows(projectId));
+
         if (!tags.isEmpty()) {
             projectDeployment.setTags(checkTags(tags));
         }
@@ -467,11 +470,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectDeployment oldProjectDeployment = projectDeploymentService.getProjectDeployment(
             projectDeployment.getId());
 
+        List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(
+            projectDeployment.getProjectId());
+
+        normalizeProjectDeploymentWorkflowIds(projectDeployment, projectDeploymentWorkflows, allProjectWorkflows);
+
         projectDeploymentService.update(projectDeployment);
 
         checkProjectDeploymentWorkflows(
             projectDeployment, oldProjectDeployment.getProjectVersion(), projectDeploymentWorkflows,
-            projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
+            allProjectWorkflows);
     }
 
     @Override
@@ -484,6 +492,36 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
+    }
+
+    private void normalizeProjectDeploymentWorkflowIds(
+        ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
+        List<ProjectWorkflow> allProjectWorkflows) {
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            String workflowId = projectDeploymentWorkflow.getWorkflowId();
+
+            ProjectWorkflow projectWorkflow = allProjectWorkflows.stream()
+                .filter(curProjectWorkflow -> Objects.equals(curProjectWorkflow.getWorkflowId(), workflowId))
+                .findFirst()
+                .orElseThrow(() -> new ConfigurationException(
+                    "Workflow id=%s does not belong to project id=%s".formatted(
+                        workflowId, projectDeployment.getProjectId()),
+                    ProjectDeploymentErrorType.INVALID_PROJECT_WORKFLOW));
+
+            String deployedWorkflowId = allProjectWorkflows.stream()
+                .filter(curProjectWorkflow -> Objects.equals(
+                    curProjectWorkflow.getUuidAsString(), projectWorkflow.getUuidAsString()) &&
+                    curProjectWorkflow.getProjectVersion() == projectDeployment.getProjectVersion())
+                .map(ProjectWorkflow::getWorkflowId)
+                .findFirst()
+                .orElseThrow(() -> new ConfigurationException(
+                    "Workflow id=%s does not exist in project version v=%s".formatted(
+                        workflowId, projectDeployment.getProjectVersion()),
+                    ProjectDeploymentErrorType.INVALID_PROJECT_WORKFLOW));
+
+            projectDeploymentWorkflow.setWorkflowId(deployedWorkflowId);
+        }
     }
 
     private void checkProjectDeploymentWorkflows(
