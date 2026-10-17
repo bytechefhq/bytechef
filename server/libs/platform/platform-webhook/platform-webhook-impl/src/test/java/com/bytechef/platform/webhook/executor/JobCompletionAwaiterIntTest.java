@@ -30,6 +30,7 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepos
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.config.MemoryMessageBrokerConfiguration;
 import com.bytechef.message.broker.memory.config.MemoryMessageBrokerListenerRegistrarConfiguration;
@@ -97,6 +98,30 @@ class JobCompletionAwaiterIntTest {
 
         assertEquals(job, completedJob);
         assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
+
+        CompletableFuture<Void> streamCompletion = registration.completion()
+            .toCompletableFuture();
+
+        streamCompletion.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void testCompletesOnCancelledEventAfterAwait() throws Exception {
+        Job job = createJob(Job.Status.STARTED);
+
+        long jobId = getJobId(job);
+
+        SseStreamBridgeRegistry.Registration registration = sseStreamBridgeRegistry.register(jobId, payload -> {});
+
+        CompletableFuture<Job> future = jobCompletionAwaiter.await(jobId, EVENT_AWAIT_TIMEOUT);
+
+        assertFalse(future.isDone());
+
+        finishJob(job, Job.Status.CANCELLED);
+
+        Job cancelledJob = future.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS);
+
+        assertEquals(Job.Status.CANCELLED, cancelledJob.getStatus());
 
         CompletableFuture<Void> streamCompletion = registration.completion()
             .toCompletableFuture();
@@ -353,7 +378,8 @@ class JobCompletionAwaiterIntTest {
         SseStreamApplicationEventListener sseStreamApplicationEventListener(
             JobService jobService, MessageBroker messageBroker) {
 
-            return new SseStreamApplicationEventListener(jobService, messageBroker, mock(TaskExecutionService.class));
+            return new SseStreamApplicationEventListener(
+                jobService, messageBroker, mock(TaskExecutionService.class), mock(TaskFileStorage.class));
         }
 
         @Bean

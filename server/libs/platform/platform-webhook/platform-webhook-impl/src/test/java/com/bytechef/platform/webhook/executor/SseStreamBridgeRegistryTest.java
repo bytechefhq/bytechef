@@ -40,6 +40,7 @@ import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registrati
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +62,8 @@ import org.slf4j.LoggerFactory;
 class SseStreamBridgeRegistryTest {
 
     private static final long JOB_ID = 42L;
+    private static final String TENANT_A = "000001";
+    private static final String TENANT_B = "000002";
 
     private SseStreamBridge sseStreamBridge;
     private SseStreamBridgeRegistry sseStreamBridgeRegistry;
@@ -282,6 +286,18 @@ class SseStreamBridgeRegistryTest {
 
         verify(sseStreamBridge).onEvent("answer");
         verify(sseStreamBridge).onComplete();
+
+        assertThat(registration.completion()).isDone();
+    }
+
+    @Test
+    void testRegisterCompletesOnCancelledStatus() {
+        Registration registration = sseStreamBridgeRegistry.register(JOB_ID, sseStreamBridge);
+
+        sendJobStatus("CANCELLED");
+
+        verify(sseStreamBridge).onComplete();
+        verify(sseStreamBridge, never()).onSuspend();
 
         assertThat(registration.completion()).isDone();
     }
@@ -588,6 +604,64 @@ class SseStreamBridgeRegistryTest {
         verify(sseStreamBridge, times(1)).onEvent("delta");
     }
 
+    @Test
+    void testEventsOfTheSameJobIdInAnotherTenantAreNotDelivered() {
+        SseStreamBridge tenantBSseStreamBridge = mock(SseStreamBridge.class);
+
+        Registration tenantARegistration = registerInTenant(TENANT_A, sseStreamBridge);
+
+        registerInTenant(TENANT_B, tenantBSseStreamBridge);
+
+        sseStreamBridgeRegistry.onSseStreamEvent(tenantEvent(TENANT_B, SseStreamEvent.EVENT_TYPE_DATA, "card"));
+        sseStreamBridgeRegistry
+            .onSseStreamEvent(tenantEvent(TENANT_B, SseStreamEvent.EVENT_TYPE_JOB_STATUS, "STOPPED"));
+
+        verify(tenantBSseStreamBridge).onEvent("card");
+        verify(tenantBSseStreamBridge).onSuspend();
+        verifyNoInteractions(sseStreamBridge);
+
+        assertThat(tenantARegistration.completion()).isNotDone();
+
+        sseStreamBridgeRegistry.onSseStreamEvent(tenantEvent(TENANT_A, SseStreamEvent.EVENT_TYPE_DATA, "own"));
+
+        verify(sseStreamBridge).onEvent("own");
+    }
+
+    @Test
+    void testRegisterForResumeIgnoresAStoppedStatusSeenInAnotherTenant() {
+        sseStreamBridgeRegistry
+            .onSseStreamEvent(tenantEvent(TENANT_B, SseStreamEvent.EVENT_TYPE_JOB_STATUS, "STOPPED"));
+
+        TenantContext.runWithTenantId(
+            TENANT_A, () -> sseStreamBridgeRegistry.registerForResume(JOB_ID, sseStreamBridge));
+
+        sseStreamBridgeRegistry.onSseStreamEvent(tenantEvent(TENANT_B, SseStreamEvent.EVENT_TYPE_DATA, "foreign"));
+        sseStreamBridgeRegistry.onSseStreamEvent(tenantEvent(TENANT_A, SseStreamEvent.EVENT_TYPE_DATA, "leftover"));
+
+        verifyNoInteractions(sseStreamBridge);
+    }
+
+    @Test
+    void testAnUndeliveredAskUserQuestionEventResumesTheJobInTheTenantOfTheEvent() {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        CompletableFuture<String> resumeTenantId = new CompletableFuture<>();
+
+        when(jobResumeFacade.resumeExpiredJob("resume-id")).thenAnswer(invocation -> {
+            resumeTenantId.complete(TenantContext.getCurrentTenantId());
+
+            return JobResumeOutcome.OK;
+        });
+
+        SseStreamBridgeRegistry registry = new SseStreamBridgeRegistry(
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, null, Duration.ZERO);
+
+        registry.onSseStreamEvent(
+            tenantEvent(TENANT_B, SseStreamEvent.EVENT_TYPE_DATA, questionEvent("http://localhost/resume/resume-id")));
+
+        assertThat(resumeTenantId).succeedsWithin(Duration.ofSeconds(5))
+            .isEqualTo(TENANT_B);
+    }
+
     private void sendData(Object payload) {
         sendEvent(SseStreamEvent.EVENT_TYPE_DATA, payload);
     }
@@ -606,6 +680,23 @@ class SseStreamBridgeRegistryTest {
         sseStreamEvent.putMetadata(SseStreamEvent.METADATA_SUSPENDED, suspended);
 
         sseStreamBridgeRegistry.onSseStreamEvent(sseStreamEvent);
+    }
+
+    private Registration registerInTenant(String tenantId, SseStreamBridge tenantSseStreamBridge) {
+        AtomicReference<Registration> registration = new AtomicReference<>();
+
+        TenantContext.runWithTenantId(
+            tenantId, () -> registration.set(sseStreamBridgeRegistry.register(JOB_ID, tenantSseStreamBridge)));
+
+        return registration.get();
+    }
+
+    private static SseStreamEvent tenantEvent(String tenantId, String eventType, Object payload) {
+        SseStreamEvent sseStreamEvent = new SseStreamEvent(JOB_ID, eventType, payload);
+
+        sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, tenantId);
+
+        return sseStreamEvent;
     }
 
     private static Map<String, Object> questionEvent(@Nullable String resumeUrl) {

@@ -14,11 +14,14 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -58,6 +61,29 @@ public class RemoteJobServiceController {
             ResponseEntity
                 .noContent()
                 .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-child-job-ids/{parentJobId}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Long>> getChildJobIds(@PathVariable long parentJobId) {
+        return ResponseEntity.ok(jobService.getChildJobIds(parentJobId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-stale-jobs",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Job>> getStaleJobs(
+        @RequestParam("status") Job.Status status,
+        @RequestParam("lastModifiedDateBefore") Instant lastModifiedDateBefore) {
+
+        return ResponseEntity.ok(jobService.getStaleJobs(status, lastModifiedDateBefore));
     }
 
     @RequestMapping(
@@ -108,6 +134,19 @@ public class RemoteJobServiceController {
         })
     public ResponseEntity<Job> setStatusToStopped(@PathVariable long id) {
         return ResponseEntity.ok(jobService.setStatusToStopped(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/try-claim-resume",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> tryClaimResume(@RequestBody Job job) {
+        return ResponseEntity.ok(jobService.tryClaimResume(job));
     }
 
     @RequestMapping(

@@ -1,0 +1,21 @@
+{
+  "label": "Sync Approval Nested",
+  "tasks": [ {
+    "name": "condition_1",
+    "type": "condition/v1",
+    "parameters": {
+      "rawExpression": true,
+      "expression": "=1 == 1",
+      "caseTrue": [ {
+        "name": "approval_1",
+        "type": "approval/v1/requestApproval",
+        "parameters": { }
+      } ],
+      "caseFalse": [ ]
+    }
+  }, {
+    "name": "afterCondition",
+    "type": "test/v1/next",
+    "parameters": { }
+  } ]
+}

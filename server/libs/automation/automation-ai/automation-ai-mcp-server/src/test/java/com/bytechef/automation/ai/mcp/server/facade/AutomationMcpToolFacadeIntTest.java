@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -73,8 +74,11 @@ import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -271,7 +275,9 @@ class AutomationMcpToolFacadeIntTest {
         assertThat(result).isInstanceOf(Map.class);
         assertThat((Map<String, Object>) result)
             .containsEntry("status", "approval_required")
-            .containsEntry("jobId", 2L);
+            .containsEntry("jobId", 2L)
+            .containsEntry("formUrl", "https://example.com/resume/resume-2")
+            .doesNotContainKey("resumeToken");
         verify(jobCompletionAwaiter, never()).await(anyLong(), any());
     }
 
@@ -660,6 +666,47 @@ class AutomationMcpToolFacadeIntTest {
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
+    }
+
+    @Test
+    void testCallOfWorkflowToolSignsTheFormUrlToTheApprovalExpiry() {
+        Job job = mock(Job.class);
+        Instant expiresAt = Instant.now()
+            .plus(Duration.ofDays(1));
+        TaskExecution taskExecution = mock(TaskExecution.class);
+        ApprovalTokens approvalTokens = mock(ApprovalTokens.class);
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider = mock(ObjectProvider.class);
+
+        when(job.getId()).thenReturn(5L);
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn("resume-5");
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
+        when(job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID)).thenReturn(7L);
+        doReturn(Map.of("suspend", Map.of("expiresAt", expiresAt.toString()))).when(taskExecution)
+            .getMetadata();
+        when(taskExecutionService.fetchTaskExecution(7L)).thenReturn(Optional.of(taskExecution));
+        when(approvalTokensObjectProvider.getIfAvailable()).thenReturn(approvalTokens);
+        when(approvalTokens.toSignedTokenIfConfigured(eq("resume-5"), any(Duration.class)))
+            .thenReturn(Optional.of("v1.signed"));
+
+        facade = new AutomationMcpToolFacade(
+            approvalTokensObjectProvider, clusterElementDefinitionFacade, clusterElementDefinitionService,
+            mock(Evaluator.class), jobCompletionAwaiter, jobResumeFacade, jobService, mcpComponentService,
+            mcpProjectService, mcpProjectWorkflowService, mcpServerService, mcpToolService, principalJobFacade,
+            projectDeploymentWorkflowService, "https://example.com", taskExecutionService, taskFileStorage,
+            toolExecutionRecorder, workflowService, workspaceMcpServerService);
+
+        ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
+
+        assertThat(toolCallback.call("{}")).contains("https://example.com/resume/v1.signed");
+
+        ArgumentCaptor<Duration> durationArgumentCaptor = ArgumentCaptor.forClass(Duration.class);
+
+        verify(approvalTokens).toSignedTokenIfConfigured(eq("resume-5"), durationArgumentCaptor.capture());
+
+        assertThat(durationArgumentCaptor.getValue()).isBetween(
+            Duration.ofDays(1), Duration.ofDays(1)
+                .plus(ApprovalFormUrls.APPROVAL_TOKEN_TTL_MARGIN));
     }
 
     @Test

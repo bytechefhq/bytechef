@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +42,17 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public void deleteJob(long id) {
+    public long createJob(JobParametersDTO jobParametersDTO, LongConsumer jobCreatedCallback) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteJob(long id) {
+        loadBalancedRestClient.delete(
+            uriBuilder -> uriBuilder
+                .host("execution-app")
+                .path("/remote/job-facade/delete-job/{id}")
+                .build(id));
     }
 
     @Override
@@ -57,6 +67,11 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
         throw new UnsupportedOperationException();
     }
 

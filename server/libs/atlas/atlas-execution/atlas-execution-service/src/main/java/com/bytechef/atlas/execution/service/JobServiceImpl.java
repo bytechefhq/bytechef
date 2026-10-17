@@ -25,7 +25,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.LongConsumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +61,15 @@ public class JobServiceImpl implements JobService {
         Job job = getJob(jobParametersDTO, workflow);
 
         job = jobRepository.save(job);
+
+        return job;
+    }
+
+    @Override
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow, LongConsumer jobCreatedCallback) {
+        Job job = create(jobParametersDTO, workflow);
+
+        jobCreatedCallback.accept(Objects.requireNonNull(job.getId(), "id"));
 
         return job;
     }
@@ -120,6 +131,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public List<Job> getStaleJobs(Job.Status status, Instant lastModifiedDateBefore) {
+        return jobRepository.findAllByStatusAndLastModifiedDateBefore(status.ordinal(), lastModifiedDateBefore);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobsPage(int pageNumber) {
         return jobRepository.findAll(PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE));
@@ -144,6 +160,7 @@ public class JobServiceImpl implements JobService {
             "Can't restart failed subflow job " + id);
 
         if (job.getStatus() == Job.Status.FAILED) {
+            job.setError(null);
             job.setStartDate(Instant.now());
         }
 
@@ -153,6 +170,14 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(job);
 
         return job;
+    }
+
+    @Override
+    public boolean tryClaimResume(Job job) {
+        long jobId = Objects.requireNonNull(job.getId(), "id");
+
+        return jobRepository.updateStatusIfCurrentStatus(
+            jobId, Job.Status.STOPPED.ordinal(), Job.Status.STARTED.ordinal()) == 1;
     }
 
     @Override
@@ -173,10 +198,11 @@ public class JobServiceImpl implements JobService {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
         Assert.isTrue(
-            job.getStatus() == Job.Status.STARTED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
+            job.getStatus() == Job.Status.STARTED || job.getStatus() == Job.Status.CREATED,
+            "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
         job.setEndDate(Instant.now());
-        job.setStatus(Job.Status.STOPPED);
+        job.setStatus(job.getStatus() == Job.Status.CREATED ? Job.Status.CANCELLED : Job.Status.STOPPED);
 
         jobRepository.save(job);
 

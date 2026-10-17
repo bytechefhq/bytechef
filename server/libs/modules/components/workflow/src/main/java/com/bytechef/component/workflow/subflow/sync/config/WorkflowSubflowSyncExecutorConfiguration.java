@@ -48,6 +48,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskDispatcher;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
@@ -73,6 +74,7 @@ import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowLauncher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.concurrent.TenantTaskDecorator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -111,7 +113,7 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
-        SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+        SimpleAsyncTaskExecutor taskExecutor = createTaskExecutor();
 
         TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(durableTaskFileStorage);
 
@@ -167,6 +169,14 @@ public class WorkflowSubflowSyncExecutorConfiguration {
                     .orElse(false);
             }
         };
+    }
+
+    static SimpleAsyncTaskExecutor createTaskExecutor() {
+        SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+
+        taskExecutor.setTaskDecorator(new TenantTaskDecorator());
+
+        return taskExecutor;
     }
 
     static String suspendingTaskMessage(String taskName, String taskType) {
@@ -281,6 +291,9 @@ public class WorkflowSubflowSyncExecutorConfiguration {
         SubflowResolver subflowResolver, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
+            (taskDispatcher) -> new SyncExecutionSuspendRejectingTaskDispatcher(
+                eventPublisher, jobService, taskExecutionService,
+                WorkflowSubflowSyncExecutorConfiguration::suspendingTaskMessage),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

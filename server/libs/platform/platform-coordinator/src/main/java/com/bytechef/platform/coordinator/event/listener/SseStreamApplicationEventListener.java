@@ -24,14 +24,19 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +51,17 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public SseStreamApplicationEventListener(
-        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+        JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
         this.jobService = jobService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -75,6 +83,10 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
 
             sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 
+            if (status == Job.Status.COMPLETED) {
+                publishFinalResultEvent(jobId);
+            }
+
             if (status == Job.Status.FAILED) {
                 String errorMessage = getFailedTaskErrorMessage(jobId);
 
@@ -94,6 +106,76 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
         } catch (Exception exception) {
             log.warn("Failed to publish the {} status SSE event of job {}", status, jobId, exception);
         }
+    }
+
+    /**
+     * Sends the run's final chat reply as a named {@code result} event before the terminal status event. An async job
+     * never stores the webhook response in its outputs, so the reply is read from the last task execution tagged
+     * {@code WEBHOOK_RESPONSE}; a run without one sends nothing.
+     */
+    private void publishFinalResultEvent(long jobId) {
+        String message;
+
+        try {
+            message = readWebhookResponseMessage(jobId);
+        } catch (Exception exception) {
+            log.warn("Failed to read the final reply of job {}", jobId, exception);
+
+            return;
+        }
+
+        if (message == null || message.isEmpty()) {
+            return;
+        }
+
+        SseStreamEvent sseStreamEvent = new SseStreamEvent(
+            jobId, SseStreamEvent.EVENT_TYPE_DATA, Map.of("event", "result", "result", Map.of("message", message)));
+
+        sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+
+        messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
+    }
+
+    private @Nullable String readWebhookResponseMessage(long jobId) {
+        TaskExecution lastTaskExecution = taskExecutionService.getJobTaskExecutions(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getMetadata()
+                .containsKey(MetadataConstants.WEBHOOK_RESPONSE))
+            .filter(taskExecution -> taskExecution.getOutput() != null)
+            .max(Comparator
+                .comparing(TaskExecution::getEndDate, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(TaskExecution::getId, Comparator.nullsFirst(Comparator.naturalOrder())))
+            .orElse(null);
+
+        if (lastTaskExecution == null) {
+            return null;
+        }
+
+        FileEntry outputFileEntry = lastTaskExecution.getOutput();
+
+        if (outputFileEntry == null) {
+            return null;
+        }
+
+        return extractMessage(taskFileStorage.readTaskExecutionOutput(outputFileEntry));
+    }
+
+    private static @Nullable String extractMessage(@Nullable Object output) {
+        if (!(output instanceof Map<?, ?> outputMap)) {
+            return null;
+        }
+
+        Object body = outputMap.get("body");
+
+        if (body instanceof String bodyText) {
+            return bodyText;
+        }
+
+        if (body instanceof Map<?, ?> bodyMap && bodyMap.get("message") instanceof String messageText) {
+            return messageText;
+        }
+
+        return null;
     }
 
     private boolean isAwaitingSubflow(long jobId) {

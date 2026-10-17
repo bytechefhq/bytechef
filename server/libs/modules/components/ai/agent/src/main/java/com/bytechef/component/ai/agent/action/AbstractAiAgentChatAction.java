@@ -36,6 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
@@ -132,12 +133,9 @@ public abstract class AbstractAiAgentChatAction {
             ModelUtils.getMessages(inputParameters, context), false);
     }
 
-    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
-        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
-        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
-        List<Message> messages, boolean resumedTurn) throws Exception {
-
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+    private ChatModel resolveChatModel(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
+        ClusterElementMap clusterElementMap) throws Exception {
 
         ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
 
@@ -150,9 +148,30 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Object> concatenatedInputParameters = MapUtils.concat(
             new HashMap<>(inputParameters.toMap()), new HashMap<>(modelClusterElement.getParameters()));
 
-        ChatModel chatModel = (ChatModel) modelFunction.apply(
+        return (ChatModel) modelFunction.apply(
             ParametersFactory.create(concatenatedInputParameters),
             ParametersFactory.create(modelConnection.getParameters()), true);
+    }
+
+    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn) throws Exception {
+
+        return getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context, messages, resumedTurn,
+            null);
+    }
+
+    private ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn, @Nullable DeferredToolCallReplay deferredToolCallReplay)
+        throws Exception {
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ChatModel chatModel = resolveChatModel(inputParameters, connectionParameters, clusterElementMap);
 
         String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
             .map(clusterElement -> resolveConversationId(inputParameters, clusterElement))
@@ -166,7 +185,8 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
 
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        ChatClient chatClient = ChatClient.builder(
+            deferredToolCallReplay == null ? chatModel : deferredToolCallReplay.replayingChatModel(chatModel))
             .build();
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = (resumedTurn
@@ -356,9 +376,12 @@ public abstract class AbstractAiAgentChatAction {
 
         String toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
 
+        DeferredToolCallReplay deferredToolCallReplay = DeferredToolCallReplay.of(
+            agentToolSuspension.resumeConversation(toolResult));
+
         return getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context,
-            agentToolSuspension.resumeConversation(toolResult), true);
+            deferredToolCallReplay.conversation(), true, deferredToolCallReplay);
     }
 
     private static ChatClient.ChatClientRequestSpec createPrompt(

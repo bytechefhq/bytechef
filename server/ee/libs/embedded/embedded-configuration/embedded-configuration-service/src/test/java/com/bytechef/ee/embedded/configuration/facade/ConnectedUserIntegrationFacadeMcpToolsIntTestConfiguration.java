@@ -34,6 +34,7 @@ import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,7 +79,7 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry = new ComponentDefinitionRegistry(
             applicationProperties, List.of(componentHandler), List::of, List.of());
 
-        return new ClusterElementDefinitionServiceImpl(componentDefinitionRegistry, null);
+        return new ClusterElementDefinitionServiceImpl(componentDefinitionRegistry, null, mock(ObjectProvider.class));
     }
 
     @Bean

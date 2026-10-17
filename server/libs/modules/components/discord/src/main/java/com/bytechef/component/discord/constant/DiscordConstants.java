@@ -31,6 +31,7 @@ public class DiscordConstants {
     public static final String CONTENT = "content";
     public static final String GUILD_ID = "guildId";
     public static final String LAST_MESSAGE_ID = "lastMessageId";
+    public static final String PUBLIC_KEY = "publicKey";
     public static final String RECIPIENT_ID = "recipient_id";
     public static final String TTS = "tts";
 

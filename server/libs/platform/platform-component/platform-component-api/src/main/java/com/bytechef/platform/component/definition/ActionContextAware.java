@@ -20,6 +20,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,6 +34,8 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface ActionContextAware extends ActionContext, JobContextAware {
+
+    Duration DEFAULT_APPROVAL_EXPIRY = Duration.ofDays(60);
 
     /**
      * Retrieves the name of the action associated with the current context.
@@ -80,6 +85,15 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
      */
     @Nullable
     String getResumeUrl();
+
+    /**
+     * Mints the resume and form links for an approval request on the current job.
+     *
+     * @param expiresAt when the approval request lapses
+     * @return the links, or null if publicUrl or jobId is not available
+     */
+    @Nullable
+    ApprovalLinks getApprovalLinks(Instant expiresAt);
 
     /**
      * Retrieves the unique identifier associated with the job principal.
@@ -143,4 +157,19 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     ClusterElementContext toClusterElementContext(
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection);
+
+    record ApprovalLinks(
+        String publicUrl, String resumeId, String resumeUrl, String formUrl, @Nullable String shortResumeId) {
+
+        public ApprovalLinks {
+            Objects.requireNonNull(publicUrl, "publicUrl");
+            Objects.requireNonNull(resumeId, "resumeId");
+            Objects.requireNonNull(resumeUrl, "resumeUrl");
+            Objects.requireNonNull(formUrl, "formUrl");
+        }
+
+        public ApprovalLinks(String publicUrl, String resumeId, String resumeUrl, String formUrl) {
+            this(publicUrl, resumeId, resumeUrl, formUrl, null);
+        }
+    }
 }

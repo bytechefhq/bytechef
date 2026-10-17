@@ -17,6 +17,7 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -25,10 +26,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.webhook.exception.WebhookErrorType;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.util.Map;
@@ -48,6 +51,8 @@ class WebhookTriggerControllerTest {
         new WebhookTriggerFlags(false, false, false, false);
     private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_VALIDATION_FLAGS =
         new WebhookTriggerFlags(false, false, true, false);
+    private static final WebhookTriggerFlags SYNC_EXECUTION_FLAGS =
+        new WebhookTriggerFlags(false, true, false, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_WITH_VALIDATION_FLAGS =
         new WebhookTriggerFlags(false, true, true, false);
 
@@ -165,6 +170,18 @@ class WebhookTriggerControllerTest {
 
         assertThat(webhookRequestArgumentCaptor.getValue()
             .validated()).isTrue();
+    }
+
+    @Test
+    void testSyncRejectionOfAWorkflowThatPausesSurfacesTheConfigurationError() {
+        ConfigurationException configurationException = new ConfigurationException(
+            "Workflows that return a synchronous response can't contain steps that pause the run",
+            WebhookErrorType.SUSPENDING_TASK_IN_SYNC_EXECUTION);
+
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(SYNC_EXECUTION_FLAGS);
+        when(webhookWorkflowExecutor.executeSync(any(), any())).thenThrow(configurationException);
+
+        assertThatThrownBy(() -> executeWorkflow("POST")).isSameAs(configurationException);
     }
 
     private ResponseEntity<?> executeWorkflow(String method) {

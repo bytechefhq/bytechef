@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
-import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
+import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -531,15 +531,84 @@ class AiAgentChatActionTest {
         assertThat(resumeResult).isEqualTo(FINAL_ANSWER);
         assertThat(prompts).hasSize(2);
 
-        ToolResponseMessage resumedToolResponseMessage = findLastToolResponseMessage(prompts.get(1)
+        List<ToolResponseMessage> resumedToolResponseMessages = findToolResponseMessages(prompts.get(1)
             .getInstructions());
 
-        assertThat(resumedToolResponseMessage).isNotNull();
-        assertThat(resumedToolResponseMessage.getResponses()).containsExactly(
-            new ToolResponseMessage.ToolResponse(FIRST_TOOL_CALL_ID, LOOK_UP_TOOL_NAME, LOOK_UP_TOOL_RESULT),
-            new ToolResponseMessage.ToolResponse(SECOND_TOOL_CALL_ID, SUSPENDING_TOOL_NAME, "{\"approved\":true}"),
-            new ToolResponseMessage.ToolResponse(
-                THIRD_TOOL_CALL_ID, LOOK_UP_TOOL_NAME, SuspendableToolCallingManager.NOT_EXECUTED_TOOL_RESULT));
+        assertThat(resumedToolResponseMessages).hasSize(2);
+        assertThat(resumedToolResponseMessages.getFirst()
+            .getResponses()).containsExactly(
+                new ToolResponseMessage.ToolResponse(FIRST_TOOL_CALL_ID, LOOK_UP_TOOL_NAME, LOOK_UP_TOOL_RESULT),
+                new ToolResponseMessage.ToolResponse(
+                    SECOND_TOOL_CALL_ID, SUSPENDING_TOOL_NAME, "{\"approved\":true}"),
+                new ToolResponseMessage.ToolResponse(
+                    THIRD_TOOL_CALL_ID, LOOK_UP_TOOL_NAME, DeferredToolCallReplay.DEFERRED_TOOL_RESULT));
+        assertThat(resumedToolResponseMessages.getLast()
+            .getResponses()).containsExactly(
+                new ToolResponseMessage.ToolResponse(
+                    THIRD_TOOL_CALL_ID + "_deferred", LOOK_UP_TOOL_NAME, LOOK_UP_TOOL_RESULT));
+    }
+
+    @Test
+    void testASecondSuspendingCallOfTheRoundSuspendsAgainOnResumeWithoutAskingTheModel() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createChatActionDefinition(
+            prompts, callNumber -> callNumber == 1
+                ? toolCallResponse(
+                    toolCall(SUSPENDING_TOOL_NAME, FIRST_TOOL_CALL_ID),
+                    toolCall(SUSPENDING_TOOL_NAME, SECOND_TOOL_CALL_ID))
+                : finalAnswer());
+
+        AtomicReference<ActionContext.Suspend> firstTurnSuspend = new AtomicReference<>();
+
+        getPerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            createActionContext(firstTurnSuspend));
+
+        assertThat(getAgentToolSuspension(firstTurnSuspend.get()).pendingToolCallId()).isEqualTo(FIRST_TOOL_CALL_ID);
+
+        AtomicReference<ActionContext.Suspend> secondTurnSuspend = new AtomicReference<>();
+
+        Object firstResumeResult = getResumePerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            toPersistedContinueParameters(firstTurnSuspend.get()),
+            MockParametersFactory.create(Map.of("approved", true)), createActionContext(secondTurnSuspend));
+
+        assertThat(firstResumeResult).isNull();
+        assertThat(prompts).hasSize(1);
+        assertThat(secondTurnSuspend.get()).isNotNull();
+        assertThat(getAgentToolSuspension(secondTurnSuspend.get()).pendingToolCallId())
+            .isEqualTo(SECOND_TOOL_CALL_ID + "_deferred");
+
+        Object secondResumeResult = getResumePerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            toPersistedContinueParameters(secondTurnSuspend.get()),
+            MockParametersFactory.create(Map.of("approved", false)), createActionContext(new AtomicReference<>()));
+
+        assertThat(secondResumeResult).isEqualTo(FINAL_ANSWER);
+        assertThat(prompts).hasSize(2);
+
+        List<ToolResponseMessage> toolResponseMessages = findToolResponseMessages(prompts.get(1)
+            .getInstructions());
+
+        assertThat(toolResponseMessages).hasSize(2);
+        assertThat(toolResponseMessages.getFirst()
+            .getResponses()).containsExactly(
+                new ToolResponseMessage.ToolResponse(
+                    FIRST_TOOL_CALL_ID, SUSPENDING_TOOL_NAME, "{\"approved\":true}"),
+                new ToolResponseMessage.ToolResponse(
+                    SECOND_TOOL_CALL_ID, SUSPENDING_TOOL_NAME, DeferredToolCallReplay.DEFERRED_TOOL_RESULT));
+        assertThat(toolResponseMessages.getLast()
+            .getResponses()).containsExactly(
+                new ToolResponseMessage.ToolResponse(
+                    SECOND_TOOL_CALL_ID + "_deferred", SUSPENDING_TOOL_NAME, "{\"approved\":false}"));
+    }
+
+    private static List<ToolResponseMessage> findToolResponseMessages(List<Message> messages) {
+        return messages.stream()
+            .filter(ToolResponseMessage.class::isInstance)
+            .map(ToolResponseMessage.class::cast)
+            .toList();
     }
 
     @Test
