@@ -612,7 +612,7 @@ def summarize(context):
 The Enterprise `kubernetes` and `aws-batch` runners take their cluster or account from a connection named
 `taskRunner`. A visual Script node gets it added when the workflow is saved; in code, declare it on the task - a
 `kubernetes` connection for `kubernetes`, an `aws` connection for `aws-batch` - and bind it like any other connection.
-It is not injected into the script's environment.
+It is never handed to the script.
 
 ```javascript
 {
@@ -637,12 +637,22 @@ Things to know:
   members throw "is not available under the … runner" there. Fetch data and call components in the task, pass what the
   script needs in `input`, and act on its result in the task.
 - **The task's connections go with it.** With `bytechef.script.inject-connections` on (as in the shipped
-  configuration), every connection the task declares except `taskRunner` reaches the script as environment variables -
-  `BYTECHEF_CONNECTION_<NAME>` with all parameters as JSON, and `BYTECHEF_CONNECTION_<NAME>_<PARAM>` one each - and
-  their values are masked in `stdout`, `stderr` and the logs (not in `vars` or output files). That is every
-  connection the task declares, not only the ones the step uses, so keep runner steps in tasks that declare only what
-  they need. The `process` runner withholds the server's own environment unless the operator allows
+  configuration), every connection the task declares except `taskRunner` is written to a `connections.json` file
+  beside the script's input, as a map from connection name to parameters - the same shape a `graalvm` script gets.
+  Declare the script's `perform` with three parameters to receive it: `perform(input, connection, context)`, then
+  read `connection["name"]["param"]`. A `perform(input, context)` keeps working and gets no connections. The values
+  are never environment variables; `BYTECHEF_CONNECTIONS_FILE` names the file for a shell script or the **Commands**
+  component, and the values are masked in `stdout`, `stderr` and the logs (not in `vars` or output files). That is
+  every connection the task declares, not only the ones the step uses, so keep runner steps in tasks that declare
+  only what they need. The `process` runner withholds the server's own environment unless the operator allows
   `inheritEnvironment`.
+
+  ```python
+  def perform(input, connection, context):
+      token = connection["github"]["accessToken"]
+
+      return {"authorized": bool(token)}
+  ```
 - **The operator decides.** Out-of-process runners are off until enabled with
   `bytechef.script.runners.<type>.enabled: true` (for example `BYTECHEF_SCRIPT_RUNNERS_DOCKER_ENABLED=true`), and
   choosing a disabled runner fails the task. Enabling `docker` lets workflow authors run any image with any user, so
