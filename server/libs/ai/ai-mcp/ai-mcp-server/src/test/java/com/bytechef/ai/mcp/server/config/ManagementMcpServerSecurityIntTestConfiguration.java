@@ -19,6 +19,7 @@ package com.bytechef.ai.mcp.server.config;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +54,7 @@ import reactor.core.publisher.Mono;
  */
 @ComponentScan(basePackages = "com.bytechef.platform.security")
 @EnableAutoConfiguration
+@EnableConfigurationProperties(ApplicationProperties.class)
 @EnableWebSecurity
 @Import(LiquibaseConfiguration.class)
 @Configuration

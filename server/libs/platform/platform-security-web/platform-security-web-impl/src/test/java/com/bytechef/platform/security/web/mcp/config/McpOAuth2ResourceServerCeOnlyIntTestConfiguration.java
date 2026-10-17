@@ -22,6 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpEndpoint;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerSecretVerifier;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -138,19 +139,20 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
         McpResourceServerProperties mcpResourceServerProperties) {
 
         return new McpOAuth2ResourceServerSecurityConfigurerContributor(
-            mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties);
+            mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties,
+            new ApplicationProperties());
     }
 
     @Bean
     McpJwtSecurityConfigurerContributor mcpJwtSecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        ObjectProvider<McpEndpoint> mcpEndpointProvider,
+        AuthorityService authorityService, ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
         ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
 
         return new McpJwtSecurityConfigurerContributor(
-            mcpResourceServerProperties, userService, mcpEndpointProvider, mcpServerSecretVerifierProvider,
-            selfIssuedTokenRevocationCheckerProvider);
+            mcpResourceServerProperties, userService, authorityService, mcpEndpointProvider,
+            mcpServerSecretVerifierProvider, selfIssuedTokenRevocationCheckerProvider, new ApplicationProperties());
     }
 
     @Bean
@@ -175,7 +177,8 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
         ObjectProvider<McpEndpoint> mcpEndpointProvider) {
 
         return new McpDiscoverySecurityConfigurerContributor(
-            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider, mcpEndpointProvider);
+            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider, mcpEndpointProvider,
+            new ApplicationProperties());
     }
 
     @Bean

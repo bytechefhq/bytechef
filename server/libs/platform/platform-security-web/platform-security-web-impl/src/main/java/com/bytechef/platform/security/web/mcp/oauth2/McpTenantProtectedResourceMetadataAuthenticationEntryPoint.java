@@ -17,35 +17,76 @@
 package com.bytechef.platform.security.web.mcp.oauth2;
 
 import com.bytechef.platform.security.web.mcp.McpAuthenticationEntryPoint;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.util.UrlUtils;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 
 /**
  * @author Ivica Cardic
  */
 public class McpTenantProtectedResourceMetadataAuthenticationEntryPoint implements McpAuthenticationEntryPoint {
 
+    public static final String INSUFFICIENT_SCOPE = "insufficient_scope";
+    public static final String INVALID_TOKEN = "invalid_token";
+
     private static final String WELL_KNOWN_PREFIX = "/.well-known/oauth-protected-resource";
+
+    private final McpEndpointRequestMatcher mcpEndpointRequestMatcher;
+    private final @Nullable String publicUrl;
+
+    @SuppressFBWarnings("EI2")
+    public McpTenantProtectedResourceMetadataAuthenticationEntryPoint(
+        McpEndpointRequestMatcher mcpEndpointRequestMatcher, @Nullable String publicUrl) {
+
+        this.mcpEndpointRequestMatcher = mcpEndpointRequestMatcher;
+        this.publicUrl = publicUrl;
+    }
 
     @Override
     public void commence(
         HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) {
 
-        String contextPath = request.getContextPath();
-        String requestUri = request.getRequestURI();
-        String pathWithinApplication = requestUri.substring(contextPath.length());
+        String error = authenticationException instanceof OAuth2AuthenticationException ? INVALID_TOKEN : null;
 
-        String metadataUrl = UriComponentsBuilder.fromUriString(UrlUtils.buildFullRequestUrl(request))
-            .replacePath(contextPath + WELL_KNOWN_PREFIX + pathWithinApplication)
-            .replaceQuery(null)
-            .fragment(null)
-            .build()
-            .toUriString();
+        sendChallenge(request, response, HttpServletResponse.SC_UNAUTHORIZED, error);
+    }
 
-        response.setHeader("WWW-Authenticate", "Bearer resource_metadata=\"" + metadataUrl + "\"");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    public void sendChallenge(
+        HttpServletRequest request, HttpServletResponse response, int status, @Nullable String error) {
+
+        String pathWithinApplication = McpProtectedResourceUrls.getPathWithinApplication(request);
+
+        StringBuilder challenge = new StringBuilder("Bearer ");
+
+        if (error != null) {
+            challenge.append("error=\"")
+                .append(error)
+                .append("\", ");
+        }
+
+        challenge.append("resource_metadata=\"")
+            .append(
+                McpProtectedResourceUrls.resolveResourceUrl(
+                    publicUrl, McpProtectedResourceUrls.getRequestBaseUrl(request),
+                    WELL_KNOWN_PREFIX + pathWithinApplication))
+            .append('"');
+
+        Optional<McpEndpoint> mcpEndpoint = mcpEndpointRequestMatcher.findMcpEndpoint(pathWithinApplication);
+
+        if (mcpEndpoint.isPresent()) {
+            McpEndpoint endpoint = mcpEndpoint.get();
+
+            challenge.append(", scope=\"")
+                .append(endpoint.getScope())
+                .append('"');
+        }
+
+        response.setHeader("WWW-Authenticate", challenge.toString());
+        response.setStatus(status);
     }
 }

@@ -43,19 +43,12 @@ public class McpEndpointRequestMatcher implements RequestMatcher {
     }
 
     public Optional<McpEndpoint> findMcpEndpoint(HttpServletRequest request) {
-        return findMcpEndpoint(getPath(request));
+        return findMcpEndpoint(McpProtectedResourceUrls.getPathWithinApplication(request));
     }
 
     public Optional<McpEndpoint> findMcpEndpoint(String path) {
         return mcpEndpoints.stream()
             .filter(mcpEndpoint -> mcpEndpoint.matches(path))
             .findFirst();
-    }
-
-    public static String getPath(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-
-        return requestUri.substring(request.getContextPath()
-            .length());
     }
 }
