@@ -17,6 +17,7 @@
 package com.bytechef.platform.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -327,6 +328,17 @@ class MailServiceIntTest {
         } catch (Exception e) {
             fail("Exception shouldn't have been thrown");
         }
+    }
+
+    @Test
+    void testSendEmailOrThrowWithException() {
+        doThrow(new MailSendException("SMTP unavailable")).when(javaMailSender)
+            .send(any(MimeMessage.class));
+
+        assertThatThrownBy(
+            () -> mailService.sendEmailOrThrow("john.doe@example.com", "testSubject", "testContent", false, false))
+                .isInstanceOf(MailSendException.class)
+                .hasMessage("SMTP unavailable");
     }
 
     @Test

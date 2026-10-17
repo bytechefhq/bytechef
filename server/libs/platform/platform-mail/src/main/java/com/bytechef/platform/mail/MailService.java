@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -38,9 +39,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 /**
- * Service for sending emails asynchronously.
- * <p>
- * We use the {@link Async} annotation to send emails asynchronously.
+ * Service for sending emails. The {@link Async} methods send in the background and only log a failed send;
+ * {@link #sendEmailOrThrow} sends on the calling thread and throws a {@link MailException} when the send fails.
  *
  * @author Ivica Cardic
  */
@@ -149,12 +149,13 @@ public class MailService {
         this.sendEmailSync(user.getEmail(), subject, content, false, true);
     }
 
-    private void sendEmailSync(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+    public void sendEmailOrThrow(
+        String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+
         log.debug(
             "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
             isMultipart, isHtml, recipient, subject, content);
 
-        // Prepare message using a Spring helper
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {
@@ -166,12 +167,20 @@ public class MailService {
 
             message.setSubject(subject);
             message.setText(content, isHtml);
+        } catch (MessagingException messagingException) {
+            throw new MailPreparationException(messagingException);
+        }
 
-            javaMailSender.send(mimeMessage);
+        javaMailSender.send(mimeMessage);
 
-            log.debug("Sent email to User '{}'", recipient);
-        } catch (MailException | MessagingException e) {
-            log.error("Email could not be sent to user '{}'", recipient, e);
+        log.debug("Sent email to User '{}'", recipient);
+    }
+
+    private void sendEmailSync(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+        try {
+            sendEmailOrThrow(recipient, subject, content, isMultipart, isHtml);
+        } catch (MailException mailException) {
+            log.error("Email could not be sent to user '{}'", recipient, mailException);
         }
     }
 }
