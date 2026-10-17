@@ -339,6 +339,34 @@ class MultiTenantAccountControllerIntTest {
     }
 
     @Test
+    void testActivateAccountOfTenantUser() throws Exception {
+        String tenantId = tenantService.createTenant();
+
+        User user = new User();
+
+        user.setLogin("activate-tenant-user@example.com");
+        user.setEmail("activate-tenant-user@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("tenant-activation-1");
+
+        TenantContext.runWithTenantId(tenantId, () -> userRepository.save(user));
+
+        restAccountMockMvc.perform(get("/api/activate?key={activationKey}", user.getActivationKey()))
+            .andExpect(status().isOk());
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            User updatedUser = userRepository.findByLogin(user.getLogin())
+                .orElseThrow();
+
+            assertThat(updatedUser.isActivated()).isTrue();
+            assertThat(updatedUser.getActivationKey()).isNull();
+        });
+
+        assertThat(tenantService.getTenantIds()).containsExactly(tenantId);
+    }
+
+    @Test
     void testActivateAccountWithWrongKey() throws Exception {
         restAccountMockMvc.perform(get("/api/activate?key=wrongActivationKey"))
             .andExpect(status().isInternalServerError());

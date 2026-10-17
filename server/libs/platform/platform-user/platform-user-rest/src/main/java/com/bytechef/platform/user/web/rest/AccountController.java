@@ -169,6 +169,22 @@ public class AccountController {
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
+        if (tenantService.isMultiTenantEnabled()) {
+            String tenantId = tenantService.getTenantIdByUserActivationKey(key);
+
+            if (tenantId != null) {
+                Optional<User> userOptional = TenantContext.callWithTenantId(
+                    tenantId, () -> userService.activateRegistration(key));
+
+                if (userOptional.isEmpty()) {
+                    throw new AccountResourceException(
+                        "No user was found for this activation key", AccountErrorType.USER_NOT_FOUND);
+                }
+
+                return;
+            }
+        }
+
         Optional<User> userOptional = userService.activateRegistration(key);
 
         if (userOptional.isEmpty()) {
