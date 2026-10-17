@@ -70,7 +70,13 @@ public final class TaskRunnerBootstrap {
                             'context.' + String(property) + ' is not available under the %s runner');
                     }
                 });
-                const bytechefResult = await perform(bytechefInput, bytechefContext);
+                const bytechefConnectionsFile = process.env.BYTECHEF_CONNECTIONS_FILE;
+                const bytechefConnection = bytechefConnectionsFile && bytechefFs.existsSync(bytechefConnectionsFile)
+                    ? JSON.parse(bytechefFs.readFileSync(bytechefConnectionsFile, 'utf8'))
+                    : {};
+                const bytechefResult = await (perform.length >= 3
+                    ? perform(bytechefInput, bytechefConnection, bytechefContext)
+                    : perform(bytechefInput, bytechefContext));
 
                 bytechefFs.writeFileSync(
                     bytechefPath.join(process.env.BYTECHEF_OUTPUT_DIR, 'output.json'),
@@ -88,6 +94,7 @@ public final class TaskRunnerBootstrap {
 
             # ByteChef bootstrap - appended, so the lines above keep their numbers.
             def _bytechef_main():
+                import inspect
                 import json
                 import os
 
@@ -99,7 +106,28 @@ public final class TaskRunnerBootstrap {
                 with open(os.environ["BYTECHEF_INPUT_FILE"], "r") as bytechef_input_file:
                     bytechef_input = json.load(bytechef_input_file)
 
-                bytechef_result = perform(bytechef_input, _BytechefContext())
+                bytechef_connection = {}
+                bytechef_connections_file = os.environ.get("BYTECHEF_CONNECTIONS_FILE")
+
+                if bytechef_connections_file and os.path.isfile(bytechef_connections_file):
+                    with open(bytechef_connections_file, "r") as bytechef_connection_file:
+                        bytechef_connection = json.load(bytechef_connection_file)
+
+                try:
+                    bytechef_parameters = inspect.signature(perform).parameters.values()
+                except (TypeError, ValueError):
+                    bytechef_parameters = []
+
+                bytechef_required_count = sum(
+                    1 for bytechef_parameter in bytechef_parameters
+                    if bytechef_parameter.kind in (
+                        inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+                    and bytechef_parameter.default is inspect.Parameter.empty)
+
+                if bytechef_required_count >= 3:
+                    bytechef_result = perform(bytechef_input, bytechef_connection, _BytechefContext())
+                else:
+                    bytechef_result = perform(bytechef_input, _BytechefContext())
 
                 bytechef_output_path = os.path.join(os.environ["BYTECHEF_OUTPUT_DIR"], "output.json")
 
