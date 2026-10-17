@@ -413,4 +413,100 @@ describe('useSSE', () => {
         expect(result.current.connectionState).toBe('CONNECTED');
         expect(result.current.errorStatus).toBeNull();
     });
+
+    it('reports the abort of a request whose fetch is cancelled by a newer request', async () => {
+        const secondStream = makeStream();
+
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockImplementationOnce(
+                (_input, init) =>
+                    new Promise<Response>((_resolve, reject) => {
+                        init?.signal?.addEventListener('abort', () =>
+                            reject(new DOMException('The operation was aborted.', 'AbortError'))
+                        );
+                    })
+            )
+            .mockResolvedValueOnce(new Response(secondStream.stream, {status: 200}));
+
+        const onRequestAbort = vi.fn();
+        const onRequestError = vi.fn();
+        const onRequestSuccess = vi.fn();
+
+        const firstRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/first'};
+        const secondRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/second'};
+
+        const {rerender} = renderHook(
+            ({request}) => useSSE(request, {onRequestAbort, onRequestError, onRequestSuccess}),
+            {initialProps: {request: firstRequest}}
+        );
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+        rerender({request: secondRequest});
+
+        await waitFor(() => expect(onRequestAbort).toHaveBeenCalledWith(firstRequest));
+        await waitFor(() => expect(onRequestSuccess).toHaveBeenCalledWith(secondRequest));
+
+        expect(onRequestError).not.toHaveBeenCalled();
+    });
+
+    it('reports the abort of a request whose response arrives after a newer request started', async () => {
+        const secondStream = makeStream();
+
+        let resolveFirstResponse: (response: Response) => void = () => {};
+
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockReturnValueOnce(
+                new Promise<Response>((resolve) => {
+                    resolveFirstResponse = resolve;
+                })
+            )
+            .mockResolvedValueOnce(new Response(secondStream.stream, {status: 200}));
+
+        const onRequestAbort = vi.fn();
+
+        const firstRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/first'};
+        const secondRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/second'};
+
+        const {rerender} = renderHook(({request}) => useSSE(request, {onRequestAbort}), {
+            initialProps: {request: firstRequest},
+        });
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+        rerender({request: secondRequest});
+
+        await act(async () => {
+            resolveFirstResponse(new Response(null, {status: 200}));
+        });
+
+        await waitFor(() => expect(onRequestAbort).toHaveBeenCalledWith(firstRequest));
+    });
+
+    it('passes the request to the success and error callbacks', async () => {
+        const rs = makeStream();
+
+        global.fetch = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(new Response(null, {status: 410}))
+            .mockResolvedValueOnce(new Response(rs.stream, {status: 200}));
+
+        const onRequestError = vi.fn();
+        const onRequestSuccess = vi.fn();
+
+        const failingRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/gone'};
+        const succeedingRequest: SSERequestType = {init: {method: 'POST'}, url: '/job/resume/live'};
+
+        const {rerender} = renderHook(({request}) => useSSE(request, {onRequestError, onRequestSuccess}), {
+            initialProps: {request: failingRequest},
+        });
+
+        await waitFor(() => expect(onRequestError).toHaveBeenCalledWith(410, failingRequest));
+
+        rerender({request: succeedingRequest});
+
+        await waitFor(() => expect(onRequestSuccess).toHaveBeenCalledWith(succeedingRequest));
+    });
 });

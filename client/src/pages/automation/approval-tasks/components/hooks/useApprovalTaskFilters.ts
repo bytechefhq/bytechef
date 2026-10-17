@@ -34,6 +34,7 @@ export function useApprovalTaskFilters(): UseApprovalTaskFiltersReturnI {
         (): ApprovalTaskCountsI => ({
             all: approvalTasks.length,
             completed: approvalTasks.filter((approvalTask) => approvalTask.status === 'completed').length,
+            expired: approvalTasks.filter((approvalTask) => approvalTask.status === 'expired').length,
             'in-progress': approvalTasks.filter((approvalTask) => approvalTask.status === 'in-progress').length,
             open: approvalTasks.filter((approvalTask) => approvalTask.status === 'open').length,
         }),

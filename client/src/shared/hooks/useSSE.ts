@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 type EventHandlersType = Record<string, (data: unknown) => void>;
 
@@ -6,14 +6,20 @@ const EVENT_PREFIX = 'event:';
 const DATA_PREFIX = 'data:';
 const SPACE = ' ';
 
-export type UseSSEOptionsType = {
-    eventHandlers?: EventHandlersType;
-    onClose?: () => void;
-};
-
 export type SSERequestType = null | {
     url: string;
     init?: RequestInit;
+};
+
+export type UseSSEOptionsType = {
+    eventHandlers?: EventHandlersType;
+    onClose?: () => void;
+
+    onRequestAbort?: (request: SSERequestType) => void;
+
+    onRequestError?: (status: number | null, request: SSERequestType) => void;
+
+    onRequestSuccess?: (request: SSERequestType) => void;
 };
 
 export type UseSSEResultType<T = unknown> = {
@@ -92,14 +98,9 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
     const abortControllerRef = useRef<AbortController | null>(null);
     const handlersRef = useRef<EventHandlersType | undefined>(options.eventHandlers);
     const onCloseRef = useRef<(() => void) | undefined>(options.onClose);
-
-    const stableRequest = useMemo(() => {
-        if (request == null) {
-            return request;
-        }
-
-        return {init: request.init, url: request.url};
-    }, [request]);
+    const onRequestAbortRef = useRef<UseSSEOptionsType['onRequestAbort']>(options.onRequestAbort);
+    const onRequestErrorRef = useRef<UseSSEOptionsType['onRequestError']>(options.onRequestError);
+    const onRequestSuccessRef = useRef<UseSSEOptionsType['onRequestSuccess']>(options.onRequestSuccess);
 
     const close = () => {
         if (abortControllerRef.current) {
@@ -110,18 +111,21 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
     useEffect(() => {
         handlersRef.current = options.eventHandlers;
-    }, [options.eventHandlers]);
+        onRequestAbortRef.current = options.onRequestAbort;
+        onRequestErrorRef.current = options.onRequestError;
+        onRequestSuccessRef.current = options.onRequestSuccess;
+    }, [options.eventHandlers, options.onRequestAbort, options.onRequestError, options.onRequestSuccess]);
 
     useEffect(() => {
         onCloseRef.current = options.onClose;
     }, [options.onClose]);
 
     useEffect(() => {
-        if (!stableRequest) {
+        if (!request) {
             return;
         }
 
-        const {init, url} = stableRequest as {url: string; init?: RequestInit};
+        const {init, url} = request;
         const controller = new AbortController();
 
         abortControllerRef.current = controller;
@@ -146,6 +150,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 });
 
                 if (controller.signal.aborted || abortControllerRef.current !== controller) {
+                    onRequestAbortRef.current?.(request);
+
                     return;
                 }
 
@@ -154,10 +160,14 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                     setErrorStatus(response.status);
                     setConnectionState('ERROR');
 
+                    onRequestErrorRef.current?.(response.status, request);
+
                     return;
                 }
 
                 setConnectionState('CONNECTED');
+
+                onRequestSuccessRef.current?.(request);
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder('utf-8');
@@ -189,6 +199,8 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
                 }
 
                 if (controller.signal.aborted || abortControllerRef.current !== controller) {
+                    onRequestAbortRef.current?.(request);
+
                     return;
                 }
 
@@ -207,9 +219,13 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
                 onCloseRef.current?.();
             } catch (error) {
-                if ((error as Error)?.name !== 'AbortError') {
+                if ((error as Error)?.name === 'AbortError') {
+                    onRequestAbortRef.current?.(request);
+                } else {
                     setError('Connection error occurred');
                     setConnectionState('ERROR');
+
+                    onRequestErrorRef.current?.(null, request);
                 }
             }
         })();
@@ -218,7 +234,7 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
             controller.abort();
             setConnectionState('CLOSED');
         };
-    }, [stableRequest]);
+    }, [request]);
 
     return {close, connectionState, data, error, errorStatus};
 };
