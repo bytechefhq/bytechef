@@ -110,24 +110,6 @@ If the execution fails, you’ll see which component encountered the error, alon
 </Steps>
 
 
-## Retention
-
-> **Coming soon.** Execution retention is on the upcoming release track and is not yet enforced in the latest released version of ByteChef.
-
-Execution records are kept indefinitely unless a retention window is configured. When one is, a
-sweep runs every six hours per tenant and deletes runs that finished before the window - the job
-row, its task outputs, its stored context, and its `CURRENT_EXECUTION` data storage. Retention
-applies to *finished* runs of every outcome; there is no separate window for failures. Subflow
-child runs are left to their parent.
-
-| Property | Purpose |
-|---|---|
-| `bytechef.workflow.execution.retention.enabled` | Turns the sweep off. Defaults to on. |
-| `bytechef.workflow.execution.retention.default-retention-days` | The window, in days, when the tenant's plan does not set one. Unset means no purging. |
-
-Deleting a run deletes its history - export anything you need for audit or analytics before the
-window elapses.
-
 ## Reading executions programmatically
 
 > **Coming soon.** The public executions endpoints are on the upcoming release track and are not yet available in the latest released version of ByteChef.

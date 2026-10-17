@@ -98,19 +98,7 @@ no workflow change and no redeploy.
 ## Data retention
 
 ByteChef does not delete your data unless you tell it to, and there is no consolidated retention
-settings screen today - retention is configured per data type through the properties below.
-
-> **Coming soon.** Execution-history retention (`BYTECHEF_WORKFLOW_EXECUTION_RETENTION_*`) is on the
-> upcoming release track and is not yet available in the latest released version of ByteChef. It
-> permanently deletes finished runs past a configured window, along with their task executions,
-> output blobs, and context rows. See
-> [Crash recovery](/platform/use-bytechef/self-hosted/management/crash-recovery) for the monitor's
-> cadence, its variables, and their defaults.
-
-Two things to plan for once you set a window. Deletion is not instantaneous - a scheduled monitor
-sweeps on a fixed cadence and removes expired records in batches. And expired execution records take
-their [file storage](/platform/use-bytechef/self-hosted/configuration/file-storage) artifacts with
-them, so storage cost tracks the retention policy rather than growing without bound.
+settings screen today. Execution history is kept until you delete it.
 
 ## More configuration topics
 

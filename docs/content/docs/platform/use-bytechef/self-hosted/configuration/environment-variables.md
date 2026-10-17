@@ -516,31 +516,6 @@ System administrator is used for accessing protected data reachable through /act
 
 ## Workflow Configuration
 
-### Execution Recovery
-
-> **Coming soon.** The execution recovery, timeout, and retention monitors (the variables in this and the following two subsections) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_ENABLED` | Enable the orphaned-job recovery monitor. Workers heartbeat every in-flight task every 30 seconds; a job whose row and non-terminal task executions all go stale is marked FAILED and becomes resumable | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_STALENESS_THRESHOLD` | How long a STARTED job and its tasks must go without a heartbeat before being treated as orphaned (ISO-8601 duration) | `PT5M` |
-| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_AUTO_RESUME` | Automatically resume recovered jobs from the last completed task (at-least-once semantics - the interrupted task re-runs) | `false` |
-| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_MAX_AUTO_RESUME_ATTEMPTS` | Cap on automatic resume attempts per job | `3` |
-
-### Execution Timeout
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_ENABLED` | Enable the per-run timeout monitor, which fails STARTED jobs whose runtime exceeds the plan's async run timeout or the default below. Timed-out runs are not auto-resumed | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_DEFAULT_TIMEOUT` | Fallback run-duration limit when the plan does not define one (ISO-8601 duration, e.g. `PT1H`). Unset means no timeout | - |
-
-### Execution Retention
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_WORKFLOW_EXECUTION_RETENTION_ENABLED` | Enable the retention monitor, which permanently deletes finished jobs (including their task executions and contexts) older than the plan's log retention window or the default below | `true` |
-| `BYTECHEF_WORKFLOW_EXECUTION_RETENTION_DEFAULT_RETENTION_DAYS` | Fallback retention window in days when the plan does not define one. Unset means execution history is kept forever | - |
-
 ### Code Workflow
 
 | Environment Variable | Description | Default Value |
