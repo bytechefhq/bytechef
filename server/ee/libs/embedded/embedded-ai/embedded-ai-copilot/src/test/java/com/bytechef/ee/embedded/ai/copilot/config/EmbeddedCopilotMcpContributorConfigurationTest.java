@@ -8,11 +8,15 @@
 package com.bytechef.ee.embedded.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
@@ -59,6 +63,21 @@ class EmbeddedCopilotMcpContributorConfigurationTest {
                 assertThat(toolCallback.getToolDefinition()
                     .inputSchema()).contains("workspaceId");
             });
+    }
+
+    @Test
+    void testRendersSpecialistQuestionsAsPlainText() {
+        IntelligentToolCatalog intelligentToolCatalog = mock(IntelligentToolCatalog.class);
+
+        McpServerToolCallbackContributor contributor =
+            configuration.embeddedWorkflowEditorMcpToolCallbackContributor(intelligentToolCatalog,
+                mock(WorkspaceFacade.class));
+
+        contributor.getToolCallbacks();
+
+        verify(intelligentToolCatalog).getByNames(
+            eq(EmbeddedCopilotMcpContributorConfiguration.INTELLIGENT_TOOL_NAMES), eq(IntelligentToolVariant.BUILD),
+            any(), any(), eq(SubAgentQuestionRenderer.PLAIN_TEXT));
     }
 
     private static IntelligentToolDefinition intelligentDefinition(String name) {
