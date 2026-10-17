@@ -20,4 +20,6 @@ package com.bytechef.platform.notification.handler;
  * @author Matija Petanjek
  */
 public interface WebhookNotificationHandler extends NotificationHandler {
+
+    String getPayload(NotificationHandlerContext notificationHandlerContext);
 }
