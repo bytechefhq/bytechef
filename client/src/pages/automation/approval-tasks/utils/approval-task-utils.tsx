@@ -1,12 +1,12 @@
 import {ApprovalTaskPriority, ApprovalTaskStatus} from '@/shared/middleware/graphql';
-import {CheckCircle2Icon, CircleIcon, ClockIcon} from 'lucide-react';
+import {CheckCircle2Icon, CircleIcon, ClockIcon, XCircleIcon} from 'lucide-react';
 
 import type {ReactNode} from 'react';
 
 import type {ApprovalTaskI, AssigneeOptionI, SortDirectionType, SortOptionType} from '../types/types';
 
 const PRIORITY_ORDER: Record<string, number> = {high: 3, low: 1, medium: 2};
-const STATUS_ORDER: Record<string, number> = {completed: 3, 'in-progress': 2, open: 1};
+const STATUS_ORDER: Record<string, number> = {completed: 3, expired: 4, 'in-progress': 2, open: 1};
 
 export const getCurrentTimestamp = (): string => {
     return new Date().toISOString();
@@ -98,6 +98,8 @@ export const getStatusIcon = (status: string): ReactNode => {
     switch (status) {
         case 'completed':
             return <CheckCircle2Icon className="size-4 text-green-500" />;
+        case 'expired':
+            return <XCircleIcon className="size-4 text-gray-400" />;
         case 'in-progress':
             return <ClockIcon className="size-4 text-blue-500" />;
         default:
@@ -119,7 +121,7 @@ export const getPriorityColor = (priority: string): string => {
 };
 
 export const isApprovalTaskOverdue = (approvalTask: ApprovalTaskI): boolean => {
-    if (!approvalTask.dueDate || approvalTask.status === 'completed') {
+    if (!approvalTask.dueDate || approvalTask.status === 'completed' || approvalTask.status === 'expired') {
         return false;
     }
 
@@ -134,6 +136,8 @@ export const getStatusLabel = (status: string): string => {
             return 'In Progress';
         case 'completed':
             return 'Completed';
+        case 'expired':
+            return 'Expired';
         default:
             return status;
     }
@@ -149,6 +153,8 @@ export const toClientStatus = (status: ApprovalTaskStatus | null | undefined): A
             return 'in-progress';
         case ApprovalTaskStatus.Completed:
             return 'completed';
+        case ApprovalTaskStatus.Expired:
+            return 'expired';
         case ApprovalTaskStatus.Open:
         default:
             return 'open';
@@ -161,6 +167,8 @@ export const toServerStatus = (status: ApprovalTaskI['status']): ApprovalTaskSta
             return ApprovalTaskStatus.InProgress;
         case 'completed':
             return ApprovalTaskStatus.Completed;
+        case 'expired':
+            return ApprovalTaskStatus.Expired;
         case 'open':
         default:
             return ApprovalTaskStatus.Open;

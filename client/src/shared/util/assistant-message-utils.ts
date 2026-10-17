@@ -18,6 +18,15 @@ export interface AskUserQuestionEventI {
     resumeUrl?: string;
 }
 
+export interface ApprovalRequestEventI {
+    expiresAt?: string;
+    formDescription?: string;
+    formTitle?: string;
+    formUrl?: string;
+    inputs?: unknown[];
+    resumeId: string;
+}
+
 export interface ResumeFailureI {
     message: string;
     retryable: boolean;
@@ -178,6 +187,15 @@ export function formatAskUserQuestionMessage(event: AskUserQuestionEventI): stri
             return `**${question.header}**: ${question.question}\n${optionLines}`;
         })
         .join('\n\n');
+}
+
+export function formatApprovalRequestMessage(event: ApprovalRequestEventI): string {
+    const title = event.formTitle || 'Approval requested';
+    const description = event.formDescription ? `\n\n${event.formDescription}` : '';
+    const expiry = event.expiresAt ? `\n\nExpires ${new Date(event.expiresAt).toLocaleString()}` : '';
+    const link = event.formUrl ? `\n\n[Open the approval form](${event.formUrl})` : '';
+
+    return `**${title}**${description}${expiry}${link}`;
 }
 
 /**
