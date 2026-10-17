@@ -46,7 +46,7 @@ import tools.jackson.databind.JsonNode;
 public final class AskUserQuestionToolCallback implements ToolCallback {
 
     static final String TOOL_NAME = "askUserQuestion";
-    static final String KIND = "ask-user-question";
+    public static final String KIND = "ask-user-question";
 
     private static final String INPUT_CONSTRAINTS_GUIDANCE =
         " Input rules: provide 1-4 questions; each question must have 2-4 options. A free-text \"Other\" answer is" +
