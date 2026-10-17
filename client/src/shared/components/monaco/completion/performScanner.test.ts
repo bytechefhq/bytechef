@@ -139,4 +139,31 @@ describe('findPerformScope', () => {
 
         expect(findPerformScope(source, source.length, 'ruby')).toBeUndefined();
     });
+
+    it('ignores braces inside JavaScript comments', () => {
+        const source =
+            'function perform(input, context) {\n  // }\n  /* } */\n  const f = (row) => row.id; // }\n  context.';
+
+        expect(findPerformScope(source, source.length, 'javascript', 'context')).toMatchObject({
+            contextName: 'context',
+        });
+    });
+
+    it('ignores closing parentheses inside a comment in an expression-bodied arrow', () => {
+        const source = 'function perform(input, context) {\n  const f = (row) => row.id /* ) */ + row.';
+
+        expect(findEnclosingFunctionName(source, source.length, 'javascript')).toBe('f');
+    });
+
+    it('ignores end keywords inside Ruby comments and strings', () => {
+        const source = 'def perform(input, context)\n  # end\n  label = "end }"\n  context.';
+
+        expect(findPerformScope(source, source.length, 'ruby', 'context')).toMatchObject({contextName: 'context'});
+    });
+
+    it('ignores dedented Python comment lines', () => {
+        const source = 'def perform(input, context):\n# note\n    context.';
+
+        expect(findPerformScope(source, source.length, 'python', 'context')).toMatchObject({contextName: 'context'});
+    });
 });
