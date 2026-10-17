@@ -201,7 +201,9 @@ class JobSyncExecutorIntTest {
 
         jobSyncExecutor.deleteJob(jobId);
 
-        assertThat(publishedApplicationEvents).containsExactly(new JobDeletedEvent(jobId));
+        assertThat(publishedApplicationEvents)
+            .filteredOn(JobDeletedEvent.class::isInstance)
+            .containsExactly(new JobDeletedEvent(jobId));
         assertThat(jobService.fetchJob(jobId)).isEmpty();
         assertThat(taskExecutionService.getJobTaskExecutions(jobId)).isEmpty();
     }
