@@ -21,6 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -46,13 +47,15 @@ import org.springframework.context.ApplicationEventPublisher;
  * Resumes a job when its suspend deadline passes. A task scheduled with the suspend's resume id resumes the job only
  * while the job still waits on that suspend, and retries with a growing delay while the job has not reached the suspend
  * yet or the resume fails. A task without a resume id (scheduled before resume ids were stored), or one whose resume id
- * cannot be checked because no local {@link JobResumeFacade} is available, resumes the job unconditionally.
+ * cannot be checked because no local {@link JobResumeFacade} is available, resumes the job unconditionally. A task runs
+ * in the tenant stored with it; a task scheduled before the tenant was stored runs in the current tenant.
  *
  * @author Ivica Cardic
  */
 public class OneTimeSchedulerJob implements Job {
 
     public static final String CONTINUE_PARAMETERS = "continueParameters";
+    public static final String TENANT_ID = "tenantId";
 
     static final int MAX_RETRY_ATTEMPTS = 10;
     static final String RETRY_ATTEMPT = "retryAttempt";
@@ -70,6 +73,32 @@ public class OneTimeSchedulerJob implements Job {
     public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
+        String tenantId = jobDataMap.getString(TENANT_ID);
+
+        if (tenantId == null) {
+            resume(context, jobDataMap);
+        } else {
+            TenantContext.runWithTenantId(tenantId, () -> resume(context, jobDataMap));
+        }
+    }
+
+    @Autowired
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+    @Autowired(required = false)
+    public void setJobResumeFacade(JobResumeFacade jobResumeFacade) {
+        this.jobResumeFacade = jobResumeFacade;
+    }
+
+    static Duration getRetryDelay(int retryAttempt) {
+        Duration retryDelay = INITIAL_RETRY_DELAY.multipliedBy(1L << Math.min(retryAttempt, 16));
+
+        return retryDelay.compareTo(MAX_RETRY_DELAY) > 0 ? MAX_RETRY_DELAY : retryDelay;
+    }
+
+    private void resume(JobExecutionContext context, JobDataMap jobDataMap) {
         long jobId = jobDataMap.getLong("jobId");
 
         String jobResumeId = getJobResumeId(jobDataMap, jobId);
@@ -97,22 +126,6 @@ public class OneTimeSchedulerJob implements Job {
         }
 
         eventPublisher.publishEvent(new ResumeJobEvent(jobId));
-    }
-
-    @Autowired
-    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
-
-    @Autowired(required = false)
-    public void setJobResumeFacade(JobResumeFacade jobResumeFacade) {
-        this.jobResumeFacade = jobResumeFacade;
-    }
-
-    static Duration getRetryDelay(int retryAttempt) {
-        Duration retryDelay = INITIAL_RETRY_DELAY.multipliedBy(1L << Math.min(retryAttempt, 16));
-
-        return retryDelay.compareTo(MAX_RETRY_DELAY) > 0 ? MAX_RETRY_DELAY : retryDelay;
     }
 
     private static @Nullable String getJobResumeId(JobDataMap jobDataMap, long jobId) {
