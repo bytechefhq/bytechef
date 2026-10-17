@@ -17,6 +17,8 @@
 package com.bytechef.ai.mcp.server.security.web.configurer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -29,6 +31,8 @@ import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA2AServerSecurityConfigurer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -209,7 +213,7 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         }
 
         @Test
-        void testRequestWithEnvironmentMismatchIsRejected() throws Exception {
+        void testRequestWithAdminApiKeyOfAnotherEnvironmentIsAccepted() throws Exception {
             mockApiKey(null, Environment.PRODUCTION);
 
             mockMvc
@@ -219,7 +223,7 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                         .header("Authorization", "Bearer " + API_SECRET_KEY)
                         .header("X-ENVIRONMENT", "STAGING"))
                 .andExpect(MockMvcResultMatchers.status()
-                    .isUnauthorized());
+                    .isOk());
         }
 
         @Test
@@ -435,6 +439,24 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             }
 
             @Bean
+            WorkspaceApiKeyService workspaceApiKeyService() {
+                WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+
+                when(workspaceApiKeyService.fetchApiKeyWorkspaceId(anyLong())).thenReturn(Optional.of(1L));
+
+                return workspaceApiKeyService;
+            }
+
+            @Bean
+            WorkspaceMcpServerService workspaceMcpServerService() {
+                WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
+
+                when(workspaceMcpServerService.fetchMcpServerWorkspaceId(any())).thenReturn(Optional.of(1L));
+
+                return workspaceMcpServerService;
+            }
+
+            @Bean
             RouterFunction<ServerResponse> mcpStubRouterFunction() {
                 return RouterFunctions.route()
                     .POST(CANONICAL_MCP_PATH, request -> {
@@ -451,7 +473,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             @Bean
             SecurityFilterChain securityFilterChain(
                 HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-                PropertyService propertyService, UserService userService) throws Exception {
+                PropertyService propertyService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+                WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
                 return http
                     .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -677,6 +700,24 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             }
 
             @Bean
+            WorkspaceApiKeyService workspaceApiKeyService() {
+                WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+
+                when(workspaceApiKeyService.fetchApiKeyWorkspaceId(anyLong())).thenReturn(Optional.of(1L));
+
+                return workspaceApiKeyService;
+            }
+
+            @Bean
+            WorkspaceMcpServerService workspaceMcpServerService() {
+                WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
+
+                when(workspaceMcpServerService.fetchMcpServerWorkspaceId(any())).thenReturn(Optional.of(1L));
+
+                return workspaceMcpServerService;
+            }
+
+            @Bean
             RouterFunction<ServerResponse> mcpStubRouterFunction() {
                 return RouterFunctions.route()
                     .POST("/api/management/{secretKey}/mcp", request -> ServerResponse.ok()
@@ -690,7 +731,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             SecurityFilterChain securityFilterChain(
                 HttpSecurity http, A2aServerService a2aServerService, ApiKeyService apiKeyService,
                 AuthorityService authorityService, McpServerService mcpServerService, PropertyService propertyService,
-                UserService userService) throws Exception {
+                UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+                WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
                 EnvironmentService environmentService = () -> List.of(Environment.values());
 
@@ -699,11 +741,13 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                         .permitAll())
                     .with(
                         new AutomationMcpServerSecurityConfigurer(
-                            apiKeyService, authorityService, environmentService, mcpServerService, userService),
+                            apiKeyService, authorityService, environmentService, mcpServerService, userService,
+                            workspaceApiKeyService, workspaceMcpServerService),
                         Customizer.withDefaults())
                     .with(
                         new AutomationA2AServerSecurityConfigurer(
-                            apiKeyService, authorityService, environmentService, a2aServerService, userService),
+                            apiKeyService, authorityService, environmentService, a2aServerService, userService,
+                            workspaceApiKeyService),
                         Customizer.withDefaults())
                     .with(
                         new ManagementMcpServerSecurityConfigurer(
@@ -850,12 +894,12 @@ class ManagementMcpServerSecurityConfigurerIntTest {
         }
 
         @Test
-        void testInitializeWithEnvironmentMismatchIsRejected() throws Exception {
+        void testInitializeWithAdminApiKeyOfAnotherEnvironmentIsAccepted() throws Exception {
             String secretKey = seedApiKey(null, ENVIRONMENT);
 
             HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, "STAGING");
 
-            assertThat(httpResponse.statusCode()).isEqualTo(401);
+            assertThat(httpResponse.statusCode()).isEqualTo(200);
         }
 
         @Test

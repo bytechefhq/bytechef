@@ -22,14 +22,23 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     implements ConnectedUserAuthentication {
 
     private long connectedUserId;
+    private boolean environmentRequested;
     private @Nullable String externalUserId;
     private @Nullable String mcpServerSecretKey;
 
     public EmbeddedMcpServerApiKeyAuthenticationToken(
         long environmentId, @Nullable String externalUserId, String tenantId, String mcpServerSecretKey) {
 
+        this(environmentId, false, externalUserId, tenantId, mcpServerSecretKey);
+    }
+
+    public EmbeddedMcpServerApiKeyAuthenticationToken(
+        long environmentId, boolean environmentRequested, @Nullable String externalUserId, String tenantId,
+        String mcpServerSecretKey) {
+
         super(environmentId, tenantId);
 
+        this.environmentRequested = environmentRequested;
         this.externalUserId = externalUserId;
         this.mcpServerSecretKey = mcpServerSecretKey;
     }
@@ -63,5 +72,9 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
 
     public @Nullable String getMcpServerSecretKey() {
         return mcpServerSecretKey;
+    }
+
+    public boolean isEnvironmentRequested() {
+        return environmentRequested;
     }
 }

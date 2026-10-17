@@ -529,7 +529,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     private void validateSameWorkspace(Project project, long mcpServerId) {
         Long projectWorkspaceId = project.getWorkspaceId();
-        Long mcpServerWorkspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServerId)
+        Long mcpServerWorkspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId)
             .orElse(null);
 
         if (projectWorkspaceId == null || !projectWorkspaceId.equals(mcpServerWorkspaceId)) {

@@ -35,6 +35,7 @@ import org.springframework.security.core.Authentication;
  */
 class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
+    private static final String ENVIRONMENT_HEADER_NAME = "X-ENVIRONMENT";
     private static final Pattern SECRET_KEY_PATH_PATTERN = Pattern.compile("^/api/embedded/(.+)/mcp");
 
     private final SigningKeyService signingKeyService;
@@ -51,12 +52,14 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
     public Authentication convert(HttpServletRequest request) {
         String mcpServerSecretKey = getMcpServerSecretKey(request);
         Environment environment = getEnvironment(request);
+        boolean environmentRequested = request.getHeader(ENVIRONMENT_HEADER_NAME) != null;
 
         Jws<Claims> jws = fetchJws(fetchAuthToken(request), environment.ordinal());
 
         if (jws == null) {
             return new EmbeddedMcpServerApiKeyAuthenticationToken(
-                environment.ordinal(), null, getTenantId(mcpServerSecretKey), mcpServerSecretKey);
+                environment.ordinal(), environmentRequested, null, getTenantId(mcpServerSecretKey),
+                mcpServerSecretKey);
         }
 
         Claims payload = jws.getPayload();
@@ -68,7 +71,7 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
         return new EmbeddedMcpServerApiKeyAuthenticationToken(
-            environment.ordinal(), externalUserId, tenantKey.getTenantId(), mcpServerSecretKey);
+            environment.ordinal(), environmentRequested, externalUserId, tenantKey.getTenantId(), mcpServerSecretKey);
     }
 
     @Nullable

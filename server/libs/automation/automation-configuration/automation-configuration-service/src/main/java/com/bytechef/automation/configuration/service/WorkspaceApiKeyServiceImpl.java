@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.repository.WorkspaceApiKeyRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,13 @@ public class WorkspaceApiKeyServiceImpl implements WorkspaceApiKeyService {
     @Override
     public List<WorkspaceApiKey> getWorkspaceApiKeys(long workspaceId) {
         return workspaceApiKeyRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchApiKeyWorkspaceId(long apiKeyId) {
+        return workspaceApiKeyRepository.findByApiKeyId(apiKeyId)
+            .map(WorkspaceApiKey::getWorkspaceId);
     }
 
     @Override

@@ -481,6 +481,7 @@ class AutomationA2AServerSecurityConfigurerIntTest {
 
         a2aServer.setId(A2A_SERVER_ID);
         a2aServer.setEnabled(enabled);
+        a2aServer.setWorkspaceId(1L);
         a2aServer.setAuthenticationRequired(authenticationRequired);
 
         when(a2aServerService.fetchA2aServer(a2aServerSecretKey)).thenAnswer(invocation -> {

@@ -99,12 +99,13 @@ class ManagementMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticateWithEnvironmentMismatchFails() {
+    void testAuthenticateAcceptsAnAdminApiKeyInAnyEnvironment() {
         mockApiKey(null, Environment.PRODUCTION);
 
-        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
-            () -> managementMcpServerApiKeyAuthenticationProvider.authenticate(
-                getUnauthenticatedToken(Environment.STAGING, "server-secret")));
+        Authentication authentication = managementMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.STAGING, "server-secret"));
+
+        assertThat(authentication.isAuthenticated()).isTrue();
     }
 
     @Test

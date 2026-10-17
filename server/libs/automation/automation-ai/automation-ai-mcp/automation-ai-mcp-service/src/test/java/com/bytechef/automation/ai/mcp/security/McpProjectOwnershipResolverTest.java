@@ -44,7 +44,7 @@ class McpProjectOwnershipResolverTest {
 
         when(mcpProject.getMcpServerId()).thenReturn(7L);
         when(mcpProjectRepository.findById(1L)).thenReturn(Optional.of(mcpProject));
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(7L)).thenReturn(Optional.of(42L));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(7L)).thenReturn(Optional.of(42L));
 
         assertThat(resolver.resolveOwner(1L)
             .workspaceId()).hasValue(42L);

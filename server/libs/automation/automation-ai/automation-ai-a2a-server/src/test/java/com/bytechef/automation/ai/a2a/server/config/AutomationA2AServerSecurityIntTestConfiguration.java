@@ -16,10 +16,13 @@
 
 package com.bytechef.automation.ai.a2a.server.config;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA2AServerSecurityConfigurer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -28,6 +31,7 @@ import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -75,9 +79,19 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
     }
 
     @Bean
+    WorkspaceApiKeyService workspaceApiKeyService() {
+        WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(anyLong())).thenReturn(Optional.of(1L));
+
+        return workspaceApiKeyService;
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-        A2aServerService a2aServerService, UserService userService) throws Exception {
+        A2aServerService a2aServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService)
+        throws Exception {
 
         return http
             .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -85,7 +99,7 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
             .with(
                 new AutomationA2AServerSecurityConfigurer(
                     apiKeyService, authorityService, () -> List.of(Environment.values()), a2aServerService,
-                    userService),
+                    userService, workspaceApiKeyService),
                 Customizer.withDefaults())
             .build();
     }

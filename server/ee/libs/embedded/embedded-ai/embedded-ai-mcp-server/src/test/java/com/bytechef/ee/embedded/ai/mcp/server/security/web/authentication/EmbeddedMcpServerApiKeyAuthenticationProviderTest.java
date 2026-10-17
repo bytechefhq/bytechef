@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -35,7 +36,7 @@ import org.springframework.security.core.Authentication;
  */
 class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
-    private static final long ENVIRONMENT_ID = 2L;
+    private static final long ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long MCP_SERVER_ID = 1050L;
     private static final String MCP_SERVER_SECRET_KEY = "server-secret";
@@ -147,6 +148,39 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
+    void testAuthenticateRejectsAnonymousRequestNamingAnotherEnvironment() {
+        mockMcpServer(PlatformType.EMBEDDED, false);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    Environment.DEVELOPMENT.ordinal(), true, null, "public", MCP_SERVER_SECRET_KEY)));
+    }
+
+    @Test
+    void testAuthenticateAllowsAnonymousRequestNamingNoEnvironment() {
+        mockMcpServer(PlatformType.EMBEDDED, false);
+
+        Authentication authentication = embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                Environment.DEVELOPMENT.ordinal(), false, null, "public", MCP_SERVER_SECRET_KEY));
+
+        assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
+    }
+
+    @Test
+    void testAuthenticateRejectsTokenOfAnotherEnvironment() {
+        mockMcpServer(PlatformType.EMBEDDED, true);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    Environment.DEVELOPMENT.ordinal(), EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)));
+        verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
+        verify(connectedUserService, never()).createConnectedUser(anyString(), anyLong());
+    }
+
+    @Test
     void testAuthenticateRejectsDisabledConnectedUser() {
         mockMcpServer(PlatformType.EMBEDDED, true);
 
@@ -169,6 +203,7 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     private void mockMcpServer(PlatformType type, boolean authenticationRequired, boolean enabled) {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getEnvironment()).thenReturn(Environment.PRODUCTION);
         when(mcpServer.getId()).thenReturn(MCP_SERVER_ID);
         when(mcpServer.getType()).thenReturn(type);
         when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);

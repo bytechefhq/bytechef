@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -54,10 +55,11 @@ class AutomationA2AServerApiKeyAuthenticationProviderTest {
     private final AuthorityService authorityService = mock(AuthorityService.class);
     private final A2aServerService a2aServerService = mock(A2aServerService.class);
     private final UserService userService = mock(UserService.class);
+    private final WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
 
     private final AutomationA2AServerApiKeyAuthenticationProvider provider =
         new AutomationA2AServerApiKeyAuthenticationProvider(
-            apiKeyService, authorityService, a2aServerService, userService);
+            apiKeyService, authorityService, a2aServerService, userService, workspaceApiKeyService);
 
     @Test
     void testAuthenticateWithValidAutomationApiKeySucceeds() {
@@ -68,6 +70,44 @@ class AutomationA2AServerApiKeyAuthenticationProviderTest {
 
         assertThat(authentication.isAuthenticated()).isTrue();
         verify(apiKeyService).updateLastUsedDate(7L);
+    }
+
+    @Test
+    void testAuthenticateWithApiKeyOfAnotherWorkspaceFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockA2aServer(Environment.PRODUCTION);
+
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.of(2L));
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(getUnauthenticatedToken()));
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithA2aServerOfNoWorkspaceFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockA2aServer(Environment.PRODUCTION);
+
+        A2aServer a2aServer = a2aServerService.fetchA2aServer("server-secret")
+            .orElseThrow();
+
+        when(a2aServer.getWorkspaceId()).thenReturn(null);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithEnvironmentHeaderOfAnotherEnvironmentFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockA2aServer(Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(
+                ApiKeyAuthenticationToken.unauthenticated(
+                    new McpApiKeyCredentials(
+                        Environment.DEVELOPMENT, Environment.DEVELOPMENT, "server-secret", "api-secret"))));
     }
 
     @Test
@@ -236,8 +276,10 @@ class AutomationA2AServerApiKeyAuthenticationProviderTest {
         A2aServer a2aServer = mock(A2aServer.class);
 
         when(a2aServer.getEnvironment()).thenReturn(environment);
+        when(a2aServer.getWorkspaceId()).thenReturn(1L);
         when(a2aServer.isEnabled()).thenReturn(true);
         when(a2aServer.isAuthenticationRequired()).thenReturn(true);
         when(a2aServerService.fetchA2aServer("server-secret")).thenReturn(Optional.of(a2aServer));
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.of(1L));
     }
 }

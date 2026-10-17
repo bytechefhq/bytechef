@@ -149,7 +149,7 @@ class ManagementMcpServerSecurityFilterChainTest {
     }
 
     @Test
-    void testRequestWithEnvironmentMismatchIsRejected() throws Exception {
+    void testRequestWithAdminApiKeyOfAnotherEnvironmentIsAccepted() throws Exception {
         mockApiKey(null, Environment.PRODUCTION);
 
         mockMvc
@@ -159,7 +159,7 @@ class ManagementMcpServerSecurityFilterChainTest {
                     .header("Authorization", "Bearer " + API_SECRET_KEY)
                     .header("X-ENVIRONMENT", "STAGING"))
             .andExpect(MockMvcResultMatchers.status()
-                .isUnauthorized());
+                .isOk());
     }
 
     private void mockApiKey(PlatformType type, Environment environment) {

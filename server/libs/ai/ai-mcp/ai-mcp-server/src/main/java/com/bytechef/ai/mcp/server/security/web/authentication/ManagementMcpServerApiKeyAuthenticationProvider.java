@@ -86,10 +86,6 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
-        if (mcpApiKeyEntity.getEnvironment() != mcpApiKeyCredentials.getEnvironment()) {
-            throw new BadCredentialsException("Invalid API key");
-        }
-
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
         return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());

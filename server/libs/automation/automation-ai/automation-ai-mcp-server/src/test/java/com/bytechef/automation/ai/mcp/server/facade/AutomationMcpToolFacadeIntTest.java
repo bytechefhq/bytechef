@@ -742,7 +742,7 @@ class AutomationMcpToolFacadeIntTest {
             .thenReturn("The POST method submits an entity to the specified resource.");
         when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
             .thenReturn(clusterElementDefinition);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             facade.getFunctionToolCallback(mcpTool);
@@ -797,7 +797,7 @@ class AutomationMcpToolFacadeIntTest {
         when(mcpComponentService.getMcpComponent(2L)).thenReturn(mcpComponent);
         when(clusterElementDefinitionService.getClusterElementDefinition("slack", 1, "sendMessage"))
             .thenReturn(clusterElementDefinition);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(30L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(30L)).thenReturn(Optional.empty());
 
         return facade.getFunctionToolCallback(mcpTool(true));
     }

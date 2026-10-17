@@ -35,12 +35,21 @@ public final class McpApiKeyCredentials implements ApiKey {
     private final Environment environment;
     private final String id;
     private final @Nullable String mcpServerSecretKey;
+    private final @Nullable Environment requestedEnvironment;
     private final @Nullable String secretKey;
 
     public McpApiKeyCredentials(
         Environment environment, @Nullable String mcpServerSecretKey, @Nullable String secretKey) {
 
+        this(environment, null, mcpServerSecretKey, secretKey);
+    }
+
+    public McpApiKeyCredentials(
+        Environment environment, @Nullable Environment requestedEnvironment, @Nullable String mcpServerSecretKey,
+        @Nullable String secretKey) {
+
         this.environment = environment;
+        this.requestedEnvironment = requestedEnvironment;
         this.id = secretKey == null ? "" : fingerprint(secretKey);
         this.mcpServerSecretKey = mcpServerSecretKey;
         this.secretKey = secretKey;
@@ -67,6 +76,11 @@ public final class McpApiKeyCredentials implements ApiKey {
     @Nullable
     public String getMcpServerSecretKey() {
         return mcpServerSecretKey;
+    }
+
+    @Nullable
+    public Environment getRequestedEnvironment() {
+        return requestedEnvironment;
     }
 
     @Override

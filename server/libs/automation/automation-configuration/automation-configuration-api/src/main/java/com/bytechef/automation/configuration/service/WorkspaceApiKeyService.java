@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -31,4 +32,6 @@ public interface WorkspaceApiKeyService {
     List<WorkspaceApiKey> getWorkspaceApiKeys(long workspaceId);
 
     void deleteWorkspaceApiKey(long apiKeyId);
+
+    Optional<Long> fetchApiKeyWorkspaceId(long apiKeyId);
 }

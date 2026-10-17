@@ -56,7 +56,7 @@ public class McpToolOwnershipResolver implements ResourceOwnershipResolver {
             .map(McpTool::getMcpComponentId)
             .flatMap(mcpComponentRepository::findById)
             .map(McpComponent::getMcpServerId)
-            .flatMap(workspaceMcpServerService::fetchWorkspaceIdByMcpServerId)
+            .flatMap(workspaceMcpServerService::fetchMcpServerWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }

@@ -155,12 +155,12 @@ class ManagementMcpServerSecurityIntTest {
     }
 
     @Test
-    void testInitializeWithEnvironmentMismatchIsRejected() throws Exception {
+    void testInitializeWithAdminApiKeyOfAnotherEnvironmentIsAccepted() throws Exception {
         String secretKey = seedApiKey(null, ENVIRONMENT);
 
         HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, "STAGING");
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
     }
 
     @Test

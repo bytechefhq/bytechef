@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.server.security.web.configurer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -29,6 +30,7 @@ import com.bytechef.automation.ai.mcp.server.config.AutomationMcpServerSecurityI
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -475,6 +477,24 @@ class AutomationMcpServerSecurityConfigurerIntTest {
             }
 
             @Bean
+            WorkspaceApiKeyService workspaceApiKeyService() {
+                WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+
+                when(workspaceApiKeyService.fetchApiKeyWorkspaceId(anyLong())).thenReturn(Optional.of(1L));
+
+                return workspaceApiKeyService;
+            }
+
+            @Bean
+            WorkspaceMcpServerService workspaceMcpServerService() {
+                WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
+
+                when(workspaceMcpServerService.fetchMcpServerWorkspaceId(any())).thenReturn(Optional.of(1L));
+
+                return workspaceMcpServerService;
+            }
+
+            @Bean
             RouterFunction<ServerResponse> mcpStubRouterFunction() {
                 return RouterFunctions.route()
                     .POST("/api/automation/{secretKey}/mcp", request -> ServerResponse.ok()
@@ -485,7 +505,9 @@ class AutomationMcpServerSecurityConfigurerIntTest {
             @Bean
             SecurityFilterChain securityFilterChain(
                 HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-                McpServerService mcpServerService, UserService userService) throws Exception {
+                McpServerService mcpServerService, UserService userService,
+                WorkspaceApiKeyService workspaceApiKeyService,
+                WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
                 return http
                     .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -493,7 +515,7 @@ class AutomationMcpServerSecurityConfigurerIntTest {
                     .with(
                         new AutomationMcpServerSecurityConfigurer(
                             apiKeyService, authorityService, () -> List.of(Environment.values()), mcpServerService,
-                            userService),
+                            userService, workspaceApiKeyService, workspaceMcpServerService),
                         Customizer.withDefaults())
                     .build();
             }
@@ -553,6 +575,8 @@ class AutomationMcpServerSecurityConfigurerIntTest {
             reset(
                 authorityService, mcpComponentService, mcpProjectService, mcpServerService, mcpToolService, userService,
                 workspaceMcpServerService);
+
+            when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.of(1L));
 
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 

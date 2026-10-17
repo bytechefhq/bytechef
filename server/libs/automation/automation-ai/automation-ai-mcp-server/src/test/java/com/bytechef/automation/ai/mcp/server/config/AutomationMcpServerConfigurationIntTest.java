@@ -122,7 +122,7 @@ class AutomationMcpServerConfigurationIntTest {
         when(mcpServerServiceTarget.getMcpServer("secret")).thenReturn(mcpServer);
         when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of());
         when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
 
         List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = buildToolSpecifications(Set.of());
 
@@ -200,7 +200,7 @@ class AutomationMcpServerConfigurationIntTest {
 
         assertThat(toolSpecifications).isEmpty();
         verify(mcpProjectServiceTarget, never()).getMcpServerMcpProjects(1L);
-        verify(workspaceMcpServerService, never()).fetchWorkspaceIdByMcpServerId(1L);
+        verify(workspaceMcpServerService, never()).fetchMcpServerWorkspaceId(1L);
     }
 
     @Test
@@ -216,7 +216,7 @@ class AutomationMcpServerConfigurationIntTest {
         assertThat(toolSpecifications).isEmpty();
         verify(mcpComponentService, never()).getMcpServerMcpComponents(1L);
         verify(mcpProjectServiceTarget, never()).getMcpServerMcpProjects(1L);
-        verify(workspaceMcpServerService, never()).fetchWorkspaceIdByMcpServerId(1L);
+        verify(workspaceMcpServerService, never()).fetchMcpServerWorkspaceId(1L);
     }
 
     @Test
@@ -233,7 +233,7 @@ class AutomationMcpServerConfigurationIntTest {
         assertThat(toolSpecifications).isEmpty();
         verify(mcpComponentService, never()).getMcpServerMcpComponents(1L);
         verify(mcpProjectServiceTarget, never()).getMcpServerMcpProjects(1L);
-        verify(workspaceMcpServerService, never()).fetchWorkspaceIdByMcpServerId(1L);
+        verify(workspaceMcpServerService, never()).fetchMcpServerWorkspaceId(1L);
     }
 
     @Test
@@ -259,7 +259,7 @@ class AutomationMcpServerConfigurationIntTest {
         when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of(mcpComponent));
         when(mcpToolServiceTarget.getMcpComponentMcpTools(2L)).thenReturn(List.of(enabledMcpTool, disabledMcpTool));
         when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
         when(mcpToolFacade.getFunctionToolCallback(enabledMcpTool)).thenReturn(functionToolCallback("enabledTool"));
 
         List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = buildToolSpecifications(Set.of());
@@ -280,7 +280,7 @@ class AutomationMcpServerConfigurationIntTest {
         when(mcpServerServiceTarget.getMcpServer("secret")).thenReturn(mcpServer);
         when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of());
         when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.of(99L));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.of(99L));
         when(workspaceToolProviders.orderedStream()).thenReturn(Stream.of(workspaceToolProvider));
         when(workspaceToolProvider.getFunctionToolCallbacks(99L))
             .thenReturn(List.of(functionToolCallback("workspaceTool")));
@@ -306,7 +306,7 @@ class AutomationMcpServerConfigurationIntTest {
         when(mcpServerServiceTarget.getMcpServer("secret")).thenReturn(mcpServer);
         when(mcpComponentService.getMcpServerMcpComponents(1L)).thenReturn(List.of());
         when(mcpProjectServiceTarget.getMcpServerMcpProjects(1L)).thenReturn(List.of());
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
         when(workspaceToolProviders.orderedStream()).thenReturn(Stream.of(workspaceToolProvider));
 
         List<McpServerFeatures.AsyncToolSpecification> toolSpecifications = buildToolSpecifications(Set.of());

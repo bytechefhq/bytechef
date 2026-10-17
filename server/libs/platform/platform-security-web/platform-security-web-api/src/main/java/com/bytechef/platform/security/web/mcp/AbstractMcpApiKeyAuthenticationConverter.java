@@ -56,8 +56,12 @@ public abstract class AbstractMcpApiKeyAuthenticationConverter implements Authen
             secretKey = authorization.substring(BEARER_PREFIX.length());
         }
 
+        Environment requestedEnvironment = getRequestedEnvironment(request);
+
         return ApiKeyAuthenticationToken.unauthenticated(
-            new McpApiKeyCredentials(getEnvironment(request), extractServerSecretKey(request), secretKey));
+            new McpApiKeyCredentials(
+                requestedEnvironment == null ? environmentService.getEnvironment((String) null) : requestedEnvironment,
+                requestedEnvironment, extractServerSecretKey(request), secretKey));
     }
 
     /**
@@ -67,8 +71,13 @@ public abstract class AbstractMcpApiKeyAuthenticationConverter implements Authen
     @Nullable
     protected abstract String extractServerSecretKey(HttpServletRequest request);
 
-    private Environment getEnvironment(HttpServletRequest request) {
+    @Nullable
+    private Environment getRequestedEnvironment(HttpServletRequest request) {
         String environment = request.getHeader(ENVIRONMENT_HEADER_NAME);
+
+        if (environment == null) {
+            return null;
+        }
 
         try {
             return environmentService.getEnvironment(environment);

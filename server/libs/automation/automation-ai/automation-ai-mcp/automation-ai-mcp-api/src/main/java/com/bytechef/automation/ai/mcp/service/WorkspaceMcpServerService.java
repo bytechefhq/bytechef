@@ -41,7 +41,7 @@ public interface WorkspaceMcpServerService {
      * @param mcpServerId the MCP server ID
      * @return the workspace ID owning the MCP server, or {@link Optional#empty()} when no assignment exists
      */
-    Optional<Long> fetchWorkspaceIdByMcpServerId(Long mcpServerId);
+    Optional<Long> fetchMcpServerWorkspaceId(Long mcpServerId);
 
     /**
      * Assigns an MCP server to a workspace.
