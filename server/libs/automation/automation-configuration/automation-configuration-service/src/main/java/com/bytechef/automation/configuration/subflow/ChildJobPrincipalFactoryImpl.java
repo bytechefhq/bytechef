@@ -80,8 +80,9 @@ class ChildJobPrincipalFactoryImpl implements ChildJobPrincipalFactory {
     }
 
     private long resolveProjectDeploymentId(long callerProjectDeploymentId, String workflowId) {
-        Optional<ProjectDeploymentWorkflow> callerProjectDeploymentWorkflow = projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
-            callerProjectDeploymentId, workflowId);
+        Optional<ProjectDeploymentWorkflow> callerProjectDeploymentWorkflow =
+            projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
+                callerProjectDeploymentId, workflowId);
 
         if (callerProjectDeploymentWorkflow.isPresent()) {
             return callerProjectDeploymentId;
