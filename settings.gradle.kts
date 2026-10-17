@@ -604,6 +604,7 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-configuration:automation-configuration-service")
 include("server:ee:libs:automation:automation-data-table:automation-data-table-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-client")
+include("server:ee:libs:automation:automation-task:automation-task-remote-rest")
 include("server:ee:libs:automation:automation-security-web:automation-security-web-impl")
 
 include("server:ee:libs:config:cloud-config")
