@@ -18,9 +18,11 @@ package com.bytechef.platform.component.runner.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.File;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -132,6 +135,51 @@ class TaskRunnerWorkingDirectoryTest {
 
             assertThat(sourcePath).hasFileName("script.js");
             assertThat(Files.readString(sourcePath)).isEqualTo("console.log(1);");
+        }
+    }
+
+    @Test
+    void testWriteConnectionsFileWritesTheMapBesideTheInputFile() throws IOException {
+        try (TaskRunnerWorkingDirectory workingDirectory =
+            TaskRunnerWorkingDirectory.create(request(Map.of(), Map.of()))) {
+
+            Path connectionsFilePath = workingDirectory.writeConnectionsFile(
+                Map.of("slack", Map.of("token", "xoxb-123456")));
+
+            assertThat(connectionsFilePath).hasFileName("connections.json")
+                .hasParent(workingDirectory.getPath());
+            assertThat(connectionsFilePath.startsWith(workingDirectory.getOutputPath())).isFalse();
+            assertThat(JsonUtils.readMap(Files.readString(connectionsFilePath)))
+                .isEqualTo(Map.of("slack", Map.of("token", "xoxb-123456")));
+        }
+    }
+
+    @Test
+    void testTheConnectionsFileIsReadableOnlyByItsOwner() throws IOException {
+        try (TaskRunnerWorkingDirectory workingDirectory =
+            TaskRunnerWorkingDirectory.create(request(Map.of(), Map.of()))) {
+
+            Path path = workingDirectory.getPath();
+
+            assumeTrue(path.getFileSystem()
+                .supportedFileAttributeViews()
+                .contains("posix"));
+
+            Path connectionsFilePath = workingDirectory.writeConnectionsFile(Map.of());
+
+            assertThat(Files.getPosixFilePermissions(connectionsFilePath))
+                .isEqualTo(PosixFilePermissions.fromString("rw-------"));
+        }
+    }
+
+    @Test
+    void testAnInputFileNamedLikeTheConnectionsFileIsRejected() throws IOException {
+        try (TaskRunnerWorkingDirectory workingDirectory =
+            TaskRunnerWorkingDirectory.create(request(Map.of(), Map.of("connections.json", "{}")))) {
+
+            assertThatThrownBy(() -> workingDirectory.writeConnectionsFile(Map.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("connections.json");
         }
     }
 
