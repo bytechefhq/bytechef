@@ -152,7 +152,7 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     @Test
-    void testWrongScopeIsRejected() throws Exception {
+    void testWrongScopeIsRejectedWithInsufficientScopeChallenge() throws Exception {
         String token = sign(
             baseClaims(ISSUER_URI)
                 .claim(TENANT_CLAIM, "public")
@@ -162,7 +162,11 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
         HttpResponse<String> httpResponse = postInitialize(token);
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
+                .contains("scope=\"mcp:management\"");
     }
 
     @Test

@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation("org.springframework.security:spring-security-web")
     implementation(libs.org.springaicommunity.mcp.server.security)
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))

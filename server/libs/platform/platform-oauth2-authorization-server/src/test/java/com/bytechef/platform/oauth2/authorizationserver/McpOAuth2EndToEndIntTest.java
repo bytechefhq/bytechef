@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.oauth2.authorizationserver.McpOAuth2EndToEndIntTest.McpOAuth2EndToEndTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.MultiTenantSchemaIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
@@ -39,6 +40,7 @@ import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
@@ -98,12 +100,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Runs the real chain end to end against one server that hosts both the embedded authorization server and the MCP
- * resource server: a logged-in user in tenant {@code acme} authorizes a client for the canonical management MCP
- * endpoint, the issued access token is accepted there, and after the grant is revoked the same token is rejected. The
- * resource server discovers the authorization server through its issuer metadata, as in production, so the issuer
- * ({@code bytechef.public-url}) and the self issuer URI both point at this server's port.
- *
  * @author Ivica Cardic
  */
 @SpringBootTest(
@@ -409,7 +405,8 @@ class McpOAuth2EndToEndIntTest {
             McpResourceServerProperties mcpResourceServerProperties) {
 
             return new McpOAuth2ResourceServerSecurityConfigurerContributor(
-                mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties);
+                mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties,
+                new ApplicationProperties());
         }
 
         @Bean
@@ -420,8 +417,8 @@ class McpOAuth2EndToEndIntTest {
             ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
 
             return new McpJwtSecurityConfigurerContributor(
-                mcpResourceServerProperties, userService, mcpEndpointProvider, mcpServerSecretVerifierProvider,
-                selfIssuedTokenRevocationCheckerProvider);
+                mcpResourceServerProperties, userService, mock(AuthorityService.class), mcpEndpointProvider,
+                mcpServerSecretVerifierProvider, selfIssuedTokenRevocationCheckerProvider, new ApplicationProperties());
         }
 
         @Bean
@@ -466,9 +463,6 @@ class McpOAuth2EndToEndIntTest {
                     .build());
         }
 
-        /**
-         * Stands in for the MCP server on the canonical management endpoint and echoes the tenant it runs in.
-         */
         @RestController
         static class McpTestController {
 
@@ -478,9 +472,6 @@ class McpOAuth2EndToEndIntTest {
             }
         }
 
-        /**
-         * Stores the requested tenant in the session the way ByteChef's multi-tenant login success handler does.
-         */
         private static final class SessionTenantTestFilter extends OncePerRequestFilter {
 
             @Override
