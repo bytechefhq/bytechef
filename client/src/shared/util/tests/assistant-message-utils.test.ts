@@ -3,6 +3,7 @@ import {describe, expect, it} from 'vitest';
 
 import {
     appendToLastAssistantMessage,
+    formatApprovalRequestMessage,
     getResumeFailure,
     getResumeStreamRequest,
     hasLastAssistantMessageText,
@@ -271,6 +272,29 @@ describe('assistant-message-utils', () => {
                 },
                 url: 'https://example.com/job/resume/abc',
             });
+        });
+    });
+
+    describe('formatApprovalRequestMessage', () => {
+        it('renders the title, description, expiry and form link', () => {
+            const expiresAt = '2026-10-20T10:00:00Z';
+
+            const message = formatApprovalRequestMessage({
+                expiresAt,
+                formDescription: 'Refund over limit',
+                formTitle: 'Approve refund',
+                formUrl: 'https://example.com/approvals/abc',
+                resumeId: 'abc',
+            });
+
+            expect(message).toBe(
+                `**Approve refund**\n\nRefund over limit\n\nExpires ${new Date(expiresAt).toLocaleString()}` +
+                    '\n\n[Open the approval form](https://example.com/approvals/abc)'
+            );
+        });
+
+        it('falls back to a default title and omits the optional parts', () => {
+            expect(formatApprovalRequestMessage({resumeId: 'abc'})).toBe('**Approval requested**');
         });
     });
 });
