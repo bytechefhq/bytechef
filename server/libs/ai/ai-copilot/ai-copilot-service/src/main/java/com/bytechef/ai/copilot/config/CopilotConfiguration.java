@@ -26,25 +26,15 @@ import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SkillsSpringAIAgent;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
-import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
-import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
-import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
-import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
-import com.bytechef.ai.copilot.tool.LookupActionPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
-import com.bytechef.ai.copilot.tool.LookupTriggerPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
-import com.bytechef.ai.copilot.tool.SelectConnectionToolCallback;
-import com.bytechef.ai.copilot.tool.SelectPropertyOptionToolCallback;
-import com.bytechef.ai.copilot.tool.SelectTriggerPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
-import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -56,7 +46,6 @@ import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
-import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -67,8 +56,6 @@ import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
@@ -152,15 +139,12 @@ public class CopilotConfiguration {
     private final String skillsBuildSystemPrompt;
     private final String workflowExecutionBuildSystemPrompt;
 
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final WorkspaceConnectionFacade workspaceConnectionFacade;
-    private final ComponentDefinitionService componentDefinitionService;
+    private final InteractivePickerToolCallbacks interactivePickerToolCallbacks;
     private final ActionDefinitionService actionDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver propertyOptionsResolver;
-    private final ObjectProvider<CopilotConnectionLister> connectionListerProvider;
     private final ScopedConnectionGuard scopedConnectionGuard;
 
     @SuppressFBWarnings({
@@ -179,18 +163,13 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_skills_build.txt") Resource promptSkillsBuildResource,
         @Value("classpath:prompt_workflow_execution_build.txt") Resource promptWorkflowExecutionBuildResource,
         WorkflowValidatorTools workflowValidatorTools, WorkflowInstructionTools workflowInstructionTools,
-        ConnectionDefinitionService connectionDefinitionService, WorkspaceConnectionFacade workspaceConnectionFacade,
-        ComponentDefinitionService componentDefinitionService, ActionDefinitionService actionDefinitionService,
+        InteractivePickerToolCallbacks interactivePickerToolCallbacks, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
-        ObjectProvider<CopilotConnectionLister> connectionListerProvider,
         ScopedConnectionGuard scopedConnectionGuard) {
 
-        this.connectionListerProvider = connectionListerProvider;
+        this.interactivePickerToolCallbacks = interactivePickerToolCallbacks;
         this.scopedConnectionGuard = scopedConnectionGuard;
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.workspaceConnectionFacade = workspaceConnectionFacade;
-        this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionService = actionDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -342,38 +321,6 @@ public class CopilotConfiguration {
             copilotPgVectorStore, embeddingProviderStatusProvider, CopilotConstants.STATE_ENVIRONMENT_ID);
     }
 
-    private List<ToolCallback> interactivePickerToolCallbacks() {
-        List<CopilotConnectionLister> connectionListers = new ArrayList<>();
-
-        connectionListers.add(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));
-
-        CopilotConnectionLister embeddedConnectionLister = connectionListerProvider.getIfAvailable();
-
-        if (embeddedConnectionLister != null) {
-            connectionListers.add(embeddedConnectionLister);
-        }
-
-        return List.of(
-            new ListConnectionsForComponentToolCallback(
-                componentDefinitionService, connectionDefinitionService, ToolStateVisibilityMetrics.NOOP,
-                connectionListers),
-            new SelectConnectionToolCallback(componentDefinitionService),
-            new LookupActionPropertyOptionsToolCallback(
-                actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
-            new LookupTriggerPropertyOptionsToolCallback(
-                triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
-            new SelectPropertyOptionToolCallback(
-                actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
-            new SelectTriggerPropertyOptionToolCallback(
-                triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver,
-                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
-            new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP),
-            new CreateConnectionToolCallback(componentDefinitionService));
-    }
-
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
@@ -393,7 +340,7 @@ public class CopilotConfiguration {
         firecrawlTools.ifPresent(tools::add);
         braveWebSearchTools.ifPresent(tools::add);
 
-        tools.addAll(interactivePickerToolCallbacks());
+        tools.addAll(interactivePickerToolCallbacks.write());
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_ASK.key())
@@ -425,7 +372,7 @@ public class CopilotConfiguration {
                 projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools));
 
-        tools.addAll(interactivePickerToolCallbacks());
+        tools.addAll(interactivePickerToolCallbacks.write());
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_BUILD.key())
