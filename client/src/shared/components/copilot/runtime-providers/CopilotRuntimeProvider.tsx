@@ -402,16 +402,21 @@ export function CopilotRuntimeProvider({
         onReload,
     });
 
-    useEffect(
-        () => () => {
+    useEffect(() => {
+        const abortedAgents = abortedAgentsRef.current;
+
+        if (agent) {
+            abortedAgents.delete(agent);
+        }
+
+        return () => {
             if (agent) {
-                abortedAgentsRef.current.add(agent);
+                abortedAgents.add(agent);
 
                 agent.abortRun();
             }
-        },
-        [agent]
-    );
+        };
+    }, [agent]);
 
     return (
         <AssistantRuntimeProvider config={AuiConfig({suggestions: Suggestions(suggestions ?? [])})} runtime={runtime}>
