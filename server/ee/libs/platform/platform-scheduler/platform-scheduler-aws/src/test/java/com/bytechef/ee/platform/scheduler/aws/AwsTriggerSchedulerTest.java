@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,9 +31,11 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
@@ -49,6 +52,7 @@ import software.amazon.awssdk.services.scheduler.model.CreateScheduleResponse;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.DeleteScheduleResponse;
 import software.amazon.awssdk.services.scheduler.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.scheduler.model.Target;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
 import software.amazon.awssdk.services.scheduler.model.UpdateScheduleResponse;
 
@@ -251,7 +255,78 @@ class AwsTriggerSchedulerTest {
         DeleteScheduleRequest request = builder.build();
 
         assertEquals("OneTimeTask", request.groupName());
-        assertEquals("OneTimeTask_resume_404", request.name());
+        assertEquals("OneTimeTask_resume_public_404", request.name());
+    }
+
+    @Test
+    void testScheduleOneTimeTaskKeepsTheTasksOfTwoTenantsWithTheSameJobIdApart() throws Exception {
+        Instant executeAt = Instant.parse("2026-10-03T12:00:00Z");
+
+        TenantContext.runWithTenantId(
+            "000001", () -> awsTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), 404L));
+        TenantContext.runWithTenantId(
+            "000002", () -> awsTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), 404L));
+        TenantContext.runWithTenantId("000001", () -> awsTriggerScheduler.cancelOneTimeTask(404L));
+
+        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> createCaptor =
+            ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient, times(2)).createSchedule(createCaptor.capture());
+
+        CreateScheduleRequest firstTenantRequest = buildCreateRequest(createCaptor.getAllValues()
+            .get(0));
+        CreateScheduleRequest secondTenantRequest = buildCreateRequest(createCaptor.getAllValues()
+            .get(1));
+
+        assertEquals("OneTimeTask_resume_000001_404", firstTenantRequest.name());
+        assertEquals("OneTimeTask_resume_000002_404", secondTenantRequest.name());
+
+        Target firstTenantTarget = firstTenantRequest.target();
+        Target secondTenantTarget = secondTenantRequest.target();
+
+        assertEquals("resume:000001:404", firstTenantTarget.input());
+        assertEquals("resume:000002:404", secondTenantTarget.input());
+        assertEquals("000001_404_" + executeAt.toEpochMilli(), firstTenantRequest.clientToken());
+
+        assertEquals(
+            List.of(
+                "OneTimeTask_resume_000001_404", "OneTimeTask_resume_000002_404", "OneTimeTask_resume_000001_404"),
+            captureDeletedNames(3));
+    }
+
+    @Test
+    void testCancelOneTimeTaskCancelsATaskScheduledUnderTheLegacyName() throws Exception {
+        when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
+            .thenThrow(ResourceNotFoundException.builder()
+                .message("Schedule not found")
+                .build())
+            .thenReturn(DeleteScheduleResponse.builder()
+                .build());
+
+        TenantContext.runWithTenantId("000001", () -> awsTriggerScheduler.cancelOneTimeTask(404L));
+
+        assertEquals(List.of("OneTimeTask_resume_000001_404", "OneTimeTask_resume_404"), captureDeletedNames(2));
+    }
+
+    @Test
+    void testCancelOneTimeTaskKeepsTheLegacyNameWhenTheTenantScopedTaskExists() throws Exception {
+        TenantContext.runWithTenantId("000001", () -> awsTriggerScheduler.cancelOneTimeTask(404L));
+
+        assertEquals(List.of("OneTimeTask_resume_000001_404"), captureDeletedNames(1));
+    }
+
+    @Test
+    void testScheduleOneTimeTaskDoesNotDeleteATaskScheduledUnderTheLegacyName() throws Exception {
+        when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
+            .thenThrow(ResourceNotFoundException.builder()
+                .message("Schedule not found")
+                .build());
+
+        TenantContext.runWithTenantId(
+            "000001",
+            () -> awsTriggerScheduler.scheduleOneTimeTask(Instant.parse("2026-10-03T12:00:00Z"), Map.of(), 404L));
+
+        assertEquals(List.of("OneTimeTask_resume_000001_404"), captureDeletedNames(1));
     }
 
     @Test
@@ -285,7 +360,7 @@ class AwsTriggerSchedulerTest {
         assertEquals(ActionAfterCompletion.DELETE, createRequest.actionAfterCompletion());
         assertEquals("at(2026-10-03T12:00:00)", createRequest.scheduleExpression());
         assertEquals("UTC", createRequest.scheduleExpressionTimezone());
-        assertEquals("404_" + executeAt.toEpochMilli(), createRequest.clientToken());
+        assertEquals("public_404_" + executeAt.toEpochMilli(), createRequest.clientToken());
 
         for (Consumer<DeleteScheduleRequest.Builder> deleteRequestConsumer : deleteCaptor.getAllValues()) {
             DeleteScheduleRequest.Builder deleteBuilder = DeleteScheduleRequest.builder();
@@ -512,5 +587,32 @@ class AwsTriggerSchedulerTest {
 
         // Verify the scheduler client was called
         verify(mockSchedulerClient).createSchedule(any(Consumer.class));
+    }
+
+    private static CreateScheduleRequest buildCreateRequest(Consumer<CreateScheduleRequest.Builder> requestConsumer) {
+        CreateScheduleRequest.Builder builder = CreateScheduleRequest.builder();
+
+        requestConsumer.accept(builder);
+
+        return builder.build();
+    }
+
+    private List<String> captureDeletedNames(int times) {
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> deleteCaptor = ArgumentCaptor.forClass(Consumer.class);
+
+        verify(mockSchedulerClient, times(times)).deleteSchedule(deleteCaptor.capture());
+
+        return deleteCaptor.getAllValues()
+            .stream()
+            .map(requestConsumer -> {
+                DeleteScheduleRequest.Builder builder = DeleteScheduleRequest.builder();
+
+                requestConsumer.accept(builder);
+
+                DeleteScheduleRequest request = builder.build();
+
+                return request.name();
+            })
+            .toList();
     }
 }

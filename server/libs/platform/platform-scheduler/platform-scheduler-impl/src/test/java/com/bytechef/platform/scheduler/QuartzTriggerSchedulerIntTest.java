@@ -23,7 +23,9 @@ import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerCon
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
+import com.bytechef.platform.scheduler.job.OneTimeSchedulerJob;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
@@ -31,12 +33,14 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -44,6 +48,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,9 +175,9 @@ public class QuartzTriggerSchedulerIntTest {
         quartzTriggerScheduler.scheduleOneTimeTask(executeAt, output, jobId);
 
         // Then
-        String jobIdStr = String.valueOf(jobId);
-        JobKey jobKey = JobKey.jobKey(jobIdStr, "OneTimeTask");
-        TriggerKey triggerKey = TriggerKey.triggerKey(jobIdStr, "OneTimeTask");
+        String oneTimeTaskName = TenantContext.DEFAULT_TENANT_ID + ":" + jobId;
+        JobKey jobKey = JobKey.jobKey(oneTimeTaskName, "OneTimeTask");
+        TriggerKey triggerKey = TriggerKey.triggerKey(oneTimeTaskName, "OneTimeTask");
 
         // Verify job and trigger were created
         Assertions.assertTrue(scheduler.checkExists(jobKey));
@@ -185,6 +190,7 @@ public class QuartzTriggerSchedulerIntTest {
         JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
         Assertions.assertEquals(jobId, jobDataMap.getLong("jobId"));
+        Assertions.assertEquals(TenantContext.DEFAULT_TENANT_ID, jobDataMap.getString("tenantId"));
         Assertions.assertNotNull(jobDataMap.getString("continueParameters"));
 
         // Verify trigger timing
@@ -206,14 +212,97 @@ public class QuartzTriggerSchedulerIntTest {
 
         quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId);
 
-        JobKey jobKey = JobKey.jobKey(String.valueOf(jobId), "OneTimeTask");
+        String oneTimeTaskName = TenantContext.DEFAULT_TENANT_ID + ":" + jobId;
+
+        JobKey jobKey = JobKey.jobKey(oneTimeTaskName, "OneTimeTask");
 
         Assertions.assertTrue(scheduler.checkExists(jobKey));
 
         quartzTriggerScheduler.cancelOneTimeTask(jobId);
 
         Assertions.assertFalse(scheduler.checkExists(jobKey));
-        Assertions.assertFalse(scheduler.checkExists(TriggerKey.triggerKey(String.valueOf(jobId), "OneTimeTask")));
+        Assertions.assertFalse(scheduler.checkExists(TriggerKey.triggerKey(oneTimeTaskName, "OneTimeTask")));
+    }
+
+    @Test
+    public void testScheduleOneTimeTaskKeepsTheTasksOfTwoTenantsWithTheSameJobIdApart() throws Exception {
+        long jobId = 1003L;
+        Instant executeAt = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+
+        TenantContext.runWithTenantId(
+            "000001", () -> quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId));
+        TenantContext.runWithTenantId(
+            "000002", () -> quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId));
+
+        JobKey firstTenantJobKey = JobKey.jobKey("000001:" + jobId, "OneTimeTask");
+        JobKey secondTenantJobKey = JobKey.jobKey("000002:" + jobId, "OneTimeTask");
+
+        JobDetail firstTenantJobDetail = scheduler.getJobDetail(firstTenantJobKey);
+        JobDetail secondTenantJobDetail = scheduler.getJobDetail(secondTenantJobKey);
+
+        Assertions.assertNotNull(firstTenantJobDetail);
+        Assertions.assertNotNull(secondTenantJobDetail);
+
+        JobDataMap firstTenantJobDataMap = firstTenantJobDetail.getJobDataMap();
+        JobDataMap secondTenantJobDataMap = secondTenantJobDetail.getJobDataMap();
+
+        Assertions.assertEquals("000001", firstTenantJobDataMap.getString("tenantId"));
+        Assertions.assertEquals("000002", secondTenantJobDataMap.getString("tenantId"));
+
+        TenantContext.runWithTenantId("000001", () -> quartzTriggerScheduler.cancelOneTimeTask(jobId));
+
+        Assertions.assertFalse(scheduler.checkExists(firstTenantJobKey));
+        Assertions.assertTrue(scheduler.checkExists(secondTenantJobKey));
+        Assertions.assertTrue(scheduler.checkExists(TriggerKey.triggerKey("000002:" + jobId, "OneTimeTask")));
+    }
+
+    @Test
+    public void testCancelOneTimeTaskCancelsATaskScheduledUnderTheLegacyKey() throws Exception {
+        long jobId = 1004L;
+        JobKey legacyJobKey = JobKey.jobKey(String.valueOf(jobId), "OneTimeTask");
+
+        scheduler.scheduleJob(
+            JobBuilder.newJob(OneTimeSchedulerJob.class)
+                .withIdentity(legacyJobKey)
+                .usingJobData("jobId", jobId)
+                .build(),
+            TriggerBuilder.newTrigger()
+                .withIdentity(TriggerKey.triggerKey(String.valueOf(jobId), "OneTimeTask"))
+                .startAt(Date.from(Instant.now()
+                    .plus(Duration.ofMinutes(5))))
+                .build());
+
+        TenantContext.runWithTenantId("000001", () -> quartzTriggerScheduler.cancelOneTimeTask(jobId));
+
+        Assertions.assertFalse(scheduler.checkExists(legacyJobKey));
+    }
+
+    @Test
+    public void testCancelOneTimeTaskKeepsTheLegacyKeyWhenTheTenantScopedTaskExists() throws Exception {
+        long jobId = 1005L;
+        JobKey legacyJobKey = JobKey.jobKey(String.valueOf(jobId), "OneTimeTask");
+        Instant executeAt = Instant.now()
+            .plus(Duration.ofMinutes(5));
+
+        scheduler.scheduleJob(
+            JobBuilder.newJob(OneTimeSchedulerJob.class)
+                .withIdentity(legacyJobKey)
+                .usingJobData("jobId", jobId)
+                .build(),
+            TriggerBuilder.newTrigger()
+                .withIdentity(TriggerKey.triggerKey(String.valueOf(jobId), "OneTimeTask"))
+                .startAt(Date.from(executeAt))
+                .build());
+
+        TenantContext.runWithTenantId("000001", () -> {
+            quartzTriggerScheduler.scheduleOneTimeTask(executeAt, Map.of(), jobId);
+            quartzTriggerScheduler.cancelOneTimeTask(jobId);
+        });
+
+        Assertions.assertFalse(scheduler.checkExists(JobKey.jobKey("000001:" + jobId, "OneTimeTask")));
+        Assertions.assertTrue(scheduler.checkExists(legacyJobKey));
     }
 
     @Test
@@ -234,7 +323,7 @@ public class QuartzTriggerSchedulerIntTest {
 
         // Then
         String jobIdStr = String.valueOf(jobId);
-        JobKey jobKey = JobKey.jobKey(jobIdStr, "OneTimeTask");
+        JobKey jobKey = JobKey.jobKey(TenantContext.DEFAULT_TENANT_ID + ":" + jobIdStr, "OneTimeTask");
 
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 

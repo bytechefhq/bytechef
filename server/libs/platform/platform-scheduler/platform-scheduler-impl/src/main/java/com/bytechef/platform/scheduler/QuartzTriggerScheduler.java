@@ -29,6 +29,7 @@ import com.bytechef.platform.scheduler.job.OneTimeSchedulerJob;
 import com.bytechef.platform.scheduler.job.PollingTriggerJob;
 import com.bytechef.platform.scheduler.job.ScheduleTriggerJob;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -72,6 +73,10 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelOneTimeTask(long jobId) {
+        if (deleteJob(getOneTimeTaskName(jobId), ONE_TIME_TASK)) {
+            return;
+        }
+
         deleteJob(String.valueOf(jobId), ONE_TIME_TASK);
     }
 
@@ -145,11 +150,12 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
-        String jobIdStr = String.valueOf(jobId);
+        String oneTimeTaskName = getOneTimeTaskName(jobId);
 
         JobBuilder jobBuilder = JobBuilder.newJob(OneTimeSchedulerJob.class)
-            .withIdentity(JobKey.jobKey(jobIdStr, ONE_TIME_TASK))
-            .usingJobData("jobId", jobId);
+            .withIdentity(JobKey.jobKey(oneTimeTaskName, ONE_TIME_TASK))
+            .usingJobData("jobId", jobId)
+            .usingJobData(OneTimeSchedulerJob.TENANT_ID, TenantContext.getCurrentTenantId());
 
         if (output != null && !output.isEmpty()) {
             jobBuilder.usingJobData(OneTimeSchedulerJob.CONTINUE_PARAMETERS, JsonUtils.write(output));
@@ -158,27 +164,37 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         JobDetail jobDetail = jobBuilder.build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(jobIdStr, ONE_TIME_TASK))
+            .withIdentity(TriggerKey.triggerKey(oneTimeTaskName, ONE_TIME_TASK))
             .startAt(Date.from(executeAt))
             .build();
 
         schedule(jobDetail, trigger);
     }
 
-    private void deleteJob(String jobName, String jobGroup) {
+    /**
+     * Quartz tables are shared by all tenants while job ids are per-tenant sequences, so the key carries the tenant.
+     * Tasks scheduled before the tenant was part of the key use the bare job id.
+     */
+    private static String getOneTimeTaskName(long jobId) {
+        return TenantContext.getCurrentTenantId() + ":" + jobId;
+    }
+
+    private boolean deleteJob(String jobName, String jobGroup) {
         try {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
 
             if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
                 log.trace("Trigger job removed for jobName: {}, jobGroup: {}", jobName, jobGroup);
 
-                return;
+                return true;
             }
 
             log.debug("Trigger job not found for jobName: {}, jobGroup: {}", jobName, jobGroup);
         } catch (SchedulerException e) {
             log.error("Unable to delete trigger job for jobName: {}, jobGroup: {}", jobName, jobGroup, e);
         }
+
+        return false;
     }
 
     private void schedule(JobDetail jobDetail, Trigger trigger) {

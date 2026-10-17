@@ -18,6 +18,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -88,14 +89,11 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void cancelOneTimeTask(long jobId) {
-        try {
-            schedulerClient.deleteSchedule(request -> request.groupName(ONE_TIME_TASK)
-                .name(getOneTimeTaskName(jobId)));
-        } catch (ResourceNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("One-time task schedule already deleted: {}", jobId);
-            }
+        if (deleteOneTimeTask(getOneTimeTaskName(jobId))) {
+            return;
         }
+
+        deleteOneTimeTask(getLegacyOneTimeTaskName(jobId));
     }
 
     @Override
@@ -176,11 +174,14 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     @Override
     public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
-        cancelOneTimeTask(jobId);
+        String oneTimeTaskName = getOneTimeTaskName(jobId);
 
-        String jobIdString = String.valueOf(jobId);
+        deleteOneTimeTask(oneTimeTaskName);
 
-        String input = AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX + jobIdString;
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        String input = AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX + tenantId +
+            AwsTriggerSchedulerConstants.ONE_TIME_TASK_TENANT_SEPARATOR + jobId;
 
         if (output != null && !output.isEmpty()) {
             input = input + AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output);
@@ -194,14 +195,15 @@ public class AwsTriggerScheduler implements TriggerScheduler {
             .input(finalInput)
             .build();
 
-        schedulerClient.createSchedule(request -> request.clientToken(jobIdString + "_" + executeAt.toEpochMilli())
-            .groupName(ONE_TIME_TASK)
-            .name(getOneTimeTaskName(jobId))
-            .actionAfterCompletion(ActionAfterCompletion.DELETE)
-            .target(sqsTarget)
-            .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
-            .scheduleExpression(getAtExpression(executeAt))
-            .scheduleExpressionTimezone("UTC"));
+        schedulerClient.createSchedule(
+            request -> request.clientToken(tenantId + "_" + jobId + "_" + executeAt.toEpochMilli())
+                .groupName(ONE_TIME_TASK)
+                .name(oneTimeTaskName)
+                .actionAfterCompletion(ActionAfterCompletion.DELETE)
+                .target(sqsTarget)
+                .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF))
+                .scheduleExpression(getAtExpression(executeAt))
+                .scheduleExpressionTimezone("UTC"));
     }
 
     @Override
@@ -254,7 +256,32 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         return "at(" + executeAtDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ")";
     }
 
+    private boolean deleteOneTimeTask(String oneTimeTaskName) {
+        try {
+            schedulerClient.deleteSchedule(request -> request.groupName(ONE_TIME_TASK)
+                .name(oneTimeTaskName));
+
+            return true;
+        } catch (ResourceNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("One-time task schedule already deleted: {}", oneTimeTaskName);
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * Schedules are shared by all tenants while job ids are per-tenant sequences, so the name carries the tenant.
+     */
     private static String getOneTimeTaskName(long jobId) {
+        return ONE_TIME_TASK + "_resume_" + TenantContext.getCurrentTenantId() + "_" + jobId;
+    }
+
+    /**
+     * The name of a task scheduled before the tenant was part of the name.
+     */
+    private static String getLegacyOneTimeTaskName(long jobId) {
         return ONE_TIME_TASK + "_resume_" + jobId;
     }
 }
