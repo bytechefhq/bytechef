@@ -45,11 +45,13 @@ public class UnifiedApiDefinitionServiceImpl implements UnifiedApiDefinitionServ
     }
 
     @Override
-    public List<ComponentDefinition>
-        getUnifiedApiComponentDefinitions(UnifiedApiDefinition.UnifiedApiCategory category) {
+    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(UnifiedApiCategory category) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getUnifiedApi()))
+            .filter(componentDefinition -> componentDefinition.getUnifiedApi()
+                .map(UnifiedApiDefinition::getCategory)
+                .filter(unifiedApiCategory -> unifiedApiCategory == category)
+                .isPresent())
             .map(ComponentDefinition::new)
             .toList();
     }
