@@ -149,7 +149,7 @@ const WorkflowNodeDetailsPanel = ({
     return (
         <div
             className={twMerge(
-                'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+                'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background dark:bg-popover',
                 copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]',
                 !className && !panelOpenedFromIssuesSidebar && 'animate-[slideInFromRight_300ms_ease-out]',
                 className
@@ -161,7 +161,7 @@ const WorkflowNodeDetailsPanel = ({
                 key={`${currentNode?.workflowNodeName}-${currentNode?.operationName}`}
             >
                 {currentNode?.workflowNodeName && currentWorkflowNode && (
-                    <div className="flex h-full flex-col divide-y divide-muted bg-background">
+                    <div className="flex h-full flex-col divide-y divide-muted bg-background dark:bg-popover">
                         <header className="flex h-20 shrink-0 items-center justify-between p-4 text-lg font-medium">
                             <div className="flex min-w-0 flex-1 items-center gap-2">
                                 {currentWorkflowNode.icon && (
@@ -405,7 +405,7 @@ const WorkflowNodeDetailsPanel = ({
                                 </div>
                             )}
 
-                            <ScrollArea className="h-full max-w-workflow-node-details-panel-width bg-surface-main [&_[data-radix-scroll-area-viewport]>div]:block! [&>div]:relative">
+                            <ScrollArea className="h-full max-w-workflow-node-details-panel-width bg-surface-main dark:bg-popover [&_[data-radix-scroll-area-viewport]>div]:block! [&>div]:relative">
                                 <div className="size-full max-w-workflow-node-details-panel-width">
                                     {activeTab === 'description' &&
                                         (nodeDefinition ? (
@@ -485,7 +485,7 @@ const WorkflowNodeDetailsPanel = ({
                             </ScrollArea>
                         </main>
 
-                        <footer className="z-50 mt-auto flex items-center justify-between bg-background px-4 py-2">
+                        <footer className="z-50 mt-auto flex items-center justify-between bg-background px-4 py-2 dark:bg-popover">
                             <Select onValueChange={handleVersionSelectChange} value={nodeVersion}>
                                 <SelectTrigger
                                     aria-label="Component version"

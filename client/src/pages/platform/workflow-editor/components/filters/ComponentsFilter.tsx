@@ -78,7 +78,9 @@ const ComponentsFilter = ({
                 >
                     <span>All</span>
 
-                    <div className="rounded-md bg-background px-2 py-1">{componentDefinitions.length}</div>
+                    <div className="rounded-md bg-background px-2 py-1 dark:bg-white/20">
+                        {componentDefinitions.length}
+                    </div>
                 </Button>
 
                 <Button
@@ -95,7 +97,7 @@ const ComponentsFilter = ({
                 >
                     <span>Filtered</span>
 
-                    <div className="rounded-md bg-background px-2 py-1">
+                    <div className="rounded-md bg-background px-2 py-1 dark:bg-white/20">
                         {filterState.activeView === 'filtered' ? filteredComponents.length : filterState.filteredCount}
                     </div>
                 </Button>

@@ -24,14 +24,22 @@ const JUDGE_TYPE_LABELS: Record<AiAgentJudgeType, string> = {
 };
 
 const JUDGE_TYPE_COLORS: Record<AiAgentJudgeType, string> = {
-    [AiAgentJudgeType.ContainsText]: 'border-amber-200 bg-amber-50 text-amber-700',
-    [AiAgentJudgeType.JsonSchema]: 'border-indigo-200 bg-indigo-50 text-indigo-700',
-    [AiAgentJudgeType.LlmRule]: 'border-blue-200 bg-blue-50 text-blue-700',
-    [AiAgentJudgeType.RegexMatch]: 'border-purple-200 bg-purple-50 text-purple-700',
-    [AiAgentJudgeType.ResponseLength]: 'border-green-200 bg-green-50 text-green-700',
-    [AiAgentJudgeType.Similarity]: 'border-teal-200 bg-teal-50 text-teal-700',
-    [AiAgentJudgeType.StringEquals]: 'border-cyan-200 bg-cyan-50 text-cyan-700',
-    [AiAgentJudgeType.ToolUsage]: 'border-orange-200 bg-orange-50 text-orange-700',
+    [AiAgentJudgeType.ContainsText]:
+        'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300',
+    [AiAgentJudgeType.JsonSchema]:
+        'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
+    [AiAgentJudgeType.LlmRule]:
+        'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
+    [AiAgentJudgeType.RegexMatch]:
+        'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300',
+    [AiAgentJudgeType.ResponseLength]:
+        'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300',
+    [AiAgentJudgeType.Similarity]:
+        'border-teal-200 bg-teal-50 text-teal-700 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-300',
+    [AiAgentJudgeType.StringEquals]:
+        'border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950 dark:text-cyan-300',
+    [AiAgentJudgeType.ToolUsage]:
+        'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300',
 };
 
 function getConfigurationSummary(type: AiAgentJudgeType, configuration: Record<string, unknown>): string {

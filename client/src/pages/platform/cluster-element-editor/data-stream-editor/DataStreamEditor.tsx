@@ -47,7 +47,7 @@ export default function DataStreamEditor({
     }
 
     return (
-        <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
+        <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-surface-neutral-primary', className)}>
             <DataStreamHeader
                 copilotEnabled={copilotEnabled}
                 onClose={onClose}

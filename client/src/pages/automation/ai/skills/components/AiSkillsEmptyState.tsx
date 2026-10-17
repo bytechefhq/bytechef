@@ -5,8 +5,8 @@ import {BookOpenIcon, BrainCircuitIcon, RepeatIcon, ZapIcon} from 'lucide-react'
 const AiSkillsEmptyState = () => (
     <div className="flex flex-1 flex-col items-center justify-center px-8 py-12">
         <div className="flex flex-col items-center gap-3">
-            <div className="flex size-12 items-center justify-center rounded-full bg-amber-100">
-                <ZapIcon className="size-6 text-amber-600" />
+            <div className="flex size-12 items-center justify-center rounded-full bg-surface-warning-secondary">
+                <ZapIcon className="size-6 text-content-warning-primary" />
             </div>
 
             <h2 className="text-xl font-semibold">Skills</h2>

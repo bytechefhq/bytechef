@@ -26,7 +26,7 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
     if (isLoading) {
         return (
             <div className="flex flex-1 items-center justify-center py-12">
-                <Loader2Icon className="size-5 animate-spin text-gray-400" />
+                <Loader2Icon className="size-5 animate-spin text-content-neutral-tertiary" />
             </div>
         );
     }
@@ -55,8 +55,8 @@ const EvalsJudgesTab = ({workflowId, workflowNodeName}: EvalsJudgesTabProps) => 
                 </>
             ) : (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-violet-100">
-                        <GavelIcon className="size-6 text-violet-600" />
+                    <div className="flex size-12 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-950">
+                        <GavelIcon className="size-6 text-violet-600 dark:text-violet-300" />
                     </div>
 
                     <h3 className="text-sm font-semibold">Agent-level Judges</h3>

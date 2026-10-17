@@ -40,13 +40,13 @@ const RunSummaryCards = ({summary}: RunSummaryCardsProps) => {
             <div className="rounded-lg border border-border/50 px-3 py-3">
                 <div className="text-xs text-content-neutral-secondary">Passed</div>
 
-                <div className="mt-1 text-xl font-semibold text-green-600">{summary.passedCount}</div>
+                <div className="mt-1 text-xl font-semibold text-content-success">{summary.passedCount}</div>
             </div>
 
             <div className="rounded-lg border border-border/50 px-3 py-3">
                 <div className="text-xs text-content-neutral-secondary">Failed</div>
 
-                <div className="mt-1 text-xl font-semibold text-red-600">
+                <div className="mt-1 text-xl font-semibold text-content-destructive">
                     {summary.failedCount + summary.errorCount}
                 </div>
             </div>

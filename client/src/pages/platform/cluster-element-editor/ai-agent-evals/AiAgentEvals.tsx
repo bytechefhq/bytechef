@@ -23,7 +23,7 @@ const AiAgentEvals = () => {
                         className={twMerge(
                             'px-4 py-2.5 text-sm',
                             evalsTab === tab
-                                ? 'border-b-2 border-blue-500 font-semibold text-gray-900'
+                                ? 'border-b-2 border-stroke-brand-primary font-semibold text-content-neutral-primary'
                                 : 'text-content-neutral-secondary'
                         )}
                         key={tab}

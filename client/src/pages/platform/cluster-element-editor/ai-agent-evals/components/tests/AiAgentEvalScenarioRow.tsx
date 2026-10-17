@@ -37,12 +37,12 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
 
     return (
         <div className="py-1">
-            <div className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-gray-50">
+            <div className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-surface-neutral-primary-hover">
                 <div className="flex flex-1 cursor-pointer items-center gap-3" onClick={() => setExpanded(!expanded)}>
                     {expanded ? (
-                        <ChevronDownIcon className="size-3.5 text-gray-400" />
+                        <ChevronDownIcon className="size-3.5 text-content-neutral-tertiary" />
                     ) : (
-                        <ChevronRightIcon className="size-3.5 text-gray-400" />
+                        <ChevronRightIcon className="size-3.5 text-content-neutral-tertiary" />
                     )}
 
                     <span className="text-sm">{scenario.name}</span>
@@ -71,7 +71,7 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                     />
 
                     <Button
-                        className="text-red-500 hover:text-red-600"
+                        className="text-content-destructive hover:text-content-destructive-primary-hover"
                         icon={<TrashIcon className="size-3.5" />}
                         onClick={() => onDelete(scenario.id)}
                         size="icon"
@@ -82,20 +82,20 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
 
             {expanded && (
                 <>
-                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-gray-50/50 p-2">
+                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-surface-neutral-secondary/50 p-2">
                         {scenario.judges.length > 0 ? (
                             <div className="flex flex-col gap-1">
                                 {scenario.judges.map((judge) => (
                                     <div
-                                        className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-white"
+                                        className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-surface-neutral-primary"
                                         key={judge.id}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <GavelIcon className="size-3.5 text-gray-400" />
+                                            <GavelIcon className="size-3.5 text-content-neutral-tertiary" />
 
                                             <span className="text-xs font-medium">{judge.name}</span>
 
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-xs text-content-neutral-tertiary">
                                                 {judge.type.replace('_', ' ').toLowerCase()}
                                             </span>
                                         </div>
@@ -109,7 +109,7 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                                             />
 
                                             <Button
-                                                className="text-red-500 hover:text-red-600"
+                                                className="text-content-destructive hover:text-content-destructive-primary-hover"
                                                 icon={<TrashIcon className="size-3" />}
                                                 onClick={() => handleDeleteJudge(judge.id)}
                                                 size="icon"
@@ -120,7 +120,9 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-2 text-center text-xs text-gray-400">No scenario-level judges</div>
+                            <div className="py-2 text-center text-xs text-content-neutral-tertiary">
+                                No scenario-level judges
+                            </div>
                         )}
 
                         <Button
@@ -133,25 +135,25 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                         />
                     </div>
 
-                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-gray-50/50 p-2">
+                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-surface-neutral-secondary/50 p-2">
                         {scenario.toolSimulations.length > 0 ? (
                             <div className="flex flex-col gap-1">
                                 {scenario.toolSimulations.map((simulation) => (
                                     <div
-                                        className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-white"
+                                        className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-surface-neutral-primary"
                                         key={simulation.id}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <WrenchIcon className="size-3.5 text-gray-400" />
+                                            <WrenchIcon className="size-3.5 text-content-neutral-tertiary" />
 
                                             <span className="text-xs font-medium">{simulation.toolName}</span>
 
-                                            <span className="max-w-48 truncate text-xs text-gray-400">
+                                            <span className="max-w-48 truncate text-xs text-content-neutral-tertiary">
                                                 {simulation.responsePrompt}
                                             </span>
 
                                             {simulation.simulationModel && (
-                                                <span className="rounded-full border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
+                                                <span className="rounded-full border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:border-violet-800 dark:bg-violet-950 dark:text-violet-300">
                                                     {simulation.simulationModel}
                                                 </span>
                                             )}
@@ -166,7 +168,7 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                                             />
 
                                             <Button
-                                                className="text-red-500 hover:text-red-600"
+                                                className="text-content-destructive hover:text-content-destructive-primary-hover"
                                                 icon={<TrashIcon className="size-3" />}
                                                 onClick={() => handleDeleteToolSimulation(simulation.id)}
                                                 size="icon"
@@ -177,7 +179,9 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-2 text-center text-xs text-gray-400">No tool simulations</div>
+                            <div className="py-2 text-center text-xs text-content-neutral-tertiary">
+                                No tool simulations
+                            </div>
                         )}
 
                         <Button

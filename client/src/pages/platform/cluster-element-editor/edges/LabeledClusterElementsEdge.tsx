@@ -61,7 +61,12 @@ export default function LabeledClusterElementsEdge({
 
     return (
         <>
-            <BaseEdge className="fill-none stroke-gray-300 stroke-2" id={id} path={edgePath} style={style} />
+            <BaseEdge
+                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                id={id}
+                path={edgePath}
+                style={style}
+            />
 
             <EdgeLabelRenderer key={id}>
                 <div

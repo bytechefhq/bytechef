@@ -219,7 +219,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                                 {
                                     class: twMerge(
                                         PROPERTY_MENTION_CHIP_CLASS,
-                                        'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 hover:bg-foreground/15',
+                                        'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2 hover:bg-foreground/15 dark:bg-surface-neutral-tertiary dark:hover:bg-foreground/15',
                                         controlType !== 'RICH_TEXT' &&
                                             controlType !== 'TEXT_AREA' &&
                                             controlType !== 'FORMULA_MODE' &&

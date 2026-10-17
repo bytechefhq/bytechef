@@ -90,7 +90,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         className={twMerge(
                             'min-h-9',
                             error &&
-                                'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
+                                'border-stroke-destructive-secondary pr-10 text-content-destructive placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
                             disabled && 'bg-gray-100 text-content-neutral-secondary',
                             leadingIcon && 'pl-12 leading-relaxed',
                             trailingAction &&

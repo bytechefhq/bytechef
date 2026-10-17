@@ -38,12 +38,14 @@ export default function AiAgentModelSelectField() {
                                 <div className="flex items-center gap-1">
                                     {model.icon ? (
                                         <InlineSVG
-                                            className="size-4 flex-none text-gray-700"
-                                            loader={<ComponentIcon className="size-4 flex-none text-gray-700" />}
+                                            className="size-4 flex-none text-content-neutral-subtle"
+                                            loader={
+                                                <ComponentIcon className="size-4 flex-none text-content-neutral-subtle" />
+                                            }
                                             src={model.icon}
                                         />
                                     ) : (
-                                        <BrainIcon className="size-4 flex-none text-gray-700" />
+                                        <BrainIcon className="size-4 flex-none text-content-neutral-subtle" />
                                     )}
 
                                     <span className="truncate">{model.title}</span>

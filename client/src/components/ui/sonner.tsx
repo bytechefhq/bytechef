@@ -28,7 +28,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           description:
             "max-h-40 overflow-y-auto overflow-x-hidden break-words whitespace-pre-wrap",
           error:
-            "group-[.toaster]:bg-destructive group-[.toaster]:text-destructive-foreground group-[.toaster]:border-destructive [&_[data-title]]:text-destructive-foreground! [&_[data-description]]:text-destructive-foreground! [&_[data-icon]]:text-destructive-foreground!",
+            "group-[.toaster]:bg-destructive group-[.toaster]:text-destructive-foreground group-[.toaster]:border-destructive [&_[data-title]]:text-destructive-foreground! [&_[data-description]]:text-destructive-foreground! [&_[data-icon]]:text-destructive-foreground! [&_[data-close-button]]:border-destructive-foreground/40 [&_[data-close-button]]:bg-destructive [&_[data-close-button]]:text-destructive-foreground",
           title: "break-words",
         },
       }}

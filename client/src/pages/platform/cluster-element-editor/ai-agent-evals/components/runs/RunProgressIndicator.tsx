@@ -10,7 +10,7 @@ const RunProgressIndicator = ({completedScenarios, totalScenarios}: RunProgressI
 
     return (
         <div className="flex items-center gap-2">
-            <div className="h-2 w-24 overflow-hidden rounded-full bg-gray-200">
+            <div className="h-2 w-24 overflow-hidden rounded-full bg-surface-neutral-tertiary">
                 <div
                     className={twMerge(
                         'h-full rounded-full transition-all',

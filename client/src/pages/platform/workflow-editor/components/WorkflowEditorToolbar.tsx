@@ -283,10 +283,7 @@ const WorkflowEditorToolbar = ({
                                 />
                             </TooltipTrigger>
 
-                            <TooltipContent
-                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
-                                side="top"
-                            >
+                            <TooltipContent className="rounded-lg bg-surface-tooltip text-content-ontooltip" side="top">
                                 Reset layout
                             </TooltipContent>
                         </Tooltip>
