@@ -132,8 +132,7 @@ class ComponentHandlerPolyglotEngineTest {
 
         assertEquals("https://api.example.com", baseUriFunction.apply(null, null));
 
-        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations()
-            .orElseThrow();
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
 
         assertEquals(1, authorizations.size());
 
@@ -156,8 +155,7 @@ class ComponentHandlerPolyglotEngineTest {
 
         assertEquals(Map.of("read", true, "write", true), scopesFunction.apply(null, null));
 
-        List<? extends Property> properties = authorization.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = authorization.getProperties();
 
         assertEquals(1, properties.size());
         assertEquals("clientId", properties.getFirst()
@@ -193,8 +191,8 @@ class ComponentHandlerPolyglotEngineTest {
                         {
                             type: "OAUTH2_AUTHORIZATION_CODE",
                             authorizationUrl: "https://example.com/oauth/authorize",
-                            tokenUrl: function (connectionParameters) {
-                                return "https://" + connectionParameters.region + ".example.com/oauth/token";
+                            tokenUrl: function (connection) {
+                                return "https://" + connection.region + ".example.com/oauth/token";
                             }
                         }
                     ]
@@ -210,8 +208,7 @@ class ComponentHandlerPolyglotEngineTest {
         ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
             .orElseThrow();
 
-        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations()
-            .orElseThrow();
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
 
         Authorization.TokenUrlFunction tokenUrlFunction = authorizations.getFirst()
             .getTokenUrl()
@@ -232,9 +229,9 @@ class ComponentHandlerPolyglotEngineTest {
                     authorizations: [
                         {
                             type: "CUSTOM",
-                            apply: function (connectionParameters) {
+                            apply: function (connection) {
                                 return {
-                                    headers: {"Authorization": "Bearer " + connectionParameters.accessToken},
+                                    headers: {"Authorization": "Bearer " + connection.accessToken},
                                     queryParameters: {"tenant": ["acme"]}
                                 };
                             }
@@ -252,8 +249,7 @@ class ComponentHandlerPolyglotEngineTest {
         ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
             .orElseThrow();
 
-        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations()
-            .orElseThrow();
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
 
         Authorization.ApplyFunction applyFunction = authorizations.getFirst()
             .getApply()
@@ -276,7 +272,7 @@ class ComponentHandlerPolyglotEngineTest {
                     authorizations: [
                         {
                             type: "OAUTH2_AUTHORIZATION_CODE",
-                            tokenUrl: function (connectionParameters) {
+                            tokenUrl: function (connection) {
                                 return 42;
                             }
                         }
@@ -293,8 +289,7 @@ class ComponentHandlerPolyglotEngineTest {
         ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
             .orElseThrow();
 
-        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations()
-            .orElseThrow();
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
 
         Authorization.TokenUrlFunction tokenUrlFunction = authorizations.getFirst()
             .getTokenUrl()
@@ -335,11 +330,9 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .getFirst();
 
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         assertEquals(2, properties.size());
         assertEquals("foo", properties.getFirst()
@@ -369,11 +362,9 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .getFirst();
 
         assertTrue(actionDefinition.getProperties()
-            .orElse(List.of())
             .isEmpty());
     }
 
@@ -405,7 +396,6 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .getFirst();
 
         OutputDefinition outputDefinition = actionDefinition.getOutputDefinition()
@@ -434,7 +424,6 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .getFirst();
 
         assertTrue(actionDefinition.getOutputDefinition()
@@ -473,8 +462,7 @@ class ComponentHandlerPolyglotEngineTest {
             "<svg viewBox=\"0 0 24 24\"></svg>", componentDefinition.getIcon()
                 .orElseThrow());
 
-        List<? extends ClusterElementDefinition<?>> clusterElements = componentDefinition.getClusterElements()
-            .orElseThrow();
+        List<? extends ClusterElementDefinition<?>> clusterElements = componentDefinition.getClusterElements();
 
         assertEquals(1, clusterElements.size());
 
@@ -483,11 +471,9 @@ class ComponentHandlerPolyglotEngineTest {
         assertEquals("lookupCustomer", clusterElementDefinition.getName());
         assertEquals(BaseToolFunction.TOOLS, clusterElementDefinition.getType());
         assertEquals(1, clusterElementDefinition.getProperties()
-            .orElseThrow()
             .size());
 
         assertEquals(2, componentDefinition.getActions()
-            .orElseThrow()
             .size());
     }
 
@@ -508,7 +494,6 @@ class ComponentHandlerPolyglotEngineTest {
         assertTrue(componentDefinition.getIcon()
             .isEmpty());
         assertTrue(componentDefinition.getClusterElements()
-            .orElse(List.of())
             .isEmpty());
     }
 
@@ -526,10 +511,10 @@ class ComponentHandlerPolyglotEngineTest {
                             {
                                 name: 'region',
                                 type: 'STRING',
-                                options: function (inputParameters, connectionParameters, searchText) {
+                                options: function (input, connection, searchText) {
                                     return [
                                         {label: 'EU ' + searchText, value: 'eu'},
-                                        {label: 'US ' + inputParameters.tenant, value: 'us'}
+                                        {label: 'US ' + input.tenant, value: 'us'}
                                     ];
                                 }
                             }
@@ -545,11 +530,9 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .getFirst();
 
         DynamicOptionsProperty<?> property = (DynamicOptionsProperty<?>) actionDefinition.getProperties()
-            .orElseThrow()
             .getFirst();
 
         OptionsDataSource<?> optionsDataSource = property.getOptionsDataSource()
@@ -584,9 +567,9 @@ class ComponentHandlerPolyglotEngineTest {
                         type: 'POLLING',
                         properties: [{name: 'folder', type: 'STRING'}],
                         output: {type: 'OBJECT', properties: [{name: 'id', type: 'STRING'}]},
-                        poll: function (inputParameters, connectionParameters, closureParameters) {
+                        poll: function (input, connection, closureParameters) {
                             return {
-                                records: [{id: inputParameters.folder + '-1'}],
+                                records: [{id: input.folder + '-1'}],
                                 closureParameters: {cursor: (closureParameters.cursor || 0) + 1}
                             };
                         }
@@ -601,13 +584,11 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
-            .orElseThrow()
             .getFirst();
 
         assertEquals("newItem", triggerDefinition.getName());
         assertEquals(TriggerDefinition.TriggerType.POLLING, triggerDefinition.getType());
         assertEquals(1, triggerDefinition.getProperties()
-            .orElseThrow()
             .size());
         assertTrue(triggerDefinition.getOutputDefinition()
             .isPresent());
@@ -634,7 +615,7 @@ class ComponentHandlerPolyglotEngineTest {
                     {
                         name: 'onPush',
                         type: 'STATIC_WEBHOOK',
-                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                        webhookRequest: function (input, connection, request) {
                             return {event: request.body.event, method: request.method};
                         }
                     }
@@ -647,7 +628,6 @@ class ComponentHandlerPolyglotEngineTest {
 
         TriggerDefinition triggerDefinition = componentHandler.getDefinition()
             .getTriggers()
-            .orElseThrow()
             .getFirst();
 
         assertEquals(TriggerDefinition.TriggerType.STATIC_WEBHOOK, triggerDefinition.getType());
@@ -678,11 +658,11 @@ class ComponentHandlerPolyglotEngineTest {
                     {
                         name: 'onPush',
                         type: 'DYNAMIC_WEBHOOK',
-                        webhookEnable: function (inputParameters, connectionParameters, args) {
+                        webhookEnable: function (input, connection, args) {
                             return {subscriptionId: 'sub-for-' + args.webhookUrl};
                         },
                         webhookDisable: function () {},
-                        webhookRequest: function (inputParameters, connectionParameters, request) {
+                        webhookRequest: function (input, connection, request) {
                             return request.body;
                         }
                     }
@@ -694,7 +674,6 @@ class ComponentHandlerPolyglotEngineTest {
         TriggerDefinition triggerDefinition = ComponentHandlerPolyglotEngine.load("js", script)
             .getDefinition()
             .getTriggers()
-            .orElseThrow()
             .getFirst();
 
         assertEquals(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK, triggerDefinition.getType());
@@ -1275,7 +1254,6 @@ class ComponentHandlerPolyglotEngineTest {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         ActionDefinition actionDefinition = componentDefinition.getActions()
-            .orElseThrow()
             .stream()
             .filter(action -> actionName.equals(action.getName()))
             .findFirst()
