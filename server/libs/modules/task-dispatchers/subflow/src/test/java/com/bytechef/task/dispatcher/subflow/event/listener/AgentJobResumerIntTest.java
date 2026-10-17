@@ -80,6 +80,7 @@ import tools.jackson.databind.ObjectMapper;
 class AgentJobResumerIntTest {
 
     private static final String AGENT_JOB_RESUME_ID = "agent-resume-id";
+    private static final AtomicBoolean CONCURRENT_START_BEFORE_NEXT_CLAIM = new AtomicBoolean();
     private static final AtomicBoolean CONCURRENT_UPDATE_ON_NEXT_GET = new AtomicBoolean();
     private static final SubflowOutcome SUBFLOW_OUTCOME = new SubflowOutcome.Completed("done");
     private static final long TASK_EXECUTION_RESUME_ID = 7L;
@@ -95,6 +96,7 @@ class AgentJobResumerIntTest {
 
     @AfterEach
     void afterEach() {
+        CONCURRENT_START_BEFORE_NEXT_CLAIM.set(false);
         CONCURRENT_UPDATE_ON_NEXT_GET.set(false);
 
         for (Job job : jobRepository.findAll()) {
@@ -118,7 +120,9 @@ class AgentJobResumerIntTest {
             .doesNotContainKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID);
         assertThat(storedAgentJob.getVersion()).isGreaterThan(agentJob.getVersion());
 
-        verify(jobFacade).resumeJob(
+        assertThat(storedAgentJob.getStatus()).isEqualTo(Job.Status.STARTED);
+
+        verify(jobFacade).resumeClaimedJob(
             getAgentJobId(agentJob), TASK_EXECUTION_RESUME_ID, Map.of("status", "completed", "result", "done"));
     }
 
@@ -129,7 +133,7 @@ class AgentJobResumerIntTest {
         assertThat(resume(agentJob)).isTrue();
         assertThat(resume(agentJob)).isFalse();
 
-        verify(jobFacade).resumeJob(anyLong(), anyLong(), any());
+        verify(jobFacade).resumeClaimedJob(anyLong(), any(), any());
     }
 
     @Test
@@ -186,7 +190,20 @@ class AgentJobResumerIntTest {
 
         assertThat(storedAgentJob.getMetadata()).doesNotContainKey(MetadataConstants.CONSUMED_JOB_RESUME_ID);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        verify(jobFacade, never()).resumeClaimedJob(anyLong(), any(), any());
+    }
+
+    @Test
+    void testDoesNotResumeWhenTheClaimIsLost() {
+        Job agentJob = saveAgentJob(Job.Status.STOPPED, waitingMetadata());
+
+        CONCURRENT_START_BEFORE_NEXT_CLAIM.set(true);
+
+        boolean resumed = resume(agentJob);
+
+        assertThat(resumed).isFalse();
+
+        verify(jobFacade, never()).resumeClaimedJob(anyLong(), any(), any());
     }
 
     @Test
@@ -194,7 +211,7 @@ class AgentJobResumerIntTest {
         Job agentJob = saveAgentJob(Job.Status.STOPPED, waitingMetadata());
 
         doThrow(new IllegalStateException("broker down")).when(jobFacade)
-            .resumeJob(anyLong(), anyLong(), any());
+            .resumeClaimedJob(anyLong(), any(), any());
 
         boolean resumed = resume(agentJob);
 
@@ -204,7 +221,6 @@ class AgentJobResumerIntTest {
 
         Map<String, Object> storedMetadata = new HashMap<>(storedAgentJob.getMetadata());
 
-        assertThat(storedAgentJob.getStatus()).isEqualTo(Job.Status.STOPPED);
         assertThat(storedMetadata).containsEntry(MetadataConstants.CONSUMED_JOB_RESUME_ID, AGENT_JOB_RESUME_ID);
     }
 
@@ -217,7 +233,7 @@ class AgentJobResumerIntTest {
 
         assertThat(storedAgentJob.getVersion()).isEqualTo(agentJob.getVersion());
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        verify(jobFacade, never()).resumeClaimedJob(anyLong(), any(), any());
     }
 
     private Job getStoredJob(Job job) {
@@ -281,6 +297,18 @@ class AgentJobResumerIntTest {
                     }
 
                     return job;
+                }
+
+                @Override
+                public boolean tryClaimResume(Job job) {
+                    if (CONCURRENT_START_BEFORE_NEXT_CLAIM.getAndSet(false)) {
+                        concurrentTransactionTemplate.executeWithoutResult(
+                            status -> jobRepository.updateStatusAndClearEndDateIfCurrentStatus(
+                                Objects.requireNonNull(job.getId()), Job.Status.STOPPED.ordinal(),
+                                Job.Status.STARTED.ordinal()));
+                    }
+
+                    return super.tryClaimResume(job);
                 }
             };
         }

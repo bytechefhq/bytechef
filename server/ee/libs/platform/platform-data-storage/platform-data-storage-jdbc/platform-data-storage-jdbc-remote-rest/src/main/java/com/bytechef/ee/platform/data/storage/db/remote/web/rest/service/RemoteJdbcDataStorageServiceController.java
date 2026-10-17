@@ -38,6 +38,18 @@ public class RemoteJdbcDataStorageServiceController {
     }
 
     @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = "/delete-scope-data/{scope}/{scopeId}")
+    public ResponseEntity<Void> deleteScopeData(
+        @PathVariable DataStorageScope scope, @PathVariable String scopeId) {
+
+        dataStorageService.deleteScopeData(scope, scopeId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @RequestMapping(
         method = RequestMethod.GET,
         value = "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}",
         consumes = {

@@ -21,7 +21,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
@@ -79,7 +78,7 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
     }
 
     @Override
-    public Map<String, ?> getApprovalForm(String id) {
+    public Optional<Map<String, ?>> fetchApprovalForm(String id) {
         String innerToken = resolveInnerToken(id)
             .orElseThrow(() -> new IllegalArgumentException("Invalid approval form id"));
 
@@ -87,38 +86,42 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
         return TenantContext.callWithTenantId(
             jobResumeId.getTenantId(),
-            () -> Objects.requireNonNull(transactionOperations.execute(transactionStatus -> {
-                Job job = jobService.getJob(jobResumeId.getJobId());
+            () -> Objects.requireNonNull(
+                transactionOperations.execute(transactionStatus -> fetchApprovalForm(jobResumeId))));
+    }
 
-                if (job.getStatus() != Job.Status.STOPPED) {
-                    throw new IllegalStateException(
-                        "Approval form is no longer available; job " + jobResumeId.getJobId() + " is "
-                            + job.getStatus());
-                }
+    private Optional<Map<String, ?>> fetchApprovalForm(JobResumeId jobResumeId) {
+        Optional<Job> jobOptional = jobService.fetchJob(jobResumeId.getJobId());
 
-                Map<String, ?> jobMetadata = job.getMetadata();
+        if (jobOptional.isEmpty()) {
+            return Optional.empty();
+        }
 
-                if (!jobResumeId.matches((String) jobMetadata.get(MetadataConstants.JOB_RESUME_ID))) {
-                    throw new IllegalStateException(
-                        "Approval form is no longer available; the resume id of job " + jobResumeId.getJobId() +
-                            " does not match");
-                }
+        Job job = jobOptional.get();
 
-                TaskExecution taskExecution = taskExecutionService.getTaskExecution(
-                    MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
+        Map<String, ?> jobMetadata = job.getMetadata();
 
-                Map<String, Object> result = new HashMap<>(getFormParameters(jobResumeId, taskExecution));
+        if (job.getStatus() != Job.Status.STOPPED ||
+            !jobResumeId.matches((String) jobMetadata.get(MetadataConstants.JOB_RESUME_ID))) {
 
-                Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
+            return Optional.empty();
+        }
 
-                Object environmentId = taskExecutionMetadata.get(ENVIRONMENT_ID_METADATA_KEY);
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(
+            MapUtils.getLong(jobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID));
 
-                if (environmentId != null) {
-                    result.put(ENVIRONMENT_ID_METADATA_KEY, environmentId);
-                }
+        Map<String, Object> approvalForm = new HashMap<>(
+            ApprovalFormParameters.getUnlocked(taskStateService, jobResumeId, taskExecution));
 
-                return result;
-            })));
+        Map<String, ?> taskExecutionMetadata = taskExecution.getMetadata();
+
+        Object environmentId = taskExecutionMetadata.get(ENVIRONMENT_ID_METADATA_KEY);
+
+        if (environmentId != null) {
+            approvalForm.put(ENVIRONMENT_ID_METADATA_KEY, environmentId);
+        }
+
+        return Optional.of(approvalForm);
     }
 
     private static TransactionTemplate createReadOnlyTransactionTemplate(
@@ -129,23 +132,6 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
         transactionTemplate.setReadOnly(true);
 
         return transactionTemplate;
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, ?> getFormParameters(JobResumeId jobResumeId, TaskExecution taskExecution) {
-        Optional<Suspend> suspendOptional = taskStateService.fetchUnlockedValue(jobResumeId);
-
-        if (suspendOptional.isPresent()) {
-            Suspend suspend = suspendOptional.get();
-
-            if (suspend.continueParameters()
-                .get(MetadataConstants.APPROVAL_FORM_PARAMETERS) instanceof Map<?, ?> formParameters) {
-
-                return (Map<String, ?>) formParameters;
-            }
-        }
-
-        return taskExecution.getParameters();
     }
 
     private Optional<String> resolveInnerToken(String id) {

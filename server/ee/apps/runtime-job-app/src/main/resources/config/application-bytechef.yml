@@ -1,4 +1,16 @@
 bytechef:
+  approval:
+    signed-token:
+      # Tolerance applied to signed approval link expiry checks default: PT60S
+      clock-skew: PT60S
+      # Lifetime of a signed approval/resume link default: P30D
+      default-ttl: P30D
+      # Base64 signing secrets accepted for verification after a rotation
+      # previous-secrets:
+      # Fail startup when no signing secret can be resolved default: false
+      required: false
+      # Base64 signing secret (at least 32 bytes); derived from the encryption key when unset
+      # secret:
   async:
     # Upper bound on concurrent @Async tasks on the default executor. There is no queue: a submitter waits for a
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.

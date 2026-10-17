@@ -30,11 +30,14 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +46,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -50,6 +55,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  */
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
+
+    private static final Logger log = LoggerFactory.getLogger(ActionContextImpl.class);
 
     private final String actionName;
     private @Nullable Approval approval;
@@ -98,7 +105,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.tracer = builder.tracer;
 
         if (builder.jobId != null && builder.publicUrl != null) {
-            this.approval = new ApprovalImpl(tenantId, builder.jobId, builder.publicUrl, builder.approvalTokens);
+            this.approval = new ApprovalImpl(
+                tenantId, builder.jobId, builder.taskExecutionId, builder.publicUrl, builder.approvalTokens);
         }
 
         this.data = new DataImpl(
@@ -156,6 +164,22 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
 
         return approvalTokens.toSignedTokenIfConfigured(innerToken)
+            .orElse(innerToken);
+    }
+
+    private String toResumeToken(String innerToken, Instant expiresAt) {
+        if (approvalTokens == null) {
+            return innerToken;
+        }
+
+        Duration remaining = Duration.between(Instant.now(), expiresAt);
+
+        if (remaining.isNegative()) {
+            remaining = Duration.ZERO;
+        }
+
+        return approvalTokens
+            .toSignedTokenIfConfigured(innerToken, remaining.plus(ApprovalFormUrls.APPROVAL_TOKEN_TTL_MARGIN))
             .orElse(innerToken);
     }
 
@@ -336,7 +360,34 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return null;
         }
 
-        return publicUrl + "/job/resume/" + toResumeToken(getOrCreateJobResumeId(jobId));
+        return ApprovalFormUrls.toResumeUrl(publicUrl, toResumeToken(getOrCreateJobResumeId(jobId)));
+    }
+
+    @Override
+    @Nullable
+    public ApprovalLinks getApprovalLinks(Instant expiresAt) {
+        if (suspendTarget != null) {
+            return suspendTarget.getApprovalLinks(expiresAt);
+        }
+
+        if (publicUrl == null || jobId == null) {
+            return null;
+        }
+
+        String resumeId = toResumeToken(getOrCreateJobResumeId(jobId), expiresAt);
+
+        return new ApprovalLinks(
+            publicUrl, resumeId, ApprovalFormUrls.toResumeUrl(publicUrl, resumeId),
+            ApprovalFormUrls.toFormUrl(publicUrl, resumeId), toShortResumeId(resumeId));
+    }
+
+    private @Nullable String toShortResumeId(String resumeId) {
+        if (approvalTokens == null) {
+            return null;
+        }
+
+        return approvalTokens.toShortToken(resumeId)
+            .orElse(null);
     }
 
     private synchronized String getOrCreateJobResumeId(long jobId) {
@@ -473,15 +524,21 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     private record ApprovalImpl(
-        String tenantId, long jobId, String publicUrl, @Nullable ApprovalTokens approvalTokens) implements Approval {
+        String tenantId, long jobId, long taskExecutionId, String publicUrl,
+        @Nullable ApprovalTokens approvalTokens) implements Approval {
 
         @Override
         public Links generateLinks() {
             String url = "%s/approvals/%s";
+            UUID uuid = UUID.randomUUID();
+
+            String pairUuid = uuid.toString();
 
             return new Links(
-                url.formatted(publicUrl, toApprovalToken(ApprovalId.of(tenantId, jobId, true))),
-                url.formatted(publicUrl, toApprovalToken(ApprovalId.of(tenantId, jobId, false))));
+                url.formatted(
+                    publicUrl, toApprovalToken(ApprovalId.of(tenantId, jobId, pairUuid, true, taskExecutionId))),
+                url.formatted(
+                    publicUrl, toApprovalToken(ApprovalId.of(tenantId, jobId, pairUuid, false, taskExecutionId))));
         }
 
         private String toApprovalToken(ApprovalId approvalId) {

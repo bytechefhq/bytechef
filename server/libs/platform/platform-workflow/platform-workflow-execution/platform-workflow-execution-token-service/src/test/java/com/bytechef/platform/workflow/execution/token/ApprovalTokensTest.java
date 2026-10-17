@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -116,5 +117,130 @@ class ApprovalTokensTest {
 
     private static String base64Secret(String raw) {
         return EncodingUtils.base64EncodeToString(raw);
+    }
+
+    @Test
+    void testResolveJobResumeIdUnwrapsSignedToken() {
+        JobResumeId jobResumeId = JobResumeId.of("public", 42L);
+
+        String token = approvalTokens.toSignedToken(jobResumeId.toString(), TTL);
+
+        assertThat(approvalTokens.resolveJobResumeId(token)).contains(jobResumeId);
+        assertThat(approvalTokens.resolveJobResumeId(jobResumeId.toString())).contains(jobResumeId);
+        assertThat(approvalTokens.resolveJobResumeId(token + "x")).isEmpty();
+        assertThat(approvalTokens.resolveJobResumeId("garbage")).isEmpty();
+    }
+
+    @Test
+    void testShortTokenRoundTripsToTheSameSignedToken() {
+        String token = approvalTokens.toSignedToken(jobResumeId("public", 42L), TTL);
+
+        String shortToken = approvalTokens.toShortToken(token)
+            .orElseThrow();
+
+        assertThat(shortToken.length()).isLessThanOrEqualTo(62);
+        assertThat(approvalTokens.toShortToken(token)).contains(shortToken);
+        assertThat(approvalTokens.parseShortToken(shortToken)).contains(token);
+    }
+
+    @Test
+    void testShortTokenFitsTelegramCallbackDataForATenantSchema() {
+        String token = approvalTokens.toSignedToken(jobResumeId("000001", 1_000_000_000L), TTL);
+
+        String shortToken = approvalTokens.toShortToken(token)
+            .orElseThrow();
+
+        assertThat((shortToken + ":a").length()).isLessThanOrEqualTo(64);
+        assertThat(approvalTokens.parseShortToken(shortToken)).contains(token);
+    }
+
+    @Test
+    void testShortTokenIsEmptyWhenItWouldNotFitTelegramCallbackData() {
+        String token = approvalTokens.toSignedToken(jobResumeId("public", Long.MAX_VALUE), TTL);
+
+        assertThat(approvalTokens.toShortToken(token)).isEmpty();
+    }
+
+    @Test
+    void testShortTokenRejectsTokensItCannotVerify() {
+        String token = approvalTokens.toSignedToken(jobResumeId("public", 42L), TTL);
+
+        assertThat(approvalTokens.toShortToken(token + "x")).isEmpty();
+        assertThat(approvalTokens.toShortToken(jobResumeId("public", 42L))).isEmpty();
+        assertThat(approvalTokens.toShortToken(approvalTokens.toSignedToken(INNER, TTL))).isEmpty();
+        assertThat(approvalTokens.toShortToken("")).isEmpty();
+    }
+
+    @Test
+    void testTamperedShortTokenIsRejected() {
+        String token = approvalTokens.toSignedToken(jobResumeId("public", 42L), TTL);
+
+        String shortToken = approvalTokens.toShortToken(token)
+            .orElseThrow();
+
+        char first = shortToken.charAt(0);
+        String tamperedShortToken = (first == 'A' ? 'B' : 'A') + shortToken.substring(1);
+
+        assertThat(approvalTokens.parseShortToken(tamperedShortToken)).isEmpty();
+        assertThat(approvalTokens.parseShortToken(shortToken.substring(1))).isEmpty();
+        assertThat(approvalTokens.parseShortToken("garbage")).isEmpty();
+        assertThat(approvalTokens.parseShortToken("")).isEmpty();
+    }
+
+    @Test
+    void testExpiredShortTokenIsRejected() {
+        String token = approvalTokens.toSignedToken(jobResumeId("public", 42L), Duration.ofHours(1));
+
+        String shortToken = approvalTokens.toShortToken(token)
+            .orElseThrow();
+
+        Clock later = Clock.offset(clock, Duration.ofMinutes(62));
+
+        ApprovalTokens laterApprovalTokens = new ApprovalTokensImpl(
+            later, SECRET, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        assertThat(laterApprovalTokens.parseShortToken(shortToken)).isEmpty();
+    }
+
+    @Test
+    void testShortTokenMintedWithARotatedOutSecretIsResignedWithTheActiveSecret() {
+        JobResumeId jobResumeId = JobResumeId.of("public", 42L);
+
+        String shortToken = approvalTokens.toShortToken(approvalTokens.toSignedToken(jobResumeId.toString(), TTL))
+            .orElseThrow();
+
+        ApprovalTokens rotatedApprovalTokens = new ApprovalTokensImpl(
+            clock, SECRET2, List.of(SECRET), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        String token = rotatedApprovalTokens.parseShortToken(shortToken)
+            .orElseThrow();
+
+        assertThat(rotatedApprovalTokens.resolveJobResumeId(token)).contains(jobResumeId);
+        assertThat(approvalTokens.parseShortToken(shortToken)).isPresent();
+
+        ApprovalTokens otherApprovalTokens = new ApprovalTokensImpl(
+            clock, SECRET2, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        assertThat(otherApprovalTokens.parseShortToken(shortToken)).isEmpty();
+    }
+
+    @Test
+    void testShortTokensNeedASigningSecret() {
+        ApprovalTokens unconfigured = new ApprovalTokensImpl(
+            clock, null, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        String token = approvalTokens.toSignedToken(jobResumeId("public", 42L), TTL);
+
+        String shortToken = approvalTokens.toShortToken(token)
+            .orElseThrow();
+
+        assertThat(unconfigured.parseShortToken(shortToken)).isEmpty();
+        assertThat(unconfigured.toShortToken(jobResumeId("public", 42L))).isEmpty();
+    }
+
+    private static String jobResumeId(String tenantId, long jobId) {
+        JobResumeId jobResumeId = JobResumeId.of(tenantId, jobId);
+
+        return jobResumeId.toString();
     }
 }

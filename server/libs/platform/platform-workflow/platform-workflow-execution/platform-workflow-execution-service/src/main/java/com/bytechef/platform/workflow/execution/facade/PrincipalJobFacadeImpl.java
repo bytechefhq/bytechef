@@ -83,7 +83,6 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     }
 
     @Override
-    @Transactional
     public long createPrincipalLinkedJob(
         long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
 
@@ -96,11 +95,19 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
                 "Cannot create principal-linked job: no principal found for reference job %d (type=%s)"
                     .formatted(referenceJobId, platformType)));
 
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        return createPrincipalLinkedJob(jobParametersDTO, principalId, platformType);
+    }
 
-        principalJobService.create(jobId, principalId, platformType);
+    @Override
+    public long createPrincipalLinkedJob(
+        JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType platformType) {
 
-        return jobId;
+        Validate.isTrue(
+            jobParametersDTO.getParentTaskExecutionId() == null,
+            "A principal-linked job is a top-level job; use createChildJob for a sub-workflow");
+
+        return jobFacade.createJob(
+            jobParametersDTO, jobId -> principalJobService.create(jobId, jobPrincipalId, platformType));
     }
 
     @Override

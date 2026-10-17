@@ -34,6 +34,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
@@ -45,6 +46,8 @@ import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import io.micrometer.tracing.Tracer;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -121,6 +124,39 @@ class ContextFactoryTest {
         verify(logFileStorage).storeLogEntries(eq(1L), eq(10L), anyList());
         verify(editorLogFileStorage).storeLogEntries(eq(2L), eq(20L), anyList());
         verify(triggerLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testApprovalLinksCarryAShortResumeId() {
+        ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
+
+        when(applicationProperties.getPublicUrl()).thenReturn("https://example.com");
+
+        ApprovalTokens approvalTokens = mock(ApprovalTokens.class);
+
+        when(approvalTokens.toSignedTokenIfConfigured(anyString(), any(Duration.class)))
+            .thenReturn(Optional.of("signed-token"));
+        when(approvalTokens.toShortToken("signed-token")).thenReturn(Optional.of("short-id"));
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ApprovalTokens> approvalTokensProvider = mock(ObjectProvider.class);
+
+        when(approvalTokensProvider.getIfAvailable()).thenReturn(approvalTokens);
+
+        ContextFactory mintingContextFactory = new ContextFactoryImpl(
+            mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
+            editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
+            approvalTokensProvider, logFileStorage, mock(TempFileStorage.class), mock(Tracer.class),
+            triggerLogFileStorage);
+
+        ActionContext actionContext = mintingContextFactory.createActionContext(
+            "approval", 1, "requestApproval", null, null, 1L, 10L, "workflowId", null, null, PlatformType.AUTOMATION,
+            false);
+
+        ApprovalLinks approvalLinks = ((ActionContextAware) actionContext).getApprovalLinks(Instant.now());
+
+        assertThat(approvalLinks).isNotNull();
+        assertThat(approvalLinks.shortResumeId()).isEqualTo("short-id");
     }
 
     @Nested

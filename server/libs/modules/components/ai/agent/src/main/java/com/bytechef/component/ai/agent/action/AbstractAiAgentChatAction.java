@@ -36,6 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.DeferredToolCallReplay;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
@@ -112,6 +113,7 @@ public abstract class AbstractAiAgentChatAction {
     private static final Logger log = LoggerFactory.getLogger(AbstractAiAgentChatAction.class);
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
+    private static final String APPROVED = "approved";
     private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
 
     static final String NO_HUMAN_RESPONSE_TOOL_RESULT = "{\"status\":\"NO_RESPONSE\",\"message\":\"No response was " +
@@ -141,12 +143,9 @@ public abstract class AbstractAiAgentChatAction {
             ModelUtils.getMessages(inputParameters, context), false);
     }
 
-    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
-        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
-        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
-        List<Message> messages, boolean resumedTurn) throws Exception {
-
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+    private ChatModel resolveChatModel(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters,
+        ClusterElementMap clusterElementMap, ActionContext context) {
 
         ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
 
@@ -159,21 +158,43 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Object> concatenatedInputParameters = MapUtils.concat(
             new HashMap<>(inputParameters.toMap()), new HashMap<>(modelClusterElement.getParameters()));
 
-        ChatModel providerChatModel;
-
         try {
-            providerChatModel = (ChatModel) modelFunction.apply(
+            return (ChatModel) modelFunction.apply(
                 ParametersFactory.create(concatenatedInputParameters),
                 ParametersFactory.create(modelConnection.getParameters()), true);
         } catch (Exception e) {
             throw clusterElementInitializationException(modelClusterElement, "model", e, context);
         }
+    }
+
+    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn) throws Exception {
+
+        return getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context, messages, resumedTurn,
+            null);
+    }
+
+    private ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<Message> messages, boolean resumedTurn, @Nullable DeferredToolCallReplay deferredToolCallReplay)
+        throws Exception {
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ChatModel providerChatModel = resolveChatModel(
+            inputParameters, connectionParameters, clusterElementMap, context);
 
         ChatModel chatModel = providerChatModel;
 
         Optional<ClusterElementCallTarget> clusterElementCallTarget = ClusterElementCallTarget.of(context);
 
         if (clusterElementCallTarget.isPresent()) {
+            ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
+
             chatModel = new ClusterElementFailureAttributingChatModel(
                 providerChatModel, modelClusterElement.getWorkflowNodeName(), modelClusterElement.getComponentName(),
                 clusterElementCallTarget.get());
@@ -191,7 +212,8 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
 
-        ChatClient chatClient = ChatClient.builder(chatModel)
+        ChatClient chatClient = ChatClient.builder(
+            deferredToolCallReplay == null ? chatModel : deferredToolCallReplay.replayingChatModel(chatModel))
             .build();
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = (resumedTurn
@@ -405,9 +427,19 @@ public abstract class AbstractAiAgentChatAction {
 
         completeSuspendedCall(agentToolSuspension, toolResult, context);
 
+        List<Message> resumedConversation = agentToolSuspension.resumeConversation(toolResult);
+
+        if (Boolean.FALSE.equals(resumeData.get(APPROVED))) {
+            return getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, toolExecutionListener, context,
+                resumedConversation, true, null);
+        }
+
+        DeferredToolCallReplay deferredToolCallReplay = DeferredToolCallReplay.of(resumedConversation);
+
         return getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context,
-            agentToolSuspension.resumeConversation(toolResult), true);
+            deferredToolCallReplay.conversation(), true, deferredToolCallReplay);
     }
 
     private static void completeSuspendedCall(
