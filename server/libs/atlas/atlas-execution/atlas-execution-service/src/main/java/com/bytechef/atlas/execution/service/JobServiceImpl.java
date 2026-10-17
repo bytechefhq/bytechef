@@ -25,7 +25,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.LongConsumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +61,15 @@ public class JobServiceImpl implements JobService {
         Job job = getJob(jobParametersDTO, workflow);
 
         job = jobRepository.save(job);
+
+        return job;
+    }
+
+    @Override
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow, LongConsumer jobCreatedCallback) {
+        Job job = create(jobParametersDTO, workflow);
+
+        jobCreatedCallback.accept(Objects.requireNonNull(job.getId(), "id"));
 
         return job;
     }
