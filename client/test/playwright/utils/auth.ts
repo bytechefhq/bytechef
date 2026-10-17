@@ -17,3 +17,11 @@ export async function ensureAuthenticated(page: Page): Promise<void> {
 
     await login(page, TEST_USER.email, TEST_USER.password);
 }
+
+export async function waitAndStaySignedIn(page: Page, milliseconds: number): Promise<void> {
+    await page.waitForTimeout(Math.max(milliseconds, 0));
+
+    await page.context().clearCookies();
+
+    await login(page, TEST_USER.email, TEST_USER.password);
+}
