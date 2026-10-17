@@ -64,7 +64,9 @@ const LeftSidebarNavItem = ({
         aria-disabled={disabled || undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
+            current
+                ? 'bg-accent text-sidebar-accent-foreground hover:bg-accent hover:text-sidebar-accent-foreground'
+                : 'text-sidebar-foreground hover:bg-accent hover:text-sidebar-accent-foreground',
             'w-full justify-start px-2 font-normal',
             disabled && 'pointer-events-none opacity-50',
             className
