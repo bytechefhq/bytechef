@@ -523,7 +523,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     return (
                         <li
-                            className={`space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 ${isDisabled ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-blue-200'}`}
+                            className={`space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 ${isDisabled ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-stroke-brand-secondary'}`}
                             key={operation.name}
                             onClick={() => {
                                 if (isDisabled) {

@@ -231,7 +231,7 @@ const Login = () => {
                                 />
 
                                 <Button
-                                    icon={<img alt="Github logo" src={githubLogo} />}
+                                    icon={<img alt="Github logo" className="dark:invert" src={githubLogo} />}
                                     label="Continue with Github"
                                     onClick={() => {
                                         rememberLoginRedirect(getLoginRedirect(pageLocation.search));
@@ -285,7 +285,7 @@ const Login = () => {
                                 />
 
                                 {ssoRedirect && (
-                                    <div className="rounded-lg border border-blue-200 bg-surface-brand-secondary p-3">
+                                    <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary p-3">
                                         <p className="mb-2 text-sm text-content-brand-primary">
                                             Your organization uses SSO for authentication.
                                         </p>

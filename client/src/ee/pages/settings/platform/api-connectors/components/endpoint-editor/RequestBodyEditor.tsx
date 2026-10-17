@@ -79,7 +79,7 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
                             {requestBody.contentType}
                         </span>
 
-                        {requestBody.required && <span className="text-xs text-red-500">Required</span>}
+                        {requestBody.required && <span className="text-xs text-content-destructive">Required</span>}
                     </div>
 
                     {requestBody.description && (

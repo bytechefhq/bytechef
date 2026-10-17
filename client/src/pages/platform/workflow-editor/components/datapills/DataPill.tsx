@@ -214,7 +214,7 @@ const DataPill = ({
             <div className="flex w-full items-center space-x-2">
                 <div
                     className={twMerge(
-                        'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
+                        'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main dark:hover:bg-surface-neutral-tertiary',
                         !mentionInput && 'cursor-not-allowed'
                     )}
                     draggable
@@ -248,7 +248,7 @@ const DataPill = ({
                 <TooltipTrigger asChild>
                     <div
                         className={twMerge(
-                            'mr-auto inline-flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
+                            'mr-auto inline-flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main dark:hover:bg-surface-neutral-tertiary',
                             !mentionInput && 'cursor-not-allowed'
                         )}
                         data-name={property?.name || workflowNodeName}

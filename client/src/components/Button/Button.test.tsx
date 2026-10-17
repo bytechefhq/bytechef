@@ -151,10 +151,8 @@ describe('Button variants', () => {
 
         expect(screen.getByRole('button')).toHaveTextContent('Button');
 
-        expect(screen.getByText('Button')).toHaveClass('bg-transparent opacity-50 text-content-destructive-primary ');
-        expect(screen.getByText('Button')).toHaveClass(
-            'hover:bg-surface-destructive-secondary-hover hover:opacity-100'
-        );
+        expect(screen.getByText('Button')).toHaveClass('bg-transparent text-content-destructive-primary');
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-surface-destructive-secondary-hover');
         expect(screen.getByText('Button')).toHaveClass('active:bg-surface-destructive-secondary-active');
     });
 

@@ -77,7 +77,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
     }, [aiAgentNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen]);
 
     const sharedClasses =
-        'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
+        'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background dark:bg-popover';
     const defaultPositionClasses = twMerge(
         'absolute top-[9px] bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
         copilotLayoutShifted ? 'right-[524px]' : 'right-[536px]'
@@ -121,7 +121,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
                         />
                     </div>
 
-                    <div className="flex min-h-0 flex-1 overflow-hidden bg-surface-main">
+                    <div className="flex min-h-0 flex-1 overflow-hidden bg-surface-main dark:bg-popover">
                         {loading ? (
                             <div className="w-full">
                                 {Array.from({length: 4}).map((_, index) => (

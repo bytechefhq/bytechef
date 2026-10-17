@@ -27,7 +27,7 @@ export default function PlaceholderEdge({
 
     return (
         <path
-            className="fill-none stroke-gray-300 stroke-2 [stroke-dasharray:3,5]"
+            className="fill-none stroke-stroke-neutral-tertiary stroke-2 [stroke-dasharray:3,5]"
             d={edgePath}
             id={id}
             style={style}

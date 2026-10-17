@@ -112,7 +112,10 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                            <DropdownMenuItem
+                                className="text-content-destructive"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>

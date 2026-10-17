@@ -89,7 +89,7 @@ const ParameterList = ({onChange, parameters}: ParameterListProps) => {
 
                                     <span className="text-xs text-content-neutral-secondary">({parameter.type})</span>
 
-                                    {parameter.required && <span className="text-xs text-red-500">*</span>}
+                                    {parameter.required && <span className="text-xs text-content-destructive">*</span>}
                                 </div>
 
                                 <Button

@@ -101,7 +101,7 @@ const DataPillPanelBodyPropertiesItem = ({
     return (
         <Fragment key={`accordion-item-${workflowNodeName}`}>
             <AccordionTrigger
-                className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b"
+                className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b dark:bg-popover"
                 key={`accordion-trigger-${workflowNodeName}`}
             >
                 <div className="flex items-center space-x-4">

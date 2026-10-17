@@ -95,7 +95,7 @@ export default function ApprovalTaskFilters() {
                         onClick={() => handleStatusChange('completed')}
                     >
                         <div className="flex items-center">
-                            <CheckCircle2Icon className="mr-2 size-3 text-green-600" />
+                            <CheckCircle2Icon className="mr-2 size-3 text-content-success-primary" />
 
                             <span>Completed</span>
                         </div>
@@ -130,7 +130,7 @@ export default function ApprovalTaskFilters() {
                     >
                         <div className="flex items-center">
                             <Badge
-                                className="mr-2 h-3 border-red-200 bg-surface-destructive-secondary px-1 text-red-800"
+                                className="mr-2 h-3 border-stroke-destructive-secondary bg-surface-destructive-secondary px-1 text-content-destructive"
                                 styleType="outline-outline"
                             >
                                 <span className="text-[10px]">High</span>
@@ -150,7 +150,7 @@ export default function ApprovalTaskFilters() {
                     >
                         <div className="flex items-center">
                             <Badge
-                                className="mr-2 h-3 border-yellow-200 bg-yellow-100 px-1 text-yellow-800"
+                                className="mr-2 h-3 border-stroke-warning-secondary bg-surface-warning-secondary px-1 text-content-warning-primary"
                                 styleType="outline-outline"
                             >
                                 <span className="text-[10px]">Med</span>
@@ -170,7 +170,7 @@ export default function ApprovalTaskFilters() {
                     >
                         <div className="flex items-center">
                             <Badge
-                                className="mr-2 h-3 border-green-200 bg-surface-success-secondary px-1 text-green-800"
+                                className="mr-2 h-3 border-stroke-success-secondary bg-surface-success-secondary px-1 text-content-success-primary"
                                 styleType="outline-outline"
                             >
                                 <span className="text-[10px]">Low</span>
