@@ -20,7 +20,9 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
+import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
@@ -30,6 +32,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -39,13 +42,13 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.web.util.UrlUtils;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -68,23 +71,29 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher managementRequestMatcher =
         RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$");
     private final McpAudienceValidator mcpAudienceValidator;
+    private final McpTenantProtectedResourceMetadataAuthenticationEntryPoint mcpAuthenticationEntryPoint;
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final List<McpServerSecretVerifier> mcpServerSecretVerifiers;
+    private final @Nullable String publicUrl;
     private final @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker;
+    private final AuthorityService authorityService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI2")
     public TenantAwareJwtAuthenticationFilter(
         McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper,
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        List<McpServerSecretVerifier> mcpServerSecretVerifiers,
-        @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker) {
+        AuthorityService authorityService, List<McpServerSecretVerifier> mcpServerSecretVerifiers,
+        @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker, @Nullable String publicUrl) {
 
+        this.authorityService = authorityService;
         this.mcpAudienceValidator = mcpAudienceValidator;
+        this.mcpAuthenticationEntryPoint = new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(publicUrl);
         this.mcpJwtIdentityMapper = mcpJwtIdentityMapper;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifiers = List.copyOf(mcpServerSecretVerifiers);
+        this.publicUrl = publicUrl;
         this.selfIssuedTokenRevocationChecker = selfIssuedTokenRevocationChecker;
         this.userService = userService;
     }
@@ -117,7 +126,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalArgumentException.getMessage(),
                 illegalArgumentException);
 
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return;
         } catch (IllegalStateException illegalStateException) {
@@ -125,7 +134,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalStateException.getMessage(),
                 illegalStateException);
 
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return;
         }
@@ -139,19 +148,19 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 "Rejecting MCP JWT for {}: MCP server secret verification failed in tenant {}",
                 request.getServletPath(), urlTenantId, runtimeException);
 
-            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            reject(request, response, HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 
             return;
         }
 
         if (!mcpServerSecretVerified) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return;
         }
 
         if (staticIssuer.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return;
         }
@@ -163,8 +172,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        List<GrantedAuthority> authorities = staticIssuer.get()
+            .isSelf() ? getSelfIssuedAuthorities(mcpJwtIdentity) : mcpJwtIdentity.authorities();
+
         JwtAuthenticationToken authentication = new JwtAuthenticationToken(
-            jwt, mcpJwtIdentity.authorities(), mcpJwtIdentity.login());
+            jwt, new org.springframework.security.core.userdetails.User(mcpJwtIdentity.login(), "", authorities),
+            authorities);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -177,24 +190,32 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     @Nullable
     private McpJwtIdentity authenticateStaticIssuer(
         HttpServletRequest request, HttpServletResponse response, JwtAuthenticationToken jwtAuthenticationToken,
-        Jwt jwt, Issuer issuer, String urlTenantId) throws IOException {
+        Jwt jwt, Issuer issuer, String urlTenantId) {
 
         String requiredScope = getRequiredScope(request);
 
-        if (requiredScope == null || !hasScope(jwtAuthenticationToken, requiredScope)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        if (requiredScope == null) {
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
 
-        if (!mcpAudienceValidator.isAudienceValid(jwt, issuer, buildRequestUrl(request))) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        if (!hasScope(jwtAuthenticationToken, requiredScope)) {
+            reject(request, response, HttpServletResponse.SC_FORBIDDEN);
+
+            return null;
+        }
+
+        if (!mcpAudienceValidator.isAudienceValid(
+            jwt, issuer, McpProtectedResourceUrls.resolveResourceUrl(publicUrl, request))) {
+
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
 
         if (issuer.isSelf() && !isActiveByteChefUser(jwt.getSubject(), urlTenantId)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
@@ -203,7 +224,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             Integer revocationErrorStatus = getRevocationErrorStatus(jwt, urlTenantId);
 
             if (revocationErrorStatus != null) {
-                response.sendError(revocationErrorStatus);
+                reject(request, response, revocationErrorStatus);
 
                 return null;
             }
@@ -212,18 +233,24 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), urlTenantId);
         } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
     }
 
-    private static String buildRequestUrl(HttpServletRequest request) {
-        String url = UrlUtils.buildFullRequestUrl(request);
-
-        int queryIndex = url.indexOf('?');
-
-        return queryIndex >= 0 ? url.substring(0, queryIndex) : url;
+    private void reject(HttpServletRequest request, HttpServletResponse response, int status) {
+        if (status == HttpServletResponse.SC_UNAUTHORIZED) {
+            mcpAuthenticationEntryPoint.sendChallenge(
+                request, response, status,
+                McpTenantProtectedResourceMetadataAuthenticationEntryPoint.INVALID_TOKEN);
+        } else if (status == HttpServletResponse.SC_FORBIDDEN) {
+            mcpAuthenticationEntryPoint.sendChallenge(
+                request, response, status,
+                McpTenantProtectedResourceMetadataAuthenticationEntryPoint.INSUFFICIENT_SCOPE);
+        } else {
+            response.setStatus(status);
+        }
     }
 
     private String resolveUrlTenantId(HttpServletRequest request, Jwt jwt, @Nullable Issuer issuer) {
@@ -271,6 +298,24 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 .flatMap(Optional::stream)
                 .findFirst()
                 .orElse(false));
+    }
+
+    private List<GrantedAuthority> getSelfIssuedAuthorities(McpJwtIdentity mcpJwtIdentity) {
+        List<GrantedAuthority> authorities = new ArrayList<>(mcpJwtIdentity.authorities());
+
+        TenantContext.runWithTenantId(
+            mcpJwtIdentity.tenantId(),
+            () -> userService.fetchUserByLogin(mcpJwtIdentity.login())
+                .map(User::getAuthorityIds)
+                .orElse(List.of())
+                .stream()
+                .map(authorityService::fetchAuthority)
+                .flatMap(Optional::stream)
+                .map(Authority::getName)
+                .map(SimpleGrantedAuthority::new)
+                .forEach(authorities::add));
+
+        return authorities;
     }
 
     private boolean isActiveByteChefUser(String login, String tenantId) {

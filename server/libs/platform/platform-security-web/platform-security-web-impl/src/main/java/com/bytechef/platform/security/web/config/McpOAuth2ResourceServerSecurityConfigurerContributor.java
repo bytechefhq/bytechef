@@ -20,16 +20,28 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties.Iss
 import com.bytechef.platform.security.web.mcp.oauth2.IssuerLocationMcpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpBearerTokenResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
+import com.bytechef.platform.security.web.mcp.oauth2.McpProtectedResourceUrls;
+import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.oauth2.MultiIssuerJwtDecoder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.config.McpServerOAuth2Configurer;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
@@ -40,21 +52,32 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 public class McpOAuth2ResourceServerSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
     private static final String MCP_PATH_REGEX = "^/api/(automation/.+|management(/[^/]+)?)/mcp$";
+    private static final String RESOURCE_NAME = "ByteChef";
     private static final String RESOURCE_PATH = "/api";
 
     private final McpJwtDecoderFactory mcpJwtDecoderFactory;
     private final McpResourceServerProperties mcpResourceServerProperties;
+    private final @Nullable String publicUrl;
+    private @Nullable AuthenticationEventPublisher authenticationEventPublisher;
 
     @SuppressFBWarnings({
         "EI2", "CT_CONSTRUCTOR_THROW"
     })
     public McpOAuth2ResourceServerSecurityConfigurerContributor(
         ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
-        McpResourceServerProperties mcpResourceServerProperties) {
+        McpResourceServerProperties mcpResourceServerProperties,
+        @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
 
         this.mcpJwtDecoderFactory = mcpJwtDecoderFactoryProvider.getIfAvailable(
             () -> new IssuerLocationMcpJwtDecoderFactory(trustedIssuerUris(mcpResourceServerProperties)));
         this.mcpResourceServerProperties = mcpResourceServerProperties;
+        this.publicUrl = publicUrl;
+    }
+
+    @Autowired(required = false)
+    @SuppressFBWarnings("EI2")
+    public void setAuthenticationEventPublisher(AuthenticationEventPublisher authenticationEventPublisher) {
+        this.authenticationEventPublisher = authenticationEventPublisher;
     }
 
     @Override
@@ -75,10 +98,47 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
         return (T) McpServerOAuth2Configurer.mcpServerOAuth2()
             .authorizationServer(primaryIssuer.getUri())
             .resourcePath(RESOURCE_PATH)
+            .protectedResourceMetadataCustomizer(protectedResourceMetadata -> protectedResourceMetadata
+                .authorizationServer(primaryIssuer.getUri())
+                .resourceName(RESOURCE_NAME)
+                .tlsClientCertificateBoundAccessTokens(false)
+                .claims(this::customizeResourceClaims))
             .validateAudienceClaim(false)
             .jwtDecoder(multiIssuerJwtDecoder)
-            .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.bearerTokenResolver(
-                mcpBearerTokenResolver));
+            .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
+                .bearerTokenResolver(mcpBearerTokenResolver)
+                .authenticationEntryPoint(new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(publicUrl))
+                .jwt(jwt -> jwt.authenticationManager(createJwtAuthenticationManager(multiIssuerJwtDecoder))));
+    }
+
+    private AuthenticationManager createJwtAuthenticationManager(JwtDecoder jwtDecoder) {
+        ProviderManager providerManager = new ProviderManager(new JwtAuthenticationProvider(jwtDecoder));
+
+        if (authenticationEventPublisher != null) {
+            providerManager.setAuthenticationEventPublisher(authenticationEventPublisher);
+        }
+
+        return providerManager;
+    }
+
+    private void customizeResourceClaims(Map<String, Object> claims) {
+        Object resource = claims.get("resource");
+
+        if (resource == null) {
+            return;
+        }
+
+        String resourceUrl = McpProtectedResourceUrls.toPublicResourceUrl(publicUrl, resource.toString());
+
+        claims.put("resource", resourceUrl);
+
+        URI resourceUri = URI.create(resourceUrl);
+
+        String requiredScope = McpProtectedResourceUrls.getRequiredScope(resourceUri.getRawPath());
+
+        if (requiredScope != null) {
+            claims.put("scopes_supported", List.of(requiredScope));
+        }
     }
 
     private static List<String> trustedIssuerUris(McpResourceServerProperties mcpResourceServerProperties) {
