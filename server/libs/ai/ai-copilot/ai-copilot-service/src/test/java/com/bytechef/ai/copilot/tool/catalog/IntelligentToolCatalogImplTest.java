@@ -17,10 +17,16 @@
 package com.bytechef.ai.copilot.tool.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelayToolCallback;
+import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
@@ -183,6 +190,98 @@ class IntelligentToolCatalogImplTest {
         assertThat(received.get()).isNull();
     }
 
+    @Test
+    void testWithoutRelayDelegateIsNotWrappedAndChatClientIsNotMutated() {
+        ChatClient chatClient = mock(ChatClient.class);
+        FakeIntelligentToolDefinition definition = projectScopedDefinition(chatClient);
+
+        List<ToolCallback> toolCallbacks = catalogOf(definition).getByNames(
+            Set.of("buildWorkflow"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks.getFirst()).isNotInstanceOf(SubAgentAskRelayToolCallback.class);
+
+        verify(chatClient, never()).mutate();
+    }
+
+    @Test
+    void testWithRelayAskCapableDelegateIsWrappedAndGetsAskTool() {
+        ChatClient chatClient = mock(ChatClient.class);
+        ChatClient.Builder builder = mock(ChatClient.Builder.class);
+
+        when(chatClient.mutate()).thenReturn(builder);
+        when(builder.defaultTools(any(Object[].class))).thenReturn(builder);
+        when(builder.build()).thenReturn(chatClient);
+
+        SubAgentAskRelay relay = fakeRelay();
+        ToolCallback askToolCallback = relay.askUserQuestionToolCallback();
+
+        FakeIntelligentToolDefinition definition = projectScopedDefinition(chatClient);
+
+        List<ToolCallback> toolCallbacks = catalogOf(relay, definition).getByNames(
+            Set.of("buildWorkflow"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks.getFirst()).isInstanceOf(SubAgentAskRelayToolCallback.class);
+
+        verify(builder).defaultTools(askToolCallback);
+    }
+
+    @Test
+    void testWithRelayNonAskCapableDelegateIsLeftAlone() {
+        ChatClient chatClient = mock(ChatClient.class);
+        FakeIntelligentToolDefinition definition = new FakeIntelligentToolDefinition(
+            "importWorkflow", AutomationConfigurationAgentType.IMPORT_WORKFLOW, Set.of(),
+            Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient), false);
+
+        List<ToolCallback> toolCallbacks = catalogOf(fakeRelay(), definition).getByNames(
+            Set.of("importWorkflow"), IntelligentToolVariant.BUILD, identityChatClientDecorator(),
+            identityToolCallbackDecorator());
+
+        assertThat(toolCallbacks.getFirst()).isNotInstanceOf(SubAgentAskRelayToolCallback.class);
+
+        verify(chatClient, never()).mutate();
+    }
+
+    @Test
+    void testGetNamesListsEveryDefinition() {
+        IntelligentToolCatalog catalog = catalogOf(projectScopedDefinition(), buildOnlyDefinition());
+
+        assertThat(catalog.getNames()).containsExactlyInAnyOrder("buildWorkflow", "importWorkflow");
+    }
+
+    private static SubAgentAskRelay fakeRelay() {
+        ToolCallback askToolCallback = mock(ToolCallback.class);
+
+        return new SubAgentAskRelay() {
+
+            @Override
+            public ToolCallback askUserQuestionToolCallback() {
+                return askToolCallback;
+            }
+
+            @Override
+            public <T> AskOutcome<T> runWithChannel(Supplier<T> supplier) {
+                return new AskOutcome<>(supplier.get(), null);
+            }
+        };
+    }
+
+    private static IntelligentToolCatalog catalogOf(SubAgentAskRelay relay, IntelligentToolDefinition... definitions) {
+        IntelligentToolContributor contributor = () -> List.of(definitions);
+
+        return new IntelligentToolCatalogImpl(fixedObjectProvider(contributor), fixedRelayProvider(relay));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<SubAgentAskRelay> fixedRelayProvider(SubAgentAskRelay relay) {
+        ObjectProvider<SubAgentAskRelay> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(relay);
+
+        return objectProvider;
+    }
+
     private static FakeIntelligentToolDefinition projectScopedDefinition() {
         return projectScopedDefinition(mock(ChatClient.class));
     }
@@ -249,6 +348,7 @@ class IntelligentToolCatalogImplTest {
         private final Set<IntelligentToolScope> panelScopes;
         private final Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant;
         private final ToolCallback toolCallback = mock(ToolCallback.class);
+        private final boolean askCapable;
 
         @Nullable
         private ChatClient capturedChatClient;
@@ -257,6 +357,15 @@ class IntelligentToolCatalogImplTest {
             String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
             Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant) {
 
+            this(name, agentType, panelScopes, chatClientFactoriesByVariant, true);
+        }
+
+        private FakeIntelligentToolDefinition(
+            String name, AgentType agentType, Set<IntelligentToolScope> panelScopes,
+            Map<IntelligentToolVariant, IntelligentToolChatClientFactory> chatClientFactoriesByVariant,
+            boolean askCapable) {
+
+            this.askCapable = askCapable;
             this.name = name;
             this.agentType = agentType;
             this.panelScopes = panelScopes;
@@ -290,6 +399,11 @@ class IntelligentToolCatalogImplTest {
             capturedChatClient = chatClientFactory.get(null);
 
             return toolCallback;
+        }
+
+        @Override
+        public boolean askCapable() {
+            return askCapable;
         }
     }
 

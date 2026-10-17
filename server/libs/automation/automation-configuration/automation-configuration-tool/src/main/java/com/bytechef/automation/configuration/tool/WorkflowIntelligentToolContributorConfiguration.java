@@ -61,7 +61,7 @@ public class WorkflowIntelligentToolContributorConfiguration {
                 Set.of(IntelligentToolScope.PROJECT),
                 variant -> variant == IntelligentToolVariant.BUILD
                     ? converterBuildFactoryProvider.getIfAvailable() : null,
-                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver)));
+                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver), false));
 
         return () -> definitions;
     }

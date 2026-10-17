@@ -156,7 +156,15 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation("io.micrometer:micrometer-core")
+    implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
 }

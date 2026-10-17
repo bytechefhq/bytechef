@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -33,9 +34,18 @@ public interface IntelligentToolCatalog {
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
         BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator);
 
+    List<ToolCallback> getByNames(
+        Set<String> names,
+        IntelligentToolVariant variant,
+        BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator,
+        SubAgentQuestionRenderer questionRenderer);
+
     List<ToolCallback> getForPanel(
         IntelligentToolScope scope,
         IntelligentToolVariant variant,
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
         BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator);
+
+    List<String> getNames();
 }
