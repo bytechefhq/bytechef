@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -22,6 +23,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -153,6 +155,28 @@ class IntegrationInstanceServiceIntTest {
     }
 
     @Test
+    void testGetIntegrationInstanceByComponentNamesMatchesComponentNamesCaseInsensitively() {
+        long configurationId = createConfiguration(createIntegration("HubSpot"), 1);
+
+        long integrationInstanceId = integrationInstanceService.create(USER_A_ID, CONNECTION_ID, configurationId)
+            .getId();
+
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            USER_A_ID, List.of("HubSpot"), Environment.PRODUCTION);
+
+        assertThat(integrationInstance.getId()).isEqualTo(integrationInstanceId);
+    }
+
+    @Test
+    void testGetIntegrationInstanceByComponentNamesRejectsEmptyComponentNames() {
+        integrationInstanceService.create(USER_A_ID, CONNECTION_ID, createConfiguration(createIntegration(), 1));
+
+        assertThatThrownBy(
+            () -> integrationInstanceService.getIntegrationInstance(USER_A_ID, List.of(), Environment.PRODUCTION))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
     void testFetchIntegrationInstanceByIntegrationIdIgnoresANewerInstanceOfASiblingIntegration() {
         long integrationId = createIntegration();
 
@@ -258,9 +282,13 @@ class IntegrationInstanceServiceIntTest {
     }
 
     private long createIntegration() {
+        return createIntegration("componentName");
+    }
+
+    private long createIntegration(String componentName) {
         Integration integration = new Integration();
 
-        integration.setComponentName("componentName");
+        integration.setComponentName(componentName);
         integration.setName("integration-" + UUID.randomUUID());
 
         integration = integrationService.create(integration);
