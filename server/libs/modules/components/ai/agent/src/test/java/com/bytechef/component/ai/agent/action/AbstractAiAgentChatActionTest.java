@@ -26,33 +26,47 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.ai.tool.GateDecision;
+import com.bytechef.platform.ai.tool.GatedToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
+import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -63,6 +77,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,6 +102,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
@@ -99,6 +116,7 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -1544,6 +1562,260 @@ class AbstractAiAgentChatActionTest {
                 .log(any());
 
             return log;
+        }
+    }
+
+    @Nested
+    @ExtendWith(ObjectMapperSetupExtension.class)
+    class ResumeGateTests {
+
+        private static final String GATED_TOOL_INPUT = "{\"channel\": \"#general\", \"text\": \"hi\"}";
+        private static final String GATED_TOOL_NAME = "SLACK_SEND_MESSAGE";
+
+        private static final Parameters NO_SIMULATION_INPUT = ParametersFactory.create(Map.of());
+
+        private static final Parameters GATED_EXTENSIONS = ParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "tools",
+                    List.of(
+                        Map.of(
+                            "name", "approvalGate_1",
+                            "type", "aiAgentUtils/v1/approvalGate",
+                            "parameters", Map.of("name", "Outbound messages"),
+                            "clusterElements",
+                            Map.of(
+                                "tools",
+                                List.of(
+                                    Map.of(
+                                        "name", "slack_1",
+                                        "type", "slack/v1/sendMessage",
+                                        "parameters", Map.of()))))))));
+
+        private static final Parameters EXTENSIONS = ParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "tools",
+                    List.of(
+                        Map.of(
+                            "name", "slack_1",
+                            "type", "slack/v1/sendMessage",
+                            "parameters", Map.of())))));
+
+        private final ToolCallback toolCallback = mock(ToolCallback.class);
+
+        private final ActionContextAware context = mock(
+            ActionContextAware.class, withSettings().extraInterfaces(ActionContext.class));
+
+        private AbstractAiAgentChatAction action;
+
+        @BeforeEach
+        void setUp() {
+            action = new AbstractAiAgentChatAction(
+                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class)) {};
+
+            lenient().when(context.isEditorEnvironment())
+                .thenReturn(false);
+            lenient().when(clusterElementDefinitionService.getClusterElement("slack", 1, "sendMessage"))
+                .thenReturn(mock(MultipleConnectionsToolFunction.class));
+            lenient().when(toolCallback.getToolDefinition())
+                .thenReturn(
+                    DefaultToolDefinition.builder()
+                        .name(GATED_TOOL_NAME)
+                        .description("Send a Slack message")
+                        .inputSchema("{}")
+                        .build());
+            lenient().when(aiAgentToolFacade.getFunctionToolCallback(any(), anyMap(), isNull(), any()))
+                .thenReturn(toolCallback);
+        }
+
+        @Test
+        void testApprovedToolNestedUnderAnApprovalGateRunsTheUnwrappedTool() throws Exception {
+            AiAgentUtilsApprovalGate aiAgentUtilsApprovalGate = new AiAgentUtilsApprovalGate(
+                new ClusterElementToolCallbacks(aiAgentToolFacade, clusterElementDefinitionService),
+                clusterElementDefinitionService, null);
+
+            ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> approvalGateDefinition =
+                aiAgentUtilsApprovalGate.clusterElementDefinition;
+
+            when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "approvalGate"))
+                .thenReturn(approvalGateDefinition.getElement());
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME), data(true, null), Map.of(),
+                GATED_EXTENSIONS, context);
+
+            verify(toolCallback).call(eq(GATED_TOOL_INPUT), any(ToolContext.class));
+            verify(clusterElementDefinitionService, never()).executeApprovalChannel(
+                anyString(), anyInt(), anyString(), anyMap(), anyString(), any(), any());
+            verify(context, never()).suspend(any());
+
+            assertThat(resumeData)
+                .contains("approvedByReviewer")
+                .contains("message sent: ts=1721");
+        }
+
+        @Test
+        void testApprovedExecutesToolWithOriginalArgumentsAndReportsResult() throws Exception {
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                data(true, "ship it"), Map.of(), EXTENSIONS, context);
+
+            verify(toolCallback).call(eq(GATED_TOOL_INPUT), any(ToolContext.class));
+
+            assertThat(resumeData)
+                .contains("approvedByReviewer")
+                .contains("message sent: ts=1721")
+                .contains("ship it");
+        }
+
+        @Test
+        void testRejectedFeedsDenialWithCommentWithoutExecutingTheTool() throws Exception {
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                data(false, "not now"), Map.of(), EXTENSIONS, context);
+
+            assertThat(resumeData)
+                .contains("denied")
+                .contains("Denied by reviewer: not now");
+
+            verifyNoInteractions(aiAgentToolFacade);
+            verifyNoInteractions(toolCallback);
+        }
+
+        @Test
+        void testApprovedCarriesVerifiedReviewerIdentity() throws Exception {
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                dataWithApprovedBy(true, "@jane"), Map.of(), EXTENSIONS, context);
+
+            assertThat(resumeData)
+                .contains("approvedByReviewer")
+                .contains("\"reviewer\"")
+                .contains("@jane");
+        }
+
+        @Test
+        void testRejectedCarriesVerifiedReviewerIdentity() throws Exception {
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                dataWithApprovedBy(false, "@jane"), Map.of(), EXTENSIONS, context);
+
+            assertThat(resumeData)
+                .contains("denied")
+                .contains("\"deniedBy\"")
+                .contains("@jane");
+
+            verifyNoInteractions(toolCallback);
+        }
+
+        @Test
+        void testApprovedButToolNoLongerConfiguredFailsLoudly() {
+            assertThatThrownBy(
+                () -> action.resolveGatedToolResumeData(
+                    NO_SIMULATION_INPUT, continueParameters("REMOVED_TOOL"),
+                    data(true, null), Map.of(), EXTENSIONS, context))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("REMOVED_TOOL");
+        }
+
+        @Test
+        void testApprovedToolFailureIsReportedAsErrorInsteadOfPropagating() throws Exception {
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class)))
+                .thenThrow(new RuntimeException("connection refused"));
+
+            String resumeData = action.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                data(true, null), Map.of(), EXTENSIONS, context);
+
+            assertThat(resumeData)
+                .contains("approvedByReviewer")
+                .contains("connection refused")
+                .doesNotContain("\"result\"");
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        void testRejectedRecordsApprovalDeniedAuditEvent() throws Exception {
+            ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
+
+            AbstractAiAgentChatAction auditedAction = createAuditedAction(toolExecutionRecorder);
+
+            auditedAction.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                data(false, "not now"), Map.of(), EXTENSIONS, context);
+
+            ArgumentCaptor<com.bytechef.platform.tool.execution.ToolExecutionEvent> eventArgumentCaptor =
+                ArgumentCaptor.forClass(com.bytechef.platform.tool.execution.ToolExecutionEvent.class);
+
+            verify(toolExecutionRecorder).record(eventArgumentCaptor.capture());
+
+            com.bytechef.platform.tool.execution.ToolExecutionEvent toolExecutionEvent =
+                eventArgumentCaptor.getValue();
+
+            assertThat(toolExecutionEvent.surface()).isEqualTo(ToolExecutionSurface.AI_AGENT);
+            assertThat(toolExecutionEvent.toolName()).isEqualTo(GATED_TOOL_NAME);
+            assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_DENIED);
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        void testApprovedExecutionRunsThroughTheAuditRecorder() throws Exception {
+            when(toolCallback.call(eq(GATED_TOOL_INPUT), any(ToolContext.class))).thenReturn("message sent: ts=1721");
+
+            ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
+
+            when(toolExecutionRecorder.record(
+                any(com.bytechef.platform.tool.execution.ToolExecutionEvent.Builder.class), any(Supplier.class)))
+                    .thenAnswer(invocation -> ((Supplier<Object>) invocation.getArgument(1)).get());
+
+            AbstractAiAgentChatAction auditedAction = createAuditedAction(toolExecutionRecorder);
+
+            String resumeData = auditedAction.resolveGatedToolResumeData(
+                NO_SIMULATION_INPUT, continueParameters(GATED_TOOL_NAME),
+                data(true, null), Map.of(), EXTENSIONS, context);
+
+            verify(toolExecutionRecorder).record(
+                any(com.bytechef.platform.tool.execution.ToolExecutionEvent.Builder.class), any(Supplier.class));
+            verify(toolCallback).call(eq(GATED_TOOL_INPUT), any(ToolContext.class));
+
+            assertThat(resumeData).contains("message sent: ts=1721");
+        }
+
+        @SuppressWarnings("unchecked")
+        private AbstractAiAgentChatAction createAuditedAction(ToolExecutionRecorder toolExecutionRecorder) {
+            ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider = mock(ObjectProvider.class);
+
+            when(toolExecutionRecorderObjectProvider.getIfAvailable()).thenReturn(toolExecutionRecorder);
+
+            return new AbstractAiAgentChatAction(
+                aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class),
+                toolExecutionRecorderObjectProvider) {};
+        }
+
+        private static GatedToolSuspension continueParameters(String gatedToolName) {
+            Map<String, Object> continueParameters = Map.of(
+                ToolSuspendConstants.GATED_TOOL_NAME, gatedToolName,
+                ToolSuspendConstants.GATED_TOOL_INPUT, GATED_TOOL_INPUT);
+
+            return GatedToolSuspension.from(continueParameters)
+                .orElseThrow();
+        }
+
+        private static GateDecision data(boolean approved, String comment) {
+            return GateDecision.from(
+                comment == null ? Map.of("approved", approved) : Map.of("approved", approved, "comment", comment));
+        }
+
+        private static GateDecision dataWithApprovedBy(boolean approved, String approvedBy) {
+            return GateDecision.from(Map.of("approved", approved, "approvedBy", approvedBy));
         }
     }
 

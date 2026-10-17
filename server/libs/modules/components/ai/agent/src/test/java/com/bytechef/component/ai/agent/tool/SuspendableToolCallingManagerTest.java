@@ -22,14 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
+import com.bytechef.component.ai.agent.utils.cluster.ApprovalGateToolCallback;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.platform.ai.tool.GatedToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +54,8 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.model.tool.ToolExecutionResult;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.DefaultToolDefinition;
 
 class SuspendableToolCallingManagerTest {
 
@@ -429,6 +438,80 @@ class SuspendableToolCallingManagerTest {
             .toList());
 
         verify(context, never()).suspend(any());
+    }
+
+    @Test
+    void testApprovalGateSuspendIsRecognisedAsAGatedToolCallAtResume() {
+        AtomicReference<ActionContext.Suspend> suspendReference = new AtomicReference<>();
+
+        ActionContextAware context =
+            mock(ActionContextAware.class, withSettings().extraInterfaces(ActionContext.class));
+
+        when(context.getSuspend()).thenAnswer(invocation -> suspendReference.get());
+        when(context.getApprovalLinks(any())).thenReturn(
+            new ApprovalLinks(
+                "https://example.com", "abc123", "https://example.com/job/resume/abc123",
+                "https://example.com/resume/abc123"));
+
+        doAnswer(invocation -> {
+            suspendReference.set(invocation.getArgument(0));
+
+            return null;
+        }).when(context)
+            .suspend(any(ActionContext.Suspend.class));
+
+        ToolCallback slackToolCallback = mock(ToolCallback.class);
+
+        when(slackToolCallback.getToolDefinition()).thenReturn(
+            DefaultToolDefinition.builder()
+                .name("SLACK_SEND_MESSAGE")
+                .description("Send a Slack message")
+                .inputSchema("{}")
+                .build());
+
+        ApprovalGateToolCallback approvalGateToolCallback = new ApprovalGateToolCallback(
+            slackToolCallback, "Outbound messages", List.of(), Map.of(), mock(ClusterElementDefinitionService.class),
+            context, null, null);
+
+        ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+        when(delegate.executeToolCalls(prompt, chatResponse)).thenAnswer(invocation -> {
+            String toolResult = approvalGateToolCallback.call("{\"text\": \"hi\"}");
+
+            return ToolExecutionResult.builder()
+                .conversationHistory(
+                    List.of(
+                        ToolResponseMessage.builder()
+                            .responses(
+                                List.of(
+                                    new ToolResponseMessage.ToolResponse(
+                                        "call_a", "SLACK_SEND_MESSAGE", toolResult)))
+                            .build()))
+                .returnDirect(false)
+                .build();
+        });
+
+        new SuspendableToolCallingManager(delegate, context).executeToolCalls(prompt, chatResponse);
+
+        Map<String, ?> continueParameters = suspendReference.get()
+            .continueParameters();
+
+        assertNotNull(continueParameters.get(AgentToolSuspension.CONTINUE_PARAMETER_KEY));
+
+        GatedToolSuspension gatedToolSuspension = GatedToolSuspension.from(continueParameters)
+            .orElseThrow();
+
+        assertEquals("SLACK_SEND_MESSAGE", gatedToolSuspension.toolName());
+        assertEquals("{\"text\": \"hi\"}", gatedToolSuspension.toolInput());
+
+        GatedToolSuspension.ApprovalRequest approvalRequest = Objects.requireNonNull(
+            gatedToolSuspension.approvalRequest());
+
+        assertEquals("https://example.com/resume/abc123", approvalRequest.formUrl());
+        assertEquals("Outbound messages: approve tool call SLACK_SEND_MESSAGE", approvalRequest.formTitle());
+        assertEquals(true, continueParameters.get(MetadataConstants.APPROVAL_RESUME));
+        verify(slackToolCallback, never()).call(any());
+        verify(slackToolCallback, never()).call(any(), any());
     }
 
     private static ActionContextAware mockSuspendableContext(

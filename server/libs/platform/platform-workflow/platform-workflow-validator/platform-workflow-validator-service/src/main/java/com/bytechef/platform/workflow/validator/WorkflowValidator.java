@@ -154,7 +154,7 @@ public class WorkflowValidator {
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
             validateChatOnlyApprovalChannels(workflowJsonNode, taskJsonNodes, warnings);
-            validateApprovalPlacement(taskJsonNodes, errors);
+            validateApprovalGatePlacement(taskJsonNodes, errors);
             validateWorkflowTasks(
                 taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, nodeVariableOutputMap,
                 clusterTypesMap, clusterTypesProvider, resourceReferenceProvider, errors, warnings);
@@ -701,17 +701,32 @@ public class WorkflowValidator {
             List<String> approvalChannelTypes = getApprovalChannelTypes(clusterElementsJsonNode);
 
             if (!approvalChannelTypes.isEmpty() && isChatOnly(approvalChannelTypes)) {
-                appendChatOnlyWarning(getNodeName(taskJsonNode), "This task", warnings);
+                appendChatOnlyWarning(getNodeName(taskJsonNode), "This task", false, warnings);
+            }
+
+            for (JsonNode approvalGateJsonNode : getApprovalGates(clusterElementsJsonNode)) {
+                List<String> gateApprovalChannelTypes = getApprovalChannelTypes(
+                    approvalGateJsonNode.get("clusterElements"));
+
+                boolean implicitChatDefault = gateApprovalChannelTypes.isEmpty();
+
+                if (implicitChatDefault || isChatOnly(gateApprovalChannelTypes)) {
+                    appendChatOnlyWarning(
+                        getNodeName(approvalGateJsonNode),
+                        "Approval gate '" + getNodeName(approvalGateJsonNode) + "' in task '" +
+                            getNodeName(taskJsonNode) + "'",
+                        implicitChatDefault, warnings);
+                }
             }
         }
     }
 
-    private static void validateApprovalPlacement(List<JsonNode> taskJsonNodes, StringBuilder errors) {
+    private static void validateApprovalGatePlacement(List<JsonNode> taskJsonNodes, StringBuilder errors) {
         Set<String> placementErrors = new LinkedHashSet<>();
 
         for (JsonNode taskJsonNode : taskJsonNodes) {
             if (taskJsonNode.isObject()) {
-                validateApprovalPlacement(taskJsonNode.get("clusterElements"), placementErrors);
+                validateApprovalGatePlacement(taskJsonNode.get("clusterElements"), placementErrors);
             }
         }
 
@@ -720,7 +735,7 @@ public class WorkflowValidator {
         }
     }
 
-    private static void validateApprovalPlacement(
+    private static void validateApprovalGatePlacement(
         @Nullable JsonNode clusterElementsJsonNode, Set<String> placementErrors) {
 
         if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
@@ -729,11 +744,15 @@ public class WorkflowValidator {
 
         for (Map.Entry<String, JsonNode> clusterElementEntry : clusterElementsJsonNode.properties()) {
             for (JsonNode clusterElementJsonNode : toClusterElementJsonNodes(clusterElementEntry.getValue())) {
+                if (isClusterElementName(clusterElementJsonNode, "approvalGate")) {
+                    validateApprovalGateTools(clusterElementJsonNode, placementErrors);
+                }
+
                 if (isClusterElementName(clusterElementJsonNode, "taskTool")) {
                     validateSubagentTools(clusterElementJsonNode, placementErrors);
                 }
 
-                validateApprovalPlacement(clusterElementJsonNode.get("clusterElements"), placementErrors);
+                validateApprovalGatePlacement(clusterElementJsonNode.get("clusterElements"), placementErrors);
             }
         }
     }
@@ -741,6 +760,13 @@ public class WorkflowValidator {
     private static void validateSubagentTools(JsonNode taskToolJsonNode, Set<String> placementErrors) {
         for (JsonNode subagentJsonNode : getChildClusterElementJsonNodes(taskToolJsonNode, "subagent")) {
             for (JsonNode toolJsonNode : getChildClusterElementJsonNodes(subagentJsonNode, "tools")) {
+                if (isClusterElementName(toolJsonNode, "approvalGate")) {
+                    placementErrors.add(
+                        "[" + getNodeName(toolJsonNode) + "] An approval gate cannot be placed under a subagent: a " +
+                            "subagent cannot pause for an approval, so the gated tool would never run. Attach the " +
+                            "gate directly to the agent.");
+                }
+
                 if (isClusterElementType(toolJsonNode, "approval", "requestApproval")) {
                     placementErrors.add(
                         "[" + getNodeName(toolJsonNode) + "] 'requestApproval' cannot be attached to subagent '" +
@@ -751,6 +777,20 @@ public class WorkflowValidator {
                 if (isClusterElementName(toolJsonNode, "taskTool")) {
                     validateSubagentTools(toolJsonNode, placementErrors);
                 }
+            }
+        }
+    }
+
+    private static void validateApprovalGateTools(JsonNode approvalGateJsonNode, Set<String> placementErrors) {
+        for (JsonNode toolJsonNode : getChildClusterElementJsonNodes(approvalGateJsonNode, "tools")) {
+            if (isClusterElementType(toolJsonNode, "approval", "requestApproval")) {
+                placementErrors.add(
+                    "[" + getNodeName(toolJsonNode) + "] 'requestApproval' cannot be attached to an approval gate - " +
+                        "it already raises an approval of its own. Attach it directly to the agent instead.");
+            } else if (isClusterElementType(toolJsonNode, "aiAgentUtils", "approvalGate")) {
+                placementErrors.add(
+                    "[" + getNodeName(toolJsonNode) + "] An approval gate cannot be attached to another approval " +
+                        "gate. Attach the tools to one gate.");
             }
         }
     }
@@ -844,14 +884,44 @@ public class WorkflowValidator {
             .allMatch(WorkflowValidator::isChatApprovalChannelType);
     }
 
-    private static void appendChatOnlyWarning(String nodeName, String subject, StringBuilder warnings) {
+    private static void appendChatOnlyWarning(
+        String nodeName, String subject, boolean implicitChatDefault, StringBuilder warnings) {
+
         StringUtils.appendWithNewline(
             "[" + nodeName + "] " + subject + " delivers approval requests only to the chat channel" +
+                (implicitChatDefault ? " (the default when no approval channels are configured)" : "") +
                 ", but the workflow does not start from a chat trigger. The chat channel fails on runs that " +
                 "are not started from a chat conversation, so those runs fail at this step because no channel " +
                 "can deliver the approval request. Configure a fallback approval channel (Slack, email, " +
                 "approval task) or use a chat trigger.",
             warnings);
+    }
+
+    private static List<JsonNode> getApprovalGates(JsonNode clusterElementsJsonNode) {
+        JsonNode toolsJsonNode = clusterElementsJsonNode.get("tools");
+
+        if (toolsJsonNode == null || !toolsJsonNode.isArray()) {
+            return List.of();
+        }
+
+        List<JsonNode> approvalGateJsonNodes = new ArrayList<>();
+
+        for (JsonNode toolJsonNode : toolsJsonNode) {
+            if (!toolJsonNode.isObject() || !toolJsonNode.has("type")) {
+                continue;
+            }
+
+            JsonNode typeJsonNode = toolJsonNode.get("type");
+
+            String[] typeParts = typeJsonNode.asString()
+                .split("/");
+
+            if (typeParts.length == 3 && "approvalGate".equals(typeParts[2])) {
+                approvalGateJsonNodes.add(toolJsonNode);
+            }
+        }
+
+        return approvalGateJsonNodes;
     }
 
     private static List<String> getApprovalChannelTypes(@Nullable JsonNode clusterElementsJsonNode) {

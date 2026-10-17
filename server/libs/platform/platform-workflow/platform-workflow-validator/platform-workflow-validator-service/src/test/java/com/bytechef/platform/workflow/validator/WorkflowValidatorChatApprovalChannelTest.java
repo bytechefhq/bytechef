@@ -181,7 +181,112 @@ class WorkflowValidatorChatApprovalChannelTest {
     }
 
     @Test
-    void validateWorkflowToolWithoutChannelsDoesNotWarn() {
+    void validateWorkflowGatedToolWithoutChannelsWithoutChatTriggerWarns() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "triggers": [
+                    {
+                        "label": "Webhook",
+                        "name": "trigger_1",
+                        "type": "webhook/v1/webhook",
+                        "parameters": {}
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "AI Agent",
+                        "name": "aiAgent_1",
+                        "type": "aiAgent/v1/chat",
+                        "parameters": {},
+                        "clusterElements": {
+                            "tools": [
+                                {
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "parameters": {
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        String warnings = validate(workflow);
+
+        assertTrue(warnings.contains(CHAT_ONLY_WARNING_FRAGMENT), warnings);
+        assertTrue(warnings.contains("aiAgent_1"), warnings);
+        assertTrue(warnings.startsWith("[approvalGate_1] "), warnings);
+        assertTrue(warnings.contains("the default when no approval channels are configured"), warnings);
+    }
+
+    @Test
+    void validateWorkflowGatedToolWithoutChannelsWithChatTriggerDoesNotWarn() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "triggers": [
+                    {
+                        "label": "Chat",
+                        "name": "trigger_1",
+                        "type": "chat/v1/newChatRequest",
+                        "parameters": {}
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "AI Agent",
+                        "name": "aiAgent_1",
+                        "type": "aiAgent/v1/chat",
+                        "parameters": {},
+                        "clusterElements": {
+                            "tools": [
+                                {
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "parameters": {
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        String warnings = validate(workflow);
+
+        assertFalse(warnings.contains(CHAT_ONLY_WARNING_FRAGMENT), warnings);
+    }
+
+    @Test
+    void validateWorkflowUngatedToolWithoutChannelsDoesNotWarn() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -219,6 +324,249 @@ class WorkflowValidatorChatApprovalChannelTest {
         assertFalse(warnings.contains(CHAT_ONLY_WARNING_FRAGMENT), warnings);
     }
 
+    @Test
+    void validateWorkflowGatedToolWithFallbackChannelDoesNotWarn() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "triggers": [
+                    {
+                        "label": "Webhook",
+                        "name": "trigger_1",
+                        "type": "webhook/v1/webhook",
+                        "parameters": {}
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "AI Agent",
+                        "name": "aiAgent_1",
+                        "type": "aiAgent/v1/chat",
+                        "parameters": {},
+                        "clusterElements": {
+                            "tools": [
+                                {
+                                    "label": "Destructive",
+                                    "name": "approvalGate_1",
+                                    "type": "aiAgentUtils/v1/approvalGate",
+                                    "parameters": {
+                                        "name": "Destructive"
+                                    },
+                                    "clusterElements": {
+                                        "approvalChannels": [
+                                            {
+                                                "label": "Slack",
+                                                "name": "slackChannel_1",
+                                                "type": "slack/v1/approvalChannel",
+                                                "parameters": {}
+                                            }
+                                        ],
+                                        "tools": [
+                                            {
+                                                "label": "Send Message",
+                                                "name": "slack_1",
+                                                "type": "slack/v1/sendMessage",
+                                                "parameters": {}
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        String warnings = validate(workflow);
+
+        assertFalse(warnings.contains(CHAT_ONLY_WARNING_FRAGMENT), warnings);
+    }
+
+    @Nested
+    class ApprovalGatePlacement {
+
+        @Test
+        void validateWorkflowApprovalGateUnderSubagentFails() {
+            String workflow = """
+                {
+                    "label": "Test Workflow",
+                    "triggers": [
+                        {
+                            "label": "Webhook",
+                            "name": "trigger_1",
+                            "type": "webhook/v1/webhook",
+                            "parameters": {}
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "label": "AI Agent",
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "tools": [
+                                    {
+                                        "label": "Task Tool",
+                                        "name": "taskTool_1",
+                                        "type": "aiAgentUtils/v1/taskTool",
+                                        "parameters": {},
+                                        "clusterElements": {
+                                            "subagent": [
+                                                {
+                                                    "label": "Notifier",
+                                                    "name": "subagentTool_1",
+                                                    "type": "aiAgentUtils/v1/subagentTool",
+                                                    "parameters": {},
+                                                    "clusterElements": {
+                                                        "tools": [
+                                                            {
+                                                                "label": "Mail gate",
+                                                                "name": "approvalGate_1",
+                                                                "type": "aiAgentUtils/v1/approvalGate",
+                                                                "parameters": {},
+                                                                "clusterElements": {
+                                                                    "approvalChannels": [
+                                                                        {
+                                                                            "label": "Approval Task",
+                                                                            "name": "approvalTaskChannel_1",
+                                                                            "type": "approvalTask/v1/approvalTask",
+                                                                            "parameters": {}
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """;
+
+            String errors = validateErrors(workflow);
+
+            assertTrue(
+                errors.contains("[approvalGate_1] An approval gate cannot be placed under a subagent"), errors);
+        }
+
+        @Test
+        void validateWorkflowApprovalGateOnAgentPasses() {
+            String workflow = """
+                {
+                    "label": "Test Workflow",
+                    "triggers": [
+                        {
+                            "label": "Webhook",
+                            "name": "trigger_1",
+                            "type": "webhook/v1/webhook",
+                            "parameters": {}
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "label": "AI Agent",
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "tools": [
+                                    {
+                                        "label": "Mail gate",
+                                        "name": "approvalGate_1",
+                                        "type": "aiAgentUtils/v1/approvalGate",
+                                        "parameters": {},
+                                        "clusterElements": {
+                                            "tools": [
+                                                {
+                                                    "label": "Send Message",
+                                                    "name": "slack_1",
+                                                    "type": "slack/v1/sendMessage",
+                                                    "parameters": {}
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """;
+
+            String errors = validateErrors(workflow);
+
+            assertFalse(errors.contains("approval gate"), errors);
+            assertFalse(errors.contains("requestApproval"), errors);
+        }
+
+        @Test
+        void validateWorkflowRequestApprovalAndNestedGateInsideGateFail() {
+            String workflow = """
+                {
+                    "label": "Test Workflow",
+                    "triggers": [
+                        {
+                            "label": "Webhook",
+                            "name": "trigger_1",
+                            "type": "webhook/v1/webhook",
+                            "parameters": {}
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "label": "AI Agent",
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "tools": [
+                                    {
+                                        "label": "Gate",
+                                        "name": "approvalGate_1",
+                                        "type": "aiAgentUtils/v1/approvalGate",
+                                        "parameters": {},
+                                        "clusterElements": {
+                                            "tools": [
+                                                {
+                                                    "label": "Request Approval",
+                                                    "name": "requestApproval_1",
+                                                    "type": "approval/v1/requestApproval",
+                                                    "parameters": {}
+                                                },
+                                                {
+                                                    "label": "Inner gate",
+                                                    "name": "approvalGate_2",
+                                                    "type": "aiAgentUtils/v1/approvalGate",
+                                                    "parameters": {}
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """;
+
+            String errors = validateErrors(workflow);
+
+            assertTrue(
+                errors.contains("[requestApproval_1] 'requestApproval' cannot be attached to an approval gate"),
+                errors);
+            assertTrue(
+                errors.contains("[approvalGate_2] An approval gate cannot be attached to another approval gate"),
+                errors);
+        }
+    }
+
     @Nested
     class SubagentApprovalPlacement {
 
@@ -237,7 +585,7 @@ class WorkflowValidatorChatApprovalChannelTest {
         }
 
         @Test
-        void validateWorkflowReportsANestedTaskToolPlacementOnce() {
+        void validateWorkflowApprovalGateOnASubagentOfANestedTaskToolFails() {
             String errors = validateErrors(
                 agentWorkflow(
                     taskTool(
@@ -247,15 +595,32 @@ class WorkflowValidatorChatApprovalChannelTest {
                             taskTool(
                                 "taskTool_2",
                                 subagent(
-                                    "subagentTool_2", tool("requestApproval_1", "approval/v1/requestApproval")))))));
+                                    "subagentTool_2", tool("approvalGate_1", "aiAgentUtils/v1/approvalGate"),
+                                    tool("requestApproval_1", "approval/v1/requestApproval")))))));
 
+            assertTrue(
+                errors.contains("[approvalGate_1] An approval gate cannot be placed under a subagent"), errors);
             assertTrue(
                 errors
                     .contains("[requestApproval_1] 'requestApproval' cannot be attached to subagent 'subagentTool_2'"),
                 errors);
+        }
+
+        @Test
+        void validateWorkflowReportsANestedTaskToolPlacementOnce() {
+            String errors = validateErrors(
+                agentWorkflow(
+                    taskTool(
+                        "taskTool_1",
+                        subagent(
+                            "subagentTool_1",
+                            taskTool(
+                                "taskTool_2",
+                                subagent("subagentTool_2", tool("approvalGate_1", "aiAgentUtils/v1/approvalGate")))))));
+
             assertEquals(
-                errors.indexOf("[requestApproval_1] 'requestApproval' cannot be attached"),
-                errors.lastIndexOf("[requestApproval_1] 'requestApproval' cannot be attached"), errors);
+                errors.indexOf("[approvalGate_1] An approval gate cannot be placed under a subagent"),
+                errors.lastIndexOf("[approvalGate_1] An approval gate cannot be placed under a subagent"), errors);
         }
 
         @Test
@@ -269,7 +634,7 @@ class WorkflowValidatorChatApprovalChannelTest {
                             "subagentTool_1",
                             toolWithChildren(
                                 "callAgent_1", "aiAgent/v1/chat", "tools",
-                                tool("requestApproval_2", "approval/v1/requestApproval"))))));
+                                tool("approvalGate_1", "aiAgentUtils/v1/approvalGate"))))));
 
             assertFalse(errors.contains("subagent"), errors);
         }
