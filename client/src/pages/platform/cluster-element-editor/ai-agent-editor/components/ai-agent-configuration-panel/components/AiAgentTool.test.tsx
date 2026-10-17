@@ -16,6 +16,7 @@ vi.mock('./AiAgentToolDropdownMenu', () => ({
 import AiAgentTool from './AiAgentTool';
 
 const httpClientTool = {
+    clusterElementType: 'tools',
     componentName: 'httpClient',
     componentVersion: 1,
     label: 'Get a random quote',
