@@ -66,6 +66,19 @@ final class IntelligentToolAskCapabilityTest {
         }
     }
 
+    @Test
+    void testSubAgentPromptSaysItHasNoConnectionPickers() throws IOException {
+        try (InputStream inputStream =
+            getClass().getResourceAsStream("/prompt_workflow_editor_build_sub_agent.txt")) {
+
+            assertThat(inputStream).isNotNull();
+
+            String prompt = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+            assertThat(prompt).contains("no selectConnection", "askUserQuestion");
+        }
+    }
+
     private static List<IntelligentToolDefinition> definitions() {
         IntelligentToolContributor workflowContributor = workflowIntelligentToolContributor(
             present(mock(IntelligentToolChatClientFactory.class)),

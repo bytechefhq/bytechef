@@ -19,7 +19,10 @@ package com.bytechef.ai.copilot.subagent;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.commons.util.JsonUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +76,7 @@ public final class SubagentAskUserQuestionToolCallback implements ToolCallback {
 
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
-        String delegateResult = delegate.call(toolInput, toolContext);
+        String delegateResult = delegate.call(toolInput, withoutLookupPropertyTracker(toolContext));
 
         if (!isAskEnvelope(delegateResult)) {
             return delegateResult;
@@ -88,6 +91,21 @@ public final class SubagentAskUserQuestionToolCallback implements ToolCallback {
         }
 
         return STOP_INSTRUCTION;
+    }
+
+    private static @Nullable ToolContext withoutLookupPropertyTracker(@Nullable ToolContext toolContext) {
+        if (toolContext == null ||
+            !toolContext.getContext()
+                .containsKey(LookupPropertyTracker.TOOL_CONTEXT_LOOKUP_PROPERTY_TRACKER_KEY)) {
+
+            return toolContext;
+        }
+
+        Map<String, Object> context = new HashMap<>(toolContext.getContext());
+
+        context.remove(LookupPropertyTracker.TOOL_CONTEXT_LOOKUP_PROPERTY_TRACKER_KEY);
+
+        return new ToolContext(context);
     }
 
     private static boolean isAskEnvelope(String delegateResult) {
