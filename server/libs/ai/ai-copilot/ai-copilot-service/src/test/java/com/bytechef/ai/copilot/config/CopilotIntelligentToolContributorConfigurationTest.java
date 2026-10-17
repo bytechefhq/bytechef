@@ -468,15 +468,19 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
         PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
         ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
+        ScopedConnectionGuard scopedConnectionGuard = new ScopedConnectionGuard(connectionListerProvider);
 
         return new CopilotConfiguration(
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
             promptResource, promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
-            workflowInstructionTools, connectionDefinitionService, workspaceConnectionFacade,
-            componentDefinitionService, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
-            triggerDefinitionFacade, propertyOptionsResolver, connectionListerProvider,
-            new ScopedConnectionGuard(connectionListerProvider));
+            workflowInstructionTools,
+            new InteractivePickerToolCallbacks(
+                connectionDefinitionService, workspaceConnectionFacade, componentDefinitionService,
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
+            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+            propertyOptionsResolver, scopedConnectionGuard);
     }
 
     private static IntelligentToolDefinition definitionNamed(
