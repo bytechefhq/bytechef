@@ -320,29 +320,22 @@ function collectHeads(source: string, language: ScriptLanguageType): FunctionHea
     return collectJavaScriptHeads(source);
 }
 
+function findContainingHeads(source: string, cursorOffset: number, language: ScriptLanguageType): FunctionHeadI[] {
+    return collectHeads(source, language)
+        .filter((head) => head.start < cursorOffset)
+        .sort((first, second) => second.start - first.start || second.bodyStart - first.bodyStart)
+        .filter((head) => headContainsCursor(source, head, cursorOffset, language));
+}
+
 function findEnclosingHead(
     source: string,
     cursorOffset: number,
     language: ScriptLanguageType
 ): FunctionHeadI | undefined {
-    const heads = collectHeads(source, language)
-        .filter((head) => head.start < cursorOffset)
-        .sort((first, second) => second.start - first.start || second.bodyStart - first.bodyStart);
-
-    return heads.find((head) => headContainsCursor(source, head, cursorOffset, language));
+    return findContainingHeads(source, cursorOffset, language)[0];
 }
 
-export function findPerformScope(
-    source: string,
-    cursorOffset: number,
-    language: ScriptLanguageType
-): PerformScopeType | undefined {
-    const head = findEnclosingHead(source, cursorOffset, language);
-
-    if (!head) {
-        return undefined;
-    }
-
+function toPerformScope(head: FunctionHeadI): PerformScopeType {
     const scope: PerformScopeType = {performStart: head.start};
     const [first, second, third] = head.parameters.map((parameter) => parameter || undefined);
     const assignments: [keyof Omit<PerformScopeType, 'performStart'>, string | undefined][] =
@@ -366,6 +359,28 @@ export function findPerformScope(
     }
 
     return scope;
+}
+
+export function findPerformScope(
+    source: string,
+    cursorOffset: number,
+    language: ScriptLanguageType,
+    root?: string
+): PerformScopeType | undefined {
+    const heads = findContainingHeads(source, cursorOffset, language);
+    const performHead = heads.at(-1);
+
+    if (!performHead) {
+        return undefined;
+    }
+
+    if (root === undefined) {
+        return toPerformScope(performHead);
+    }
+
+    const bindingHead = heads.find((head) => head.parameters.includes(root));
+
+    return bindingHead === performHead ? toPerformScope(performHead) : undefined;
 }
 
 export function findEnclosingFunctionName(
