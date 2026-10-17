@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -51,6 +52,15 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
             throw new BadCredentialsException("MCP server is disabled");
         }
 
+        Environment mcpServerEnvironment = mcpServer.getEnvironment();
+
+        boolean environmentMatches =
+            embeddedMcpServerApiKeyAuthenticationToken.getEnvironmentId() == mcpServerEnvironment.ordinal();
+
+        if (embeddedMcpServerApiKeyAuthenticationToken.isEnvironmentRequested() && !environmentMatches) {
+            throw new BadCredentialsException("X-ENVIRONMENT does not match the MCP server environment");
+        }
+
         if (!mcpServer.isAuthenticationRequired()) {
             return McpAnonymousAuthenticationToken.ofEmbeddedMcpServer(mcpServer.getId());
         }
@@ -59,6 +69,10 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
 
         if (externalUserId == null) {
             throw new BadCredentialsException("Authorization token does not exist");
+        }
+
+        if (!environmentMatches) {
+            throw new BadCredentialsException("X-ENVIRONMENT does not match the MCP server environment");
         }
 
         long environmentId = embeddedMcpServerApiKeyAuthenticationToken.getEnvironmentId();

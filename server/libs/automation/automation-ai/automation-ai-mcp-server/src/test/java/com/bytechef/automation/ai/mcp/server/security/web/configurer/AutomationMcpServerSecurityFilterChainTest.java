@@ -16,10 +16,14 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.configurer;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -232,6 +236,24 @@ class AutomationMcpServerSecurityFilterChainTest {
         }
 
         @Bean
+        WorkspaceApiKeyService workspaceApiKeyService() {
+            WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+
+            when(workspaceApiKeyService.fetchApiKeyWorkspaceId(anyLong())).thenReturn(Optional.of(1L));
+
+            return workspaceApiKeyService;
+        }
+
+        @Bean
+        WorkspaceMcpServerService workspaceMcpServerService() {
+            WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
+
+            when(workspaceMcpServerService.fetchMcpServerWorkspaceId(any())).thenReturn(Optional.of(1L));
+
+            return workspaceMcpServerService;
+        }
+
+        @Bean
         RouterFunction<ServerResponse> mcpStubRouterFunction() {
             return RouterFunctions.route()
                 .POST("/api/automation/{secretKey}/mcp", request -> ServerResponse.ok()
@@ -242,7 +264,8 @@ class AutomationMcpServerSecurityFilterChainTest {
         @Bean
         SecurityFilterChain securityFilterChain(
             HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-            McpServerService mcpServerService, UserService userService) throws Exception {
+            McpServerService mcpServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+            WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
             return http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -250,7 +273,7 @@ class AutomationMcpServerSecurityFilterChainTest {
                 .with(
                     new AutomationMcpServerSecurityConfigurer(
                         apiKeyService, authorityService, () -> List.of(Environment.values()), mcpServerService,
-                        userService),
+                        userService, workspaceApiKeyService, workspaceMcpServerService),
                     Customizer.withDefaults())
                 .build();
         }

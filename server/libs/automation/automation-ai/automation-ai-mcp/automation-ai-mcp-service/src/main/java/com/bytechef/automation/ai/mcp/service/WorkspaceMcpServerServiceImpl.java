@@ -48,7 +48,7 @@ public class WorkspaceMcpServerServiceImpl implements WorkspaceMcpServerService 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Long> fetchWorkspaceIdByMcpServerId(Long mcpServerId) {
+    public Optional<Long> fetchMcpServerWorkspaceId(Long mcpServerId) {
         List<WorkspaceMcpServer> workspaceMcpServers = workspaceMcpServerRepository.findByMcpServerId(mcpServerId);
 
         return workspaceMcpServers.stream()

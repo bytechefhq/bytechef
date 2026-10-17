@@ -16,6 +16,9 @@
 
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -27,6 +30,8 @@ import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -42,15 +47,20 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
     private final ApiKeyService apiKeyService;
     private final McpApiKeyEntityRepository mcpApiKeyEntityRepository;
     private final McpServerService mcpServerService;
+    private final WorkspaceApiKeyService workspaceApiKeyService;
+    private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public AutomationMcpServerApiKeyAuthenticationProvider(
         ApiKeyService apiKeyService, AuthorityService authorityService, McpServerService mcpServerService,
-        UserService userService) {
+        UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.apiKeyService = apiKeyService;
         this.mcpApiKeyEntityRepository = new McpApiKeyEntityRepository(apiKeyService, authorityService, userService);
         this.mcpServerService = mcpServerService;
+        this.workspaceApiKeyService = workspaceApiKeyService;
+        this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
     @Override
@@ -65,6 +75,12 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
         if (!mcpServer.isEnabled()) {
             throw new BadCredentialsException("MCP server is disabled");
+        }
+
+        Environment requestedEnvironment = mcpApiKeyCredentials.getRequestedEnvironment();
+
+        if (requestedEnvironment != null && requestedEnvironment != mcpServer.getEnvironment()) {
+            throw new BadCredentialsException("X-ENVIRONMENT does not match the MCP server environment");
         }
 
         if (!mcpServer.isAuthenticationRequired()) {
@@ -91,6 +107,10 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
+        if (!isSameWorkspace(mcpApiKeyEntity.getApiKeyId(), mcpServer.getId())) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
         return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
@@ -99,6 +119,13 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
     @Override
     public boolean supports(Class<?> authentication) {
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    private boolean isSameWorkspace(long apiKeyId, Long mcpServerId) {
+        Optional<Long> apiKeyWorkspaceId = workspaceApiKeyService.fetchApiKeyWorkspaceId(apiKeyId);
+
+        return apiKeyWorkspaceId.isPresent() &&
+            Objects.equals(apiKeyWorkspaceId, workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId));
     }
 
     private McpServer getMcpServer(@Nullable String mcpServerSecretKey) {

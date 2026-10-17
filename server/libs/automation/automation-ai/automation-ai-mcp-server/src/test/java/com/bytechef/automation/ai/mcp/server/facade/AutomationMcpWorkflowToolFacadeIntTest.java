@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.server.config.AutomationMcpServerMethodSecurityIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
@@ -49,11 +50,18 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * A workflow exposed as an MCP tool carries an optional name and description. Left unset, the workflow's own label and
@@ -63,7 +71,17 @@ import org.springframework.beans.factory.ObjectProvider;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 @SuppressWarnings("unchecked")
-class AutomationMcpWorkflowToolFacadeTest {
+@SpringBootTest(classes = AutomationMcpServerMethodSecurityIntTestConfiguration.class)
+class AutomationMcpWorkflowToolFacadeIntTest {
+
+    @Autowired
+    private McpProjectService mcpProjectService;
+
+    @Autowired
+    private McpServerService mcpServerService;
+
+    @Autowired
+    private McpToolService mcpToolService;
 
     private final McpProjectWorkflowService mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
@@ -71,15 +89,28 @@ class AutomationMcpWorkflowToolFacadeTest {
     private final WorkflowService workflowService = mock(WorkflowService.class);
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
-    private final AutomationMcpToolFacade automationMcpToolFacade = new AutomationMcpToolFacade(
-        (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class), mock(ClusterElementDefinitionFacade.class),
-        mock(ClusterElementDefinitionService.class), mock(Evaluator.class), mock(JobCompletionAwaiter.class),
-        mock(JobResumeFacade.class), mock(JobService.class), mock(McpComponentService.class),
-        mock(McpProjectService.class), mcpProjectWorkflowService, mock(McpServerService.class),
-        mock(McpToolService.class), mock(PrincipalJobFacade.class), projectDeploymentWorkflowService,
-        "https://example.com",
-        mock(TaskExecutionService.class), mock(TaskFileStorage.class), mock(ToolExecutionRecorder.class),
-        workflowService, workspaceMcpServerService);
+    private AutomationMcpToolFacade automationMcpToolFacade;
+
+    @BeforeEach
+    void beforeEach() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        automationMcpToolFacade = new AutomationMcpToolFacade(
+            (ObjectProvider<ApprovalTokens>) mock(ObjectProvider.class), mock(ClusterElementDefinitionFacade.class),
+            mock(ClusterElementDefinitionService.class), mock(Evaluator.class), mock(JobCompletionAwaiter.class),
+            mock(JobResumeFacade.class), mock(JobService.class), mock(McpComponentService.class), mcpProjectService,
+            mcpProjectWorkflowService, mcpServerService, mcpToolService, mock(PrincipalJobFacade.class),
+            projectDeploymentWorkflowService, "https://example.com", mock(TaskExecutionService.class),
+            mock(TaskFileStorage.class), mock(ToolExecutionRecorder.class), workflowService, workspaceMcpServerService);
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testToolNameFallsBackToTheWorkflowLabel() {
@@ -138,7 +169,7 @@ class AutomationMcpWorkflowToolFacadeTest {
         projectDeploymentWorkflow.setWorkflowId("workflow-1");
 
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(1L)).thenReturn(projectDeploymentWorkflow);
-        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(1L)).thenReturn(Optional.empty());
 
         WorkflowTrigger workflowTrigger = new WorkflowTrigger(
             Map.of("name", "trigger_1", "parameters", Map.of(), "type", "workflow/v1/newWorkflowCall"));
