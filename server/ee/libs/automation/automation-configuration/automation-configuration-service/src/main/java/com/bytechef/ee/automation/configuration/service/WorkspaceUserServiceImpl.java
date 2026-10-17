@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.PermissionService.UserWorkspacePair;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvent;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -85,6 +86,31 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     @Transactional(readOnly = true)
     public long countByCustomRoleId(long customRoleId) {
         return workspaceUserRepository.countByCustomRoleId(customRoleId);
+    }
+
+    @Override
+    public void deleteUserWorkspaceUsers(long userId) {
+        List<WorkspaceUser> workspaceUsers = workspaceUserRepository.findAllByUserId(userId);
+
+        if (workspaceUsers.isEmpty()) {
+            return;
+        }
+
+        workspaceUserRepository.deleteAll(workspaceUsers);
+
+        permissionService.evictWorkspaceScopeCaches(
+            workspaceUsers.stream()
+                .map(workspaceUser -> new UserWorkspacePair(userId, workspaceUser.getWorkspaceId()))
+                .toList());
+
+        for (WorkspaceUser workspaceUser : workspaceUsers) {
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("workspaceId", String.valueOf(workspaceUser.getWorkspaceId()));
+            data.put("userId", String.valueOf(userId));
+
+            workspaceUserAuditPublisher.publish(WorkspaceUserAuditEvent.WORKSPACE_USER_REMOVED, data);
+        }
     }
 
     @Override

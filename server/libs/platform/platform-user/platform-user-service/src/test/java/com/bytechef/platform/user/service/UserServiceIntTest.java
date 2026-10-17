@@ -24,6 +24,7 @@ import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.event.UserDeletedEvent;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import java.time.Instant;
@@ -31,20 +32,26 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for {@link UserService}.
  */
 @SpringBootTest(classes = UserIntTestConfiguration.class)
+@RecordApplicationEvents
 @Transactional
 class UserServiceIntTest {
 
@@ -54,6 +61,12 @@ class UserServiceIntTest {
     private static final String DEFAULT_LASTNAME = "doe";
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
     private static final String DEFAULT_LANGKEY = "dummy";
+
+    @Autowired
+    private ApplicationEvents applicationEvents;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
@@ -71,6 +84,12 @@ class UserServiceIntTest {
 
     @BeforeEach
     public void init() {
+        for (String cacheName : cacheManager.getCacheNames()) {
+            Cache cache = Objects.requireNonNull(cacheManager.getCache(cacheName));
+
+            cache.clear();
+        }
+
         persistentTokenRepository.deleteAll();
 
         user = new User();
@@ -278,6 +297,35 @@ class UserServiceIntTest {
         Optional<User> maybeDbUser = userRepository.findById(dbUser.getId());
 
         assertThat(maybeDbUser).contains(dbUser);
+    }
+
+    @Test
+    public void testDeleteRemovesUserAndPersistentTokens() {
+        User dbUser = userRepository.save(user);
+
+        generateUserToken(dbUser, "1111-1111", LocalDate.now());
+
+        userService.delete(DEFAULT_LOGIN);
+
+        assertThat(userRepository.findById(dbUser.getId())).isEmpty();
+        assertThat(persistentTokenRepository.findAllByUserId(dbUser.getId())).isEmpty();
+    }
+
+    @Test
+    public void testDeletePublishesUserDeletedEvent() {
+        User dbUser = userRepository.save(user);
+
+        userService.delete(DEFAULT_LOGIN);
+
+        assertThat(applicationEvents.stream(UserDeletedEvent.class)).containsExactly(
+            new UserDeletedEvent(dbUser.getId()));
+    }
+
+    @Test
+    public void testDeleteUnknownLoginPublishesNoEvent() {
+        userService.delete("unknown-login");
+
+        assertThat(applicationEvents.stream(UserDeletedEvent.class)).isEmpty();
     }
 
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
