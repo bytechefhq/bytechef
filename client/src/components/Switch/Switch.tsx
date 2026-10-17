@@ -94,6 +94,7 @@ const Switch = ({
         'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-tertiary',
         'focus-visible:ring-2 focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
         '[&_[data-slot=switch-thumb]]:bg-surface-neutral-primary',
+        'dark:[&_[data-slot=switch-thumb][data-state=checked]]:bg-content-onbrand',
         className
     );
 

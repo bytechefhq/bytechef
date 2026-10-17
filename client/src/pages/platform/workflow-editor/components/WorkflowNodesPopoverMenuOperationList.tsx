@@ -138,9 +138,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 componentName,
                 componentVersion: version,
                 icon: icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={icon} />
+                    <InlineSVG className="size-9 text-content-neutral-primary" src={icon} />
                 ) : (
-                    <ComponentIcon className="size-9 text-gray-700" />
+                    <ComponentIcon className="size-9 text-content-neutral-primary" />
                 ),
                 label: componentLabel,
                 metadata: undefined,
@@ -523,7 +523,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     return (
                         <li
-                            className={`space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 ${isDisabled ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-blue-200'}`}
+                            className={`space-y-1 rounded border-2 border-transparent bg-surface-neutral-primary px-2 py-1 ${isDisabled ? 'cursor-wait opacity-70' : 'cursor-pointer hover:border-stroke-brand-secondary'}`}
                             key={operation.name}
                             onClick={() => {
                                 if (isDisabled) {

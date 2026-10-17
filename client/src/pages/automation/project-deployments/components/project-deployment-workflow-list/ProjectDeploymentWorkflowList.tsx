@@ -123,7 +123,7 @@ const ProjectDeploymentWorkflowList = ({
                     No enabled workflows. Enable a workflow in the project to run it in this deployment.
                 </p>
             ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-stroke-neutral-primary">
                     {enabledWorkflows.map(({projectDeploymentWorkflow, workflow}) => {
                         const componentNames = [
                             ...(workflow.workflowTriggerComponentNames ?? []),
@@ -163,7 +163,7 @@ const ProjectDeploymentWorkflowList = ({
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                        <ul className="divide-y divide-gray-100">
+                        <ul className="divide-y divide-stroke-neutral-primary">
                             {disabledWorkflows.map(({projectDeploymentWorkflow, workflow}) => {
                                 const componentNames = [
                                     ...(workflow.workflowTriggerComponentNames ?? []),

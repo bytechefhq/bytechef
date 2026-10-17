@@ -7,6 +7,7 @@ import {X as CloseIcon} from 'lucide-react';
 import {ReactNode, useMemo, useState} from 'react';
 import Select from 'react-select';
 
+import '../../CreatableSelect/CreatableSelect.css';
 import {getAllSchemaKeys, getSchemaMenuOptions, getSchemaType, setSchemaField, translateLabels} from '../utils/helpers';
 import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 import SchemaMenuList from './SchemaMenuList';
@@ -65,6 +66,7 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
 
                         <Select
                             className="w-full min-w-48 text-sm"
+                            classNamePrefix="react-select"
                             isClearable={false}
                             key={selectKey}
                             onChange={handleSelectChange}

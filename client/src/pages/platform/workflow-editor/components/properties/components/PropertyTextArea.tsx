@@ -81,7 +81,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     )}
                 >
                     {leadingIcon && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-stroke-neutral-secondary bg-surface-neutral-secondary px-3">
                             {leadingIcon}
                         </div>
                     )}
@@ -90,8 +90,8 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         className={twMerge(
                             'min-h-9',
                             error &&
-                                'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
-                            disabled && 'bg-gray-100 text-content-neutral-secondary',
+                                'border-stroke-destructive-secondary pr-10 text-content-destructive placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
+                            disabled && 'bg-surface-neutral-secondary text-content-neutral-secondary',
                             leadingIcon && 'pl-12 leading-relaxed',
                             trailingAction &&
                                 'flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',

@@ -90,7 +90,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
 
     return (
         <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
-            <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+            <div className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-1 items-center gap-x-2">
                         <CollapsibleTrigger asChild>
@@ -172,7 +172,10 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
+                                <DropdownMenuItem
+                                    className="text-content-destructive"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                >
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -199,7 +202,10 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                     {actions.length > 0 ? (
                                         <ul className="space-y-2">
                                             {actions.map((action) => (
-                                                <li className="rounded bg-gray-50 p-2" key={action.name}>
+                                                <li
+                                                    className="rounded bg-surface-neutral-primary p-2"
+                                                    key={action.name}
+                                                >
                                                     <div className="text-sm font-medium">
                                                         {action.title || action.name}
                                                     </div>
@@ -209,7 +215,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                                     </div>
 
                                                     {action.description && (
-                                                        <div className="mt-1 text-xs text-gray-600">
+                                                        <div className="mt-1 text-xs text-content-neutral-secondary">
                                                             {action.description}
                                                         </div>
                                                     )}
@@ -231,7 +237,10 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                     {triggers.length > 0 ? (
                                         <ul className="space-y-2">
                                             {triggers.map((trigger) => (
-                                                <li className="rounded bg-gray-50 p-2" key={trigger.name}>
+                                                <li
+                                                    className="rounded bg-surface-neutral-primary p-2"
+                                                    key={trigger.name}
+                                                >
                                                     <div className="text-sm font-medium">
                                                         {trigger.title || trigger.name}
                                                     </div>
@@ -241,7 +250,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                                     </div>
 
                                                     {trigger.description && (
-                                                        <div className="mt-1 text-xs text-gray-600">
+                                                        <div className="mt-1 text-xs text-content-neutral-secondary">
                                                             {trigger.description}
                                                         </div>
                                                     )}

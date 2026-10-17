@@ -273,7 +273,7 @@ const ClusterElementsCanvasDialog = ({
                         )}
 
                         {evalsPanelOpen && (
-                            <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto rounded-lg bg-white">
+                            <div className="absolute inset-0 z-20 flex flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary">
                                 <div className="flex items-center justify-between border-b border-b-border/50 p-4">
                                     <div className="text-lg font-semibold">Evals</div>
 

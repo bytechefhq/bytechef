@@ -21,8 +21,8 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
     if (runs.length === 0) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center gap-3">
-                <div className="flex size-12 items-center justify-center rounded-full bg-gray-100">
-                    <HistoryIcon className="size-6 text-gray-400" />
+                <div className="flex size-12 items-center justify-center rounded-full bg-surface-neutral-secondary">
+                    <HistoryIcon className="size-6 text-content-neutral-tertiary" />
                 </div>
 
                 <h3 className="text-sm font-semibold">No runs yet</h3>
@@ -57,7 +57,7 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
 
                 return (
                     <div
-                        className="cursor-pointer border-b border-border/30 px-3 py-2.5 last:border-b-0 hover:bg-gray-50"
+                        className="cursor-pointer border-b border-border/30 px-3 py-2.5 last:border-b-0 hover:bg-surface-neutral-primary-hover"
                         key={run.id}
                         onClick={() => onSelectRun(run.id)}
                     >
@@ -89,7 +89,7 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
                             <div>
                                 {scorePercent != null ? (
                                     <div className="flex items-center gap-1.5">
-                                        <div className="h-1.5 w-10 overflow-hidden rounded-full bg-gray-200">
+                                        <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-neutral-tertiary">
                                             <div
                                                 className={twMerge(
                                                     'h-full rounded-full',
@@ -103,10 +103,10 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
                                             />
                                         </div>
 
-                                        <span className="text-xs text-gray-600">{scorePercent}%</span>
+                                        <span className="text-xs text-content-neutral-secondary">{scorePercent}%</span>
                                     </div>
                                 ) : (
-                                    <span className="text-xs text-gray-400">--</span>
+                                    <span className="text-xs text-content-neutral-tertiary">--</span>
                                 )}
                             </div>
 

@@ -48,6 +48,53 @@
     color: hsl(var(--destructive-foreground)) !important;
 }
 
+@layer components {
+    .dark [data-slot='tooltip-content'] {
+        background-color: hsl(var(--popover)) !important;
+        color: hsl(var(--popover-foreground)) !important;
+        border: 1px solid hsl(var(--surface-neutral-tertiary)) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='context-menu-content'],
+            [data-slot='context-menu-sub-content'],
+            [data-slot='dropdown-menu-content'],
+            [data-slot='dropdown-menu-sub-content'],
+            [data-slot='hover-card-content'],
+            [data-slot='popover-content'],
+            [data-slot='select-content']
+        ) {
+        border-color: hsl(var(--surface-neutral-tertiary)) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='context-menu-content'],
+            [data-slot='context-menu-sub-content'],
+            [data-slot='dropdown-menu-content'],
+            [data-slot='dropdown-menu-sub-content'],
+            [data-slot='select-content']
+        ) {
+        box-shadow: 0 10px 24px -6px rgb(0 0 0 / 0.6) !important;
+    }
+
+    .dark
+        :is(
+            [data-slot='command-separator'],
+            [data-slot='context-menu-separator'],
+            [data-slot='dropdown-menu-separator'],
+            [data-slot='select-separator']
+        ) {
+        background-color: color-mix(in srgb, hsl(var(--border)) 50%, hsl(var(--surface-neutral-tertiary))) !important;
+    }
+
+    .dark [data-slot='tooltip-content'] svg.fill-foreground {
+        background-color: hsl(var(--popover)) !important;
+        fill: hsl(var(--popover)) !important;
+    }
+}
+
 @utility heading-tertiary {
     @apply font-semibold text-muted-foreground uppercase;
 }
@@ -60,6 +107,7 @@
 
     :root {
         @apply h-full;
+        color-scheme: light;
 
         --accent: 220 14.3% 95.9%;
         --accent-foreground: 220.9 39.3% 11%;
@@ -79,14 +127,17 @@
         --content-brand-secondary: 217 92% 28%;
         --content-destructive: 0 74% 42%;
         --content-destructive-primary: 0 74% 42%;
-        --content-destructive-secondary: 0 94% 82%;
+        --content-destructive-primary-hover: 0 70% 35%;
         --content-disabled: 0 0% 64%;
         --content-neutral-primary: 229 84% 5%;
         --content-neutral-secondary: 215 19% 35%;
         --content-neutral-secondary-hover: 215 19% 35%;
+        --content-neutral-subtle: 229 84% 5%;
         --content-neutral-tertiary: 215 20% 65%;
+        --content-onbrand: 0 0% 100%;
         --content-onsurface-primary: 0 0% 100%;
         --content-onsurface-secondary: 215 20% 65%;
+        --content-ontooltip: 0 0% 100%;
         --content-onwarning: 229 84% 5%;
         --content-success-primary: 142 72% 29%;
         --content-success: 142 72% 29%;
@@ -95,8 +146,6 @@
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 210 20% 98%;
         --foreground: 224 71.4% 4.1%;
-        --info: 214, 100%, 97%;
-        --info-foreground: 224, 76%, 48%;
         --input: 220 13% 91%;
         --muted: 220 14.3% 95.9%;
         --muted-foreground: 220 8.9% 46.1%;
@@ -108,7 +157,6 @@
         --ring: 217 61% 60%;
         --secondary: 220 14.3% 95.9%;
         --secondary-foreground: 220.9 39.3% 11%;
-        --skeleton: 220 9% 93%;
         --stroke-branch-primary: 239 84% 67%;
         --stroke-branch-secondary: 243 75% 59%;
         --stroke-branch-tertiary: 245 58% 51%;
@@ -116,7 +164,6 @@
         --stroke-brand-primary: 217 91% 40%;
         --stroke-brand-primary-hover: 217 91% 36%;
         --stroke-brand-primary-active: 217 92% 28%;
-        --stroke-brand-primary-pressed: 213 87% 34%;
         --stroke-brand-secondary: 217 62% 82%;
         --stroke-brand-secondary-hover: 217 61% 73%;
         --stroke-brand-secondary-active: 217 61% 52%;
@@ -145,9 +192,8 @@
         --stroke-map-secondary: 271 81% 56%;
         --stroke-map-tertiary: 272 72% 47%;
         --stroke-neutral-primary: 210 40% 96%;
-        --stroke-neutral-primary-hover: 215 20% 65%;
         --stroke-neutral-secondary: 214 32% 91%;
-        --stroke-neutral-tertiary: 213, 27%, 84%;
+        --stroke-neutral-tertiary: 213 27% 84%;
         --stroke-onsurface-primary: 0 0% 100%;
         --stroke-onsurface-primary-hover: 0 0% 100%;
         --stroke-parallel-primary: 85 85% 35%;
@@ -163,7 +209,7 @@
         --stroke-warning-primary: 45 93% 47%;
         --stroke-warning-primary-hover: 41 96% 40%;
         --stroke-warning-primary-active: 35 92% 33%;
-        --stroke-warning-secondary: 44, 70%, 82%;
+        --stroke-warning-secondary: 44 70% 82%;
         --success: 142 76% 36%;
         --success-foreground: 142 77% 73%;
         --surface-brand-primary: 217 91% 40%;
@@ -184,13 +230,12 @@
         --surface-neutral-primary: 0 0% 100%;
         --surface-neutral-primary-active: 214 32% 91%;
         --surface-neutral-primary-hover: 210 40% 96%;
-        --surface-neutral-secondary: 210 40% 96%;
-        --surface-neutral-secondary-hover: 214 32% 91%;
-        --surface-neutral-secondary-active: 213 27% 84%;
+        --surface-neutral-secondary: 214 32% 93%;
+        --surface-neutral-secondary-hover: 214 32% 88%;
+        --surface-neutral-secondary-active: 213 27% 82%;
         --surface-neutral-tertiary: 214 32% 91%;
         --surface-neutral-tertiary-hover: 213 27% 84%;
         --surface-neutral-transparent: 0 0% 100% / 0%;
-        --surface-overlay-primary: 222 47% 11%;
         --surface-popover-canvas: 210 40% 98%;
         --surface-success-primary: 142 72% 29%;
         --surface-success-primary-hover: 143 64% 24%;
@@ -211,7 +256,6 @@
         --sidebar-accent-foreground: var(--accent-foreground);
         --sidebar-border: var(--border);
         --sidebar-ring: var(--ring);
-        --sidebar-active-foreground: var(--content-brand-primary);
         --rdg-color-scheme: light;
 
         --hub-surface: hsl(var(--muted));
@@ -226,54 +270,69 @@
     }
 
     .dark {
+        color-scheme: dark;
+        --hub-surface: hsl(var(--background));
+        --hub-card: hsl(var(--muted));
+        --hub-active-border: #22c55e;
+        --hub-enable: #22c55e;
+        --hub-enable-hover: #16a34a;
+        --hub-disable: #ef4444;
+        --hub-disable-hover: #dc2626;
+        --hub-on-accent: #ffffff;
+        --hub-segment-selected: #414146;
+
         --hub-surface: hsl(var(--background));
         --hub-card: hsl(var(--muted));
         --hub-active-border: #22c55e;
         --hub-segment-selected: #414146;
 
-        --accent: 215 27.9% 16.9%;
-        --accent-foreground: 210 20% 98%;
-        --background: 224 71.4% 4.1%;
-        --border: 215 27.9% 16.9%;
-        --card: 224 71.4% 4.1%;
-        --card-foreground: 210 20% 98%;
+        --accent: 240 4% 18%;
+        --accent-foreground: 240 9% 94%;
+        --background: 240 6% 13%;
+        --border: 240 4% 18%;
+        --card: 240 6% 13%;
+        --card-foreground: 240 9% 94%;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
         --content-brand-primary: 217 61% 73%;
-        --content-brand-primary-hover: 217 91% 36%;
-        --content-brand-primary-active: 217 92% 28%;
+        --content-brand-primary-hover: 217 62% 82%;
+        --content-brand-primary-active: 217 61% 90%;
         --content-brand-secondary: 217 91% 40%;
-        --content-canvas_dot: 217 33% 17%;
-        --content-destructive-primary: 0 84% 60%;
-        --content-destructive-secondary: 0 0% 100%;
+        --content-canvas_dot: 240 4% 26%;
+        --content-destructive: 0 91% 71%;
+        --content-destructive-primary: 0 91% 71%;
+        --content-destructive-primary-hover: 0 94% 82%;
         --content-disabled: 0 0% 64%;
-        --content-neutral-primary: 210 40% 98%;
-        --content-neutral-secondary: 215 20% 65%;
-        --content-neutral-secondary-hover: 215 20% 65%;
-        --content-neutral-tertiary: 215 20% 65%;
-        --content-onsurface-primary: 210 40% 98%;
-        --content-onsurface-secondary: 214 32% 91%;
+        --content-neutral-primary: 240 9% 94%;
+        --content-neutral-secondary: 240 2% 60%;
+        --content-neutral-secondary-hover: 240 3% 77%;
+        --content-neutral-subtle: 240 3% 77%;
+        --content-neutral-tertiary: 240 2% 60%;
+        --content-onbrand: 0 0% 100%;
+        --content-onsurface-primary: 240 9% 94%;
+        --content-onsurface-secondary: 240 3% 77%;
+        --content-ontooltip: 240 6% 10%;
         --content-onwarning: 229 84% 5%;
+        --content-success: 142 71% 45%;
         --content-success-primary: 142 71% 45%;
+        --content-warning: 45 93% 47%;
         --content-warning-primary: 45 93% 47%;
-        --destructive: 0 62.8% 30.6%;
+        --destructive: 0 72% 51%;
         --destructive-foreground: 210 20% 98%;
-        --foreground: 210 20% 98%;
-        --info: 214, 100%, 97%;
-        --info-foreground: 224, 76%, 48%;
-        --input: 215 27.9% 16.9%;
-        --muted: 215 27.9% 16.9%;
-        --muted-foreground: 217.9 10.6% 64.9%;
-        --popover: 224 71.4% 4.1%;
-        --popover-foreground: 210 20% 98%;
-        --primary: 210 20% 98%;
-        --primary-foreground: 220.9 39.3% 11%;
-        --ring: 216 12.2% 83.9%;
-        --secondary: 215 27.9% 16.9%;
-        --secondary-foreground: 210 20% 98%;
+        --foreground: 240 9% 94%;
+        --input: 240 4% 27%;
+        --muted: 240 4% 18%;
+        --muted-foreground: 240 2% 60%;
+        --popover: 240 6% 15%;
+        --popover-foreground: 240 9% 94%;
+        --primary: 240 9% 94%;
+        --primary-foreground: 240 6% 10%;
+        --ring: 240 5% 84%;
+        --secondary: 240 4% 18%;
+        --secondary-foreground: 240 9% 94%;
         --stroke-branch-primary: 0 0% 100%;
         --stroke-branch-secondary: 0 0% 100%;
         --stroke-branch-tertiary: 0 0% 100%;
@@ -308,6 +367,9 @@
         --stroke-map-primary: 0 0% 100%;
         --stroke-map-secondary: 0 0% 100%;
         --stroke-map-tertiary: 0 0% 100%;
+        --stroke-neutral-primary: 240 4% 18%;
+        --stroke-neutral-secondary: 240 4% 24%;
+        --stroke-neutral-tertiary: 240 4% 30%;
         --stroke-onsurface-primary: 0 0% 100%;
         --stroke-onsurface-primary-hover: 0 0% 100%;
         --stroke-parallel-primary: 0 0% 100%;
@@ -323,43 +385,45 @@
         --stroke-warning-primary: 48 96% 53%;
         --stroke-warning-primary-hover: 48 96% 53%;
         --stroke-warning-primary-active: 48 96% 53%;
-        --success: 142, 69%, 58%;
-        --success-foreground: 144, 61%, 20%;
-        --surface-brand-primary: 217 62% 82%;
-        --surface-brand-primary-hover: 217 61% 73%;
-        --surface-brand-primary-active: 217 61% 60%;
-        --surface-brand-primary-disabled: 217 62% 82%;
-        --surface-brand-secondary: 217 91% 22%;
-        --surface-brand-tertiary: 217 91% 22%;
+        --stroke-warning-secondary: 45 80% 30%;
+        --success: 142 69% 58%;
+        --success-foreground: 144 61% 20%;
+        --surface-brand-primary: 217 91% 48%;
+        --surface-brand-primary-hover: 217 91% 55%;
+        --surface-brand-primary-active: 217 91% 60%;
+        --surface-brand-primary-disabled: 217 91% 48% / 50%;
+        --surface-brand-secondary: 217 45% 20%;
+        --surface-brand-secondary-hover: 217 45% 25%;
+        --surface-brand-tertiary: 217 45% 20%;
         --surface-destructive-primary: 0 72% 51%;
         --surface-destructive-primary-hover: 0 72% 51%;
         --surface-destructive-primary-active: 0 72% 51%;
-        --surface-destructive-secondary: 0 93% 94%;
-        --surface-destructive-secondary-hover: 0 93% 94%;
-        --surface-destructive-secondary-active: 0 93% 94%;
+        --surface-destructive-secondary: 0 63% 13%;
+        --surface-destructive-secondary-hover: 0 63% 19%;
+        --surface-destructive-secondary-active: 0 63% 25%;
         --surface-disabled: 0 0% 83%;
-        --surface-main: 229 84% 5%;
-        --surface-neutral-primary: 229 84% 5%;
-        --surface-neutral-primary-hover: 222 47% 11%;
-        --surface-neutral-primary-active: 217 33% 17%;
-        --surface-neutral-secondary: 217 33% 17%;
-        --surface-neutral-secondary-hover: 215 25% 27%;
-        --surface-neutral-secondary-active: 215 19% 35%;
-        --surface-neutral-tertiary: 215 25% 27%;
-        --surface-neutral-tertiary-hover: 215 19% 35%;
+        --surface-main: 240 6% 10%;
+        --surface-neutral-primary: 240 6% 13%;
+        --surface-neutral-primary-hover: 240 5% 16%;
+        --surface-neutral-primary-active: 240 4% 18%;
+        --surface-neutral-secondary: 240 4% 18%;
+        --surface-neutral-secondary-hover: 240 4% 24%;
+        --surface-neutral-secondary-active: 240 3% 30%;
+        --surface-neutral-tertiary: 240 4% 24%;
+        --surface-neutral-tertiary-hover: 240 3% 30%;
         --surface-neutral-transparent: 0 0% 100% / 0%;
-        --surface-overlay-primary: 0 0% 83%;
-        --surface-popover-canvas: 229 84% 5%;
+        --surface-popover-canvas: 240 6% 12%;
         --surface-success-primary: 142 71% 45%;
         --surface-success-primary-hover: 143 64% 24%;
         --surface-success-primary-active: 144 61% 20%;
-        --surface-success-secondary: 142 72% 29%;
-        --surface-success-secondary-hover: 142 72% 29%;
-        --surface-tooltip: 210 40% 98%;
+        --surface-success-secondary: 142 72% 16%;
+        --surface-success-secondary-hover: 142 72% 22%;
+        --surface-tooltip: 240 9% 94%;
         --surface-warning-primary: 45 93% 47%;
-        --surface-warning-secondary: 45 93% 47%;
-        --surface-warning-secondary-hover: 45 93% 47%;
-        --surface-warning-secondary-active: 45 93% 47%;
+        --surface-warning-secondary: 45 80% 16%;
+        --surface-warning-secondary-hover: 45 80% 22%;
+        --surface-warning-secondary-active: 45 80% 28%;
+        --sidebar-foreground: 240 3% 77%;
         --rdg-color-scheme: dark;
     }
 
@@ -370,44 +434,199 @@
     }
 
     [data-environment='staging'] {
-        --sidebar: 48 85% 90%;
-        --sidebar-accent: 48 90% 81%;
-        --sidebar-border: 48 70% 74%;
-        --sidebar-ring: 38 92% 50%;
-        --sidebar-active-foreground: 32 95% 34%;
+        --sidebar: 48 70% 95%;
+        --sidebar-accent: 48 75% 89%;
+        --sidebar-border: 48 60% 84%;
     }
 
     [data-environment='production'] {
-        --sidebar: 0 80% 92%;
-        --sidebar-accent: 0 80% 86%;
-        --sidebar-border: 0 65% 80%;
-        --sidebar-ring: 0 72% 60%;
-        --sidebar-active-foreground: 0 72% 42%;
+        --sidebar: 215 55% 95%;
+        --sidebar-accent: 215 60% 89%;
+        --sidebar-border: 215 50% 84%;
     }
 
     .dark [data-environment='development'],
     .dark[data-environment='development'] {
-        --sidebar: 215 27.9% 16.9%;
-        --sidebar-accent: 215 27.9% 22%;
-        --sidebar-border: 215 27.9% 25%;
+        --sidebar: 240 6% 10%;
+        --sidebar-accent: 240 4% 18%;
+        --sidebar-border: 240 4% 18%;
     }
 
     .dark [data-environment='staging'],
     .dark[data-environment='staging'] {
-        --sidebar: 43 50% 18%;
-        --sidebar-accent: 43 50% 26%;
-        --sidebar-border: 43 45% 32%;
-        --sidebar-ring: 43 80% 50%;
-        --sidebar-active-foreground: 45 93% 65%;
+        --sidebar: 43 40% 15%;
+        --sidebar-accent: 43 40% 22%;
+        --sidebar-border: 43 35% 27%;
     }
 
     .dark [data-environment='production'],
     .dark[data-environment='production'] {
-        --sidebar: 0 45% 18%;
-        --sidebar-accent: 0 48% 26%;
-        --sidebar-border: 0 42% 32%;
-        --sidebar-ring: 0 65% 55%;
-        --sidebar-active-foreground: 0 85% 72%;
+        --sidebar: 217 40% 16%;
+        --sidebar-accent: 217 42% 23%;
+        --sidebar-border: 217 38% 28%;
+    }
+
+    .dark
+        svg:not([fill], [role='img']):not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        ),
+    .dark
+        :is(
+            svg:not(
+                :has(
+                    [fill='#fff' i],
+                    [fill='#ffffff' i],
+                    [fill='white' i],
+                    [fill='#f9f9f9' i],
+                    [fill='#fafafa' i],
+                    [fill='#fbfbfb' i],
+                    [stroke='#fff' i],
+                    [stroke='#ffffff' i],
+                    [stroke='white' i],
+                    [style*='fill: rgb(255, 255, 255)'],
+                    [style*='stroke: rgb(255, 255, 255)']
+                )
+            ),
+            svg:not(
+                    :has(
+                        [fill='#fff' i],
+                        [fill='#ffffff' i],
+                        [fill='white' i],
+                        [fill='#f9f9f9' i],
+                        [fill='#fafafa' i],
+                        [fill='#fbfbfb' i],
+                        [stroke='#fff' i],
+                        [stroke='#ffffff' i],
+                        [stroke='white' i],
+                        [style*='fill: rgb(255, 255, 255)'],
+                        [style*='stroke: rgb(255, 255, 255)']
+                    )
+                )
+                *
+        ):is(
+            [fill='black' i],
+            [fill='#000' i],
+            [fill='#000000' i],
+            [fill='#020202' i],
+            [fill='#040202' i],
+            [fill='#181818' i],
+            [fill='#1b1f23' i],
+            [fill='#1d1919' i],
+            [fill='#1e232d' i],
+            [fill='#201d1e' i],
+            [fill='#212121' i],
+            [fill='#212322' i],
+            [fill='#231f20' i],
+            [fill='#282a36' i],
+            [fill='#292929' i],
+            [fill='#292d32' i],
+            [fill='#333' i],
+            [fill='#333333' i],
+            [fill='#343434' i],
+            [fill='#353333' i],
+            [fill='#374151' i],
+            [fill='#383434' i],
+            [fill='#464342' i],
+            [fill='#474747' i],
+            [fill='#4c4c4c' i]
+        ) {
+        fill: hsl(var(--content-neutral-subtle));
+    }
+
+    .dark
+        :is(
+            svg:not(
+                :has(
+                    [fill='#fff' i],
+                    [fill='#ffffff' i],
+                    [fill='white' i],
+                    [fill='#f9f9f9' i],
+                    [fill='#fafafa' i],
+                    [fill='#fbfbfb' i],
+                    [stroke='#fff' i],
+                    [stroke='#ffffff' i],
+                    [stroke='white' i],
+                    [style*='fill: rgb(255, 255, 255)'],
+                    [style*='stroke: rgb(255, 255, 255)']
+                )
+            ),
+            svg:not(
+                    :has(
+                        [fill='#fff' i],
+                        [fill='#ffffff' i],
+                        [fill='white' i],
+                        [fill='#f9f9f9' i],
+                        [fill='#fafafa' i],
+                        [fill='#fbfbfb' i],
+                        [stroke='#fff' i],
+                        [stroke='#ffffff' i],
+                        [stroke='white' i],
+                        [style*='fill: rgb(255, 255, 255)'],
+                        [style*='stroke: rgb(255, 255, 255)']
+                    )
+                )
+                *
+        ):is(
+            [stroke='black' i],
+            [stroke='#000' i],
+            [stroke='#000000' i],
+            [stroke='#212121' i],
+            [stroke='#33363f' i],
+            [stroke='#374151' i]
+        ) {
+        stroke: hsl(var(--content-neutral-subtle));
+    }
+
+    .dark
+        svg:not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        )
+        :is([style*='fill: rgb(0, 0, 0)'], [style*='fill: rgb(24, 24, 24)'], [style*='fill: rgb(40, 42, 54)']) {
+        fill: hsl(var(--content-neutral-subtle)) !important;
+    }
+
+    .dark
+        svg:not(
+            :has(
+                [fill='#fff' i],
+                [fill='#ffffff' i],
+                [fill='white' i],
+                [fill='#f9f9f9' i],
+                [fill='#fafafa' i],
+                [fill='#fbfbfb' i],
+                [stroke='#fff' i],
+                [stroke='#ffffff' i],
+                [stroke='white' i],
+                [style*='fill: rgb(255, 255, 255)'],
+                [style*='stroke: rgb(255, 255, 255)']
+            )
+        )
+        [style*='stroke: rgb(0, 0, 0)'] {
+        stroke: hsl(var(--content-neutral-subtle)) !important;
     }
 
     * {
@@ -486,7 +705,9 @@
     line-height: 1.5rem !important;
 }
 
-.aui-thread-root .aui-composer-root {
+.aui-thread-root .aui-composer-root,
+.aui-cc-thread-root .aui-composer-root {
+    background-color: hsl(var(--background));
     box-shadow: none;
 }
 

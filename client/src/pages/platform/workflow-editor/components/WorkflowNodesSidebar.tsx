@@ -71,7 +71,7 @@ const WorkflowNodesSidebar = ({
         >
             <div className="px-3 pt-3 text-center text-content-neutral-secondary">
                 <Input
-                    className="bg-white shadow-none"
+                    className="bg-surface-neutral-primary shadow-none"
                     name="workflowNodeFilter"
                     onChange={(event) => setFilter(event.target.value)}
                     placeholder="Filter components"

@@ -38,13 +38,13 @@ const LazyLoadWrapper: FC<LazyLoadWrapperProps> = ({children, errorFallback, fal
             )}
 
             <div className={twMerge('flex animate-pulse space-x-2', hasLeftSidebar && 'mx-auto')}>
-                <div className="size-4 rounded-full bg-gray-400"></div>
+                <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
 
-                <div className="size-4 rounded-full bg-gray-400"></div>
+                <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
 
-                <div className="size-4 rounded-full bg-gray-400"></div>
+                <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
 
-                <div className="size-4 rounded-full bg-gray-400"></div>
+                <div className="size-4 rounded-full bg-content-neutral-tertiary"></div>
             </div>
         </div>
     );

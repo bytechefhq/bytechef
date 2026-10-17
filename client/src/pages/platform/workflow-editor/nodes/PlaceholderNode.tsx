@@ -105,7 +105,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     >
                         <div
                             className={twMerge(
-                                'nodrag relative mx-[22px] flex size-7 cursor-pointer items-center justify-center rounded-md bg-gray-300 text-lg text-content-neutral-secondary shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
+                                'nodrag relative mx-[22px] flex size-7 cursor-pointer items-center justify-center rounded-md bg-surface-neutral-tertiary text-lg text-content-neutral-secondary shadow-none hover:scale-110 hover:bg-surface-neutral-tertiary-hover hover:text-content-onsurface-primary',
                                 isClusterElement && 'mx-0 size-6',
                                 isFinalPlaceholder &&
                                     'mx-3 size-12 border-2 border-dashed border-stroke-neutral-tertiary bg-surface-neutral-primary hover:scale-105 hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:text-content-neutral-primary'

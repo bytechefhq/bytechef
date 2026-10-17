@@ -76,7 +76,7 @@ async function renderApp() {
     root.render(
         <StrictMode>
             <I18n>
-                <ThemeProvider defaultTheme="light">
+                <ThemeProvider defaultTheme="system">
                     <QueryClientProvider client={queryClient}>
                         <ConditionalPostHogProvider>
                             <TooltipProvider>

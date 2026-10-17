@@ -8,9 +8,7 @@ it('should render a default button with label if no styling props are set', () =
     render(<Button label="Button" />);
 
     expect(screen.getByRole('button')).toHaveTextContent('Button');
-    expect(screen.getByText('Button')).toHaveClass(
-        'h-9 px-4 py-2 bg-surface-brand-primary text-content-onsurface-primary'
-    );
+    expect(screen.getByText('Button')).toHaveClass('h-9 px-4 py-2 bg-surface-brand-primary text-content-onbrand');
     expect(screen.getByText('Button')).toHaveClass('hover:bg-surface-brand-primary-hover');
     expect(screen.getByText('Button')).toHaveClass('active:bg-surface-brand-primary-active');
 });
@@ -153,10 +151,8 @@ describe('Button variants', () => {
 
         expect(screen.getByRole('button')).toHaveTextContent('Button');
 
-        expect(screen.getByText('Button')).toHaveClass('bg-transparent opacity-50 text-content-destructive-primary ');
-        expect(screen.getByText('Button')).toHaveClass(
-            'hover:bg-surface-destructive-secondary-hover hover:opacity-100'
-        );
+        expect(screen.getByText('Button')).toHaveClass('bg-transparent text-content-destructive-primary');
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-surface-destructive-secondary-hover');
         expect(screen.getByText('Button')).toHaveClass('active:bg-surface-destructive-secondary-active');
     });
 
@@ -213,6 +209,29 @@ describe('Button variants', () => {
         expect(screen.getByText('Button')).toHaveClass(
             'active:bg-transparent active:text-content-brand-primary active:underline'
         );
+    });
+});
+
+describe('Button call sites requesting no hover highlight', () => {
+    it('suppresses the ghost variant dark-mode hover when the call site asks for hover:bg-transparent', () => {
+        render(<Button className="hover:bg-transparent" label="Button" variant="ghost" />);
+
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-transparent dark:hover:bg-transparent');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+    });
+
+    it('suppresses the outline variant dark-mode hover when the call site asks for hover:bg-transparent', () => {
+        render(<Button className="hover:bg-transparent" label="Button" variant="outline" />);
+
+        expect(screen.getByText('Button')).toHaveClass('hover:bg-transparent dark:hover:bg-transparent');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+    });
+
+    it('leaves the ghost variant dark-mode hover in place when the call site does not ask for hover:bg-transparent', () => {
+        render(<Button label="Button" variant="ghost" />);
+
+        expect(screen.getByText('Button')).toHaveClass('dark:hover:bg-surface-neutral-primary-hover');
+        expect(screen.getByText('Button')).not.toHaveClass('dark:hover:bg-transparent');
     });
 });
 

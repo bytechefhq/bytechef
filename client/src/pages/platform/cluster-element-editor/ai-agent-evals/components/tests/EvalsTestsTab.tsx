@@ -26,7 +26,7 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
     if (isLoading) {
         return (
             <div className="flex flex-1 items-center justify-center py-12">
-                <Loader2Icon className="size-5 animate-spin text-gray-400" />
+                <Loader2Icon className="size-5 animate-spin text-content-neutral-tertiary" />
             </div>
         );
     }
@@ -59,8 +59,8 @@ const EvalsTestsTab = ({workflowId, workflowNodeName}: EvalsTestsTabProps) => {
                 </>
             ) : (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-emerald-100">
-                        <FlaskConicalIcon className="size-6 text-emerald-600" />
+                    <div className="flex size-12 items-center justify-center rounded-full bg-surface-success-secondary">
+                        <FlaskConicalIcon className="size-6 text-content-success" />
                     </div>
 
                     <h3 className="text-sm font-semibold">Tests</h3>
