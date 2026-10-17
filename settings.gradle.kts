@@ -625,6 +625,8 @@ include("server:ee:libs:core:message:message-broker:message-broker-aws")
 include("server:ee:libs:core:remote:remote-client")
 include("server:ee:libs:core:remote:remote-rest")
 include("server:ee:libs:core:tenant:tenant-multi-service")
+include("server:ee:libs:core:tenant:tenant-remote-client")
+include("server:ee:libs:core:tenant:tenant-remote-rest")
 
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-graphql")
