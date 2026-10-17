@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -60,6 +61,7 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -114,6 +116,9 @@ class A2aProjectFacadeIntTest {
     private A2aProjectService a2aProjectService;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Autowired
@@ -134,9 +139,11 @@ class A2aProjectFacadeIntTest {
     }
 
     @Test
-    void testAdminCanDeleteAnA2aProject() {
+    void testWorkspaceEditorCanDeleteAnA2aProject() {
         resetCollaborators();
-        authenticate("ROLE_ADMIN");
+        authenticate("ROLE_USER");
+
+        when(permissionService.hasResourceScope(2L, "A2aProject", "A2A_EDIT")).thenReturn(true);
 
         A2aProject a2aProject = new A2aProject(100L, 1L, 42L);
 
@@ -150,7 +157,7 @@ class A2aProjectFacadeIntTest {
     }
 
     @Test
-    void testNonAdminCannotCreateUpdateOrDeleteAnA2aProject() {
+    void testCallerWithoutTheA2aEditScopeCannotCreateUpdateOrDeleteAnA2aProject() {
         resetCollaborators();
         authenticate("ROLE_USER");
 
@@ -161,6 +168,8 @@ class A2aProjectFacadeIntTest {
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> a2aProjectFacade.deleteA2aProject(2L));
 
+        verify(permissionService).hasResourceScope(1L, "A2aServer", "A2A_EDIT");
+        verify(permissionService, times(2)).hasResourceScope(2L, "A2aProject", "A2A_EDIT");
         verifyNoInteractions(
             a2aProjectService, projectDeploymentFacade, projectDeploymentService, projectDeploymentWorkflowService,
             projectService,
@@ -169,9 +178,8 @@ class A2aProjectFacadeIntTest {
 
     private void resetCollaborators() {
         reset(
-            a2aProjectService, projectDeploymentFacade, projectDeploymentService, projectDeploymentWorkflowService,
-            projectService,
-            projectWorkflowService);
+            a2aProjectService, permissionService, projectDeploymentFacade, projectDeploymentService,
+            projectDeploymentWorkflowService, projectService, projectWorkflowService);
     }
 
     private static void authenticate(String authority) {
@@ -253,9 +261,10 @@ class A2aProjectFacadeIntTest {
 
         @BeforeEach
         void beforeEach() {
-            a2aServer = a2aServerRepository.save(new A2aServer("test-agent", null, Environment.DEVELOPMENT));
-
             Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+            a2aServer = a2aServerRepository
+                .save(withWorkspace(new A2aServer("test-agent", null, Environment.DEVELOPMENT), workspace.getId()));
 
             Project newProject = Project.builder()
                 .description("test-project")
@@ -530,7 +539,7 @@ class A2aProjectFacadeIntTest {
         @Test
         void testCreateA2aProjectAllowsTheSameProjectVersionOnAnotherServer() {
             A2aServer otherA2aServer = a2aServerRepository.save(
-                new A2aServer("other-agent", null, Environment.DEVELOPMENT));
+                withWorkspace(new A2aServer("other-agent", null, Environment.DEVELOPMENT), a2aServer.getWorkspaceId()));
 
             a2aProjectFacade.createA2aProject(a2aServer.getId(), project.getId(), 1, List.of(workflowId));
             a2aProjectFacade.createA2aProject(otherA2aServer.getId(), project.getId(), 1, List.of(workflowId));
@@ -550,7 +559,7 @@ class A2aProjectFacadeIntTest {
         @Test
         void testCreateA2aProjectUsesTheServerEnvironment() {
             A2aServer productionA2aServer = a2aServerRepository.save(
-                new A2aServer("prod-agent", null, Environment.PRODUCTION));
+                withWorkspace(new A2aServer("prod-agent", null, Environment.PRODUCTION), a2aServer.getWorkspaceId()));
 
             A2aProject a2aProject = a2aProjectFacade.createA2aProject(
                 productionA2aServer.getId(), project.getId(), 1, List.of(workflowId));
@@ -814,7 +823,7 @@ class A2aProjectFacadeIntTest {
             String addedWorkflowId = createProjectWorkflow(workflowDefinition("workflow/v1/newWorkflowCall"));
 
             A2aServer productionA2aServer = a2aServerRepository.save(
-                new A2aServer("prod-agent", null, Environment.PRODUCTION));
+                withWorkspace(new A2aServer("prod-agent", null, Environment.PRODUCTION), a2aServer.getWorkspaceId()));
 
             A2aProject a2aProject = a2aProjectFacade.createA2aProject(
                 productionA2aServer.getId(), project.getId(), 1, List.of(workflowId));
@@ -1011,5 +1020,11 @@ class A2aProjectFacadeIntTest {
 
             return projectDeployment;
         }
+    }
+
+    private static A2aServer withWorkspace(A2aServer a2aServer, Long workspaceId) {
+        a2aServer.setWorkspaceId(workspaceId);
+
+        return a2aServer;
     }
 }

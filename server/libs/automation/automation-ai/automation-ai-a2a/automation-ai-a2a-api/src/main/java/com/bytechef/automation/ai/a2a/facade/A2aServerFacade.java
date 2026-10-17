@@ -20,6 +20,7 @@ import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -27,11 +28,28 @@ import java.util.Map;
 public interface A2aServerFacade {
 
     /**
-     * Returns the tags assigned to any A2A server.
+     * Creates an A2A server in a workspace.
      *
-     * @return the tags used by the A2A servers
+     * @param workspaceId the ID of the workspace the server belongs to
+     * @param a2aServer   the server to create
+     * @return the created server
      */
-    List<Tag> getA2aServerTags();
+    A2aServer createA2aServer(long workspaceId, A2aServer a2aServer);
+
+    /**
+     * Deletes an A2A server.
+     *
+     * @param id the ID of the A2A server
+     */
+    void deleteA2aServer(long id);
+
+    /**
+     * Returns the tags assigned to any A2A server of a workspace.
+     *
+     * @param workspaceId the ID of the workspace
+     * @return the tags used by the workspace's A2A servers
+     */
+    List<Tag> getA2aServerTags(long workspaceId);
 
     /**
      * Returns the tags of each of the given A2A servers.
@@ -49,4 +67,26 @@ public interface A2aServerFacade {
      * @return the assigned tags
      */
     List<Tag> updateA2aServerTags(long id, List<Tag> tags);
+
+    /**
+     * Returns the A2A servers of a workspace.
+     *
+     * @param workspaceId the ID of the workspace
+     * @return the workspace's A2A servers
+     */
+    List<A2aServer> getWorkspaceA2aServers(long workspaceId);
+
+    /**
+     * Updates an A2A server, leaving each property passed as {@code null} unchanged.
+     *
+     * @param id                     the ID of the A2A server
+     * @param name                   the new name
+     * @param description            the new description
+     * @param enabled                whether the server answers requests
+     * @param authenticationRequired whether the server requires an API key
+     * @return the updated server
+     */
+    A2aServer updateA2aServer(
+        long id, @Nullable String name, @Nullable String description, @Nullable Boolean enabled,
+        @Nullable Boolean authenticationRequired);
 }

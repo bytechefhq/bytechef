@@ -31,4 +31,6 @@ public interface A2aServerRepository extends ListCrudRepository<A2aServer, Long>
     Optional<A2aServer> findBySecretKey(String secretKey);
 
     List<A2aServer> findAllByOrderByIdAsc();
+
+    List<A2aServer> findAllByWorkspaceIdOrderByIdAsc(long workspaceId);
 }
