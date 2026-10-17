@@ -15,6 +15,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -139,6 +140,10 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     @Override
     public IntegrationInstance getIntegrationInstance(
         long connectedUserId, List<String> componentNames, Environment environment) {
+
+        if (componentNames.isEmpty()) {
+            throw new NoSuchElementException("No integration instance matches an empty list of component names");
+        }
 
         List<String> lowercasedComponentNames = componentNames.stream()
             .map(String::toLowerCase)
