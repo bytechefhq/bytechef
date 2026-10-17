@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.mcp;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -55,14 +56,23 @@ public abstract class AbstractMcpApiKeyAuthenticationConverter implements Authen
             secretKey = authorization.substring(BEARER_PREFIX.length());
         }
 
+        Environment requestedEnvironment = getRequestedEnvironment(request);
+
         return ApiKeyAuthenticationToken.unauthenticated(
-            new McpApiKeyCredentials(getEnvironment(request), extractServerSecretKey(request), secretKey));
+            new McpApiKeyCredentials(
+                requestedEnvironment == null ? environmentService.getEnvironment((String) null) : requestedEnvironment,
+                requestedEnvironment, extractServerSecretKey(request), secretKey));
     }
 
     protected abstract String extractServerSecretKey(HttpServletRequest request);
 
-    private Environment getEnvironment(HttpServletRequest request) {
+    @Nullable
+    private Environment getRequestedEnvironment(HttpServletRequest request) {
         String environment = request.getHeader(ENVIRONMENT_HEADER_NAME);
+
+        if (environment == null) {
+            return null;
+        }
 
         try {
             return environmentService.getEnvironment(environment);

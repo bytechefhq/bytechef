@@ -56,7 +56,7 @@ public class McpProjectWorkflowOwnershipResolver implements ResourceOwnershipRes
             .map(McpProjectWorkflow::getMcpProjectId)
             .flatMap(mcpProjectRepository::findById)
             .map(McpProject::getMcpServerId)
-            .flatMap(workspaceMcpServerService::fetchWorkspaceIdByMcpServerId)
+            .flatMap(workspaceMcpServerService::fetchMcpServerWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }

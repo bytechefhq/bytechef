@@ -42,7 +42,7 @@ public class McpServerOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        Optional<Long> workspaceId = workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(id);
+        Optional<Long> workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(id);
 
         return workspaceId.map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
