@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.rest;
+package com.bytechef.platform.webhook.web.rest.handler;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.connection.domain.Connection;

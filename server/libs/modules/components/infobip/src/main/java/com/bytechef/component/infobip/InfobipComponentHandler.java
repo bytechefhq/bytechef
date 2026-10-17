@@ -24,6 +24,8 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.infobip.action.InfobipSendSMSAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsAppTemplateMessageAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsappTextMessageAction;
+import com.bytechef.component.infobip.cluster.InfobipSmsApprovalChannel;
+import com.bytechef.component.infobip.cluster.InfobipWhatsAppApprovalChannel;
 import com.bytechef.component.infobip.connection.InfobipConnection;
 import com.bytechef.component.infobip.trigger.InfobipNewSMSTrigger;
 import com.bytechef.component.infobip.trigger.InfobipNewWhatsAppMessageTrigger;
@@ -50,6 +52,9 @@ public class InfobipComponentHandler implements ComponentHandler {
             InfobipSendSMSAction.ACTION_DEFINITION,
             InfobipSendWhatsAppTemplateMessageAction.ACTION_DEFINITION,
             InfobipSendWhatsappTextMessageAction.ACTION_DEFINITION)
+        .clusterElements(
+            InfobipSmsApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
+            InfobipWhatsAppApprovalChannel.CLUSTER_ELEMENT_DEFINITION)
         .triggers(
             InfobipNewSMSTrigger.TRIGGER_DEFINITION,
             InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION);

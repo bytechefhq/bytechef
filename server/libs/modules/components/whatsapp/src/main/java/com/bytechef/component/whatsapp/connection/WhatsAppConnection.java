@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.Authorization.BEARER;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.APP_SECRET;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SYSTEM_USER_ACCESS_TOKEN;
 
@@ -46,7 +47,14 @@ public class WhatsAppConnection {
                         .required(true),
                     string(PHONE_NUMBER_ID)
                         .label("Phone number ID")
-                        .required(true))
+                        .required(true),
+                    string(APP_SECRET)
+                        .label("App secret")
+                        .description(
+                            "The Meta app's secret. When set, approval request messages use in-place Approve/Discard " +
+                                "reply buttons resolved through the webhook, and the webhook signature is verified " +
+                                "against this secret. Leave empty to deliver approval links to the hosted form.")
+                        .required(false))
                 .apply((connectionParameters, context) -> ofHeaders(
                     Map.of(
                         AUTHORIZATION,
