@@ -418,6 +418,7 @@ components:
             - "CREATED"
             - "STARTED"
             - "STOPPED"
+            - "CANCELLED"
             - "FAILED"
             - "COMPLETED"
           readOnly: true
@@ -495,6 +496,7 @@ components:
             - "CREATED"
             - "STARTED"
             - "STOPPED"
+            - "CANCELLED"
             - "FAILED"
             - "COMPLETED"
           readOnly: true

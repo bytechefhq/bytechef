@@ -54,7 +54,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
 
-        CREATED, STARTED, COMPLETED, FAILED, STOPPED
+        CREATED, STARTED, COMPLETED, FAILED, STOPPED, CANCELLED
     }
 
     @CreatedBy
