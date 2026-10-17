@@ -19,10 +19,12 @@ package com.bytechef.automation.configuration.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -44,6 +46,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
@@ -66,6 +69,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.quality.Strictness;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -178,6 +182,85 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext))
                 .doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    class WorkflowArtifactRecorderTest {
+
+        @Test
+        void testCreateProjectWorkflowRecordsCreatedArtifact() {
+            WorkflowArtifactRecorder workflowArtifactRecorder = mock(WorkflowArtifactRecorder.class);
+
+            when(projectWorkflowFacade.addWorkflow(5L, DEFINITION))
+                .thenReturn(buildProjectWorkflow(11L, 5L, "wf-1"));
+
+            newTools(workflowArtifactRecorder).createProjectWorkflow(5L, DEFINITION, toolContext);
+
+            verify(workflowArtifactRecorder).recordWorkflowArtifact(toolContext, true, "wf-1", 5L, 11L, "My Flow");
+        }
+
+        @Test
+        void testUpdateWorkflowRecordsUpdatedArtifact() {
+            WorkflowArtifactRecorder workflowArtifactRecorder = mock(WorkflowArtifactRecorder.class);
+
+            stubUpdate();
+
+            newTools(workflowArtifactRecorder).updateWorkflow("wf-1", DEFINITION, 3, toolContext);
+
+            verify(workflowArtifactRecorder).recordWorkflowArtifact(toolContext, false, "wf-1", 5L, 11L, "My Flow");
+        }
+
+        @Test
+        void testRecorderFailureDoesNotFailUpdateWorkflow() {
+            WorkflowArtifactRecorder workflowArtifactRecorder = mock(WorkflowArtifactRecorder.class);
+
+            doThrow(new IllegalStateException("db down")).when(workflowArtifactRecorder)
+                .recordWorkflowArtifact(any(), anyBoolean(), any(), anyLong(), any(), any());
+
+            stubUpdate();
+
+            WorkflowInfo workflowInfo = newTools(workflowArtifactRecorder)
+                .updateWorkflow("wf-1", DEFINITION, 3, toolContext);
+
+            assertThat(workflowInfo).isNotNull();
+
+            verify(workflowArtifactRecorder).recordWorkflowArtifact(toolContext, false, "wf-1", 5L, 11L, "My Flow");
+        }
+
+        @Test
+        void testRecorderFailureDoesNotFailCreateProjectWorkflow() {
+            WorkflowArtifactRecorder workflowArtifactRecorder = mock(WorkflowArtifactRecorder.class);
+
+            doThrow(new IllegalStateException("db down")).when(workflowArtifactRecorder)
+                .recordWorkflowArtifact(any(), anyBoolean(), any(), anyLong(), any(), any());
+
+            when(projectWorkflowFacade.addWorkflow(5L, DEFINITION))
+                .thenReturn(buildProjectWorkflow(11L, 5L, "wf-1"));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools(workflowArtifactRecorder)
+                .createProjectWorkflow(5L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo).isNotNull();
+
+            verify(workflowArtifactRecorder).recordWorkflowArtifact(toolContext, true, "wf-1", 5L, 11L, "My Flow");
+        }
+
+        @Test
+        void testNoRecorderBeanIsIgnored() {
+            stubUpdate();
+
+            ProjectWorkflowTools tools = newTools(null);
+
+            assertThatCode(() -> tools.updateWorkflow("wf-1", DEFINITION, 3, toolContext))
+                .doesNotThrowAnyException();
+        }
+
+        private void stubUpdate() {
+            when(projectWorkflowFacade.getProjectWorkflow("wf-1")).thenReturn(buildDto("wf-1", 11L, 3));
+            when(projectWorkflowFacade.updateWorkflow("wf-1", DEFINITION, 3))
+                .thenReturn(buildDto("wf-1", 11L, 4));
+            when(projectWorkflowFacade.getWorkflowProjectId("wf-1")).thenReturn(5L);
         }
     }
 
@@ -772,9 +855,21 @@ class ProjectWorkflowToolsTest {
     }
 
     private ProjectWorkflowTools newTools() {
+        return newTools(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private ProjectWorkflowTools newTools(WorkflowArtifactRecorder workflowArtifactRecorder) {
+        ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider = mock(ObjectProvider.class);
+
+        if (workflowArtifactRecorder != null) {
+            when(workflowArtifactRecorderProvider.getIfAvailable()).thenReturn(workflowArtifactRecorder);
+        }
+
         return new ProjectWorkflowTools(
             componentDefinitionFacade, projectFacade, projectWorkflowFacade,
             new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
+            workflowArtifactRecorderProvider,
             workspaceConnectionFacade, workspaceFacade);
     }
 
