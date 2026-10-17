@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import {toToolResultDataPart} from '../toToolResultDataPart';
 
@@ -161,5 +161,31 @@ describe('toToolResultDataPart', () => {
         expect(
             toToolResultDataPart('openFileTab', JSON.stringify({fileId: '1', name: 'f', opened: true}))
         ).toBeUndefined();
+    });
+
+    it('maps a delegate tool result whose payload kind is ask-user-question', () => {
+        const result = toToolResultDataPart(
+            'buildWorkflow',
+            JSON.stringify({
+                awaitingAnswer: true,
+                kind: 'ask-user-question',
+                questions: [{multiSelect: false, options: [], question: 'Q?'}],
+            })
+        );
+
+        expect(result).toMatchObject({ok: true, type: 'data-ask-user-question'});
+    });
+
+    it('leaves a brace-prefixed non-JSON result to the generic fallback without warning', () => {
+        const warnSpy = vi.spyOn(console, 'warn');
+
+        expect(toToolResultDataPart('someTool', '{not json')).toBeUndefined();
+        expect(warnSpy).not.toHaveBeenCalled();
+
+        warnSpy.mockRestore();
+    });
+
+    it('ignores a JSON result with an unknown kind', () => {
+        expect(toToolResultDataPart('someTool', JSON.stringify({kind: 'something-else'}))).toBeUndefined();
     });
 });
