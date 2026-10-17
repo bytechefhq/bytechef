@@ -1,5 +1,5 @@
-query a2aServerTags {
-    a2aServerTags {
+query a2aServerTags($workspaceId: ID!) {
+    a2aServerTags(workspaceId: $workspaceId) {
         id
         name
     }
