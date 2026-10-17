@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.email.action.ReadEmailAction;
 import com.bytechef.component.email.action.SendEmailAction;
+import com.bytechef.component.email.cluster.EmailApprovalChannel;
 import com.bytechef.component.email.connection.EmailConnection;
 import com.google.auto.service.AutoService;
 
@@ -39,7 +40,8 @@ public class EmailComponentHandler implements ComponentHandler {
         .connection(EmailConnection.CONNECTION_DEFINITION)
         .icon("path:assets/email.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.HELPERS)
-        .actions(SendEmailAction.ACTION_DEFINITION, ReadEmailAction.ACTION_DEFINITION);
+        .actions(SendEmailAction.ACTION_DEFINITION, ReadEmailAction.ACTION_DEFINITION)
+        .clusterElements(EmailApprovalChannel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

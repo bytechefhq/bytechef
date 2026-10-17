@@ -19,6 +19,8 @@ package com.bytechef.atlas.execution.service;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.file.storage.domain.FileEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -27,8 +29,27 @@ public class ContextServiceImpl implements ContextService {
 
     private final ContextRepository contextRepository;
 
+    @SuppressFBWarnings("EI2")
     public ContextServiceImpl(ContextRepository contextRepository) {
         this.contextRepository = contextRepository;
+    }
+
+    @Override
+    public void deleteStackContexts(long stackId, Context.Classname classname) {
+        Assert.notNull(classname, "'classname' must not be null");
+
+        contextRepository.deleteAllByStackIdAndClassnameId(stackId, classname.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FileEntry> getStackFileEntries(long stackId, Context.Classname classname) {
+        Assert.notNull(classname, "'classname' must not be null");
+
+        return contextRepository.findAllByStackIdAndClassnameId(stackId, classname.ordinal())
+            .stream()
+            .map(Context::getValue)
+            .toList();
     }
 
     @Override

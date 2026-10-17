@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.storage.jdbc.repository;
+package com.bytechef.automation.task.domain;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import java.time.Instant;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public class DataEntryRepositoryTest {
+public record PendingApproval(
+    long jobId, String workflowLabel, @Nullable String formUrl, @Nullable Instant createdDate,
+    @Nullable Instant expiresAt) {
 
-    @Disabled
-    @Test
-    public void test() {
-        // TODO
+    public PendingApproval {
+        Objects.requireNonNull(workflowLabel, "workflowLabel");
     }
 }

@@ -67,6 +67,13 @@ public class SyncExecutionSuspendRejectingTaskCompletionHandler implements TaskC
     public void handle(TaskExecution taskExecution) {
         taskExecution.setHandled(true);
 
+        failJob(taskExecution, errorMessageFunction, eventPublisher, jobService, taskExecutionService);
+    }
+
+    static void failJob(
+        TaskExecution taskExecution, BiFunction<String, String, String> errorMessageFunction,
+        ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService) {
+
         Instant endDate = Instant.now();
 
         ExecutionError executionError = new ExecutionError(

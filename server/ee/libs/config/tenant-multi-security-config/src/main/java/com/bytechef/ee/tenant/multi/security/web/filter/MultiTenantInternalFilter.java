@@ -1,17 +1,8 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
 package com.bytechef.ee.tenant.multi.security.web.filter;
@@ -28,18 +19,30 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import org.springframework.boot.web.servlet.FilterRegistration;
 
+/**
+ * @version ee
+ */
 @FilterRegistration(name = "multi-tenant-internal-filter", urlPatterns = {
     "/api/*", "/graphql"
 })
 public class MultiTenantInternalFilter implements Filter {
+
+    private static final String APPROVAL_FORM_PATH = "/api/platform/internal/approval-form/";
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
         throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpSession session = request.getSession();
         String requestURI = request.getRequestURI();
+
+        if (requestURI.startsWith(APPROVAL_FORM_PATH)) {
+            filterChain.doFilter(servletRequest, servletResponse);
+
+            return;
+        }
+
+        HttpSession session = request.getSession();
         String authorizationHeader = request.getHeader("Authorization");
 
         String sessionCurrentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
