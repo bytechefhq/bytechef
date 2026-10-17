@@ -55,11 +55,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * End-to-end integration test that drives a real streamable-HTTP MCP client against a live Tomcat server (random port)
- * backed by a real PostgreSQL (Testcontainers) and a DB-backed {@code ApiKeyService}. Unlike a MockMvc test, this
- * exercises {@code HttpServletRequest#getServletPath()} on a genuine servlet container, which is exactly the path used
- * by {@code McpApiKeyAuthenticationConverter} to extract the URL path secret.
- *
  * @author Ivica Cardic
  */
 @SpringBootTest(
@@ -155,12 +150,12 @@ class ManagementMcpServerSecurityIntTest {
     }
 
     @Test
-    void testInitializeWithEnvironmentMismatchIsRejected() throws Exception {
+    void testInitializeWithAdminApiKeyOfAnotherEnvironmentIsAccepted() throws Exception {
         String secretKey = seedApiKey(null, ENVIRONMENT);
 
         HttpResponse<String> httpResponse = postInitialize(MCP_SERVER_SECRET_KEY, secretKey, "STAGING");
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
     }
 
     @Test

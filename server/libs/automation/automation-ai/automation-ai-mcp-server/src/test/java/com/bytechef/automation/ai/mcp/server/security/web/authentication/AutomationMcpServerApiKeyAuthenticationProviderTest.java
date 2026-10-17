@@ -25,6 +25,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -55,10 +57,13 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     private final AuthorityService authorityService = mock(AuthorityService.class);
     private final McpServerService mcpServerService = mock(McpServerService.class);
     private final UserService userService = mock(UserService.class);
+    private final WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
+    private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
     private final AutomationMcpServerApiKeyAuthenticationProvider automationMcpServerApiKeyAuthenticationProvider =
         new AutomationMcpServerApiKeyAuthenticationProvider(
-            apiKeyService, authorityService, mcpServerService, userService);
+            apiKeyService, authorityService, mcpServerService, userService, workspaceApiKeyService,
+            workspaceMcpServerService);
 
     @Test
     void testAuthenticateWithValidAutomationApiKeySucceeds() {
@@ -70,6 +75,67 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
         assertThat(authentication.isAuthenticated()).isTrue();
         verify(apiKeyService).updateLastUsedDate(7L);
+    }
+
+    @Test
+    void testAuthenticateWithApiKeyOfAnotherWorkspaceFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.of(2L));
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithApiKeyOfNoWorkspaceFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(9L)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithMatchingEnvironmentHeaderSucceeds() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        Authentication authentication = automationMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken(Environment.PRODUCTION));
+
+        assertThat(authentication.isAuthenticated()).isTrue();
+    }
+
+    @Test
+    void testAuthenticateWithEnvironmentHeaderOfAnotherEnvironmentFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.DEVELOPMENT)));
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithEnvironmentHeaderOfAnotherEnvironmentFailsEvenWhenAuthenticationIsNotRequired() {
+        McpServer mcpServer = mock(McpServer.class);
+
+        when(mcpServer.getEnvironment()).thenReturn(Environment.PRODUCTION);
+        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
+        when(mcpServer.isAuthenticationRequired()).thenReturn(false);
+        when(mcpServer.isEnabled()).thenReturn(true);
+        when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(
+                getUnauthenticatedToken(Environment.DEVELOPMENT)));
     }
 
     @Test
@@ -209,6 +275,11 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
             new McpApiKeyCredentials(Environment.PRODUCTION, "server-secret", "api-secret"));
     }
 
+    private ApiKeyAuthenticationToken getUnauthenticatedToken(Environment requestedEnvironment) {
+        return ApiKeyAuthenticationToken.unauthenticated(
+            new McpApiKeyCredentials(requestedEnvironment, requestedEnvironment, "server-secret", "api-secret"));
+    }
+
     private void mockApiKey(PlatformType type, Environment environment) {
         ApiKey apiKey = new ApiKey();
 
@@ -234,8 +305,11 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
         when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.getEnvironment()).thenReturn(environment);
+        when(mcpServer.getId()).thenReturn(9L);
         when(mcpServer.isAuthenticationRequired()).thenReturn(true);
         when(mcpServer.isEnabled()).thenReturn(true);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+        when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.of(1L));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(9L)).thenReturn(Optional.of(1L));
     }
 }

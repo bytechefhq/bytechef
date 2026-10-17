@@ -49,7 +49,7 @@ public class McpProjectOwnershipResolver implements ResourceOwnershipResolver {
     public ResourceOwner resolveOwner(long id) {
         return mcpProjectRepository.findById(id)
             .map(McpProject::getMcpServerId)
-            .flatMap(workspaceMcpServerService::fetchWorkspaceIdByMcpServerId)
+            .flatMap(workspaceMcpServerService::fetchMcpServerWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }
