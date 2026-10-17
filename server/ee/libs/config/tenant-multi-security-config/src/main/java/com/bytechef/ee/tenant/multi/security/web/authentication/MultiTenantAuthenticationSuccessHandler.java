@@ -16,7 +16,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -24,6 +26,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 /**
@@ -33,14 +37,16 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
  */
 public final class MultiTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
     private final ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider;
 
     @SuppressFBWarnings("EI")
     public MultiTenantAuthenticationSuccessHandler(
-        TenantService tenantService,
+        RememberMeServices rememberMeServices, TenantService tenantService,
         ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
 
+        this.rememberMeServices = rememberMeServices;
         this.tenantService = tenantService;
         this.twoFactorAuthenticationCustomizerProvider = twoFactorAuthenticationCustomizerProvider;
     }
@@ -52,7 +58,23 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         UserDetails userDetails = (UserDetails) Objects.requireNonNull(
             authentication.getPrincipal(), "principal is required");
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDetails.getUsername());
+        List<String> tenantIds = getTenantIds(request, userDetails);
+
+        if (tenantIds.isEmpty()) {
+            rememberMeServices.loginFail(request, response);
+
+            SecurityContextHolder.clearContext();
+
+            HttpSession existingSession = request.getSession(false);
+
+            if (existingSession != null) {
+                existingSession.invalidate();
+            }
+
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+            return;
+        }
 
         HttpSession session = request.getSession();
 
@@ -74,5 +96,21 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
         } else {
             response.setStatus(HttpStatus.OK.value());
         }
+    }
+
+    private List<String> getTenantIds(HttpServletRequest request, UserDetails userDetails) {
+        String username = request.getParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY);
+
+        if (username == null) {
+            username = userDetails.getUsername();
+        }
+
+        EmailValidator emailValidator = EmailValidator.getInstance();
+
+        if (emailValidator.isValid(username)) {
+            return tenantService.getTenantIdsByUserEmail(username);
+        }
+
+        return tenantService.getTenantIdsByUserLogin(username.toLowerCase(Locale.ENGLISH));
     }
 }

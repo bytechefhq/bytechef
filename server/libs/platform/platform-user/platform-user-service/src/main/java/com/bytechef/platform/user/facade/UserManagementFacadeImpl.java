@@ -24,16 +24,17 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.validator.PasswordValidator;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -75,6 +76,10 @@ class UserManagementFacadeImpl implements UserManagementFacade {
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void inviteUser(String email, String password, String role) {
+        if (email.length() > UserConstants.LOGIN_MAX_LENGTH) {
+            throw new InvalidEmailException(email);
+        }
+
         if (tenantService.isMultiTenantEnabled() && tenantService.tenantIdsByUserEmailExist(email)) {
             throw new EmailAlreadyUsedException();
         } else {
@@ -94,7 +99,7 @@ class UserManagementFacadeImpl implements UserManagementFacade {
             .findFirst()
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
 
-        String login = StringUtils.substringBefore(email, "@");
+        String login = email.toLowerCase(Locale.ENGLISH);
 
         AdminUserDTO userDTO = new AdminUserDTO();
 
