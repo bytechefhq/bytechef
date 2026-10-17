@@ -1,6 +1,8 @@
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
-import {useSSE} from '@/shared/hooks/useSSE';
+import {ApprovalResolutionContext, ResumeError} from '@/shared/components/ai-chat/approvalResolutionContext';
+import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {
+    ApprovalRequestEventI,
     AskUserQuestionEventI,
     formatAskUserQuestionMessage,
     getResumeFailure,
@@ -24,6 +26,22 @@ const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
 };
 
+const SUSPENDING_TASK_IN_SYNC_EXECUTION_ERROR_KEY = 100;
+
+const SUSPENDING_TASK_IN_SYNC_EXECUTION_MESSAGE =
+    "This chat can't pause the run for an approval or wait step. A chat can only wait on one when it streams " +
+    'its reply, so add a step that streams, such as an AI Agent, after it.';
+
+interface ProblemDetailI {
+    detail?: string;
+    entityClass?: string;
+    errorKey?: number;
+}
+
+const isSuspendingTaskInSyncExecutionError = (problemDetail: ProblemDetailI) =>
+    problemDetail.entityClass === 'WebhookErrorType' &&
+    problemDetail.errorKey === SUSPENDING_TASK_IN_SYNC_EXECUTION_ERROR_KEY;
+
 const attachmentAdapter = new CompositeAttachmentAdapter([
     new SimpleImageAttachmentAdapter(),
     new SimpleTextAttachmentAdapter(),
@@ -40,12 +58,16 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
     sseStreamResponse?: boolean;
     children: ReactNode;
 }>) {
-    const [streamRequest, setStreamRequest] = useState<{
-        url: string;
-        init?: RequestInit;
-    } | null>(null);
+    const [streamRequest, setStreamRequest] = useState<SSERequestType>(null);
 
+    const approvalCardShownRef = useRef(false);
+    const approvalStreamRef = useRef(false);
     const awaitingStreamEventRef = useRef(false);
+    const pendingResumeRef = useRef<{
+        reject: (error: Error) => void;
+        request: SSERequestType;
+        resolve: () => void;
+    } | null>(null);
     const pendingResumeUrlRef = useRef<string | null>(null);
     const questionShownRef = useRef(false);
 
@@ -55,6 +77,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         messages,
         setIsRunning,
         setLastAssistantMessageContent,
+        setLastEmptyAssistantMessage,
         setMessage,
         setResumeUrl,
     } = useChatsStore(
@@ -64,6 +87,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             messages: state.messages,
             setIsRunning: state.setIsRunning,
             setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+            setLastEmptyAssistantMessage: state.setLastEmptyAssistantMessage,
             setMessage: state.setMessage,
             setResumeUrl: state.setResumeUrl,
         }))
@@ -172,10 +196,46 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         [setIsRunning, setLastAssistantMessageContent, setResumeUrl]
     );
 
+    const handleApprovalRequest = useCallback(
+        (data: unknown) => {
+            if (typeof data !== 'object' || data === null || !('resumeId' in data)) {
+                console.error('Received malformed approval_request event:', data);
+
+                return;
+            }
+
+            const approvalEvent = data as ApprovalRequestEventI;
+
+            approvalCardShownRef.current = true;
+            awaitingStreamEventRef.current = false;
+
+            setLastEmptyAssistantMessage({
+                content: [
+                    {
+                        data: {
+                            expiresAt: approvalEvent.expiresAt,
+                            formDescription: approvalEvent.formDescription,
+                            formTitle: approvalEvent.formTitle,
+                            formUrl: approvalEvent.formUrl,
+                            hasInputs: Array.isArray(approvalEvent.inputs) && approvalEvent.inputs.length > 0,
+                            kind: 'approval-request',
+                            resumeId: approvalEvent.resumeId,
+                        },
+                        type: 'data-approval-request',
+                    },
+                ],
+                role: 'assistant',
+            });
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setIsRunning, setLastEmptyAssistantMessage]
+    );
+
     const handleSuspended = useCallback(() => {
         awaitingStreamEventRef.current = false;
 
-        if (!hasLastAssistantMessageText(useChatsStore.getState().messages)) {
+        if (!approvalCardShownRef.current && !hasLastAssistantMessageText(useChatsStore.getState().messages)) {
             setLastAssistantMessageContent('The workflow is waiting for a response before it can continue.');
         }
 
@@ -185,13 +245,14 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
 
     const eventHandlers = useMemo(
         () => ({
+            approval_request: handleApprovalRequest,
             ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
             suspended: handleSuspended,
         }),
-        [handleAskUserQuestion, handleError, handleResult, handleStream, handleSuspended]
+        [handleApprovalRequest, handleAskUserQuestion, handleError, handleResult, handleStream, handleSuspended]
     );
 
     const onNew = useCallback(
@@ -203,6 +264,8 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             const input = message.content[0].text;
             const currentResumeUrl = useChatsStore.getState().resumeUrl;
 
+            approvalCardShownRef.current = false;
+            approvalStreamRef.current = false;
             questionShownRef.current = false;
 
             setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
@@ -294,11 +357,15 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
                         method: 'POST',
                     }).then(async (res) => {
                         if (res.status >= 400) {
-                            const result = await res.json();
+                            const problemDetail: ProblemDetailI = await res.json();
+
+                            if (isSuspendingTaskInSyncExecutionError(problemDetail)) {
+                                return {error: {message: SUSPENDING_TASK_IN_SYNC_EXECUTION_MESSAGE}};
+                            }
 
                             return {
                                 error: {
-                                    detail: result.detail,
+                                    detail: problemDetail.detail,
                                     message: 'An error occurred',
                                 },
                             };
@@ -361,7 +428,71 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         )
     );
 
-    const {connectionState, error, errorStatus} = useSSE(streamRequest, {eventHandlers});
+    const takePendingResume = (request: SSERequestType) => {
+        const pending = pendingResumeRef.current;
+
+        if (!pending || pending.request !== request) {
+            return null;
+        }
+
+        pendingResumeRef.current = null;
+
+        return pending;
+    };
+
+    const {connectionState, error, errorStatus} = useSSE(streamRequest, {
+        eventHandlers,
+        onRequestAbort: (request) => {
+            takePendingResume(request)?.reject(new ResumeError(null));
+        },
+        onRequestError: (status, request) => {
+            takePendingResume(request)?.reject(new ResumeError(status));
+        },
+        onRequestSuccess: (request) => {
+            const pending = takePendingResume(request);
+
+            if (pending) {
+                approvalCardShownRef.current = false;
+                approvalStreamRef.current = false;
+
+                setMessage({content: '', role: 'assistant'});
+
+                pending.resolve();
+            }
+        },
+    });
+
+    const resolveApproval = useCallback(
+        (resumeId: string, payload: Record<string, unknown>) => {
+            if (pendingResumeRef.current) {
+                return Promise.reject(
+                    new Error('Another decision is being submitted. Wait for it to finish, then try again.')
+                );
+            }
+
+            return new Promise<void>((resolve, reject) => {
+                const request: SSERequestType = {
+                    init: {
+                        body: JSON.stringify(payload),
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST',
+                    },
+                    url: `/job/resume/${resumeId}`,
+                };
+
+                pendingResumeRef.current = {reject, request, resolve};
+                approvalStreamRef.current = true;
+                awaitingStreamEventRef.current = false;
+                pendingResumeUrlRef.current = null;
+
+                setIsRunning(true);
+                setStreamRequest(request);
+            });
+        },
+        [setIsRunning]
+    );
+
+    const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
     useEffect(() => {
         if (connectionState === 'CONNECTED') {
@@ -378,7 +509,7 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
             }
 
             pendingResumeUrlRef.current = null;
-        } else if (connectionState === 'ERROR') {
+        } else if (connectionState === 'ERROR' && !approvalStreamRef.current) {
             const errorMessage = `The request failed: ${error || 'Connection error occurred'}`;
 
             if (hasLastAssistantMessageText(useChatsStore.getState().messages)) {
@@ -416,5 +547,9 @@ export const ChatRuntimeProvider = memo(function ChatRuntimeProvider({
         };
     }, [setIsRunning]);
 
-    return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
+    return (
+        <ApprovalResolutionContext.Provider value={approvalResolution}>
+            <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>
+        </ApprovalResolutionContext.Provider>
+    );
 });

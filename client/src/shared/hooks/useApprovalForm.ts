@@ -4,12 +4,59 @@ import {useGetApprovalFormQuery} from '@/shared/queries/platform/approvalForms.q
 import {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
+interface ApprovalFormInputI {
+    fieldName?: string;
+    fieldType?: number;
+}
+
+export const toSubmittedValues = (
+    inputs: ApprovalFormInputI[] | undefined,
+    values: Record<string, unknown>
+): Record<string, unknown> => {
+    const submittedValues = {...values};
+
+    (inputs || []).forEach((input) => {
+        const {fieldName, fieldType} = input;
+
+        if (!fieldName || fieldType !== FieldType.NUMBER_INPUT) {
+            return;
+        }
+
+        const value = submittedValues[fieldName];
+
+        if (typeof value !== 'string') {
+            return;
+        }
+
+        const trimmedValue = value.trim();
+
+        if (trimmedValue === '') {
+            delete submittedValues[fieldName];
+
+            return;
+        }
+
+        const numberValue = Number(trimmedValue);
+
+        if (!Number.isNaN(numberValue)) {
+            submittedValues[fieldName] = numberValue;
+        }
+    });
+
+    return submittedValues;
+};
+
 interface UseApprovalFormOptionsI {
     onSubmitted?: (approved: boolean) => void;
+
+    submitOverride?: (data: Record<string, unknown>, approved: boolean) => Promise<void>;
 }
 
 export default function useApprovalForm(id: string | undefined, options?: UseApprovalFormOptionsI) {
     const [approved, setApproved] = useState<boolean | null>(null);
+    const [overrideError, setOverrideError] = useState<string | null>(null);
+    const [overrideSubmitted, setOverrideSubmitted] = useState(false);
+    const [overrideSubmitting, setOverrideSubmitting] = useState(false);
 
     const {data: definition, error, isLoading: loading} = useGetApprovalFormQuery(id ?? '');
 
@@ -41,8 +88,30 @@ export default function useApprovalForm(id: string | undefined, options?: UseApp
             return;
         }
 
+        const submittedValues = toSubmittedValues(definition?.inputs, values);
+
+        if (options?.submitOverride) {
+            setOverrideSubmitting(true);
+            setOverrideError(null);
+
+            try {
+                await options.submitOverride(submittedValues, approveValue);
+
+                setApproved(approveValue);
+                setOverrideSubmitted(true);
+
+                options?.onSubmitted?.(approveValue);
+            } catch (submitError) {
+                setOverrideError(submitError instanceof Error ? submitError.message : 'Failed to submit the approval.');
+            } finally {
+                setOverrideSubmitting(false);
+            }
+
+            return;
+        }
+
         try {
-            await resumeJobMutation.mutateAsync({approved: approveValue, data: values, id});
+            await resumeJobMutation.mutateAsync({approved: approveValue, data: submittedValues, id});
 
             setApproved(approveValue);
 
@@ -81,9 +150,9 @@ export default function useApprovalForm(id: string | undefined, options?: UseApp
         form,
         handleSubmit,
         loading,
-        submitError: resumeJobMutation.error?.message ?? null,
-        submitted: resumeJobMutation.isSuccess,
-        submitting: resumeJobMutation.isPending,
+        submitError: options?.submitOverride ? overrideError : (resumeJobMutation.error?.message ?? null),
+        submitted: options?.submitOverride ? overrideSubmitted : resumeJobMutation.isSuccess,
+        submitting: options?.submitOverride ? overrideSubmitting : resumeJobMutation.isPending,
         uiDefinition,
     };
 }
