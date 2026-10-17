@@ -125,6 +125,37 @@ describe('useWorkflowChatStore', () => {
         expect(result.current.messages[1]).toEqual({content: 'Assistant content', role: 'assistant'});
     });
 
+    it('replaces the trailing empty assistant placeholder', () => {
+        useChatsStore.setState({
+            messages: [
+                {content: 'Hi', role: 'user'},
+                {content: '', role: 'assistant'},
+            ],
+        });
+
+        act(() => {
+            useChatsStore.getState().setLastEmptyAssistantMessage({content: 'Card', role: 'assistant'});
+        });
+
+        expect(useChatsStore.getState().messages).toEqual([
+            {content: 'Hi', role: 'user'},
+            {content: 'Card', role: 'assistant'},
+        ]);
+    });
+
+    it('appends the message when the last assistant message has content', () => {
+        useChatsStore.setState({messages: [{content: 'Streamed text', role: 'assistant'}]});
+
+        act(() => {
+            useChatsStore.getState().setLastEmptyAssistantMessage({content: 'Card', role: 'assistant'});
+        });
+
+        expect(useChatsStore.getState().messages).toEqual([
+            {content: 'Streamed text', role: 'assistant'},
+            {content: 'Card', role: 'assistant'},
+        ]);
+    });
+
     it('resets messages to empty array', () => {
         const {result} = renderHook(() => useChatsStore());
 

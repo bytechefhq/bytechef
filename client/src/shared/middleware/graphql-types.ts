@@ -447,6 +447,7 @@ export enum ApprovalTaskPriority {
 
 export enum ApprovalTaskStatus {
   Completed = 'COMPLETED',
+  Expired = 'EXPIRED',
   InProgress = 'IN_PROGRESS',
   Open = 'OPEN'
 }
@@ -2894,6 +2895,15 @@ export enum ParameterType {
   String = 'STRING'
 }
 
+export type PendingApproval = {
+  __typename?: 'PendingApproval';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  formUrl?: Maybe<Scalars['String']['output']>;
+  jobId: Scalars['ID']['output'];
+  workflowLabel: Scalars['String']['output'];
+};
+
 export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
@@ -3196,6 +3206,7 @@ export type Query = {
    */
   myWorkspaceScopes: Array<Scalars['String']['output']>;
   oauth2ConsentClient?: Maybe<OAuth2ConsentClient>;
+  pendingApprovals?: Maybe<Array<Maybe<PendingApproval>>>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
@@ -3813,6 +3824,11 @@ export type QueryMyWorkspaceScopesArgs = {
 
 export type QueryOauth2ConsentClientArgs = {
   clientId: Scalars['String']['input'];
+};
+
+
+export type QueryPendingApprovalsArgs = {
+  environmentId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
