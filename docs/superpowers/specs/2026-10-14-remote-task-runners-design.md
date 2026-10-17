@@ -581,6 +581,16 @@ runner registry on its classpath, so the connection preprocessor would not run t
 
 ## 13. Connections in external runners (addendum, 2026-10-14)
 
+> **Superseded (2026-10-17).** The environment-variable delivery below was replaced: the connections (minus
+> `taskRunner`) are now written as one JSON map, connection name to parameters, to `connections.json` in the working
+> directory beside the input file, owner-only where the file system supports it, and `BYTECHEF_CONNECTIONS_FILE` names
+> it (the in-container path on remote runners, which ship it in the working-directory tar). The JavaScript and Python
+> bootstraps pass that map to a `perform(input, connection, context)` declaring three or more required parameters, the
+> rule the GraalVM runner uses. No `BYTECHEF_CONNECTION_*` variable is set any more, so the naming and collision rules
+> of 13.1 are gone; masking (13.3) and the `inject-connections` switch are unchanged, and `TaskRunnerConnections`
+> replaced `TaskRunnerConnectionEnvironment` (13.2). The exposure table of 13.4 now lives in the Commands component's
+> README.
+
 GraalVM scripts use connections indirectly, through `context.component.<component>.<action>(input, connectionName)`;
 the credentials never enter the guest. The external runners (Process, Docker, Kubernetes, AWS Batch) have no
 component bridge, so until now a Script or Commands task's connections never reached its script. This section
