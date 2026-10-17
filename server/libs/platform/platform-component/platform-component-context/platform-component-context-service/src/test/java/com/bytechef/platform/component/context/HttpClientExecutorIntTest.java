@@ -33,6 +33,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,14 +43,17 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -119,10 +123,67 @@ class HttpClientExecutorIntTest {
             .thenReturn(mock(ActionDefinitionService.class));
         when(applicationContext.getBean(TriggerDefinitionService.class))
             .thenReturn(mock(TriggerDefinitionService.class));
+        when(applicationContext.getBean(ClusterElementDefinitionService.class))
+            .thenReturn(mock(ClusterElementDefinitionService.class));
         when(applicationContext.getBean(ConnectionDefinitionService.class))
             .thenReturn(connectionDefinitionService);
 
         httpClientExecutor = new HttpClientExecutor(applicationContext, tempFileStorage);
+    }
+
+    @Nested
+    @DisplayName("Cluster Element Error Response Tests")
+    class ClusterElementErrorResponseTests {
+
+        @Test
+        @DisplayName("Should process a cluster element's error response through the cluster element service")
+        void testClusterElementErrorResponseUsesClusterElementDefinitionService() {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(401)
+                    .withBody("unauthorized")));
+
+            ClusterElementDefinitionService clusterElementDefinitionService = mock(
+                ClusterElementDefinitionService.class);
+            ProviderException providerException = new ProviderException("Unauthorized by provider");
+
+            when(applicationContext.getBean(ClusterElementDefinitionService.class))
+                .thenReturn(clusterElementDefinitionService);
+            when(clusterElementDefinitionService.executeProcessErrorResponse(
+                ArgumentMatchers.eq("telegram"), ArgumentMatchers.eq(1), ArgumentMatchers.anyInt(),
+                ArgumentMatchers.eq("telegram"), ArgumentMatchers.eq(401), ArgumentMatchers.any(),
+                ArgumentMatchers.any()))
+                    .thenReturn(providerException);
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "telegram", 1, 1L, Map.of("token", "secret-token"), AuthorizationType.BEARER_TOKEN);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .build();
+
+            Exception exception = assertThrows(
+                Exception.class,
+                () -> httpClientExecutor.execute(
+                    baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                    RequestMethod.GET, "telegram", 1, "telegram", componentConnection,
+                    mock(ClusterElementContext.class)));
+
+            assertTrue(hasCause(exception, providerException), exception.toString());
+        }
+
+        private static boolean hasCause(Throwable throwable, Throwable expectedCause) {
+            Throwable currentThrowable = throwable;
+
+            while (currentThrowable != null) {
+                if (currentThrowable == expectedCause) {
+                    return true;
+                }
+
+                currentThrowable = currentThrowable.getCause();
+            }
+
+            return false;
+        }
     }
 
     @Nested

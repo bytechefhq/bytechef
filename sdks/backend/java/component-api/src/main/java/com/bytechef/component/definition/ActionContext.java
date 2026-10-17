@@ -100,5 +100,8 @@ public interface ActionContext extends Context {
      */
     @SuppressFBWarnings("EI")
     record Suspend(Map<String, ?> continueParameters, Instant expiresAt) {
+
+        public static final String CONTINUE_PARAMETERS = "continueParameters";
+        public static final String EXPIRES_AT = "expiresAt";
     }
 }
