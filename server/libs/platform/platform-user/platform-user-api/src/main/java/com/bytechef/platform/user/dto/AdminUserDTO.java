@@ -42,7 +42,7 @@ public class AdminUserDTO {
 
     @NotBlank
     @Pattern(regexp = UserConstants.LOGIN_REGEX)
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = UserConstants.LOGIN_MAX_LENGTH)
     private String login;
 
     @Size(max = 50)
@@ -52,7 +52,7 @@ public class AdminUserDTO {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 254)
+    @Size(min = 5, max = UserConstants.EMAIL_MAX_LENGTH)
     private String email;
 
     @Size(max = 256)
