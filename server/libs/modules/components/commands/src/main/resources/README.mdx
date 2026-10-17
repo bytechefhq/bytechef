@@ -90,9 +90,9 @@ anything else under them takes effect. What each key costs to turn on:
   daemons they can reach.
 - `docker.allow-volume-mounts`: offers the runner's `volumes` property; a host bind mount chosen by a workflow author is
   a container escape.
-- `inject-connections`: when `true` (as in the shipped `application-bytechef.yml`; the Java default is `false`), the connections a task declares are handed to external runners as
-  environment variables and masked in the output; see **Connections in external runners**. Set it to `false` to
-  inject nothing and mask nothing.
+- `inject-connections`: when `true` (as in the shipped `application-bytechef.yml`; the Java default is `false`), the connections a task declares are handed to external runners in
+  a `connections.json` file and masked in the output; see **Connections in external runners**. Set it to `false` to
+  deliver nothing and mask nothing.
 - `runner-limits`: ceilings on what a remote execution may cost this server: the longest a worker waits on one job, the
   most log bytes it keeps, and the most bytes it moves in or out; any runner may override them under its own
   `properties`.
@@ -396,73 +396,72 @@ itself. Check these by hand on a real account:
 - Confirm a stuck queue fails after `waitUntilRunning`.
 - Confirm an init-container failure (for example an expired input URL or an unreachable S3) ends the job promptly
   with a failure, instead of hanging until the job timeout.
-- Confirm a task declaring a connection sees `BYTECHEF_CONNECTION_*` in `main`, and its value appears as `******` in
-  the task's stdout.
+- Confirm a task declaring a connection finds it in the file `BYTECHEF_CONNECTIONS_FILE` names in `main`, and its
+  value appears as `******` in the task's stdout.
 - Confirm a missing output object reads as "no outputs". This relies on the role and bucket granting
   `s3:ListBucket`; without it S3 answers 403 instead of 404.
 
 ### Connections in external runners
 
-The Process, Docker, Kubernetes and AWS Batch runners receive the connections the task declares as environment
-variables, so a script or command can authenticate without the credentials being written into its source.
+The Process, Docker, Kubernetes and AWS Batch runners hand the connections the task declares to the execution in a
+JSON file, so a script or command can authenticate without the credentials being written into its source.
 
-**What is injected.** Every connection the task declares, except `taskRunner`, becomes:
+**What is delivered.** Every connection the task declares, except `taskRunner`, is written to `connections.json` in the
+working directory, beside the input file, as one JSON object that maps each connection's name to its parameters:
 
-- `BYTECHEF_CONNECTION_<KEY>`: a JSON object holding all of the connection's parameters.
-- `BYTECHEF_CONNECTION_<KEY>_<PARAM>`: one variable per parameter. Strings are exported as-is, enums by name, other
-  values as JSON, and null parameters are skipped. A string containing a NUL character cannot be an environment
-  value, so it is left out of this flat form (it stays in the JSON form) and the server log warns, naming the
-  connection and parameter but never the value.
-
-`<KEY>` is the name the connection is declared under in the task's `connections`, and `<PARAM>` is the parameter
-name. Both are converted the same way: the name is split at camelCase boundaries first (an `_` is inserted between a
-lowercase letter or digit and an uppercase letter), then upper-cased, then every character outside `[A-Z0-9_]`
-becomes `_`. So `github-bot` becomes `GITHUB_BOT`, `accessKeyId` becomes `ACCESS_KEY_ID`, `authorizationType`
-becomes `AUTHORIZATION_TYPE` and `awsProd` becomes `AWS_PROD`. A connection `github-bot` with an `accessToken`
-parameter therefore gives `BYTECHEF_CONNECTION_GITHUB_BOT` and `BYTECHEF_CONNECTION_GITHUB_BOT_ACCESS_TOKEN`. If two
-names convert to the same variable, the task fails before anything starts with a message naming both, so rename one.
-
-**Precedence.** The task's own `env` overrides an injected name, and the runner's `BYTECHEF_WORKING_DIR`,
-`BYTECHEF_INPUT_FILE` and `BYTECHEF_OUTPUT_DIR` always win. For a tool that expects fixed names, remap in the command:
-
-```sh
-export AWS_ACCESS_KEY_ID="$BYTECHEF_CONNECTION_AWS_ACCESS_KEY_ID"
+```json
+{
+  "github-bot": {"accessToken": "gho_..."},
+  "slack": {"token": "xoxb-..."}
+}
 ```
 
-**Masking.** Every string value of the injected connections' parameters (nested values included), and each
-connection's JSON form, is replaced by `******` in `stdout`, `stderr`, failure messages and the server log. Values
-shorter than 6 characters are not masked, and the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain are exported but never
-masked (the name match ignores case, `_`, `-` and `.`).
+Names and parameters keep their exact spelling, and the parameters are the same ones a GraalVM script's
+`perform(input, connection, context)` receives. `BYTECHEF_CONNECTIONS_FILE` holds the file's path - on Docker,
+Kubernetes and AWS Batch the path inside the container - and, like `BYTECHEF_WORKING_DIR`, `BYTECHEF_INPUT_FILE` and
+`BYTECHEF_OUTPUT_DIR`, the task's own `env` cannot override it. No parameter is ever exported as an environment
+variable. The file lies outside the output directory, so it is never collected into `outputFiles`. An input file
+named `connections.json` collides with it and fails the task.
+
+A script on these runners reads the map through its `perform`; see the Script component. A command reads the file
+itself, for example with `jq`:
+
+```sh
+export AWS_ACCESS_KEY_ID="$(jq -r '.aws.accessKeyId' "$BYTECHEF_CONNECTIONS_FILE")"
+```
+
+**Masking.** Every string value of the delivered connections' parameters (nested values included), each connection's
+JSON form and the whole file's JSON are replaced by `******` in `stdout`, `stderr`, failure messages and the server
+log. Values shorter than 6 characters are not masked, and the top-level parameters named authorizationType, region,
+baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain are delivered but never masked (the
+name match ignores case, `_`, `-` and `.`).
 Masking is best effort: a transformed value (base64, a substring) is not caught, and `vars` and `outputFiles` are not
 masked. It is applied where the captured text is read and on each logged line, and each line of a multi-line secret is
 masked too. Very long lines (over 8192 characters) are split before logging, so a secret crossing that split may
 appear in fragments in the server log.
 
-**Exposure.** Environment variables are readable outside the script. All parameters are injected, including long-lived
-credentials such as an OAuth2 `refresh_token` and `clientSecret`:
+**Exposure.** All parameters are delivered, including long-lived credentials such as an OAuth2 `refresh_token` and
+`clientSecret`. The file travels with the rest of the working directory, so it is readable wherever that directory is:
 
 | Runner | Readable by |
 | --- | --- |
-| Process | the same OS user (`/proc/<pid>/environ`) |
-| Docker | anyone with `docker inspect` on the host |
-| Kubernetes | anyone who can `get pods` in the namespace (the pod spec, stored in etcd) |
-| AWS Batch | anyone with `DescribeJobDefinitions` / `DescribeJobs`; the values persist in AWS Batch after the run |
+| Process | the server's OS user while the run lasts; the file is created owner-only (`rw-------`) where the file system supports it, and removed with the working directory |
+| Docker | anyone who can `docker exec` into or `docker cp` from the container while it exists |
+| Kubernetes | anyone who can `exec` into the pod while it runs; the file sits in the pod's `emptyDir`, not in the pod spec |
+| AWS Batch | anyone who can read the staged input archive under the bucket's `bytechef/` prefix until the run's cleanup removes it |
 
-On AWS Batch the values are written into a per-run job definition. Deregistering it makes it INACTIVE, not deleted, and
-it stays visible via `DescribeJobDefinitions`; `DescribeJobs` keeps returning job details for some days; on detach the
-definition stays ACTIVE. The values persist in AWS Batch after the run regardless. The injected values also grow the
-job definition, and a definition AWS rejects fails as "registering the
-job definition: ClientException (HTTP 400)". Pass large values such as a service-account JSON through `inputFiles`
-instead. On AWS Batch the variables reach only the `main` container, never the sidecars.
+The values no longer reach `docker inspect`, the Kubernetes pod spec or the AWS Batch job definition.
 
 **Snapshot.** Values are read when the run starts. An OAuth access token is not refreshed during the run, so it can
 expire in a long one.
 
 **Operator switch.** `bytechef.script.inject-connections` (`true` in the shipped configuration, `application-bytechef.yml`; without that file the Java default is `false`)
-turns the whole feature off when `false`: nothing is injected and nothing is masked.
+turns the whole feature off when `false`: no file is written, `BYTECHEF_CONNECTIONS_FILE` is not set, a script's
+`connection` argument is an empty map, and nothing is masked.
 
-**GraalVM.** Scripts on the GraalVM runner keep using connections through `context.component.<component>.<action>(input,
-connectionName)` and never see the values.
+**GraalVM.** Scripts on the GraalVM runner receive the same map as the `connection` argument of
+`perform(input, connection, context)`, and can also use a connection through
+`context.component.<component>.<action>(input, connectionName)`.
 
 ## Workflow data reaches commands through `env`, not `${…}`
 

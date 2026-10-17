@@ -18,7 +18,7 @@
       "input": {
         "count": "${count}"
       },
-      "script": "function perform(input, context) {\n    return input.count * 2;\n}"
+      "script": "function perform(input, connection, context) {\n    return input.count * 2;\n}"
     }
   } ]
 }
