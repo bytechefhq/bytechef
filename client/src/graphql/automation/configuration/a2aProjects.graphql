@@ -1,5 +1,5 @@
-query a2aProjects {
-    a2aProjects {
+query a2aProjects($workspaceId: ID!) {
+    a2aProjects(workspaceId: $workspaceId) {
         a2aServerId
         id
         projectId

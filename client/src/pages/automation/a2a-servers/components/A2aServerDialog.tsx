@@ -12,6 +12,7 @@ import {
 import {Input} from '@/components/Input/Input';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {A2aServer, useCreateA2aServerMutation, useUpdateA2aServerMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -44,6 +45,7 @@ const A2aServerDialog = ({
     const [internalOpen, setInternalOpen] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const form = useForm<FormValuesType>({
         defaultValues: {
@@ -89,6 +91,7 @@ const A2aServerDialog = ({
                         description: values.description,
                         environmentId: currentEnvironmentId!.toString(),
                         name: values.name,
+                        workspaceId: currentWorkspaceId + '',
                     },
                 },
                 {
