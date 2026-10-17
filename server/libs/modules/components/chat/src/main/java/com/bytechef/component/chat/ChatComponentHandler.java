@@ -19,29 +19,37 @@ package com.bytechef.component.chat;
 import static com.bytechef.component.chat.constant.ChatConstants.CHAT;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.chat.action.ChatResponseToRequestAction;
+import com.bytechef.component.chat.cluster.ChatApprovalChannel;
 import com.bytechef.component.chat.trigger.ChatNewRequestTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.message.broker.MessageBroker;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@AutoService(ComponentHandler.class)
+@Component(CHAT + "_v1_ComponentHandler")
 public class ChatComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(CHAT)
-        .title("Chat")
-        .description("Actions and triggers for using with the chat widget.")
-        .icon("path:assets/chat.svg")
-        .categories(ComponentCategory.HELPERS)
-        .triggers(ChatNewRequestTrigger.TRIGGER_DEFINITION)
-        .actions(ChatResponseToRequestAction.ACTION_DEFINITION);
+    private final ComponentDefinition componentDefinition;
+
+    public ChatComponentHandler(MessageBroker messageBroker, JobService jobService) {
+        this.componentDefinition = component(CHAT)
+            .title("Chat")
+            .description("Actions and triggers for using with the chat widget.")
+            .icon("path:assets/chat.svg")
+            .categories(ComponentCategory.HELPERS)
+            .triggers(ChatNewRequestTrigger.TRIGGER_DEFINITION)
+            .actions(ChatResponseToRequestAction.ACTION_DEFINITION)
+            .clusterElements(ChatApprovalChannel.of(messageBroker, jobService));
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 }
