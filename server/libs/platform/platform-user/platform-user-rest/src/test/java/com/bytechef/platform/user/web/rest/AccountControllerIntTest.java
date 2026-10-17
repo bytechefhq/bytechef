@@ -173,6 +173,28 @@ class AccountControllerIntTest {
 
     @Test
     @Transactional
+    void testRegisterWithEmailLongerThanTheEmailColumnIsRejected() throws Exception {
+        String email = "user@" + "a".repeat(63) + "." + "b".repeat(63) + "." + "c".repeat(63) + ".com";
+
+        ManagedUserVM managedUserVM = new ManagedUserVM();
+
+        managedUserVM.setLogin("too-long-email");
+        managedUserVM.setPassword("Password1");
+        managedUserVM.setEmail(email);
+        managedUserVM.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+
+        restAccountMockMvc
+            .perform(
+                post("/api/register").contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(managedUserVM))
+                    .with(csrf()))
+            .andExpect(status().isBadRequest());
+
+        assertThat(userRepository.findByLogin("too-long-email")).isEmpty();
+    }
+
+    @Test
+    @Transactional
     void testRegisterValid() throws Exception {
         ManagedUserVM validUser = new ManagedUserVM();
 

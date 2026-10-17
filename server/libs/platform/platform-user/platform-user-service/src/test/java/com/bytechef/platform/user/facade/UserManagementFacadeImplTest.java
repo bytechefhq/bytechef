@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.user.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,7 +27,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
@@ -75,6 +79,40 @@ class UserManagementFacadeImplTest {
         userManagementFacade.inviteUser("newuser@example.com", "Password123", "ROLE_USER");
 
         verify(mailService).sendInvitationEmail(any(), anyString());
+    }
+
+    @Test
+    void testInviteUserUsesLowerCasedEmailAsLogin() {
+        Authority authority = createAuthority("ROLE_USER");
+
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+        when(userService.fetchUserByEmail("Jane.Doe@Example.com")).thenReturn(Optional.empty());
+        when(userService.registerUser(any(), anyString()))
+            .thenReturn(createUser("jane.doe@example.com", "jane.doe@example.com"));
+        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
+
+        userManagementFacade.inviteUser("Jane.Doe@Example.com", "Password123", "ROLE_USER");
+
+        ArgumentCaptor<AdminUserDTO> adminUserDTOArgumentCaptor = ArgumentCaptor.forClass(AdminUserDTO.class);
+
+        verify(userService).registerUser(adminUserDTOArgumentCaptor.capture(), anyString());
+
+        AdminUserDTO adminUserDTO = adminUserDTOArgumentCaptor.getValue();
+
+        assertThat(adminUserDTO.getLogin()).isEqualTo("jane.doe@example.com");
+    }
+
+    @Test
+    void testInviteUserWithEmailLongerThanTheLoginLimitDoesNotRegister() {
+        String email = "firstname.middlename.lastname.department@subdomain.example.com";
+
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+        when(userService.fetchUserByEmail(email)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, "Password123", "ROLE_USER"))
+            .isInstanceOf(InvalidEmailException.class);
+
+        verify(userService, never()).registerUser(any(), anyString());
     }
 
     @Test

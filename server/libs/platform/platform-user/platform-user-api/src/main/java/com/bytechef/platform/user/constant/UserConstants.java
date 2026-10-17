@@ -26,6 +26,10 @@ public final class UserConstants {
 
     public static final String DEFAULT_LANGUAGE = "en";
 
+    public static final int EMAIL_MAX_LENGTH = 191;
+
+    public static final int LOGIN_MAX_LENGTH = 50;
+
     // Regex for acceptable logins
     public static final String LOGIN_REGEX =
         "^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$";

@@ -84,6 +84,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private static final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
+    private static final String ISSUED_TOKEN_ATTRIBUTE =
+        PersistentTokenRememberMeServices.class.getName() + ".ISSUED_TOKEN";
     private static final ReentrantLock LOCK = new ReentrantLock();
     // Token is valid for one month
     private static final int TOKEN_VALIDITY_DAYS = 31;
@@ -218,14 +220,36 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                     persistentTokenService.save(token);
 
                     addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+
+                    request.setAttribute(
+                        ISSUED_TOKEN_ATTRIBUTE, new IssuedToken(token.getSeries(), TenantContext.getCurrentTenantId()));
                 });
             } else {
                 persistentTokenService.save(token);
 
                 addCookie(token, TenantContext.getCurrentTenantId(), request, response);
+
+                request.setAttribute(
+                    ISSUED_TOKEN_ATTRIBUTE, new IssuedToken(token.getSeries(), TenantContext.getCurrentTenantId()));
             }
         } catch (DataAccessException e) {
             log.error("Failed to save persistent token ", e);
+        }
+    }
+
+    @Override
+    protected void onLoginFail(HttpServletRequest request, HttpServletResponse response) {
+        if (!(request.getAttribute(ISSUED_TOKEN_ATTRIBUTE) instanceof IssuedToken issuedToken)) {
+            return;
+        }
+
+        request.removeAttribute(ISSUED_TOKEN_ATTRIBUTE);
+
+        if (tenantService.isMultiTenantEnabled()) {
+            TenantContext.runWithTenantId(
+                issuedToken.tenantId(), () -> persistentTokenService.delete(issuedToken.series()));
+        } else {
+            persistentTokenService.delete(issuedToken.series());
         }
     }
 
@@ -346,6 +370,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         }
 
         return userService;
+    }
+
+    private record IssuedToken(String series, String tenantId) {
     }
 
     private record UpgradedRememberMeToken(String[] upgradedToken, String userLogin) implements Serializable {
