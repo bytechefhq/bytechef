@@ -435,19 +435,19 @@ class McpServerServiceIntTest {
         }
 
         @Test
-        void testGetSecretKeyRequiresTenantAdmin() {
+        void testGetSecretKeyRequiresEditor() {
             assertThatThrownBy(() -> mcpServerService.getMcpServerSecretKey(7L))
                 .isInstanceOf(AccessDeniedException.class);
 
-            verify(tenantAdminCheck).isTenantAdmin();
+            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpServer"), eq("MCP_EDIT"));
         }
 
         @Test
-        void testRotateSecretKeyRequiresTenantAdmin() {
+        void testRotateSecretKeyRequiresEditor() {
             assertThatThrownBy(() -> mcpServerService.rotateSecretKey(7L))
                 .isInstanceOf(AccessDeniedException.class);
 
-            verify(tenantAdminCheck).isTenantAdmin();
+            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpServer"), eq("MCP_EDIT"));
         }
 
         @Test
