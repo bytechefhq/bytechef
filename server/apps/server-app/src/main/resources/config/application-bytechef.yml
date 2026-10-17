@@ -5,6 +5,8 @@ bytechef:
       provider: jdbc
     copilot:
       enabled: false
+    hub:
+      enabled: false
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
