@@ -16,6 +16,7 @@
 
 package com.bytechef.ai.copilot.config;
 
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
@@ -67,7 +68,8 @@ public class ToolCallbackContributorConfiguration {
                 intelligentToolCatalog.getByNames(
                     INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
                     (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback,
-                        workspaceFacade)));
+                        workspaceFacade),
+                    SubAgentQuestionRenderer.PLAIN_TEXT));
 
             return toolCallbacks;
         };
