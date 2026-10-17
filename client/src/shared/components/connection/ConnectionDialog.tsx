@@ -740,7 +740,7 @@ const ConnectionDialog = ({
                                     {showOAuth2AppPredefined && (
                                         <div>
                                             <a
-                                                className="text-sm text-blue-600"
+                                                className="text-sm text-content-brand-primary"
                                                 href="#"
                                                 onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
                                             >
