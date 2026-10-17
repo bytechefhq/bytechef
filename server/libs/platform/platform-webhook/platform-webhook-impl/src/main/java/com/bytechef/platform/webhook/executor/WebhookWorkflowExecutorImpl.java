@@ -40,6 +40,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.SuspendingTasks;
 import com.bytechef.platform.webhook.exception.WebhookErrorType;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -75,8 +76,6 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         "Workflows that return a synchronous response can't contain steps that pause the run, such as approval " +
             "or wait steps. Step '%s' (%s) would pause it. Use a trigger that responds asynchronously, or remove " +
             "the step.";
-
-    private static final List<String> SUSPENDING_TASK_TYPE_PREFIXES = List.of("approval/", "wait/", "waitForApproval/");
 
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
@@ -136,7 +135,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         long jobId = TenantContext.callWithTenantId(
             workflowExecutionId.getTenantId(),
             () -> principalJobFacade.createJob(
-                new JobParametersDTO(workflowId, inputs), workflowExecutionId.getJobPrincipalId(),
+                new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.STREAMED_EXECUTION, true)),
+                workflowExecutionId.getJobPrincipalId(),
                 workflowExecutionId.getType()));
 
         Registration registration = sseStreamBridgeRegistry.register(jobId, sseStreamBridge);
@@ -261,6 +261,13 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             .filter(Objects::nonNull)
             .anyMatch(type -> type.toLowerCase()
                 .contains("stream"));
+    }
+
+    @Override
+    public boolean hasSuspendingTask(WorkflowExecutionId workflowExecutionId) {
+        Optional<WorkflowTask> suspendingTask = findSuspendingTask(getWorkflowId(workflowExecutionId));
+
+        return suspendingTask.isPresent();
     }
 
     @Override
@@ -396,12 +403,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         return workflow.getTasks(true)
             .stream()
-            .filter(workflowTask -> {
-                String type = workflowTask.getType();
-
-                return type != null && SUSPENDING_TASK_TYPE_PREFIXES.stream()
-                    .anyMatch(type::startsWith);
-            })
+            .filter(SuspendingTasks::isSuspending)
             .findFirst();
     }
 

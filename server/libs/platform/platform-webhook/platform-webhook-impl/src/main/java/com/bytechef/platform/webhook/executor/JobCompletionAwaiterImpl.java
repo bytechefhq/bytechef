@@ -92,7 +92,9 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
         Object payload = sseStreamEvent.getPayload();
         String status = payload != null ? payload.toString() : "";
 
-        if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status)) {
+        if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status) ||
+            "CANCELLED".equals(status)) {
+
             try {
                 Job job = jobService.getJob(jobId);
 
@@ -131,7 +133,7 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
     private static boolean isTerminal(Job job) {
         Job.Status status = job.getStatus();
 
-        return status == Job.Status.COMPLETED || status == Job.Status.FAILED ||
+        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.CANCELLED ||
             (status == Job.Status.STOPPED && !JobSuspends.isAwaitingSubflow(job));
     }
 }
