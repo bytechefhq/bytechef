@@ -36,4 +36,8 @@ public interface IntelligentToolDefinition {
     IntelligentToolChatClientFactory chatClientFactory(IntelligentToolVariant variant);
 
     ToolCallback create(IntelligentToolChatClientFactory chatClientFactory);
+
+    default boolean askCapable() {
+        return true;
+    }
 }
