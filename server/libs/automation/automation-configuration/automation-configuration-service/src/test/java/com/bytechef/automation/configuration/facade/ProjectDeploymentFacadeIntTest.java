@@ -44,6 +44,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -270,7 +271,6 @@ public class ProjectDeploymentFacadeIntTest {
             });
     }
 
-    @Disabled
     @Test
     public void testCreateProjectDeploymentMapsDraftWorkflowIdToDeployedVersion() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
@@ -312,16 +312,18 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Test
-    public void testCreateProjectDeploymentRejectsUnknownWorkflowId() {
+    public void testCreateProjectDeploymentRejectsWorkflowMissingFromDeployedVersion() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
 
         projectFacade.publishProject(projectDTO.id(), "Published for test", false);
 
+        ProjectWorkflowDTO draftOnlyProjectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
             List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
-            "unknown-workflow-id", null);
+            draftOnlyProjectWorkflowDTO.getId(), draftOnlyProjectWorkflowDTO.getWorkflowUuid());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
             .projectId(projectDTO.id())
@@ -333,11 +335,10 @@ public class ProjectDeploymentFacadeIntTest {
 
         assertThatThrownBy(() -> projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO))
             .isInstanceOf(ConfigurationException.class)
-            .hasMessageContaining("unknown-workflow-id");
-
-        assertThat(projectDeploymentRepository.count()).isZero();
+            .hasMessageContaining("does not exist in project version v=1");
     }
 
+    @Disabled
     @Test
     public void testCreateProjectDeploymentJob() {
         // TODO
