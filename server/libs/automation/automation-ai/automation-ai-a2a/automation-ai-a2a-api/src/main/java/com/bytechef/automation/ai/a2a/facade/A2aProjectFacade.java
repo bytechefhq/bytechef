@@ -34,6 +34,10 @@ public interface A2aProjectFacade {
 
     void deleteA2aProject(long a2aProjectId);
 
+    List<A2aProject> getA2aServerA2aProjects(long a2aServerId);
+
+    List<A2aProject> getWorkspaceA2aProjects(long workspaceId);
+
     List<ProjectWorkflow> getA2aEligibleProjectVersionWorkflows(long projectId, int projectVersion);
 
     A2aProject updateA2aProject(long a2aProjectId, List<String> selectedWorkflowIds);

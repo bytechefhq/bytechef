@@ -39,6 +39,8 @@ public interface A2aServerService {
 
     List<A2aServer> getA2aServers();
 
+    List<A2aServer> getWorkspaceA2aServers(long workspaceId);
+
     A2aServer update(A2aServer a2aServer);
 
     A2aServer updateTags(long id, List<Long> tagIds);

@@ -20,7 +20,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.facade.A2aProjectFacade;
-import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -47,19 +46,17 @@ import org.springframework.stereotype.Controller;
 public class A2aProjectGraphQlController {
 
     private final A2aProjectFacade a2aProjectFacade;
-    private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public A2aProjectGraphQlController(
-        A2aProjectFacade a2aProjectFacade, A2aProjectService a2aProjectService,
-        A2aProjectWorkflowService a2aProjectWorkflowService, ProjectDeploymentService projectDeploymentService,
+        A2aProjectFacade a2aProjectFacade, A2aProjectWorkflowService a2aProjectWorkflowService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         this.a2aProjectFacade = a2aProjectFacade;
-        this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
@@ -74,14 +71,14 @@ public class A2aProjectGraphQlController {
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public List<A2aProject> a2aProjects() {
-        return a2aProjectService.getA2aProjects();
+    public List<A2aProject> a2aProjects(@Argument long workspaceId) {
+        return a2aProjectFacade.getWorkspaceA2aProjects(workspaceId);
     }
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     public List<A2aProject> a2aProjectsByServerId(@Argument long a2aServerId) {
-        return a2aProjectService.getA2aServerA2aProjects(a2aServerId);
+        return a2aProjectFacade.getA2aServerA2aProjects(a2aServerId);
     }
 
     @MutationMapping

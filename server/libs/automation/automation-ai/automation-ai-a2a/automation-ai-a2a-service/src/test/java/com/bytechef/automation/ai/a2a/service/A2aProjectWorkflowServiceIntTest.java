@@ -17,18 +17,9 @@
 package com.bytechef.automation.ai.a2a.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.config.A2aIntTestConfiguration;
 import com.bytechef.automation.ai.a2a.config.A2aIntTestConfigurationSharedMocks;
-import com.bytechef.automation.ai.a2a.config.A2aMethodSecurityIntTestConfiguration;
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
@@ -46,7 +37,6 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +45,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,80 +53,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Ivica Cardic
  */
 class A2aProjectWorkflowServiceIntTest {
-
-    @Nested
-    @SpringBootTest(classes = A2aMethodSecurityIntTestConfiguration.class)
-    class MethodSecurity {
-
-        @Autowired
-        private A2aProjectWorkflowRepository a2aProjectWorkflowRepository;
-
-        @Autowired
-        private A2aProjectWorkflowService a2aProjectWorkflowService;
-
-        @BeforeEach
-        void beforeEach() {
-            when(a2aProjectWorkflowRepository.findById(5L)).thenReturn(Optional.of(new A2aProjectWorkflow(2L, 3L)));
-            when(a2aProjectWorkflowRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        }
-
-        @AfterEach
-        void afterEach() {
-            SecurityContextHolder.clearContext();
-
-            reset(a2aProjectWorkflowRepository);
-        }
-
-        @Test
-        void testNonAdminCannotUpdateASkill() {
-            authenticate("ROLE_USER");
-
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aProjectWorkflowService.updateSkill(5L, "Summarize", null));
-
-            verify(a2aProjectWorkflowRepository, never()).findById(anyLong());
-            verify(a2aProjectWorkflowRepository, never()).save(any());
-        }
-
-        @Test
-        void testAdminCanUpdateASkill() {
-            authenticate("ROLE_ADMIN");
-
-            A2aProjectWorkflow a2aProjectWorkflow = a2aProjectWorkflowService.updateSkill(5L, "Summarize", null);
-
-            assertThat(a2aProjectWorkflow.getSkillName()).isEqualTo("Summarize");
-
-            verify(a2aProjectWorkflowRepository).save(a2aProjectWorkflow);
-        }
-
-        @Test
-        void testNonAdminCannotUpdateEnabled() {
-            authenticate("ROLE_USER");
-
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aProjectWorkflowService.updateEnabled(5L, false));
-
-            verify(a2aProjectWorkflowRepository, never()).findById(anyLong());
-            verify(a2aProjectWorkflowRepository, never()).save(any());
-        }
-
-        @Test
-        void testAdminCanDisableAndReEnableAWorkflow() {
-            authenticate("ROLE_ADMIN");
-
-            A2aProjectWorkflow disabledA2aProjectWorkflow = a2aProjectWorkflowService.updateEnabled(5L, false);
-
-            assertThat(disabledA2aProjectWorkflow.isEnabled()).isFalse();
-
-            verify(a2aProjectWorkflowRepository).save(disabledA2aProjectWorkflow);
-
-            A2aProjectWorkflow enabledA2aProjectWorkflow = a2aProjectWorkflowService.updateEnabled(5L, true);
-
-            assertThat(enabledA2aProjectWorkflow.isEnabled()).isTrue();
-
-            verify(a2aProjectWorkflowRepository, times(2)).save(enabledA2aProjectWorkflow);
-        }
-    }
 
     @Nested
     @SpringBootTest(classes = A2aIntTestConfiguration.class)
@@ -174,10 +89,10 @@ class A2aProjectWorkflowServiceIntTest {
 
         @BeforeEach
         void beforeEach() {
-            A2aServer a2aServer = a2aServerRepository.save(
-                new A2aServer("test-agent", null, Environment.DEVELOPMENT));
-
             Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+            A2aServer a2aServer = a2aServerRepository.save(
+                withWorkspace(new A2aServer("test-agent", null, Environment.DEVELOPMENT), workspace.getId()));
 
             Project project = Project.builder()
                 .description("test-project")
@@ -263,5 +178,11 @@ class A2aProjectWorkflowServiceIntTest {
             .setAuthentication(
                 new UsernamePasswordAuthenticationToken(
                     "user", "n/a", List.of(new SimpleGrantedAuthority(authority))));
+    }
+
+    private static A2aServer withWorkspace(A2aServer a2aServer, Long workspaceId) {
+        a2aServer.setWorkspaceId(workspaceId);
+
+        return a2aServer;
     }
 }

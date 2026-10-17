@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
-import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
+import com.bytechef.automation.ai.a2a.facade.A2aProjectWorkflowFacade;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,36 +40,36 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class A2aProjectWorkflowGraphQlController {
 
-    private final A2aProjectWorkflowService a2aProjectWorkflowService;
+    private final A2aProjectWorkflowFacade a2aProjectWorkflowFacade;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public A2aProjectWorkflowGraphQlController(
-        A2aProjectWorkflowService a2aProjectWorkflowService,
+        A2aProjectWorkflowFacade a2aProjectWorkflowFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, WorkflowService workflowService) {
 
-        this.a2aProjectWorkflowService = a2aProjectWorkflowService;
+        this.a2aProjectWorkflowFacade = a2aProjectWorkflowFacade;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowService = workflowService;
     }
 
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
-    public List<A2aProjectWorkflow> a2aProjectWorkflowsByA2aProjectId(@Argument Long a2aProjectId) {
-        return a2aProjectWorkflowService.getA2aProjectA2aProjectWorkflows(a2aProjectId);
+    public List<A2aProjectWorkflow> a2aProjectWorkflowsByA2aProjectId(@Argument long a2aProjectId) {
+        return a2aProjectWorkflowFacade.getA2aProjectA2aProjectWorkflows(a2aProjectId);
     }
 
     @MutationMapping
     public A2aProjectWorkflow updateA2aProjectWorkflowEnabled(@Argument long id, @Argument boolean enabled) {
-        return a2aProjectWorkflowService.updateEnabled(id, enabled);
+        return a2aProjectWorkflowFacade.updateA2aProjectWorkflowEnabled(id, enabled);
     }
 
     @MutationMapping
     public A2aProjectWorkflow updateA2aProjectWorkflowParameters(
         @Argument long id, @Argument A2aProjectWorkflowParametersInput input) {
 
-        return a2aProjectWorkflowService.updateSkill(id, input.skillName(), input.skillDescription());
+        return a2aProjectWorkflowFacade.updateA2aProjectWorkflowSkill(id, input.skillName(), input.skillDescription());
     }
 
     @SchemaMapping(typeName = "A2aProjectWorkflow", field = "workflowId")

@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -93,53 +92,23 @@ class A2aServerServiceIntTest {
         }
 
         @Test
-        void testNonAdminCannotCreateUpdateOrDeleteAServer() {
+        void testSecretKeyIsDeniedWithoutTheA2aEditScope() {
             authenticate("ROLE_USER");
-
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aServerService.create(new A2aServer("agent", "", Environment.DEVELOPMENT)));
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aServerService.update(a2aServer));
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aServerService.delete(1L));
-
-            verify(a2aServerRepository, never()).save(any());
-            verify(a2aServerRepository, never()).findById(anyLong());
-            verify(a2aServerRepository, never()).deleteById(anyLong());
-            verifyNoInteractions(permissionService);
-        }
-
-        @Test
-        void testAdminCanDeleteAServer() {
-            authenticate("ROLE_ADMIN");
-
-            a2aServerService.delete(1L);
-
-            verify(a2aServerRepository).deleteById(1L);
-        }
-
-        @Test
-        void testSecretKeyIsDeniedWhenTheCallerIsNotATenantAdmin() {
-            authenticate("ROLE_ADMIN");
-
-            when(permissionService.isTenantAdmin()).thenReturn(false);
 
             assertThatExceptionOfType(AccessDeniedException.class)
                 .isThrownBy(() -> a2aServerService.getA2aServerSecretKey(1L));
 
-            verify(permissionService).isTenantAdmin();
+            verify(permissionService).hasResourceScope(1L, "A2aServer", "A2A_EDIT");
             verify(a2aServerRepository, never()).findById(anyLong());
         }
 
         @Test
-        void testSecretKeyIsReturnedToATenantAdmin() {
-            authenticate("ROLE_ADMIN");
+        void testSecretKeyIsReturnedToAWorkspaceEditor() {
+            authenticate("ROLE_USER");
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            when(permissionService.hasResourceScope(1L, "A2aServer", "A2A_EDIT")).thenReturn(true);
 
             assertThat(a2aServerService.getA2aServerSecretKey(1L)).isEqualTo(a2aServer.getSecretKey());
-
-            verify(permissionService).isTenantAdmin();
         }
 
         @Test

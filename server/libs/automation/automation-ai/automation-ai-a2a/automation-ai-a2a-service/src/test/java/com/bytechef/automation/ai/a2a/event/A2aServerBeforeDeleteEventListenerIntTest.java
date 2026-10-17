@@ -102,9 +102,10 @@ class A2aServerBeforeDeleteEventListenerIntTest {
 
     @BeforeEach
     void beforeEach() {
-        a2aServer = a2aServerService.create(new A2aServer("test-agent", null, Environment.DEVELOPMENT));
-
         Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+
+        a2aServer = a2aServerService
+            .create(withWorkspace(new A2aServer("test-agent", null, Environment.DEVELOPMENT), workspace.getId()));
 
         project = createPublishedProject(workspace, "test-project");
         secondProject = createPublishedProject(workspace, "second-test-project");
@@ -173,7 +174,8 @@ class A2aServerBeforeDeleteEventListenerIntTest {
     @Test
     void testDeleteServerWithoutProjectsDeletesNoProject() {
         A2aServer otherA2aServer = a2aServerService.create(
-            new A2aServer("other-test-agent", null, Environment.DEVELOPMENT));
+            withWorkspace(new A2aServer("other-test-agent", null, Environment.DEVELOPMENT),
+                a2aServer.getWorkspaceId()));
 
         A2aProject otherA2aProject = a2aProjectFacade.createA2aProject(
             otherA2aServer.getId(), project.getId(), 1, List.of(workflowId1));
@@ -198,5 +200,11 @@ class A2aServerBeforeDeleteEventListenerIntTest {
         newProject.publish("v1");
 
         return projectRepository.save(newProject);
+    }
+
+    private static A2aServer withWorkspace(A2aServer a2aServer, Long workspaceId) {
+        a2aServer.setWorkspaceId(workspaceId);
+
+        return a2aServer;
     }
 }

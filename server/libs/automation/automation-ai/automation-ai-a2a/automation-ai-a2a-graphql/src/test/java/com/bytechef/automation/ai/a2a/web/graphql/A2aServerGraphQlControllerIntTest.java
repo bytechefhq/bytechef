@@ -76,14 +76,14 @@ class A2aServerGraphQlControllerIntTest {
     void testA2aServersReturnsTheTagsOfEachServer() {
         A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
 
-        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+        when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
         when(a2aServerFacade.getA2aServerTags(List.of(a2aServer))).thenReturn(
             Map.of(a2aServer, List.of(createTag(7L, "sales"))));
 
         graphQlTester
             .document("""
                 query {
-                    a2aServers {
+                    a2aServers(workspaceId: "1") {
                         tags {
                             id
                             name
@@ -103,12 +103,12 @@ class A2aServerGraphQlControllerIntTest {
     @Test
     @WithMockUser
     void testA2aServerTagsReturnsTheTagsUsedByA2aServers() {
-        when(a2aServerFacade.getA2aServerTags()).thenReturn(List.of(createTag(7L, "sales")));
+        when(a2aServerFacade.getA2aServerTags(1L)).thenReturn(List.of(createTag(7L, "sales")));
 
         graphQlTester
             .document("""
                 query {
-                    a2aServerTags {
+                    a2aServerTags(workspaceId: "1") {
                         id
                         name
                     }
@@ -153,13 +153,13 @@ class A2aServerGraphQlControllerIntTest {
     void testA2aServersResolvesTheSecretKeyThroughTheGatedServiceMethod() {
         A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
 
-        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+        when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
         when(a2aServerService.getA2aServerSecretKey(5L)).thenReturn("gated-secret");
 
         graphQlTester
             .document("""
                 query {
-                    a2aServers {
+                    a2aServers(workspaceId: "1") {
                         id
                         name
                         environmentId
@@ -195,12 +195,12 @@ class A2aServerGraphQlControllerIntTest {
 
         ReflectionTestUtils.setField(a2aServer, "lastModifiedDate", Instant.ofEpochMilli(1_791_000_000_000L));
 
-        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+        when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
 
         graphQlTester
             .document("""
                 query {
-                    a2aServers {
+                    a2aServers(workspaceId: "1") {
                         lastModifiedDate
                     }
                 }
@@ -216,13 +216,13 @@ class A2aServerGraphQlControllerIntTest {
     void testA2aServersReturnsANullSecretKeyForCallersWhoAreNotTenantAdmins() {
         A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
 
-        when(a2aServerService.getA2aServers()).thenReturn(List.of(a2aServer));
+        when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
         when(a2aServerService.getA2aServerSecretKey(5L)).thenThrow(new AccessDeniedException("denied"));
 
         graphQlTester
             .document("""
                 query {
-                    a2aServers {
+                    a2aServers(workspaceId: "1") {
                         id
                         secretKey
                     }
@@ -241,7 +241,7 @@ class A2aServerGraphQlControllerIntTest {
         graphQlTester
             .document("""
                 query {
-                    a2aServers {
+                    a2aServers(workspaceId: "1") {
                         id
                     }
                 }
@@ -262,8 +262,8 @@ class A2aServerGraphQlControllerIntTest {
     void testCreateA2aServer() {
         ArgumentCaptor<A2aServer> a2aServerArgumentCaptor = ArgumentCaptor.forClass(A2aServer.class);
 
-        when(a2aServerService.create(a2aServerArgumentCaptor.capture()))
-            .thenAnswer(invocation -> withId(invocation.getArgument(0), 5L));
+        when(a2aServerFacade.createA2aServer(eq(1049L), a2aServerArgumentCaptor.capture()))
+            .thenAnswer(invocation -> withId(invocation.getArgument(1), 5L));
 
         graphQlTester
             .document("""
@@ -272,7 +272,8 @@ class A2aServerGraphQlControllerIntTest {
                         name: "agent",
                         description: "An agent",
                         environmentId: "1",
-                        authenticationRequired: true
+                        authenticationRequired: true,
+                        workspaceId: "1049"
                     }) {
                         id
                         name
@@ -306,7 +307,7 @@ class A2aServerGraphQlControllerIntTest {
         graphQlTester
             .document("""
                 mutation {
-                    createA2aServer(input: {name: "agent", environmentId: "99"}) {
+                    createA2aServer(input: {name: "agent", environmentId: "99", workspaceId: "1049"}) {
                         id
                     }
                 }
@@ -322,17 +323,17 @@ class A2aServerGraphQlControllerIntTest {
             .path("createA2aServer")
             .valueIsNull();
 
-        verifyNoInteractions(a2aServerService);
+        verifyNoInteractions(a2aServerFacade, a2aServerService);
     }
 
     @Test
     void testUpdateA2aServerAppliesOnlyTheProvidedFields() {
-        A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
+        A2aServer a2aServer = createA2aServer(5L, "renamed", Environment.PRODUCTION);
 
         a2aServer.setDescription("Original description");
+        a2aServer.setEnabled(false);
 
-        when(a2aServerService.getA2aServer(5L)).thenReturn(a2aServer);
-        when(a2aServerService.update(any(A2aServer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(a2aServerFacade.updateA2aServer(5L, "renamed", null, false, null)).thenReturn(a2aServer);
 
         graphQlTester
             .document("""
@@ -356,7 +357,7 @@ class A2aServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(false);
 
-        verify(a2aServerService).update(a2aServer);
+        verify(a2aServerFacade).updateA2aServer(5L, "renamed", null, false, null);
     }
 
     @Test
@@ -372,7 +373,7 @@ class A2aServerGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(a2aServerService).delete(5L);
+        verify(a2aServerFacade).deleteA2aServer(5L);
     }
 
     private static A2aServer createA2aServer(long id, String name, Environment environment) {

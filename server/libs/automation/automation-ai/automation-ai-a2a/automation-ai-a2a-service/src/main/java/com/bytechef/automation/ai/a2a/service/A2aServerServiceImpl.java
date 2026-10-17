@@ -40,7 +40,6 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public A2aServer create(A2aServer a2aServer) {
         Validate.notNull(
             a2aServer.getSecretKey(), "An A2A server needs a secret key; create it through A2aServer(name, " +
@@ -54,7 +53,6 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long a2aServerId) {
         a2aServerRepository.deleteById(a2aServerId);
     }
@@ -80,7 +78,7 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT')")
     @Transactional(readOnly = true)
     public String getA2aServerSecretKey(long a2aServerId) {
         A2aServer a2aServer = getA2aServer(a2aServerId);
@@ -95,7 +93,12 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Transactional(readOnly = true)
+    public List<A2aServer> getWorkspaceA2aServers(long workspaceId) {
+        return a2aServerRepository.findAllByWorkspaceIdOrderByIdAsc(workspaceId);
+    }
+
+    @Override
     public A2aServer update(A2aServer a2aServer) {
         A2aServer currentA2aServer = a2aServerRepository.findById(a2aServer.getId())
             .orElseThrow(
@@ -111,7 +114,6 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public A2aServer updateTags(long id, List<Long> tagIds) {
         A2aServer a2aServer = a2aServerRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("A2A server with id " + id + " not found"));

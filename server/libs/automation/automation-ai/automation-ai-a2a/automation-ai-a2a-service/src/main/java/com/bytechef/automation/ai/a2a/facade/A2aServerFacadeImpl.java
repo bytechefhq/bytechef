@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +50,9 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getA2aServerTags() {
-        List<Long> tagIds = a2aServerService.getA2aServers()
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_VIEW')")
+    public List<Tag> getA2aServerTags(long workspaceId) {
+        List<Long> tagIds = a2aServerService.getWorkspaceA2aServers(workspaceId)
             .stream()
             .map(A2aServer::getTagIds)
             .flatMap(Collection::stream)
@@ -86,7 +88,7 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'A2aServer', 'A2A_EDIT')")
     public List<Tag> updateA2aServerTags(long id, List<Tag> tags) {
         List<Tag> savedTags = tags.isEmpty() ? List.of() : tagService.save(tags);
 
@@ -96,5 +98,53 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
                 .toList());
 
         return savedTags;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_VIEW')")
+    public List<A2aServer> getWorkspaceA2aServers(long workspaceId) {
+        return a2aServerService.getWorkspaceA2aServers(workspaceId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_CREATE')")
+    public A2aServer createA2aServer(long workspaceId, A2aServer a2aServer) {
+        a2aServer.setWorkspaceId(workspaceId);
+
+        return a2aServerService.create(a2aServer);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'A2aServer', 'A2A_EDIT')")
+    public void deleteA2aServer(long id) {
+        a2aServerService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'A2aServer', 'A2A_EDIT')")
+    public A2aServer updateA2aServer(
+        long id, @Nullable String name, @Nullable String description, @Nullable Boolean enabled,
+        @Nullable Boolean authenticationRequired) {
+
+        A2aServer a2aServer = a2aServerService.getA2aServer(id);
+
+        if (name != null) {
+            a2aServer.setName(name);
+        }
+
+        if (description != null) {
+            a2aServer.setDescription(description);
+        }
+
+        if (enabled != null) {
+            a2aServer.setEnabled(enabled);
+        }
+
+        if (authenticationRequired != null) {
+            a2aServer.setAuthenticationRequired(authenticationRequired);
+        }
+
+        return a2aServerService.update(a2aServer);
     }
 }
