@@ -622,6 +622,11 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
 
+include("server:ee:libs:ai:ai-hub:ai-hub-api")
+include("server:ee:libs:ai:ai-hub:ai-hub-graphql")
+include("server:ee:libs:ai:ai-hub:ai-hub-rest")
+include("server:ee:libs:ai:ai-hub:ai-hub-service")
+
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service")
