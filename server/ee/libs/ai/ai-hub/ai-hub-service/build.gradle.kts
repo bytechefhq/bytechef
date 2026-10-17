@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin"))
