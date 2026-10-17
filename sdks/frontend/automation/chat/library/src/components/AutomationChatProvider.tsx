@@ -13,8 +13,20 @@ import {ReactNode, memo, useCallback, useEffect, useMemo, useState} from 'react'
 import {useShallow} from 'zustand/shallow';
 
 import {useChatStore} from '@/stores/useChatStore';
+import type {PendingApprovalI} from '@/stores/useChatStore';
+import {ApprovalResolutionContext} from '@/components/approvalResolutionContext';
 import {useSSE} from '@/hooks/useSSE';
 import {extractStreamChunk} from '@/utils/stream-utils';
+import {drainSseResponse} from '@/utils/sse-parser';
+import {
+    ApprovalRequestEventI,
+    AskUserQuestionEventI,
+    formatApprovalRequest,
+    formatAskUserQuestion,
+    getApprovalResumeUrl,
+    isAcceptedResumeResponse,
+    isEventStreamResponse,
+} from '@/utils/approval-utils';
 import {AutomationChatContext} from '@/hooks/useAutomationChatConfig';
 import type {AutomationChatConfig} from '@/types';
 
@@ -56,14 +68,16 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         init?: RequestInit;
     } | null>(null);
 
-    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent, setMessage} = useChatStore(
-        useShallow((state) => ({
-            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
-            messages: state.messages,
-            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
-            setMessage: state.setMessage,
-        }))
-    );
+    const {appendToLastAssistantMessage, messages, setLastAssistantMessageContent, setMessage, setResumeUrl} =
+        useChatStore(
+            useShallow((state) => ({
+                appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+                messages: state.messages,
+                setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+                setMessage: state.setMessage,
+                setResumeUrl: state.setResumeUrl,
+            }))
+        );
 
     const handleError = useCallback(() => {
         setIsRunning(false);
@@ -118,15 +132,99 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         [appendToLastAssistantMessage]
     );
 
+    const handleAskUserQuestion = useCallback(
+        (data: unknown) => {
+            if (!data || typeof data !== 'object') {
+                return;
+            }
+
+            const event = data as AskUserQuestionEventI;
+            const formatted = formatAskUserQuestion(event);
+
+            if (formatted) {
+                setLastAssistantMessageContent(formatted);
+            }
+
+            setResumeUrl(event.resumeUrl ?? null);
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setLastAssistantMessageContent, setResumeUrl]
+    );
+
+    const handleApprovalRequest = useCallback(
+        (data: unknown) => {
+            if (!data || typeof data !== 'object' || !('resumeId' in data)) {
+                return;
+            }
+
+            const event = data as ApprovalRequestEventI;
+
+            const hasInputs = Array.isArray(event.inputs) && event.inputs.length > 0;
+            const approvalResumeUrl = getApprovalResumeUrl(event, webhookUrl);
+
+            if (!hasInputs && approvalResumeUrl) {
+                useChatStore.getState().setPendingApproval({
+                    expiresAt: event.expiresAt,
+                    formDescription: event.formDescription,
+                    formTitle: event.formTitle,
+                    resumeUrl: approvalResumeUrl,
+                });
+            } else {
+                setMessage({content: formatApprovalRequest(event), role: 'assistant'});
+            }
+
+            setIsRunning(false);
+            setStreamRequest(null);
+        },
+        [setMessage, webhookUrl]
+    );
+
     const eventHandlers = useMemo(
         () => ({
+            approval_request: handleApprovalRequest,
+            ask_user_question: handleAskUserQuestion,
             error: handleError,
             result: handleResult,
             stream: handleStream,
             message: handleResult, // Handle default SSE 'message' events as results
         }),
-        [handleError, handleResult, handleStream]
+        [handleApprovalRequest, handleAskUserQuestion, handleError, handleResult, handleStream]
     );
+
+    const resolveApproval = useCallback(
+        async (pendingApproval: PendingApprovalI, payload: Record<string, unknown>) => {
+            const response = await fetch(pendingApproval.resumeUrl, {
+                body: JSON.stringify(payload),
+                headers: {Accept: 'text/event-stream', 'Content-Type': 'application/json'},
+                method: 'POST',
+            });
+
+            if (!isAcceptedResumeResponse(response)) {
+                throw new Error(`Resume request was not accepted (status ${response.status})`);
+            }
+
+            const resolvedTitle = pendingApproval.formTitle || 'Approval requested';
+
+            useChatStore.getState().setPendingApproval(null);
+            setMessage({
+                content: `**${resolvedTitle}** — ${payload.approved ? 'approved' : 'discarded'}.`,
+                role: 'assistant',
+            });
+
+            if (isEventStreamResponse(response)) {
+                setIsRunning(true);
+                setMessage({content: '', role: 'assistant'});
+
+                void drainSseResponse(response, eventHandlers)
+                    .catch((drainError) => console.error('Failed to stream the resumed run:', drainError))
+                    .finally(() => setIsRunning(false));
+            }
+        },
+        [eventHandlers, setMessage]
+    );
+
+    const approvalResolution = useMemo(() => ({resolveApproval}), [resolveApproval]);
 
     const onNew = useCallback(
         async (message: AppendMessage) => {
@@ -135,6 +233,53 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
             }
 
             const input = message.content[0].text;
+
+            const currentResumeUrl = useChatStore.getState().resumeUrl;
+
+            if (currentResumeUrl) {
+                useChatStore.getState().setResumeUrl(null);
+
+                setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
+                setIsRunning(true);
+
+                const headers: Record<string, string> = sseEnabled
+                    ? {Accept: 'text/event-stream', 'Content-Type': 'application/json'}
+                    : {'Content-Type': 'application/json'};
+
+                try {
+                    const response = await fetch(currentResumeUrl, {
+                        body: JSON.stringify({message: input}),
+                        headers,
+                        method: 'POST',
+                    });
+
+                    if (!isAcceptedResumeResponse(response)) {
+                        throw new Error(`Resume request was not accepted (status ${response.status})`);
+                    }
+
+                    if (isEventStreamResponse(response)) {
+                        setMessage({content: '', role: 'assistant'});
+
+                        await drainSseResponse(response, eventHandlers);
+                    } else {
+                        const result = (await response.json().catch(() => null)) as {message?: string} | null;
+                        const responseText = result?.message ?? 'Answer submitted. The workflow will resume.';
+
+                        setMessage({content: responseText, role: 'assistant'});
+                    }
+                } catch (error) {
+                    console.error('Failed to submit answer to resume URL:', error);
+
+                    setMessage({
+                        content: 'Failed to submit your answer. Please try again.',
+                        role: 'assistant',
+                    });
+                } finally {
+                    setIsRunning(false);
+                }
+
+                return;
+            }
 
             setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
             setIsRunning(true);
@@ -197,7 +342,7 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
                 setIsRunning(false);
             }
         },
-        [setMessage, sseEnabled, webhookUrl]
+        [eventHandlers, setMessage, sseEnabled, webhookUrl]
     );
 
     const runtime = useExternalStoreRuntime(
@@ -227,9 +372,11 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
 
     return (
         <AutomationChatContext.Provider value={contextValue}>
-            <AssistantRuntimeProvider aui={aui} runtime={runtime}>
-                {children}
-            </AssistantRuntimeProvider>
+            <ApprovalResolutionContext.Provider value={approvalResolution}>
+                <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+                    {children}
+                </AssistantRuntimeProvider>
+            </ApprovalResolutionContext.Provider>
         </AutomationChatContext.Provider>
     );
 });
