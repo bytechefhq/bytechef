@@ -329,6 +329,10 @@ const MANUAL_RESOLUTIONS = {
         reason: '`AiHubChatComposer.tsx` — the `task` kind badge. One member of a categorical badge palette whose siblings have no token counterpart.',
         set: 'E',
     },
+    'bg-slate-200': {
+        reason: '`Appearance.tsx` theme preview swatch — all 8 are the backdrop, skeleton bars and dots inside the Light card. Must stay literal so the Light preview stays light while the app is in dark mode.',
+        set: 'E',
+    },
     'bg-slate-400': {
         reason: '`Appearance.tsx` theme preview swatch — all 12 are the skeleton bars and dots inside the Dark card. Must stay literal so the Dark preview stays dark while the app is in light mode.',
         set: 'E',
