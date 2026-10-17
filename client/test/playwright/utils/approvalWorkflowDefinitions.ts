@@ -59,6 +59,7 @@ interface ApprovalWorkflowProps {
     channels: ApprovalChannelType[];
     expiresIn?: number;
     expiresInUnit?: 'DAYS' | 'HOURS';
+    formDescription?: string;
     formTitle: string;
     inputs?: ApprovalFormInputI[];
     label: string;
@@ -75,6 +76,7 @@ export function buildApprovalWorkflow({
     channels,
     expiresIn = 2,
     expiresInUnit = 'HOURS',
+    formDescription = 'Please approve ${trigger_1.body.n}',
     formTitle,
     inputs,
     label,
@@ -96,7 +98,7 @@ export function buildApprovalWorkflow({
                 parameters: {
                     expiresIn,
                     expiresInUnit,
-                    formDescription: 'Please approve ${trigger_1.body.n}',
+                    formDescription,
                     formTitle,
                     ...(inputs ? {inputs} : {}),
                 },
@@ -429,6 +431,43 @@ export function buildAgentApprovalToolWorkflow({
                 type: 'aiAgent/v1/chat',
             },
             {name: 'chat_2', parameters: {message: '${aiAgent_1}'}, type: 'chat/v1/responseToRequest'},
+        ],
+        triggers: [{name: 'trigger_1', parameters: {mode: 1}, type: 'chat/v1/newChatRequest'}],
+    };
+}
+
+/**
+ * Chat trigger, then Request Approval (Chat channel), then a streaming AI Agent reply. The streaming step makes the
+ * Chats page talk to the workflow over SSE, which a run that pauses for an approval needs.
+ */
+export function buildStreamingChatApprovalWorkflow(label: string): WorkflowDefinitionType {
+    return {
+        description: label,
+        label,
+        tasks: [
+            {
+                clusterElements: {approvalChannels: [buildApprovalChannel('chat', {})]},
+                name: 'approval_1',
+                parameters: {
+                    expiresIn: 2,
+                    expiresInUnit: 'HOURS',
+                    formDescription: '${trigger_1.message}',
+                    formTitle: 'Approval for ${trigger_1.message}',
+                },
+                type: 'approval/v1/requestApproval',
+            },
+            {
+                clusterElements: {model: OPEN_AI_MODEL},
+                name: 'aiAgent_1',
+                parameters: {
+                    format: 'SIMPLE',
+                    response: {responseFormat: 'TEXT'},
+                    systemPrompt: 'Reply in at most 12 words.',
+                    userPrompt:
+                        'Tell the user their request was decided: approved=${approval_1.approved}, comment=${approval_1.comment}.',
+                },
+                type: 'aiAgent/v1/streamChat',
+            },
         ],
         triggers: [{name: 'trigger_1', parameters: {mode: 1}, type: 'chat/v1/newChatRequest'}],
     };
