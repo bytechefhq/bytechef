@@ -20,7 +20,9 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,6 +158,10 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
                 taskExecution.setStartDate(currentTaskExecution.getStartDate());
             }
 
+            if (taskExecution.getVersion() != currentTaskExecution.getVersion()) {
+                mergeStaleCopy(taskExecution, currentTaskExecution);
+            }
+
             // Do not override initial workflow task definition
 
             taskExecution.setWorkflowTask(currentTaskExecution.getWorkflowTask());
@@ -164,5 +170,22 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         } finally {
             taskExecutionRepository.unlockForUpdate(id);
         }
+    }
+
+    /**
+     * Applies a copy loaded before the last save of the row onto the locked current row. The copy's own state wins, but
+     * metadata entries written by other writers in the meantime are kept unless the copy removed them.
+     */
+    private static void mergeStaleCopy(TaskExecution staleTaskExecution, TaskExecution currentTaskExecution) {
+        Map<String, Object> metadata = new HashMap<>(currentTaskExecution.getMetadata());
+
+        for (String removedMetadataKey : staleTaskExecution.getRemovedMetadataKeys()) {
+            metadata.remove(removedMetadataKey);
+        }
+
+        metadata.putAll(staleTaskExecution.getMetadata());
+
+        staleTaskExecution.setMetadata(metadata);
+        staleTaskExecution.setVersion(currentTaskExecution.getVersion());
     }
 }
