@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -80,8 +81,8 @@ class McpJwtSecurityConfigurerContributorTest {
         mcpResourceServerProperties.setIssuers(List.of(issuer));
 
         return new McpJwtSecurityConfigurerContributor(
-            mcpResourceServerProperties, mock(UserService.class),
+            mcpResourceServerProperties, mock(UserService.class), mock(AuthorityService.class),
             staticListableBeanFactory.getBeanProvider(McpServerSecretVerifier.class),
-            staticListableBeanFactory.getBeanProvider(SelfIssuedTokenRevocationChecker.class));
+            staticListableBeanFactory.getBeanProvider(SelfIssuedTokenRevocationChecker.class), null);
     }
 }

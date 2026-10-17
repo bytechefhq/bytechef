@@ -22,7 +22,9 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpAuthenticationRequiredPr
 import com.bytechef.platform.security.web.mcp.oauth2.McpDiscoveryAuthenticationFilter;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -38,14 +40,17 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
 
     private final ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
+    private final @Nullable String publicUrl;
 
     @SuppressFBWarnings("EI2")
     public McpDiscoverySecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties,
-        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider,
+        @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
 
         this.mcpAuthenticationRequiredResolverProvider = mcpAuthenticationRequiredResolverProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -58,7 +63,7 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
         }
 
         McpAuthenticationEntryPoint mcpAuthenticationEntryPoint =
-            new McpTenantProtectedResourceMetadataAuthenticationEntryPoint();
+            new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(publicUrl);
 
         McpAuthenticationRequiredPredicate mcpAuthenticationRequiredPredicate = new McpAuthenticationRequiredPredicate(
             mcpAuthenticationRequiredResolverProvider.orderedStream()

@@ -16,17 +16,13 @@
 
 package com.bytechef.platform.security.web.mcp;
 
+import com.bytechef.platform.security.web.configurer.ApiKeyAuthenticationManagerFactory;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -84,7 +80,7 @@ public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHtt
         TenantAwareApiKeyAuthenticationFilter tenantAwareApiKeyAuthenticationFilter =
             new TenantAwareApiKeyAuthenticationFilter(
                 RegexRequestMatcher.regexMatcher(pathPatternRegex), mcpServerSecretPattern, tenantlessPath,
-                createAuthenticationManager(http), authenticationConverter);
+                ApiKeyAuthenticationManagerFactory.create(http, authenticationProvider), authenticationConverter);
 
         http.addFilterBefore(tenantAwareApiKeyAuthenticationFilter, BasicAuthenticationFilter.class);
 
@@ -93,21 +89,6 @@ public class McpApiKeyHttpConfigurer extends AbstractHttpConfigurer<McpApiKeyHtt
             acceptedAuthenticationTypes, getAuthenticationEntryPoint(http));
 
         http.addFilterBefore(mcpAuthenticationGuardFilter, AuthorizationFilter.class);
-    }
-
-    private AuthenticationManager createAuthenticationManager(HttpSecurity http) {
-        ProviderManager providerManager = new ProviderManager(authenticationProvider);
-
-        ApplicationContext applicationContext = http.getSharedObject(ApplicationContext.class);
-
-        if (applicationContext != null) {
-            ObjectProvider<AuthenticationEventPublisher> authenticationEventPublisherProvider =
-                applicationContext.getBeanProvider(AuthenticationEventPublisher.class);
-
-            authenticationEventPublisherProvider.ifUnique(providerManager::setAuthenticationEventPublisher);
-        }
-
-        return providerManager;
     }
 
     private static AuthenticationEntryPoint getAuthenticationEntryPoint(HttpSecurity http) {

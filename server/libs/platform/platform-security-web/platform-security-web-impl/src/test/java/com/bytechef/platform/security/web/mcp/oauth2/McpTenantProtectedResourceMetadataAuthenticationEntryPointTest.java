@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 
 /**
  * @author Ivica Cardic
@@ -30,10 +31,10 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 class McpTenantProtectedResourceMetadataAuthenticationEntryPointTest {
 
     private final McpTenantProtectedResourceMetadataAuthenticationEntryPoint entryPoint =
-        new McpTenantProtectedResourceMetadataAuthenticationEntryPoint();
+        new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(null);
 
     @Test
-    void testCommenceEmitsResourceMetadataPointerForRequestPath() {
+    void testCommenceEmitsResourceMetadataPointerAndAutomationScopeForRequestPath() {
         MockHttpServletRequest request = request("/api/automation/secret/mcp");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -44,11 +45,11 @@ class McpTenantProtectedResourceMetadataAuthenticationEntryPointTest {
         assertThat(response.getHeader("WWW-Authenticate"))
             .isEqualTo(
                 "Bearer resource_metadata=\"http://localhost/.well-known/oauth-protected-resource"
-                    + "/api/automation/secret/mcp\"");
+                    + "/api/automation/secret/mcp\", scope=\"mcp:automation\"");
     }
 
     @Test
-    void testCommenceHandlesManagementEndpointPathIdentically() {
+    void testCommenceEmitsManagementScopeForSecretManagementPath() {
         MockHttpServletRequest request = request("/api/management/secret/mcp");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -58,7 +59,57 @@ class McpTenantProtectedResourceMetadataAuthenticationEntryPointTest {
         assertThat(response.getHeader("WWW-Authenticate"))
             .isEqualTo(
                 "Bearer resource_metadata=\"http://localhost/.well-known/oauth-protected-resource"
-                    + "/api/management/secret/mcp\"");
+                    + "/api/management/secret/mcp\", scope=\"mcp:management\"");
+    }
+
+    @Test
+    void testCommenceEmitsManagementScopeForTenantlessManagementPath() {
+        MockHttpServletRequest request = request("/api/management/mcp");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        entryPoint.commence(request, response, new InsufficientAuthenticationException("Authentication is required"));
+
+        assertThat(response.getHeader("WWW-Authenticate"))
+            .isEqualTo(
+                "Bearer resource_metadata=\"http://localhost/.well-known/oauth-protected-resource"
+                    + "/api/management/mcp\", scope=\"mcp:management\"");
+    }
+
+    @Test
+    void testCommenceAnchorsMetadataUrlToPublicUrlInsteadOfRequestHost() {
+        McpTenantProtectedResourceMetadataAuthenticationEntryPoint publicUrlEntryPoint =
+            new McpTenantProtectedResourceMetadataAuthenticationEntryPoint("https://bytechef.example.com/");
+
+        MockHttpServletRequest request = request("/api/management/mcp");
+
+        request.setServerName("internal-host");
+        request.setServerPort(9555);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        publicUrlEntryPoint.commence(
+            request, response, new InsufficientAuthenticationException("Authentication is required"));
+
+        assertThat(response.getHeader("WWW-Authenticate"))
+            .isEqualTo(
+                "Bearer resource_metadata=\"https://bytechef.example.com/.well-known/oauth-protected-resource"
+                    + "/api/management/mcp\", scope=\"mcp:management\"");
+    }
+
+    @Test
+    void testCommenceMarksARejectedBearerTokenAsInvalid() {
+        MockHttpServletRequest request = request("/api/management/mcp");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        entryPoint.commence(request, response, new InvalidBearerTokenException("Jwt expired"));
+
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+        assertThat(response.getHeader("WWW-Authenticate"))
+            .isEqualTo(
+                "Bearer error=\"invalid_token\", resource_metadata=\"http://localhost/.well-known/" +
+                    "oauth-protected-resource/api/management/mcp\", scope=\"mcp:management\"");
     }
 
     private static MockHttpServletRequest request(String path) {

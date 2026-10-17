@@ -70,7 +70,8 @@ public class AbstractApiKeyHttpConfigurer
 
     @Override
     public void configure(HttpSecurity http) {
-        var authenticationManager = http.getSharedObject(AuthenticationManager.class);
+        AuthenticationManager authenticationManager = ApiKeyAuthenticationManagerFactory.create(
+            http, authenticationProvider);
 
         RequestMatcher requestMatcher;
 

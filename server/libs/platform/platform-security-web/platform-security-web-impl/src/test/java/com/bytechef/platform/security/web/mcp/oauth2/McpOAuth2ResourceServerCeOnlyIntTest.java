@@ -135,7 +135,7 @@ class McpOAuth2ResourceServerCeOnlyIntTest {
     }
 
     @Test
-    void testWrongScopeIsRejected() throws Exception {
+    void testWrongScopeIsRejectedWithInsufficientScopeChallenge() throws Exception {
         String token = sign(
             baseClaims(ISSUER_URI)
                 .claim(TENANT_CLAIM, "public")
@@ -145,7 +145,38 @@ class McpOAuth2ResourceServerCeOnlyIntTest {
 
         HttpResponse<String> httpResponse = postInitialize(token);
 
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
+                .contains("scope=\"mcp:management\"");
+    }
+
+    @Test
+    void testExpiredTokenIsAnsweredWithInvalidTokenChallengeForTheEndpoint() throws Exception {
+        String token = sign(
+            new JWTClaimsSet.Builder()
+                .issuer(ISSUER_URI)
+                .subject("admin@localhost.com")
+                .issueTime(Date.from(Instant.now()
+                    .minus(10, ChronoUnit.MINUTES)))
+                .expirationTime(Date.from(Instant.now()
+                    .minus(5, ChronoUnit.MINUTES)))
+                .claim(TENANT_CLAIM, "public")
+                .claim("scope", "mcp:management")
+                .audience(List.of(managementEndpointUrl()))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse(""))
+                .isEqualTo(
+                    "Bearer error=\"invalid_token\", resource_metadata=\"http://localhost:" + port +
+                        "/.well-known/oauth-protected-resource/api/management/" + MCP_SERVER_SECRET_KEY +
+                        "/mcp\", scope=\"mcp:management\"");
     }
 
     @Test
@@ -194,6 +225,25 @@ class McpOAuth2ResourceServerCeOnlyIntTest {
 
             assertThat(httpResponse.statusCode()).isEqualTo(200);
             assertThat(httpResponse.body()).contains(ISSUER_URI);
+        }
+    }
+
+    @Test
+    void testProtectedResourceMetadataNamesTheEndpointAndTheScopeItRequires() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:" + port + "/.well-known/oauth-protected-resource/api/management/mcp"))
+            .GET()
+            .build();
+
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            assertThat(httpResponse.statusCode()).isEqualTo(200);
+            assertThat(httpResponse.body())
+                .contains("\"resource\":\"http://localhost:" + port + "/api/management/mcp\"")
+                .contains("\"scopes_supported\":[\"mcp:management\"]")
+                .contains("\"tls_client_certificate_bound_access_tokens\":false")
+                .contains("\"resource_name\":\"ByteChef\"");
         }
     }
 
