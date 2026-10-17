@@ -7,11 +7,13 @@ import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useValidateWorkflowQuery} from '@/shared/middleware/graphql';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
+import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
 
@@ -84,6 +86,8 @@ const useWorkflowCodeEditorSheet = ({
     const conversationTokenRef = useRef<string | null>(null);
 
     const hasErrors = markers.some((marker) => marker.severity === MARKER_SEVERITY_ERROR);
+
+    const queryClient = useQueryClient();
 
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
@@ -195,6 +199,13 @@ const useWorkflowCodeEditorSheet = ({
                 onError: () => setDirty(true),
                 onSuccess: () => {
                     setDirty(false);
+
+                    queryClient.invalidateQueries({
+                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                            environmentId: currentEnvironmentId,
+                            id: workflow.id!,
+                        }),
+                    });
 
                     invalidateWorkflowQueries();
                 },
