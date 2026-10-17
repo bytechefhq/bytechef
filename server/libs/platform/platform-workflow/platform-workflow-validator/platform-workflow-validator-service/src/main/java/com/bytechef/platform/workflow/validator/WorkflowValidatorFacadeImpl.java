@@ -49,8 +49,10 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowDeploymentConnectionResolver.WorkflowNodeConnection;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,6 +87,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final List<WorkflowDeploymentConnectionResolver> workflowDeploymentConnectionResolvers;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -114,7 +117,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        List<ResourceReferenceResolver> resourceReferenceResolvers) {
+        List<ResourceReferenceResolver> resourceReferenceResolvers,
+        List<WorkflowDeploymentConnectionResolver> workflowDeploymentConnectionResolvers) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
@@ -124,6 +128,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowDeploymentConnectionResolvers = workflowDeploymentConnectionResolvers;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -353,8 +358,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         String type = nodeJsonNode.get("type")
             .asString();
 
-        List<WorkflowTestConfigurationConnection> connections = getTestConfigurationConnections(
-            workflowId, name, environmentId);
+        List<WorkflowNodeConnection> connections = getWorkflowNodeConnections(workflowId, name, environmentId);
 
         String componentTitle = getTitleOfComponentRequiringConnection(type);
         Set<String> nodeConnectionKeys = getNodeConnectionKeys(nodeJsonNode, type);
@@ -402,14 +406,14 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     private static boolean isConnected(
-        List<WorkflowTestConfigurationConnection> connections, Set<String> connectionKeys) {
+        List<WorkflowNodeConnection> connections, Set<String> connectionKeys) {
 
         return connections.stream()
-            .anyMatch(connection -> connectionKeys.contains(connection.getWorkflowConnectionKey()));
+            .anyMatch(connection -> connectionKeys.contains(connection.workflowConnectionKey()));
     }
 
     private void appendMissingClusterElementConnections(
-        @Nullable JsonNode clusterElementsJsonNode, List<WorkflowTestConfigurationConnection> connections,
+        @Nullable JsonNode clusterElementsJsonNode, List<WorkflowNodeConnection> connections,
         StringBuilder errors) {
 
         if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
@@ -428,7 +432,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     private void appendMissingClusterElementConnection(
-        JsonNode elementJsonNode, List<WorkflowTestConfigurationConnection> connections, StringBuilder errors) {
+        JsonNode elementJsonNode, List<WorkflowNodeConnection> connections, StringBuilder errors) {
 
         if (!elementJsonNode.isObject() || !elementJsonNode.has("name") || !elementJsonNode.has("type")) {
             return;
@@ -451,15 +455,15 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     private void appendInvalidConnections(
-        String nodeName, List<WorkflowTestConfigurationConnection> connections, Set<String> connectionKeys,
+        String nodeName, List<WorkflowNodeConnection> connections, Set<String> connectionKeys,
         StringBuilder errors) {
 
-        for (WorkflowTestConfigurationConnection testConfigurationConnection : connections) {
-            if (!connectionKeys.contains(testConfigurationConnection.getWorkflowConnectionKey())) {
+        for (WorkflowNodeConnection connection : connections) {
+            if (!connectionKeys.contains(connection.workflowConnectionKey())) {
                 continue;
             }
 
-            String invalidConnectionName = getInvalidConnectionName(testConfigurationConnection.getConnectionId());
+            String invalidConnectionName = getInvalidConnectionName(connection.connectionId());
 
             if (invalidConnectionName != null) {
                 StringUtils.appendWithNewline(
@@ -480,6 +484,33 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         }
 
         return null;
+    }
+
+    private List<WorkflowNodeConnection> getWorkflowNodeConnections(
+        String workflowId, String workflowNodeName, long environmentId) {
+
+        List<WorkflowNodeConnection> workflowNodeConnections = new ArrayList<>();
+
+        for (WorkflowTestConfigurationConnection workflowTestConfigurationConnection : getTestConfigurationConnections(
+            workflowId, workflowNodeName, environmentId)) {
+
+            workflowNodeConnections.add(
+                new WorkflowNodeConnection(
+                    workflowTestConfigurationConnection.getConnectionId(),
+                    workflowTestConfigurationConnection.getWorkflowConnectionKey()));
+        }
+
+        for (WorkflowDeploymentConnectionResolver workflowDeploymentConnectionResolver : workflowDeploymentConnectionResolvers) {
+            try {
+                workflowNodeConnections.addAll(
+                    workflowDeploymentConnectionResolver.getWorkflowNodeConnections(
+                        workflowId, workflowNodeName, environmentId));
+            } catch (Exception e) {
+                log.debug("Failed to read the deployment connections of node '{}'", workflowNodeName, e);
+            }
+        }
+
+        return workflowNodeConnections;
     }
 
     private List<WorkflowTestConfigurationConnection> getTestConfigurationConnections(
