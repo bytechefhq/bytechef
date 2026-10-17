@@ -17,6 +17,9 @@
 package com.bytechef.automation.task.facade;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.domain.PendingApproval;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for cross-service approval task operations that span the task module and other domain services.
@@ -26,12 +29,13 @@ import com.bytechef.automation.task.domain.ApprovalTask;
 public interface ApprovalTaskFacade {
 
     /**
-     * Creates an approval task, deriving its {@code environment} from the deployment that owns the task's resume job
-     * (job → principal job → project deployment → environment). Falls back to {@code DEVELOPMENT} when the chain cannot
-     * be resolved.
+     * Creates an approval task, deriving its {@code environment} from the deployment that owns the task's resume job.
      *
      * @param approvalTask the approval task to create; {@code jobResumeId} must be set
      * @return the persisted approval task
+     * @throws IllegalArgumentException if the resume token is invalid or expired
      */
     ApprovalTask createApprovalTask(ApprovalTask approvalTask);
+
+    List<PendingApproval> getPendingApprovals(@Nullable Integer environmentId);
 }

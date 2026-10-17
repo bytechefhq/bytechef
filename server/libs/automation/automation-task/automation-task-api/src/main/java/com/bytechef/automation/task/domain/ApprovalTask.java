@@ -36,7 +36,13 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class ApprovalTask {
 
     public enum Status {
-        OPEN, IN_PROGRESS, COMPLETED
+
+        // Persisted as INT ordinal - append new values at the end only.
+        OPEN, IN_PROGRESS, COMPLETED, EXPIRED;
+
+        public boolean isTerminal() {
+            return this == COMPLETED || this == EXPIRED;
+        }
     }
 
     public enum Priority {
@@ -111,6 +117,44 @@ public final class ApprovalTask {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public void changeProgressStatus(Status targetStatus) {
+        Status currentStatus = getStatus();
+
+        if (targetStatus == currentStatus) {
+            return;
+        }
+
+        if (currentStatus.isTerminal()) {
+            throw new ApprovalTaskStatusException(
+                "Cannot change approval task %s to %s; it is already %s".formatted(id, targetStatus, currentStatus));
+        }
+
+        if (targetStatus.isTerminal()) {
+            throw new ApprovalTaskStatusException(
+                "Cannot mark approval task %s as %s; only its resolution can".formatted(id, targetStatus));
+        }
+
+        this.status = targetStatus.ordinal();
+    }
+
+    public void complete() {
+        checkUnresolved(Status.COMPLETED);
+
+        this.status = Status.COMPLETED.ordinal();
+    }
+
+    public void expire() {
+        checkUnresolved(Status.EXPIRED);
+
+        this.status = Status.EXPIRED.ordinal();
+    }
+
+    public boolean isResolved() {
+        Status currentStatus = getStatus();
+
+        return currentStatus.isTerminal();
     }
 
     @Override
@@ -233,6 +277,13 @@ public final class ApprovalTask {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    private void checkUnresolved(Status targetStatus) {
+        if (isResolved()) {
+            throw new ApprovalTaskStatusException(
+                "Cannot mark approval task %s as %s; it is already %s".formatted(id, targetStatus, getStatus()));
+        }
     }
 
     private static <T extends Enum<T>> T toEnum(T[] values, int ordinal, String propertyName) {
