@@ -24,6 +24,8 @@ import java.util.Optional;
  */
 public final class TaskRunnerBootstrap {
 
+    public static final String CONNECTIONS_FILE_VARIABLE = "BYTECHEF_CONNECTIONS_FILE";
+
     private TaskRunnerBootstrap() {
     }
 

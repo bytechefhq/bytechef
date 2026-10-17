@@ -375,7 +375,7 @@ class KubernetesTaskRunnerBackendIntTest {
     }
 
     @Test
-    void testADeclaredConnectionReachesThePodAndIsMasked() {
+    void testTheConnectionsFileReachesThePodAndIsMasked() {
         RemoteTaskRunner runner = runner(() -> "connection-key");
 
         Map<String, ComponentConnection> connections = new HashMap<>(connections());
@@ -384,15 +384,17 @@ class KubernetesTaskRunnerBackendIntTest {
 
         TaskRunnerRequest request = commandsRequest(
             List.of(
-                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
-                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+                "grep -q 'xoxb-123456' \"$BYTECHEF_CONNECTIONS_FILE\" && echo matched",
+                "echo \"file=$(cat \"$BYTECHEF_CONNECTIONS_FILE\")\"",
+                "echo \"[${BYTECHEF_CONNECTION_SLACK_TOKEN:-}]\""),
             Map.of(), List.of(), Map.of("image", SHELL_IMAGE), actionContext(null, new LinkedHashMap<>()),
             connections);
 
         TaskRunnerResult taskRunnerResult = runner.run(request);
 
         assertThat(taskRunnerResult.stdout()).contains("matched")
-            .contains("token=******")
+            .contains("file=******")
+            .contains("[]")
             .doesNotContain("xoxb-123456");
     }
 
