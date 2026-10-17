@@ -16,6 +16,9 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelayToolCallback;
+import com.bytechef.ai.copilot.tool.ask.SubAgentQuestionRenderer;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,12 +37,27 @@ import org.springframework.stereotype.Component;
 public class IntelligentToolCatalog {
 
     private final List<IntelligentToolDefinition> definitions;
+    private final @Nullable SubAgentAskRelay askRelay;
 
     public IntelligentToolCatalog(ObjectProvider<IntelligentToolContributor> contributors) {
+        this(contributors, (SubAgentAskRelay) null);
+    }
+
+    @Autowired
+    public IntelligentToolCatalog(
+        ObjectProvider<IntelligentToolContributor> contributors, ObjectProvider<SubAgentAskRelay> askRelayProvider) {
+
+        this(contributors, askRelayProvider.getIfAvailable());
+    }
+
+    private IntelligentToolCatalog(
+        ObjectProvider<IntelligentToolContributor> contributors, @Nullable SubAgentAskRelay askRelay) {
+
         this.definitions = contributors.orderedStream()
             .flatMap(contributor -> contributor.getIntelligentToolDefinitions()
                 .stream())
             .toList();
+        this.askRelay = askRelay;
     }
 
     public List<ToolCallback> getByNames(
@@ -47,11 +66,22 @@ public class IntelligentToolCatalog {
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
         BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
 
+        return getByNames(names, variant, chatClientDecorator, callbackDecorator, SubAgentQuestionRenderer.JSON);
+    }
+
+    public List<ToolCallback> getByNames(
+        Set<String> names,
+        IntelligentToolVariant variant,
+        BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator,
+        SubAgentQuestionRenderer questionRenderer) {
+
         List<IntelligentToolDefinition> matchingDefinitions = definitions.stream()
             .filter(definition -> names.contains(definition.name()))
             .toList();
 
-        return buildToolCallbacks(matchingDefinitions, variant, chatClientDecorator, callbackDecorator);
+        return buildToolCallbacks(
+            matchingDefinitions, variant, chatClientDecorator, callbackDecorator, questionRenderer);
     }
 
     public List<ToolCallback> getForPanel(
@@ -65,17 +95,27 @@ public class IntelligentToolCatalog {
                 .contains(scope))
             .toList();
 
-        return buildToolCallbacks(matchingDefinitions, variant, chatClientDecorator, callbackDecorator);
+        return buildToolCallbacks(
+            matchingDefinitions, variant, chatClientDecorator, callbackDecorator, SubAgentQuestionRenderer.JSON);
+    }
+
+    public List<String> getNames() {
+        return definitions.stream()
+            .map(IntelligentToolDefinition::name)
+            .toList();
     }
 
     private List<ToolCallback> buildToolCallbacks(
         List<IntelligentToolDefinition> candidateDefinitions,
         IntelligentToolVariant variant,
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
-        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator,
+        SubAgentQuestionRenderer questionRenderer) {
 
         return candidateDefinitions.stream()
-            .map(definition -> buildToolCallback(definition, variant, chatClientDecorator, callbackDecorator))
+            .map(
+                definition -> buildToolCallback(
+                    definition, variant, chatClientDecorator, callbackDecorator, questionRenderer))
             .filter(Objects::nonNull)
             .toList();
     }
@@ -85,7 +125,8 @@ public class IntelligentToolCatalog {
         IntelligentToolDefinition definition,
         IntelligentToolVariant variant,
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator,
-        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator) {
+        BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> callbackDecorator,
+        SubAgentQuestionRenderer questionRenderer) {
 
         IntelligentToolChatClientFactory rawChatClientFactory = definition.chatClientFactory(variant);
 
@@ -93,11 +134,34 @@ public class IntelligentToolCatalog {
             return null;
         }
 
+        boolean askCapable = definition.askCapable();
+
         IntelligentToolChatClientFactory decoratedChatClientFactory =
-            chatModel -> chatClientDecorator.apply(rawChatClientFactory.get(chatModel), definition);
+            chatModel -> chatClientDecorator.apply(
+                withAskTool(rawChatClientFactory.get(chatModel), askCapable), definition);
 
         ToolCallback toolCallback = definition.create(decoratedChatClientFactory);
 
-        return callbackDecorator.apply(toolCallback, definition);
+        return callbackDecorator.apply(withAskRelay(toolCallback, questionRenderer, askCapable), definition);
+    }
+
+    private ChatClient withAskTool(ChatClient chatClient, boolean askCapable) {
+        if (askRelay == null || !askCapable) {
+            return chatClient;
+        }
+
+        return chatClient.mutate()
+            .defaultTools(askRelay.askUserQuestionToolCallback())
+            .build();
+    }
+
+    private ToolCallback withAskRelay(
+        ToolCallback toolCallback, SubAgentQuestionRenderer questionRenderer, boolean askCapable) {
+
+        if (askRelay == null || !askCapable) {
+            return toolCallback;
+        }
+
+        return new SubAgentAskRelayToolCallback(toolCallback, askRelay, questionRenderer);
     }
 }
