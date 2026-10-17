@@ -7,7 +7,7 @@ vi.mock('@/shared/components/MonacoEditorLoader', () => ({
     default: () => <div data-testid="monaco-loader" />,
 }));
 
-vi.mock('@monaco-editor/react', () => ({
+vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: () => <div data-testid="monaco-editor" />,
 }));
 
