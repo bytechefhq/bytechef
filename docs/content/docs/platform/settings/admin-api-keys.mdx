@@ -43,7 +43,7 @@ Each row ends with an **edit** (pencil) and a **delete** (trash) icon.
 
 ## Environments
 
-Every key is bound to the environment active in the **Environment** selector at the moment it is created. Keys created against one environment do not authenticate calls made against another. Switching the selector re-lists the keys for that environment.
+Every key is listed under the environment active in the **Environment** selector at the moment it is created, and switching the selector re-lists the keys for that environment. The environment only organizes the list: an admin key authenticates in every environment.
 
 ## Create a key
 
@@ -82,6 +82,6 @@ An Admin API key is the default credential for the [management MCP server](/plat
 Authorization: Bearer <your-api-key>
 ```
 
-The key is bound to an environment, so requests must target the same one via the `X-ENVIRONMENT` header. That header defaults to `PRODUCTION` when omitted, and an unrecognised value is rejected as bad credentials rather than falling back.
+The key works in every environment; the `X-ENVIRONMENT` header is not checked against it.
 
 Because the key is tied to your account, the assistant acts with your permissions - and you can revoke a single client by deleting its key, without touching the server URL or the other clients. See [MCP Server](/platform/settings/mcp-server) for the full setup.

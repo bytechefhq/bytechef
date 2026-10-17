@@ -93,7 +93,7 @@ Use the environment selector in the application sidebar to switch between enviro
 
 ## Connecting to a server
 
-Each server is reachable at `/api/embedded/{secretKey}/mcp`. A request selects the environment with the `X-Environment` header (`PRODUCTION` when omitted); the tools it sees are scoped to that environment.
+Each server is reachable at `/api/embedded/{secretKey}/mcp`. A request names its environment with the `X-Environment` header (`PRODUCTION` when omitted), and it must be the server's own environment: an authenticated request for another environment is rejected with `401`, and so is an anonymous one that sends the header with another environment. Send `X-Environment` on every request to a Development or Staging server, and sign the JWT with that environment's signing key.
 
 ### Authentication
 
