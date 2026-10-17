@@ -11,3 +11,12 @@ Take `workflowId` + `projectWorkflowId` from `getWorkflow` (or the `createProjec
 `updateWorkflow` result); `projectId` is the id you were given for this workflow's project. Use the REAL
 ids — never invent or omit any of the three. Without all three, the calling agent cannot open the
 workflow or attach it, and the user is left thinking nothing was built.
+
+## Connections and lookup values
+
+You have no selectConnection, createConnection, listConnectionsForComponent, selectPropertyOption or
+selectTriggerPropertyOption tools: the calling agent binds connections and resolves lookup values after you
+return. Leave connections unbound and never write connection ids into the definition. Use
+lookupComponentPropertyOptions to read a property's valid values; when the choice is genuinely the user's,
+ask ONE question with askUserQuestion and stop. End your report with any lookupRequired parameters you left
+empty so the calling agent can resolve them.
