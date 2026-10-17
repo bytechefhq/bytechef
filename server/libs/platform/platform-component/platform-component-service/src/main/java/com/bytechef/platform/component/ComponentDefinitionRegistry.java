@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.platform.component.util.ClusterElementTypeUtils.isSameClusterElementType;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MemoizationUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -48,17 +49,31 @@ import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ProviderEntry;
+import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
+import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
+import com.bytechef.platform.component.index.ComponentIndex;
+import com.bytechef.platform.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
+import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -87,13 +102,51 @@ public class ComponentDefinitionRegistry {
         .actions(ComponentDsl.action("missing")
             .title("Missing Action"));
 
-    private final Map<String, Map<Integer, ComponentDefinition>> componentDefinitionsMap = new HashMap<>();
+    private static final List<ComponentHandlerLoader> COMPONENT_HANDLER_LOADERS = List.of(
+        new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenApiComponentHandlerLoader());
+
+    private final ApplicationProperties applicationProperties;
+    private final Supplier<List<ComponentDefinition>> allComponentDefinitionsSupplier;
+    private final Supplier<Map<String, Map<Integer, ComponentDefinition>>> componentDefinitionsMapSupplier;
+    private final List<ComponentHandler> componentHandlers;
+    private final Supplier<Optional<ComponentIndex>> componentIndexSupplier;
     private final List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries;
+    private final Map<String, List<ComponentDefinition>> loadedComponentDefinitionsByName = new ConcurrentHashMap<>();
+    private final Supplier<List<ComponentDefinition>> stubComponentDefinitionsSupplier;
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
         Supplier<List<ComponentHandlerEntry>> componentHandlerEntriesSupplier,
         List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries) {
+
+        this(
+            applicationProperties, componentHandlers, componentHandlerEntriesSupplier,
+            dynamicComponentHandlerRegistries,
+            MemoizationUtils.memoize(() -> ComponentIndex.load(ComponentDefinitionRegistry.class.getClassLoader())));
+    }
+
+    ComponentDefinitionRegistry(
+        ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
+        Supplier<List<ComponentHandlerEntry>> componentHandlerEntriesSupplier,
+        List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries,
+        Supplier<Optional<ComponentIndex>> componentIndexSupplier) {
+
+        this.applicationProperties = applicationProperties;
+        this.componentHandlers = componentHandlers;
+        this.allComponentDefinitionsSupplier = MemoizationUtils.memoize(this::loadAllComponentDefinitions);
+        this.componentDefinitionsMapSupplier = MemoizationUtils.memoize(
+            () -> loadComponentDefinitionsMap(
+                applicationProperties, componentHandlers, componentHandlerEntriesSupplier));
+        this.componentIndexSupplier = componentIndexSupplier;
+        this.dynamicComponentHandlerRegistries = dynamicComponentHandlerRegistries;
+        this.stubComponentDefinitionsSupplier = MemoizationUtils.memoize(this::loadStubComponentDefinitions);
+    }
+
+    private static Map<String, Map<Integer, ComponentDefinition>> loadComponentDefinitionsMap(
+        ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
+        Supplier<List<ComponentHandlerEntry>> componentHandlerEntriesSupplier) {
+
+        long startTime = System.currentTimeMillis();
 
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
             componentHandlers,
@@ -119,13 +172,218 @@ public class ComponentDefinitionRegistry {
 
         validate(componentDefinitions);
 
+        Map<String, Map<Integer, ComponentDefinition>> componentDefinitionsMap = new HashMap<>();
+
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            this.componentDefinitionsMap
+            componentDefinitionsMap
                 .computeIfAbsent(StringUtils.upperCase(componentDefinition.getName()), key -> new HashMap<>())
                 .put(componentDefinition.getVersion(), componentDefinition);
         }
 
-        this.dynamicComponentHandlerRegistries = dynamicComponentHandlerRegistries;
+        if (log.isInfoEnabled()) {
+            log.info(
+                "Loaded, validated and indexed {} component definitions in {} ms", componentDefinitions.size(),
+                System.currentTimeMillis() - startTime);
+        }
+
+        return componentDefinitionsMap;
+    }
+
+    private List<String> getExcludedComponentNames() {
+        ApplicationProperties.Component component = applicationProperties.getComponent();
+
+        Registry registry = component.getRegistry();
+
+        List<String> exclude = registry.getExclude();
+
+        return exclude == null ? List.of() : exclude;
+    }
+
+    private boolean isExcluded(String componentName) {
+        return CollectionUtils.contains(getExcludedComponentNames(), componentName);
+    }
+
+    private List<ComponentDefinition> getComponentDefinitionsFromIndex(String name, ComponentIndex componentIndex) {
+        return getComponentDefinitionsFromIndex(
+            name, componentIndex,
+            entry -> getComponentHandlerLoader(entry.loaderKind()).loadComponentHandler(entry.providerClassName()));
+    }
+
+    private List<ComponentDefinition> getComponentDefinitionsFromIndex(
+        String name, ComponentIndex componentIndex,
+        Function<ComponentIndex.Entry, Optional<ComponentHandlerEntry>> componentHandlerEntryResolver) {
+
+        if (isExcluded(name)) {
+            return List.of();
+        }
+
+        if (name.equalsIgnoreCase(MANUAL_COMPONENT_DEFINITION.getName())) {
+            return List.of(MANUAL_COMPONENT_DEFINITION);
+        }
+
+        if (name.equalsIgnoreCase(MISSING_COMPONENT_DEFINITION.getName())) {
+            return List.of(MISSING_COMPONENT_DEFINITION);
+        }
+
+        return loadedComponentDefinitionsByName.computeIfAbsent(
+            StringUtils.upperCase(name),
+            key -> loadComponentDefinitionsByName(name, componentIndex, componentHandlerEntryResolver));
+    }
+
+    private List<ComponentDefinition> loadComponentDefinitionsByName(
+        String name, ComponentIndex componentIndex,
+        Function<ComponentIndex.Entry, Optional<ComponentHandlerEntry>> componentHandlerEntryResolver) {
+
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>();
+
+        for (ComponentHandler componentHandler : componentHandlers) {
+            ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+            if (name.equalsIgnoreCase(componentDefinition.getName())) {
+                validate(List.of(componentDefinition));
+
+                componentDefinitions.add(componentDefinition);
+            }
+        }
+
+        for (ComponentIndex.Entry entry : componentIndex.entries()) {
+            if (!name.equalsIgnoreCase(entry.name())) {
+                continue;
+            }
+
+            ComponentDefinition componentDefinition = componentHandlerEntryResolver.apply(entry)
+                .map(componentHandlerEntry -> componentHandlerEntry.componentHandler()
+                    .getDefinition())
+                .orElse(null);
+
+            if (componentDefinition == null) {
+                log.warn(
+                    "Component index entry '{}' v{} points to provider '{}' which is not present on the classpath",
+                    entry.name(), entry.version(), entry.providerClassName());
+
+                continue;
+            }
+
+            validate(List.of(componentDefinition));
+
+            componentDefinitions.add(componentDefinition);
+        }
+
+        componentDefinitions.sort(Comparator.comparing(ComponentDefinition::getVersion));
+
+        if (log.isDebugEnabled() && !componentDefinitions.isEmpty()) {
+            log.debug("Loaded component '{}' on demand ({} version(s))", name, componentDefinitions.size());
+        }
+
+        return componentDefinitions;
+    }
+
+    private static ComponentHandlerLoader getComponentHandlerLoader(ComponentHandlerLoaderKind loaderKind) {
+        return COMPONENT_HANDLER_LOADERS.stream()
+            .filter(componentHandlerLoader -> componentHandlerLoader.getKind() == loaderKind)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Unknown component loader kind: " + loaderKind));
+    }
+
+    private List<ComponentDefinition> loadAllComponentDefinitions() {
+        ComponentIndex componentIndex = getRequiredComponentIndex();
+
+        Set<ComponentHandlerLoaderKind> loaderKinds = EnumSet.noneOf(ComponentHandlerLoaderKind.class);
+
+        for (ComponentIndex.Entry entry : componentIndex.entries()) {
+            loaderKinds.add(entry.loaderKind());
+        }
+
+        Map<String, ComponentHandlerEntry> componentHandlerEntriesByProviderClassName = new HashMap<>();
+
+        for (ComponentHandlerLoader componentHandlerLoader : COMPONENT_HANDLER_LOADERS) {
+            if (!loaderKinds.contains(componentHandlerLoader.getKind())) {
+                continue;
+            }
+
+            for (ProviderEntry providerEntry : componentHandlerLoader.loadProviderEntries()) {
+                componentHandlerEntriesByProviderClassName.put(
+                    providerEntry.providerClassName(), providerEntry.componentHandlerEntry());
+            }
+        }
+
+        Function<ComponentIndex.Entry, Optional<ComponentHandlerEntry>> componentHandlerEntryResolver =
+            entry -> Optional.ofNullable(componentHandlerEntriesByProviderClassName.get(entry.providerClassName()));
+
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>();
+
+        Set<String> names = new LinkedHashSet<>();
+
+        for (ComponentHandler componentHandler : componentHandlers) {
+            ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+            names.add(componentDefinition.getName());
+        }
+
+        for (ComponentIndex.Entry entry : componentIndex.entries()) {
+            names.add(entry.name());
+        }
+
+        for (String name : names) {
+            componentDefinitions.addAll(
+                getComponentDefinitionsFromIndex(name, componentIndex, componentHandlerEntryResolver));
+        }
+
+        if (!isExcluded(MANUAL_COMPONENT_DEFINITION.getName())) {
+            componentDefinitions.add(MANUAL_COMPONENT_DEFINITION);
+        }
+
+        if (!isExcluded(MISSING_COMPONENT_DEFINITION.getName())) {
+            componentDefinitions.add(MISSING_COMPONENT_DEFINITION);
+        }
+
+        return componentDefinitions;
+    }
+
+    private List<ComponentDefinition> loadStubComponentDefinitions() {
+        ComponentIndex componentIndex = getRequiredComponentIndex();
+
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>();
+
+        for (ComponentHandler componentHandler : componentHandlers) {
+            componentDefinitions.add(componentHandler.getDefinition());
+        }
+
+        for (ComponentIndex.Entry entry : componentIndex.entries()) {
+            try {
+                componentDefinitions.add(ComponentIndex.toStubComponentDefinition(entry));
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Failed to build the list-view stub for component '{}' v{} from the index; falling back to full "
+                        + "component loading for the components list",
+                    entry.name(), entry.version(), exception);
+
+                return CollectionUtils.sort(allComponentDefinitionsSupplier.get(), this::compare);
+            }
+        }
+
+        componentDefinitions.add(MANUAL_COMPONENT_DEFINITION);
+        componentDefinitions.add(MISSING_COMPONENT_DEFINITION);
+
+        List<String> excludedComponentNames = getExcludedComponentNames();
+
+        if (!excludedComponentNames.isEmpty()) {
+            componentDefinitions = componentDefinitions.stream()
+                .filter(componentDefinition -> !CollectionUtils.contains(
+                    excludedComponentNames, componentDefinition.getName()))
+                .toList();
+        }
+
+        return CollectionUtils.sort(componentDefinitions, this::compare);
+    }
+
+    private ComponentIndex getRequiredComponentIndex() {
+        return componentIndexSupplier.get()
+            .orElseThrow(() -> new IllegalStateException("Component index is not present"));
+    }
+
+    private Optional<ComponentIndex> fetchComponentIndex() {
+        return componentIndexSupplier.get();
     }
 
     public Optional<Authorization> fetchAuthorization(
@@ -150,11 +408,21 @@ public class ComponentDefinitionRegistry {
                 componentDefinition = filteredComponentDefinitions.getLast();
             }
         } else {
-            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitionsMap.get(
-                StringUtils.upperCase(name));
+            Optional<ComponentIndex> componentIndexOptional = fetchComponentIndex();
 
-            if (componentDefinitionMap != null) {
-                componentDefinition = componentDefinitionMap.get(version);
+            if (componentIndexOptional.isPresent()) {
+                componentDefinition = getComponentDefinitionsFromIndex(name, componentIndexOptional.get())
+                    .stream()
+                    .filter(curComponentDefinition -> curComponentDefinition.getVersion() == version)
+                    .findFirst()
+                    .orElse(null);
+            } else {
+                Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitionsMapSupplier.get()
+                    .get(StringUtils.upperCase(name));
+
+                if (componentDefinitionMap != null) {
+                    componentDefinition = componentDefinitionMap.get(version);
+                }
             }
 
             if (componentDefinition == null) {
@@ -184,12 +452,21 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ComponentDefinition> getComponentDefinitions() {
+        List<ComponentDefinition> staticComponentDefinitions;
+
+        if (fetchComponentIndex().isPresent()) {
+            staticComponentDefinitions = allComponentDefinitionsSupplier.get();
+        } else {
+            staticComponentDefinitions = componentDefinitionsMapSupplier.get()
+                .values()
+                .stream()
+                .flatMap(map -> CollectionUtils.stream(map.values()))
+                .toList();
+        }
+
         return CollectionUtils.sort(
             CollectionUtils.concat(
-                componentDefinitionsMap.values()
-                    .stream()
-                    .flatMap(map -> CollectionUtils.stream(map.values()))
-                    .toList(),
+                staticComponentDefinitions,
                 dynamicComponentHandlerRegistries.stream()
                     .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
                         dynamicComponentHandlerRegistry.getComponentHandlers()))
@@ -308,15 +585,21 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ComponentDefinition> getComponentDefinitions(String name) {
-        Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitionsMap.get(
-            StringUtils.upperCase(name));
-
         List<ComponentDefinition> filteredComponentDefinitions = List.of();
 
-        if (integerComponentDefinitionMap != null) {
-            filteredComponentDefinitions = integerComponentDefinitionMap.values()
-                .stream()
-                .toList();
+        Optional<ComponentIndex> componentIndexOptional = fetchComponentIndex();
+
+        if (componentIndexOptional.isPresent()) {
+            filteredComponentDefinitions = getComponentDefinitionsFromIndex(name, componentIndexOptional.get());
+        } else {
+            Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitionsMapSupplier.get()
+                .get(StringUtils.upperCase(name));
+
+            if (integerComponentDefinitionMap != null) {
+                filteredComponentDefinitions = integerComponentDefinitionMap.values()
+                    .stream()
+                    .toList();
+            }
         }
 
         if (filteredComponentDefinitions.isEmpty()) {
@@ -372,8 +655,13 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ComponentDefinition> getStaticComponentDefinitions() {
+        if (fetchComponentIndex().isPresent()) {
+            return stubComponentDefinitionsSupplier.get();
+        }
+
         return CollectionUtils.sort(
-            componentDefinitionsMap.values()
+            componentDefinitionsMapSupplier.get()
+                .values()
                 .stream()
                 .flatMap(map -> CollectionUtils.stream(map.values()))
                 .toList(),
@@ -544,7 +832,7 @@ public class ComponentDefinitionRegistry {
         return firstSubPropertyName;
     }
 
-    private void validate(List<ComponentDefinition> componentDefinitions) {
+    private static void validate(List<ComponentDefinition> componentDefinitions) {
         for (ComponentDefinition componentDefinition : componentDefinitions) {
             List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions()
                 .orElse(List.of());
