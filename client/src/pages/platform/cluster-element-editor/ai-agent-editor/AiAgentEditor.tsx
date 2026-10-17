@@ -51,7 +51,7 @@ export default function AiAgentEditor({
 
     if (evalsPanelOpen) {
         return (
-            <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
+            <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-surface-neutral-primary', className)}>
                 <AiAgentHeader
                     copilotEnabled={ff_4572 && copilotEnabled}
                     onClose={handleEvalsClose}
@@ -67,7 +67,7 @@ export default function AiAgentEditor({
     }
 
     return (
-        <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-white', className)}>
+        <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-surface-neutral-primary', className)}>
             <AiAgentHeader
                 copilotEnabled={copilotEnabled}
                 onClose={onClose}

@@ -206,7 +206,7 @@ const CreateKnowledgeBaseDialog = ({trigger, workspaceId}: CreateKnowledgeBaseDi
 
                                                     {file.status === 'error' && (
                                                         <div className="flex items-center space-x-2">
-                                                            <span className="text-xs text-red-500">
+                                                            <span className="text-xs text-content-destructive">
                                                                 {file.statusMessage || 'Error'}
                                                             </span>
                                                         </div>

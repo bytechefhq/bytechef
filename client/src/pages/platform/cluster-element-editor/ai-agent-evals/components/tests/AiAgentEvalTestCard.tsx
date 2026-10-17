@@ -83,14 +83,14 @@ const AiAgentEvalTestCard = ({
         <>
             <div className="rounded-lg border border-border/50">
                 <div
-                    className="flex cursor-pointer items-center justify-between px-3 py-3 hover:bg-gray-50"
+                    className="flex cursor-pointer items-center justify-between px-3 py-3 hover:bg-surface-neutral-primary-hover"
                     onClick={() => setExpanded(!expanded)}
                 >
                     <div className="flex flex-1 items-center gap-3">
                         {expanded ? (
-                            <ChevronDownIcon className="size-4 text-gray-400" />
+                            <ChevronDownIcon className="size-4 text-content-neutral-tertiary" />
                         ) : (
-                            <ChevronRightIcon className="size-4 text-gray-400" />
+                            <ChevronRightIcon className="size-4 text-content-neutral-tertiary" />
                         )}
 
                         <div className="flex size-8 items-center justify-center rounded bg-emerald-500">

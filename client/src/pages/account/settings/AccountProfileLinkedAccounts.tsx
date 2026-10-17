@@ -133,7 +133,7 @@ const AccountProfileLinkedAccounts = () => {
                 )}
 
                 {isLinked && !linkedAccount.hasPassword && (
-                    <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-surface-warning-secondary p-3">
+                    <div className="flex items-center gap-2 rounded-lg border border-stroke-warning-secondary bg-surface-warning-secondary p-3">
                         <UnlinkIcon className="size-4 text-content-warning-primary" />
 
                         <p className="text-sm text-content-warning-primary">

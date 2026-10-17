@@ -23,20 +23,20 @@ export const getStatusCodeColor = (statusCode: string): string => {
     const code = parseInt(statusCode, 10);
 
     if (code >= 200 && code < 300) {
-        return 'bg-surface-success-secondary text-green-800';
+        return 'bg-surface-success-secondary text-content-success-primary';
     }
 
     if (code >= 300 && code < 400) {
-        return 'bg-surface-brand-secondary text-blue-800';
+        return 'bg-surface-brand-secondary text-content-brand-primary';
     }
 
     if (code >= 400 && code < 500) {
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-surface-warning-secondary text-content-warning-primary';
     }
 
     if (code >= 500) {
-        return 'bg-surface-destructive-secondary text-red-800';
+        return 'bg-surface-destructive-secondary text-content-destructive';
     }
 
-    return 'bg-surface-neutral-secondary text-gray-800';
+    return 'bg-surface-neutral-secondary text-content-neutral-primary';
 };

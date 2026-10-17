@@ -18,7 +18,7 @@ type ResultType = NonNullable<AiAgentEvalRunQuery['aiAgentEvalRun']>['results'][
 const STATUS_ICONS: Record<AiAgentEvalResultStatus, React.ReactNode> = {
     [AiAgentEvalResultStatus.Completed]: <CheckCircle2Icon className="size-4 text-green-500" />,
     [AiAgentEvalResultStatus.Failed]: <XCircleIcon className="size-4 text-red-500" />,
-    [AiAgentEvalResultStatus.Pending]: <div className="size-4 rounded-full border-2 border-gray-300" />,
+    [AiAgentEvalResultStatus.Pending]: <div className="size-4 rounded-full border-2 border-stroke-neutral-tertiary" />,
     [AiAgentEvalResultStatus.Running]: <Loader2Icon className="size-4 animate-spin text-blue-500" />,
 };
 
@@ -68,7 +68,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                     return (
                         <div className="border-b border-border/30 last:border-b-0" key={result.id}>
                             <div
-                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 px-3 py-2.5 hover:bg-gray-50"
+                                className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 px-3 py-2.5 hover:bg-surface-neutral-primary-hover"
                                 onClick={() => setExpandedResultId(isExpanded ? null : result.id)}
                             >
                                 <div>{STATUS_ICONS[result.status]}</div>
@@ -84,8 +84,8 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                         className={twMerge(
                                             'rounded-full border px-2 py-0.5 text-xs font-medium',
                                             isSingleTurn
-                                                ? 'border-blue-200 bg-blue-50 text-blue-700'
-                                                : 'border-purple-200 bg-purple-50 text-purple-700'
+                                                ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                                                : 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300'
                                         )}
                                     >
                                         {isSingleTurn ? 'Single-turn' : 'Multi-turn'}
@@ -95,7 +95,7 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                 <div>
                                     {scorePercent != null ? (
                                         <div className="flex items-center gap-1.5">
-                                            <div className="h-1.5 w-10 overflow-hidden rounded-full bg-gray-200">
+                                            <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-neutral-tertiary">
                                                 <div
                                                     className={twMerge(
                                                         'h-full rounded-full',
@@ -109,10 +109,12 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                                 />
                                             </div>
 
-                                            <span className="text-xs text-gray-600">{scorePercent}%</span>
+                                            <span className="text-xs text-content-neutral-secondary">
+                                                {scorePercent}%
+                                            </span>
                                         </div>
                                     ) : (
-                                        <span className="text-xs text-gray-400">--</span>
+                                        <span className="text-xs text-content-neutral-tertiary">--</span>
                                     )}
                                 </div>
 
@@ -141,17 +143,17 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                     )}
 
                                     {isExpanded ? (
-                                        <ChevronDownIcon className="size-4 text-gray-400" />
+                                        <ChevronDownIcon className="size-4 text-content-neutral-tertiary" />
                                     ) : (
-                                        <ChevronRightIcon className="size-4 text-gray-400" />
+                                        <ChevronRightIcon className="size-4 text-content-neutral-tertiary" />
                                     )}
                                 </div>
                             </div>
 
                             {isExpanded && (
-                                <div className="border-t border-border/30 bg-gray-50/50">
+                                <div className="border-t border-border/30 bg-surface-neutral-secondary/50">
                                     {result.errorMessage && (
-                                        <div className="px-3 py-2 text-xs text-red-600">
+                                        <div className="px-3 py-2 text-xs text-content-destructive">
                                             Error: {result.errorMessage}
                                         </div>
                                     )}

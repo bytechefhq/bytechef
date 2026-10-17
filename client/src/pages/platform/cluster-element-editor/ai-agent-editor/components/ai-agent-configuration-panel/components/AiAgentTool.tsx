@@ -29,12 +29,12 @@ export default function AiAgentTool({configuredConnectionKeys, tool}: AiAgentToo
         >
             {tool.icon ? (
                 <InlineSVG
-                    className="size-5 flex-none text-gray-700"
-                    loader={<ComponentIcon className="size-5 flex-none text-gray-700" />}
+                    className="size-5 flex-none text-content-neutral-subtle"
+                    loader={<ComponentIcon className="size-5 flex-none text-content-neutral-subtle" />}
                     src={tool.icon}
                 />
             ) : (
-                <ComponentIcon className="size-5 flex-none text-gray-700" />
+                <ComponentIcon className="size-5 flex-none text-content-neutral-subtle" />
             )}
 
             <div className="flex flex-1 items-center justify-start gap-1 truncate">

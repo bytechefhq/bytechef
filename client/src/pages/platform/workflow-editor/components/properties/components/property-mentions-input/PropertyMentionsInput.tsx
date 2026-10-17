@@ -277,7 +277,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     className={twMerge(
                         'relative flex items-center rounded-md transition-colors',
                         error &&
-                            'border-stroke-destructive-secondary text-rose-900 ring-stroke-destructive-secondary focus-within:ring-stroke-destructive-secondary',
+                            'border-stroke-destructive-secondary text-content-destructive ring-stroke-destructive-secondary focus-within:ring-stroke-destructive-secondary',
                         isFocused && 'ring-2 ring-ring',
                         label && 'mt-1',
                         leadingIcon && 'rounded-md border border-stroke-neutral-secondary'

@@ -37,20 +37,20 @@ const PlanTierCard = ({
                 highlighted ? 'bg-surface-neutral-primary' : 'bg-slate-100'
             )}
         >
-            <span className="text-xl font-bold">{name}</span>
+            <span className="text-xl font-bold text-content-neutral-primary">{name}</span>
 
-            <span className="text-base text-muted-foreground">{description}</span>
+            <span className="text-base text-content-neutral-secondary">{description}</span>
         </div>
 
         <div className="flex flex-col items-center justify-center gap-4 px-4 py-8">
             {price !== null ? (
                 <p className="text-[0px]">
-                    <span className="text-xl font-bold text-foreground">{price}</span>
+                    <span className="text-xl font-bold text-content-neutral-primary">{price}</span>
 
-                    <span className="text-base text-muted-foreground">{' / Month'}</span>
+                    <span className="text-base text-content-neutral-secondary">{' / Month'}</span>
                 </p>
             ) : (
-                <span className="text-xl font-bold text-foreground">{ctaLabel}</span>
+                <span className="text-xl font-bold text-content-neutral-primary">{ctaLabel}</span>
             )}
 
             <Button
@@ -67,9 +67,9 @@ const PlanTierCard = ({
         <ul className="flex flex-1 flex-col gap-3 px-4 py-5">
             {features.map((feature) => (
                 <li className="flex items-start gap-3" key={feature}>
-                    <CircleCheckIcon className="mt-0.5 size-4 shrink-0 text-foreground" />
+                    <CircleCheckIcon className="mt-0.5 size-4 shrink-0 text-content-brand-primary" />
 
-                    <span className="text-base font-medium text-foreground">{feature}</span>
+                    <span className="text-base font-medium text-content-neutral-primary">{feature}</span>
                 </li>
             ))}
         </ul>
