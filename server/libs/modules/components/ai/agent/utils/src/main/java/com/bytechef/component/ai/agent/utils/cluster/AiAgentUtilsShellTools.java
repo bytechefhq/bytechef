@@ -16,16 +16,14 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
-import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
-import java.nio.file.Path;
-import org.jspecify.annotations.Nullable;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import org.springaicommunity.agent.tools.ShellTools;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
@@ -36,18 +34,17 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsShellTools {
 
-    public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("shellTools")
+    public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
+        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("shellTools")
             .title("Shell Tools")
             .description("Execute shell commands with timeout control, background process management, "
                 + "and regex output filtering.")
-            .type(CLAUDE_CODE_TOOLS)
+            .type(TOOLS)
             .object(() -> AiAgentUtilsShellTools::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
-        @Nullable ChatModel chatModel) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         ShellTools shellTools = ShellTools.builder()
             .build();
