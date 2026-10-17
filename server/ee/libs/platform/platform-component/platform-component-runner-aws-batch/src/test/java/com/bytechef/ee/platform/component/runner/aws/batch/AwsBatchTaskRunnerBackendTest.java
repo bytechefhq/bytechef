@@ -14,6 +14,7 @@ import static com.bytechef.ee.platform.component.runner.aws.batch.FakeAwsBatchOp
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
@@ -33,6 +34,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +117,19 @@ class AwsBatchTaskRunnerBackendTest {
         assertThat(operations.submitted.getFirst()
             .jobQueue()).isEqualTo("bytechef");
         assertThat(operations.sessionDurations).contains(Duration.ofMinutes(70));
+    }
+
+    @Test
+    void testSubmitSpoolsTheInputsIntoAnOwnerOnlyTempFile() throws Exception {
+        assumeTrue(FileSystems.getDefault()
+            .supportedFileAttributeViews()
+            .contains("posix"));
+
+        backend.submit(
+            spec(base()), new ByteArrayInputStream("tar-bytes".getBytes(StandardCharsets.UTF_8)),
+            Deadline.after(Duration.ofMinutes(1)), context(base(), connection()));
+
+        assertThat(operations.stagedFilePermissions).containsExactly("rw-------");
     }
 
     @Test

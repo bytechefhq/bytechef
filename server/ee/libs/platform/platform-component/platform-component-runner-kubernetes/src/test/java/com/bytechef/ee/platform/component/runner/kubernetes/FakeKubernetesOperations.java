@@ -21,6 +21,12 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -49,6 +56,7 @@ final class FakeKubernetesOperations implements KubernetesOperations {
     final List<Pod> createdPods = new ArrayList<>();
     final List<Duration> requestTimeouts = new ArrayList<>();
     final List<SecretOwner> secretOwners = new ArrayList<>();
+    final List<String> deliveredFilePermissions = new ArrayList<>();
 
     List<Pod> listedPods = List.of();
     String logText = "";
@@ -184,6 +192,12 @@ final class FakeKubernetesOperations implements KubernetesOperations {
         execCalls.add(new ExecCall(container, command, input));
 
         if (String.join(" ", command)
+            .contains("tar -xf -")) {
+
+            recordDeliveredFilePermissions();
+        }
+
+        if (String.join(" ", command)
             .contains("tar -cf -")) {
 
             stdout.write(collectBytes);
@@ -192,6 +206,24 @@ final class FakeKubernetesOperations implements KubernetesOperations {
         Integer exitCode = execResults.poll();
 
         return new ExecResult(exitCode == null ? 0 : exitCode, exitCode == null || exitCode == 0 ? "" : "tar: error");
+    }
+
+    private void recordDeliveredFilePermissions() throws IOException {
+        FileSystem fileSystem = FileSystems.getDefault();
+
+        Set<String> supportedFileAttributeViews = fileSystem.supportedFileAttributeViews();
+
+        if (!supportedFileAttributeViews.contains("posix")) {
+            return;
+        }
+
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(
+            Path.of(System.getProperty("java.io.tmpdir")), "bytechef-kubernetes-input-*")) {
+
+            for (Path path : paths) {
+                deliveredFilePermissions.add(PosixFilePermissions.toString(Files.getPosixFilePermissions(path)));
+            }
+        }
     }
 
     @Override

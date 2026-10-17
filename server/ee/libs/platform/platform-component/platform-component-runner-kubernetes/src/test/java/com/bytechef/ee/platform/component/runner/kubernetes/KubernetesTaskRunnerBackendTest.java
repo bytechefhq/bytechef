@@ -17,6 +17,7 @@ import static com.bytechef.ee.platform.component.runner.kubernetes.FakeKubernete
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,6 +44,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -165,6 +167,23 @@ class KubernetesTaskRunnerBackendTest {
             .getMetadata()
             .getAnnotations()).containsEntry("bytechef.io/pull-secret", SECRET_NAME);
         assertThat(handle.attributes()).containsEntry("pullSecret", SECRET_NAME);
+    }
+
+    @Test
+    void testSubmitSpoolsTheInputsIntoAnOwnerOnlyTempFile() throws Exception {
+        assumeTrue(FileSystems.getDefault()
+            .supportedFileAttributeViews()
+            .contains("posix"));
+
+        operations.podSnapshots.add(pod(running(), null, null, KEY_ANNOTATION));
+
+        Map<String, ?> runnerParameters = Map.of();
+
+        backend.submit(
+            spec(runnerParameters), new ByteArrayInputStream("tar-bytes".getBytes(StandardCharsets.UTF_8)),
+            Deadline.after(Duration.ofMinutes(1)), context(runnerParameters, validConnection()));
+
+        assertThat(operations.deliveredFilePermissions).containsExactly("rw-------");
     }
 
     @Test
