@@ -99,6 +99,35 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApprovalTask> getUnresolvedApprovalTasks() {
+        return approvalTaskRepository.findAllByStatusIn(
+            List.of(ApprovalTask.Status.OPEN.ordinal(), ApprovalTask.Status.IN_PROGRESS.ordinal()));
+    }
+
+    @Override
+    public ApprovalTask resolve(ApprovalTask approvalTask) {
+        Assert.notNull(approvalTask, "'approvalTask' must not be null");
+        Assert.notNull(approvalTask.getId(), "'id' must not be null");
+
+        ApprovalTask.Status resolvedStatus = approvalTask.getStatus();
+
+        Assert.isTrue(resolvedStatus.isTerminal(), "'status' must be COMPLETED or EXPIRED");
+
+        ApprovalTask curApprovalTask = getApprovalTask(approvalTask.getId());
+
+        if (resolvedStatus == ApprovalTask.Status.COMPLETED) {
+            curApprovalTask.complete();
+        } else {
+            curApprovalTask.expire();
+        }
+
+        curApprovalTask.setVersion(approvalTask.getVersion());
+
+        return approvalTaskRepository.save(curApprovalTask);
+    }
+
+    @Override
     public ApprovalTask update(ApprovalTask approvalTask) {
         Assert.notNull(approvalTask, "'approvalTask' must not be null");
         Assert.notNull(approvalTask.getId(), "'id' must not be null");
@@ -108,7 +137,7 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
 
         curApprovalTask.setDescription(approvalTask.getDescription());
         curApprovalTask.setName(approvalTask.getName());
-        curApprovalTask.setStatus(approvalTask.getStatus());
+        curApprovalTask.changeProgressStatus(approvalTask.getStatus());
         curApprovalTask.setPriority(approvalTask.getPriority());
         curApprovalTask.setAssigneeId(approvalTask.getAssigneeId());
         curApprovalTask.setDueDate(approvalTask.getDueDate());

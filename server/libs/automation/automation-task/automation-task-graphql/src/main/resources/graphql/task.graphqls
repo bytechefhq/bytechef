@@ -2,6 +2,7 @@ enum ApprovalTaskStatus {
     OPEN
     IN_PROGRESS
     COMPLETED
+    EXPIRED
 }
 
 enum ApprovalTaskPriority {
@@ -37,10 +38,19 @@ input ApprovalTaskInput {
     version: Int
 }
 
+type PendingApproval {
+    jobId: ID!
+    workflowLabel: String!
+    formUrl: String
+    createdDate: String
+    expiresAt: String
+}
+
 extend type Query {
     approvalTask(id: ID!): ApprovalTask
     approvalTasks(environmentId: Int): [ApprovalTask]
     approvalTasksByIds(ids: [ID!]!): [ApprovalTask]
+    pendingApprovals(environmentId: Int): [PendingApproval]
 }
 
 extend type Mutation {
