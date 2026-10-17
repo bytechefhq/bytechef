@@ -117,19 +117,23 @@ public class ConditionTaskUtils {
     // SpelExpressionParser. The actual sink reported in #5081 is closed by evaluating against the
     // SimpleEvaluationContext built below, which forbids T(...), constructors, bean references,
     // and methods on Object/Class/ClassLoader.
+    public static boolean resolveCase(TaskExecution conditionTaskExecution) {
+        return resolveCase(conditionTaskExecution.getParameters());
+    }
+
     @SuppressFBWarnings({
         "SPEL_INJECTION", "REDOS"
     })
-    public static boolean resolveCase(TaskExecution conditionTaskExecution) {
+    public static boolean resolveCase(Map<String, ?> parameters) {
         Map<String, Object> variables = new LinkedHashMap<>();
         String expression;
 
-        if (MapUtils.getBoolean(conditionTaskExecution.getParameters(), RAW_EXPRESSION, false)) {
-            expression = MapUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION);
+        if (MapUtils.getBoolean(parameters, RAW_EXPRESSION, false)) {
+            expression = MapUtils.getString(parameters, EXPRESSION);
         } else {
             List<List<Map<String, ?>>> conditions = MapUtils.getList(
-                conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
-                new TypeReference<>() {}, Collections.emptyList());
+                parameters, ConditionTaskDispatcherConstants.CONDITIONS, new TypeReference<>() {},
+                Collections.emptyList());
 
             List<String> conditionExpressions = new ArrayList<>();
 

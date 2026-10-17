@@ -145,6 +145,14 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the condition
         else {
+            if (taskExecution.getOutput() != null) {
+                long jobId = Objects.requireNonNull(conditionTaskExecution.getJobId());
+
+                Object outputValue = taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+
+                conditionTaskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(jobId, id, outputValue));
+            }
+
             conditionTaskExecution.setEndDate(Instant.now());
 
             conditionTaskExecution = taskExecutionService.update(conditionTaskExecution);

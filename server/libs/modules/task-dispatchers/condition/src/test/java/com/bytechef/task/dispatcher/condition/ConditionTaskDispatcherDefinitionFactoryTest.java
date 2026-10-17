@@ -16,7 +16,9 @@
 
 package com.bytechef.task.dispatcher.condition;
 
+import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,7 +28,10 @@ public class ConditionTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/condition_v1.json",
-            new ConditionTaskDispatcherDefinitionFactory().getDefinition());
+        TaskListOutputDataSource stubDataSource = (workflowId, lastTaskName, lastTaskType, environmentId) -> null;
+
+        JsonFileAssert.assertEquals(
+            "definition/condition_v1.json",
+            new ConditionTaskDispatcherDefinitionFactory(Optional.of(stubDataSource)).getDefinition());
     }
 }
