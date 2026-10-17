@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.LongConsumer;
 import org.springframework.data.domain.Page;
 
 /**
@@ -29,6 +30,12 @@ import org.springframework.data.domain.Page;
 public interface JobService {
 
     Job create(JobParametersDTO jobParametersDTO, Workflow workflow);
+
+    /**
+     * Creates a job and passes its id to {@code jobCreatedCallback} inside the transaction that inserts the job, so
+     * rows the callback writes commit or roll back together with the job.
+     */
+    Job create(JobParametersDTO jobParametersDTO, Workflow workflow, LongConsumer jobCreatedCallback);
 
     void deleteJob(long id);
 
