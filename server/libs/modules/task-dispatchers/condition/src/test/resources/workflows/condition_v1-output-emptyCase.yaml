@@ -1,0 +1,20 @@
+---
+label: "If Task Output Empty Case"
+outputs:
+- name: "result"
+  value: "${condition_1}"
+tasks:
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - type: "boolean"
+        value1: "true"
+        operation: "EQUALS"
+        value2: "true"
+    caseTrue: []
+    caseFalse:
+    - name: "lastTask"
+      type: "var/v1/set"
+      parameters:
+        value: "false branch output"
