@@ -24,16 +24,13 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ai.agent.tool.AgentTypeRegistry;
 import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
-import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.InteractivePickerToolCallbacks;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
-import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
@@ -66,11 +63,9 @@ class CopilotConfigurationTest {
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
         mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
-        mock(ConnectionDefinitionService.class),
-        mock(WorkspaceConnectionFacade.class), mock(ComponentDefinitionService.class),
-        mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
-        mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
-        CopilotConfigurationTest.<CopilotConnectionLister>emptyProvider(), mock(ScopedConnectionGuard.class));
+        mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
+        mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class),
+        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class));
 
     @Test
     void testMcpServerBuildAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
