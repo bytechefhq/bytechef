@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,6 +84,7 @@ public class ProjectWorkflowTools {
     private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
+    private final ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final WorkspaceFacade workspaceFacade;
 
@@ -90,13 +92,14 @@ public class ProjectWorkflowTools {
     public ProjectWorkflowTools(
         ComponentDefinitionFacade componentDefinitionFacade, ProjectFacade projectFacade,
         ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard,
-        WorkspaceConnectionFacade workspaceConnectionFacade,
-        WorkspaceFacade workspaceFacade) {
+        ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider,
+        WorkspaceConnectionFacade workspaceConnectionFacade, WorkspaceFacade workspaceFacade) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
+        this.workflowArtifactRecorderProvider = workflowArtifactRecorderProvider;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.workspaceFacade = workspaceFacade;
     }
@@ -265,6 +268,10 @@ public class ProjectWorkflowTools {
             }
 
             capturePersistedWorkflow(
+                toolContext, true, projectWorkflow.getWorkflowId(), projectWorkflow.getProjectId(),
+                projectWorkflow.getId(), extractWorkflowName(definition));
+
+            recordWorkflowArtifact(
                 toolContext, true, projectWorkflow.getWorkflowId(), projectWorkflow.getProjectId(),
                 projectWorkflow.getId(), extractWorkflowName(definition));
 
@@ -514,8 +521,28 @@ public class ProjectWorkflowTools {
 
             capturePersistedWorkflow(
                 toolContext, false, workflowId, projectId, projectWorkflowDTO.getProjectWorkflowId(), workflowName);
+            recordWorkflowArtifact(
+                toolContext, false, workflowId, projectId, projectWorkflowDTO.getProjectWorkflowId(), workflowName);
         } catch (RuntimeException exception) {
             log.warn("Failed to capture updated workflow (workflowId={})", workflowId, exception);
+        }
+    }
+
+    private void recordWorkflowArtifact(
+        @Nullable ToolContext toolContext, boolean created, String workflowId, long projectId,
+        @Nullable Long projectWorkflowId, String workflowName) {
+
+        WorkflowArtifactRecorder recorder = workflowArtifactRecorderProvider.getIfAvailable();
+
+        if (recorder == null) {
+            return;
+        }
+
+        try {
+            recorder.recordWorkflowArtifact(
+                toolContext, created, workflowId, projectId, projectWorkflowId, workflowName);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to record workflow artifact (workflowId={})", workflowId, exception);
         }
     }
 
