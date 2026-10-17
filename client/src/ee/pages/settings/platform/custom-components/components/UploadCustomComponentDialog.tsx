@@ -52,18 +52,24 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
 
                                 <div
                                     className={twMerge(
-                                        'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6',
-                                        uploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+                                        'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-6',
+                                        uploading
+                                            ? 'cursor-not-allowed opacity-50'
+                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
                                     )}
                                     onClick={() =>
                                         !uploading && document.getElementById('component-file-upload')?.click()
                                     }
                                 >
-                                    <UploadIcon className="mb-2 size-8 text-gray-400" />
+                                    <UploadIcon className="mb-2 size-8 text-content-neutral-tertiary" />
 
-                                    <p className="text-sm text-gray-600">Drop files here or click to browse</p>
+                                    <p className="text-sm text-content-neutral-secondary">
+                                        Drop files here or click to browse
+                                    </p>
 
-                                    <p className="mt-1 text-xs text-gray-400">.JAR, .JS, .PY, .RB files</p>
+                                    <p className="mt-1 text-xs text-content-neutral-tertiary">
+                                        .JAR, .JS, .PY, .RB files
+                                    </p>
 
                                     <input
                                         accept=".jar,.js,.py,.rb"
@@ -84,7 +90,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     <div className="max-h-[250px] space-y-2 overflow-y-auto">
                                         {selectedFiles.map((file, index) => (
                                             <div
-                                                className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 p-2 px-3"
+                                                className="flex items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary p-2 px-3"
                                                 key={index}
                                             >
                                                 <div className="flex flex-1 items-center space-x-2 overflow-hidden">
@@ -92,7 +98,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                                         {file.file.name}
                                                     </span>
 
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className="text-xs text-content-neutral-tertiary">
                                                         {formatFileSize(file.file.size)}
                                                     </span>
                                                 </div>
@@ -100,16 +106,18 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                                 <div className="ml-2 flex items-center space-x-2">
                                                     {file.status === 'uploading' && (
                                                         <div className="flex items-center space-x-2">
-                                                            <span className="text-xs text-gray-400">Uploading...</span>
+                                                            <span className="text-xs text-content-neutral-tertiary">
+                                                                Uploading...
+                                                            </span>
 
-                                                            <Loader2Icon className="size-4 animate-spin text-gray-400" />
+                                                            <Loader2Icon className="size-4 animate-spin text-content-neutral-tertiary" />
                                                         </div>
                                                     )}
 
                                                     {file.status === 'completed' && (
                                                         <div className="flex size-4 items-center justify-center rounded-full bg-green-500">
                                                             <svg
-                                                                className="size-3 text-white"
+                                                                className="size-3 text-content-onsurface-primary"
                                                                 fill="none"
                                                                 stroke="currentColor"
                                                                 viewBox="0 0 24 24"
@@ -134,7 +142,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
 
                                                     {!uploading && (
                                                         <button
-                                                            className="rounded-full p-1 hover:bg-gray-200"
+                                                            className="rounded-full p-1 hover:bg-surface-neutral-secondary-hover"
                                                             onClick={(event) => {
                                                                 event.stopPropagation();
                                                                 removeFile(index);

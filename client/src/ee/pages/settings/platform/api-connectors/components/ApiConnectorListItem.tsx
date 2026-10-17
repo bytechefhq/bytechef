@@ -33,7 +33,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
     } = useApiConnectorListItem({apiConnector});
 
     return (
-        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
+        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                     <ul className="space-y-1 border-t pt-4">
                         {apiConnector.endpoints.map((endpoint) => (
                             <li
-                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                className="flex items-center justify-between rounded-md p-2 hover:bg-surface-neutral-primary-hover"
                                 key={endpoint.id}
                             >
                                 <ApiConnectorEndpointListItem
