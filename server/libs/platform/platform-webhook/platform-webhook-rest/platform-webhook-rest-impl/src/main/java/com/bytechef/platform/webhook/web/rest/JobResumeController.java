@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,8 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,7 +90,8 @@ public class JobResumeController {
 
     /**
      * Resumes a suspended job via anonymous webhook callback, submitted by the approval form in the SPA, by a chat
-     * client posting the user's answer without streaming, or by an email link.
+     * client posting the user's answer without streaming, or by an email link. A GET never resolves an approval and a
+     * HEAD never resumes anything; both answer 405 so a link scanner or prefetcher cannot decide one.
      *
      * <p>
      * <b>Security Note:</b> CSRF protection is not required for this endpoint. Resume callbacks may come from external
@@ -111,14 +115,20 @@ public class JobResumeController {
     @RequestMapping(method = {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/job/resume/{id}")
-    public ResponseEntity<Void> resume(
-        @PathVariable String id, @RequestBody(required = false) Map<String, Object> data) {
+    public ResponseEntity<?> resume(
+        @PathVariable String id, @RequestBody(required = false) Map<String, Object> data, HttpMethod httpMethod) {
+
+        if (isRejectedLinkVisit(id, httpMethod)) {
+            return methodNotAllowed();
+        }
 
         JobResumeOutcome outcome;
 
         try {
             outcome = retryWhileNotYetSuspended(
                 () -> jobResumeFacade.resumeJob(id, data), JobResumeOutcome.NOT_YET_SUSPENDED::equals);
+        } catch (ApprovalInputException approvalInputException) {
+            return invalidApprovalInput(approvalInputException);
         } catch (RuntimeException exception) {
             if (!isOptimisticLockingFailure(exception)) {
                 throw exception;
@@ -147,8 +157,12 @@ public class JobResumeController {
         },
         value = "/job/resume/{id}",
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> resumeStreaming(
-        @PathVariable String id, @RequestBody(required = false) Map<String, Object> data) {
+    public ResponseEntity<?> resumeStreaming(
+        @PathVariable String id, @RequestBody(required = false) Map<String, Object> data, HttpMethod httpMethod) {
+
+        if (isRejectedLinkVisit(id, httpMethod)) {
+            return methodNotAllowed();
+        }
 
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
 
@@ -171,6 +185,10 @@ public class JobResumeController {
                             .whenComplete((unused, throwable) -> registration.close());
                     }),
                 JobResumeOutcome.NOT_YET_SUSPENDED::equals);
+        } catch (ApprovalInputException approvalInputException) {
+            closeRegistrationIfPresent(registrationReference);
+
+            return invalidApprovalInput(approvalInputException);
         } catch (RuntimeException exception) {
             closeRegistrationIfPresent(registrationReference);
 
@@ -192,6 +210,41 @@ public class JobResumeController {
         }
 
         return ResponseEntity.status(getErrorStatus(outcome))
+            .build();
+    }
+
+    private boolean isRejectedLinkVisit(String id, HttpMethod httpMethod) {
+        if (HttpMethod.HEAD.equals(httpMethod)) {
+            return true;
+        }
+
+        if (!HttpMethod.GET.equals(httpMethod)) {
+            return false;
+        }
+
+        boolean approvalResumeId = jobResumeFacade.isApprovalResumeId(id);
+
+        if (approvalResumeId) {
+            log.debug("Ignored a GET of an approval resume link; an approval is resolved only by a POST");
+        }
+
+        return approvalResumeId;
+    }
+
+    private static ResponseEntity<ProblemDetail> invalidApprovalInput(ApprovalInputException approvalInputException) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST, approvalInputException.getMessage());
+
+        problemDetail.setProperty("errors", approvalInputException.getErrors());
+
+        return ResponseEntity.badRequest()
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .body(problemDetail);
+    }
+
+    private static <T> ResponseEntity<T> methodNotAllowed() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .allow(HttpMethod.POST)
             .build();
     }
 
