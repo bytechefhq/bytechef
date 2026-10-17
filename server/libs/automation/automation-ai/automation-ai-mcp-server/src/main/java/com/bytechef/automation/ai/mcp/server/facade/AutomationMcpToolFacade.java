@@ -42,6 +42,7 @@ import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -399,7 +400,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         ApprovalTokens approvalTokens = approvalTokensObjectProvider.getIfAvailable();
 
         String formUrl = ApprovalFormUrls
-            .buildFormUrl(publicUrl, jobResumeIdString, approvalTokens)
+            .buildFormUrl(publicUrl, jobResumeIdString, approvalTokens, resolveApprovalExpiresAt(job))
             .orElse(null);
 
         Map<String, Object> result = new HashMap<>();
@@ -415,9 +416,6 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         if (formUrl != null) {
             result.put("formUrl", formUrl);
         }
-
-        ApprovalFormUrls.buildResumeToken(jobResumeIdString, approvalTokens)
-            .ifPresent(resumeToken -> result.put("resumeToken", resumeToken));
 
         if (job.getId() != null) {
             result.put("jobId", job.getId());
@@ -437,7 +435,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         Object jobResumeId = Objects.requireNonNull(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
 
         return ApprovalFormUrls.buildResumeToken(
-            jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());
+            jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable(), resolveApprovalExpiresAt(job));
     }
 
     public boolean isJobWorkflowExposedByMcpServer(long jobId, long mcpServerId) {
@@ -493,7 +491,20 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         Object jobResumeId = Objects.requireNonNull(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
 
         return ApprovalFormUrls.buildFormUrl(
-            publicUrl, jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable());
+            publicUrl, jobResumeId.toString(), approvalTokensObjectProvider.getIfAvailable(),
+            resolveApprovalExpiresAt(job));
+    }
+
+    private @Nullable Instant resolveApprovalExpiresAt(Job job) {
+        Object taskExecutionResumeId = job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (taskExecutionResumeId == null) {
+            return null;
+        }
+
+        return taskExecutionService.fetchTaskExecution(ConvertUtils.convertValue(taskExecutionResumeId, Long.class))
+            .map(taskExecution -> SuspendUtils.extractSuspendExpiresAt(taskExecution.getMetadata()))
+            .orElse(null);
     }
 
     public @Nullable Object awaitApprovedWorkflowRun(long jobId) {

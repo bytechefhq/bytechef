@@ -17,11 +17,19 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApprovalFormFacade {
 
-    Map<String, ?> getApprovalForm(String id);
+    /**
+     * Returns the form of a suspended approval.
+     *
+     * @param id the possibly signed resume token of the approval
+     * @return the form parameters, or empty when the job is gone, no longer suspended or suspended under another token
+     * @throws IllegalArgumentException when the token is malformed or its signature does not verify
+     */
+    Optional<Map<String, ?>> fetchApprovalForm(String id);
 }

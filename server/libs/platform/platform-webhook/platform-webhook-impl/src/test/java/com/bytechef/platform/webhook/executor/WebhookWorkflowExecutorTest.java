@@ -32,17 +32,21 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -52,6 +56,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -74,6 +79,8 @@ public class WebhookWorkflowExecutorTest {
     private Evaluator evaluator;
     private ApplicationEventPublisher eventPublisher;
     private JobSyncExecutor jobSyncExecutor;
+    private PrincipalJobFacade principalJobFacade;
+    private SseStreamBridgeRegistry sseStreamBridgeRegistry;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
     private WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
     private WorkflowService workflowService;
@@ -83,6 +90,8 @@ public class WebhookWorkflowExecutorTest {
         evaluator = mock(Evaluator.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
         jobSyncExecutor = mock(JobSyncExecutor.class);
+        principalJobFacade = mock(PrincipalJobFacade.class);
+        sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
         webhookWorkflowSyncExecutor = mock(WebhookWorkflowSyncExecutor.class);
         workflowService = mock(WorkflowService.class);
 
@@ -95,8 +104,8 @@ public class WebhookWorkflowExecutorTest {
         when(evaluator.evaluate(any(), any(), anyBoolean())).thenAnswer(invocation -> invocation.getArgument(0));
 
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
-            evaluator, eventPublisher, jobPrincipalAccessorRegistry, jobSyncExecutor, mock(PrincipalJobFacade.class),
-            mock(SseStreamBridgeRegistry.class), webhookWorkflowSyncExecutor, mock(TaskFileStorage.class),
+            evaluator, eventPublisher, jobPrincipalAccessorRegistry, jobSyncExecutor, principalJobFacade,
+            sseStreamBridgeRegistry, webhookWorkflowSyncExecutor, mock(TaskFileStorage.class),
             mock(TriggerDefinitionService.class), workflowService);
     }
 
@@ -110,6 +119,25 @@ public class WebhookWorkflowExecutorTest {
     @Disabled
     public void testExecuteAsyncSync() {
         // TODO
+    }
+
+    @Test
+    public void testExecuteAsyncWithStreamBridgeMarksTheJobAsStreamed() {
+        Registration registration = mock(Registration.class);
+
+        when(registration.completion()).thenReturn(new CompletableFuture<>());
+        when(sseStreamBridgeRegistry.register(anyLong(), any())).thenReturn(registration);
+        when(webhookWorkflowSyncExecutor.execute(any(), any())).thenReturn(new TriggerOutput(Map.of(), null, false));
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(7L);
+
+        webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest, mock(SseStreamBridge.class));
+
+        ArgumentCaptor<JobParametersDTO> jobParametersArgumentCaptor = ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        verify(principalJobFacade).createJob(jobParametersArgumentCaptor.capture(), anyLong(), any());
+
+        assertThat(jobParametersArgumentCaptor.getValue()
+            .getMetadata()).containsEntry(MetadataConstants.STREAMED_EXECUTION, true);
     }
 
     @Test
@@ -231,6 +259,25 @@ public class WebhookWorkflowExecutorTest {
 
             assertThatThrownBy(() -> webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest))
                 .isSameAs(triggerRan);
+        }
+
+        @Test
+        void testHasSuspendingTaskDetectsTopLevelApprovalStep() {
+            givenWorkflow(workflowTask("approve", "approval/v1/requestApproval"));
+
+            assertThat(webhookWorkflowExecutor.hasSuspendingTask(workflowExecutionId)).isTrue();
+        }
+
+        @Test
+        void testHasSuspendingTaskIgnoresAiAgentWithTools() {
+            givenWorkflow(
+                new WorkflowTask(
+                    Map.of(
+                        "name", "agent", "type", "aiAgent/v1/chat",
+                        "clusterElements", Map.of(
+                            "tools", List.of(Map.of("name", "search", "type", "googleSearch/v1/search"))))));
+
+            assertThat(webhookWorkflowExecutor.hasSuspendingTask(workflowExecutionId)).isFalse();
         }
 
         private void givenWorkflow(WorkflowTask... workflowTasks) {

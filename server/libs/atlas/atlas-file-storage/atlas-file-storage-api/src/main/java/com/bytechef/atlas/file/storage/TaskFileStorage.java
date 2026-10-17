@@ -25,6 +25,12 @@ import java.util.Map;
  */
 public interface TaskFileStorage {
 
+    void deleteContextValue(FileEntry fileEntry);
+
+    void deleteJobOutputs(FileEntry fileEntry);
+
+    void deleteTaskExecutionOutput(FileEntry fileEntry);
+
     Map<String, ?> readContextValue(FileEntry fileEntry);
 
     Map<String, ?> readJobOutputs(FileEntry fileEntry);

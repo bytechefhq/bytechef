@@ -62,6 +62,8 @@ class AgentJobResumerTest {
     void testResumesTheAgentAndConsumesTheSuspend() {
         stubAgentJob(Job.Status.STOPPED, waitingMetadata());
 
+        when(jobService.tryClaimResume(any())).thenReturn(true);
+
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
             AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
@@ -78,7 +80,7 @@ class AgentJobResumerTest {
         assertThat(updatedMetadata).containsEntry(MetadataConstants.CONSUMED_JOB_RESUME_ID, AGENT_JOB_RESUME_ID)
             .doesNotContainKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_RESUME_ID);
 
-        verify(jobFacade).resumeJob(
+        verify(jobFacade).resumeClaimedJob(
             AGENT_JOB_ID, TASK_EXECUTION_RESUME_ID, Map.of("status", "completed", "result", "done"));
     }
 
@@ -135,13 +137,23 @@ class AgentJobResumerTest {
     void testReportsNotResumedWhenDispatchingTheResumeFails() {
         stubAgentJob(Job.Status.STOPPED, waitingMetadata());
 
+        when(jobService.tryClaimResume(any())).thenReturn(true);
         doThrow(new IllegalStateException("broker down")).when(jobFacade)
-            .resumeJob(anyLong(), anyLong(), any());
+            .resumeClaimedJob(anyLong(), any(), any());
 
         boolean resumed = new AgentJobResumer(jobFacade, jobService).resume(
             AGENT_JOB_ID, AGENT_JOB_RESUME_ID, SUBFLOW_OUTCOME);
 
         assertThat(resumed).isFalse();
+    }
+
+    @Test
+    void testDoesNotResumeWhenTheClaimIsLost() {
+        stubAgentJob(Job.Status.STOPPED, waitingMetadata());
+
+        when(jobService.tryClaimResume(any())).thenReturn(false);
+
+        assertNotResumed();
     }
 
     private void assertNotResumed() {
@@ -150,7 +162,7 @@ class AgentJobResumerTest {
 
         assertThat(resumed).isFalse();
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        verify(jobFacade, never()).resumeClaimedJob(anyLong(), any(), any());
     }
 
     private void stubAgentJob(Job.Status status, Map<String, Object> metadata) {

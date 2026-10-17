@@ -144,6 +144,27 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
         return fileEntry;
     }
 
+    @Override
+    public void deleteContextValue(FileEntry fileEntry) {
+        jobDataStorage.invalidate(fileEntry.getUrl());
+
+        durableTaskFileStorage.deleteContextValue(fileEntry);
+    }
+
+    @Override
+    public void deleteJobOutputs(FileEntry fileEntry) {
+        jobDataStorage.invalidate(fileEntry.getUrl());
+
+        durableTaskFileStorage.deleteJobOutputs(fileEntry);
+    }
+
+    @Override
+    public void deleteTaskExecutionOutput(FileEntry fileEntry) {
+        jobDataStorage.invalidate(fileEntry.getUrl());
+
+        durableTaskFileStorage.deleteTaskExecutionOutput(fileEntry);
+    }
+
     @Nullable
     private Object cache(FileEntry fileEntry, @Nullable Object value) {
         if (value == null) {

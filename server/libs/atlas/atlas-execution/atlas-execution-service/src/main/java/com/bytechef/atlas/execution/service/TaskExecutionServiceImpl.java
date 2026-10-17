@@ -112,6 +112,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<TaskExecution> fetchTaskExecution(long id) {
+        return taskExecutionRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));

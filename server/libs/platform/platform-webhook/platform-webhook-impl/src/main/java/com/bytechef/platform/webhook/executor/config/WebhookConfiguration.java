@@ -42,6 +42,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskDispatcher;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
@@ -209,6 +210,8 @@ public class WebhookConfiguration {
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
+            (taskDispatcher) -> new SyncExecutionSuspendRejectingTaskDispatcher(
+                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl::suspendingTaskMessage),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

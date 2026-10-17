@@ -36,6 +36,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -82,6 +83,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public ChatActionDefinitionWrapper(ActionDefinition actionDefinition) {
             super(actionDefinition);
         }

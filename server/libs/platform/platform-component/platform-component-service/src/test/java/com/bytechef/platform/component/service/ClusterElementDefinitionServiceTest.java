@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -72,7 +73,7 @@ class ClusterElementDefinitionServiceTest {
     @BeforeEach
     void setUp() {
         clusterElementDefinitionService = new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory);
+            componentDefinitionRegistry, contextFactory, mock(ObjectProvider.class));
     }
 
     @Test

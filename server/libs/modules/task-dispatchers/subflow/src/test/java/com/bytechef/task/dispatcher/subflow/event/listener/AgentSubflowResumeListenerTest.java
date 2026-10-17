@@ -93,6 +93,8 @@ class AgentSubflowResumeListenerTest {
 
         lenient().when(jobService.getJob(AGENT_JOB_ID))
             .thenReturn(agentJob);
+        lenient().when(jobService.tryClaimResume(any()))
+            .thenReturn(true);
         lenient().when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID))
             .thenReturn(Optional.empty());
     }
@@ -200,6 +202,19 @@ class AgentSubflowResumeListenerTest {
     }
 
     @Test
+    void testCancelledSubflowReleasesTheAgentWithAnError() {
+        stubSubflowJob(Job.Status.CANCELLED);
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.CANCELLED));
+
+        Map<String, Object> resumeData = captureResumeData();
+
+        assertThat(resumeData).containsEntry("status", "failed");
+        assertThat((String) resumeData.get("error")).contains("cancelled");
+    }
+
+    @Test
     void testStoppedSubflowReleasesTheAgentWithAnError() {
         stubSubflowJob(Job.Status.STOPPED);
 
@@ -230,7 +245,7 @@ class AgentSubflowResumeListenerTest {
         agentSubflowResumeListener.onApplicationEvent(
             new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        verify(jobFacade, never()).resumeClaimedJob(anyLong(), any(), any());
     }
 
     @Test
@@ -272,7 +287,7 @@ class AgentSubflowResumeListenerTest {
     private Map<String, Object> captureResumeData() {
         ArgumentCaptor<Map<String, ?>> resumeDataCaptor = ArgumentCaptor.forClass(Map.class);
 
-        verify(jobFacade).resumeJob(eq(AGENT_JOB_ID), eq(TASK_EXECUTION_RESUME_ID), resumeDataCaptor.capture());
+        verify(jobFacade).resumeClaimedJob(eq(AGENT_JOB_ID), eq(TASK_EXECUTION_RESUME_ID), resumeDataCaptor.capture());
 
         return new HashMap<>(resumeDataCaptor.getValue());
     }

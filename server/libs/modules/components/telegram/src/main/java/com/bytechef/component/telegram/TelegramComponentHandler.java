@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.telegram.action.TelegramSendMediaAction;
 import com.bytechef.component.telegram.action.TelegramSendMessageAction;
+import com.bytechef.component.telegram.cluster.TelegramApprovalChannel;
 import com.bytechef.component.telegram.connection.TelegramConnection;
 import com.bytechef.component.telegram.trigger.TelegramNewMessageTrigger;
 import com.google.auto.service.AutoService;
@@ -48,6 +49,7 @@ public class TelegramComponentHandler implements ComponentHandler {
             TelegramSendMediaAction.ACTION_DEFINITION,
             TelegramSendMessageAction.ACTION_DEFINITION)
         .clusterElements(
+            TelegramApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(TelegramSendMediaAction.ACTION_DEFINITION),
             tool(TelegramSendMessageAction.ACTION_DEFINITION))
         .triggers(TelegramNewMessageTrigger.TRIGGER_DEFINITION)

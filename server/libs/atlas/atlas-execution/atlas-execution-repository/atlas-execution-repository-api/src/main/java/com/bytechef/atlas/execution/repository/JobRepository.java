@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Job;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -50,7 +51,11 @@ public interface JobRepository {
 
     List<Job> findAllByWorkflowId(String workflowId);
 
+    List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
+
     Optional<Job> findById(Long id);
+
+    int updateStatusIfCurrentStatus(long id, int currentStatus, int newStatus);
 
     Optional<Job> findByTaskExecutionId(Long taskExecutionId);
 

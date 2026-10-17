@@ -18,6 +18,7 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,10 +59,14 @@ public class ApplicationProperties {
      */
     private Analytics analytics = new Analytics();
 
+    private Approval approval = new Approval();
+
     /**
      * Default @Async executor configuration
      */
     private Async async = new Async();
+
+    private Automation automation = new Automation();
 
     /**
      * Cache provider configuration
@@ -205,6 +210,8 @@ public class ApplicationProperties {
      */
     private UserGuiding userGuiding = new UserGuiding();
 
+    private Webhook webhook = new Webhook();
+
     /**
      * Webhook URL for external integrations
      */
@@ -224,8 +231,16 @@ public class ApplicationProperties {
         return analytics;
     }
 
+    public Approval getApproval() {
+        return approval;
+    }
+
     public Async getAsync() {
         return async;
+    }
+
+    public Automation getAutomation() {
+        return automation;
     }
 
     public Cache getCache() {
@@ -344,6 +359,10 @@ public class ApplicationProperties {
         return userGuiding;
     }
 
+    public Webhook getWebhook() {
+        return webhook;
+    }
+
     public String getWebhookUrl() {
         return webhookUrl;
     }
@@ -364,8 +383,16 @@ public class ApplicationProperties {
         this.analytics = analytics;
     }
 
+    public void setApproval(Approval approval) {
+        this.approval = approval;
+    }
+
     public void setAsync(Async async) {
         this.async = async;
+    }
+
+    public void setAutomation(Automation automation) {
+        this.automation = automation;
     }
 
     public void setCache(Cache cache) {
@@ -482,6 +509,10 @@ public class ApplicationProperties {
 
     public void setUserGuiding(UserGuiding userGuiding) {
         this.userGuiding = userGuiding;
+    }
+
+    public void setWebhook(Webhook webhook) {
+        this.webhook = webhook;
     }
 
     public void setWebhookUrl(String webhookUrl) {
@@ -2846,6 +2877,72 @@ public class ApplicationProperties {
         }
     }
 
+    public static class Approval {
+
+        private SignedToken signedToken = new SignedToken();
+
+        public SignedToken getSignedToken() {
+            return signedToken;
+        }
+
+        public void setSignedToken(SignedToken signedToken) {
+            this.signedToken = signedToken;
+        }
+
+        public static class SignedToken {
+
+            private Duration clockSkew;
+
+            private Duration defaultTtl;
+
+            private List<String> previousSecrets = new ArrayList<>();
+
+            private boolean required;
+
+            private String secret;
+
+            public Duration getClockSkew() {
+                return clockSkew;
+            }
+
+            public Duration getDefaultTtl() {
+                return defaultTtl;
+            }
+
+            public List<String> getPreviousSecrets() {
+                return previousSecrets;
+            }
+
+            public String getSecret() {
+                return secret;
+            }
+
+            public boolean isRequired() {
+                return required;
+            }
+
+            public void setClockSkew(Duration clockSkew) {
+                this.clockSkew = clockSkew;
+            }
+
+            public void setDefaultTtl(Duration defaultTtl) {
+                this.defaultTtl = defaultTtl;
+            }
+
+            public void setPreviousSecrets(List<String> previousSecrets) {
+                this.previousSecrets = previousSecrets;
+            }
+
+            public void setRequired(boolean required) {
+                this.required = required;
+            }
+
+            public void setSecret(String secret) {
+                this.secret = secret;
+            }
+        }
+    }
+
     /**
      * Configuration of the default {@code @Async} executor, which carries mail, notifications and other background
      * work. Workflow task and trigger execution are bounded separately by the worker task properties.
@@ -2864,6 +2961,45 @@ public class ApplicationProperties {
 
         public void setConcurrencyLimit(int concurrencyLimit) {
             this.concurrencyLimit = concurrencyLimit;
+        }
+    }
+
+    public static class Automation {
+
+        private ApprovalTask approvalTask = new ApprovalTask();
+
+        public ApprovalTask getApprovalTask() {
+            return approvalTask;
+        }
+
+        public void setApprovalTask(ApprovalTask approvalTask) {
+            this.approvalTask = approvalTask;
+        }
+
+        public static class ApprovalTask {
+
+            private Reconciliation reconciliation = new Reconciliation();
+
+            public Reconciliation getReconciliation() {
+                return reconciliation;
+            }
+
+            public void setReconciliation(Reconciliation reconciliation) {
+                this.reconciliation = reconciliation;
+            }
+
+            public static class Reconciliation {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
         }
     }
 
@@ -4647,6 +4783,55 @@ public class ApplicationProperties {
         }
     }
 
+    public static class Webhook {
+
+        private Discord discord = new Discord();
+
+        private Whatsapp whatsapp = new Whatsapp();
+
+        public Discord getDiscord() {
+            return discord;
+        }
+
+        public Whatsapp getWhatsapp() {
+            return whatsapp;
+        }
+
+        public void setDiscord(Discord discord) {
+            this.discord = discord;
+        }
+
+        public void setWhatsapp(Whatsapp whatsapp) {
+            this.whatsapp = whatsapp;
+        }
+
+        public static class Discord {
+
+            private String publicKey;
+
+            public String getPublicKey() {
+                return publicKey;
+            }
+
+            public void setPublicKey(String publicKey) {
+                this.publicKey = publicKey;
+            }
+        }
+
+        public static class Whatsapp {
+
+            private String verifyToken;
+
+            public String getVerifyToken() {
+                return verifyToken;
+            }
+
+            public void setVerifyToken(String verifyToken) {
+                this.verifyToken = verifyToken;
+            }
+        }
+    }
+
     /**
      * Worker node configuration for task execution.
      */
@@ -4780,12 +4965,42 @@ public class ApplicationProperties {
              */
             private Agent agent = new Agent();
 
+            private ApprovalEscalation approvalEscalation = new ApprovalEscalation();
+
+            private ApprovalExpiry approvalExpiry = new ApprovalExpiry();
+
+            private ApprovalReminder approvalReminder = new ApprovalReminder();
+
             public Agent getAgent() {
                 return agent;
             }
 
+            public ApprovalEscalation getApprovalEscalation() {
+                return approvalEscalation;
+            }
+
+            public ApprovalExpiry getApprovalExpiry() {
+                return approvalExpiry;
+            }
+
+            public ApprovalReminder getApprovalReminder() {
+                return approvalReminder;
+            }
+
             public void setAgent(Agent agent) {
                 this.agent = agent;
+            }
+
+            public void setApprovalEscalation(ApprovalEscalation approvalEscalation) {
+                this.approvalEscalation = approvalEscalation;
+            }
+
+            public void setApprovalExpiry(ApprovalExpiry approvalExpiry) {
+                this.approvalExpiry = approvalExpiry;
+            }
+
+            public void setApprovalReminder(ApprovalReminder approvalReminder) {
+                this.approvalReminder = approvalReminder;
             }
 
             /**
@@ -4804,6 +5019,65 @@ public class ApplicationProperties {
 
                 public void setMaxSubflowDepth(int maxSubflowDepth) {
                     this.maxSubflowDepth = maxSubflowDepth;
+                }
+            }
+
+            public static class ApprovalEscalation {
+
+                private Duration after;
+
+                private boolean enabled;
+
+                public Duration getAfter() {
+                    return after;
+                }
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setAfter(Duration after) {
+                    this.after = after;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
+
+            public static class ApprovalExpiry {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+            }
+
+            public static class ApprovalReminder {
+
+                private boolean enabled;
+
+                private Duration leadTime;
+
+                public Duration getLeadTime() {
+                    return leadTime;
+                }
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public void setLeadTime(Duration leadTime) {
+                    this.leadTime = leadTime;
                 }
             }
         }

@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Context;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -33,6 +34,10 @@ import org.springframework.data.repository.NoRepositoryBean;
  */
 @NoRepositoryBean
 public interface ContextRepository {
+
+    List<Context> findAllByStackIdAndClassnameId(long stackId, int classnameId);
+
+    void deleteAllByStackIdAndClassnameId(long stackId, int classnameId);
 
     Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
 

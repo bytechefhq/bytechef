@@ -17,6 +17,7 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.DeleteJobEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
@@ -30,12 +31,16 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.LongConsumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -52,6 +57,8 @@ public class JobFacadeImpl implements JobFacade {
     private static final Logger log = LoggerFactory.getLogger(JobFacadeImpl.class);
 
     private static final String APPROVALS = "approvals";
+    private static final AtomicBoolean CONTEXT_CLEANUP_UNSUPPORTED_LOGGED = new AtomicBoolean();
+    private static final String WAIT_FOR_APPROVAL_TYPE_PREFIX = "waitForApproval/";
 
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
@@ -81,6 +88,19 @@ public class JobFacadeImpl implements JobFacade {
     public long createJob(JobParametersDTO jobParametersDTO) {
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
+        return startJob(job);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NEVER)
+    public long createJob(JobParametersDTO jobParametersDTO, LongConsumer jobCreatedCallback) {
+        Job job = jobService.create(
+            jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()), jobCreatedCallback);
+
+        return startJob(job);
+    }
+
+    private long startJob(Job job) {
         long jobId = Validate.notNull(job.getId(), "id");
 
         log.debug("Job id={}, label='{}' created", jobId, job.getLabel());
@@ -102,13 +122,74 @@ public class JobFacadeImpl implements JobFacade {
             deleteJob(childJobId);
         }
 
+        deleteJobFiles(id);
+
         taskExecutionService.deleteJobTaskExecutions(id);
+
+        Job job = jobService.getJob(id);
+
+        eventPublisher.publishEvent(new DeleteJobEvent(id, job.getMetadata()));
 
         jobService.deleteJob(id);
     }
 
+    private void deleteJobFiles(long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        if (job.getOutputs() != null) {
+            deleteFileQuietly(() -> taskFileStorage.deleteJobOutputs(job.getOutputs()));
+        }
+
+        for (TaskExecution taskExecution : taskExecutionService.getJobTaskExecutions(jobId)) {
+            if (taskExecution.getOutput() != null) {
+                deleteFileQuietly(() -> taskFileStorage.deleteTaskExecutionOutput(taskExecution.getOutput()));
+            }
+
+            deleteStackFiles(Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION);
+        }
+
+        deleteStackFiles(jobId, Context.Classname.JOB);
+    }
+
+    private void deleteStackFiles(long stackId, Context.Classname classname) {
+        try {
+            for (FileEntry fileEntry : contextService.getStackFileEntries(stackId, classname)) {
+                deleteFileQuietly(() -> taskFileStorage.deleteContextValue(fileEntry));
+            }
+
+            contextService.deleteStackContexts(stackId, classname);
+        } catch (UnsupportedOperationException exception) {
+            if (CONTEXT_CLEANUP_UNSUPPORTED_LOGGED.compareAndSet(false, true)) {
+                log.warn(
+                    "Context enumeration is unsupported by the configured context repository; job context values " +
+                        "are not deleted with their jobs");
+            }
+        }
+    }
+
+    private static void deleteFileQuietly(Runnable deleteAction) {
+        try {
+            deleteAction.run();
+        } catch (RuntimeException exception) {
+            log.warn("Failed to delete job file-storage blob", exception);
+        }
+    }
+
     @Override
     public void resumeApproval(long jobId, String uuid, boolean approved) {
+        Job job = jobService.getJob(jobId);
+
+        if (job.getStatus() != Job.Status.STOPPED) {
+            throw new IllegalStateException("Job %s is not waiting for an approval".formatted(jobId));
+        }
+
+        TaskExecution waitingTaskExecution = findWaitingApprovalTaskExecution(jobId)
+            .orElseThrow(() -> new IllegalStateException("Job %s has no pending approval".formatted(jobId)));
+
+        if (!jobService.tryClaimResume(job)) {
+            throw new IllegalStateException("Job %s approval was already resolved".formatted(jobId));
+        }
+
         Map<String, Object> jobContext = new HashMap<>(
             taskFileStorage.readContextValue(contextService.peek(jobId, Context.Classname.JOB)));
 
@@ -127,21 +208,33 @@ public class JobFacadeImpl implements JobFacade {
         contextService.push(
             jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, jobContext));
 
-        jobService.resumeToStatusStarted(jobId);
+        waitingTaskExecution.setEndDate(Instant.now());
 
+        waitingTaskExecution.setOutput(
+            taskFileStorage.storeTaskExecutionOutput(
+                jobId, Objects.requireNonNull(waitingTaskExecution.getId()), Map.of("approved", approved)));
+
+        eventPublisher.publishEvent(new TaskExecutionCompleteEvent(waitingTaskExecution));
+    }
+
+    private Optional<TaskExecution> findWaitingApprovalTaskExecution(long jobId) {
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
-        if (!taskExecutions.isEmpty()) {
-            TaskExecution currentTaskExecution = taskExecutions.getLast();
-
-            currentTaskExecution.setEndDate(Instant.now());
-
-            currentTaskExecution.setOutput(
-                taskFileStorage.storeTaskExecutionOutput(
-                    jobId, Objects.requireNonNull(currentTaskExecution.getId()), Map.of("approved", approved)));
-
-            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(currentTaskExecution));
+        if (taskExecutions.isEmpty()) {
+            return Optional.empty();
         }
+
+        TaskExecution lastTaskExecution = taskExecutions.getLast();
+
+        String type = lastTaskExecution.getType();
+
+        if (lastTaskExecution.getStatus() != TaskExecution.Status.STARTED || type == null ||
+            !type.startsWith(WAIT_FOR_APPROVAL_TYPE_PREFIX)) {
+
+            return Optional.empty();
+        }
+
+        return Optional.of(lastTaskExecution);
     }
 
     @Override
@@ -154,6 +247,11 @@ public class JobFacadeImpl implements JobFacade {
     @Override
     public void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data) {
         eventPublisher.publishEvent(new ResumeJobEvent(id, taskExecutionId, data));
+    }
+
+    @Override
+    public void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
+        eventPublisher.publishEvent(ResumeJobEvent.ofStartedJob(id, taskExecutionId, data));
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepos
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.redis.config.RedisMessageBrokerConfiguration;
 import com.bytechef.message.broker.redis.env.RedisMessageBrokerListenerRegistrarConfiguration;
@@ -122,7 +123,7 @@ class SseStreamMessageRouteIntTest {
 
         SseStreamApplicationEventListener sseStreamApplicationEventListener = new SseStreamApplicationEventListener(
             mock(JobService.class), coordinatorInstanceContext.getBean(MessageBroker.class),
-            mock(TaskExecutionService.class));
+            mock(TaskExecutionService.class), mock(TaskFileStorage.class));
 
         sseStreamApplicationEventListener.onApplicationEvent(
             new JobStatusApplicationEvent(jobId, Job.Status.COMPLETED));

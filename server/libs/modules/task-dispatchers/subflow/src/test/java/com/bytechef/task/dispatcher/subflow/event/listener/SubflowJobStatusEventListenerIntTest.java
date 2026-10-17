@@ -185,6 +185,20 @@ class SubflowJobStatusEventListenerIntTest {
         rig.awaitJobStatus(parentJobId, Job.Status.STOPPED);
     }
 
+    @Test
+    void testCancelledChildStopsTheParent() throws InterruptedException {
+        Rig rig = new Rig();
+
+        long parentJobId = rig.startParent();
+        long childJobId = rig.awaitChildLaunched();
+
+        rig.awaitJobStatus(childJobId, Job.Status.STOPPED);
+
+        rig.taskCoordinator.onApplicationEvent(new JobStatusApplicationEvent(childJobId, Job.Status.CANCELLED));
+
+        rig.awaitJobStatus(parentJobId, Job.Status.STOPPED);
+    }
+
     private final class Rig {
 
         private final AtomicReference<Long> childJobIdReference = new AtomicReference<>();

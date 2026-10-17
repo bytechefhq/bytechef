@@ -34,6 +34,7 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
@@ -43,8 +44,10 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.service.ApprovalShortTokenService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import io.micrometer.tracing.Tracer;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -59,6 +62,9 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 class ContextFactoryTest {
 
+    @SuppressWarnings("unchecked")
+    private final ObjectProvider<ApprovalShortTokenService> approvalShortTokenServiceProvider =
+        mock(ObjectProvider.class);
     private final EditorLogFileStorage editorLogFileStorage = mock(EditorLogFileStorage.class);
     private final LogFileStorage logFileStorage = mock(LogFileStorage.class);
     private final TriggerLogFileStorage triggerLogFileStorage = mock(TriggerLogFileStorage.class);
@@ -75,8 +81,8 @@ class ContextFactoryTest {
         contextFactory = new ContextFactoryImpl(
             mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
             editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
-            approvalTokensProvider, logFileStorage, mock(TempFileStorage.class), mock(Tracer.class),
-            triggerLogFileStorage);
+            approvalTokensProvider, approvalShortTokenServiceProvider, logFileStorage, mock(TempFileStorage.class),
+            mock(Tracer.class), triggerLogFileStorage);
     }
 
     @Test
@@ -123,6 +129,38 @@ class ContextFactoryTest {
         verify(triggerLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), any());
     }
 
+    @Test
+    void testApprovalLinksCarryAShortResumeIdMintedInProcess() {
+        ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
+
+        when(applicationProperties.getPublicUrl()).thenReturn("https://example.com");
+
+        ApprovalShortTokenService approvalShortTokenService = mock(ApprovalShortTokenService.class);
+
+        when(approvalShortTokenService.mint(anyString(), any(Instant.class))).thenReturn("short-id");
+        when(approvalShortTokenServiceProvider.getIfAvailable()).thenReturn(approvalShortTokenService);
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ApprovalTokens> approvalTokensProvider = mock(ObjectProvider.class);
+
+        ContextFactory mintingContextFactory = new ContextFactoryImpl(
+            mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
+            editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
+            approvalTokensProvider, approvalShortTokenServiceProvider, logFileStorage, mock(TempFileStorage.class),
+            mock(Tracer.class), triggerLogFileStorage);
+
+        ActionContext actionContext = mintingContextFactory.createActionContext(
+            "approval", 1, "requestApproval", null, null, 1L, 10L, "workflowId", null, null, PlatformType.AUTOMATION,
+            false);
+
+        ApprovalLinks approvalLinks = ((ActionContextAware) actionContext).getApprovalLinks(Instant.now());
+
+        assertThat(approvalLinks).isNotNull();
+        assertThat(approvalLinks.shortResumeId()).isEqualTo("short-id");
+
+        verify(approvalShortTokenService).mint(eq(approvalLinks.resumeId()), any(Instant.class));
+    }
+
     @Nested
     @SuppressWarnings("deprecation")
     class ClusterElementApprovalLinksTest {
@@ -145,8 +183,8 @@ class ContextFactoryTest {
             ContextFactory signingContextFactory = new ContextFactoryImpl(
                 mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class),
                 mock(DataStorage.class), editorLogFileStorage, mock(EditorTempFileStorage.class),
-                mock(ApplicationEventPublisher.class), approvalTokensProvider, logFileStorage,
-                mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
+                mock(ApplicationEventPublisher.class), approvalTokensProvider, approvalShortTokenServiceProvider,
+                logFileStorage, mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
 
             ActionContext actionContext = signingContextFactory.createActionContext(
                 "aiAgent", 1, "chat", null, null, 1L, 10L, "workflowId", null, null, PlatformType.AUTOMATION, false);

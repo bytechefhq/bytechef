@@ -17,11 +17,23 @@
 package com.bytechef.atlas.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
@@ -50,6 +62,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -61,8 +78,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -75,7 +95,16 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
+@RecordApplicationEvents
 public class JobFacadeIntTest {
+
+    private static final String WAIT_FOR_APPROVAL_TYPE = "waitForApproval/v1";
+
+    @Autowired
+    private ApplicationEvents applicationEvents;
+
+    @Autowired
+    private ContextService contextService;
 
     @Autowired
     private JobFacade jobFacade;
@@ -83,13 +112,19 @@ public class JobFacadeIntTest {
     @Autowired
     private JobRepository jobRepository;
 
+    @MockitoSpyBean
+    private JobService jobService;
+
     @Autowired
     private TaskExecutionRepository taskExecutionRepository;
+
+    @Autowired
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
-            NullPointerException.class,
+            IllegalArgumentException.class,
             () -> jobFacade.createJob(new JobParametersDTO("aGVsbG8x", Collections.emptyMap())));
     }
 
@@ -120,6 +155,241 @@ public class JobFacadeIntTest {
         assertThat(jobRepository.findById(childJobId)).isEmpty();
         assertThat(taskExecutionRepository.findById(parentTaskExecutionId)).isEmpty();
         assertThat(taskExecutionRepository.findById(childTaskExecutionId)).isEmpty();
+
+        verify(contextService).deleteStackContexts(parentJobId, Context.Classname.JOB);
+        verify(contextService).deleteStackContexts(childJobId, Context.Classname.JOB);
+        verify(contextService).deleteStackContexts(parentTaskExecutionId, Context.Classname.TASK_EXECUTION);
+        verify(contextService).deleteStackContexts(childTaskExecutionId, Context.Classname.TASK_EXECUTION);
+    }
+
+    @Test
+    public void testOptimisticLockRejectsConcurrentStoppedResumeClaim() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        Job racerA = jobRepository.findById(jobId)
+            .orElseThrow();
+        Job racerB = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        racerA.setStatus(Job.Status.STARTED);
+
+        jobRepository.save(racerA);
+
+        racerB.setStatus(Job.Status.STARTED);
+
+        assertThatThrownBy(() -> jobRepository.save(racerB)).isInstanceOf(OptimisticLockingFailureException.class);
+
+        assertThat(jobRepository.findById(jobId))
+            .get()
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testTryClaimResumeReturnsFalseWithoutThrowingWhenClaimIsLost() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        Job racerA = jobRepository.findById(jobId)
+            .orElseThrow();
+        Job racerB = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(jobService.tryClaimResume(racerA)).isTrue();
+
+        assertThat(jobService.tryClaimResume(racerB)).isFalse();
+    }
+
+    @Test
+    public void testTryClaimResumeStartsStoppedJob() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        Job stoppedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(jobService.tryClaimResume(stoppedJob)).isTrue();
+
+        Job claimedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(claimedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testResumeToStatusStartedTransitionsStoppedJob() {
+        Job job = newJob();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        long jobId = Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+
+        assertThat(jobService.resumeToStatusStarted(jobId)
+            .getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testResumeToStatusStartedRejectsAStartedJob() {
+        long jobId = saveJob(Job.Status.STARTED);
+
+        assertThatThrownBy(() -> jobService.resumeToStatusStarted(jobId))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testResumeJobRejectsARestartOfAStartedJob() {
+        long jobId = saveJob(Job.Status.FAILED);
+
+        jobFacade.resumeJob(jobId);
+
+        assertThatThrownBy(() -> jobFacade.resumeJob(jobId))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class)).hasSize(1);
+    }
+
+    @Test
+    public void testResumeClaimedJobPublishesAStartedResumeEvent() {
+        jobFacade.resumeClaimedJob(1L, 2L, Map.of("approved", true));
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class))
+            .singleElement()
+            .satisfies(resumeJobEvent -> {
+                assertThat(resumeJobEvent.isStarted()).isTrue();
+                assertThat(resumeJobEvent.getTaskExecutionId()).isEqualTo(2L);
+                assertThat(resumeJobEvent.getData()).isEqualTo(Map.of("approved", true));
+            });
+    }
+
+    @Test
+    public void testConcurrentResumeApprovalsCompleteTheWaitingTaskExecutionOnce() throws Exception {
+        long jobId = saveJob(Job.Status.STOPPED);
+
+        long taskExecutionId = saveStartedTaskExecution(jobId, WAIT_FOR_APPROVAL_TYPE);
+
+        CyclicBarrier statusCheckBarrier = new CyclicBarrier(2);
+
+        doAnswer(invocation -> {
+            Object job = invocation.callRealMethod();
+
+            statusCheckBarrier.await(10, TimeUnit.SECONDS);
+
+            return job;
+        }).when(jobService)
+            .getJob(jobId);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        try {
+            Future<Boolean> firstApproval = executorService.submit(() -> resumeApproval(jobId, "uuid-1"));
+            Future<Boolean> secondApproval = executorService.submit(() -> resumeApproval(jobId, "uuid-2"));
+
+            List<Boolean> results = List.of(
+                firstApproval.get(30, TimeUnit.SECONDS), secondApproval.get(30, TimeUnit.SECONDS));
+
+            assertThat(results).containsExactlyInAnyOrder(true, false);
+        } finally {
+            executorService.shutdownNow();
+        }
+
+        verify(taskFileStorage, times(1)).storeTaskExecutionOutput(eq(jobId), eq(taskExecutionId), anyMap());
+    }
+
+    private boolean resumeApproval(long jobId, String uuid) {
+        try {
+            jobFacade.resumeApproval(jobId, uuid, true);
+
+            return true;
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            return false;
+        }
+    }
+
+    @Test
+    public void testResumeApprovalRejectsAJobThatIsNotStopped() {
+        long jobId = saveJob(Job.Status.STARTED);
+
+        saveStartedTaskExecution(jobId, WAIT_FOR_APPROVAL_TYPE);
+
+        assertThatThrownBy(() -> jobFacade.resumeApproval(jobId, "uuid-1", true))
+            .isInstanceOf(IllegalStateException.class);
+
+        verify(taskFileStorage, never()).storeTaskExecutionOutput(eq(jobId), anyLong(), anyMap());
+
+        assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).isEmpty();
+    }
+
+    @Test
+    public void testResumeApprovalDoesNotCompleteAnUnrelatedTaskExecution() {
+        long jobId = saveJob(Job.Status.STOPPED);
+
+        saveStartedTaskExecution(jobId, "httpClient/v1/get");
+
+        assertThatThrownBy(() -> jobFacade.resumeApproval(jobId, "uuid-1", true))
+            .isInstanceOf(IllegalStateException.class);
+
+        assertThat(jobRepository.findById(jobId))
+            .get()
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.STOPPED);
+
+        verify(taskFileStorage, never()).storeTaskExecutionOutput(eq(jobId), anyLong(), anyMap());
+
+        assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).isEmpty();
+    }
+
+    @Test
+    public void testResumeApprovalCompletesTheWaitingApprovalTaskExecution() {
+        long jobId = saveJob(Job.Status.STOPPED);
+
+        long taskExecutionId = saveStartedTaskExecution(jobId, WAIT_FOR_APPROVAL_TYPE);
+
+        jobFacade.resumeApproval(jobId, "uuid-1", true);
+
+        assertThat(jobRepository.findById(jobId))
+            .get()
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.STARTED);
+
+        verify(taskFileStorage).storeTaskExecutionOutput(jobId, taskExecutionId, Map.of("approved", true));
+
+        assertThat(applicationEvents.stream(TaskExecutionCompleteEvent.class)).hasSize(1);
+    }
+
+    private long saveJob(Job.Status status) {
+        Job job = newJob();
+
+        job.setStatus(status);
+
+        return Validate.notNull(jobRepository.save(job)
+            .getId(), "id");
+    }
+
+    private long saveStartedTaskExecution(long jobId, String type) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of("name", "task1", "type", type)))
+            .build();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setStatus(TaskExecution.Status.STARTED);
+        taskExecution.setTaskNumber(1);
+
+        return Validate.notNull(taskExecutionRepository.save(taskExecution)
+            .getId(), "id");
     }
 
     private static Job newJob() {
@@ -158,19 +428,26 @@ public class JobFacadeIntTest {
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 
-        @MockitoBean
-        private ContextService contextService;
+        @Bean
+        ContextService contextService() {
+            return mock(ContextService.class);
+        }
 
-        @MockitoBean
-        private WorkflowService workflowService;
+        @Bean
+        WorkflowService workflowService() {
+            return mock(WorkflowService.class);
+        }
 
-        @MockitoBean
-        private TaskFileStorage taskFileStorage;
+        @Bean
+        TaskFileStorage taskFileStorage() {
+            return mock(TaskFileStorage.class);
+        }
 
         @Bean
         JobFacade jobFacade(
-            ApplicationEventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService) {
+            ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
+            TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+            WorkflowService workflowService) {
 
             return new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);

@@ -57,13 +57,13 @@ public class ApprovalTaskCompletionListener {
 
         ApprovalTask approvalTask = approvalTaskOptional.get();
 
-        if (approvalTask.getStatus() == ApprovalTask.Status.COMPLETED) {
+        if (approvalTask.isResolved()) {
             return;
         }
 
-        approvalTask.setStatus(ApprovalTask.Status.COMPLETED);
+        approvalTask.complete();
 
-        approvalTaskService.update(approvalTask);
+        approvalTaskService.resolve(approvalTask);
 
         if (log.isDebugEnabled()) {
             log.debug("Marked approval task id={} as COMPLETED after job resume", approvalTask.getId());

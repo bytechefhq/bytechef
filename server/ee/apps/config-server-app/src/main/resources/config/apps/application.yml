@@ -150,6 +150,18 @@ bytechef:
       chat:
         options:
           model: gpt-4o
+  approval:
+    signed-token:
+      # Tolerance applied to signed approval link expiry checks default: PT60S
+      clock-skew: PT60S
+      # Lifetime of a signed approval/resume link default: P30D
+      default-ttl: P30D
+      # Base64 signing secrets accepted for verification after a rotation
+      # previous-secrets:
+      # Fail startup when no signing secret can be resolved default: false
+      required: false
+      # Base64 signing secret (at least 32 bytes); derived from the encryption key when unset
+      # secret:
   async:
     # Upper bound on concurrent @Async tasks on the default executor. There is no queue: a submitter waits for a
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
@@ -209,6 +221,16 @@ bytechef:
       agent:
         # Maximum nesting depth of sub-workflows called by AI agent tools default: 10
         max-subflow-depth: 10
+      approval-escalation:
+        # Escalate a pending approval after this duration; the sweep is a no-op while unset
+        # after:
+        enabled: true
+      approval-expiry:
+        enabled: true
+      approval-reminder:
+        enabled: true
+        # Remind approvers this long before an approval expires default: PT24H
+        lead-time: PT24H
     output-storage:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
       provider: jdbc

@@ -75,6 +75,13 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
             new CreatePrincipalLinkedJobRequest(referenceJobId, jobParametersDTO, platformType), Long.class);
     }
 
+    @Override
+    public long createPrincipalLinkedJob(
+        JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType platformType) {
+
+        throw new UnsupportedOperationException();
+    }
+
     @SuppressFBWarnings("EI")
     public record CreateChildJobRequest(long parentJobId, JobParametersDTO jobParameters, PlatformType platformType) {
     }

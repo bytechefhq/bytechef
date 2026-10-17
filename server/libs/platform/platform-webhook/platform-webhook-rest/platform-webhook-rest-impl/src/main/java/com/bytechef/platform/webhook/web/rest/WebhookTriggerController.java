@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.AbstractException;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -31,6 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -91,7 +93,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        return callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
 
             boolean head = Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name());
@@ -146,7 +148,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+        return callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             SseEmitterStreamBridge bridge = new SseEmitterStreamBridge(emitter);
 
             WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(
@@ -157,6 +159,18 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
             return emitter;
         });
+    }
+
+    private static <V> V callWithTenantId(String tenantId, Callable<V> callable) {
+        try {
+            return TenantContext.callWithTenantId(tenantId, callable);
+        } catch (RuntimeException runtimeException) {
+            if (runtimeException.getCause() instanceof AbstractException abstractException) {
+                throw abstractException;
+            }
+
+            throw runtimeException;
+        }
     }
 
     private ResponseEntity<?> doValidateOnEnable(

@@ -37,6 +37,8 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
+    Optional<TaskExecution> fetchTaskExecution(long id);
+
     TaskExecution getTaskExecution(long id);
 
     TaskExecution getTaskExecutionForUpdate(long id);

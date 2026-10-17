@@ -45,13 +45,17 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalF
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowLauncher;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.mock.env.MockEnvironment;
 
 /**
@@ -139,6 +143,18 @@ class WorkflowSubflowSyncExecutorConfigurationTest {
         suspendedTaskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, "resume-id");
 
         assertThat(taskCompletionHandler.canHandle(suspendedTaskExecution)).isTrue();
+    }
+
+    @Test
+    void testTheTaskExecutorRunsTasksInTheTenantOfTheSubmitter() throws Exception {
+        SimpleAsyncTaskExecutor taskExecutor = WorkflowSubflowSyncExecutorConfiguration.createTaskExecutor();
+
+        CompletableFuture<String> taskTenantId = new CompletableFuture<>();
+
+        TenantContext.runWithTenantId(
+            "000001", () -> taskExecutor.execute(() -> taskTenantId.complete(TenantContext.getCurrentTenantId())));
+
+        assertThat(taskTenantId.get(5, TimeUnit.SECONDS)).isEqualTo("000001");
     }
 
     private SubflowSyncExecutor createSubflowSyncExecutor() {

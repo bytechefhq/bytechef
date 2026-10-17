@@ -33,10 +33,12 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.config.ApprovalFormFacadeIntTestConfiguration;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Clock;
 import java.time.Duration;
@@ -48,7 +50,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionOperations;
@@ -57,7 +63,9 @@ import org.springframework.transaction.support.TransactionOperations;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class ApprovalFormFacadeTest {
+@Import(PostgreSQLContainerConfiguration.class)
+@SpringBootTest(classes = ApprovalFormFacadeIntTestConfiguration.class)
+class ApprovalFormFacadeIntTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 7L;
@@ -86,6 +94,12 @@ class ApprovalFormFacadeTest {
 
     private ApprovalFormFacade approvalFormFacade;
 
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
+
+    @Autowired
+    private TaskStateService persistentTaskStateService;
+
     @BeforeEach
     void setUp() {
         approvalFormFacade = new ApprovalFormFacadeImpl(
@@ -96,30 +110,56 @@ class ApprovalFormFacadeTest {
     void testGetApprovalFormOpensItsTransactionUnderTheTenantOfTheResumeId() {
         JobResumeId jobResumeId = TenantContext.callWithTenantId(TENANT_ID, () -> JobResumeId.of(JOB_ID));
 
-        when(jobService.getJob(JOB_ID)).thenReturn(mock(Job.class));
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(mock(Job.class)));
 
-        String id = jobResumeId.toString();
-
-        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(id))
-            .isInstanceOf(RuntimeException.class)
-            .hasRootCauseInstanceOf(IllegalStateException.class)
-            .hasRootCauseMessage("Approval form is no longer available; job " + JOB_ID + " is null");
-
+        assertThat(approvalFormFacade.fetchApprovalForm(jobResumeId.toString())).isEmpty();
         assertThat(transactionTenantIds).containsExactly(TENANT_ID);
+    }
+
+    @Test
+    void testGetApprovalFormIsEmptyForAMissingJob() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.empty());
+
+        assertThat(approvalFormFacade.fetchApprovalForm(jobResumeId.toString())).isEmpty();
+    }
+
+    @Test
+    void testGetApprovalFormReadsTheSuspendStoredInTheTaskState() {
+        JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
+
+        persistentTaskStateService.save(
+            jobResumeId,
+            new Suspend(
+                Map.of(MetadataConstants.APPROVAL_FORM_PARAMETERS, Map.of("formTitle", "Refund order 42")), null));
+
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(stoppedJob(jobResumeId)));
+        when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
+        doReturn(Map.of()).when(taskExecution)
+            .getMetadata();
+
+        ApprovalFormFacade persistentApprovalFormFacade = new ApprovalFormFacadeImpl(
+            approvalTokensProvider(), jobService, taskExecutionService, persistentTaskStateService,
+            platformTransactionManager);
+
+        Map<String, ?> approvalForm = persistentApprovalFormFacade.fetchApprovalForm(jobResumeId.toString())
+            .orElseThrow();
+
+        assertThat(approvalForm).isEqualTo(Map.of("formTitle", "Refund order 42"));
+
+        persistentTaskStateService.delete(jobResumeId);
     }
 
     @Test
     void testGetApprovalFormRejectsAResumeIdThatDoesNotMatch() {
         JobResumeId storedJobResumeId = JobResumeId.of(JOB_ID);
 
-        when(jobService.getJob(JOB_ID)).thenReturn(stoppedJob(storedJobResumeId));
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(stoppedJob(storedJobResumeId)));
 
         JobResumeId otherJobResumeId = JobResumeId.of(JOB_ID);
 
-        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(otherJobResumeId.toString()))
-            .hasRootCauseInstanceOf(IllegalStateException.class)
-            .hasRootCauseMessage(
-                "Approval form is no longer available; the resume id of job " + JOB_ID + " does not match");
+        assertThat(approvalFormFacade.fetchApprovalForm(otherJobResumeId.toString())).isEmpty();
 
         verify(taskExecutionService, never()).getTaskExecution(anyLong());
     }
@@ -128,7 +168,7 @@ class ApprovalFormFacadeTest {
     void testGetApprovalFormReturnsTheParametersStoredWithTheSuspend() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
-        when(jobService.getJob(JOB_ID)).thenReturn(stoppedJob(jobResumeId));
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(stoppedJob(jobResumeId)));
         when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
         doReturn(Map.of("model", "agent model")).when(taskExecution)
             .getParameters();
@@ -140,7 +180,8 @@ class ApprovalFormFacadeTest {
                     Map.of(MetadataConstants.APPROVAL_FORM_PARAMETERS, Map.of("formTitle", "Refund order 42")),
                     null)));
 
-        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(jobResumeId.toString());
+        Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(jobResumeId.toString())
+            .orElseThrow();
 
         assertThat(approvalForm).isEqualTo(Map.of("formTitle", "Refund order 42"));
     }
@@ -149,7 +190,7 @@ class ApprovalFormFacadeTest {
     void testGetApprovalFormFallsBackToTheTaskParameters() {
         JobResumeId jobResumeId = JobResumeId.of(JOB_ID);
 
-        when(jobService.getJob(JOB_ID)).thenReturn(stoppedJob(jobResumeId));
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(stoppedJob(jobResumeId)));
         when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
         doReturn(Map.of("formTitle", "Approve the invoice")).when(taskExecution)
             .getParameters();
@@ -158,7 +199,8 @@ class ApprovalFormFacadeTest {
         when(taskStateService.<Suspend>fetchValue(jobResumeId)).thenReturn(
             Optional.of(new Suspend(Map.of("formUrl", "https://example.com/resume/abc"), null)));
 
-        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(jobResumeId.toString());
+        Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(jobResumeId.toString())
+            .orElseThrow();
 
         assertThat(approvalForm).isEqualTo(Map.of("formTitle", "Approve the invoice"));
     }
@@ -171,13 +213,14 @@ class ApprovalFormFacadeTest {
 
         String signedToken = approvalTokens.toSignedToken(jobResumeId.toString(), Duration.ofHours(1));
 
-        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(signedToken);
+        Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(signedToken)
+            .orElseThrow();
 
         assertThat(approvalForm)
             .extractingByKey("formTitle")
             .isEqualTo("Approve order");
 
-        verify(jobService).getJob(JOB_ID);
+        verify(jobService).fetchJob(JOB_ID);
     }
 
     @Test
@@ -193,10 +236,10 @@ class ApprovalFormFacadeTest {
         String tamperedToken =
             signedToken.substring(0, signatureStart) + replacement + signedToken.substring(signatureStart + 1);
 
-        assertThatThrownBy(() -> approvalFormFacade.getApprovalForm(tamperedToken))
+        assertThatThrownBy(() -> approvalFormFacade.fetchApprovalForm(tamperedToken))
             .isInstanceOf(IllegalArgumentException.class);
 
-        verify(jobService, never()).getJob(anyLong());
+        verify(jobService, never()).fetchJob(anyLong());
     }
 
     @Test
@@ -205,7 +248,8 @@ class ApprovalFormFacadeTest {
 
         stubStoppedJobWithTaskParameters(jobResumeId);
 
-        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(jobResumeId.toString());
+        Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(jobResumeId.toString())
+            .orElseThrow();
 
         assertThat(approvalForm)
             .extractingByKey("formTitle")
@@ -221,7 +265,7 @@ class ApprovalFormFacadeTest {
     }
 
     private void stubStoppedJobWithTaskParameters(JobResumeId jobResumeId) {
-        when(jobService.getJob(JOB_ID)).thenReturn(stoppedJob(jobResumeId));
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(stoppedJob(jobResumeId)));
         when(taskExecutionService.getTaskExecution(TASK_EXECUTION_ID)).thenReturn(taskExecution);
         doReturn(Map.of("formTitle", "Approve order")).when(taskExecution)
             .getParameters();

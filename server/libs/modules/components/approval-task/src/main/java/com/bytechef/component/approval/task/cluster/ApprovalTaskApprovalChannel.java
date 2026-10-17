@@ -17,6 +17,8 @@
 package com.bytechef.component.approval.task.cluster;
 
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.EXPIRES_AT;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.RESUME_ID;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
@@ -24,6 +26,8 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author Ivica Cardic
@@ -37,23 +41,35 @@ public class ApprovalTaskApprovalChannel {
             .type(APPROVAL_CHANNELS)
             .object(
                 () -> (inputParameters, connectionParameters, formUrl, context) -> perform(
-                    inputParameters, formUrl, approvalTaskFacade));
+                    inputParameters, approvalTaskFacade));
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private static Object perform(Parameters inputParameters, String formUrl, ApprovalTaskFacade approvalTaskFacade) {
-        String jobResumeId = formUrl.substring(formUrl.lastIndexOf('/') + 1);
-
+    private static Object perform(Parameters inputParameters, ApprovalTaskFacade approvalTaskFacade) {
         ApprovalTask approvalTask = ApprovalTask.builder()
             .name(inputParameters.getString("formTitle", "ApprovalTask"))
             .description(inputParameters.getString("formDescription"))
-            .jobResumeId(jobResumeId)
+            .jobResumeId(inputParameters.getRequiredString(RESUME_ID))
             .status(ApprovalTask.Status.OPEN)
             .priority(ApprovalTask.Priority.MEDIUM)
+            .dueDate(parseExpiresAt(inputParameters))
             .build();
 
         approvalTaskFacade.createApprovalTask(approvalTask);
 
         return null;
+    }
+
+    private static Instant parseExpiresAt(Parameters inputParameters) {
+        String expiresAt = inputParameters.getString(EXPIRES_AT);
+
+        if (expiresAt == null || expiresAt.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Instant.parse(expiresAt);
+        } catch (DateTimeParseException dateTimeParseException) {
+            return null;
+        }
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -30,6 +31,12 @@ import org.springframework.stereotype.Repository;
 public interface JdbcContextRepository
     extends ListPagingAndSortingRepository<Context, Long>, ListCrudRepository<Context, Long>,
     ContextRepository {
+
+    @Override
+    List<Context> findAllByStackIdAndClassnameId(long stackId, int classnameId);
+
+    @Override
+    void deleteAllByStackIdAndClassnameId(long stackId, int classnameId);
 
     @Override
     Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);

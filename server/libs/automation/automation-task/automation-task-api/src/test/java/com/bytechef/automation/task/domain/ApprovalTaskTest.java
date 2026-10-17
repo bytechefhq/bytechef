@@ -74,6 +74,88 @@ class ApprovalTaskTest {
         assertThatThrownBy(approvalTask::getPriority).isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    void testCompleteResolvesAnOpenTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.IN_PROGRESS.ordinal(), Priority.MEDIUM.ordinal());
+
+        approvalTask.complete();
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.COMPLETED);
+    }
+
+    @Test
+    void testExpireResolvesAnOpenTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.OPEN.ordinal(), Priority.MEDIUM.ordinal());
+
+        approvalTask.expire();
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.EXPIRED);
+    }
+
+    @Test
+    void testExpireRejectsACompletedTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.COMPLETED.ordinal(), Priority.MEDIUM.ordinal());
+
+        assertThatThrownBy(approvalTask::expire).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testCompleteRejectsAnExpiredTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.EXPIRED.ordinal(), Priority.MEDIUM.ordinal());
+
+        assertThatThrownBy(approvalTask::complete).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testChangeProgressStatusMovesBetweenOpenAndInProgress() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.OPEN.ordinal(), Priority.MEDIUM.ordinal());
+
+        approvalTask.changeProgressStatus(Status.IN_PROGRESS);
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.IN_PROGRESS);
+
+        approvalTask.changeProgressStatus(Status.OPEN);
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.OPEN);
+    }
+
+    @Test
+    void testChangeProgressStatusRejectsResolvingATask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.IN_PROGRESS.ordinal(), Priority.MEDIUM.ordinal());
+
+        assertThatThrownBy(() -> approvalTask.changeProgressStatus(Status.COMPLETED))
+            .isInstanceOf(IllegalStateException.class);
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.IN_PROGRESS);
+    }
+
+    @Test
+    void testChangeProgressStatusRejectsReopeningAResolvedTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.EXPIRED.ordinal(), Priority.MEDIUM.ordinal());
+
+        assertThatThrownBy(() -> approvalTask.changeProgressStatus(Status.OPEN))
+            .isInstanceOf(IllegalStateException.class);
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.EXPIRED);
+    }
+
+    @Test
+    void testChangeProgressStatusKeepsTheCurrentStatusOfAResolvedTask() {
+        ApprovalTask approvalTask = persistedApprovalTask(Status.COMPLETED.ordinal(), Priority.MEDIUM.ordinal());
+
+        approvalTask.changeProgressStatus(Status.COMPLETED);
+
+        assertThat(approvalTask.getStatus()).isEqualTo(Status.COMPLETED);
+    }
+
+    @Test
+    void testStatusIsTerminalOnlyForCompletedAndExpired() {
+        assertThat(Status.OPEN.isTerminal()).isFalse();
+        assertThat(Status.IN_PROGRESS.isTerminal()).isFalse();
+        assertThat(Status.COMPLETED.isTerminal()).isTrue();
+        assertThat(Status.EXPIRED.isTerminal()).isTrue();
+    }
+
     private static ApprovalTask persistedApprovalTask(int status, int priority) {
         return new ApprovalTask(1L, "name", null, "jobResumeId", 0, status, priority, null, null, 0);
     }

@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -59,5 +60,30 @@ public class JdbcContextRepositoryIntTest {
             .orElseThrow();
 
         Assertions.assertEquals(context.getValue(), resultContext.getValue());
+    }
+
+    @Test
+    public void testDeleteAllByStackIdAndClassnameIdKeepsOtherClassname() {
+        contextRepository.save(
+            new Context(
+                7L, Context.Classname.JOB,
+                taskFileStorage.storeContextValue(7L, Context.Classname.JOB, Map.of("job", "value"))));
+
+        Context taskExecutionContext = contextRepository.save(
+            new Context(
+                7L, Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(7L, Context.Classname.TASK_EXECUTION, Map.of("task", "value"))));
+
+        contextRepository.deleteAllByStackIdAndClassnameId(7L, Context.Classname.JOB.ordinal());
+
+        List<Context> jobContexts = contextRepository.findAllByStackIdAndClassnameId(
+            7L, Context.Classname.JOB.ordinal());
+        List<Context> taskExecutionContexts = contextRepository.findAllByStackIdAndClassnameId(
+            7L, Context.Classname.TASK_EXECUTION.ordinal());
+
+        Assertions.assertTrue(jobContexts.isEmpty());
+        Assertions.assertEquals(1, taskExecutionContexts.size());
+        Assertions.assertEquals(taskExecutionContext.getValue(), taskExecutionContexts.getFirst()
+            .getValue());
     }
 }

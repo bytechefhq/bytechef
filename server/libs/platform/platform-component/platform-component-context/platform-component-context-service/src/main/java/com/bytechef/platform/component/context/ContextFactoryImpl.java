@@ -31,6 +31,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.service.ApprovalShortTokenService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.Tracer;
@@ -48,6 +49,7 @@ import org.springframework.stereotype.Component;
 public class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
+    private final ObjectProvider<ApprovalShortTokenService> approvalShortTokenServiceProvider;
     private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
@@ -65,10 +67,11 @@ public class ContextFactoryImpl implements ContextFactory {
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, EditorTempFileStorage editorTempFileStorage,
         ApplicationEventPublisher eventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
-        LogFileStorage logFileStorage, TempFileStorage tempFileStorage, Tracer tracer,
-        TriggerLogFileStorage triggerLogFileStorage) {
+        ObjectProvider<ApprovalShortTokenService> approvalShortTokenServiceProvider, LogFileStorage logFileStorage,
+        TempFileStorage tempFileStorage, Tracer tracer, TriggerLogFileStorage triggerLogFileStorage) {
 
         this.applicationContext = applicationContext;
+        this.approvalShortTokenServiceProvider = approvalShortTokenServiceProvider;
         this.approvalTokensProvider = approvalTokensProvider;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
@@ -94,6 +97,7 @@ public class ContextFactoryImpl implements ContextFactory {
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment),
                 approvalTokensProvider.getIfAvailable())
+            .approvalShortTokenService(approvalShortTokenServiceProvider.getIfAvailable())
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)
@@ -133,6 +137,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .builder(
                 componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment))
+            .approvalShortTokenService(approvalShortTokenServiceProvider.getIfAvailable())
             .approvalTokens(approvalTokensProvider.getIfAvailable())
             .clusterElementResolver(clusterElementResolver)
             .componentConnection(componentConnection)

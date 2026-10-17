@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -63,9 +64,12 @@ import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -248,6 +252,47 @@ class A2AAgentExecutorTest {
             .join()).isInstanceOfSatisfying(
                 Working.class,
                 working -> assertThat(working.taskReference()).isEqualTo(agentRun.taskReference()));
+    }
+
+    @Test
+    void testPausedRunFormUrlTokenExpiresWithTheApproval() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+
+        Job job = mock(Job.class);
+        String jobResumeId = JobResumeId.of(100L)
+            .toString();
+        Instant expiresAt = Instant.now()
+            .plus(Duration.ofDays(1));
+        TaskExecution taskExecution = mock(TaskExecution.class);
+        ApprovalTokens approvalTokens = mock(ApprovalTokens.class);
+
+        when(job.getId()).thenReturn(100L);
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(job.getMetadata(MetadataConstants.JOB_RESUME_ID)).thenReturn(jobResumeId);
+        when(job.getMetadata(MetadataConstants.APPROVAL_RESUME)).thenReturn(true);
+        when(job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID)).thenReturn(7L);
+        doReturn(Map.of("suspend", Map.of("expiresAt", expiresAt.toString()))).when(taskExecution)
+            .getMetadata();
+        when(taskExecutionService.fetchTaskExecution(7L)).thenReturn(Optional.of(taskExecution));
+        when(approvalTokensObjectProvider.getIfAvailable()).thenReturn(approvalTokens);
+        when(approvalTokens.toSignedTokenIfConfigured(eq(jobResumeId), any(Duration.class)))
+            .thenReturn(Optional.of("v1.signed"));
+
+        A2AAgentResult agentResult = start(CompletableFuture.completedFuture(job), null).result()
+            .join();
+
+        assertThat(agentResult).isInstanceOfSatisfying(
+            InputRequired.class,
+            inputRequired -> assertThat(inputRequired.text()).contains("https://example.com/resume/v1.signed"));
+
+        ArgumentCaptor<Duration> durationArgumentCaptor = ArgumentCaptor.forClass(Duration.class);
+
+        verify(approvalTokens).toSignedTokenIfConfigured(eq(jobResumeId), durationArgumentCaptor.capture());
+
+        assertThat(durationArgumentCaptor.getValue()).isBetween(
+            Duration.ofDays(1), Duration.ofDays(1)
+                .plus(ApprovalFormUrls.APPROVAL_TOKEN_TTL_MARGIN));
     }
 
     @Test

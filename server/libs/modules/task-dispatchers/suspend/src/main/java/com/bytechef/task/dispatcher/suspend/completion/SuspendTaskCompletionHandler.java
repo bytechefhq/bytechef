@@ -77,6 +77,14 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
+        FileEntry outputFileEntry = taskExecution.getOutput();
+
+        Object output = taskFileStorage.readTaskExecutionOutput(outputFileEntry);
+
+        Suspend suspend = ConvertUtils.convertValue(output, Suspend.class);
+
+        taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend);
+
         taskExecution.setHandled(true);
 
         taskExecution.setStatus(Status.COMPLETED);
@@ -98,12 +106,9 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         long jobId = Objects.requireNonNull(job.getId());
 
         String name = taskExecution.getName();
-        FileEntry outputFileEntry = taskExecution.getOutput();
 
         Map<String, Object> newContext = new HashMap<>(
             taskFileStorage.readContextValue(contextService.peek(jobId, Context.Classname.JOB)));
-
-        Object output = taskFileStorage.readTaskExecutionOutput(outputFileEntry);
 
         newContext.put(name, output);
 
@@ -113,8 +118,6 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         String jobResumeIdString = MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.JOB_RESUME_ID);
 
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
-
-        Suspend suspend = ConvertUtils.convertValue(output, Suspend.class);
 
         taskStateService.save(jobResumeId, suspend);
 

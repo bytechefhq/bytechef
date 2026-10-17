@@ -21,6 +21,7 @@ import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
@@ -53,6 +54,10 @@ import org.slf4j.LoggerFactory;
  * suspends, stops, completes or fails, or two minutes after the job's first pending registration, by which time any
  * leftover events have been delivered.
  *
+ * <p>
+ * Job ids are only unique within a tenant, so registrations are keyed by the tenant current at registration time and
+ * events are routed by the tenant carried in their metadata.
+ *
  * @author Ivica Cardic
  */
 public class SseStreamBridgeRegistry {
@@ -63,20 +68,20 @@ public class SseStreamBridgeRegistry {
     private static final int UNDELIVERED_QUESTION_MAX_ATTEMPTS = 30;
     private static final Duration UNDELIVERED_QUESTION_RETRY_DELAY = Duration.ofSeconds(2);
 
-    private final Cache<Long, CopyOnWriteArrayList<SseStreamBridge>> bridges = Caffeine.newBuilder()
+    private final Cache<JobKey, CopyOnWriteArrayList<SseStreamBridge>> bridges = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
-    private final Cache<Long, CompletableFuture<Void>> completionFutures = Caffeine.newBuilder()
+    private final Cache<JobKey, CompletableFuture<Void>> completionFutures = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
     private final Executor executor;
     private final @Nullable JobResumeFacade jobResumeFacade;
-    private final Cache<Long, List<PendingRegistration>> pendingRegistrations;
+    private final Cache<JobKey, List<PendingRegistration>> pendingRegistrations;
     private final Duration undeliveredQuestionRetryDelay;
 
-    private final Cache<Long, Boolean> stoppedJobIds = Caffeine.newBuilder()
+    private final Cache<JobKey, Boolean> stoppedJobKeys = Caffeine.newBuilder()
         .expireAfterWrite(30, TimeUnit.MINUTES)
         .maximumSize(10_000)
         .build();
@@ -108,7 +113,7 @@ public class SseStreamBridgeRegistry {
             .executor(executor)
             .scheduler(Scheduler.systemScheduler())
             .ticker(ticker)
-            .<Long, List<PendingRegistration>>removalListener((jobId, jobPendingRegistrations, removalCause) -> {
+            .<JobKey, List<PendingRegistration>>removalListener((jobKey, jobPendingRegistrations, removalCause) -> {
                 if (removalCause.wasEvicted() && jobPendingRegistrations != null) {
                     for (PendingRegistration pendingRegistration : jobPendingRegistrations) {
                         pendingRegistration.activate();
@@ -119,23 +124,24 @@ public class SseStreamBridgeRegistry {
     }
 
     public void onSseStreamEvent(SseStreamEvent sseStreamEvent) {
-        long jobId = sseStreamEvent.getJobId();
+        JobKey jobKey = JobKey.of(sseStreamEvent);
+        long jobId = jobKey.jobId();
 
         String eventType = sseStreamEvent.getEventType();
 
         if (SseStreamEvent.EVENT_TYPE_TASK_STARTED.equals(eventType)) {
-            activatePendingRegistrations(jobId);
+            activatePendingRegistrations(jobKey);
 
             return;
         }
 
         if (SseStreamEvent.EVENT_TYPE_JOB_STATUS.equals(eventType)) {
-            handleJobStatus(jobId, sseStreamEvent);
+            handleJobStatus(jobKey, sseStreamEvent);
 
             return;
         }
 
-        CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobId);
+        CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobKey);
 
         if (sseStreamBridges == null || sseStreamBridges.isEmpty()) {
             if (isAskUserQuestionEvent(sseStreamEvent.getPayload())) {
@@ -143,7 +149,7 @@ public class SseStreamBridgeRegistry {
                     "The '{}' event of job {} was dropped because no SSE connection is registered for the job",
                     AiAgentSseEventType.ASK_USER_QUESTION, jobId);
 
-                resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
+                resumeWithoutAnswer(jobKey, sseStreamEvent.getPayload());
             }
 
             return;
@@ -170,7 +176,7 @@ public class SseStreamBridgeRegistry {
                         "The '{}' event of job {} was not delivered to any SSE connection of the job",
                         AiAgentSseEventType.ASK_USER_QUESTION, jobId);
 
-                    resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
+                    resumeWithoutAnswer(jobKey, sseStreamEvent.getPayload());
                 }
             }
 
@@ -211,15 +217,19 @@ public class SseStreamBridgeRegistry {
     }
 
     public Registration register(long jobId, SseStreamBridge sseStreamBridge) {
+        return register(JobKey.current(jobId), sseStreamBridge);
+    }
+
+    private Registration register(JobKey jobKey, SseStreamBridge sseStreamBridge) {
         CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.get(
-            jobId, key -> new CopyOnWriteArrayList<>());
+            jobKey, key -> new CopyOnWriteArrayList<>());
 
         sseStreamBridges.add(sseStreamBridge);
 
-        CompletableFuture<Void> completionFuture = completionFutures.get(jobId, key -> new CompletableFuture<>());
+        CompletableFuture<Void> completionFuture = completionFutures.get(jobKey, key -> new CompletableFuture<>());
 
         AutoCloseable handle = () -> {
-            CopyOnWriteArrayList<SseStreamBridge> currentBridges = bridges.getIfPresent(jobId);
+            CopyOnWriteArrayList<SseStreamBridge> currentBridges = bridges.getIfPresent(jobKey);
 
             if (currentBridges != null) {
                 currentBridges.remove(sseStreamBridge);
@@ -230,15 +240,17 @@ public class SseStreamBridgeRegistry {
     }
 
     public synchronized Registration registerForResume(long jobId, SseStreamBridge sseStreamBridge) {
-        PendingRegistration pendingRegistration = new PendingRegistration(jobId, sseStreamBridge);
+        JobKey jobKey = JobKey.current(jobId);
 
-        if (stoppedJobIds.getIfPresent(jobId) != null) {
-            stoppedJobIds.invalidate(jobId);
+        PendingRegistration pendingRegistration = new PendingRegistration(jobKey, sseStreamBridge);
+
+        if (stoppedJobKeys.getIfPresent(jobKey) != null) {
+            stoppedJobKeys.invalidate(jobKey);
 
             pendingRegistration.activate();
         } else {
             List<PendingRegistration> jobPendingRegistrations = pendingRegistrations.get(
-                jobId, key -> new CopyOnWriteArrayList<>());
+                jobKey, key -> new CopyOnWriteArrayList<>());
 
             jobPendingRegistrations.add(pendingRegistration);
         }
@@ -250,23 +262,23 @@ public class SseStreamBridgeRegistry {
         pendingRegistrations.cleanUp();
     }
 
-    private synchronized void activatePendingRegistrations(long jobId) {
-        stoppedJobIds.invalidate(jobId);
+    private synchronized void activatePendingRegistrations(JobKey jobKey) {
+        stoppedJobKeys.invalidate(jobKey);
 
-        List<PendingRegistration> jobPendingRegistrations = pendingRegistrations.getIfPresent(jobId);
+        List<PendingRegistration> jobPendingRegistrations = pendingRegistrations.getIfPresent(jobKey);
 
         if (jobPendingRegistrations == null) {
             return;
         }
 
-        pendingRegistrations.invalidate(jobId);
+        pendingRegistrations.invalidate(jobKey);
 
         for (PendingRegistration pendingRegistration : jobPendingRegistrations) {
             pendingRegistration.activate();
         }
     }
 
-    private void handleJobStatus(long jobId, SseStreamEvent sseStreamEvent) {
+    private void handleJobStatus(JobKey jobKey, SseStreamEvent sseStreamEvent) {
         Object payload = sseStreamEvent.getPayload();
         String status = payload != null ? payload.toString() : "";
 
@@ -278,11 +290,11 @@ public class SseStreamBridgeRegistry {
         }
 
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || ("STOPPED".equals(status) && !suspended)) {
-            activatePendingRegistrations(jobId);
+            activatePendingRegistrations(jobKey);
         }
 
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status)) {
-            CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobId);
+            CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobKey);
 
             if (sseStreamBridges != null) {
                 for (SseStreamBridge sseStreamBridge : sseStreamBridges) {
@@ -302,18 +314,18 @@ public class SseStreamBridgeRegistry {
                 }
             }
 
-            CompletableFuture<Void> completionFuture = completionFutures.getIfPresent(jobId);
+            CompletableFuture<Void> completionFuture = completionFutures.getIfPresent(jobKey);
 
             if (completionFuture != null) {
                 completionFuture.complete(null);
             }
 
-            bridges.invalidate(jobId);
-            completionFutures.invalidate(jobId);
+            bridges.invalidate(jobKey);
+            completionFutures.invalidate(jobKey);
         }
 
         if (suspended) {
-            onJobStopped(jobId);
+            onJobStopped(jobKey);
         }
     }
 
@@ -332,21 +344,23 @@ public class SseStreamBridgeRegistry {
             AiAgentSseEventType.ASK_USER_QUESTION.equals(map.get(AiAgentSseEventType.EVENT_TYPE));
     }
 
-    private void resumeWithoutAnswer(long jobId, @Nullable Object payload) {
+    private void resumeWithoutAnswer(JobKey jobKey, @Nullable Object payload) {
         if (jobResumeFacade == null || !(payload instanceof Map<?, ?> map) ||
             !(map.get("resumeUrl") instanceof String resumeUrl) || resumeUrl.isBlank()) {
 
             return;
         }
 
-        resumeWithoutAnswer(jobId, resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1), 1);
+        resumeWithoutAnswer(jobKey, resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1), 1);
     }
 
-    private void resumeWithoutAnswer(long jobId, String jobResumeId, int attempt) {
+    private void resumeWithoutAnswer(JobKey jobKey, String jobResumeId, int attempt) {
+        long jobId = jobKey.jobId();
+
         Executor delayedExecutor = CompletableFuture.delayedExecutor(
             undeliveredQuestionRetryDelay.toMillis(), TimeUnit.MILLISECONDS, executor);
 
-        delayedExecutor.execute(() -> {
+        delayedExecutor.execute(() -> TenantContext.runWithTenantId(jobKey.tenantId(), () -> {
             JobResumeOutcome jobResumeOutcome;
 
             try {
@@ -368,34 +382,49 @@ public class SseStreamBridgeRegistry {
             }
 
             if (attempt < UNDELIVERED_QUESTION_MAX_ATTEMPTS) {
-                resumeWithoutAnswer(jobId, jobResumeId, attempt + 1);
+                resumeWithoutAnswer(jobKey, jobResumeId, attempt + 1);
             } else {
                 log.warn(
                     "Job {} did not suspend on its undelivered question after {} attempts; it waits until the " +
                         "question expires",
                     jobId, attempt);
             }
-        });
+        }));
     }
 
-    private synchronized void onJobStopped(long jobId) {
-        if (pendingRegistrations.getIfPresent(jobId) == null) {
-            stoppedJobIds.put(jobId, Boolean.TRUE);
+    private synchronized void onJobStopped(JobKey jobKey) {
+        if (pendingRegistrations.getIfPresent(jobKey) == null) {
+            stoppedJobKeys.put(jobKey, Boolean.TRUE);
         } else {
-            activatePendingRegistrations(jobId);
+            activatePendingRegistrations(jobKey);
+        }
+    }
+
+    private record JobKey(String tenantId, long jobId) {
+
+        private static JobKey current(long jobId) {
+            return new JobKey(TenantContext.getCurrentTenantId(), jobId);
+        }
+
+        private static JobKey of(SseStreamEvent sseStreamEvent) {
+            String tenantId =
+                sseStreamEvent.getMetadata(TenantContext.CURRENT_TENANT_ID) instanceof String eventTenantId
+                    ? eventTenantId : TenantContext.getCurrentTenantId();
+
+            return new JobKey(tenantId, sseStreamEvent.getJobId());
         }
     }
 
     private final class PendingRegistration {
 
         private final CompletableFuture<Void> completion = new CompletableFuture<>();
-        private final long jobId;
+        private final JobKey jobKey;
         private final SseStreamBridge sseStreamBridge;
         private @Nullable AutoCloseable activeHandle;
         private boolean closed;
 
-        private PendingRegistration(long jobId, SseStreamBridge sseStreamBridge) {
-            this.jobId = jobId;
+        private PendingRegistration(JobKey jobKey, SseStreamBridge sseStreamBridge) {
+            this.jobKey = jobKey;
             this.sseStreamBridge = sseStreamBridge;
         }
 
@@ -405,7 +434,7 @@ public class SseStreamBridgeRegistry {
                     return;
                 }
 
-                Registration registration = register(jobId, sseStreamBridge);
+                Registration registration = register(jobKey, sseStreamBridge);
 
                 activeHandle = registration;
 
@@ -423,7 +452,7 @@ public class SseStreamBridgeRegistry {
             }
 
             if (handle == null) {
-                List<PendingRegistration> jobPendingRegistrations = pendingRegistrations.getIfPresent(jobId);
+                List<PendingRegistration> jobPendingRegistrations = pendingRegistrations.getIfPresent(jobKey);
 
                 if (jobPendingRegistrations != null) {
                     jobPendingRegistrations.remove(this);

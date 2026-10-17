@@ -1,4 +1,5 @@
 dependencies {
+    implementation("io.micrometer:micrometer-core")
     implementation(("io.micrometer:micrometer-tracing"))
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
@@ -41,6 +42,7 @@ dependencies {
     testImplementation(project(":server:libs:modules:components:google:google-sheets"))
     testImplementation(project(":server:libs:modules:components:http-client"))
     testImplementation(project(":server:libs:modules:components:slack"))
+    testImplementation(project(":server:libs:modules:components:xero"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }

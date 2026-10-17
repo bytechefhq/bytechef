@@ -153,6 +153,8 @@ public class WorkflowValidator {
             processTasks(
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
+            validateChatOnlyApprovalChannels(workflowJsonNode, taskJsonNodes, warnings);
+            validateApprovalPlacement(taskJsonNodes, errors);
             validateWorkflowTasks(
                 taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, nodeVariableOutputMap,
                 clusterTypesMap, clusterTypesProvider, resourceReferenceProvider, errors, warnings);
@@ -676,6 +678,222 @@ public class WorkflowValidator {
     private static boolean isValidInputName(String name) {
         return INPUT_NAME_PATTERN.matcher(name)
             .matches();
+    }
+
+    private static void validateChatOnlyApprovalChannels(
+        JsonNode workflowJsonNode, List<JsonNode> taskJsonNodes, StringBuilder warnings) {
+
+        if (hasChatCapableTrigger(workflowJsonNode)) {
+            return;
+        }
+
+        for (JsonNode taskJsonNode : taskJsonNodes) {
+            if (!taskJsonNode.isObject() || !taskJsonNode.has("clusterElements")) {
+                continue;
+            }
+
+            JsonNode clusterElementsJsonNode = taskJsonNode.get("clusterElements");
+
+            if (!clusterElementsJsonNode.isObject()) {
+                continue;
+            }
+
+            List<String> approvalChannelTypes = getApprovalChannelTypes(clusterElementsJsonNode);
+
+            if (!approvalChannelTypes.isEmpty() && isChatOnly(approvalChannelTypes)) {
+                appendChatOnlyWarning(getNodeName(taskJsonNode), "This task", warnings);
+            }
+        }
+    }
+
+    private static void validateApprovalPlacement(List<JsonNode> taskJsonNodes, StringBuilder errors) {
+        Set<String> placementErrors = new LinkedHashSet<>();
+
+        for (JsonNode taskJsonNode : taskJsonNodes) {
+            if (taskJsonNode.isObject()) {
+                validateApprovalPlacement(taskJsonNode.get("clusterElements"), placementErrors);
+            }
+        }
+
+        for (String placementError : placementErrors) {
+            StringUtils.appendWithNewline(placementError, errors);
+        }
+    }
+
+    private static void validateApprovalPlacement(
+        @Nullable JsonNode clusterElementsJsonNode, Set<String> placementErrors) {
+
+        if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
+            return;
+        }
+
+        for (Map.Entry<String, JsonNode> clusterElementEntry : clusterElementsJsonNode.properties()) {
+            for (JsonNode clusterElementJsonNode : toClusterElementJsonNodes(clusterElementEntry.getValue())) {
+                if (isClusterElementName(clusterElementJsonNode, "taskTool")) {
+                    validateSubagentTools(clusterElementJsonNode, placementErrors);
+                }
+
+                validateApprovalPlacement(clusterElementJsonNode.get("clusterElements"), placementErrors);
+            }
+        }
+    }
+
+    private static void validateSubagentTools(JsonNode taskToolJsonNode, Set<String> placementErrors) {
+        for (JsonNode subagentJsonNode : getChildClusterElementJsonNodes(taskToolJsonNode, "subagent")) {
+            for (JsonNode toolJsonNode : getChildClusterElementJsonNodes(subagentJsonNode, "tools")) {
+                if (isClusterElementType(toolJsonNode, "approval", "requestApproval")) {
+                    placementErrors.add(
+                        "[" + getNodeName(toolJsonNode) + "] 'requestApproval' cannot be attached to subagent '" +
+                            getNodeName(subagentJsonNode) + "': a subagent cannot pause for an approval. Attach it " +
+                            "directly to the agent instead.");
+                }
+
+                if (isClusterElementName(toolJsonNode, "taskTool")) {
+                    validateSubagentTools(toolJsonNode, placementErrors);
+                }
+            }
+        }
+    }
+
+    private static List<JsonNode> getChildClusterElementJsonNodes(JsonNode clusterElementJsonNode, String key) {
+        JsonNode childClusterElementsJsonNode = clusterElementJsonNode.get("clusterElements");
+
+        if (childClusterElementsJsonNode == null || !childClusterElementsJsonNode.isObject()) {
+            return List.of();
+        }
+
+        return toClusterElementJsonNodes(childClusterElementsJsonNode.get(key));
+    }
+
+    private static boolean isClusterElementName(JsonNode clusterElementJsonNode, String elementName) {
+        JsonNode typeJsonNode = clusterElementJsonNode.get("type");
+
+        if (typeJsonNode == null || !typeJsonNode.isString()) {
+            return false;
+        }
+
+        String[] typeParts = typeJsonNode.asString()
+            .split("/");
+
+        return typeParts.length == 3 && elementName.equals(typeParts[2]);
+    }
+
+    private static List<JsonNode> toClusterElementJsonNodes(@Nullable JsonNode jsonNode) {
+        if (jsonNode == null) {
+            return List.of();
+        }
+
+        if (jsonNode.isObject()) {
+            return List.of(jsonNode);
+        }
+
+        List<JsonNode> clusterElementJsonNodes = new ArrayList<>();
+
+        if (jsonNode.isArray()) {
+            for (JsonNode elementJsonNode : jsonNode) {
+                if (elementJsonNode.isObject()) {
+                    clusterElementJsonNodes.add(elementJsonNode);
+                }
+            }
+        }
+
+        return clusterElementJsonNodes;
+    }
+
+    private static boolean isClusterElementType(
+        JsonNode clusterElementJsonNode, String componentName, String elementName) {
+
+        JsonNode typeJsonNode = clusterElementJsonNode.get("type");
+
+        if (typeJsonNode == null || !typeJsonNode.isString()) {
+            return false;
+        }
+
+        String[] typeParts = typeJsonNode.asString()
+            .split("/");
+
+        return typeParts.length == 3 && componentName.equals(typeParts[0]) && elementName.equals(typeParts[2]);
+    }
+
+    private static boolean hasChatCapableTrigger(JsonNode workflowJsonNode) {
+        JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
+
+        if (triggersJsonNode == null || !triggersJsonNode.isArray()) {
+            return false;
+        }
+
+        for (JsonNode triggerJsonNode : triggersJsonNode) {
+            if (!triggerJsonNode.isObject() || !triggerJsonNode.has("type")) {
+                continue;
+            }
+
+            JsonNode typeJsonNode = triggerJsonNode.get("type");
+
+            String type = typeJsonNode.asString();
+
+            if (type.startsWith("chat/")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean isChatOnly(List<String> approvalChannelTypes) {
+        return approvalChannelTypes.stream()
+            .allMatch(WorkflowValidator::isChatApprovalChannelType);
+    }
+
+    private static void appendChatOnlyWarning(String nodeName, String subject, StringBuilder warnings) {
+        StringUtils.appendWithNewline(
+            "[" + nodeName + "] " + subject + " delivers approval requests only to the chat channel" +
+                ", but the workflow does not start from a chat trigger. The chat channel fails on runs that " +
+                "are not started from a chat conversation, so those runs fail at this step because no channel " +
+                "can deliver the approval request. Configure a fallback approval channel (Slack, email, " +
+                "approval task) or use a chat trigger.",
+            warnings);
+    }
+
+    private static List<String> getApprovalChannelTypes(@Nullable JsonNode clusterElementsJsonNode) {
+        if (clusterElementsJsonNode == null || !clusterElementsJsonNode.isObject()) {
+            return List.of();
+        }
+
+        JsonNode approvalChannelsJsonNode = clusterElementsJsonNode.get("approvalChannels");
+
+        if (approvalChannelsJsonNode == null || !approvalChannelsJsonNode.isArray()) {
+            return List.of();
+        }
+
+        List<String> approvalChannelTypes = new ArrayList<>();
+
+        for (JsonNode approvalChannelJsonNode : approvalChannelsJsonNode) {
+            if (approvalChannelJsonNode.isObject() && approvalChannelJsonNode.has("type")) {
+                JsonNode typeJsonNode = approvalChannelJsonNode.get("type");
+
+                approvalChannelTypes.add(typeJsonNode.asString());
+            }
+        }
+
+        return approvalChannelTypes;
+    }
+
+    private static boolean isChatApprovalChannelType(String type) {
+        String[] typeParts = type.split("/");
+
+        return typeParts.length == 3 && "chat".equals(typeParts[0]) && "chat".equals(typeParts[2]);
+    }
+
+    private static String getNodeName(JsonNode taskJsonNode) {
+        JsonNode nameJsonNode = taskJsonNode.get("name");
+
+        if (nameJsonNode != null && nameJsonNode.isString()) {
+            return nameJsonNode.asString();
+        }
+
+        JsonNode typeJsonNode = taskJsonNode.get("type");
+
+        return typeJsonNode != null ? typeJsonNode.asString() : "unknown";
     }
 
     public static List<String> getDuplicateNodeNames(String workflow) {
