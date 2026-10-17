@@ -73,6 +73,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacadeImpl;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -110,6 +111,7 @@ import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -677,9 +679,12 @@ class AiAgentChatActionIntTest {
         @Bean
         AiAgentComponentHandler aiAgentComponentHandler(
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-            ToolCallingManager toolCallingManager) {
+            ToolCallingManager toolCallingManager,
+            ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider) {
 
-            return new AiAgentComponentHandler(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            return new AiAgentComponentHandler(
+                aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                toolExecutionRecorderObjectProvider);
         }
 
         @Bean

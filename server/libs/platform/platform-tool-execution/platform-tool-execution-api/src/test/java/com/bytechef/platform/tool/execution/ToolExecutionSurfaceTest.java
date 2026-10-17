@@ -31,6 +31,6 @@ class ToolExecutionSurfaceTest {
         assertThat(Arrays.stream(ToolExecutionSurface.values())
             .map(Enum::name)
             .toList())
-                .containsExactly("MCP_AUTOMATION");
+                .containsExactly("MCP_AUTOMATION", "AI_AGENT");
     }
 }

@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
@@ -41,6 +42,7 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,6 +69,7 @@ import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.ai.tool.resolution.DelegatingToolCallbackResolver;
+import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
 
 /**
@@ -253,6 +256,27 @@ final class AiAgentResumeTestSupport {
         Map<String, ?> persistedContinueParameters = JsonUtils.readMap(JsonUtils.write(suspend.continueParameters()));
 
         return ParametersFactory.create(persistedContinueParameters);
+    }
+
+    static Parameters toPersistedGatedToolContinueParameters(ActionContext.Suspend suspend, String gatedToolName) {
+        Map<String, Object> persistedContinueParameters = new HashMap<>(
+            JsonUtils.readMap(JsonUtils.write(suspend.continueParameters())));
+
+        persistedContinueParameters.put(ToolSuspendConstants.GATED_TOOL_NAME, gatedToolName);
+        persistedContinueParameters.put(ToolSuspendConstants.GATED_TOOL_INPUT, "{}");
+
+        return ParametersFactory.create(persistedContinueParameters);
+    }
+
+    @SuppressWarnings("unchecked")
+    static ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider(
+        ToolExecutionRecorder toolExecutionRecorder) {
+
+        ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider = mock(ObjectProvider.class);
+
+        when(toolExecutionRecorderObjectProvider.getIfAvailable()).thenReturn(toolExecutionRecorder);
+
+        return toolExecutionRecorderObjectProvider;
     }
 
     static ChatResponse toolCallResponse(String toolName, String... toolCallIds) {

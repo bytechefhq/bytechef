@@ -33,12 +33,15 @@ import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.fi
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.mockJson;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.textResponse;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedContinueParameters;
+import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedGatedToolContinueParameters;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCall;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCallResponse;
+import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolExecutionRecorderObjectProvider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
@@ -55,6 +58,9 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
+import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
+import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +70,7 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -207,7 +214,7 @@ class AiAgentChatActionTest {
             eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
 
         AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = AiAgentChatAction.of(
-            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager());
+            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager(), null);
 
         AtomicReference<ActionContext.Suspend> firstTurnSuspend = new AtomicReference<>();
 
@@ -227,6 +234,44 @@ class AiAgentChatActionTest {
 
         assertThat(resumeResult).isEqualTo(HumanAnswerBlockingAdvisor.BLOCKED_MESSAGE);
         assertThat(prompts).hasSize(1);
+    }
+
+    @Test
+    void testDeniedGatedToolResumeIsRecordedByTheToolExecutionRecorder() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+        ToolExecutionRecorder toolExecutionRecorder = mock(ToolExecutionRecorder.class);
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = AiAgentChatAction.of(
+            mock(AiAgentToolFacade.class),
+            createClusterElementDefinitionService(
+                createChatModel(
+                    prompts,
+                    callNumber -> callNumber == 1 ? suspendingToolCallResponse(FIRST_TOOL_CALL_ID) : finalAnswer()),
+                null),
+            createToolCallingManager(), toolExecutionRecorderObjectProvider(toolExecutionRecorder));
+
+        AtomicReference<ActionContext.Suspend> suspendReference = new AtomicReference<>();
+
+        getPerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            createActionContext(suspendReference));
+
+        Object resumeResult = getResumePerformFunction(chatActionDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            toPersistedGatedToolContinueParameters(suspendReference.get(), SUSPENDING_TOOL_NAME),
+            MockParametersFactory.create(Map.of("approved", false)), createActionContext(new AtomicReference<>()));
+
+        assertThat(resumeResult).isEqualTo(FINAL_ANSWER);
+
+        ArgumentCaptor<ToolExecutionEvent> toolExecutionEventArgumentCaptor = ArgumentCaptor.forClass(
+            ToolExecutionEvent.class);
+
+        verify(toolExecutionRecorder).record(toolExecutionEventArgumentCaptor.capture());
+
+        ToolExecutionEvent toolExecutionEvent = toolExecutionEventArgumentCaptor.getValue();
+
+        assertThat(toolExecutionEvent.toolName()).isEqualTo(SUSPENDING_TOOL_NAME);
+        assertThat(toolExecutionEvent.outcome()).isEqualTo(ToolExecutionOutcome.APPROVAL_DENIED);
     }
 
     @Test
@@ -638,7 +683,7 @@ class AiAgentChatActionTest {
         return AiAgentChatAction.of(
             mock(AiAgentToolFacade.class),
             createClusterElementDefinitionService(createChatModel(prompts, responseFunction), chatMemoryResult),
-            createToolCallingManager());
+            createToolCallingManager(), null);
     }
 
     private static MultipleConnectionsPerformFunction getPerformFunction(
