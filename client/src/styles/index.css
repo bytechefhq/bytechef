@@ -224,6 +224,11 @@
         --hub-surface: hsl(var(--background));
         --hub-card: hsl(var(--muted));
         --hub-active-border: #22c55e;
+        --hub-enable: #22c55e;
+        --hub-enable-hover: #16a34a;
+        --hub-disable: #ef4444;
+        --hub-disable-hover: #dc2626;
+        --hub-on-accent: #ffffff;
         --hub-segment-selected: #414146;
 
         --accent: 215 27.9% 16.9%;
