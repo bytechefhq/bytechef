@@ -23,6 +23,12 @@ describe('MarkdownEditor', () => {
         expect(Array.from(items).map((item) => item.textContent)).toEqual(['first', 'second']);
     });
 
+    it('leaves the editable element unlabelled when no aria label is given', () => {
+        const {container} = render(<MarkdownEditor value="Text" />);
+
+        expect(container.querySelector('[contenteditable="true"]')).not.toHaveAttribute('aria-label');
+    });
+
     it('exposes the placeholder on an empty document', () => {
         render(<MarkdownEditor ariaLabel="Instructions" placeholder="Describe the agent" value="" />);
 
