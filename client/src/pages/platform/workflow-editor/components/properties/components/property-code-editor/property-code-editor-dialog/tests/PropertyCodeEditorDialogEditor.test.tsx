@@ -1,13 +1,21 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {
+    getCompletionContext,
+    unregisterCompletionContext,
+} from '@/shared/components/monaco/completion/completionContextRegistry';
+import {fireEvent, render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogEditor from '../PropertyCodeEditorDialogEditor';
 
 const hoisted = vi.hoisted(() => {
     return {
+        catalog: {components: [], getConnectionDefinition: vi.fn(), getDefinition: vi.fn()},
         mockSetEditorValue: vi.fn(),
         storeState: {
+            componentConnections: [] as Array<{componentName: string; componentVersion: number; name: string}>,
             editorValue: 'const x = 1;',
+            inputParameters: undefined as Record<string, unknown> | undefined,
+            scriptInput: {} as Record<string, unknown>,
         },
     };
 });
@@ -15,7 +23,10 @@ const hoisted = vi.hoisted(() => {
 vi.mock('../stores/usePropertyCodeEditorDialogStore', () => ({
     usePropertyCodeEditorDialogStore: (selector: (state: unknown) => unknown) =>
         selector({
+            componentConnections: hoisted.storeState.componentConnections,
             editorValue: hoisted.storeState.editorValue,
+            inputParameters: hoisted.storeState.inputParameters,
+            scriptInput: hoisted.storeState.scriptInput,
             setEditorValue: hoisted.mockSetEditorValue,
         }),
 }));
@@ -31,7 +42,7 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
         className?: string;
         defaultLanguage: string;
         onChange: (value: string | undefined) => void;
-        onMount: (editor: {focus: () => void}) => void;
+        onMount: (editor: {focus: () => void; getModel: () => unknown}) => void;
         value?: string;
     }) => (
         <div data-testid="monaco-editor">
@@ -53,13 +64,17 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
             <button
                 data-testid="mount-btn"
                 onClick={() => {
-                    onMount({focus: vi.fn()});
+                    onMount({focus: vi.fn(), getModel: () => ({uri: {toString: () => 'inmemory://test'}})});
                 }}
             >
                 Mount
             </button>
         </div>
     ),
+}));
+
+vi.mock('@/shared/components/monaco/completion/useComponentCatalog', () => ({
+    useComponentCatalog: () => hoisted.catalog,
 }));
 
 vi.mock('@/shared/components/MonacoEditorLoader', () => ({
@@ -70,9 +85,13 @@ describe('PropertyCodeEditorDialogEditor', () => {
     beforeEach(() => {
         windowResizeObserver();
         hoisted.storeState.editorValue = 'const x = 1;';
+        hoisted.storeState.componentConnections = [];
+        hoisted.storeState.inputParameters = undefined;
+        hoisted.storeState.scriptInput = {};
     });
 
     afterEach(() => {
+        unregisterCompletionContext('inmemory://test');
         resetAll();
         vi.clearAllMocks();
     });
@@ -148,6 +167,67 @@ describe('PropertyCodeEditorDialogEditor', () => {
             changeBtn.click();
 
             expect(hoisted.mockSetEditorValue).toHaveBeenCalledWith('new value');
+        });
+    });
+
+    describe('completion context', () => {
+        const mountEditor = async () => {
+            fireEvent.click(await screen.findByTestId('mount-btn'));
+        };
+
+        it('registers a script completion context with the dialog connections and input', async () => {
+            hoisted.storeState.componentConnections = [{componentName: 'googleMaps', componentVersion: 1, name: 'gm'}];
+            hoisted.storeState.scriptInput = {order: 1};
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                connections: [{name: 'gm'}],
+                input: {order: 1},
+                kind: 'script',
+                language: 'javascript',
+            });
+        });
+
+        it('prefers the edited input parameters over the stored script input', async () => {
+            hoisted.storeState.inputParameters = {edited: true};
+            hoisted.storeState.scriptInput = {order: 1};
+
+            render(<PropertyCodeEditorDialogEditor language="python" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                input: {edited: true},
+                kind: 'script',
+                language: 'python',
+            });
+        });
+
+        it('lowercases the dialog language', async () => {
+            render(<PropertyCodeEditorDialogEditor language="JAVASCRIPT" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'script', language: 'javascript'});
+        });
+
+        it('registers no context for a Java script', async () => {
+            render(<PropertyCodeEditorDialogEditor language="java" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toBeUndefined();
+        });
+
+        it('registers no context for an R script', async () => {
+            render(<PropertyCodeEditorDialogEditor language="R" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toBeUndefined();
         });
     });
 });

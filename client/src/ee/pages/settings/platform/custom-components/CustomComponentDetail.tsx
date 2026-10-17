@@ -2,6 +2,8 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
+import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
+import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -18,8 +20,10 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {ArrowLeftIcon, SendIcon, ZapIcon} from 'lucide-react';
-import {useRef, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+
+import type {editor} from 'monaco-editor';
 
 const MONACO_LANGUAGE_BY_CUSTOM_COMPONENT_LANGUAGE: Record<CustomComponentLanguage, string> = {
     [CustomComponentLanguage.Java]: 'java',
@@ -178,34 +182,50 @@ const CustomComponentJavaDefinition = ({actions, customComponent, triggers}: Cus
     </div>
 );
 
+const SCRIPT_MONACO_LANGUAGES = ['javascript', 'python', 'ruby'];
+
 interface CustomComponentSourceEditorProps {
     monacoLanguage: string;
     onChange: (value: string | undefined) => void;
     value: string;
 }
 
-const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomComponentSourceEditorProps) => (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="relative min-h-0 flex-1">
-            <div className="absolute inset-0">
-                <MonacoEditorWrapper
-                    defaultLanguage={monacoLanguage}
-                    onChange={onChange}
-                    onMount={() => {}}
-                    options={{
-                        automaticLayout: true,
-                        folding: true,
-                        lineNumbers: 'on',
-                        minimap: {enabled: false},
-                        scrollBeyondLastLine: false,
-                        wordWrap: 'on',
-                    }}
-                    value={value}
-                />
+const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomComponentSourceEditorProps) => {
+    const [model, setModel] = useState<editor.ITextModel>();
+
+    const completionContext = useMemo<CompletionContextType | undefined>(
+        () =>
+            SCRIPT_MONACO_LANGUAGES.includes(monacoLanguage)
+                ? {kind: 'customComponent', language: monacoLanguage as ScriptLanguageType}
+                : undefined,
+        [monacoLanguage]
+    );
+
+    useCompletionContext(model, completionContext);
+
+    return (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="relative min-h-0 flex-1">
+                <div className="absolute inset-0">
+                    <MonacoEditorWrapper
+                        defaultLanguage={monacoLanguage}
+                        onChange={onChange}
+                        onMount={(mountedEditor) => setModel(mountedEditor.getModel() ?? undefined)}
+                        options={{
+                            automaticLayout: true,
+                            folding: true,
+                            lineNumbers: 'on',
+                            minimap: {enabled: false},
+                            scrollBeyondLastLine: false,
+                            wordWrap: 'on',
+                        }}
+                        value={value}
+                    />
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const CustomComponentDetail = () => {
     const params = useParams<{id: string}>();
