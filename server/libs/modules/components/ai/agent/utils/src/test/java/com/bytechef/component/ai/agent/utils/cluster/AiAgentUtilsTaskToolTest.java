@@ -16,7 +16,9 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static com.bytechef.component.definition.ai.agent.SubagentFunction.SUBAGENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -41,6 +43,7 @@ import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsTo
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -293,5 +296,57 @@ class AiAgentUtilsTaskToolTest {
             return ChatOptions.builder()
                 .build();
         }
+    }
+
+    @Test
+    void testRejectsRequestApprovalAttachedToASubagent() {
+        List<ClusterElement> subagentClusterElements = subagentClusterElements(
+            tool("requestApproval_1", "approval/v1/requestApproval"));
+
+        assertThatThrownBy(() -> AiAgentUtilsTaskTool.checkSubagentTools(subagentClusterElements))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("requestApproval_1");
+    }
+
+    @Test
+    void testRejectsRequestApprovalInASubagentOfANestedTaskTool() {
+        Map<String, Object> nestedTaskTool = Map.of(
+            "name", "taskTool_2", "type", "aiAgentUtils/v1/taskTool",
+            "clusterElements", Map.of(
+                "subagent",
+                List.of(subagent("subagent_2", tool("requestApproval_2", "approval/v1/requestApproval")))));
+
+        List<ClusterElement> subagentClusterElements = subagentClusterElements(nestedTaskTool);
+
+        assertThatThrownBy(() -> AiAgentUtilsTaskTool.checkSubagentTools(subagentClusterElements))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("requestApproval_2")
+            .hasMessageContaining("subagent_2");
+    }
+
+    @Test
+    void testAcceptsOrdinaryToolsAttachedToASubagent() {
+        List<ClusterElement> subagentClusterElements = subagentClusterElements(
+            tool("grepTool_1", "aiAgentUtils/v1/grepTool"));
+
+        assertThatCode(() -> AiAgentUtilsTaskTool.checkSubagentTools(subagentClusterElements))
+            .doesNotThrowAnyException();
+    }
+
+    private static List<ClusterElement> subagentClusterElements(Map<String, Object> toolClusterElement) {
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(
+            Map.of("clusterElements", Map.of("subagent", List.of(subagent("subagent_1", toolClusterElement)))));
+
+        return clusterElementMap.getClusterElements(SUBAGENT);
+    }
+
+    private static Map<String, Object> subagent(String name, Map<String, Object> toolClusterElement) {
+        return Map.of(
+            "name", name, "type", "aiAgentUtils/v1/subagentTool",
+            "clusterElements", Map.of("tools", List.of(toolClusterElement)));
+    }
+
+    private static Map<String, Object> tool(String name, String type) {
+        return Map.of("name", name, "type", type);
     }
 }

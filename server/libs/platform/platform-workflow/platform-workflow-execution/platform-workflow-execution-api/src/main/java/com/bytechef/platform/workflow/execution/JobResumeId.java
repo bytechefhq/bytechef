@@ -56,6 +56,10 @@ public class JobResumeId implements Serializable {
         return new JobResumeId(tenantId, jobId, uuid.toString());
     }
 
+    public static JobResumeId of(String tenantId, long jobId, UUID uuid) {
+        return new JobResumeId(tenantId, jobId, uuid.toString());
+    }
+
     public static JobResumeId parse(String id) {
         String decoded = EncodingUtils.base64DecodeToString(id);
 

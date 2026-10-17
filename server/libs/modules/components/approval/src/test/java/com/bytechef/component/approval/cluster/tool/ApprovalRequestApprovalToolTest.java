@@ -38,6 +38,7 @@ import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ActionContextAware.ApprovalLinks;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -51,7 +52,8 @@ import org.junit.jupiter.api.Test;
  */
 class ApprovalRequestApprovalToolTest {
 
-    private static final String RESUME_URL = "https://example.com/job/resume/abc";
+    private static final ApprovalLinks APPROVAL_LINKS = new ApprovalLinks(
+        "https://example.com", "abc", "https://example.com/job/resume/abc", "https://example.com/resume/abc");
 
     private final ActionContextAware actionContextAware = mock(ActionContextAware.class);
     private final ClusterElementContextAware clusterElementContextAware = mock(ClusterElementContextAware.class);
@@ -83,7 +85,7 @@ class ApprovalRequestApprovalToolTest {
 
     @Test
     void testToolReturnsSuspendedToolResultAfterInvokingPerform() throws Exception {
-        when(actionContextAware.getResumeUrl()).thenReturn(RESUME_URL);
+        when(actionContextAware.getApprovalLinks(any())).thenReturn(APPROVAL_LINKS);
 
         MultipleConnectionsToolFunction toolFunction = getToolFunction();
 
@@ -101,7 +103,7 @@ class ApprovalRequestApprovalToolTest {
 
     @Test
     void testToolStoresItsInputParametersAsTheApprovalFormParameters() throws Exception {
-        when(actionContextAware.getResumeUrl()).thenReturn(RESUME_URL);
+        when(actionContextAware.getApprovalLinks(any())).thenReturn(APPROVAL_LINKS);
 
         getToolFunction().apply(
             inputParameters, connectionParameters, extensions, Map.of(), clusterElementContextAware);
@@ -122,7 +124,7 @@ class ApprovalRequestApprovalToolTest {
     @Test
     void testToolInEditorEnvironmentNeitherSendsTheRequestNorSuspends() throws Exception {
         when(clusterElementContextAware.isEditorEnvironment()).thenReturn(true);
-        when(actionContextAware.getResumeUrl()).thenReturn(RESUME_URL);
+        when(actionContextAware.getApprovalLinks(any())).thenReturn(APPROVAL_LINKS);
 
         Object result = getToolFunction().apply(
             inputParameters, connectionParameters, extensions, Map.of(), clusterElementContextAware);
@@ -134,7 +136,7 @@ class ApprovalRequestApprovalToolTest {
 
     @Test
     void testToolThrowsToolSuspensionExceptionWithCauseWhenApprovalRequestCannotBeSent() {
-        when(actionContextAware.getResumeUrl()).thenReturn(null);
+        when(actionContextAware.getApprovalLinks(any())).thenReturn(null);
 
         MultipleConnectionsToolFunction toolFunction = getToolFunction();
 
@@ -155,7 +157,7 @@ class ApprovalRequestApprovalToolTest {
 
     @Test
     void testToolThrowsToolSuspensionExceptionWithCauseWhenSuspendFails() {
-        when(actionContextAware.getResumeUrl()).thenReturn(RESUME_URL);
+        when(actionContextAware.getApprovalLinks(any())).thenReturn(APPROVAL_LINKS);
 
         IllegalStateException suspendFailure = new IllegalStateException("suspend failed");
 

@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
+import com.bytechef.error.ExecutionError;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,13 @@ public class JobServiceIntTest {
     public void testResumeToStatusStartedRestartsFailedJobFromCurrentTask() {
         long jobId = saveResumableJob(Job.Status.FAILED);
 
+        Job failedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        failedJob.setError(new ExecutionError("The pending approval expired", List.of()));
+
+        jobRepository.save(failedJob);
+
         Job resumedJob = jobService.resumeToStatusStarted(jobId);
 
         assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
@@ -89,6 +97,7 @@ public class JobServiceIntTest {
         assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(persistedJob.getCurrentTask()).isEqualTo(2);
         assertThat(persistedJob.getEndDate()).isNull();
+        assertThat(persistedJob.getError()).isNull();
         assertThat(persistedJob.getStartDate()).isAfter(ORIGINAL_START_DATE);
     }
 

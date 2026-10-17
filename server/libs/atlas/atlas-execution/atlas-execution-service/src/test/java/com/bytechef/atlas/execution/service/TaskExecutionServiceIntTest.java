@@ -171,6 +171,18 @@ public class TaskExecutionServiceIntTest {
     }
 
     @Test
+    public void testCompleteIfNotCancelledCompletesAlreadyCompletedTaskExecution() {
+        long taskExecutionId = getId(saveTaskExecution(saveJob(), TaskExecution.Status.COMPLETED));
+
+        assertThat(taskExecutionService.completeIfNotCancelled(taskExecutionId)).isTrue();
+
+        assertThat(getPersistedTaskExecution(taskExecutionId).getStatus())
+            .isEqualTo(TaskExecution.Status.COMPLETED);
+
+        assertRowLockReleased(taskExecutionId);
+    }
+
+    @Test
     public void testUpdateKeepsStartDateOfClaimedTaskExecution() {
         Instant startDate = Instant.parse("2026-09-25T10:00:00Z");
 

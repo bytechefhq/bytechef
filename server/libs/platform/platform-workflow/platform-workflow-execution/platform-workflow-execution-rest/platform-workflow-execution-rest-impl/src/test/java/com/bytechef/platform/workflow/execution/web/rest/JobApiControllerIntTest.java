@@ -16,49 +16,96 @@
 
 package com.bytechef.platform.workflow.execution.web.rest;
 
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
-@WebMvcTest(JobApiController.class)
-public class JobApiControllerIntTest {
+@AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = JobApiController.class)
+@WebMvcTest(controllers = JobApiController.class, properties = "bytechef.coordinator.enabled=true")
+class JobApiControllerIntTest {
+
+    private static final long JOB_ID = 42L;
+
+    @MockitoBean
+    private JobFacade jobFacade;
+
+    @MockitoBean
+    private JobResumeFacade jobResumeFacade;
+
+    @MockitoBean
+    private JobService jobService;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
-    public void testGetJob() {
-        // TODO
+    void testRestartJobRestartsAStoppedJob() throws Exception {
+        when(jobService.getJob(JOB_ID)).thenReturn(stoppedJob(Map.of()));
+
+        mockMvc.perform(put("/internal/jobs/{id}/restart", JOB_ID))
+            .andExpect(status().isNoContent());
+
+        verify(jobFacade).resumeJob(JOB_ID);
     }
 
     @Test
-    public void testGetJobTaskExecutions() {
-        // TODO
+    void testRestartJobRejectsAJobWaitingOnAnApproval() throws Exception {
+        when(jobService.getJob(JOB_ID)).thenReturn(
+            stoppedJob(Map.of(MetadataConstants.JOB_RESUME_ID, "resumeId", MetadataConstants.APPROVAL_RESUME, true)));
+
+        mockMvc.perform(put("/internal/jobs/{id}/restart", JOB_ID))
+            .andExpect(status().isConflict());
+
+        verify(jobFacade, never()).resumeJob(anyLong());
     }
 
     @Test
-    public void testGetJobs() {
-        // TODO
+    void testStopJobCancelsAJobWaitingOnAnApproval() throws Exception {
+        when(jobResumeFacade.cancelApproval(JOB_ID)).thenReturn(true);
+
+        mockMvc.perform(put("/internal/jobs/{id}/stop", JOB_ID))
+            .andExpect(status().isNoContent());
+
+        verify(jobFacade, never()).stopJob(anyLong());
     }
 
     @Test
-    public void testGetLatestJob() {
-        // TODO
+    void testStopJobStopsARunningJob() throws Exception {
+        when(jobResumeFacade.cancelApproval(JOB_ID)).thenReturn(false);
+
+        mockMvc.perform(put("/internal/jobs/{id}/stop", JOB_ID))
+            .andExpect(status().isNoContent());
+
+        verify(jobFacade).stopJob(JOB_ID);
     }
 
-    @Test
-    public void testPostJob() {
-        // TODO
-    }
+    private static Job stoppedJob(Map<String, Object> metadata) {
+        Job job = new Job(JOB_ID);
 
-    @Test
-    public void testRestartJob() {
-        // TODO
-    }
+        job.setMetadata(metadata);
+        job.setStatus(Job.Status.STOPPED);
 
-    @Test
-    public void testStopJob() {
-        // TODO
+        return job;
     }
 }

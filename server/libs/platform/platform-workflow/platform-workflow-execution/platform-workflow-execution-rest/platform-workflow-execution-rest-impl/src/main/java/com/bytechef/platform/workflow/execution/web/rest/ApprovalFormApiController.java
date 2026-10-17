@@ -21,6 +21,9 @@ import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacade;
 import com.bytechef.platform.workflow.execution.web.rest.model.ApprovalFormModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +39,8 @@ import org.springframework.web.server.ResponseStatusException;
 @ConditionalOnCoordinator
 public class ApprovalFormApiController implements ApprovalFormApi {
 
+    private static final Logger log = LoggerFactory.getLogger(ApprovalFormApiController.class);
+
     private final ApprovalFormFacade approvalFormFacade;
     private final ConversionService conversionService;
 
@@ -47,16 +52,22 @@ public class ApprovalFormApiController implements ApprovalFormApi {
 
     @Override
     public ResponseEntity<ApprovalFormModel> getApprovalForm(String id) {
-        Map<String, ?> parameters;
+        Optional<Map<String, ?>> approvalFormOptional;
 
         try {
-            parameters = approvalFormFacade.getApprovalForm(id);
+            approvalFormOptional = approvalFormFacade.fetchApprovalForm(id);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, exception);
-        } catch (Exception exception) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available.", exception);
+        } catch (RuntimeException exception) {
+            log.error("Unable to load the approval form", exception);
+
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR, "Unable to load the approval form.", exception);
         }
 
-        return ResponseEntity.ok(conversionService.convert(parameters, ApprovalFormModel.class));
+        Map<String, ?> approvalForm = approvalFormOptional.orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval form is no longer available."));
+
+        return ResponseEntity.ok(conversionService.convert(approvalForm, ApprovalFormModel.class));
     }
 }

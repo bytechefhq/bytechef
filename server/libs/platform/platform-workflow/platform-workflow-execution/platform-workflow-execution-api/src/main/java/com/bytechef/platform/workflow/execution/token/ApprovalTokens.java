@@ -33,6 +33,10 @@ public interface ApprovalTokens {
 
     Optional<String> parseSignedToken(String token);
 
+    Optional<String> toShortToken(String token);
+
+    Optional<String> parseShortToken(String shortToken);
+
     boolean looksLikeSignedToken(String token);
 
     boolean isSignedTokenRequired();

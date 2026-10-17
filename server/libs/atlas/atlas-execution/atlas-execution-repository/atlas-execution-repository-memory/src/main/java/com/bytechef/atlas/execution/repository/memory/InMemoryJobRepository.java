@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -102,6 +103,20 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
+    public List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate) {
+        return cache.values()
+            .stream()
+            .filter(job -> {
+                Job.Status jobStatus = job.getStatus();
+
+                return jobStatus != null && jobStatus.ordinal() == status && job.getLastModifiedDate() != null &&
+                    job.getLastModifiedDate()
+                        .isBefore(lastModifiedDate);
+            })
+            .toList();
+    }
+
+    @Override
     public List<Job> findAllByWorkflowId(String workflowId) {
         throw new UnsupportedOperationException();
     }
@@ -129,6 +144,28 @@ public class InMemoryJobRepository implements JobRepository {
     @Override
     public Optional<Job> findById(Long id) {
         return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)));
+    }
+
+    @Override
+    public int updateStatusAndClearEndDateIfCurrentStatus(long id, int currentStatus, int newStatus) {
+        int[] updatedCount = {
+            0
+        };
+
+        cache.computeIfPresent(TenantCacheKeyUtils.getKey(id), (key, job) -> {
+            Job.Status status = job.getStatus();
+
+            if (status.ordinal() == currentStatus) {
+                job.setEndDate(null);
+                job.setStatus(Job.Status.values()[newStatus]);
+
+                updatedCount[0] = 1;
+            }
+
+            return job;
+        });
+
+        return updatedCount[0];
     }
 
     @Override
