@@ -28,7 +28,7 @@ Providers are registered at runtime - metadata URLs, client IDs, secrets, and at
 
 ## The providers list
 
-**Settings → Identity Providers** lists configured providers with these columns: **Name**, **Type**, **Issuer / Metadata URI**, **Domains**, **Status**, **Enforced**, and **MCP**, plus per-row edit and delete actions. **Add Identity Provider** opens the configuration dialog.
+**Settings → Identity Providers** lists configured providers with these columns: **Name**, **Type**, **Issuer / Metadata URI**, **Domains**, **Status**, and **Enforced**, plus per-row edit and delete actions. **Add Identity Provider** opens the configuration dialog.
 
 ![The Add Identity Provider dialog](identity-providers/add-identity-provider.png)
 
@@ -58,18 +58,9 @@ Four checkboxes control behavior:
 
 For SAML, editing a saved provider exposes a **Download SP Metadata** button to hand to your IdP.
 
-### Using a provider for MCP endpoints
+### MCP servers
 
-OIDC providers additionally expose three per-surface toggles:
-
-- **Use for embedded MCP servers** - advertise this provider as the authorization server for embedded MCP endpoints, so MCP clients authenticate directly against it.
-- **Use for automation MCP servers** - trust this provider's tokens on the automation MCP endpoint.
-- **Use for management MCP servers** - trust this provider's tokens on the management MCP endpoint.
-
-Enabling any of them reveals two more settings:
-
-- **Require token audience to match the MCP endpoint** - reject tokens whose audience does not include this tenant's MCP URL. Enable this when the identity provider is shared across tenants.
-- **Groups Claim** (default `groups`) plus a group-to-authority mapping table - map the provider's group claim values, e.g. `idp-group` → `ROLE_SALES`, to ByteChef authorities used for MCP tool authorization.
+Identity providers configured here are used for signing in to ByteChef. Their tokens are not accepted on MCP servers yet. To connect an automation MCP client with a token from an external issuer, the installation must list that issuer in its configuration - see [MCP Servers → JWT from a trusted issuer](/platform/automation/deploy/mcp-servers#jwt-from-a-trusted-issuer-optional).
 
 ## What gets federated
 
