@@ -29,7 +29,9 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-actuator")
+    testImplementation("org.springframework.boot:spring-boot-liquibase")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }
