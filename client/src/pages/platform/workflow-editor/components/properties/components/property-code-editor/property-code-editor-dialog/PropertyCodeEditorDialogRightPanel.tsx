@@ -12,7 +12,10 @@ import {
 } from '@/shared/middleware/graphql';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
+
+import {usePropertyCodeEditorDialogStore} from './stores/usePropertyCodeEditorDialogStore';
 
 interface PropertyCodeEditorDialogConnectionsSheetRightPanelProps {
     workflow: Workflow;
@@ -26,6 +29,12 @@ const PropertyCodeEditorDialogRightPanel = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
+    const {setComponentConnections, setScriptInput} = usePropertyCodeEditorDialogStore(
+        useShallow((state) => ({
+            setComponentConnections: state.setComponentConnections,
+            setScriptInput: state.setScriptInput,
+        }))
+    );
 
     const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
     const isClusterElement = currentNode?.clusterElementType && mainClusterRootName;
@@ -79,13 +88,43 @@ const PropertyCodeEditorDialogRightPanel = ({
         }
     );
 
-    const input = isClusterElement
-        ? (clusterElementScriptInputData?.clusterElementScriptInput ?? {})
-        : (workflowNodeScriptInputData?.workflowNodeScriptInput ?? {});
+    const input = useMemo(
+        () =>
+            isClusterElement
+                ? (clusterElementScriptInputData?.clusterElementScriptInput ?? {})
+                : (workflowNodeScriptInputData?.workflowNodeScriptInput ?? {}),
+        [
+            clusterElementScriptInputData?.clusterElementScriptInput,
+            isClusterElement,
+            workflowNodeScriptInputData?.workflowNodeScriptInput,
+        ]
+    );
 
-    const componentConnections = isClusterElement
-        ? (clusterElementComponentConnectionsData?.clusterElementComponentConnections ?? [])
-        : (workflowNodeComponentConnectionsData?.workflowNodeComponentConnections ?? []);
+    const componentConnections = useMemo(
+        () =>
+            isClusterElement
+                ? (clusterElementComponentConnectionsData?.clusterElementComponentConnections ?? [])
+                : (workflowNodeComponentConnectionsData?.workflowNodeComponentConnections ?? []),
+        [
+            clusterElementComponentConnectionsData?.clusterElementComponentConnections,
+            isClusterElement,
+            workflowNodeComponentConnectionsData?.workflowNodeComponentConnections,
+        ]
+    );
+
+    useEffect(() => {
+        setComponentConnections(
+            componentConnections.map((connection) => ({
+                componentName: connection.componentName,
+                componentVersion: connection.componentVersion,
+                name: connection.key,
+            }))
+        );
+    }, [componentConnections, setComponentConnections]);
+
+    useEffect(() => {
+        setScriptInput(input as Record<string, unknown>);
+    }, [input, setScriptInput]);
 
     return (
         <ResizablePanelGroup orientation="vertical">
