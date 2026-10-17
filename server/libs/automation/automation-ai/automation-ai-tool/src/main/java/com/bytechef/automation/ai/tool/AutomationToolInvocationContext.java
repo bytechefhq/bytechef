@@ -40,6 +40,11 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_WORKSPACE_ID_KEY;
     public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_ENVIRONMENT_ID_KEY;
     public static final String TOOL_CONTEXT_PROJECT_OWNER_KEY = ScopedToolContextKeys.TOOL_CONTEXT_PROJECT_OWNER_KEY;
+    public static final String TOOL_CONTEXT_USER_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_USER_ID_KEY;
+    public static final String TOOL_CONTEXT_SOURCE_ORDINAL_KEY = ScopedToolContextKeys.TOOL_CONTEXT_SOURCE_ORDINAL_KEY;
+    public static final String TOOL_CONTEXT_LAST_USER_PROMPT_KEY =
+        ScopedToolContextKeys.TOOL_CONTEXT_LAST_USER_PROMPT_KEY;
+    public static final String TOOL_CONTEXT_THREAD_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_THREAD_ID_KEY;
 
     public static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional inside a Copilot chat, which defaults to the chat's workspace; otherwise " +

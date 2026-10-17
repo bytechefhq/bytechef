@@ -22,7 +22,11 @@ package com.bytechef.ai.copilot.tool.context;
 public final class ScopedToolContextKeys {
 
     public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = "bytechef.automationTool.environmentId";
+    public static final String TOOL_CONTEXT_LAST_USER_PROMPT_KEY = "bytechef.automationTool.lastUserPrompt";
     public static final String TOOL_CONTEXT_PROJECT_OWNER_KEY = "bytechef.automationTool.projectOwner";
+    public static final String TOOL_CONTEXT_SOURCE_ORDINAL_KEY = "bytechef.automationTool.sourceOrdinal";
+    public static final String TOOL_CONTEXT_THREAD_ID_KEY = "bytechef.automationTool.threadId";
+    public static final String TOOL_CONTEXT_USER_ID_KEY = "bytechef.automationTool.userId";
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.automationTool.workspaceId";
 
     private ScopedToolContextKeys() {
