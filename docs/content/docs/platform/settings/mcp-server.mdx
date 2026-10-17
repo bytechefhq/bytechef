@@ -18,38 +18,26 @@ See the [AI MCP Server configuration reference](/platform/use-bytechef/self-host
 
 ## Get Your MCP Server URL
 
-{/* TODO screenshot: Settings → MCP Server page - the MCP server URL with the client tabs (Claude / Cursor / Windsurf / Other) and, below it, the URL for external identity providers with its Refresh control */}
+{/* TODO screenshot: Settings → MCP Server page - the MCP server URL with the client tabs (Claude / Cursor / Windsurf / Other) */}
 
-The management server has two URLs. Most people only need the first one.
-
-| URL | Use it for |
-|---|---|
-| `https://<your-host>/api/management/mcp` | Everything by default: MCP directories, AI assistants and coding agents. The URL is the same for every ByteChef account and contains no secret. It accepts an admin API key or signing in with your ByteChef account (this requires the embedded authorization server - see [Sign in with ByteChef](#sign-in-with-bytechef-optional)). |
-| `https://<your-host>/api/management/<secret-key>/mcp` | Clients that sign in through your own identity provider (Okta, Microsoft Entra, Keycloak, …). The secret key tells ByteChef which account's identity providers to trust. |
+The management server has one URL: `https://<your-host>/api/management/mcp`. It is the same for every ByteChef account and contains no secret, so you can add it to an MCP directory or share it with teammates. ByteChef works out which account a request belongs to from the credential: an admin API key, or the account you signed in with (this requires the embedded authorization server - see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
 
 1. Open ByteChef and go to **Settings** → **MCP Server**
 2. Copy the **MCP server URL**. The snippets are grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**.
-3. If your clients sign in through your own identity provider, copy the **URL for external identity providers** instead. It has a **Refresh** control that rotates the secret key.
 
 The server speaks the Streamable HTTP transport only.
 
-Because the first URL has no secret and is the same for everyone, you can add it to an MCP directory or share it with teammates. ByteChef works out which account a request belongs to from the credential: the API key, or the account you signed in with.
+The settings page is available to tenant admins only.
 
-> **Keep the secret URL private.** Its secret key identifies your account for external identity providers. Regenerating it makes requests that still use the old secret fail with `401`, even with a valid credential, until each client is updated. The other URL is not affected.
-
-If the management MCP server is turned off for your account, both URLs reject requests with `401`.
-
-The settings page - reading and rotating the URLs - is available to tenant admins only.
-
-Either URL alone is never enough to connect: every request must also carry a credential - see [Authentication](#authentication).
+The URL alone is never enough to connect: every request must also carry a credential - see [Authentication](#authentication).
 
 ---
 
 ## Authentication
 
-Every request must carry a credential: an admin API key, a sign-in through ByteChef itself, or - on the secret URL only - a JWT from a trusted issuer. Requests without one are rejected with `401`. There is no anonymous mode.
+Every request must carry a credential: an admin API key or a sign-in through ByteChef itself. Requests without one are rejected with `401`. There is no anonymous mode.
 
-> **Upgrading?** Earlier versions had a **Require authentication** setting that could be switched off. That setting is gone: a server that had it off now requires a credential like any other, so its clients must send one - see [API key](#api-key-default) below. Admin API keys are an Enterprise Edition feature; on Community Edition, connect with a [JWT from a trusted issuer](#jwt-from-a-trusted-issuer-optional). Clients that already use such a JWT must now connect through the secret-key URL (`/api/management/<secret-key>/mcp`); the tenant-less URL rejects external-issuer tokens.
+> **Upgrading?** Earlier versions had a **Require authentication** setting that could be switched off. That setting is gone: a server that had it off now requires a credential like any other, so its clients must send one - see [API key](#api-key-default) below. Admin API keys are an Enterprise Edition feature; on Community Edition, connect by [signing in with ByteChef](#sign-in-with-bytechef-optional).
 
 ### API key (default)
 
@@ -61,7 +49,7 @@ Authorization: Bearer <your-api-key>
 
 It must be an **Admin** API key. A workspace API key - the kind under **Settings** → **API Keys**, for the automation public API - is rejected here with `401`, because it is bound to a workspace while this server administers the whole account.
 
-The connection snippets below include this header. The API key is bound to an environment, and it must match the environment named in the `X-ENVIRONMENT` header (`PRODUCTION` when omitted; an unknown value is rejected with `401`). The header only selects which key environment is accepted: tools that work inside a workspace take their own `environment` argument, which defaults to Development. A key that belongs to a deactivated user is rejected. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
+The connection snippets below include this header. An admin API key works in every environment: it is not checked against the `X-ENVIRONMENT` header, whichever environment it was created under. Tools that work inside a workspace take their own `environment` argument, which defaults to Development. A key that belongs to a deactivated user is rejected. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
 
 ### Sign in with ByteChef (optional)
 
@@ -77,11 +65,15 @@ BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
 
 If an external issuer already uses index `0`, add the self issuer at the next free index instead (for example `_1_`). Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
 
+Set `BYTECHEF_PUBLIC_URL` to the address clients use to reach ByteChef. The issuer, the discovery documents and the `401` challenge all name that address, and an MCP client refuses a server whose discovery names a different one - which is what happens behind a proxy when the public URL is not set.
+
+What the client gets:
+
+- **A consent screen every time a client asks for access** that you have not approved yet. Approving grants the requested scope (`mcp:management` here, `mcp:automation` for automation MCP servers) and nothing more.
+- **A token for this URL only.** The access token names the MCP URL the client connected to; it does not work on another MCP server, and the client cannot exchange it for one.
+- **An access token that lasts one hour and a refresh token that lasts 30 days.** The client renews the access token on its own, without sending you back to the browser. Each refresh token works once - the client gets a new one with every renewal - so a stolen refresh token is useless after the client's next renewal.
+
 See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration) for details.
-
-### JWT from a trusted issuer (optional)
-
-The secret-key MCP endpoint can also accept JWTs issued by an identity provider you trust (Okta, Microsoft Entra, Keycloak, …). List each trusted issuer and its claim mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays dormant until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`. Tokens from external issuers are accepted on the secret URL only; on the tenant-less URL they are rejected with `401`. A token for this server must carry the `mcp:management` scope. API keys keep working alongside JWTs.
 
 ---
 
@@ -170,7 +162,7 @@ Any MCP-compatible client that supports Streamable HTTP transport can connect us
 https://<your-host>/api/management/mcp
 ```
 
-Send an admin API key with every request as an `Authorization: Bearer` header, or a JWT from a [trusted issuer](#jwt-from-a-trusted-issuer-optional) (the JWT option requires the secret-key URL, `https://<your-host>/api/management/<secret-key>/mcp`).
+Send an admin API key with every request as an `Authorization: Bearer` header, or connect by [signing in with ByteChef](#sign-in-with-bytechef-optional).
 
 </Tab>
 </Tabs>

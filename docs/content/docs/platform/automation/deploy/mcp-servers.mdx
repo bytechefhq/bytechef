@@ -115,7 +115,7 @@ Expand the server's row and open its **Connect** tab. It presents the URL inside
 https://<your-host>/api/automation/<secret-key>/mcp
 ```
 
-> **Keep this URL private.** The secret key identifies this server and selects which tools are exposed. Each snippet has a **refresh** control, available to tenant admins, that rotates the secret in the URL, invalidating the old one.
+> **Keep this URL private.** The secret key identifies this server and selects which tools are exposed. Each snippet has a **refresh** control, available to editors of the server's workspace and to tenant admins, that rotates the secret in the URL, invalidating the old one. Viewers do not see the URL.
 
 Whether the URL alone is enough to connect depends on the server's [Require authentication](#require-authentication) setting.
 
@@ -148,11 +148,17 @@ Create a workspace API key under **Settings** → **API Keys** in the Automation
 Authorization: Bearer <your-api-key>
 ```
 
-Only workspace API keys are accepted; an admin API key is rejected with `401`. When the server requires authentication, the connection snippets below include this header. API keys are bound to an environment - the key's environment must match the MCP server's environment. Because the key is bound to your user account, you can revoke a single client by deleting its key without regenerating the server URL or touching other clients.
+Only workspace API keys are accepted; an admin API key is rejected with `401`. When the server requires authentication, the connection snippets below include this header. A key works only on the MCP servers of its own workspace and environment: a key from another workspace, or created for another environment, is rejected with `401`. A request may name an environment in the `X-ENVIRONMENT` header, but it must be the server's own - another one is rejected with `401`, also on a server that does not require authentication. Because the key is bound to your user account, you can revoke a single client by deleting its key without regenerating the server URL or touching other clients.
+
+### Sign in with ByteChef (optional)
+
+When the embedded OAuth2 authorization server is turned on, an OAuth-capable MCP client can connect to the server URL without an API key: you sign in with your ByteChef account and approve the `mcp:automation` scope. The server then accepts the client only if you are a member of the server's workspace (or a tenant administrator), and only for that server - the token does not work on another MCP server. A request that names another environment in `X-ENVIRONMENT` is rejected with `403`. See [MCP Server → Sign in with ByteChef](/platform/settings/mcp-server#sign-in-with-bytechef-optional) for the setup and how long tokens last.
 
 ### JWT from a trusted issuer (optional)
 
-The MCP endpoints can also accept JWTs issued by an identity provider you trust. List each trusted issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays off until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`, and a token for these endpoints must carry the `mcp:automation` scope. API keys keep working alongside JWTs.
+The MCP endpoints can also accept JWTs from an external issuer that your installation trusts. List each trusted issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays off until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`, and a token for these endpoints must carry the `mcp:automation` scope. API keys keep working alongside JWTs.
+
+> **Per-account identity providers are not used here yet.** Trusted issuers are set by whoever runs the ByteChef installation, in its configuration, and apply to every account. Identity providers added under [Settings → Identity Providers](/platform/settings/identity-providers) are used for signing in to ByteChef only; their tokens are not accepted on MCP servers.
 
 ---
 
