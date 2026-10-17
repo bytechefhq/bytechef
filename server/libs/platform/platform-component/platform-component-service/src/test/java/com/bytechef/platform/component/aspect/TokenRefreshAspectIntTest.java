@@ -418,6 +418,27 @@ class TokenRefreshAspectIntTest {
     }
 
     @Test
+    void testExecuteConnectionMapWithoutConnectionOfTheComponentSurfacesTheOriginalError() {
+        Map<String, ComponentConnection> connectionMap = new HashMap<>();
+
+        connectionMap.put(
+            "telegram_1",
+            new ComponentConnection("telegram", 1, 2L, Map.of("token", "bot"), AuthorizationType.CUSTOM));
+
+        ProviderException providerException = new ProviderException(401, "Unauthorized");
+
+        tokenRefreshTestService.setBehavior(() -> {
+            throw providerException;
+        });
+
+        assertThatThrownBy(() -> tokenRefreshTestService.executeWithConnectionMap("approval", 1, connectionMap))
+            .isSameAs(providerException);
+
+        verify(connectionDefinitionService, never()).getAuthorizationRefreshOn(anyString(), anyInt(), any());
+        verify(connectionDefinitionService, never()).executeAcquire(anyString(), anyInt(), any(), any(), any());
+    }
+
+    @Test
     void testExecuteEmptyConnectionMapNoRefreshAttempted() {
         Map<String, ComponentConnection> emptyMap = new HashMap<>();
 
