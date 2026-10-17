@@ -21,13 +21,20 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * Describes the output produced by an action or trigger, either as a statically declared response (schema plus sample
+ * data) or as a function that computes the output dynamically at runtime.
+ *
  * @author Ivica Cardic
  */
 public interface BaseOutputDefinition {
 
-    Optional<? extends BaseOutputFunction> getOutput();
+    default Optional<? extends BaseOutputFunction> getOutput() {
+        return Optional.empty();
+    }
 
-    Optional<OutputResponse> getOutputResponse();
+    default Optional<OutputResponse> getOutputResponse() {
+        return Optional.empty();
+    }
 
     default BaseValueProperty<?> getOutputSchema() {
         return getOutputResponse()
@@ -124,20 +131,26 @@ public interface BaseOutputDefinition {
     }
 
     /**
-     * @param outputSchema
-     * @param <P>
+     * Carries the property that describes the structure of an action's or trigger's output.
+     *
+     * @param outputSchema the property describing the structure of the output
+     * @param <P>          the concrete {@link BaseValueProperty} type of the output schema
      */
     record OutputSchema<P extends BaseValueProperty<?>>(P outputSchema) {
     }
 
     /**
-     * @param placeholder
+     * Carries a placeholder value shown before real output data is available.
+     *
+     * @param placeholder the placeholder value
      */
     record Placeholder(Object placeholder) {
     }
 
     /**
-     * @param sampleOutput
+     * Carries a sample of the data produced as output.
+     *
+     * @param sampleOutput the sample output value
      */
     record SampleOutput(Object sampleOutput) {
     }

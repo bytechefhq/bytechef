@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.customcomponent.handler;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -77,12 +76,10 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
         return new ComponentHandlerWrapper(
             new ComponentDefinitionWrapper(
                 componentDefinition,
-                OptionalUtils.orElse(
-                    componentDefinition.getActions()
-                        .map(actionDefinitions -> actionDefinitions.stream()
-                            .map(actionDefinition -> (ActionDefinition) actionDefinition)
-                            .toList()),
-                    List.of())) {
+                componentDefinition.getActions()
+                    .stream()
+                    .map(actionDefinition -> (ActionDefinition) actionDefinition)
+                    .toList()) {
 
                 @Override
                 public int getVersion() {

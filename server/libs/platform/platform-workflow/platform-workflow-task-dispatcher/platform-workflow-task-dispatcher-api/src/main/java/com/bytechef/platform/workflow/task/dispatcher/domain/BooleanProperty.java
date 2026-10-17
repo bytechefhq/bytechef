@@ -17,7 +17,6 @@
 package com.bytechef.platform.workflow.task.dispatcher.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import java.util.Collections;
 import java.util.List;
@@ -36,8 +35,7 @@ public class BooleanProperty extends ValueProperty<Boolean> {
     public BooleanProperty(Property.BooleanProperty booleanProperty) {
         super(booleanProperty);
 
-        this.options = CollectionUtils.map(
-            OptionalUtils.orElse(booleanProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(booleanProperty.getOptions(), Option::new);
     }
 
     @Override
