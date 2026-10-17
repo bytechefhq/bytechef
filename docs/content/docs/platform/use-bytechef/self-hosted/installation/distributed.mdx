@@ -322,22 +322,12 @@ fail open if Redis is briefly unreachable, so an enforcement hiccup never blocks
 The monthly-cost cap and the quota checks (workspaces, members, storage) read shared database
 state, so they are naturally global and need no Redis provider.
 
-## Crash recovery and run governance
+## Broker redelivery
 
 <Callout type="warn" title="Coming soon">
-    The crash-recovery, per-run timeout, and retention monitors described here are on the upcoming
-    release track and are not yet available in the latest released version of ByteChef.
+    The Redis pending-entry reclaim described here is on the upcoming release track and is not yet
+    available in the latest released version of ByteChef.
 </Callout>
-
-Workers heartbeat every in-flight task every 30 seconds; `coordinator-app` runs the recovery
-monitors. Both the orphaned-job recovery monitor (fails jobs whose heartbeats went stale, making
-them resumable) and the per-run timeout monitor (fails STARTED jobs past the plan's async run
-timeout or `bytechef.workflow.execution.timeout.default-timeout`) work in the distributed
-deployment - their stale/long-running finder queries reach `execution-app` through
-`/remote/job-service` and `/remote/task-execution-service` endpoints. The retention purge monitor
-(`bytechef.workflow.execution.retention.*`) also works distributed: it finds expired runs through
-the remote job service and deletes them (rows and the stored output/context blobs) through the
-remote job facade, with the cascade executing on `execution-app`.
 
 When Redis is the message broker, redelivery after a worker crash is handled by a consumer-group
 pending-entry reclaim: every consumer sweeps its queue's pending entries (XPENDING), claims
