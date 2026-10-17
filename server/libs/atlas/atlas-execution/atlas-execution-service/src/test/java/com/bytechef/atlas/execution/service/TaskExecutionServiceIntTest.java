@@ -38,6 +38,7 @@ import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -106,7 +107,9 @@ public class TaskExecutionServiceIntTest {
 
         TaskExecution storedTaskExecution = taskExecutionService.getTaskExecution(id);
 
-        assertThat(storedTaskExecution.getMetadata()).containsEntry("approvalId", "approval-1")
+        Map<String, Object> metadata = new HashMap<>(storedTaskExecution.getMetadata());
+
+        assertThat(metadata).containsEntry("approvalId", "approval-1")
             .containsEntry("resumeId", "resume-1");
         assertThat(storedTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.COMPLETED);
         assertThat(storedTaskExecution.getVersion()).isEqualTo(firstCopy.getVersion());
@@ -129,7 +132,9 @@ public class TaskExecutionServiceIntTest {
 
         TaskExecution storedTaskExecution = taskExecutionService.getTaskExecution(id);
 
-        assertThat(storedTaskExecution.getMetadata()).containsEntry("approvalId", "approval-1")
+        Map<String, Object> metadata = new HashMap<>(storedTaskExecution.getMetadata());
+
+        assertThat(metadata).containsEntry("approvalId", "approval-1")
             .doesNotContainKey("resumeId");
     }
 

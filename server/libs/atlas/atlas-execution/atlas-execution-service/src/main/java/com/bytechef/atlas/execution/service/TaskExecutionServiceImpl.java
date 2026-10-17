@@ -173,8 +173,8 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     /**
-     * Applies a copy loaded before the last save of the row onto the locked current row. The copy's own state wins,
-     * but metadata entries written by other writers in the meantime are kept unless the copy removed them.
+     * Applies a copy loaded before the last save of the row onto the locked current row. The copy's own state wins, but
+     * metadata entries written by other writers in the meantime are kept unless the copy removed them.
      */
     private static void mergeStaleCopy(TaskExecution staleTaskExecution, TaskExecution currentTaskExecution) {
         Map<String, Object> metadata = new HashMap<>(currentTaskExecution.getMetadata());

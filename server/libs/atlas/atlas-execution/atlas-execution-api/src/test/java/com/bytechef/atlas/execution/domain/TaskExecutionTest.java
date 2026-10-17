@@ -27,6 +27,7 @@ import com.bytechef.evaluator.Evaluator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -37,10 +38,11 @@ class TaskExecutionTest {
 
     private static final Evaluator EVALUATOR = new TestEvaluator();
 
-    static {
-        JsonMapper.Builder builder = JsonMapper.builder();
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .build();
 
-        MapUtils.setObjectMapper(builder.build());
+    static {
+        MapUtils.setObjectMapper(JSON_MAPPER);
 
         DeferredEvaluationParameterKeys.register("condition/", "caseTrue", "caseFalse");
     }
@@ -193,6 +195,39 @@ class TaskExecutionTest {
         assertEquals(
             "resolved", parameters.get("iteratee"),
             "Non-registered task types should have all parameters evaluated");
+    }
+
+    @Test
+    void testRemoveMetadataRecordsTheRemovedKey() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .metadata(Map.of("resumeId", "resume-1", "approvalId", "approval-1"))
+            .build();
+
+        taskExecution.removeMetadata("resumeId");
+
+        assertEquals(Map.of("approvalId", "approval-1"), taskExecution.getMetadata());
+        assertEquals(Set.of("resumeId"), taskExecution.getRemovedMetadataKeys());
+
+        taskExecution.putMetadata("resumeId", "resume-2");
+
+        assertEquals(Set.of(), taskExecution.getRemovedMetadataKeys());
+    }
+
+    @Test
+    void testVersionAndRemovedMetadataKeysSurviveJsonRoundTrip() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(1L)
+            .metadata(Map.of("resumeId", "resume-1"))
+            .build();
+
+        taskExecution.setVersion(3);
+        taskExecution.removeMetadata("resumeId");
+
+        TaskExecution deserializedTaskExecution = JSON_MAPPER.readValue(
+            JSON_MAPPER.writeValueAsString(taskExecution), TaskExecution.class);
+
+        assertEquals(3, deserializedTaskExecution.getVersion());
+        assertEquals(Set.of("resumeId"), deserializedTaskExecution.getRemovedMetadataKeys());
     }
 
     private static class TestEvaluator implements Evaluator {
