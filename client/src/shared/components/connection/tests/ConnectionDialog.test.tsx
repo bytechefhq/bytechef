@@ -17,6 +17,10 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: () => true,
 }));
 
+vi.mock('@/shared/hooks/useIsResourceOwnerOrTenantAdmin', () => ({
+    useIsResourceOwnerOrTenantAdmin: () => true,
+}));
+
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
     useGetConnectionDefinitionsQuery: vi.fn(() => ({data: undefined})),

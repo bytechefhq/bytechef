@@ -11,8 +11,6 @@ import {
     SelectValue,
 } from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
-import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -21,6 +19,8 @@ import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/middleware/graphql';
 import {
     ComponentConnection,
@@ -453,7 +453,7 @@ const ConnectionTabConnectionSelect = ({
 
                                             {visibilityGroupingEnabled && connection.visibility && (
                                                 <span className="shrink-0">
-                                                    <ConnectionScopeBadge visibility={connection.visibility} />
+                                                    <ResourceVisibilityBadge visibility={connection.visibility} />
                                                 </span>
                                             )}
 

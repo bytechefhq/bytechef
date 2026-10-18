@@ -9,13 +9,15 @@ import {
     DialogMain,
     DialogTrigger,
 } from '@/components/Dialog';
-import {Form} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import CategoryFormField from '@/shared/components/entity-form/CategoryFormField';
 import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
 import NameFormField from '@/shared/components/entity-form/NameFormField';
 import TagsFormField from '@/shared/components/entity-form/TagsFormField';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
@@ -39,6 +41,8 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
 
     const {captureProjectCreated} = useAnalytics();
 
+    const visibilityFeatureEnabled = useIsVisibilityEditionEnabled();
+
     const form = useForm<Project>({
         defaultValues: {
             category: project?.category
@@ -54,11 +58,12 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: project?.visibility || 'WORKSPACE',
             workspaceId: project?.workspaceId,
         } as Project,
     });
 
-    const {getValues, handleSubmit, reset} = form;
+    const {control, getValues, handleSubmit, reset} = form;
 
     const {
         data: categories,
@@ -183,6 +188,30 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
                                 <CategoryFormField categories={categories} categoriesLoading={categoriesLoading} />
 
                                 <TagsFormField remainingTags={remainingTags} />
+
+                                {!project?.id && visibilityFeatureEnabled && (
+                                    <FormField
+                                        control={control}
+                                        name="visibility"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Visibility</FormLabel>
+
+                                                <FormControl>
+                                                    <ResourceVisibilityPicker
+                                                        grantedUserIds={[]}
+                                                        onGrantedUserIdsChange={() => undefined}
+                                                        onVisibilityChange={field.onChange}
+                                                        showSpecificPeopleOption={false}
+                                                        visibility={field.value || 'WORKSPACE'}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
                             </DialogBody>
 
                             <DialogFooter>
