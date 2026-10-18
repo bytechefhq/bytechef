@@ -2,8 +2,12 @@ import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import AiHubWorkflowViewer from '@/ee/pages/automation/ai-hub/AiHubWorkflowViewer';
 import WorkflowTabLabel from '@/ee/pages/automation/ai-hub/WorkflowTabLabel';
+import ResourcePickerMenu, {
+    ResourcePickerSelectionI,
+} from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {PanelRightCloseIcon, XIcon} from 'lucide-react';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PanelRightCloseIcon, PlusIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -11,17 +15,33 @@ import {useShallow} from 'zustand/react/shallow';
 const AiHubResourcePanel = () => {
     const activeTabRef = useRef<HTMLDivElement | null>(null);
 
-    const {activeTabId, closeTab, openTabs, setActiveTab, setRightPanelOpen} = useAiHubTabsStore(
+    const {activeTabId, closeTab, openTabs, openWorkflowTab, setActiveTab, setRightPanelOpen} = useAiHubTabsStore(
         useShallow((state) => ({
             activeTabId: state.activeTabId,
             closeTab: state.closeTab,
             openTabs: state.openTabs,
+            openWorkflowTab: state.openWorkflowTab,
             setActiveTab: state.setActiveTab,
             setRightPanelOpen: state.setRightPanelOpen,
         }))
     );
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const activeTab = openTabs.find((tab) => tab.id === activeTabId);
+
+    const handleResourceSelect = (selection: ResourcePickerSelectionI) => {
+        if (selection.projectId == null || selection.projectWorkflowId == null) {
+            return;
+        }
+
+        openWorkflowTab({
+            name: selection.name,
+            projectId: selection.projectId,
+            projectWorkflowId: selection.projectWorkflowId,
+            workflowId: selection.id,
+        });
+    };
 
     useEffect(() => {
         activeTabRef.current?.scrollIntoView({block: 'nearest', inline: 'nearest'});
@@ -31,7 +51,7 @@ const AiHubResourcePanel = () => {
         <div className="size-full bg-surface-main py-2 pr-2">
             <div className="flex size-full flex-col overflow-hidden rounded-xl border bg-surface-neutral-primary shadow-sm">
                 <div className="flex min-h-12 items-center gap-1 border-b">
-                    <div className="flex flex-1 items-stretch gap-0 overflow-x-auto">
+                    <div className="flex min-w-0 items-stretch gap-0 overflow-x-auto">
                         {openTabs.map((tab) => {
                             const isActive = tab.id === activeTabId;
 
@@ -64,7 +84,27 @@ const AiHubResourcePanel = () => {
                         })}
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-1 px-2">
+                    <Tooltip>
+                        <ResourcePickerMenu
+                            onSelect={handleResourceSelect}
+                            trigger={
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Open a resource"
+                                        className="ml-1 shrink-0"
+                                        icon={<PlusIcon />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+                            }
+                            workspaceId={currentWorkspaceId ?? 0}
+                        />
+
+                        <TooltipContent>Open a resource</TooltipContent>
+                    </Tooltip>
+
+                    <div className="ml-auto flex shrink-0 items-center gap-1 px-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button

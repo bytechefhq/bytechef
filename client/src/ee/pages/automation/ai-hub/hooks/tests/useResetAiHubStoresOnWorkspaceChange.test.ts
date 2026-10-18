@@ -4,6 +4,7 @@ import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 
 import {aiHubChatsStore} from '../../chats/stores/useAiHubChatsStore';
+import {aiHubComposerStore} from '../../composer/stores/useAiHubComposerStore';
 import {aiHubStore} from '../../stores/useAiHubStore';
 import {aiHubTabsStore} from '../../stores/useAiHubTabsStore';
 import {useResetAiHubStoresOnWorkspaceChange} from '../useResetAiHubStoresOnWorkspaceChange';
@@ -34,6 +35,7 @@ describe('useResetAiHubStoresOnWorkspaceChange', () => {
 
         aiHubTabsStore.getState().openWorkflowTab(WORKFLOW);
         aiHubChatsStore.getState().setCurrentChatId(5);
+        aiHubComposerStore.getState().addReference({id: 'wf-1', kind: 'workflow', name: 'Workflow'});
         aiHubStore.setState({messages: [{content: 'hi', role: 'user'}]});
         aiChatRetryableErrorStore.getState().setError({errorMessage: 'x', lastUserMessage: 'y', toolName: 'z'});
 
@@ -45,6 +47,7 @@ describe('useResetAiHubStoresOnWorkspaceChange', () => {
 
         expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
         expect(aiHubChatsStore.getState().currentChatId).toBeUndefined();
+        expect(aiHubComposerStore.getState().referencedResources).toEqual([]);
         expect(aiHubStore.getState().messages).toEqual([]);
         expect(aiHubStore.getState().chatId).not.toBe(previousChatId);
         expect(aiChatRetryableErrorStore.getState().currentError).toBeUndefined();

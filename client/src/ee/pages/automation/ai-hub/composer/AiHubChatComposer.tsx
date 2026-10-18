@@ -1,19 +1,35 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import AiHubComposer from '@/ee/pages/automation/ai-hub/composer/AiHubComposer';
+import {
+    ReferencedResourceKindType,
+    aiHubComposerStore,
+    useAiHubComposerStore,
+} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {
     aiHubRunStateStore,
     isChatRunning,
     useAiHubRunStateStore,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
+import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
 import {ComposerPrimitive, useAui} from '@assistant-ui/react';
-import {ArrowUpIcon, SquareIcon} from 'lucide-react';
+import {ArrowUpIcon, SquareIcon, XIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
+
+const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
+    workflow: 'Workflow',
+};
+
+const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
+    workflow: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+};
 
 interface AiHubChatComposerPropsI {
     /**
@@ -24,8 +40,11 @@ interface AiHubChatComposerPropsI {
 }
 
 const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
+    const atMentionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
     const previousChatIdRef = useRef<string | undefined>(undefined);
 
+    const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
+    const resourcePickerOpen = useAiHubComposerStore((state) => state.resourcePickerOpen);
     const chatId = useAiHubStore((state) => state.chatId);
     const mode = useAiHubStore((state) => state.mode);
     const pendingToolApproval = useAiHubStore((state) => hasPendingToolApproval(state.messages));
@@ -54,7 +73,45 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         });
     }, [aui, cancelAiHubRunMutation, chatId, currentChatId, currentWorkspaceId]);
 
+    const handleRemoveReference = (id: string, kind: ReferencedResourceKindType) => {
+        const composerState = aiHubComposerStore.getState();
+
+        const removedResource = composerState.referencedResources.find(
+            (resource) => resource.id === id && resource.kind === kind
+        );
+
+        composerState.removeReference(id, kind);
+
+        if (removedResource?.tabId == null || !removedResource.ownsTab) {
+            return;
+        }
+
+        const tabsState = aiHubTabsStore.getState();
+
+        const attachedTab = tabsState.openTabs.find((tab) => tab.id === removedResource.tabId);
+
+        if (attachedTab?.workflowId === removedResource.id) {
+            tabsState.closeTab(attachedTab.id);
+        }
+    };
+
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === '@') {
+            const textarea = event.currentTarget;
+            const caret = textarea.selectionStart;
+            const atWordBoundary = caret === 0 || /\s/.test(textarea.value.charAt(caret - 1));
+
+            if (atWordBoundary) {
+                event.preventDefault();
+
+                atMentionTextareaRef.current = textarea;
+
+                aiHubComposerStore.getState().setResourcePickerOpen(true);
+
+                return;
+            }
+        }
+
         if (event.key !== 'Enter' || !event.altKey || event.shiftKey) {
             return;
         }
@@ -98,12 +155,53 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
             aui.composer.setText('');
         }
 
+        if (previousChatIdRef.current !== undefined && previousChatIdRef.current !== chatId) {
+            aiHubComposerStore.getState().clear();
+        }
+
         previousChatIdRef.current = chatId;
     }, [aui, chatId]);
+
+    useEffect(() => {
+        if (resourcePickerOpen || atMentionTextareaRef.current == null) {
+            return;
+        }
+
+        const textarea = atMentionTextareaRef.current;
+
+        atMentionTextareaRef.current = null;
+
+        requestAnimationFrame(() => textarea.focus());
+    }, [resourcePickerOpen]);
 
     return (
         <div className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2">
             <ComposerPrimitive.Root className="flex w-full flex-col rounded-2xl border border-border bg-muted/40 shadow-sm focus-within:border-foreground/20">
+                {referencedResources.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 px-3 pt-2" data-testid="reference-chips">
+                        {referencedResources.map((resource) => (
+                            <Badge
+                                className={`flex items-center gap-1 px-2 py-0.5 text-xs font-normal ${KIND_BADGE_CLASSES[resource.kind]}`}
+                                key={`${resource.kind}-${resource.id}`}
+                                styleType="outline-outline"
+                            >
+                                <span className="font-medium">{KIND_LABELS[resource.kind]}:</span>
+
+                                <span>{resource.name}</span>
+
+                                <button
+                                    aria-label={`Remove ${resource.name}`}
+                                    className="ml-0.5 rounded hover:opacity-75"
+                                    onClick={() => handleRemoveReference(resource.id, resource.kind)}
+                                    type="button"
+                                >
+                                    <XIcon className="size-3" />
+                                </button>
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+
                 <ComposerPrimitive.Input
                     aria-label="Message input"
                     autoFocus
@@ -115,7 +213,11 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                 />
 
                 <div className="flex items-center justify-between gap-1 px-2 pb-2">
-                    <div className="flex min-w-0 items-center gap-1">{modelPicker}</div>
+                    <div className="flex min-w-0 items-center gap-1">
+                        {modelPicker}
+
+                        <AiHubComposer />
+                    </div>
 
                     <div className="flex shrink-0 items-center gap-2">
                         <ModeSwitch
