@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {
@@ -82,6 +83,8 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         });
     }, []);
 
+    const isWorkspaceReady = isWorkspaceIdKnown(currentWorkspaceId);
+
     const placeholder = pendingToolApproval
         ? 'Approve or reject the tool call above, or send a message to withdraw it...'
         : 'Send a message...';
@@ -105,7 +108,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     aria-label="Message input"
                     autoFocus
                     className="max-h-32 min-h-12 w-full resize-none border-0 bg-transparent px-4 pt-2 pb-1 text-sm ring-0 outline-none placeholder:text-muted-foreground"
-                    disabled={isRunning}
+                    disabled={isRunning || !isWorkspaceReady}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     rows={1}
@@ -135,6 +138,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                                 <Button
                                     aria-label="Send message"
                                     className="size-8 rounded-full"
+                                    disabled={!isWorkspaceReady}
                                     icon={<ArrowUpIcon className="size-4" />}
                                     size="icon"
                                     type="submit"
