@@ -48,6 +48,10 @@ public class AiHubSessionMemory implements AutoCloseable {
             .build();
     }
 
+    public AiHubTurnEndingToolResultAdvisor createTurnEndingToolResultAdvisor() {
+        return new AiHubTurnEndingToolResultAdvisor(sessionService);
+    }
+
     @SuppressFBWarnings("EI_EXPOSE_REP")
     public SessionRepository sessionRepository() {
         return sessionRepository;
