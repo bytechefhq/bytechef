@@ -317,6 +317,46 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('skips toast for AI Hub chat turn errors, which the hub surfaces itself', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {error: 'TURN_IN_FLIGHT'},
+                status: 409,
+                url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts errors from other agents chat endpoints and other internal urls', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            for (const url of [
+                'http://localhost/api/platform/internal/ai/chat/workflow_editor_build',
+                'http://localhost/api/platform/internal/ai/chat/ai_hub_other',
+                'http://localhost/api/platform/internal/projects/1',
+            ]) {
+                clearActiveToasts();
+
+                hoisted.registeredHandlers!.response(
+                    createMockResponse({jsonData: {detail: 'Conflict', title: 'Error'}, status: 409, url})
+                );
+
+                await act(async () => {
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+                });
+            }
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(3);
+        });
+
         it('skips toast for a failed AI Hub presence heartbeat', async () => {
             renderHook(() => useFetchInterceptor());
 

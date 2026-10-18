@@ -30,10 +30,23 @@ function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
 }
 
+/*
+ * Some reads render their own error state inline and own the failure UX. The approval-form read,
+ * for instance, shows a "Form no longer available" panel (see ApprovalForm.tsx) whenever its fetch
+ * fails, and a workflow node's Test / Reset shows its failure in the Output tab (see
+ * testOutputInlineErrors.ts), so a global error toast on top of them is redundant and confusing.
+ * The AI Hub chat turn endpoint is another: its runtime provider shows RUN_ERROR inline and its own
+ * toasts, such as the "turn already running" notice on a 409 TURN_IN_FLIGHT (see
+ * AiHubRuntimeProvider.tsx). Only the hub's own path matches, so other agents' /ai/chat/{agentId}
+ * endpoints keep the global toast. Suppress the toast for those endpoints.
+ */
+const AI_HUB_CHAT_URL_PATTERN = /\/internal\/ai\/chat\/ai_hub(?:[?#]|$)/;
+
 function handlesErrorInline(url: string): boolean {
     return (
         url.includes('/approval-form/') ||
         isInlineTestOutputUrl(url) ||
+        AI_HUB_CHAT_URL_PATTERN.test(url) ||
         url.includes('/ai/chat/ai_hub/status') ||
         /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url)
     );
