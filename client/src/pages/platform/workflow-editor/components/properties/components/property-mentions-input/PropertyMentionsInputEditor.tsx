@@ -68,7 +68,7 @@ interface PropertyMentionsInputEditorProps {
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
-    onSinglePillAbandoned?: () => void;
+    onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
     pillRequired?: boolean;
     placeholder?: string;
@@ -619,9 +619,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 if ((singlePill || pillRequired) && blurredEditor && countMentionNodes(blurredEditor) === 0) {
                     unsavedSuggestionValueRef.current = undefined;
 
-                    blurredEditor.commands.clearContent(false);
-
-                    onSinglePillAbandoned?.();
+                    if (onSinglePillAbandoned?.() !== true) {
+                        blurredEditor.commands.clearContent(false);
+                    }
 
                     return;
                 }

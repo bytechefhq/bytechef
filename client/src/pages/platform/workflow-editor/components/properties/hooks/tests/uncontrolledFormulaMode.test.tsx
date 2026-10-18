@@ -406,6 +406,39 @@ describe('uncontrolled Text/Formula', () => {
                 expect(result.current.inputMode.renderer).toBe('native');
             });
 
+            it('keeps unsaved text when the Dynamic editor loses focus without a pill', () => {
+                const {result} = renderSelect(methodProperty, undefined);
+
+                act(() => result.current.handleDynamicSwitch());
+                act(() => result.current.handleMentionInputValueChange('id '));
+
+                let keepsEditorText = false;
+
+                act(() => {
+                    keepsEditorText = result.current.handleSinglePillAbandoned();
+                });
+
+                expect(keepsEditorText).toBe(true);
+                expect(result.current.inputMode.renderer).toBe('mentions');
+                expect(result.current.mentionInputValue).toBe('id ');
+                expect(saveProperty).not.toHaveBeenCalled();
+            });
+
+            it('clears the field when the Dynamic editor loses focus with only text left after a saved pill', () => {
+                const {result} = renderSelect(methodProperty, '${trigger_1.method}');
+
+                act(() => result.current.handleMentionInputValueChange('id '));
+
+                let keepsEditorText = true;
+
+                act(() => {
+                    keepsEditorText = result.current.handleSinglePillAbandoned();
+                });
+
+                expect(keepsEditorText).toBe(false);
+                expect(result.current.propertyParameterValue).toBe('');
+                expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
+            });
         });
 
         describe('the Dynamic switch', () => {

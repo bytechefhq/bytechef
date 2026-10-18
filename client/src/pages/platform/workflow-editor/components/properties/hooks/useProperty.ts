@@ -108,7 +108,7 @@ type UsePropertyReturnType = {
     handleNativeKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
     handleSelectChange: (value: string, name: string) => void;
     handleSelectKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
-    handleSinglePillAbandoned: () => void;
+    handleSinglePillAbandoned: () => boolean;
     expressionEnabled: boolean | undefined;
     hasError: boolean;
     hidden: boolean | undefined;
@@ -1154,19 +1154,22 @@ export const useProperty = ({
         if (hasDynamicSwitch && !isFormulaMode) {
             // The editor stays up until the Dynamic switch is turned off; focus moves away when a pill is picked from
             // the panel, too. A select keeps its option until a pill replaces it.
-            if (pillEntryKeepsOptionRef.current) {
-                return;
+            const hasSavedValue = typeof propertyParameterValue === 'string' && propertyParameterValue !== '';
+            const keepsEditorText = !hasSavedValue && !inputMode.singlePill;
+
+            if (pillEntryKeepsOptionRef.current || keepsEditorText) {
+                return keepsEditorText;
             }
 
             dispatchValueAction({type: 'valueCleared'});
 
             // Text left without a pill is never saved (validateMentionInputValue), so the stored value may still
             // hold the last pill.
-            if (typeof propertyParameterValue === 'string' && propertyParameterValue !== '') {
+            if (hasSavedValue) {
                 saveResolvedValue(null);
             }
 
-            return;
+            return false;
         }
 
         setPillEntry(false);
@@ -1174,7 +1177,9 @@ export const useProperty = ({
         dispatchValueAction({type: 'valueCleared'});
 
         requestAnimationFrame(() => inputRef.current?.focus());
-    }, [hasDynamicSwitch, isFormulaMode, propertyParameterValue, saveResolvedValue]);
+
+        return false;
+    }, [hasDynamicSwitch, inputMode.singlePill, isFormulaMode, propertyParameterValue, saveResolvedValue]);
 
     const handleDynamicSwitch = useCallback(() => {
         if (!mentionInput) {

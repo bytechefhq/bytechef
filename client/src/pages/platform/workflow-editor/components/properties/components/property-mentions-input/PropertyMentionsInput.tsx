@@ -60,7 +60,7 @@ interface PropertyMentionsInputProps {
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
-    onSinglePillAbandoned?: () => void;
+    onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
     path?: string;
     pillRequired?: boolean;
