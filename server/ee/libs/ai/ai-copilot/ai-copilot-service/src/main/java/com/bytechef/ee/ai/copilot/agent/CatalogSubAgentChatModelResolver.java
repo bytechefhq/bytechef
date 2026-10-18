@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.agent;
 
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.IncompleteChatModelSelectionException;
 import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentModelRequest;
@@ -62,9 +63,7 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
                 "Subagent user-selected LLM half-set (provider={}, model={}) in environment {}", providerKey, model,
                 environmentId);
 
-            throw new ChatModelUnavailableException(
-                "The model selection is incomplete (provider=%s, model=%s). Pick a model again.".formatted(
-                    providerKey, model));
+            throw new IncompleteChatModelSelectionException(providerKey, model);
         }
 
         ChatModel chatModel;
@@ -72,7 +71,7 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
         try {
             chatModel = catalogChatClientResolver.resolveChatModel(providerKey, model, Math.toIntExact(environmentId));
         } catch (RuntimeException exception) {
-            throw new SelectedChatModelUnavailableException(providerKey, model, environmentId, exception);
+            throw unresolvable(environmentId, exception);
         }
 
         if (chatModel == null) {
@@ -93,7 +92,7 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
             chatModel = catalogChatClientResolver.resolveDefaultChatModel(
                 defaultProvider, Math.toIntExact(environmentId));
         } catch (RuntimeException exception) {
-            throw ChatModelUnavailableException.noProviderEnabled(environmentId, exception);
+            throw unresolvable(environmentId, exception);
         }
 
         if (chatModel == null) {
@@ -101,5 +100,11 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
         }
 
         return chatModel;
+    }
+
+    private static ChatModelUnavailableException unresolvable(long environmentId, RuntimeException exception) {
+        return new ChatModelUnavailableException(
+            "Could not resolve the AI model in environment %d: %s".formatted(environmentId, exception.getMessage()),
+            exception);
     }
 }

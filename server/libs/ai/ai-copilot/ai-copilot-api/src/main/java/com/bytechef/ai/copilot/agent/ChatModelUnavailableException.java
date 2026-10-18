@@ -30,15 +30,10 @@ public class ChatModelUnavailableException extends RuntimeException {
     }
 
     public static ChatModelUnavailableException noProviderEnabled(long environmentId) {
-        return new ChatModelUnavailableException(getNoProviderEnabledMessage(environmentId));
+        return new NoAiProviderEnabledException(environmentId);
     }
 
     public static ChatModelUnavailableException noProviderEnabled(long environmentId, Throwable cause) {
-        return new ChatModelUnavailableException(getNoProviderEnabledMessage(environmentId), cause);
-    }
-
-    private static String getNoProviderEnabledMessage(long environmentId) {
-        return ("No AI provider is enabled in environment %d. Ask an administrator to enable an AI provider with a "
-            + "chat model.").formatted(environmentId);
+        return new NoAiProviderEnabledException(environmentId, cause);
     }
 }
