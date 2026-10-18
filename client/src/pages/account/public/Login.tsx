@@ -8,8 +8,8 @@ import {getLoginRedirect, rememberLoginRedirect} from '@/shared/auth/login-redir
 import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -33,6 +33,15 @@ interface SsoRedirectI {
     url: string;
 }
 
+const SOCIAL_LOGIN_ERROR_MESSAGES: Record<string, string> = {
+    account_disabled: 'This account has been deactivated. Contact your administrator.',
+    account_not_provisioned:
+        'There is no account for this email yet. Ask your administrator to invite you, then sign in again.',
+    email_not_verified: 'Your email address is not verified with the provider. Verify it there and try again.',
+    invalid_email_domain: 'Sign-up is not available for this email domain.',
+    sign_up_disabled: 'Sign-up is currently disabled. Ask your administrator to invite you.',
+};
+
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [ssoRedirect, setSsoRedirect] = useState<SsoRedirectI | null>(null);
@@ -50,7 +59,9 @@ const Login = () => {
         }))
     );
 
-    const ff_1874 = useFeatureFlagsStore()('ff-1874');
+    const socialLogin = useApplicationInfoStore((state) => state.socialLogin);
+
+    const socialLoginProviders = socialLogin.enabled ? socialLogin.providers : [];
 
     const ceEdition = useCeEdition();
 
@@ -177,7 +188,9 @@ const Login = () => {
         if (searchParams.get('error') === 'oauth2') {
             navigate('/account-error', {
                 state: {
-                    error: 'Failed to sign in with social provider. Please try again or use email/password.',
+                    error:
+                        SOCIAL_LOGIN_ERROR_MESSAGES[searchParams.get('code') || ''] ||
+                        'Failed to sign in with social provider. Please try again or use email/password.',
                     fromInternalFlow: true,
                 },
             });
@@ -215,32 +228,36 @@ const Login = () => {
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-6 p-0">
-                    {ff_1874 && (
+                    {socialLoginProviders.length > 0 && (
                         <>
                             <div className="flex flex-col gap-4">
-                                <Button
-                                    icon={<img alt="Google logo" src={googleLogo} />}
-                                    label="Continue with Google"
-                                    onClick={() => {
-                                        rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+                                {socialLoginProviders.includes('google') && (
+                                    <Button
+                                        icon={<img alt="Google logo" src={googleLogo} />}
+                                        label="Continue with Google"
+                                        onClick={() => {
+                                            rememberLoginRedirect(getLoginRedirect(pageLocation.search));
 
-                                        window.location.href = '/oauth2/authorization/google';
-                                    }}
-                                    size="lg"
-                                    variant="outline"
-                                />
+                                            window.location.href = '/oauth2/authorization/google';
+                                        }}
+                                        size="lg"
+                                        variant="outline"
+                                    />
+                                )}
 
-                                <Button
-                                    icon={<img alt="Github logo" src={githubLogo} />}
-                                    label="Continue with Github"
-                                    onClick={() => {
-                                        rememberLoginRedirect(getLoginRedirect(pageLocation.search));
+                                {socialLoginProviders.includes('github') && (
+                                    <Button
+                                        icon={<img alt="Github logo" src={githubLogo} />}
+                                        label="Continue with Github"
+                                        onClick={() => {
+                                            rememberLoginRedirect(getLoginRedirect(pageLocation.search));
 
-                                        window.location.href = '/oauth2/authorization/github';
-                                    }}
-                                    size="lg"
-                                    variant="outline"
-                                />
+                                            window.location.href = '/oauth2/authorization/github';
+                                        }}
+                                        size="lg"
+                                        variant="outline"
+                                    />
+                                )}
                             </div>
 
                             <div className="flex items-center">

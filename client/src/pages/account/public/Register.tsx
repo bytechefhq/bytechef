@@ -12,7 +12,6 @@ import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
@@ -70,7 +69,9 @@ const Register = () => {
 
     const activationRequired = useApplicationInfoStore((state) => state.signUp.activationRequired);
 
-    const ff_1874 = useFeatureFlagsStore()('ff-1874');
+    const socialLogin = useApplicationInfoStore((state) => state.socialLogin);
+
+    const socialLoginProviders = socialLogin.enabled ? socialLogin.providers : [];
 
     const {captureUserSignedUp} = useAnalytics();
 
@@ -147,28 +148,32 @@ const Register = () => {
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-6 p-0">
-                    {ff_1874 && (
+                    {socialLoginProviders.length > 0 && (
                         <>
                             <div className="flex flex-col gap-4">
-                                <Button
-                                    icon={<img alt="Google logo" src={googleLogo} />}
-                                    label="Continue with Google"
-                                    onClick={() => {
-                                        window.location.href = '/oauth2/authorization/google';
-                                    }}
-                                    size="lg"
-                                    variant="outline"
-                                />
+                                {socialLoginProviders.includes('google') && (
+                                    <Button
+                                        icon={<img alt="Google logo" src={googleLogo} />}
+                                        label="Continue with Google"
+                                        onClick={() => {
+                                            window.location.href = '/oauth2/authorization/google';
+                                        }}
+                                        size="lg"
+                                        variant="outline"
+                                    />
+                                )}
 
-                                <Button
-                                    icon={<img alt="Github logo" src={githubLogo} />}
-                                    label="Continue with Github"
-                                    onClick={() => {
-                                        window.location.href = '/oauth2/authorization/github';
-                                    }}
-                                    size="lg"
-                                    variant="outline"
-                                />
+                                {socialLoginProviders.includes('github') && (
+                                    <Button
+                                        icon={<img alt="Github logo" src={githubLogo} />}
+                                        label="Continue with Github"
+                                        onClick={() => {
+                                            window.location.href = '/oauth2/authorization/github';
+                                        }}
+                                        size="lg"
+                                        variant="outline"
+                                    />
+                                )}
                             </div>
 
                             <div className="flex items-center">

@@ -4,10 +4,13 @@ import AccountProfileMfa from '@/pages/account/settings/AccountProfileMfa';
 import AccountProfilePassword from '@/pages/account/settings/AccountProfilePassword';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import React from 'react';
 
 const AccountProfile = () => {
+    const socialLoginEnabled = useApplicationInfoStore((state) => state.socialLogin.enabled);
+
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const identityProvidersEnabled = isFeatureFlagEnabled('ff-1040');
@@ -25,7 +28,7 @@ const AccountProfile = () => {
 
                     {identityProvidersEnabled && <AccountProfileMfa />}
 
-                    {identityProvidersEnabled && <AccountProfileLinkedAccounts />}
+                    {socialLoginEnabled && <AccountProfileLinkedAccounts />}
                 </div>
             </div>
         </LayoutContainer>
