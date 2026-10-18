@@ -93,10 +93,13 @@ class CopilotChatClientResolverTest {
         state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
         state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
 
-        SelectedChatModelUnavailableException exception = assertThrows(
-            SelectedChatModelUnavailableException.class, () -> resolver.resolve(state));
+        ChatModelUnavailableException exception = assertThrows(
+            ChatModelUnavailableException.class, () -> resolver.resolve(state));
 
+        assertSame(ChatModelUnavailableException.class, exception.getClass());
         assertSame(cause, exception.getCause());
+        assertTrue(exception.getMessage()
+            .contains("cannot decrypt the API key"));
         verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
     }
 
@@ -159,7 +162,10 @@ class CopilotChatClientResolverTest {
         ChatModelUnavailableException exception = assertThrows(
             ChatModelUnavailableException.class, () -> resolver.resolve(state));
 
+        assertSame(ChatModelUnavailableException.class, exception.getClass());
         assertSame(cause, exception.getCause());
+        assertTrue(exception.getMessage()
+            .contains("catalog down"));
     }
 
     @Test

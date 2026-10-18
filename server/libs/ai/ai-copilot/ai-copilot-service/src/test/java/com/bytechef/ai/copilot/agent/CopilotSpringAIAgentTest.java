@@ -35,6 +35,7 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
+import com.bytechef.platform.ai.llm.NoChatProviderActivatedException;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
@@ -270,6 +271,63 @@ class CopilotSpringAIAgentTest {
 
             verify(startupChatModel, never()).call(any(Prompt.class));
             verify(startupChatModel, never()).stream(any(Prompt.class));
+        }
+    }
+
+    @Nested
+    class RunErrorCodeTest {
+
+        @Test
+        void testNoEnabledProviderCarriesTheNoAiProviderCode() throws AGUIException {
+            assertThat(runErrorFor(ChatModelUnavailableException.noProviderEnabled(1)).getCode())
+                .isEqualTo("NO_AI_PROVIDER");
+        }
+
+        @Test
+        void testNoActivatedCatalogProviderCarriesTheNoAiProviderCode() throws AGUIException {
+            assertThat(runErrorFor(new NoChatProviderActivatedException("No chat provider is activated")).getCode())
+                .isEqualTo("NO_AI_PROVIDER");
+        }
+
+        @Test
+        void testUnavailableSelectedModelCarriesTheSelectedModelUnavailableCode() throws AGUIException {
+            assertThat(runErrorFor(new SelectedChatModelUnavailableException("openai", "gpt-4o", 1)).getCode())
+                .isEqualTo("SELECTED_MODEL_UNAVAILABLE");
+        }
+
+        @Test
+        void testIncompleteSelectionCarriesTheModelSelectionIncompleteCode() throws AGUIException {
+            RunErrorEvent runErrorEvent = runErrorFor(new IncompleteChatModelSelectionException("openai", null));
+
+            assertThat(runErrorEvent.getCode()).isEqualTo("MODEL_SELECTION_INCOMPLETE");
+            assertThat(runErrorEvent.getError()).contains("The model selection is incomplete");
+        }
+
+        @Test
+        void testOtherModelFailuresCarryNoCode() throws AGUIException {
+            assertThat(runErrorFor(new ChatModelUnavailableException("The run carries no environment.")).getCode())
+                .isNull();
+        }
+
+        @Test
+        void testUnknownFailuresCarryNoCode() throws AGUIException {
+            assertThat(runErrorFor(new IllegalStateException("catalog down")).getCode()).isNull();
+        }
+
+        private static RunErrorEvent runErrorFor(RuntimeException exception) throws AGUIException {
+            OverrideChatClientResolver overrideChatClientResolver = mock(OverrideChatClientResolver.class);
+
+            when(overrideChatClientResolver.resolve(any())).thenThrow(exception);
+
+            PlainAgent agent = new PlainAgent(newBuilder(mock(ChatModel.class)), overrideChatClientResolver);
+
+            List<RunErrorEvent> runErrorEvents = new ArrayList<>();
+
+            agent.run(newInput(stateWithTenantId(CALLER_TENANT_ID)), newRunErrorCollector(runErrorEvents));
+
+            assertThat(runErrorEvents).hasSize(1);
+
+            return runErrorEvents.getFirst();
         }
     }
 

@@ -120,8 +120,23 @@ class CatalogSubAgentChatModelResolverTest {
             .thenThrow(cause);
 
         assertThatThrownBy(() -> resolver.resolve(SubAgentModelRequest.fromToolContext(fullToolContext())))
-            .isInstanceOf(SelectedChatModelUnavailableException.class)
-            .hasCause(cause);
+            .isExactlyInstanceOf(ChatModelUnavailableException.class)
+            .hasCause(cause)
+            .hasMessageContaining("provider exploded");
+    }
+
+    @Test
+    void testUnrelatedFailureOfTheDefaultLookupIsNotReportedAsNoProvider() {
+        IllegalStateException cause = new IllegalStateException("connection refused");
+
+        when(catalogChatClientResolver.resolveDefaultChatModel("anthropic", 1)).thenThrow(cause);
+
+        Map<String, Object> toolContext = Map.of(AgentToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 1L);
+
+        assertThatThrownBy(() -> resolver.resolve(SubAgentModelRequest.fromToolContext(toolContext)))
+            .isExactlyInstanceOf(ChatModelUnavailableException.class)
+            .hasCause(cause)
+            .hasMessageContaining("connection refused");
     }
 
     private static Map<String, Object> fullToolContext() {
