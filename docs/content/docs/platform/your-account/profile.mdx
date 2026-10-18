@@ -5,7 +5,8 @@ description: Your own account - name and email, password, two-factor authenticat
 
 **Your Account → Profile** holds the settings of your own account. Every signed-in user can open it; nothing on it requires an administrator.
 
-The page is headed **Your profile**, with the description "Manage your name, email address, and password, and the security options that protect your account." It shows the **Profile** and **Change password** sections. The **Two-Factor Authentication** and **Linked Accounts** sections appear only when the `ff-1040` feature flag is on.
+The page is headed **Your profile** and stacks up to four sections. **Two-Factor Authentication** appears when the
+server has two-factor authentication enabled, and **Linked Accounts** when it has social login enabled.
 
 ![The Profile page - the Profile and Change password sections](profile/profile.png)
 
@@ -39,9 +40,16 @@ A password change does not sign out your other sessions. To end them, use [Activ
 
 The section is described as "Add an extra layer of security to your account using an authenticator app."
 
-1. Click **Set up 2FA**. The section shows a QR code and the secret as text, for authenticator apps that cannot scan.
-2. Scan the code, enter the current code from the app and click **Verify & Enable**. **Cancel** abandons the setup.
-3. When 2FA is on, the section reads "Two-factor authentication is enabled." and offers **Disable 2FA**, which opens the **Disable Two-Factor Authentication** dialog and asks for your current password and a code.
+1. Click **Set up 2FA**. The section shows a QR code and the secret in text form, for authenticator
+   apps that cannot scan.
+2. Scan it, then type the rotating code into the verification field and click **Verify & Enable**.
+   **Cancel** abandons the setup.
+3. Once enabled, the section reads "Two-factor authentication is enabled." and offers **Disable 2FA**,
+   which asks for your password and a current code before turning it off. An account that signs in only
+   through Google, GitHub, or SSO has no password of its own, so for it the current code is enough.
+
+While 2FA is enabled, **Set up 2FA** is not offered again: disable it first to move to a new
+authenticator. The code is asked for after every sign-in, including Google, GitHub, and SSO sign-ins.
 
 ## Linked Accounts
 
