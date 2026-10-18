@@ -40,15 +40,13 @@ Each entry is a row in `persistent_audit_event` plus its data map in `persistent
 
 Anything you want to filter on later has to be in the **Data** map - that is what **Search data** searches.
 
-### Correlation IDs for bulk operations
+### Bulk operations
 
-A single admin action that fans out into many writes - reassigning every connection in a workspace, for example - would otherwise read as dozens of unrelated entries. When a bulk operation establishes a correlation scope, every audit event raised beneath it picks up the same id and records it under the `correlationId` data key, so the timeline can be reassembled without relying on timestamps being close together.
+A single admin action that changes many resources is recorded as one entry that lists them. Reassigning every connection a former member owned, for example, records one `CONNECTION_REASSIGNED` entry whose data holds the affected `connectionIds` and their `connectionCount`.
 
-The correlation id is carried in a plain thread-local, deliberately not an inheritable one: work handed to another thread does not inherit it, because leaking a correlation id across a recycled pool thread is worse than losing the grouping.
+### Failed audit writes
 
-### Strict-audit events
-
-Some events are marked *strict*: if the audit entry cannot be written, the operation itself fails rather than proceeding unrecorded. The events that can remove someone's access are the ones marked this way - `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, and `AI_HUB_CHAT_DELETED`. A failed non-strict write is counted on the `bytechef_connection_audit_failed` / `bytechef_ai_hub_audit_failed` counters instead of failing the request.
+Writing an audit entry never fails or rolls back the operation it records. If an entry cannot be built or written, the operation still completes, the failure is logged, and the `bytechef_audit_failure` counter is incremented with a `reason` tag.
 
 ## Event types
 
@@ -60,10 +58,10 @@ The dropdown on the page is populated from the events your instance has actually
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Embedded membership** | `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Custom roles** | `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, `CUSTOM_ROLE_DELETED` |
-| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED` |
+| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_VISIBILITY_CHANGED`, `PROJECT_ACCESS_GRANTED`, `PROJECT_ACCESS_REVOKED` |
 | **Workflows** | `WORKFLOW_CREATED`, `WORKFLOW_UPDATED`, `WORKFLOW_DELETED` |
 | **Deployments** | `DEPLOYMENT_CREATED`, `DEPLOYMENT_UPDATED`, `DEPLOYMENT_ENABLED`, `DEPLOYMENT_DISABLED`, `DEPLOYMENT_DELETED` |
-| **Connections** | `CONNECTION_CREATED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` |
+| **Connections** | `CONNECTION_CREATED`, `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_CREDENTIALS_UPDATED`, `CONNECTION_REASSIGNED`, `WORKFLOW_PAUSED` |
 | **API keys** | `API_KEY_CREATED`, `API_KEY_DELETED`, `WORKSPACE_API_KEY_CREATED`, `WORKSPACE_API_KEY_DELETED` |
 | **Custom components** | `CUSTOM_COMPONENT_CREATED`, `CUSTOM_COMPONENT_UPDATED`, `CUSTOM_COMPONENT_DELETED`, `CUSTOM_COMPONENT_ENABLED`, `CUSTOM_COMPONENT_DISABLED`, `CUSTOM_COMPONENT_PUBLISHED` |
 | **Data tables** | `DATA_TABLE_CREATED`, `DATA_TABLE_COLUMN_ADDED`, `DATA_TABLE_DELETED` |
@@ -75,6 +73,26 @@ The dropdown on the page is populated from the events your instance has actually
 | **Integrations (embedded)** | `INTEGRATION_CREATED`, `INTEGRATION_UPDATED`, `INTEGRATION_DELETED` |
 | **Jobs** | `JOB_CREATED`, `JOB_STARTED`, `JOB_COMPLETED`, `JOB_FAILED`, `JOB_STOPPED` - recorded under the `SYSTEM` principal, with the job id in the data |
 | **Access checks** | `PERMISSION_CHECK` - a guarded call that was denied or failed, or a successful call that changes something; successful reads are not recorded |
+
+### Connection and project sharing events
+
+These events are recorded under the login of the user who acted. Every entry also carries `method` (the operation that ran) and `result` (`SUCCESS`, `DENIED` or `ERROR`, or `ROLLED_BACK` when an enclosing transaction rolled back; an error adds `errorClass`), so an attempt the platform refused is recorded as well as one it allowed.
+
+| Event | Recorded when | Data |
+|---|---|---|
+| `CONNECTION_CREATED` | A workspace or organization connection is created. | `connectionId`, `workspaceId` (workspace connections only), `visibility` as stored |
+| `CONNECTION_DELETED` | A workspace or organization connection is deleted. | `connectionId` |
+| `CONNECTION_VISIBILITY_CHANGED` | A connection's visibility is changed. | `connectionId`, `workspaceId`, `fromVisibility`, `toVisibility` |
+| `CONNECTION_ACCESS_GRANTED` | A member is named on a private connection. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_ACCESS_REVOKED` | A member's access to a private connection is removed. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_CREDENTIALS_UPDATED` | A connection's credentials are replaced. No credential values are recorded. | `connectionId` |
+| `CONNECTION_REASSIGNED` | An organization admin gives a connection a new owner. | `connectionId`, `workspaceId`, `newOwnerUserId`; for a bulk reassignment, `previousOwnerUserId`, `connectionIds` and `connectionCount` instead of `connectionId` |
+| `WORKFLOW_PAUSED` | A deployed workflow run is refused because a connection it uses is not active. The `result` is `ERROR`. | `jobPrincipalId` (the project deployment), `workflowId`, `connectionIds`, `connectionStatuses` |
+| `PROJECT_VISIBILITY_CHANGED` | A project's visibility is changed. | `workspaceId`, `projectId`, `fromVisibility`, `toVisibility` |
+| `PROJECT_ACCESS_GRANTED` | A member is named on a private project. | `workspaceId`, `projectId`, `targetUserId` |
+| `PROJECT_ACCESS_REVOKED` | A member's access to a private project is removed. | `workspaceId`, `projectId`, `targetUserId` |
+
+Users are recorded by id, never by email address. `WORKFLOW_PAUSED` for a manual run is recorded under the user who started it; for a run fired by a webhook trigger it is recorded under `anonymousUser`, the principal of the webhook request, and under `SYSTEM` where no security context exists.
 
 ## What is not logged
 
