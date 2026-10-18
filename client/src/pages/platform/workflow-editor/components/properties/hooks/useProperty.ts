@@ -71,6 +71,28 @@ import {useDebouncedCallback} from 'use-debounce';
 import {getTask} from '../../../utils/getTask';
 import {computeFromAiToggle} from './fromAiToggle';
 
+const getStringValueValidation = (
+    stringValue: string,
+    minLength: number | undefined,
+    maxLength: number | undefined,
+    regex: string | undefined
+) => {
+    const valueTooShort = !!minLength && stringValue.length < minLength;
+    const valueTooLong = !!maxLength && stringValue.length > maxLength;
+
+    let regexMismatch = false;
+
+    if (regex) {
+        try {
+            regexMismatch = new RegExp(regex).test(stringValue);
+        } catch {
+            console.warn('Invalid regex provided: ', regex);
+        }
+    }
+
+    return {hasValidationError: valueTooShort || valueTooLong || regexMismatch, regexMismatch};
+};
+
 const isSavedFormulaValue = (value: unknown): boolean =>
     typeof value === 'string' && value.startsWith('=') && !value.startsWith('=fromAi(');
 
@@ -115,7 +137,7 @@ type UsePropertyReturnType = {
     handleNativeKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
     handleSelectChange: (value: string, name: string) => void;
     handleSelectKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
-    handleSinglePillAbandoned: () => void;
+    handleSinglePillAbandoned: () => boolean;
     expressionEnabled: boolean | undefined;
     hasError: boolean;
     hidden: boolean | undefined;
@@ -968,6 +990,32 @@ export const useProperty = ({
         saveInputValue();
     };
 
+    const handleSinglePillMentionValue = useCallback((value: string | number, keepsEditor: boolean) => {
+        if (value === '') {
+            dispatchValueAction({type: 'valueCleared'});
+
+            if (!keepsEditor) {
+                setPillEntry(false);
+
+                requestAnimationFrame(() => inputRef.current?.focus());
+            }
+
+            return true;
+        }
+
+        if (typeof value === 'string' && isSingleDataPill(value)) {
+            if (!keepsEditor) {
+                setPillEntry(false);
+            }
+
+            dispatchValueAction({type: 'pillValueSet', value});
+
+            return true;
+        }
+
+        return false;
+    }, []);
+
     const handleMentionInputValueChange = useCallback(
         (value: string | number) => {
             setMentionInputValue(typeof value === 'number' ? String(value) : value);
@@ -989,28 +1037,8 @@ export const useProperty = ({
                 return;
             }
 
-            if (inputMode.singlePill) {
-                if (value === '') {
-                    dispatchValueAction({type: 'valueCleared'});
-
-                    if (!keepsEditor) {
-                        setPillEntry(false);
-
-                        requestAnimationFrame(() => inputRef.current?.focus());
-                    }
-
-                    return;
-                }
-
-                if (typeof value === 'string' && isSingleDataPill(value)) {
-                    if (!keepsEditor) {
-                        setPillEntry(false);
-                    }
-
-                    dispatchValueAction({type: 'pillValueSet', value});
-
-                    return;
-                }
+            if (inputMode.singlePill && handleSinglePillMentionValue(value, keepsEditor)) {
+                return;
             }
 
             const stringValue = typeof value === 'string' ? value : '';
@@ -1022,27 +1050,18 @@ export const useProperty = ({
                 return;
             }
 
-            const valueTooShort = minLength && stringValue.length < minLength;
-            const valueTooLong = maxLength && stringValue.length > maxLength;
-
-            let regexMismatch = false;
-
-            if (regex) {
-                try {
-                    regexMismatch = new RegExp(regex).test(stringValue);
-                } catch {
-                    console.warn('Invalid regex provided: ', regex);
-                }
-            }
-
-            const hasValidationError = !!valueTooShort || !!valueTooLong || regexMismatch;
-
-            const errorMessage = regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE;
+            const {hasValidationError, regexMismatch} = getStringValueValidation(
+                stringValue,
+                minLength,
+                maxLength,
+                regex
+            );
 
             setHasError(hasValidationError);
-            setErrorMessage(errorMessage);
+            setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
         },
         [
+            handleSinglePillMentionValue,
             hasDynamicSwitch,
             INCORRECT_VALUE,
             inputMode.singlePill,
@@ -1220,21 +1239,24 @@ export const useProperty = ({
         if (hasDynamicSwitch && !isFormulaMode) {
             // The editor stays up until the Dynamic switch is turned off; focus moves away when a pill is picked from
             // the panel, too. A select keeps its option until a pill replaces it.
-            if (pillEntryKeepsOptionRef.current) {
-                return;
+            const hasSavedValue = typeof propertyParameterValue === 'string' && propertyParameterValue !== '';
+            const keepsEditorText = !inputMode.singlePill && (!hasSavedValue || pillEntryKeepsOptionRef.current);
+
+            if (pillEntryKeepsOptionRef.current || keepsEditorText) {
+                return keepsEditorText;
             }
 
             dispatchValueAction({type: 'valueCleared'});
 
             // Text left without a pill is never saved (validateMentionInputValue), so the stored value may still
             // hold the last pill.
-            if (typeof propertyParameterValue === 'string' && propertyParameterValue !== '') {
+            if (hasSavedValue) {
                 cancelPendingSaves();
 
                 saveResolvedValue(null);
             }
 
-            return;
+            return false;
         }
 
         setPillEntry(false);
@@ -1242,7 +1264,16 @@ export const useProperty = ({
         dispatchValueAction({type: 'valueCleared'});
 
         requestAnimationFrame(() => inputRef.current?.focus());
-    }, [cancelPendingSaves, hasDynamicSwitch, isFormulaMode, propertyParameterValue, saveResolvedValue]);
+
+        return false;
+    }, [
+        cancelPendingSaves,
+        hasDynamicSwitch,
+        inputMode.singlePill,
+        isFormulaMode,
+        propertyParameterValue,
+        saveResolvedValue,
+    ]);
 
     const handleDynamicSwitch = useCallback(() => {
         if (!mentionInput) {
