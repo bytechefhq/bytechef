@@ -15,6 +15,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.ee.ai.hub.util.EnumOrdinals;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
      * never needs more than the most recent slice.
      */
     private static final int MESSAGE_LIMIT = 500;
+
+    private static final EventFilter TOOL_EVENTS_FILTER = EventFilter.builder()
+        .messageTypes(Set.of(MessageType.TOOL))
+        .build();
 
     private final AiHubChatRepository chatRepository;
     private final AiHubChatAccessPolicy accessPolicy;
@@ -169,8 +175,11 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             return List.of();
         }
 
-        List<SessionEvent> allEvents = sessionMemory.sessionService()
-            .getEvents(chat.getThreadId(), EventFilter.active());
+        List<SessionEvent> allEvents = withDisplayOnlyToolResults(
+            sessionMemory.sessionService()
+                .getEvents(chat.getThreadId(), EventFilter.active()),
+            sessionMemory.sessionService()
+                .getEvents(chat.getThreadId(), TOOL_EVENTS_FILTER));
 
         List<SessionEvent> visibleEvents = new ArrayList<>();
         List<List<Map<String, String>>> toolEventsPerRow = new ArrayList<>();
@@ -215,6 +224,67 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         }
 
         return messages;
+    }
+
+    /**
+     * Places each display-only turn-ending tool result right after the active tool call it answers. A result whose call
+     * is gone (truncated) or already answered by an active response is left out.
+     */
+    private static List<SessionEvent> withDisplayOnlyToolResults(
+        List<SessionEvent> activeEvents, List<SessionEvent> toolEvents) {
+
+        List<SessionEvent> displayOnlyEvents = new ArrayList<>(toolEvents.stream()
+            .filter(AiHubTurnEndingToolResultAdvisor::isDisplayOnly)
+            .filter(event -> event.getMessage() instanceof ToolResponseMessage)
+            .toList());
+
+        if (displayOnlyEvents.isEmpty()) {
+            return activeEvents;
+        }
+
+        Set<String> answeredToolCallIds = new HashSet<>();
+
+        for (SessionEvent event : activeEvents) {
+            if (event.getMessage() instanceof ToolResponseMessage toolResponseMessage) {
+                toolResponseMessage.getResponses()
+                    .forEach(toolResponse -> answeredToolCallIds.add(toolResponse.id()));
+            }
+        }
+
+        List<SessionEvent> mergedEvents = new ArrayList<>(activeEvents.size() + displayOnlyEvents.size());
+
+        for (SessionEvent event : activeEvents) {
+            mergedEvents.add(event);
+
+            if (!(event.getMessage() instanceof AssistantMessage assistantMessage)
+                || !assistantMessage.hasToolCalls()) {
+                continue;
+            }
+
+            Set<String> toolCallIds = new HashSet<>();
+
+            assistantMessage.getToolCalls()
+                .forEach(toolCall -> toolCallIds.add(toolCall.id()));
+
+            for (Iterator<SessionEvent> iterator = displayOnlyEvents.iterator(); iterator.hasNext();) {
+                SessionEvent displayOnlyEvent = iterator.next();
+
+                List<ToolResponseMessage.ToolResponse> toolResponses =
+                    ((ToolResponseMessage) displayOnlyEvent.getMessage()).getResponses();
+
+                boolean answersThisCall = !toolResponses.isEmpty() && toolResponses.stream()
+                    .allMatch(toolResponse -> toolCallIds.contains(toolResponse.id())
+                        && !answeredToolCallIds.contains(toolResponse.id()));
+
+                if (answersThisCall) {
+                    mergedEvents.add(displayOnlyEvent);
+
+                    iterator.remove();
+                }
+            }
+        }
+
+        return mergedEvents;
     }
 
     private static void appendToolEvents(List<Map<String, String>> target, SessionEvent event) {

@@ -226,6 +226,7 @@ public class AiHubConfiguration {
             .approvalGate(approvalGate);
 
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
+        builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor());
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
 

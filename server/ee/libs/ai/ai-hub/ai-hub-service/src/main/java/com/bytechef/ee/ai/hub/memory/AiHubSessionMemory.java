@@ -73,6 +73,14 @@ public class AiHubSessionMemory implements AutoCloseable {
             .build();
     }
 
+    /**
+     * Builds the advisor that keeps the result of a tool call that ended the turn (a picker, a question or a call held
+     * for approval) in the chat history for display, outside the tool-calling loop.
+     */
+    public AiHubTurnEndingToolResultAdvisor createTurnEndingToolResultAdvisor() {
+        return new AiHubTurnEndingToolResultAdvisor(sessionService);
+    }
+
     @SuppressFBWarnings("EI_EXPOSE_REP")
     public SessionRepository sessionRepository() {
         return sessionRepository;
