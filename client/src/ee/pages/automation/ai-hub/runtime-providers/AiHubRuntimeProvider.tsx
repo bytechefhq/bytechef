@@ -24,11 +24,15 @@ import {
     isRunningToolCall,
     useAiChatToolCallStore,
 } from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
-import {readLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
-import {useResolveAiHubToolApprovalMutation} from '@/shared/middleware/graphql';
+import {resolveRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
+import {
+    AiProviderCatalogQuery,
+    useAiProviderCatalogQuery,
+    useResolveAiHubToolApprovalMutation,
+} from '@/shared/middleware/graphql';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
@@ -462,7 +466,15 @@ export interface AiHubStateToSendI {
     workspaceId: string;
 }
 
-export const buildStateToSend = ({mode, workspaceId}: {mode: MODE; workspaceId: number | undefined}) => {
+export const buildStateToSend = ({
+    mode,
+    providerCatalog,
+    workspaceId,
+}: {
+    mode: MODE;
+    providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined;
+    workspaceId: number | undefined;
+}) => {
     const tabsState = aiHubTabsStore.getState();
     const chatsState = aiHubChatsStore.getState();
 
@@ -473,7 +485,7 @@ export const buildStateToSend = ({mode, workspaceId}: {mode: MODE; workspaceId: 
         chatLlmSelection?.provider != null && chatLlmSelection.model != null
             ? chatLlmSelection
             : isWorkspaceIdKnown(workspaceId)
-              ? readLastUsedModel(workspaceId)
+              ? resolveRememberedModel(workspaceId, providerCatalog)
               : null;
 
     const state: AiHubStateToSendI = {
@@ -641,9 +653,15 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     const isRunning = useAiHubRunStateStore((state) => isChatRunning(state, chatId));
     const toolCalls = useAiChatToolCallStore((state) => state.toolCalls);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const catalogEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
     const resolveToolApprovalMutation = useResolveAiHubToolApprovalMutation();
+
+    const {data: providerCatalogData} = useAiProviderCatalogQuery(
+        {environment: String(catalogEnvironmentId)},
+        {enabled: catalogEnvironmentId >= 0}
+    );
     const truncateChatMessagesMutation = useTruncateAiHubChatMessagesMutation();
 
     const handleWorkflowMutated = useCallback(
@@ -800,7 +818,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         const turnController = startTurnController();
         const {handleTurnInFlight, wasHandled} = createTurnInFlightHandler(optimisticTurnMarker, input);
 
-        agent!.setState(buildStateToSend({mode, workspaceId: currentWorkspaceId}));
+        agent!.setState(
+            buildStateToSend({
+                mode,
+                providerCatalog: providerCatalogData?.aiProviderCatalog,
+                workspaceId: currentWorkspaceId,
+            })
+        );
 
         addMessage(stampOptimisticTurnMarker({content: '', role: 'assistant'}, optimisticTurnMarker));
 
