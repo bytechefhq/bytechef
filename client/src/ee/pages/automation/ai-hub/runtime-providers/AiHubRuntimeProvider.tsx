@@ -3,6 +3,7 @@ import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats'
 import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {attachToInFlightRun} from '@/ee/pages/automation/ai-hub/runtime-providers/inFlightRunClient';
 import {
     aiHubRunStateStore,
@@ -978,6 +979,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         agent.addMessage({content: input, id: getRandomId(), role: 'user'});
+
+        aiHubComposerStore.getState().clear();
 
         const {turnInFlight} = await runTurn({
             input,

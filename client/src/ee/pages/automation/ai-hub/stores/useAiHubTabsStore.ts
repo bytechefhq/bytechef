@@ -58,6 +58,16 @@ interface AiHubTabsStateI {
  */
 export const getTabGenericId = (tab: AiHubTabType): string => tab.workflowId;
 
+export const attachTab = (open: () => string): {ownsTab: boolean; tabId: string} => {
+    const openTabCountBefore = aiHubTabsStore.getState().openTabs.length;
+
+    const tabId = open();
+
+    const ownsTab = aiHubTabsStore.getState().openTabs.length > openTabCountBefore;
+
+    return {ownsTab, tabId};
+};
+
 export const aiHubTabsStore = create<AiHubTabsStateI>()(
     devtools(
         persist(
