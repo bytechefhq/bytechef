@@ -1,7 +1,14 @@
 import {type Page, type Request, expect} from '@playwright/test';
 
 import {workspaceRolesTest as test} from '../../fixtures/workspaceRoles';
-import {RBAC_BASE_URL, type RbacWorkspaceI, openAsRoleUser, requestWorkflowUpdateAs} from '../../utils/rbacUtils';
+import {
+    RBAC_BASE_URL,
+    type RbacWorkspaceI,
+    openAsRoleUser,
+    requestNodeParameterUpdateAs,
+    requestWorkflowTestAs,
+    requestWorkflowUpdateAs,
+} from '../../utils/rbacUtils';
 
 const SAMPLE_WORKFLOW_NODE_NAME = 'var_1';
 
@@ -86,6 +93,14 @@ test.describe('Workflow editor as a VIEWER', () => {
             await test.step('is refused when saving the workflow directly', async () => {
                 expect(await requestWorkflowUpdateAs(page, rbacWorkspace.workflowId)).toBe(403);
             });
+
+            await test.step('is refused when changing a node parameter directly', async () => {
+                expect(await requestNodeParameterUpdateAs(page, rbacWorkspace.workflowId)).toBe(403);
+            });
+
+            await test.step('is refused when starting a test run directly', async () => {
+                expect(await requestWorkflowTestAs(page, rbacWorkspace.workflowId)).toBe(403);
+            });
         } finally {
             await context.close();
         }
@@ -103,6 +118,7 @@ test.describe('Workflow editor as an EDITOR', () => {
             await expect(page.getByRole('button', {name: 'Components & Flow Controls'})).toBeVisible();
 
             expect(await requestWorkflowUpdateAs(page, rbacWorkspace.workflowId)).toBe(200);
+            expect(await requestNodeParameterUpdateAs(page, rbacWorkspace.workflowId)).toBe(200);
         } finally {
             await context.close();
         }

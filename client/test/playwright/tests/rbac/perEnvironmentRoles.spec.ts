@@ -11,6 +11,8 @@ import {
     openAsRoleUser,
     openAsTenantAdmin,
     openPage,
+    postGraphQl,
+    publishRbacWorkspaceProject,
     setEnvironmentRole,
 } from '../../utils/rbacUtils';
 
@@ -41,6 +43,8 @@ test.describe('Member with per-environment roles', () => {
         rbacWorkspace,
     }) => {
         roleUser = await createRoleUser(adminApi, RBAC_BASE_URL, rbacWorkspace, 'EDITOR');
+
+        await publishRbacWorkspaceProject(adminApi, rbacWorkspace);
 
         await setEnvironmentRole(adminApi, rbacWorkspace, roleUser, 'DEVELOPMENT', 'EDITOR');
 
@@ -113,6 +117,8 @@ test.describe('Member with per-environment roles', () => {
     }) => {
         roleUser = await createRoleUser(adminApi, RBAC_BASE_URL, rbacWorkspace, 'VIEWER');
 
+        await publishRbacWorkspaceProject(adminApi, rbacWorkspace);
+
         await setEnvironmentRole(adminApi, rbacWorkspace, roleUser, 'DEVELOPMENT', 'VIEWER');
         await setEnvironmentRole(adminApi, rbacWorkspace, roleUser, 'PRODUCTION', 'ADMIN');
 
@@ -153,14 +159,17 @@ test.describe('Member with per-environment roles', () => {
         });
     });
 
-    test('removing the last environment role keeps that role in every environment', async ({
+    test('the last environment role cannot be removed while another one can', async ({
         adminApi,
         browser,
         rbacWorkspace,
     }) => {
         roleUser = await createRoleUser(adminApi, RBAC_BASE_URL, rbacWorkspace, 'VIEWER');
 
+        await publishRbacWorkspaceProject(adminApi, rbacWorkspace);
+
         await setEnvironmentRole(adminApi, rbacWorkspace, roleUser, 'DEVELOPMENT', 'EDITOR');
+        await setEnvironmentRole(adminApi, rbacWorkspace, roleUser, 'STAGING', 'VIEWER');
 
         const adminSession = await openAsTenantAdmin(browser, RBAC_BASE_URL, rbacWorkspace);
 
@@ -173,17 +182,35 @@ test.describe('Member with per-environment roles', () => {
         const memberRow = page.getByRole('row').filter({hasText: roleUser.email});
 
         await expect(memberRow.getByText('Development')).toBeVisible();
+        await expect(memberRow.getByText('Staging')).toBeVisible();
 
-        await memberRow.getByRole('button', {name: 'Remove Development role'}).click();
+        await memberRow.getByRole('button', {name: 'Remove Staging role'}).click();
 
         const alertDialog = page.getByRole('alertdialog');
 
-        await expect(alertDialog).toContainText('They will keep the Editor role in every environment.');
+        await expect(alertDialog).toContainText('Remove the Staging role?');
+        await expect(alertDialog).toContainText(
+            'They will lose access to Staging. Their roles in the other environments are unchanged.'
+        );
 
         await alertDialog.getByRole('button', {name: 'Remove'}).click();
 
-        await expect(memberRow.getByText('Development')).toHaveCount(0);
+        await expect(memberRow.getByText('Staging')).toHaveCount(0);
+        await expect(memberRow.getByText('Development')).toBeVisible();
+        await expect(memberRow.getByRole('combobox', {name: 'Development role'})).toContainText('Editor');
         await expect(memberRow.getByRole('button', {name: 'Remove Development role'})).toHaveCount(0);
-        await expect(memberRow.getByRole('combobox').first()).toContainText('Editor');
+
+        const response = await postGraphQl(
+            adminApi,
+            `
+                mutation RemoveWorkspaceUserEnvironmentRole($workspaceId: ID!, $userId: ID!, $environment: EnvironmentEnum!) {
+                    removeWorkspaceUserEnvironmentRole(workspaceId: $workspaceId, userId: $userId, environment: $environment)
+                }
+            `,
+            {environment: 'DEVELOPMENT', userId: roleUser.userId, workspaceId: String(rbacWorkspace.id)}
+        );
+
+        expect(response.errors?.[0]?.extensions).toMatchObject({classification: 'BAD_REQUEST'});
+        expect(response.errors?.[0]?.message).toContain('is the only role user');
     });
 });
