@@ -53,7 +53,7 @@ describe('useWorkflowLayout', () => {
         });
 
         expect(useCopilotStore.getState().context).toEqual({
-            mode: MODE.ASK,
+            mode: MODE.BUILD,
             parameters: {},
             source: Source.WORKFLOW_EDITOR,
         });
@@ -70,10 +70,30 @@ describe('useWorkflowLayout', () => {
         });
 
         expect(useCopilotStore.getState().context).toEqual({
-            mode: MODE.ASK,
+            mode: MODE.BUILD,
             parameters: {integrationId: '7'},
             source: Source.WORKFLOW_EDITOR_EMBEDDED,
         });
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
+    it('opens the editor Copilot in Ask after a Skills conversation was left in Build', () => {
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '2'};
+
+        useCopilotStore.setState({
+            context: {mode: MODE.BUILD, parameters: {}, source: Source.SKILLS},
+        });
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.WORKFLOW_EDITOR,
+        });
     });
 });
