@@ -2377,6 +2377,8 @@ export type Mutation = {
   generateSpecification: GenerateSpecificationResponse;
   /** Grant a named workspace member access to a connection its owner has withheld. Idempotent. (owner or admin, EE only) */
   grantConnectionAccess: Scalars['Boolean']['output'];
+  /** Grant a named workspace member access to a project its owner has withheld. Idempotent. (owner or admin, EE only) */
+  grantProjectAccess: Scalars['Boolean']['output'];
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -2430,6 +2432,8 @@ export type Mutation = {
   restoreAutomationProjectVersion: Scalars['Boolean']['output'];
   /** Revoke a grant. Silent when no grant exists. (owner or admin, EE only) */
   revokeConnectionAccess: Scalars['Boolean']['output'];
+  /** Revoke a grant. Silent when no grant exists. (owner or admin, EE only) */
+  revokeProjectAccess: Scalars['Boolean']['output'];
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -2439,6 +2443,8 @@ export type Mutation = {
   setConnectionVisibility: Scalars['Boolean']['output'];
   /** Give an embedded member a role in one environment. */
   setEmbeddedUserEnvironmentRole: EmbeddedUser;
+  /** Set a project's reach. PRIVATE withholds it (and its workflows, deployments and executions) from the workspace; WORKSPACE shares it. ORGANIZATION is not supported for projects. (owner or admin, EE only) */
+  setProjectVisibility: Scalars['Boolean']['output'];
   /**
    * Give a member a role in one environment. The first such call switches the member from a
    * single workspace-wide role to per-environment roles, deleting their workspace-wide row.
@@ -3199,6 +3205,13 @@ export type MutationGrantConnectionAccessArgs = {
 };
 
 
+export type MutationGrantProjectAccessArgs = {
+  projectId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationImportDataTableCsvArgs = {
   input: ImportCsvInput;
 };
@@ -3353,6 +3366,13 @@ export type MutationRevokeConnectionAccessArgs = {
 };
 
 
+export type MutationRevokeProjectAccessArgs = {
+  projectId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationRevokeRegisteredClientGrantArgs = {
   principalName: Scalars['String']['input'];
   registeredClientId: Scalars['ID']['input'];
@@ -3405,6 +3425,13 @@ export type MutationSetEmbeddedUserEnvironmentRoleArgs = {
   environment: EnvironmentEnum;
   role: WorkspaceRole;
   userId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetProjectVisibilityArgs = {
+  projectId: Scalars['ID']['input'];
+  visibility: ResourceVisibility;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4012,6 +4039,7 @@ export type Project = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   tags?: Maybe<Array<Maybe<Tag>>>;
+  visibility: ResourceVisibility;
 };
 
 export type ProjectDeployment = {
@@ -4450,6 +4478,8 @@ export type Query = {
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
+  /** The users a private project has been granted to. Owner or admin only; an ordinary viewer of a shared project must not learn who else it was handed to. (EE only) */
+  projectGrants: Array<Scalars['Long']['output']>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projectVersionWorkflowChange: VersionWorkflowChange;
   projectVersionWorkflowChanges: VersionWorkflowChanges;
@@ -5369,6 +5399,12 @@ export type QueryProjectArgs = {
 
 export type QueryProjectDeploymentWorkflowArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryProjectGrantsArgs = {
+  projectId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 

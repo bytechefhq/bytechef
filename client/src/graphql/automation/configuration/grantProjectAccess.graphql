@@ -1,0 +1,3 @@
+mutation GrantProjectAccess($workspaceId: ID!, $projectId: ID!, $userId: ID!) {
+    grantProjectAccess(workspaceId: $workspaceId, projectId: $projectId, userId: $userId)
+}
