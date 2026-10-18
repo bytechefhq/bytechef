@@ -12,29 +12,25 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {
+    NavigationType,
+    automationNavigation,
+    filterAutomationNavigation,
+} from '@/shared/navigation/automationNavigation';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
-import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
-    FolderIcon,
-    Layers3Icon,
-    LayoutTemplateIcon,
     Link2Icon,
-    LucideIcon,
-    MessagesSquareIcon,
-    NetworkIcon,
-    ServerCogIcon,
     ServerIcon,
     Settings2Icon,
     SquareIcon,
-    Table2Icon,
     UnplugIcon,
     UsersIcon,
-    VectorSquareIcon,
     Workflow,
     ZapIcon,
 } from 'lucide-react';
@@ -44,67 +40,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
 const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
-
-type NavigationGroupType = {
-    icon: LucideIcon;
-    name: string;
-};
-
-type NavigationType = {
-    group?: NavigationGroupType;
-    name: string;
-    href: string;
-    icon: LucideIcon;
-};
-
-const serversNavigationGroup: NavigationGroupType = {icon: ServerCogIcon, name: 'Servers'};
-
-const automationNavigation: NavigationType[] = [
-    {
-        href: '/automation/projects',
-        icon: FolderIcon,
-        name: 'Projects',
-    },
-    {
-        href: '/automation/deployments',
-        icon: Layers3Icon,
-        name: 'Project Deployments',
-    },
-    {
-        href: '/automation/api-platform',
-        icon: LayoutTemplateIcon,
-        name: 'API Collections',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/mcp-servers',
-        icon: ServerIcon,
-        name: 'MCP Servers',
-    },
-    {
-        group: serversNavigationGroup,
-        href: '/automation/a2a-servers',
-        icon: NetworkIcon,
-        name: 'A2A Servers',
-    },
-    {
-        href: '/automation/executions',
-        icon: ActivityIcon,
-        name: 'Workflow Executions',
-    },
-    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
-    {
-        href: '/automation/datatables',
-        icon: Table2Icon,
-        name: 'Data Tables',
-    },
-    {
-        href: '/automation/knowledge-bases',
-        icon: VectorSquareIcon,
-        name: 'Knowledge Base',
-    },
-    {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
-];
 
 const embeddedNavigation: NavigationType[] = [
     {
@@ -186,28 +121,12 @@ function App() {
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
-    const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
-        if (
-            currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
-            edition === EditionType.EE &&
-            navItem.href === '/automation/projects'
-        ) {
-            return false;
-        }
-
-        if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/automation/deployments') {
-            return false;
-        }
-
-        if (navItem.href === '/automation/api-platform') {
-            return ff_1023;
-        }
-
-        if (navItem.href === '/automation/knowledge-bases') {
-            return ai.knowledgeBase.enabled;
-        }
-
-        return true;
+    const filteredAutomationNavigation = filterAutomationNavigation({
+        aiHubEnabled: ai.hub.enabled,
+        apiPlatformEnabled: ff_1023,
+        currentEnvironmentId,
+        edition,
+        knowledgeBaseEnabled: ai.knowledgeBase.enabled,
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
