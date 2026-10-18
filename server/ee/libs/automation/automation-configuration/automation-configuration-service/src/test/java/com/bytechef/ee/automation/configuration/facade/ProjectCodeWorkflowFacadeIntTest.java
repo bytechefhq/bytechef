@@ -39,6 +39,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -137,7 +138,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     JobFacade.class, JobService.class, PreBuiltTemplateService.class, PrincipalJobFacade.class,
     PrincipalJobService.class, ProjectCodeWorkflowService.class, ProjectDeploymentService.class,
     ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectOwnershipService.class, ProjectService.class,
-    ProjectWorkflowService.class,
+    ProjectVisibilityFilter.class, ProjectWorkflowService.class,
     SharedTemplateFileStorage.class, SharedTemplateService.class, TagService.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, WorkflowCacheManager.class, WorkflowFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowService.class, WorkflowTestConfigurationService.class,

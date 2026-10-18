@@ -163,8 +163,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
         @AuditData(key = "connectionId", value = "#connectionId")
     })
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void delete(long connectionId) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
 
@@ -227,8 +227,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     private boolean canEditConnection(long connectionId) {
-        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT) ||
-            permissionService.isResourceOwner(CONNECTION_TYPE, connectionId);
+        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT) &&
+            (permissionService.isResourceOwner(CONNECTION_TYPE, connectionId) || permissionService.isTenantAdmin());
     }
 
     protected List<Long> getSharedConnectionIds() {
@@ -303,8 +303,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "name", value = "#name")
     })
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
 
@@ -316,8 +316,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "name", value = "#name")
     })
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void update(
         long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
 
@@ -327,8 +327,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateConnectionTags(long connectionId, List<Tag> tags) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
 
@@ -339,7 +339,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "connectionId", value = "#connectionId")
     })
-    @PreAuthorize("isTenantAdmin() or isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         requireAutomationConnection(connectionId);
 

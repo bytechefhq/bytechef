@@ -24,11 +24,15 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * {@code 'Project'} is the most-used token in the tree, and it is only a check because this resolver is registered for
@@ -42,12 +46,14 @@ import org.springframework.beans.factory.support.StaticListableBeanFactory;
 class ProjectOwnershipResolverTest {
 
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
+    private final UserService userService = mock(UserService.class);
     private ProjectOwnershipResolver resolver;
 
     @BeforeEach
     void setUp() {
         resolver = new ProjectOwnershipResolver(
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository);
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+            userService);
     }
 
     @Test
@@ -75,10 +81,27 @@ class ProjectOwnershipResolverTest {
         ProjectOwnershipResolver embeddedAwareResolver = new ProjectOwnershipResolver(
             new StaticListableBeanFactory(Map.of("embeddedResourceResolver", embeddedResourceResolver))
                 .getBeanProvider(EmbeddedResourceResolver.class),
-            projectRepository);
+            projectRepository, userService);
 
         assertThat(embeddedAwareResolver.resolveOwner(3L)).isEqualTo(ResourceOwner.ofEmbeddedProject());
         verifyNoInteractions(projectRepository);
+    }
+
+    @Test
+    void testResolveOwnerReturnsTheCreatorAsOwner() {
+        Project project = new Project();
+
+        ReflectionTestUtils.setField(project, "createdBy", "owner@localhost.com");
+        project.setWorkspaceId(9L);
+
+        User user = new User();
+
+        user.setId(5L);
+
+        when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
+        when(userService.fetchUserByLogin("owner@localhost.com")).thenReturn(Optional.of(user));
+
+        assertThat(resolver.resolveOwner(3L)).isEqualTo(ResourceOwner.of(OptionalLong.of(9L), OptionalLong.of(5L)));
     }
 
     @Test
