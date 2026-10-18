@@ -63,6 +63,10 @@ info:
     enabled: ${bytechef.sign-up.enabled}
   socialLogin:
     enabled: ${bytechef.security.social-login.enabled}
+  sso:
+    enabled: ${bytechef.security.sso.enabled:false}
+  twoFactorAuthentication:
+    enabled: ${bytechef.security.two-factor-authentication.enabled:false}
   userGuiding:
     containerId: ${bytechef.user-guiding.container-id:}
     enabled: ${bytechef.user-guiding.enabled}

@@ -26,7 +26,7 @@ public record ScimUser(
     ScimName name,
     String displayName,
     List<ScimEmail> emails,
-    boolean active,
+    Boolean active,
     List<ScimGroupRef> groups,
     ScimMeta meta) {
 

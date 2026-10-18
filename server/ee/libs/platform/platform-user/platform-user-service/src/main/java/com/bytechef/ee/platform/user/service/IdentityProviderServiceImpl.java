@@ -8,9 +8,11 @@
 package com.bytechef.ee.platform.user.service;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.domain.ScimApiKey;
 import com.bytechef.ee.platform.user.repository.IdentityProviderRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
 
     @Override
     public IdentityProvider create(IdentityProvider identityProvider) {
-        identityProvider.setClientSecret(encryption.encrypt(identityProvider.getClientSecret()));
+        String clientSecret = identityProvider.getClientSecret();
+
+        if (clientSecret != null && !clientSecret.isEmpty()) {
+            identityProvider.setClientSecret(encryption.encrypt(clientSecret));
+        }
 
         return identityProviderRepository.save(identityProvider);
     }
@@ -63,7 +69,20 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Override
     @Transactional(readOnly = true)
     public Optional<IdentityProvider> fetchByScimApiKey(String scimApiKey) {
-        return identityProviderRepository.findByScimApiKey(scimApiKey);
+        return identityProviderRepository.findByScimApiKey(ScimApiKey.hash(scimApiKey));
+    }
+
+    @Override
+    public String generateScimApiKey(long id) {
+        IdentityProvider identityProvider = getIdentityProvider(id);
+
+        String scimApiKey = ScimApiKey.generate(TenantContext.getCurrentTenantId());
+
+        identityProvider.setScimApiKey(ScimApiKey.hash(scimApiKey));
+
+        identityProviderRepository.save(identityProvider);
+
+        return scimApiKey;
     }
 
     @Override
@@ -90,6 +109,10 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         } else {
             identityProvider.setClientSecret(existingIdentityProvider.getClientSecret());
         }
+
+        identityProvider.setCreatedBy(existingIdentityProvider.getCreatedBy());
+        identityProvider.setCreatedDate(existingIdentityProvider.getCreatedDate());
+        identityProvider.setScimApiKey(existingIdentityProvider.getScimApiKey());
 
         return identityProviderRepository.save(identityProvider);
     }

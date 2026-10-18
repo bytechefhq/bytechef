@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class ScimFilterParser {
 
     private static final Pattern EQUALITY_PATTERN = Pattern.compile(
-        "^\\s*(\\w+)\\s+eq\\s+\"([^\"]*)\"\\s*$", Pattern.CASE_INSENSITIVE);
+        "^\\s*([\\w.]+)\\s+eq\\s+\"([^\"]*)\"\\s*$", Pattern.CASE_INSENSITIVE);
 
     private ScimFilterParser() {
     }

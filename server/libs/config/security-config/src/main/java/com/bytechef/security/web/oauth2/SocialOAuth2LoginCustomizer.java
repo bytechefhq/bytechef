@@ -17,8 +17,10 @@
 package com.bytechef.security.web.oauth2;
 
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
+import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -39,16 +41,19 @@ public class SocialOAuth2LoginCustomizer implements OAuth2LoginCustomizer {
     private final SocialOidcUserService socialOidcUserService;
     private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
+    private final ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider;
 
     @SuppressFBWarnings("EI")
     public SocialOAuth2LoginCustomizer(
         CustomOAuth2UserService customOAuth2UserService, SocialOidcUserService socialOidcUserService,
-        RememberMeServices rememberMeServices, TenantService tenantService) {
+        RememberMeServices rememberMeServices, TenantService tenantService,
+        ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.socialOidcUserService = socialOidcUserService;
         this.rememberMeServices = rememberMeServices;
         this.tenantService = tenantService;
+        this.twoFactorAuthenticationCustomizerProvider = twoFactorAuthenticationCustomizerProvider;
     }
 
     @Override
@@ -57,7 +62,8 @@ public class SocialOAuth2LoginCustomizer implements OAuth2LoginCustomizer {
             .userInfoEndpoint(endpoint -> endpoint
                 .userService(customOAuth2UserService)
                 .oidcUserService(socialOidcUserService))
-            .successHandler(new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService))
+            .successHandler(new OAuth2AuthenticationSuccessHandler(
+                rememberMeServices, tenantService, twoFactorAuthenticationCustomizerProvider.getIfAvailable()))
             .failureHandler(new OAuth2AuthenticationFailureHandler()));
     }
 }

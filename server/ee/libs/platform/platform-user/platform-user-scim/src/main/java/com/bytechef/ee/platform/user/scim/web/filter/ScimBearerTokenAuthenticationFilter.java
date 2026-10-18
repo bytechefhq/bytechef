@@ -8,9 +8,14 @@
 package com.bytechef.ee.platform.user.scim.web.filter;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.domain.ScimApiKey;
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,15 +24,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
- * Filter that authenticates SCIM 2.0 requests using Bearer token authentication. The Bearer token is matched against
- * the {@code scimApiKey} field of configured identity providers. When a match is found, the tenant context is set for
- * the duration of the request.
+ * Authenticates SCIM requests by the identity provider's bearer token. The token names its tenant, so the request is
+ * resolved with one lookup in that tenant; the identity provider then becomes the request's principal, holding only the
+ * {@code ROLE_SCIM} authority, and the request runs in the tenant.
  *
  * @version ee
  *
@@ -37,7 +43,6 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String SCIM_PATH_PREFIX = "/api/scim/v2/";
 
     private final IdentityProviderService identityProviderService;
     private final TenantService tenantService;
@@ -52,8 +57,11 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getRequestURI()
-            .startsWith(SCIM_PATH_PREFIX);
+        String path = request.getRequestURI()
+            .substring(request.getContextPath()
+                .length());
+
+        return !path.startsWith(ScimConstants.PATH_PREFIX);
     }
 
     @Override
@@ -71,36 +79,47 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = authorizationHeader.substring(BEARER_PREFIX.length())
             .trim();
 
-        if (bearerToken.isEmpty()) {
-            sendUnauthorized(response, "Empty Bearer token");
+        Optional<String> tenantId = ScimApiKey.tenantIdOf(bearerToken);
 
-            return;
-        }
-
-        String matchedTenantId = findTenantIdByScimApiKey(bearerToken);
-
-        if (matchedTenantId == null) {
+        if (tenantId.isEmpty() || !isTenantOfThisMode(tenantId.get())) {
             sendUnauthorized(response, "Invalid SCIM API key");
 
             return;
         }
 
-        TenantContext.runWithTenantId(matchedTenantId, () -> filterChain.doFilter(request, response));
+        String previousTenantId = TenantContext.getCurrentTenantId();
+        SecurityContext previousSecurityContext = SecurityContextHolder.getContext();
+
+        TenantContext.setCurrentTenantId(tenantId.get());
+
+        try {
+            Optional<IdentityProvider> identityProvider = identityProviderService.fetchByScimApiKey(bearerToken);
+
+            if (identityProvider.isEmpty()) {
+                sendUnauthorized(response, "Invalid SCIM API key");
+
+                return;
+            }
+
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new PreAuthenticatedAuthenticationToken(
+                    "scim:" + identityProvider.get()
+                        .getName(),
+                    null, List.of(new SimpleGrantedAuthority(ScimConstants.SCIM_AUTHORITY))));
+
+            SecurityContextHolder.setContext(securityContext);
+
+            filterChain.doFilter(request, response);
+        } finally {
+            SecurityContextHolder.setContext(previousSecurityContext);
+            TenantContext.setCurrentTenantId(previousTenantId);
+        }
     }
 
-    private String findTenantIdByScimApiKey(String apiKey) {
-        List<String> tenantIds = tenantService.getTenantIds();
-
-        for (String tenantId : tenantIds) {
-            Optional<IdentityProvider> identityProvider = TenantContext.callWithTenantId(
-                tenantId, () -> identityProviderService.fetchByScimApiKey(apiKey));
-
-            if (identityProvider.isPresent()) {
-                return tenantId;
-            }
-        }
-
-        return null;
+    private boolean isTenantOfThisMode(String tenantId) {
+        return tenantService.isMultiTenantEnabled() != TenantContext.DEFAULT_TENANT_ID.equals(tenantId);
     }
 
     @SuppressFBWarnings("XSS_SERVLET")
@@ -109,7 +128,7 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
         ArrayNode schemasNode = errorNode.putArray("schemas");
 
-        schemasNode.add("urn:ietf:params:scim:api:messages:2.0:Error");
+        schemasNode.add(ScimConstants.ERROR_SCHEMA);
 
         errorNode.put("detail", detail);
         errorNode.put("status", "401");

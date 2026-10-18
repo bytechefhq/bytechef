@@ -666,7 +666,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
-        userRepository.save(user);
+        Long id = user.getId();
+
+        if (id != null) {
+            userRepository.findById(id)
+                .ifPresent(this::clearUserCaches);
+        }
+
+        User savedUser = userRepository.save(user);
+
+        clearUserCaches(savedUser);
+
+        if (!savedUser.isActivated() && savedUser.getId() != null) {
+            persistentTokenRepository.deleteAll(persistentTokenRepository.findAllByUserId(savedUser.getId()));
+        }
     }
 
     @Override

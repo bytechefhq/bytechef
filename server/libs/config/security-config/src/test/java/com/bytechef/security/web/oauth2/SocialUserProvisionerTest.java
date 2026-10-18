@@ -61,6 +61,7 @@ class SocialUserProvisionerTest {
     private final ApplicationProperties applicationProperties = new ApplicationProperties();
     private final AuthorityService authorityService = mock(AuthorityService.class);
     private final SignUpEmailDomainValidator signUpEmailDomainValidator = mock(SignUpEmailDomainValidator.class);
+    private final SsoEnforcementChecker ssoEnforcementChecker = mock(SsoEnforcementChecker.class);
     private final TenantService tenantService = mock(TenantService.class);
     private final UserService userService = mock(UserService.class);
 
@@ -71,14 +72,18 @@ class SocialUserProvisionerTest {
     void beforeEach() {
         ObjectProvider<SignUpEmailDomainValidator> signUpEmailDomainValidatorProvider = mock(ObjectProvider.class);
 
+        ObjectProvider<SsoEnforcementChecker> ssoEnforcementCheckerProvider = mock(ObjectProvider.class);
+
         when(signUpEmailDomainValidatorProvider.getIfAvailable()).thenReturn(signUpEmailDomainValidator);
+        when(ssoEnforcementCheckerProvider.getIfAvailable()).thenReturn(ssoEnforcementChecker);
         when(signUpEmailDomainValidator.isEmailDomainValid(anyString())).thenReturn(true);
         when(authorityService.fetchAuthority(ADMIN_AUTHORITY_ID))
             .thenReturn(Optional.of(new Authority().id(ADMIN_AUTHORITY_ID)
                 .name(AuthorityConstants.ADMIN)));
 
         socialUserProvisioner = new SocialUserProvisioner(
-            applicationProperties, authorityService, signUpEmailDomainValidatorProvider, tenantService, userService);
+            applicationProperties, authorityService, signUpEmailDomainValidatorProvider, ssoEnforcementCheckerProvider,
+            tenantService, userService);
     }
 
     @AfterEach
@@ -227,6 +232,16 @@ class SocialUserProvisionerTest {
 
         verify(tenantService).deleteTenant("000007");
         assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
+    }
+
+    @Test
+    void testSsoEnforcedDomainRefusesSocialLogin() {
+        when(ssoEnforcementChecker.isSsoEnforced(EMAIL)).thenReturn(true);
+
+        assertSocialLoginFails(SocialUserProvisioner.SSO_REQUIRED_ERROR_CODE);
+
+        verify(userService, never()).findOrCreateSocialUser(
+            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(), anyString());
     }
 
     private void assertSocialLoginFails(String errorCode) {

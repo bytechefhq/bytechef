@@ -26,6 +26,8 @@ import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
+import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TwoFactorRememberMeServices;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
 import com.bytechef.security.web.filter.CsrfCookieIssuingFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
@@ -107,6 +109,7 @@ public class SecurityConfiguration {
         ObjectProvider<List<OAuth2LoginCustomizer>> oAuth2LoginCustomizersProvider, PasswordEncoder passwordEncoder,
         RememberMeKey rememberMeKey, RememberMeServices rememberMeServices,
         ObjectProvider<List<Saml2LoginCustomizer>> saml2LoginCustomizersProvider,
+        ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider,
         ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
@@ -114,7 +117,12 @@ public class SecurityConfiguration {
         this.oAuth2LoginCustomizers = oAuth2LoginCustomizersProvider.getIfAvailable(List::of);
         this.passwordEncoder = passwordEncoder;
         this.rememberMeKey = rememberMeKey;
-        this.rememberMeServices = rememberMeServices;
+        TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer =
+            twoFactorAuthenticationCustomizerProvider.getIfAvailable();
+
+        this.rememberMeServices = twoFactorAuthenticationCustomizer == null
+            ? rememberMeServices
+            : new TwoFactorRememberMeServices(rememberMeServices, twoFactorAuthenticationCustomizer);
         this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
         this.security = applicationProperties.getSecurity();
         this.twoFactorVerificationFilterProvider = twoFactorVerificationFilterProvider;

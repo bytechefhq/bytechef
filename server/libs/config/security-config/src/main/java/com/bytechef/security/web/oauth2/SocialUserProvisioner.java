@@ -54,29 +54,40 @@ public class SocialUserProvisioner {
 
     static final String INVALID_EMAIL_DOMAIN_ERROR_CODE = "invalid_email_domain";
     static final String SIGN_UP_DISABLED_ERROR_CODE = "sign_up_disabled";
+    static final String SSO_REQUIRED_ERROR_CODE = "sso_required";
 
     private static final Logger log = LoggerFactory.getLogger(SocialUserProvisioner.class);
 
     private final ApplicationProperties applicationProperties;
     private final AuthorityService authorityService;
     private final ObjectProvider<SignUpEmailDomainValidator> signUpEmailDomainValidatorProvider;
+    private final ObjectProvider<SsoEnforcementChecker> ssoEnforcementCheckerProvider;
     private final TenantService tenantService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public SocialUserProvisioner(
         ApplicationProperties applicationProperties, AuthorityService authorityService,
-        ObjectProvider<SignUpEmailDomainValidator> signUpEmailDomainValidatorProvider, TenantService tenantService,
+        ObjectProvider<SignUpEmailDomainValidator> signUpEmailDomainValidatorProvider,
+        ObjectProvider<SsoEnforcementChecker> ssoEnforcementCheckerProvider, TenantService tenantService,
         UserService userService) {
 
         this.applicationProperties = applicationProperties;
         this.authorityService = authorityService;
         this.signUpEmailDomainValidatorProvider = signUpEmailDomainValidatorProvider;
+        this.ssoEnforcementCheckerProvider = ssoEnforcementCheckerProvider;
         this.tenantService = tenantService;
         this.userService = userService;
     }
 
     public ProvisionedUser provision(SocialIdentity socialIdentity) {
+        SsoEnforcementChecker ssoEnforcementChecker = ssoEnforcementCheckerProvider.getIfAvailable();
+
+        if (ssoEnforcementChecker != null && ssoEnforcementChecker.isSsoEnforced(socialIdentity.email())) {
+            throw new OAuth2AuthenticationException(
+                new OAuth2Error(SSO_REQUIRED_ERROR_CODE, "Your organization requires SSO login", null));
+        }
+
         if (tenantService.isMultiTenantEnabled()) {
             return provisionMultiTenant(socialIdentity);
         }

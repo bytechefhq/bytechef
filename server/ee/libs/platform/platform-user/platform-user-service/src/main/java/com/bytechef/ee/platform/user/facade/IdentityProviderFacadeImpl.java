@@ -46,6 +46,12 @@ class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String generateScimApiKey(Long id) {
+        return identityProviderService.generateScimApiKey(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProvider getIdentityProvider(Long id) {
         return identityProviderService.getIdentityProvider(id);
     }
