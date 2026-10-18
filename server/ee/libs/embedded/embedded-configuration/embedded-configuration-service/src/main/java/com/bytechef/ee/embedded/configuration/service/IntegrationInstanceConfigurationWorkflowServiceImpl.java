@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional
 public class IntegrationInstanceConfigurationWorkflowServiceImpl
     implements IntegrationInstanceConfigurationWorkflowService {
