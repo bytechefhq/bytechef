@@ -1,0 +1,119 @@
+"""
+AI Hub chat metadata. {@code threadId} is client-generated and keys the chat's session memory;
+the (workspace, user, environment, threadId) tuple uniquely identifies the chat thread.
+"""
+type AiHubChat {
+    id: ID!
+    workspaceId: Long!
+    userId: Long!
+    threadId: String!
+    title: String
+    lastPreview: String
+    messageCount: Int!
+    status: AiHubChatStatus!
+    environmentId: Long!
+    createdAt: Long
+    updatedAt: Long
+    """
+    Whether the title was set automatically and remains eligible for LLM regeneration. Flips to false
+    when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
+    """
+    autoTitled: Boolean!
+    """The chat owner's user id, resolved off the row's userId column."""
+    ownerUserId: Long!
+    """Whether the current caller is this chat's owner."""
+    isOwner: Boolean!
+}
+
+enum AiHubChatStatus {
+    ACTIVE
+    ARCHIVED
+    DELETED
+}
+
+"""
+Single chat message in a chat. {@code role} is one of {@code user}/{@code assistant}/{@code system};
+{@code timestamp} is the message's epoch-milli arrival time.
+"""
+type AiHubChatMessage {
+    role: String!
+    content: String!
+    timestamp: Long!
+    """
+    Nullable JSON array of the tool activity that followed this row before the next visible row. Entries are
+    {kind: "call", id, name, arguments} and {kind: "result", id, name, response}. The client rebuilds tool-call
+    cards from it on reload.
+    """
+    toolEventsJson: String
+}
+
+input AiHubChatPatchInput {
+    id: ID!
+    workspaceId: ID!
+    title: String
+    lastPreview: String
+    messageCount: Int
+    status: AiHubChatStatus
+}
+
+extend type Query {
+    """
+    Lists the caller's chats in the given workspace, scoped to the supplied environment, filtered by
+    lifecycle status (default {@code ACTIVE}).
+    """
+    aiHubChats(workspaceId: ID!, environment: Int!, status: AiHubChatStatus): [AiHubChat!]!
+
+    """
+    Returns the message history for a chat. A chat the caller may not view is reported as not found.
+    """
+    aiHubChatMessages(workspaceId: ID!, id: ID!): [AiHubChatMessage!]!
+
+    """
+    Returns the artifact log for a chat, ordered newest-first. A chat the caller may not view is reported as
+    not found.
+    """
+    aiHubChatArtifactsByAiHubChat(workspaceId: ID!, id: ID!): [AiHubChatArtifact!]!
+}
+
+extend type Mutation {
+    """
+    Creates a new chat, or returns the existing one if the same {@code threadId} is reused. Idempotent
+    on (workspace, user, environment, threadId).
+    """
+    createAiHubChat(workspaceId: ID!, environment: Int!, threadId: String!): AiHubChat!
+
+    """
+    Partial update of a chat by primary key. At least one of {@code title}, {@code lastPreview},
+    {@code messageCount}, {@code status} must be non-null; an all-null patch is rejected with BAD_REQUEST.
+    """
+    updateAiHubChat(input: AiHubChatPatchInput!): AiHubChat!
+
+    """
+    Generates a title for a chat with the title-generation service, then saves it. Returns the current state
+    without calling the LLM when the title is no longer auto-generated. Fails with a typed error code when the
+    upstream model is unavailable so the client can surface a retryable error.
+    """
+    generateAiHubChatTitle(workspaceId: ID!, id: ID!): AiHubChat!
+
+    """
+    Hard-deletes a chat, its artifacts and its approvals, and removes its session messages. Returns true on
+    success.
+    """
+    deleteAiHubChat(workspaceId: ID!, id: ID!): Boolean!
+
+    """
+    Truncates the chat history, deleting the message at {@code fromMessageIndex} and every message after it.
+    Returns the number of session events deleted; zero when the index is past the end.
+    """
+    truncateAiHubChatMessages(workspaceId: ID!, id: ID!, fromMessageIndex: Int!): Int!
+
+    "Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn."
+    appendAiHubChatAssistantMessage(workspaceId: ID!, id: ID!, content: String!): Boolean!
+
+    """
+    Cancels the in-flight agent run of a chat. Returns {@code true} when a live run was cancelled and
+    {@code false} when none was in flight. The optional {@code runId} is the AG-UI run id of the turn being
+    stopped; when supplied the server tombstones it so a Stop that arrives before the run registers still sticks.
+    """
+    cancelAiHubRun(workspaceId: ID!, id: ID!, runId: String): Boolean!
+}
