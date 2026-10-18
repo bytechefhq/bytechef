@@ -14,6 +14,7 @@ import {
     listChats,
     patchChat,
 } from '../api/chats.api';
+import {isWorkspaceIdKnown} from '../isWorkspaceIdKnown';
 
 export const AiHubChatsKeys = {
     all: ['aiHubChats'] as const,
@@ -33,10 +34,15 @@ function listPrefixKeyForWorkspace(workspaceId: number) {
     return [...AiHubChatsKeys.all, 'list', workspaceId] as const;
 }
 
-export function useAiHubChatsQuery(workspaceId: number, environment: number, status: 'ACTIVE' | 'ARCHIVED') {
+export function useAiHubChatsQuery(
+    workspaceId: number | undefined,
+    environment: number,
+    status: 'ACTIVE' | 'ARCHIVED'
+) {
     const query = useQuery<AiHubChatI[], Error>({
-        queryFn: () => listChats({environment, status, workspaceId}),
-        queryKey: AiHubChatsKeys.list(workspaceId, environment, status),
+        enabled: isWorkspaceIdKnown(workspaceId),
+        queryFn: () => listChats({environment, status, workspaceId: workspaceId!}),
+        queryKey: AiHubChatsKeys.list(workspaceId ?? -1, environment, status),
         staleTime: 30_000,
     });
 
@@ -45,11 +51,11 @@ export function useAiHubChatsQuery(workspaceId: number, environment: number, sta
     return query;
 }
 
-export function useAiHubChatMessagesQuery(chatId: number, workspaceId: number, enabled: boolean = true) {
+export function useAiHubChatMessagesQuery(chatId: number, workspaceId: number | undefined, enabled: boolean = true) {
     const query = useQuery<AiHubChatMessageI[], Error>({
-        enabled,
-        queryFn: () => getChatMessages({chatId, workspaceId}),
-        queryKey: AiHubChatsKeys.messages(chatId, workspaceId),
+        enabled: enabled && isWorkspaceIdKnown(workspaceId),
+        queryFn: () => getChatMessages({chatId, workspaceId: workspaceId!}),
+        queryKey: AiHubChatsKeys.messages(chatId, workspaceId ?? -1),
     });
 
     useReportQueryError('Load chat messages', query.error);
@@ -57,11 +63,15 @@ export function useAiHubChatMessagesQuery(chatId: number, workspaceId: number, e
     return query;
 }
 
-export function useAiHubChatArtifactsQuery(chatId: number | undefined, workspaceId: number, enabled = true) {
+export function useAiHubChatArtifactsQuery(
+    chatId: number | undefined,
+    workspaceId: number | undefined,
+    enabled = true
+) {
     const query = useQuery<AiHubChatArtifactI[], Error>({
-        enabled: enabled && chatId !== undefined,
-        queryFn: () => getChatArtifacts({chatId: chatId!, workspaceId}),
-        queryKey: AiHubChatsKeys.artifacts(chatId ?? -1, workspaceId),
+        enabled: enabled && chatId !== undefined && isWorkspaceIdKnown(workspaceId),
+        queryFn: () => getChatArtifacts({chatId: chatId!, workspaceId: workspaceId!}),
+        queryKey: AiHubChatsKeys.artifacts(chatId ?? -1, workspaceId ?? -1),
         staleTime: 60_000,
     });
 
