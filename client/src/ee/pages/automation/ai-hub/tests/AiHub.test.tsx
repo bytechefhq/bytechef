@@ -9,7 +9,7 @@ import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {archivedChatsQueryRef, chatsQueryRef, switchChatMock} = vi.hoisted(() => ({
+const {archivedChatsQueryRef, chatsQueryRef, currentWorkspaceIdRef, switchChatMock} = vi.hoisted(() => ({
     archivedChatsQueryRef: {
         current: {data: [], error: null, isLoading: false} as {
             data: AiHubChatI[] | undefined;
@@ -24,6 +24,7 @@ const {archivedChatsQueryRef, chatsQueryRef, switchChatMock} = vi.hoisted(() => 
             isLoading: boolean;
         },
     },
+    currentWorkspaceIdRef: {current: 1 as number | undefined},
     switchChatMock: vi.fn(),
 }));
 
@@ -51,8 +52,8 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
         status === 'ARCHIVED' ? archivedChatsQueryRef.current : chatsQueryRef.current,
 }));
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
-    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
-        selector({currentWorkspaceId: 1}),
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | undefined}) => unknown) =>
+        selector({currentWorkspaceId: currentWorkspaceIdRef.current}),
 }));
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
@@ -102,6 +103,8 @@ const renderAt = (path: string) =>
 describe('AiHub', () => {
     beforeEach(() => {
         switchChatMock.mockReset();
+
+        currentWorkspaceIdRef.current = 1;
 
         chatsQueryRef.current = {data: [], error: null, isLoading: false};
         archivedChatsQueryRef.current = {data: [], error: null, isLoading: false};
@@ -178,6 +181,15 @@ describe('AiHub', () => {
 
             expect(screen.getByTestId('ai-hub-chat-loading')).toBeInTheDocument();
             expect(screen.queryByTestId('home-panel')).not.toBeInTheDocument();
+        });
+
+        it('shows the loading state, not the not-found state, while the workspace id is still unset', () => {
+            currentWorkspaceIdRef.current = undefined;
+
+            renderAt('/automation/ai-hub/chats/7');
+
+            expect(screen.getByTestId('ai-hub-chat-loading')).toBeInTheDocument();
+            expect(screen.queryByText('Chat not found')).toBeNull();
         });
 
         it('shows the not-found state for a chat the API does not return to this user (FORBIDDEN)', () => {
