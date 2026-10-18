@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.aspect.AuditedMethodValidator;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserInvitationService;
@@ -576,6 +578,69 @@ class WorkspaceUserServiceIntTest {
                 .containsEntry("role", "VIEWER");
             assertThat(persistentAuditEvent.getData()
                 .values()).noneMatch(value -> value.contains("@"));
+        }
+
+        @Test
+        void testRemoveRecordsTheRemovedMemberAndTheirPreviousRole() {
+            grantMemberManagement();
+
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR)));
+
+            workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED);
+            assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("workspaceId", "1")
+                .containsEntry("userId", "2")
+                .containsEntry("previousRole", "EDITOR");
+        }
+
+        @Test
+        void testAddingAnExistingMemberRecordsAnErrorAndStillFails() {
+            grantMemberManagement();
+
+            when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
+
+            assertThatThrownBy(
+                () -> workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, null))
+                    .isInstanceOf(ConfigurationException.class);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED);
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("result", "ERROR")
+                .containsEntry("userId", "2")
+                .containsEntry("role", "VIEWER")
+                .hasEntrySatisfying("errorClass",
+                    errorClass -> assertThat(errorClass).contains("ConfigurationException"));
+        }
+
+        @Test
+        void testRemovingTheLastAdminRecordsAnErrorWithThePreviousRole() {
+            grantMemberManagement();
+
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
+            when(workspaceUserRepository.countAdminsForEnvironment(anyLong(), anyInt(), anyInt())).thenReturn(1L);
+
+            assertThatThrownBy(() -> workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+                .isInstanceOf(ConfigurationException.class);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED);
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("result", "ERROR")
+                .containsEntry("userId", "2")
+                .containsEntry("previousRole", "ADMIN")
+                .hasEntrySatisfying("errorClass",
+                    errorClass -> assertThat(errorClass).contains("ConfigurationException"));
         }
 
         private void grantMemberManagement() {
