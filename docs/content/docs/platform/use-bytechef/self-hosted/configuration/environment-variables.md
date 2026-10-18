@@ -443,6 +443,10 @@ ceiling is not retryable.
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_AUTHORIZATION_URI` | GitHub authorization endpoint override, for GitHub Enterprise Server (`https://{host}/login/oauth/authorize`) | GitHub.com |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_TOKEN_URI` | GitHub token endpoint override (`https://{host}/login/oauth/access_token`) | GitHub.com |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_USER_INFO_URI` | GitHub user endpoint override (`https://{host}/api/v3/user`); the primary email is read from this URI plus `/emails` | GitHub.com |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_AUTHORIZATION_URI`, `..._TOKEN_URI`, `..._USER_INFO_URI`, `..._JWK_SET_URI`, `..._ISSUER_URI` | Google endpoint overrides, normally left unset; used to point Google at a test identity provider | Google |
 | `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC), the **Identity Providers** settings page, and the SCIM 2.0 API (`/api/scim/v2`). Enterprise Edition only; Community Edition supports local login and social login | `false` |
 | `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable TOTP two-factor authentication. When on, users can enroll in their profile and the code is required after password, social, and SSO sign-in | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |

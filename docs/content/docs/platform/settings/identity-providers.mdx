@@ -143,7 +143,7 @@ Register these redirect URIs with the providers:
 - Google: `{your ByteChef URL}/login/oauth2/code/google`
 - GitHub: `{your ByteChef URL}/login/oauth2/code/github`
 
-The login and sign-up pages show a button only for the providers that have a client id.
+The login and sign-up pages show a button only for the providers that have a client id. To use a GitHub Enterprise Server instead of GitHub.com, also set its authorization, token, and user endpoints (`BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_AUTHORIZATION_URI`, `..._TOKEN_URI`, `..._USER_INFO_URI`; see [environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables)).
 
 **Who can sign in.** A Google or GitHub identity signs in to the ByteChef account with the same email, or the account already linked to it. In a multi-tenant deployment the user lands in the tenant that holds that account. A pending invitation is accepted by signing in with the invited email. Deactivated accounts are refused, and so is a Google account whose email is not verified, so an unverified address cannot take over an existing account.
 
