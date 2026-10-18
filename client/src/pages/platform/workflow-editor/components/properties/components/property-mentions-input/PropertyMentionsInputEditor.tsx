@@ -68,6 +68,7 @@ interface PropertyMentionsInputEditorProps {
     isFormulaMode?: boolean;
     isFromAi?: boolean;
     labelId?: string;
+    legacyMixed?: boolean;
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
@@ -134,6 +135,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             isFormulaMode,
             isFromAi = false,
             labelId,
+            legacyMixed = false,
             onChange,
             onFocus,
             onSinglePillAbandoned,
@@ -495,7 +497,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         const editorRef = useRef<Editor | null>(null);
 
-        const restrictsToOnePill = singlePill || type !== 'STRING';
+        const restrictsToOnePill = singlePill || (type !== 'STRING' && !legacyMixed);
 
         const handlePaste = useCallback(
             (view: EditorView, _event: ClipboardEvent, slice: Slice): boolean => {
