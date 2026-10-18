@@ -1,6 +1,9 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection, ConnectionApi} from '@/shared/middleware/automation/configuration';
-import {useDisconnectConnectionMutation as useDisconnectConnectionGraphQL} from '@/shared/middleware/graphql';
+import {
+    useDisconnectConnectionMutation as useDisconnectConnectionGraphQL,
+    useUpdateConnectionCredentialsMutation as useUpdateConnectionCredentialsGraphQL,
+} from '@/shared/middleware/graphql';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
@@ -56,6 +59,29 @@ export const useDisconnectConnectionMutation = (mutationProps?: DisconnectConnec
             });
 
             return result.disconnectConnection;
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+};
+
+interface UpdateConnectionCredentialsMutationProps {
+    onError?: (error: Error, variables: Connection) => void;
+    onSuccess?: (result: void, variables: Connection) => void;
+}
+
+export const useUpdateConnectionCredentialsMutation = (mutationProps?: UpdateConnectionCredentialsMutationProps) => {
+    const graphqlMutation = useUpdateConnectionCredentialsGraphQL();
+
+    return useMutation<void, Error, Connection>({
+        mutationFn: async (connection: Connection) => {
+            await graphqlMutation.mutateAsync({
+                input: {
+                    connectionId: String(connection.id!),
+                    parameters: connection.parameters,
+                    version: connection.version!,
+                },
+            });
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

@@ -86,6 +86,12 @@ export interface Project {
      */
     uuid?: string;
     /**
+     * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+     * @type {ProjectVisibilityEnum}
+     * @memberof Project
+     */
+    visibility?: ProjectVisibilityEnum;
+    /**
      * 
      */
     category?: Category;
@@ -111,6 +117,15 @@ export interface Project {
     version?: number;
 }
 
+
+/**
+ * @export
+ */
+export const ProjectVisibilityEnum = {
+    Private: 'PRIVATE',
+    Workspace: 'WORKSPACE'
+} as const;
+export type ProjectVisibilityEnum = typeof ProjectVisibilityEnum[keyof typeof ProjectVisibilityEnum];
 
 
 /**
@@ -143,6 +158,7 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],
+        'visibility': json['visibility'] == null ? undefined : json['visibility'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
         'developmentDeploymentCount': json['developmentDeploymentCount'] == null ? undefined : json['developmentDeploymentCount'],
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
@@ -167,6 +183,7 @@ export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDat
         'name': value['name'],
         'lastStatus': ProjectStatusToJSON(value['lastStatus']),
         'uuid': value['uuid'],
+        'visibility': value['visibility'],
         'category': CategoryToJSON(value['category']),
         'projectWorkflowIds': value['projectWorkflowIds'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
