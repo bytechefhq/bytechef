@@ -15,6 +15,7 @@ export interface AuthenticationI {
     authenticated: boolean;
     loading: boolean;
     loginError: boolean;
+    loginErrorMessage: string | undefined;
     mfaRequired: boolean;
     sessionHasBeenFetched: boolean;
     showLogin: boolean;
@@ -26,11 +27,26 @@ export interface AuthenticationI {
     verifyMfa: (code: string) => Promise<UserI | undefined>;
 }
 
+const readLoginErrorMessage = async (response: Response): Promise<string | undefined> => {
+    if (response.status !== 403) {
+        return undefined;
+    }
+
+    try {
+        const body = await response.json();
+
+        return typeof body?.message === 'string' ? body.message : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
 const initialState = {
     account: undefined,
     authenticated: false,
     loading: false,
     loginError: false,
+    loginErrorMessage: undefined,
     mfaRequired: false,
     sessionHasBeenFetched: false,
     showLogin: false,
@@ -197,10 +213,15 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         } else {
                             invalidateAccountRequest();
 
-                            setAuthenticationState({
-                                ...initialState,
-                                loginError: true,
-                                showLogin: true,
+                            return readLoginErrorMessage(response).then((loginErrorMessage) => {
+                                setAuthenticationState({
+                                    ...initialState,
+                                    loginError: true,
+                                    loginErrorMessage,
+                                    showLogin: true,
+                                });
+
+                                return undefined;
                             });
 
                             permissionStore.getState().clearPermissions();
@@ -253,22 +274,14 @@ export const authenticationStore = createStore<AuthenticationI>()(
                             const {getAccount} = get();
 
                             return getAccount();
-                        } else {
-                            invalidateAccountRequest();
-
-                            setAuthenticationState({
-                                loginError: true,
-                            });
-
-                            permissionStore.getState().clearPermissions();
-
-                            return undefined;
                         }
-                    } catch {
-                        setAuthenticationState({
-                            loginError: true,
-                        });
 
+                        invalidateAccountRequest();
+
+                        permissionStore.getState().clearPermissions();
+
+                        return undefined;
+                    } catch {
                         permissionStore.getState().clearPermissions();
 
                         return undefined;

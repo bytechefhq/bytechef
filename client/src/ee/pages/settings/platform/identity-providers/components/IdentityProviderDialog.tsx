@@ -17,6 +17,7 @@ import {getRoleLabel} from '@/shared/util/role-utils';
 import {DownloadIcon, XIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
+import IdentityProviderScimSection from './IdentityProviderScimSection';
 import useIdentityProviderDialog from './hooks/useIdentityProviderDialog';
 
 const IdentityProviderDialog = () => {
@@ -27,6 +28,8 @@ const IdentityProviderDialog = () => {
         domainInput,
         domains,
         editingProviderId,
+        editingRegistrationId,
+        editingScimEnabled,
         handleAddDomain,
         handleOpenChange,
         handleRemoveDomain,
@@ -165,6 +168,21 @@ const IdentityProviderDialog = () => {
                                                 value={scopes}
                                             />
                                         </fieldset>
+
+                                        {isEditing && editingRegistrationId && (
+                                            <fieldset className="space-y-2 border-0 p-0">
+                                                <label className="text-sm font-medium">Redirect URI</label>
+
+                                                <Input
+                                                    readOnly
+                                                    value={`${window.location.origin}/login/oauth2/code/${editingRegistrationId}`}
+                                                />
+
+                                                <p className="text-xs text-muted-foreground">
+                                                    Register this redirect URI with your identity provider.
+                                                </p>
+                                            </fieldset>
+                                        )}
                                     </>
                                 )}
 
@@ -244,13 +262,13 @@ const IdentityProviderDialog = () => {
                                                 <label className="text-sm font-medium">SP Metadata</label>
 
                                                 <Button
-                                                    disabled={!editingProviderId}
+                                                    disabled={!editingRegistrationId}
                                                     icon={<DownloadIcon className="size-4" />}
                                                     label="Download SP Metadata"
                                                     onClick={() => {
-                                                        if (editingProviderId) {
+                                                        if (editingRegistrationId) {
                                                             window.open(
-                                                                `/api/saml2/metadata/saml-${editingProviderId}`,
+                                                                `/saml2/metadata/${editingRegistrationId}`,
                                                                 '_blank'
                                                             );
                                                         }
@@ -264,6 +282,13 @@ const IdentityProviderDialog = () => {
                                             </fieldset>
                                         )}
                                     </>
+                                )}
+
+                                {isEditing && editingProviderId && (
+                                    <IdentityProviderScimSection
+                                        identityProviderId={editingProviderId}
+                                        scimEnabled={editingScimEnabled}
+                                    />
                                 )}
 
                                 <fieldset className="space-y-2 border-0 p-0">

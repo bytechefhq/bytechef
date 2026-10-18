@@ -68,6 +68,7 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
 
 export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
+    const ssoEnabled = useApplicationInfoStore((state) => state.sso.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
     const apiKeyViewGranted = useHasEmbeddedScope('API_KEY_VIEW');
     const embeddedMembersViewGranted = useHasEmbeddedScope('EMBEDDED_VIEW', UNION_ENVIRONMENT_ID);
@@ -114,7 +115,7 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
         }
 
         if (pageKey === 'identity-providers') {
-            return isFeatureFlagEnabled('ff-1040');
+            return ssoEnabled;
         }
 
         if (pageKey === 'billing') {

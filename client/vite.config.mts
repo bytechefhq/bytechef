@@ -126,6 +126,11 @@ export default ({mode}) => {
                     secure: false,
                     target: 'http://localhost:9555',
                 },
+                '/login/saml2': {
+                    changeOrigin: false,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
                 '/oauth2/authorization': {
                     changeOrigin: false,
                     secure: false,
@@ -158,6 +163,11 @@ export default ({mode}) => {
                 },
                 '/oauth2/token': {
                     changeOrigin: true,
+                    secure: false,
+                    target: 'http://localhost:9555',
+                },
+                '/saml2': {
+                    changeOrigin: false,
                     secure: false,
                     target: 'http://localhost:9555',
                 },
