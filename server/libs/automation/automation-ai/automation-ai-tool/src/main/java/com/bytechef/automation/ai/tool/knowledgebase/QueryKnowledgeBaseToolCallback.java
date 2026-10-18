@@ -68,7 +68,7 @@ public class QueryKnowledgeBaseToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "knowledgeBaseId": {"type": "string", "description": "Knowledge base id obtained from listKnowledgeBases"},
+                    "knowledgeBaseId": {"type": "integer", "description": "Knowledge base id obtained from listKnowledgeBases"},
                     "question": {"type": "string", "description": "Natural-language question to search for"},
                     "limit": {"type": "integer", "description": "Maximum number of chunks to return (capped at 20, default 5)"}
                 },

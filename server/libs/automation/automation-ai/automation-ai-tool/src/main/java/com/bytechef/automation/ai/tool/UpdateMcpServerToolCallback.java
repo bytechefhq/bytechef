@@ -45,7 +45,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "mcpServerId": {"type": "string", "description": "Numeric MCP server id from listMcpServers"},
+                    "mcpServerId": {"type": "integer", "description": "Numeric MCP server id from listMcpServers"},
                     "name": {"type": "string", "description": "New server name (optional; leave omitted to keep)"},
                     "enabled": {"type": "boolean", "description": "New enabled state (optional; leave omitted to keep)"}
                 },
