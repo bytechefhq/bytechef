@@ -11,6 +11,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
 import {AiHubChatsKeys, useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -65,7 +66,7 @@ interface ChatItemProps {
     onRename: () => void;
     onSelect: () => void;
     onUnarchive: () => void;
-    workspaceId: number;
+    workspaceId: number | undefined;
 }
 
 const ChatItem = ({
@@ -90,7 +91,7 @@ const ChatItem = ({
     const handleRetryTitleGeneration = async (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
 
-        if (isRetryingTitle) {
+        if (isRetryingTitle || !isWorkspaceIdKnown(workspaceId)) {
             return;
         }
 
