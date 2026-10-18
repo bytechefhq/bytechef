@@ -56,6 +56,11 @@ public class McpResourceServerProperties implements InitializingBean {
                 throw new IllegalStateException(
                     "bytechef.oauth2.resource-server.issuers[" + index + "] must not set audience when self is true");
             }
+
+            if (!issuer.isSelf() && StringUtils.isBlank(issuer.getEmailClaim())) {
+                throw new IllegalStateException(
+                    "bytechef.oauth2.resource-server.issuers[" + index + "].email-claim must not be blank");
+            }
         }
     }
 
@@ -84,6 +89,7 @@ public class McpResourceServerProperties implements InitializingBean {
         private List<String> authorities = new ArrayList<>();
         private boolean self;
         private @Nullable String audience;
+        private String emailClaim = "email";
 
         @Nullable
         public String getUri() {
@@ -113,6 +119,10 @@ public class McpResourceServerProperties implements InitializingBean {
             return audience;
         }
 
+        public String getEmailClaim() {
+            return emailClaim;
+        }
+
         public void setUri(@Nullable String uri) {
             this.uri = uri;
         }
@@ -135,6 +145,10 @@ public class McpResourceServerProperties implements InitializingBean {
 
         public void setAudience(@Nullable String audience) {
             this.audience = audience;
+        }
+
+        public void setEmailClaim(String emailClaim) {
+            this.emailClaim = emailClaim;
         }
     }
 }

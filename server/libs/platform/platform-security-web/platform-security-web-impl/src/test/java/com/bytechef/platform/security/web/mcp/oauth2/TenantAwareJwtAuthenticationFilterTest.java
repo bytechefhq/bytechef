@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -77,6 +78,13 @@ class TenantAwareJwtAuthenticationFilterTest {
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
             authorityService,
             List.of(mcpServerSecretVerifier), null, null);
+
+    @BeforeEach
+    void beforeEach() {
+        User externalUser = activeUser("admin@localhost.com");
+
+        when(userService.fetchUserByEmail("admin@localhost.com")).thenReturn(Optional.of(externalUser));
+    }
 
     @AfterEach
     void afterEach() {
@@ -314,9 +322,7 @@ class TenantAwareJwtAuthenticationFilterTest {
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
             authorityService, List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER, null);
 
-        User user = mock(User.class);
-
-        when(user.isActivated()).thenReturn(true);
+        User user = activeUser("admin@localhost.com");
         when(user.getAuthorityIds()).thenReturn(List.of(5L));
         when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
 
@@ -370,9 +376,7 @@ class TenantAwareJwtAuthenticationFilterTest {
             authorityService,
             List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER, null);
 
-        User user = mock(User.class);
-
-        when(user.isActivated()).thenReturn(true);
+        User user = activeUser("admin@localhost.com");
         when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
 
         String path = automationPath("acme");
@@ -387,6 +391,160 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(chainInvoked).isTrue();
+    }
+
+    @Test
+    void testExternalIssuerTokenBindsToTheByteChefUserMatchingItsEmail() throws Exception {
+        User user = activeUser("alice", 7L);
+
+        when(userService.fetchUserByEmail("alice@example.com")).thenReturn(Optional.of(user));
+
+        Authority userAuthority = new Authority();
+
+        userAuthority.setName("ROLE_USER");
+
+        when(authorityService.fetchAuthority(7L)).thenReturn(Optional.of(userAuthority));
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("email", "alice@example.com")
+                .build(),
+            "SCOPE_mcp:automation");
+
+        AtomicReference<Authentication> authentication = new AtomicReference<>();
+        AtomicReference<Optional<String>> currentUserLogin = new AtomicReference<>();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        tenantAwareJwtAuthenticationFilter.doFilter(request(path), response, (servletRequest, servletResponse) -> {
+            authentication.set(SecurityContextHolder.getContext()
+                .getAuthentication());
+            currentUserLogin.set(SecurityUtils.fetchCurrentUserLogin());
+        });
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(currentUserLogin.get()).contains("alice");
+        assertThat(authorityNames(authentication.get()))
+            .containsExactlyInAnyOrder("SCOPE_mcp:automation", "ROLE_USER");
+    }
+
+    @Test
+    void testLooksUpTheExternalIssuerUserInsideTheUrlTenant() throws Exception {
+        AtomicReference<String> lookupTenantId = new AtomicReference<>();
+
+        User user = activeUser("alice");
+
+        when(userService.fetchUserByEmail("alice@example.com")).thenAnswer(invocation -> {
+            lookupTenantId.set(TenantContext.getCurrentTenantId());
+
+            return Optional.of(user);
+        });
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("email", "alice@example.com")
+                .build(),
+            "SCOPE_mcp:automation");
+
+        tenantAwareJwtAuthenticationFilter.doFilter(
+            request(path), new MockHttpServletResponse(), (servletRequest, servletResponse) -> {});
+
+        assertThat(lookupTenantId.get()).isEqualTo("acme");
+    }
+
+    @Test
+    void testRejectsExternalIssuerTokenWithoutAMatchingByteChefUser() throws Exception {
+        when(userService.fetchUserByEmail("nobody@example.com")).thenReturn(Optional.empty());
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("email", "nobody@example.com")
+                .build(),
+            "SCOPE_mcp:automation");
+
+        assertRejectedWithUnauthorized(path);
+    }
+
+    @Test
+    void testRejectsExternalIssuerTokenWhenTheByteChefUserIsNotActive() throws Exception {
+        User user = activeUser("alice");
+
+        when(user.isActivated()).thenReturn(false);
+        when(userService.fetchUserByEmail("alice@example.com")).thenReturn(Optional.of(user));
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("email", "alice@example.com")
+                .build(),
+            "SCOPE_mcp:automation");
+
+        assertRejectedWithUnauthorized(path);
+    }
+
+    @Test
+    void testRejectsExternalIssuerTokenWithoutTheEmailClaim() throws Exception {
+        String path = automationPath("acme");
+
+        authenticate(externalUserJwtBuilder(path).build(), "SCOPE_mcp:automation");
+
+        assertRejectedWithUnauthorized(path);
+    }
+
+    @Test
+    void testRejectsExternalIssuerTokenWhoseEmailIsNotVerified() throws Exception {
+        User user = activeUser("alice");
+
+        when(userService.fetchUserByEmail("alice@example.com")).thenReturn(Optional.of(user));
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("email", "alice@example.com")
+                .claim("email_verified", false)
+                .build(),
+            "SCOPE_mcp:automation");
+
+        assertRejectedWithUnauthorized(path);
+    }
+
+    @Test
+    void testExternalIssuerMatchesTheConfiguredEmailClaim() throws Exception {
+        McpResourceServerProperties mcpResourceServerProperties = mcpResourceServerProperties();
+
+        mcpResourceServerProperties.getIssuers()
+            .getFirst()
+            .setEmailClaim("upn");
+
+        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
+            authorityService, List.of(mcpServerSecretVerifier), null, null);
+
+        User user = activeUser("alice");
+
+        when(userService.fetchUserByEmail("alice@contoso.com")).thenReturn(Optional.of(user));
+
+        String path = automationPath("acme");
+
+        authenticate(
+            externalUserJwtBuilder(path).claim("upn", "alice@contoso.com")
+                .claim("email", "someone-else@example.com")
+                .build(),
+            "SCOPE_mcp:automation");
+
+        AtomicReference<Optional<String>> currentUserLogin = new AtomicReference<>();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(
+            request(path), response,
+            (servletRequest, servletResponse) -> currentUserLogin.set(SecurityUtils.fetchCurrentUserLogin()));
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(currentUserLogin.get()).contains("alice");
     }
 
     @Test
@@ -650,9 +808,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
     @Test
     void testCanonicalManagementPathRejectsTenantWithoutManagementServer() throws Exception {
-        User user = mock(User.class);
-
-        when(user.isActivated()).thenReturn(true);
+        User user = activeUser("admin@localhost.com");
         when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
 
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
@@ -689,12 +845,22 @@ class TenantAwareJwtAuthenticationFilterTest {
         assertThat(response.getStatus()).isEqualTo(401);
     }
 
+    private void assertRejectedWithUnauthorized(String path) throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        tenantAwareJwtAuthenticationFilter.doFilter(
+            request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(chainInvoked).isFalse();
+    }
+
     private TenantAwareJwtAuthenticationFilter selfIssuerFilterWithChecker(
         SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker) {
 
-        User user = mock(User.class);
-
-        when(user.isActivated()).thenReturn(true);
+        User user = activeUser("admin@localhost.com");
         when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
 
         return new TenantAwareJwtAuthenticationFilter(
@@ -770,7 +936,31 @@ class TenantAwareJwtAuthenticationFilterTest {
             .expiresAt(Instant.now()
                 .plusSeconds(300))
             .claim("authorities", List.of("ROLE_ADMIN", "engineering"))
+            .claim("email", "admin@localhost.com")
             .claim("scope", scope);
+    }
+
+    private static Jwt.Builder externalUserJwtBuilder(String path) {
+        return Jwt.withTokenValue("token")
+            .header("alg", "none")
+            .issuer(ISSUER_URI)
+            .subject("0b4a499a-7484-42cd-8d2e-e801e9327d83")
+            .issuedAt(Instant.now())
+            .expiresAt(Instant.now()
+                .plusSeconds(300))
+            .claim("scope", "mcp:automation")
+            .claim("tenant_id", "acme")
+            .audience(List.of(endpointUrl(path)));
+    }
+
+    private static User activeUser(String login, Long... authorityIds) {
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getLogin()).thenReturn(login);
+        when(user.getAuthorityIds()).thenReturn(List.of(authorityIds));
+
+        return user;
     }
 
     private static String automationPath(String tenantId) {

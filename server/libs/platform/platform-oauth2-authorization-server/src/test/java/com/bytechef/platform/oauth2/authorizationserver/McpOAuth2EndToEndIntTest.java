@@ -178,11 +178,11 @@ class McpOAuth2EndToEndIntTest {
 
         registeredClientRepository.save(registeredClient);
 
-        User user = mock(User.class);
+        User user = activeUser(USER_LOGIN);
+        User otherUser = activeUser(OTHER_USER_LOGIN);
 
-        when(user.isActivated()).thenReturn(true);
         when(userService.fetchUserByLogin(USER_LOGIN)).thenAnswer(invocation -> fetchAcmeUser(user));
-        when(userService.fetchUserByLogin(OTHER_USER_LOGIN)).thenAnswer(invocation -> fetchAcmeUser(user));
+        when(userService.fetchUserByLogin(OTHER_USER_LOGIN)).thenAnswer(invocation -> fetchAcmeUser(otherUser));
     }
 
     @AfterEach
@@ -372,6 +372,15 @@ class McpOAuth2EndToEndIntTest {
         }
 
         return matcher.group(1);
+    }
+
+    private static User activeUser(String login) {
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getLogin()).thenReturn(login);
+
+        return user;
     }
 
     private static Optional<User> fetchAcmeUser(User user) {

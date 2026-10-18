@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
@@ -82,6 +83,26 @@ class McpResourceServerPropertiesTest {
         assertThatIllegalStateException()
             .isThrownBy(mcpResourceServerProperties::afterPropertiesSet)
             .withMessageContaining("issuers[0].tenant-claim");
+    }
+
+    @Test
+    void testRejectsExternalIssuerWithBlankEmailClaim() {
+        Issuer externalIssuer = issuer("https://idp.customer.test", false, "bytechef-mcp");
+
+        externalIssuer.setEmailClaim(" ");
+
+        McpResourceServerProperties mcpResourceServerProperties = properties(externalIssuer);
+
+        assertThatIllegalStateException()
+            .isThrownBy(mcpResourceServerProperties::afterPropertiesSet)
+            .withMessageContaining("issuers[0].email-claim");
+    }
+
+    @Test
+    void testExternalIssuerMatchesTheEmailClaimByDefault() {
+        Issuer externalIssuer = issuer("https://idp.customer.test", false, "bytechef-mcp");
+
+        assertThat(externalIssuer.getEmailClaim()).isEqualTo("email");
     }
 
     @Test

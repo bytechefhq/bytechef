@@ -61,6 +61,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(TenantAwareJwtAuthenticationFilter.class);
 
     private static final String AUTOMATION_SCOPE = "mcp:automation";
+    private static final String EMAIL_VERIFIED_CLAIM = "email_verified";
     private static final Pattern CANONICAL_MANAGEMENT_PATTERN = Pattern.compile("^/api/management/mcp$");
     private static final String MANAGEMENT_SCOPE = "mcp:management";
     private static final Pattern MCP_SECRET_PATTERN = Pattern.compile("/api/(?:automation|management)/(.+)/mcp");
@@ -172,8 +173,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        List<GrantedAuthority> authorities = staticIssuer.get()
-            .isSelf() ? getSelfIssuedAuthorities(mcpJwtIdentity) : mcpJwtIdentity.authorities();
+        List<GrantedAuthority> authorities = mcpJwtIdentity.authorities();
 
         JwtAuthenticationToken authentication = new JwtAuthenticationToken(
             jwt, new org.springframework.security.core.userdetails.User(mcpJwtIdentity.login(), "", authorities),
@@ -214,7 +214,13 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
 
-        if (issuer.isSelf() && !isActiveByteChefUser(jwt.getSubject(), urlTenantId)) {
+        User user = fetchActiveUser(jwt, issuer, urlTenantId).orElse(null);
+
+        if (user == null) {
+            log.warn(
+                "Rejecting MCP JWT from {} for {}: no active ByteChef user matches the token", issuer.getUri(),
+                request.getServletPath());
+
             reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
@@ -230,13 +236,22 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        McpJwtIdentity mcpJwtIdentity;
+
         try {
-            return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), urlTenantId);
+            mcpJwtIdentity = mcpJwtIdentityMapper.map(
+                jwt, issuer, jwtAuthenticationToken.getAuthorities(), urlTenantId);
         } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
             reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
+
+        List<GrantedAuthority> authorities = new ArrayList<>(mcpJwtIdentity.authorities());
+
+        authorities.addAll(getUserAuthorities(user, urlTenantId));
+
+        return new McpJwtIdentity(urlTenantId, user.getLogin(), authorities);
     }
 
     private void reject(HttpServletRequest request, HttpServletResponse response, int status) {
@@ -300,30 +315,40 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
                 .orElse(false));
     }
 
-    private List<GrantedAuthority> getSelfIssuedAuthorities(McpJwtIdentity mcpJwtIdentity) {
-        List<GrantedAuthority> authorities = new ArrayList<>(mcpJwtIdentity.authorities());
-
-        TenantContext.runWithTenantId(
-            mcpJwtIdentity.tenantId(),
-            () -> userService.fetchUserByLogin(mcpJwtIdentity.login())
-                .map(User::getAuthorityIds)
-                .orElse(List.of())
+    private List<GrantedAuthority> getUserAuthorities(User user, String tenantId) {
+        return TenantContext.callWithTenantId(
+            tenantId,
+            () -> user.getAuthorityIds()
                 .stream()
                 .map(authorityService::fetchAuthority)
                 .flatMap(Optional::stream)
                 .map(Authority::getName)
-                .map(SimpleGrantedAuthority::new)
-                .forEach(authorities::add));
-
-        return authorities;
+                .<GrantedAuthority>map(SimpleGrantedAuthority::new)
+                .toList());
     }
 
-    private boolean isActiveByteChefUser(String login, String tenantId) {
-        return TenantContext.callWithTenantId(
-            tenantId,
-            () -> userService.fetchUserByLogin(login)
-                .map(User::isActivated)
-                .orElse(false));
+    private Optional<User> fetchActiveUser(Jwt jwt, Issuer issuer, String tenantId) {
+        Optional<User> user;
+
+        if (issuer.isSelf()) {
+            String login = jwt.getSubject();
+
+            if (StringUtils.isBlank(login)) {
+                return Optional.empty();
+            }
+
+            user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByLogin(login));
+        } else {
+            String email = jwt.getClaimAsString(issuer.getEmailClaim());
+
+            if (StringUtils.isBlank(email) || Boolean.FALSE.equals(jwt.getClaimAsBoolean(EMAIL_VERIFIED_CLAIM))) {
+                return Optional.empty();
+            }
+
+            user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByEmail(email));
+        }
+
+        return user.filter(User::isActivated);
     }
 
     @Nullable
