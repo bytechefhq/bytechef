@@ -781,9 +781,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools) {
 
         return ChatClient.builder(chatModel)
-            .defaultSystem(
-                workflowEditorBuildSystemPrompt + "\n\n" + workflowEditorBuildSubAgentSystemPrompt +
-                    BUILD_WORKFLOW_SUBAGENT_ADDENDUM)
+            .defaultSystem(buildWorkflowSubAgentSystemPrompt())
             .defaultTools(
                 projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)
@@ -792,6 +790,11 @@ public class CopilotConfiguration {
                     actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
                     propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard))
             .build();
+    }
+
+    String buildWorkflowSubAgentSystemPrompt() {
+        return workflowEditorBuildSystemPrompt + "\n\n" + workflowEditorBuildSubAgentSystemPrompt +
+            BUILD_WORKFLOW_SUBAGENT_ADDENDUM;
     }
 
     @Bean
