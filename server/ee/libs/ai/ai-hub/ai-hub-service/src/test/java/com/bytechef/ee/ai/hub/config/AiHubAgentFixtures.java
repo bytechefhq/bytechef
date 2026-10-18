@@ -1,0 +1,171 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.hub.config;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.agui.core.exception.AGUIException;
+import com.bytechef.ai.copilot.config.InteractivePickerToolCallbacks;
+import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
+import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
+import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.ProjectTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.ReadProjectTools;
+import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.ScopedProjectGuard;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.io.ClassPathResource;
+
+/**
+ * Builds the AI Hub ASK and BUILD agents through {@link AiHubConfiguration}'s own bean methods over real tool objects
+ * and mocked facades, so tests see the tool lists, wrappers and tool context exactly as the running hub assembles them.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public final class AiHubAgentFixtures {
+
+    public final AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
+    public final AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
+    public final AiHubChatService chatService = mock(AiHubChatService.class);
+    public final ChatModel chatModel = mock(ChatModel.class);
+    public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
+    public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+    public final ProjectFacade projectFacade = mock(ProjectFacade.class);
+    public final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
+    public final ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+    public final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+    public final AiHubApprovalGate approvalGate = new AiHubApprovalGate(policy, approvalService, chatService);
+    public final IntelligentToolCatalog intelligentToolCatalog = mock(IntelligentToolCatalog.class);
+    public final InteractivePickerToolCallbacks interactivePickerToolCallbacks;
+    public final ProjectTools projectTools = new ProjectTools(
+        mock(ProjectCategoryFacade.class), projectDeploymentFacade, projectFacade, mock(ProjectTagFacade.class),
+        mock(ScopedProjectGuard.class), workspaceFacade);
+    public final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools =
+        new ProjectWorkflowLifecycleTools(projectWorkflowTools);
+    public final ReadProjectTools readProjectTools = new ReadProjectTools(projectTools);
+    public final ReadProjectWorkflowTools readProjectWorkflowTools = new ReadProjectWorkflowTools(projectWorkflowTools);
+    public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
+    public final AiHubSessionMemory sessionMemory = new AiHubSessionMemory(
+        InMemorySessionRepository.builder()
+            .build(),
+        null);
+
+    private final AiHubConfiguration configuration = new AiHubConfiguration(
+        new ClassPathResource("prompt_ai_hub_ask.txt"), new ClassPathResource("prompt_ai_hub_build.txt"));
+
+    @SuppressWarnings("unchecked")
+    public AiHubAgentFixtures(Set<String> catalogToolNames) {
+        when(securityContextRehydrator.withUserSecurityContext(any(), any()))
+            .thenAnswer(invocation -> invocation.getArgument(1, Supplier.class)
+                .get());
+
+        interactivePickerToolCallbacks = new InteractivePickerToolCallbacks(
+            mock(ConnectionDefinitionService.class), mock(WorkspaceConnectionFacade.class),
+            mock(ComponentDefinitionService.class), mock(ActionDefinitionService.class),
+            mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
+            mock(TriggerDefinitionFacade.class), new PropertyOptionsResolver(securityContextRehydrator),
+            mock(ObjectProvider.class), mock(ScopedConnectionGuard.class));
+
+        when(intelligentToolCatalog.getByNames(anySet(), eq(IntelligentToolVariant.BUILD), any(), any()))
+            .thenAnswer(invocation -> {
+                Set<String> names = invocation.getArgument(0);
+                BiFunction<ToolCallback, Object, ToolCallback> callbackDecorator = invocation.getArgument(3);
+
+                List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+                for (String name : names) {
+                    if (catalogToolNames.contains(name)) {
+                        toolCallbacks.add(callbackDecorator.apply(stubToolCallback(name), null));
+                    }
+                }
+
+                return toolCallbacks;
+            });
+    }
+
+    public static AiHubAgentFixtures withBuildWorkflow() {
+        return new AiHubAgentFixtures(Set.of("buildWorkflow", "importWorkflow"));
+    }
+
+    public AiHubSpringAIAgent askAgent() throws AGUIException {
+        return configuration.aiHubAskSpringAIAgent(
+            sessionMemory, chatModel, readProjectTools, readProjectWorkflowTools,
+            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
+            securityContextRehydrator, approvalGate, emptyProvider());
+    }
+
+    public AiHubSpringAIAgent buildAgent() throws AGUIException {
+        return configuration.aiHubBuildSpringAIAgent(
+            sessionMemory, chatModel, projectTools, projectWorkflowLifecycleTools,
+            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
+            workspaceFacade, projectWorkflowFacade, artifactRecorder, securityContextRehydrator, approvalGate,
+            emptyProvider());
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider() {
+        ObjectProvider<DeploymentToolCallbacksFactory> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(new DeploymentToolCallbacksFactory(projectDeploymentFacade));
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> emptyProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    private static ToolCallback stubToolCallback(String name) {
+        return FunctionToolCallback.builder(name, (String input) -> "{\"result\":\"" + name + "\"}")
+            .description(name)
+            .inputType(String.class)
+            .build();
+    }
+}
