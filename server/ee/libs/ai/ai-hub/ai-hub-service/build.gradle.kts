@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
 
+    testImplementation("io.projectreactor:reactor-test")
     testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
