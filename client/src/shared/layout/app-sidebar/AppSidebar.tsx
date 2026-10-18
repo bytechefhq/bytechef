@@ -17,7 +17,7 @@ import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {type LucideIcon, PanelLeftCloseIcon} from 'lucide-react';
+import {type LucideIcon, PanelLeftIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 
@@ -78,7 +78,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
 
     return (
         <Sidebar className="h-full" collapsible="icon">
-            <SidebarHeader>
+            <SidebarHeader className="py-[13px]">
                 <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-3">
                     <AppSidebarWorkspaceSelect />
 
@@ -90,7 +90,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                                 <Button
                                     aria-label="Close sidebar"
                                     className="size-auto shrink-0 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-5"
-                                    icon={<PanelLeftCloseIcon />}
+                                    icon={<PanelLeftIcon />}
                                     onClick={toggleSidebar}
                                     size="icon"
                                     variant="ghost"
