@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
+import com.bytechef.platform.ai.llm.NoChatProviderActivatedException;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
@@ -76,7 +77,7 @@ public class CatalogChatModel implements ChatModel {
         AiDefaultModelWithApiKeyDTO defaultModel = aiProviderFacade.getAiDefaultChatModelApiKey(ordinal);
 
         if (defaultModel == null) {
-            throw new IllegalStateException(
+            throw new NoChatProviderActivatedException(
                 "No chat provider is activated for environment " + environment + ". Activate the Anthropic or OpenAI " +
                     "provider in the AI Providers UI (or set bytechef.ai.provider.anthropic.api-key / " +
                     "bytechef.ai.provider.openai.api-key) so the copilot can generate.");
