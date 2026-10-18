@@ -153,3 +153,43 @@ export async function stopJob(page: Page, jobId: string): Promise<APIResponse> {
 export async function restartJob(page: Page, jobId: string): Promise<APIResponse> {
     return apiFetch({method: 'PUT', page, path: `/api/platform/internal/jobs/${jobId}/restart`});
 }
+
+/**
+ * Finds a job created after `afterJobId` by its workflow label. Sub-workflow jobs started by a Subflow task or a
+ * synchronous caller are not listed among their project's executions, so they are looked up by id instead.
+ */
+export async function waitForJobByLabelAfter({
+    afterJobId,
+    label,
+    page,
+    timeout = JOB_TIMEOUT,
+}: {
+    afterJobId: string;
+    label: string;
+    page: Page;
+    timeout?: number;
+}): Promise<JobI> {
+    let foundJob: JobI | undefined;
+
+    await expect(async () => {
+        for (let jobId = Number(afterJobId) + 1; jobId <= Number(afterJobId) + 50 && !foundJob; jobId++) {
+            const response = await apiFetch({
+                method: 'GET',
+                page,
+                path: `${AUTOMATION_API_PATH}/workflow-executions/${jobId}`,
+            });
+
+            if (response.ok()) {
+                const workflowExecution = (await response.json()) as WorkflowExecutionI;
+
+                if (workflowExecution.job.label === label) {
+                    foundJob = workflowExecution.job;
+                }
+            }
+        }
+
+        expect(foundJob).toBeTruthy();
+    }).toPass({intervals: [1000, 2000], timeout});
+
+    return foundJob as JobI;
+}
