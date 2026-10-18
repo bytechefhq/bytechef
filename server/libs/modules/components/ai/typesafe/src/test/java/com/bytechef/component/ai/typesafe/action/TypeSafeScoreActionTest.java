@@ -21,6 +21,7 @@ import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.LEVE
 import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.MODEL;
 import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.STATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,6 +35,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -91,5 +93,29 @@ class TypeSafeScoreActionTest {
                 "nearestLevel", 2, "nearestLabel", "Very angry", "model", "jev-1.13.0",
                 "usage", Map.of("input_tokens", 10, "output_tokens", 2)),
             result);
+    }
+
+    @Test
+    void testPutNearestLevelSkipsKeysThatAreNotLevels() {
+        Map<String, Object> answer = new HashMap<>();
+
+        answer.put("probabilities", Map.of("high", 0.9, "1", 0.4, "0", 0.2));
+
+        TypeSafeScoreAction.putNearestLevel(answer, List.of("Calm", "Frustrated", "Very angry"));
+
+        assertEquals(1, answer.get("nearestLevel"));
+        assertEquals("Frustrated", answer.get("nearestLabel"));
+    }
+
+    @Test
+    void testPutNearestLevelWithoutLabelForUnknownLevel() {
+        Map<String, Object> answer = new HashMap<>();
+
+        answer.put("probabilities", Map.of("5", 0.9));
+
+        TypeSafeScoreAction.putNearestLevel(answer, List.of("Calm", "Frustrated"));
+
+        assertEquals(5, answer.get("nearestLevel"));
+        assertNull(answer.get("nearestLabel"));
     }
 }

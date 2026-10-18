@@ -105,8 +105,14 @@ public class TypeSafeChoiceAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        List<Map<String, Object>> options = inputParameters.getRequiredList(OPTIONS, new TypeReference<>() {});
+        Map<String, Object> question = createQuestion(
+            inputParameters.getRequiredString(INSTRUCTIONS),
+            inputParameters.getRequiredList(OPTIONS, new TypeReference<>() {}));
 
+        return TypeSafeUtils.askQuestion(inputParameters, question, context);
+    }
+
+    public static Map<String, Object> createQuestion(String instructions, List<Map<String, Object>> options) {
         Map<String, Object> criteria = new LinkedHashMap<>();
 
         for (Map<String, Object> option : options) {
@@ -132,9 +138,9 @@ public class TypeSafeChoiceAction {
         Map<String, Object> question = new LinkedHashMap<>();
 
         question.put(TYPE, CHOICE);
-        question.put(INSTRUCTIONS, inputParameters.getRequiredString(INSTRUCTIONS));
+        question.put(INSTRUCTIONS, instructions);
         question.put(CRITERIA, criteria);
 
-        return TypeSafeUtils.askQuestion(inputParameters, question, context);
+        return question;
     }
 }
