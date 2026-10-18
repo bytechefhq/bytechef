@@ -1,0 +1,201 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.hub.agent;
+
+import com.agui.core.event.BaseEvent;
+import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Component
+@ConditionalOnAiHub
+public class InFlightAiHubRunRegistry {
+
+    private static final Logger log = LoggerFactory.getLogger(InFlightAiHubRunRegistry.class);
+
+    static final int REPLAY_BUFFER_LIMIT = 1000;
+
+    static final long ENTRY_TTL_MINUTES = 30L;
+
+    static final long CANCELLED_RUN_ID_TTL_MINUTES = 2L;
+
+    private final Cache<String, InFlightRun> runs;
+    private final Cache<String, Boolean> cancelledRunIds;
+
+    public InFlightAiHubRunRegistry() {
+        this(buildDefaultCache());
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    InFlightAiHubRunRegistry(Cache<String, InFlightRun> runs) {
+        this.runs = runs;
+        this.cancelledRunIds = buildCancelledRunIdCache();
+    }
+
+    public Optional<InFlightRun> tryStart(String threadId, @Nullable String runId) {
+        AtomicBoolean started = new AtomicBoolean();
+
+        InFlightRun run = runs.asMap()
+            .compute(threadId, (key, existing) -> {
+                if (existing != null && !existing.isTerminated()) {
+                    return existing;
+                }
+
+                if (existing != null) {
+                    existing.completeSink();
+                }
+
+                InFlightRun newRun = new InFlightRun(threadId, runId);
+
+                if (runId != null && cancelledRunIds.asMap()
+                    .remove(runId) != null) {
+
+                    log.debug("tryStart for threadId={} runId={} matched a cancel tombstone; born terminated",
+                        threadId, runId);
+
+                    newRun.complete();
+                }
+
+                started.set(true);
+
+                return newRun;
+            });
+
+        return started.get() ? Optional.of(run) : Optional.empty();
+    }
+
+    public boolean cancel(String threadId) {
+        return cancel(threadId, null);
+    }
+
+    public boolean cancel(String threadId, @Nullable String runId) {
+        if (runId != null && !runId.isBlank()) {
+            cancelledRunIds.put(runId, Boolean.TRUE);
+        }
+
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        if (run == null || run.isTerminated()) {
+            return false;
+        }
+
+        run.complete();
+
+        return true;
+    }
+
+    public Optional<Flux<BaseEvent>> attach(String threadId) {
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        if (run == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(run.asFlux());
+    }
+
+    public boolean isInFlight(String threadId) {
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        return run != null && !run.isTerminated();
+    }
+
+    private static Cache<String, InFlightRun> buildDefaultCache() {
+        return Caffeine.newBuilder()
+            .expireAfterWrite(ENTRY_TTL_MINUTES, TimeUnit.MINUTES)
+            .build();
+    }
+
+    private static Cache<String, Boolean> buildCancelledRunIdCache() {
+        return Caffeine.newBuilder()
+            .expireAfterWrite(CANCELLED_RUN_ID_TTL_MINUTES, TimeUnit.MINUTES)
+            .build();
+    }
+
+    /**
+     * One agent run on one thread: the replay sink producers push to and subscribers attach to. The producer holds the
+     * run itself, not the thread id, so events of a cancelled run can never land in a later run on the same thread.
+     */
+    public static final class InFlightRun {
+
+        private final String threadId;
+        private final @Nullable String runId;
+        private final Instant startedAt;
+        private final Sinks.Many<BaseEvent> sink;
+        private volatile boolean terminated;
+
+        InFlightRun(String threadId, @Nullable String runId) {
+            this.threadId = threadId;
+            this.runId = runId;
+            this.startedAt = Instant.now();
+            this.sink = Sinks.many()
+                .replay()
+                .limit(REPLAY_BUFFER_LIMIT);
+        }
+
+        public String getThreadId() {
+            return threadId;
+        }
+
+        public @Nullable String getRunId() {
+            return runId;
+        }
+
+        public Instant getStartedAt() {
+            return startedAt;
+        }
+
+        public boolean isTerminated() {
+            return terminated;
+        }
+
+        void emit(BaseEvent event) {
+            Sinks.EmitResult result = sink.tryEmitNext(event);
+
+            if (result.isFailure()) {
+                log.debug("Failed to emit event for threadId={} runId={}: {}", threadId, runId, result);
+            }
+        }
+
+        void complete() {
+            terminated = true;
+
+            completeSink();
+        }
+
+        void fail(Throwable error) {
+            terminated = true;
+
+            sink.tryEmitError(error);
+        }
+
+        Flux<BaseEvent> asFlux() {
+            return sink.asFlux();
+        }
+
+        private void completeSink() {
+            sink.tryEmitComplete();
+        }
+    }
+}

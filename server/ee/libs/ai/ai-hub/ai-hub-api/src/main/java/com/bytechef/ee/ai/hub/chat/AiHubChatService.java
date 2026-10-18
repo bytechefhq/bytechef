@@ -74,6 +74,14 @@ public interface AiHubChatService {
     void appendAssistantMessage(long chatId, long requesterWorkspaceId, long requesterUserId, String content);
 
     /**
+     * Stops the chat's in-flight agent run, for a requester who may participate in the chat. Returns {@code true} when
+     * a live run was cancelled. {@code runId} is the AG-UI run id of the turn being stopped, or {@code null}; when
+     * present it is tombstoned, so a Stop that reaches the server before the turn's POST registers the run still stops
+     * it.
+     */
+    boolean cancelAiHubRun(long chatId, long requesterWorkspaceId, long requesterUserId, @Nullable String runId);
+
+    /**
      * Looks a chat up by thread id with no access check; callers that act for a user must verify access themselves.
      */
     Optional<AiHubChat> findByThreadId(String threadId);
