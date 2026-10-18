@@ -11,6 +11,7 @@ export interface SelectConnectionDataI {
     componentLabel: string;
     componentName: string;
     kind: 'select-connection';
+    pickedLabel?: string;
 }
 
 /**
@@ -74,13 +75,15 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
         });
     };
 
-    if (pickedConnection) {
+    const pickedName = pickedConnection?.name ?? data.pickedLabel;
+
+    if (pickedName) {
         return (
             <div className="mt-2 flex items-center gap-2 text-sm">
                 <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
-                    Picked: <span className="font-medium">{pickedConnection.name}</span>
+                    Picked: <span className="font-medium">{pickedName}</span>
                 </span>
             </div>
         );

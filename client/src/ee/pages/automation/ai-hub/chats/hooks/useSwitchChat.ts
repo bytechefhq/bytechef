@@ -32,6 +32,10 @@ interface OpenToolCallI {
     toolName: string;
 }
 
+const PICKED_LABEL_PATTERN = /^User picked: (.+) \((?:ID|value): [^)]*\)$/s;
+
+const PICKER_DATA_PART_TYPES = new Set(['data-select-connection', 'data-select-property-option']);
+
 const TOOL_APPROVAL_CONTINUATION_PATTERN = /^\[tool-approval #(\d+)[\s\]]/;
 
 const INTERACTIVE_DATA_PART_TYPES = new Set([
@@ -69,7 +73,11 @@ type RestoredPartType = Exclude<ThreadMessageLike['content'], string>[number];
  */
 function buildRestoredToolParts(
     events: RestoredToolEventI[],
-    {allowInteractive, rowIndex}: {allowInteractive: boolean; rowIndex: number}
+    {
+        allowInteractive,
+        followingUserText,
+        rowIndex,
+    }: {allowInteractive: boolean; followingUserText: string | undefined; rowIndex: number}
 ): RestoredPartType[] {
     const resultsById = new Map<string, RestoredToolEventI>();
 
@@ -127,6 +135,15 @@ function buildRestoredToolParts(
 
             if (dataPart?.ok && (allowInteractive || !INTERACTIVE_DATA_PART_TYPES.has(dataPart.type))) {
                 parts.push({data: dataPart.data, type: dataPart.type as `data-${string}`} as RestoredPartType);
+            } else if (dataPart?.ok && PICKER_DATA_PART_TYPES.has(dataPart.type)) {
+                const pickedLabel = followingUserText ? PICKED_LABEL_PATTERN.exec(followingUserText)?.[1] : undefined;
+
+                if (pickedLabel) {
+                    parts.push({
+                        data: {...dataPart.data, pickedLabel},
+                        type: dataPart.type as `data-${string}`,
+                    } as RestoredPartType);
+                }
             }
         }
     });
@@ -170,8 +187,13 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
             return;
         }
 
+        const followingUserRow = messages
+            .slice(rowIndex + 1)
+            .find((message) => mapServerRoleToClient(message.role) === 'user');
+
         const toolParts = buildRestoredToolParts(parseRestoredToolEvents(serverMessage.toolEventsJson), {
             allowInteractive: rowIndex >= lastUserRowIndex,
+            followingUserText: followingUserRow?.content,
             rowIndex,
         });
 
