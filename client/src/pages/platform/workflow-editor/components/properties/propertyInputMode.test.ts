@@ -29,6 +29,18 @@ describe('getPropertyInputMode', () => {
             value: '${trigger_1.id}',
         },
         {
+            controlType: 'INTEGER',
+            expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true},
+            name: 'a lone pill on a number renders the one-pill editor',
+            value: '${trigger_1.count}',
+        },
+        {
+            controlType: 'TEXT_AREA',
+            expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false},
+            name: 'an empty text-like control is still the mentions editor',
+            value: '',
+        },
+        {
             controlType: 'NUMBER',
             expected: {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false},
             name: 'text around a pill on a non-string is legacy mixed',
@@ -213,6 +225,8 @@ describe('fromFormulaValue', () => {
         {expected: 2.5, type: 'NUMBER', value: '=2.5'},
         {expected: undefined, type: 'INTEGER', value: '=2.5'},
         {expected: true, type: 'BOOLEAN', value: '=true'},
+        {expected: false, type: 'BOOLEAN', value: '=false'},
+        {expected: undefined, type: 'BOOLEAN', value: '=yes'},
         {expected: 'x', type: 'STRING', value: "='x'"},
         {expected: "it's", type: 'STRING', value: "='it''s'"},
         {expected: undefined, type: 'NUMBER', value: "='x'"},

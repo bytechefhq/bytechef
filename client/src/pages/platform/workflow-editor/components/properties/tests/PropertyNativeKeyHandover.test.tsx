@@ -11,6 +11,7 @@ import {PropertyAllType} from '@/shared/types';
 import {render} from '@/shared/util/test-utils';
 import {act, fireEvent, screen, waitFor} from '@testing-library/react';
 import {StrictMode} from 'react';
+import {useForm} from 'react-hook-form';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const countProperty = {
@@ -114,6 +115,22 @@ describe('keyboard handover from an empty number field', () => {
         expect(editorElement).not.toBeNull();
         expect(container.querySelector('input[type=number]')).toBeNull();
         expect(document.activeElement).toBe(editorElement);
+    });
+
+    it.each(['$', '='])('%s on a number field holding a typed value keeps the native input', async (key) => {
+        const {container} = renderEmptyCount();
+
+        const input = container.querySelector('input[type=number]') as HTMLInputElement;
+
+        fireEvent.focus(input);
+        fireEvent.change(input, {target: {value: '5'}});
+        fireEvent.keyDown(input, {key});
+
+        await settle();
+
+        expect(container.querySelector('.ProseMirror')).toBeNull();
+        expect(container.querySelector('input[type=number]')).not.toBeNull();
+        expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'false');
     });
 });
 
@@ -231,6 +248,22 @@ describe('keyboard handover from a select holding an option', () => {
             expect(saveProperty).not.toHaveBeenCalled();
         }
     );
+
+    it('= on a select holding an option keeps the select', async () => {
+        const {container} = renderSelect(methodProperty, 'GET');
+
+        const trigger = container.querySelector('[role=combobox]') as HTMLElement;
+
+        fireEvent.focus(trigger);
+        fireEvent.keyDown(trigger, {key: '='});
+
+        await settle();
+
+        expect(container.querySelector('.ProseMirror')).toBeNull();
+        expect(container.querySelector('[role=combobox]')?.textContent).toContain('GET');
+        expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'false');
+        expect(saveProperty).not.toHaveBeenCalled();
+    });
 });
 
 const tagsProperty = {
@@ -305,6 +338,88 @@ describe('the Dynamic switch', () => {
         );
 
         expect(container.querySelector('.ProseMirror [data-id="trigger_1.flag"]')).not.toBeNull();
+    });
+
+    it.each([
+        [
+            'an empty object builder',
+            {
+                controlType: 'OBJECT_BUILDER',
+                expressionEnabled: true,
+                label: 'Settings',
+                name: 'settings',
+                properties: [countProperty],
+                type: 'OBJECT',
+            },
+            {},
+        ],
+        [
+            'an empty JSON schema builder',
+            {
+                controlType: 'JSON_SCHEMA_BUILDER',
+                expressionEnabled: true,
+                label: 'Response',
+                name: 'schema',
+                type: 'STRING',
+            },
+            '',
+        ],
+    ])('is offered on %s', (_, property, parameterValue) => {
+        renderSelect(property as PropertyAllType, parameterValue);
+
+        expect(screen.getByRole('switch', {name: 'Dynamic'})).not.toBeChecked();
+    });
+
+    it.each([
+        ['a number field', countProperty, 5],
+        [
+            'a text field',
+            {controlType: 'TEXT', expressionEnabled: true, label: 'URI', name: 'uri', type: 'STRING'},
+            'x',
+        ],
+        [
+            'an array item object',
+            {
+                controlType: 'OBJECT_BUILDER',
+                expressionEnabled: true,
+                label: 'Item',
+                name: '__item',
+                properties: [countProperty],
+                type: 'OBJECT',
+            },
+            {},
+        ],
+        ['a select with expressions disabled', {...methodProperty, expressionEnabled: false}, 'GET'],
+        ['an empty array builder with expressions disabled', {...tagsProperty, expressionEnabled: false}, undefined],
+    ])('is not offered on %s', (_, property, parameterValue) => {
+        renderSelect(property as PropertyAllType, parameterValue);
+
+        expect(screen.queryByRole('switch', {name: 'Dynamic'})).toBeNull();
+    });
+
+    it('is not offered on a controlled select', () => {
+        const ControlledSelect = () => {
+            const form = useForm({defaultValues: {method: 'GET'}});
+
+            return (
+                <TooltipProvider>
+                    <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
+                        <Property
+                            control={form.control as never}
+                            controlPath=""
+                            formState={form.formState}
+                            property={methodProperty}
+                            toolsMode
+                        />
+                    </WorkflowEditorProvider>
+                </TooltipProvider>
+            );
+        };
+
+        render(<ControlledSelect />);
+
+        expect(screen.queryByRole('switch', {name: 'Dynamic'})).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Formula'})).toBeInTheDocument();
     });
 
     it('is not offered in Formula mode', () => {

@@ -7,7 +7,7 @@ import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {render} from '@/shared/util/test-utils';
-import {act, waitFor} from '@testing-library/react';
+import {act, fireEvent, waitFor} from '@testing-library/react';
 import {Editor} from '@tiptap/react';
 import {ComponentProps} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -81,6 +81,47 @@ describe('single-pill editor', () => {
         });
 
         await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith('${new.pill}'));
+    });
+
+    it('takes only $ while empty', async () => {
+        const {getEditor} = renderSinglePill({value: ''});
+
+        await settle();
+
+        const pressKey = (key: string) => {
+            const keyPressEvent = new KeyboardEvent('keypress', {
+                bubbles: true,
+                cancelable: true,
+                charCode: key.charCodeAt(0),
+                key,
+            });
+
+            getEditor().view.dom.dispatchEvent(keyPressEvent);
+
+            return keyPressEvent.defaultPrevented;
+        };
+
+        expect(pressKey('a')).toBe(true);
+        expect(pressKey('5')).toBe(true);
+        expect(pressKey('$')).toBe(false);
+    });
+
+    it('deletes the pill on Backspace and reports an empty value', async () => {
+        const {getEditor, onValueChange} = renderSinglePill({value: '${old.pill}'});
+
+        await settle();
+
+        act(() => {
+            getEditor().commands.focus('end');
+        });
+
+        await settle();
+
+        fireEvent.keyDown(getEditor().view.dom, {code: 'Backspace', key: 'Backspace', keyCode: 8});
+
+        await waitFor(() => expect(onValueChange).toHaveBeenLastCalledWith(''));
+
+        expect(getEditor().state.doc.textContent).toBe('');
     });
 
     it('reports an empty value when the pill is deleted', async () => {

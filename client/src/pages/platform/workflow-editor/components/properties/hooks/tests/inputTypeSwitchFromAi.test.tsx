@@ -102,6 +102,24 @@ describe('Formula mode on a from-AI property', () => {
         });
     });
 
+    describe('leaving Formula after customizing', () => {
+        it('returns an empty Text mode without the model filling the property', () => {
+            const {result} = renderUriProperty({fromAi: true});
+
+            act(() => result.current.handleFromAiClick?.(false));
+
+            expect(result.current.isFormulaMode).toBe(true);
+
+            act(() => result.current.handleFormulaSwitch());
+
+            expect(result.current.isFromAi).toBe(false);
+            expect(result.current.isFormulaMode).toBe(false);
+            expect(result.current.mentionInputValue).toBe('');
+            expect(result.current.propertyParameterValue).toBe('');
+            expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
+        });
+    });
+
     describe('switching Formula on and off', () => {
         it('leaves the field empty for a property the model does not fill', () => {
             const {result} = renderUriProperty();

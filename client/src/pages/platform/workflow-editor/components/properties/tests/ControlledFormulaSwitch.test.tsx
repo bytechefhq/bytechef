@@ -12,6 +12,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {PropertyAllType} from '@/shared/types';
 import {render} from '@/shared/util/test-utils';
 import {fireEvent, screen, waitFor, within} from '@testing-library/react';
+import {Editor} from '@tiptap/react';
 import {ReactNode} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -253,6 +254,52 @@ describe('controlled Formula switch', () => {
         fireEvent.click(screen.getByRole('switch', {name: 'Formula'}));
 
         await waitFor(() => expect(formValues.priority).toBe('2'));
+    });
+
+    it('clears mixed text and pills when Formula turns on', async () => {
+        const {container} = render(<Wrapper property={uriProperty} value="hello ${trigger_1.name}" />);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Formula'}));
+
+        await waitFor(() => expect(formValues.uri).toBe('='));
+
+        expect(container.querySelector('.ProseMirror')?.textContent).toBe('');
+        expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'true');
+    });
+
+    it('focuses the formula editor at the end when Formula turns on', async () => {
+        const {container} = render(<Wrapper property={countProperty} value={5} />);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Formula'}));
+
+        await settle();
+
+        const editorElement = container.querySelector('.ProseMirror') as HTMLElement & {editor: Editor};
+
+        expect(editorElement.textContent).toBe('5');
+        expect(document.activeElement).toBe(editorElement);
+        expect(editorElement.editor.state.selection.to).toBe(editorElement.editor.state.doc.content.size - 1);
+    });
+
+    it('focuses the native input when Formula turns off', async () => {
+        const {container} = render(<Wrapper property={countProperty} value="=7" />);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Formula'}));
+
+        await waitFor(() => expect(formValues.count).toBe(7));
+
+        await settle();
+
+        const input = container.querySelector('input[type=number]');
+
+        expect(input).not.toBeNull();
+        expect(document.activeElement).toBe(input);
     });
 
     it('typing = into an empty number field enters formula mode', async () => {

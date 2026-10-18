@@ -126,6 +126,42 @@ describe('uncontrolled Text/Formula', () => {
         expect(result.current.editorFocusRequest?.initialInput).toBe('$');
     });
 
+    it('$ on an empty NUMBER field opens pill entry and requests editor focus with $', () => {
+        const {result} = renderHook(
+            () =>
+                useProperty({
+                    parameterValue: '',
+                    path: 'parameters.amount',
+                    property: {
+                        ...countProperty,
+                        controlType: 'NUMBER',
+                        name: 'amount',
+                        type: 'NUMBER',
+                    } as PropertyAllType,
+                }),
+            {wrapper}
+        );
+
+        const preventDefault = vi.fn();
+
+        act(() => result.current.handleNativeKeyDown({currentTarget: {value: ''}, key: '$', preventDefault} as never));
+
+        expect(preventDefault).toHaveBeenCalled();
+        expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
+        expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+    });
+
+    it('ignores = when the field already holds a constant', () => {
+        const {result} = renderCount(5);
+
+        const preventDefault = vi.fn();
+
+        act(() => result.current.handleNativeKeyDown({currentTarget: {value: '5'}, key: '=', preventDefault} as never));
+
+        expect(preventDefault).not.toHaveBeenCalled();
+        expect(result.current.isFormulaMode).toBe(false);
+    });
+
     it('= on an empty number field enters formula mode', () => {
         const {result} = renderCount('');
 
@@ -369,6 +405,7 @@ describe('uncontrolled Text/Formula', () => {
 
                 expect(result.current.inputMode.renderer).toBe('native');
             });
+
         });
 
         describe('the Dynamic switch', () => {
@@ -452,6 +489,18 @@ describe('uncontrolled Text/Formula', () => {
             act(() => result.current.handleSelectKeyDown({key: 'G', preventDefault} as never));
 
             expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.inputMode.renderer).toBe('native');
+        });
+
+        it('ignores =', () => {
+            const {result} = renderSelect(methodProperty, 'GET');
+
+            const preventDefault = vi.fn();
+
+            act(() => result.current.handleSelectKeyDown({key: '=', preventDefault} as never));
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(false);
             expect(result.current.inputMode.renderer).toBe('native');
         });
 

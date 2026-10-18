@@ -2,6 +2,7 @@ vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({
     default: vi.fn(),
 }));
 
+import {FormulaEnabledProvider} from '@/pages/platform/workflow-editor/components/properties/FormulaEnabledContext';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -399,6 +400,54 @@ describe('non-string expression mode', () => {
 
         it('should show for DATE type with expressionEnabled', () => {
             expect(renderShowFormulaSwitch({controlType: 'DATE', expressionEnabled: true, type: 'DATE'})).toBe(true);
+        });
+
+        it('should show for BOOLEAN and options SELECT types with expressionEnabled', () => {
+            expect(renderShowFormulaSwitch({controlType: 'SELECT', expressionEnabled: true, type: 'BOOLEAN'})).toBe(
+                true
+            );
+            expect(
+                renderShowFormulaSwitch({
+                    controlType: 'SELECT',
+                    expressionEnabled: true,
+                    options: [{label: 'GET', value: 'GET'}],
+                    type: 'STRING',
+                })
+            ).toBe(true);
+        });
+
+        it('should NOT show for FORMULA_MODE controls or DYNAMIC_PROPERTIES types', () => {
+            expect(
+                renderShowFormulaSwitch({controlType: 'FORMULA_MODE', expressionEnabled: true, type: 'STRING'})
+            ).toBe(false);
+            expect(
+                renderShowFormulaSwitch({
+                    controlType: 'DYNAMIC_PROPERTIES',
+                    expressionEnabled: true,
+                    type: 'DYNAMIC_PROPERTIES',
+                })
+            ).toBe(false);
+        });
+
+        it('should NOT show when the surface disables formulas', () => {
+            const {result} = renderHook(
+                () =>
+                    useProperty({
+                        path: 'parameters.field',
+                        property: {
+                            controlType: 'INTEGER',
+                            expressionEnabled: true,
+                            name: 'field',
+                            type: 'INTEGER',
+                        } as PropertyAllType,
+                    }),
+                {
+                    wrapper: ({children}: {children: ReactNode}) =>
+                        createElement(FormulaEnabledProvider, {value: false}, wrapper({children})),
+                }
+            );
+
+            expect(result.current.showFormulaSwitch).toBe(false);
         });
 
         it('should NOT show for FILE_ENTRY, NULL or CODE_EDITOR controls', () => {

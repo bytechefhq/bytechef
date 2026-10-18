@@ -147,6 +147,35 @@ describe('keyboard handover from an empty container', () => {
         expect(screen.getByRole('button', {name: /add array item/i})).toBeInTheDocument();
     });
 
+    it.each([
+        ['$', '$'],
+        ['=', ''],
+    ])('%s on the hint of an empty array item object swaps to the editor', async (key, editorText) => {
+        setParameters({rows: [{}]});
+
+        const {container} = render(
+            <TooltipProvider>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
+                    <Property path="rows[0]" property={{...objectProperty, name: '__item'} as PropertyAllType} />
+                </WorkflowEditorProvider>
+            </TooltipProvider>
+        );
+
+        await settle();
+
+        expect(screen.queryByRole('switch', {name: 'Dynamic'})).toBeNull();
+
+        pressKeyOn(screen.getByText('Drop or click a data pill, or type $'), key);
+
+        await settle();
+
+        const editorElement = container.querySelector('.ProseMirror');
+
+        expect(editorElement).not.toBeNull();
+        expect(editorElement!.textContent).toBe(editorText);
+        expect(document.activeElement).toBe(editorElement);
+    });
+
     it('$ in a nested field of an empty object stays with that field', async () => {
         setParameters({settings: {}});
 

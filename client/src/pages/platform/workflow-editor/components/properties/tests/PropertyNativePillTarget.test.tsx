@@ -137,6 +137,76 @@ describe('native pill target', () => {
         );
     });
 
+    it('a pill clicked after focusing a boolean select replaces its option', async () => {
+        const {container} = renderUncontrolled(booleanProperty, true);
+
+        fireEvent.focus(container.querySelector('button')!);
+
+        act(() => useWorkflowNodeDetailsPanelStore.getState().pillTarget!.insertPill('trigger_1.enabled'));
+
+        await waitFor(() =>
+            expect(container.querySelector('.ProseMirror [data-id="trigger_1.enabled"]')).not.toBeNull()
+        );
+
+        expect(saveProperty).toHaveBeenLastCalledWith(
+            expect.objectContaining({path: 'parameters.enabled', value: '${trigger_1.enabled}'})
+        );
+    });
+
+    it('dropping a pill onto a select replaces its option', async () => {
+        const {container} = renderUncontrolled(booleanProperty, true);
+
+        const dataTransfer = {
+            getData: () => JSON.stringify({mentionId: 'trigger_1.enabled'}),
+            types: ['application/bytechef-datapill'],
+        };
+
+        fireEvent.drop(container.querySelector('button')!, {dataTransfer});
+
+        await waitFor(() =>
+            expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: '${trigger_1.enabled}'}))
+        );
+
+        await waitFor(() =>
+            expect(container.querySelector('.ProseMirror [data-id="trigger_1.enabled"]')).not.toBeNull()
+        );
+    });
+
+    it('a field with expressions disabled does not accept pills', () => {
+        const {container} = renderUncontrolled({...countProperty, expressionEnabled: false} as PropertyAllType, 5);
+
+        fireEvent.focus(container.querySelector('input')!);
+
+        const pillTarget = useWorkflowNodeDetailsPanelStore.getState().pillTarget;
+
+        expect(pillTarget === null || pillTarget.acceptsPill() === false).toBe(true);
+    });
+
+    it('a pill clicked in Formula mode lands in the formula text', async () => {
+        const {container} = renderUncontrolled(countProperty, '=1 + ');
+
+        await waitFor(() => expect(container.querySelector('.ProseMirror')).not.toBeNull());
+
+        const editorElement = container.querySelector('.ProseMirror') as HTMLElement & {
+            editor: {commands: {focus: (position: string) => void}};
+        };
+
+        act(() => editorElement.editor.commands.focus('end'));
+
+        await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget).not.toBeNull());
+
+        act(() => useWorkflowNodeDetailsPanelStore.getState().pillTarget!.insertPill('trigger_1.count'));
+
+        await waitFor(() =>
+            expect(saveProperty).toHaveBeenLastCalledWith(
+                expect.objectContaining({value: expect.stringMatching(/^=1 \+ ?\$\{trigger_1\.count}$/)})
+            )
+        );
+
+        expect(editorElement.textContent).toContain('1 +');
+        expect(editorElement.querySelector('[data-id="trigger_1.count"]')).not.toBeNull();
+    });
+
     it('a fromAi field does not accept pills', () => {
         const {container} = renderUncontrolled(countProperty, "=fromAi('count', 'INTEGER', {'required': false})");
 
