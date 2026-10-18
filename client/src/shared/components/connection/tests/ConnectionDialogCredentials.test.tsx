@@ -12,6 +12,7 @@ import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest
 
 const hoisted = vi.hoisted(() => ({
     embeddedGrants: {} as Record<number, string[]>,
+    ownerOrTenantAdmin: true,
     workspaceGrants: {} as Record<number, string[]>,
 }));
 
@@ -39,6 +40,10 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', async () => {
             ).includes(scope),
     };
 });
+
+vi.mock('@/shared/hooks/useIsResourceOwnerOrTenantAdmin', () => ({
+    useIsResourceOwnerOrTenantAdmin: () => hoisted.ownerOrTenantAdmin,
+}));
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(),
@@ -169,6 +174,7 @@ describe('ConnectionDialog withheld credentials', () => {
 
     beforeEach(() => {
         hoisted.embeddedGrants = {};
+        hoisted.ownerOrTenantAdmin = true;
         hoisted.workspaceGrants = {};
 
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
@@ -297,6 +303,22 @@ describe('ConnectionDialog withheld credentials', () => {
 
         expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
         expect(screen.getByText('secret-api-key-value')).toBeInTheDocument();
+    });
+
+    it('testAutomationEditorWhoDoesNotOwnTheConnectionSeesHiddenCredentials', () => {
+        act(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.ownerOrTenantAdmin = false;
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderEditDialog();
+
+        expect(screen.getAllByText('Hidden')).toHaveLength(3);
+        expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
     });
 
     it('testAnExplicitPlatformTypeWinsOverAStaleStoredType', () => {
