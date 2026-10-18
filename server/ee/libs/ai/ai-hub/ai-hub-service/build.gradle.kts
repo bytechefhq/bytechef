@@ -41,10 +41,16 @@ dependencies {
     testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest")) {
+        exclude(module = "ai-hub-service")
+    }
     testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-graphql")) {
         exclude(module = "ai-hub-service")
     }
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service"))
 }
