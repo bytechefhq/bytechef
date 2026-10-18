@@ -33,7 +33,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -159,6 +161,55 @@ final class MultiIssuerJwtDecoderTest {
         multiIssuerJwtDecoder.decode(token);
 
         assertThat(jwtDecoderFactory.createdDecoderCount).isEqualTo(1);
+    }
+
+    @Test
+    void testRejectsTokenAsBadJwtWhenTheIssuerConfigurationCannotBeLoaded() {
+        MultiIssuerJwtDecoder multiIssuerJwtDecoder = new MultiIssuerJwtDecoder(issuer -> {
+            throw new IllegalArgumentException("Unable to resolve the Configuration with the provided Issuer");
+        });
+
+        String token = signToken(ISSUER_A, keyPairA);
+
+        assertThatExceptionOfType(BadJwtException.class)
+            .isThrownBy(() -> multiIssuerJwtDecoder.decode(token));
+    }
+
+    @Test
+    void testRejectsTokenAsBadJwtWhenTheIssuerKeysCannotBeRetrieved() {
+        MultiIssuerJwtDecoder multiIssuerJwtDecoder = new MultiIssuerJwtDecoder(issuer -> token -> {
+            throw new JwtException("Couldn't retrieve remote JWK set");
+        });
+
+        String token = signToken(ISSUER_A, keyPairA);
+
+        assertThatExceptionOfType(BadJwtException.class)
+            .isThrownBy(() -> multiIssuerJwtDecoder.decode(token));
+    }
+
+    @Test
+    void testRetriesTheIssuerConfigurationAfterAFailedLoad() {
+        AtomicBoolean issuerReachable = new AtomicBoolean();
+
+        MultiIssuerJwtDecoder multiIssuerJwtDecoder = new MultiIssuerJwtDecoder(issuer -> {
+            if (!issuerReachable.get()) {
+                throw new IllegalArgumentException("Unable to resolve the Configuration with the provided Issuer");
+            }
+
+            return perIssuerDecoder(issuer);
+        });
+
+        String token = signToken(ISSUER_A, keyPairA);
+
+        assertThatExceptionOfType(BadJwtException.class)
+            .isThrownBy(() -> multiIssuerJwtDecoder.decode(token));
+
+        issuerReachable.set(true);
+
+        Jwt jwt = multiIssuerJwtDecoder.decode(token);
+
+        assertThat(jwt.getIssuer()
+            .toString()).isEqualTo(ISSUER_A);
     }
 
     private JwtDecoder perIssuerDecoder(String issuer) {
