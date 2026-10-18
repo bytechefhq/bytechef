@@ -123,6 +123,11 @@ class AiHubSpringAIAgentTest {
     }
 
     @Test
+    void testSplitsTextAtToolCallsSoToolEventsStreamDuringTheTurn() throws AGUIException {
+        assertThat(newAgent().splitsTextAtToolCalls()).isTrue();
+    }
+
+    @Test
     void testCreateSystemMessageIncludesActiveTabContext() throws AGUIException {
         AiHubSpringAIAgent agent = newAgent();
 
