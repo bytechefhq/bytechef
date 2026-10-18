@@ -314,6 +314,176 @@ export type AiDefaultModel = {
   provider: Scalars['String']['output'];
 };
 
+/**
+ * AI Hub chat metadata. {@code threadId} is client-generated and keys the chat's session memory;
+ * the (workspace, user, environment, threadId) tuple uniquely identifies the chat thread.
+ */
+export type AiHubChat = {
+  __typename?: 'AiHubChat';
+  /**
+   * Whether the title was set automatically and remains eligible for LLM regeneration. Flips to false
+   * when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
+   */
+  autoTitled: Scalars['Boolean']['output'];
+  createdAt?: Maybe<Scalars['Long']['output']>;
+  environmentId: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  /** Whether the current caller is this chat's owner. */
+  isOwner: Scalars['Boolean']['output'];
+  lastPreview?: Maybe<Scalars['String']['output']>;
+  messageCount: Scalars['Int']['output'];
+  /** The chat owner's user id, resolved off the row's userId column. */
+  ownerUserId: Scalars['Long']['output'];
+  status: AiHubChatStatus;
+  threadId: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['Long']['output']>;
+  userId: Scalars['Long']['output'];
+  workspaceId: Scalars['Long']['output'];
+};
+
+/**
+ * Audit/undo log row for a AI Hub mutation. Mirrors {@link AiHubChatArtifact}: id is the primary
+ * key, chatId pins the row to a chat, kind/status are ordinal-pinned enums, environmentId is
+ * denormalised from the parent chat at write time so analytics queries do not need a join.
+ */
+export type AiHubChatArtifact = {
+  __typename?: 'AiHubChatArtifact';
+  artifactId: Scalars['String']['output'];
+  artifactName: Scalars['String']['output'];
+  chatId: Scalars['ID']['output'];
+  createdAt?: Maybe<Scalars['Long']['output']>;
+  environmentId: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  kind: AiHubChatArtifactKind;
+  metadataJson?: Maybe<Scalars['String']['output']>;
+  status: AiHubChatArtifactStatus;
+  statusChangedAt?: Maybe<Scalars['Long']['output']>;
+};
+
+export enum AiHubChatArtifactKind {
+  AiAgentReferenced = 'AI_AGENT_REFERENCED',
+  ApiCollectionReferenced = 'API_COLLECTION_REFERENCED',
+  BinaryFileCreated = 'BINARY_FILE_CREATED',
+  ChatReferenced = 'CHAT_REFERENCED',
+  CodeWorkflowReferenced = 'CODE_WORKFLOW_REFERENCED',
+  CustomComponentReferenced = 'CUSTOM_COMPONENT_REFERENCED',
+  DataTableColumnAdded = 'DATA_TABLE_COLUMN_ADDED',
+  DataTableReferenced = 'DATA_TABLE_REFERENCED',
+  DataTableRowAdded = 'DATA_TABLE_ROW_ADDED',
+  DataTableRowDeleted = 'DATA_TABLE_ROW_DELETED',
+  DataTableRowUpdated = 'DATA_TABLE_ROW_UPDATED',
+  FileCreated = 'FILE_CREATED',
+  FileReferenced = 'FILE_REFERENCED',
+  FileUpdated = 'FILE_UPDATED',
+  KbDocumentAdded = 'KB_DOCUMENT_ADDED',
+  KbDocumentDeleted = 'KB_DOCUMENT_DELETED',
+  KbReferenced = 'KB_REFERENCED',
+  McpServerReferenced = 'MCP_SERVER_REFERENCED',
+  MemoryCreated = 'MEMORY_CREATED',
+  MemoryDeleted = 'MEMORY_DELETED',
+  MemoryRenamed = 'MEMORY_RENAMED',
+  MemoryUpdated = 'MEMORY_UPDATED',
+  SkillReferenced = 'SKILL_REFERENCED',
+  WorkflowCreated = 'WORKFLOW_CREATED',
+  WorkflowExecutionReferenced = 'WORKFLOW_EXECUTION_REFERENCED',
+  WorkflowExecutionStarted = 'WORKFLOW_EXECUTION_STARTED',
+  WorkflowReferenced = 'WORKFLOW_REFERENCED',
+  WorkflowUpdated = 'WORKFLOW_UPDATED'
+}
+
+export enum AiHubChatArtifactStatus {
+  Applied = 'APPLIED',
+  Expired = 'EXPIRED',
+  Irreversible = 'IRREVERSIBLE'
+}
+
+/**
+ * Single chat message in a chat. {@code role} is one of {@code user}/{@code assistant}/{@code system};
+ * {@code timestamp} is the message's epoch-milli arrival time.
+ */
+export type AiHubChatMessage = {
+  __typename?: 'AiHubChatMessage';
+  content: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  timestamp: Scalars['Long']['output'];
+  /**
+   * Nullable JSON array of the tool activity that followed this row before the next visible row. Entries are
+   * {kind: "call", id, name, arguments} and {kind: "result", id, name, response}. The client rebuilds tool-call
+   * cards from it on reload.
+   */
+  toolEventsJson?: Maybe<Scalars['String']['output']>;
+};
+
+export type AiHubChatPatchInput = {
+  id: Scalars['ID']['input'];
+  lastPreview?: InputMaybe<Scalars['String']['input']>;
+  messageCount?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<AiHubChatStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export enum AiHubChatStatus {
+  Active = 'ACTIVE',
+  Archived = 'ARCHIVED',
+  Deleted = 'DELETED'
+}
+
+export type AiHubToolApproval = {
+  __typename?: 'AiHubToolApproval';
+  arguments: Scalars['String']['output'];
+  chatId: Scalars['ID']['output'];
+  comment?: Maybe<Scalars['String']['output']>;
+  componentName?: Maybe<Scalars['String']['output']>;
+  createdDate: Scalars['Long']['output'];
+  decidedAt?: Maybe<Scalars['Long']['output']>;
+  decidedByUserId?: Maybe<Scalars['Long']['output']>;
+  executionError?: Maybe<Scalars['String']['output']>;
+  expiresAt: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  requestedByUserId: Scalars['Long']['output'];
+  status: AiHubToolApprovalStatus;
+  toolKind: AiHubToolKind;
+  toolName: Scalars['String']['output'];
+};
+
+export type AiHubToolApprovalResolution = {
+  __typename?: 'AiHubToolApprovalResolution';
+  approval: AiHubToolApproval;
+  continuationStarted: Scalars['Boolean']['output'];
+  runId?: Maybe<Scalars['String']['output']>;
+};
+
+export type AiHubToolApprovalRule = {
+  __typename?: 'AiHubToolApprovalRule';
+  componentName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  mode: AiHubToolApprovalRuleMode;
+  toolKind: AiHubToolKind;
+  toolName: Scalars['String']['output'];
+  workspaceId: Scalars['Long']['output'];
+};
+
+export enum AiHubToolApprovalRuleMode {
+  Exempt = 'EXEMPT',
+  Require = 'REQUIRE'
+}
+
+export enum AiHubToolApprovalStatus {
+  Approved = 'APPROVED',
+  Expired = 'EXPIRED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED',
+  Superseded = 'SUPERSEDED'
+}
+
+export enum AiHubToolKind {
+  Catalog = 'CATALOG',
+  Component = 'COMPONENT'
+}
+
 export type AiProviderCatalogItem = {
   __typename?: 'AiProviderCatalogItem';
   enabled: Scalars['Boolean']['output'];
@@ -1118,6 +1288,11 @@ export type DateTimeProperty = Property & {
   type: PropertyType;
 };
 
+export type DeleteAiHubChatArtifactInput = {
+  artifactId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type DeleteRowInput = {
   environmentId: Scalars['ID']['input'];
   id: Scalars['ID']['input'];
@@ -1780,7 +1955,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  /** Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn. */
+  appendAiHubChatAssistantMessage: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
+  /**
+   * Cancels the in-flight agent run of a chat. Returns {@code true} when a live run was cancelled and
+   * {@code false} when none was in flight. The optional {@code runId} is the AG-UI run id of the turn being
+   * stopped; when supplied the server tombstones it so a Stop that arrives before the run registers still sticks.
+   */
+  cancelAiHubRun: Scalars['Boolean']['output'];
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
@@ -1790,6 +1973,12 @@ export type Mutation = {
   createAiAgentJudge: AiAgentJudge;
   createAiAgentScenarioJudge: AiAgentScenarioJudge;
   createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  /**
+   * Creates a new chat, or returns the existing one if the same {@code threadId} is reused. Idempotent
+   * on (workspace, user, environment, threadId).
+   */
+  createAiHubChat: AiHubChat;
+  createAiHubToolApprovalRule: AiHubToolApprovalRule;
   createAiSkill: AiSkill;
   createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
@@ -1826,6 +2015,19 @@ export type Mutation = {
    * Fails with CONFLICT when another write changes the memory while it is being deleted; reload it and retry.
    */
   deleteAiAutoMemory: Scalars['Boolean']['output'];
+  /**
+   * Hard-deletes a chat, its artifacts and its approvals, and removes its session messages. Returns true on
+   * success.
+   */
+  deleteAiHubChat: Scalars['Boolean']['output'];
+  /**
+   * Removes a user-attached reference artifact (FILE_REFERENCED / WORKFLOW_REFERENCED /
+   * DATA_TABLE_REFERENCED / KB_REFERENCED) from a chat. Returns `true` on success or when the row was
+   * already gone (idempotent). Throws on ownership / workspace mismatch and on any non-reference kind -
+   * those are agent-driven audit rows that the user cannot delete via this surface.
+   */
+  deleteAiHubChatArtifact: Scalars['Boolean']['output'];
+  deleteAiHubToolApprovalRule: Scalars['Boolean']['output'];
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -1874,6 +2076,12 @@ export type Mutation = {
   enableWebSearchProvider?: Maybe<Scalars['Boolean']['output']>;
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
+  /**
+   * Generates a title for a chat with the title-generation service, then saves it. Returns the current state
+   * without calling the LLM when the title is no longer auto-generated. Fails with a typed error code when the
+   * upstream model is unavailable so the client can surface a retryable error.
+   */
+  generateAiHubChatTitle: AiHubChat;
   generateFromDocumentation: ApiConnector;
   generatePropertyValue: GeneratePropertyValuePayload;
   generateSpecification: GenerateSpecificationResponse;
@@ -1887,10 +2095,18 @@ export type Mutation = {
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  /**
+   * Records a user-attached reference (file / workflow / data table / knowledge base) as a chat
+   * artifact so it appears in the sidebar artifact list. Idempotent - re-attaching the same resource hits
+   * the existing row instead of creating a duplicate. Used by the composer plus-button menu when the user
+   * references an artifact in a chat.
+   */
+  recordReferencedAiHubChatArtifact: AiHubChatArtifact;
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  resolveAiHubToolApproval: AiHubToolApprovalResolution;
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -1903,6 +2119,11 @@ export type Mutation = {
   testClusterElementScript: ScriptTestExecution;
   testWebSearchProvider: WebSearchProviderTestResult;
   testWorkflowNodeScript: ScriptTestExecution;
+  /**
+   * Truncates the chat history, deleting the message at {@code fromMessageIndex} and every message after it.
+   * Returns the number of session events deleted; zero when the index is past the end.
+   */
+  truncateAiHubChatMessages: Scalars['Int']['output'];
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -1922,6 +2143,11 @@ export type Mutation = {
    * when the memory has changed since expectedVersion, or when another write races this one; reload it and retry.
    */
   updateAiAutoMemory: AiAutoMemory;
+  /**
+   * Partial update of a chat by primary key. At least one of {@code title}, {@code lastPreview},
+   * {@code messageCount}, {@code status} must be non-null; an all-null patch is rejected with BAD_REQUEST.
+   */
+  updateAiHubChat: AiHubChat;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -1970,8 +2196,22 @@ export type MutationAddDataTableColumnArgs = {
 };
 
 
+export type MutationAppendAiHubChatAssistantMessageArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationCancelAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCancelAiHubRunArgs = {
+  id: Scalars['ID']['input'];
+  runId?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2038,6 +2278,21 @@ export type MutationCreateAiAgentScenarioToolSimulationArgs = {
   responsePrompt: Scalars['String']['input'];
   simulationModel?: InputMaybe<Scalars['String']['input']>;
   toolName: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAiHubChatArgs = {
+  environment: Scalars['Int']['input'];
+  threadId: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiHubToolApprovalRuleArgs = {
+  mode: AiHubToolApprovalRuleMode;
+  toolKind: AiHubToolKind;
+  toolName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2212,6 +2467,23 @@ export type MutationDeleteAiAutoMemoryArgs = {
   environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
   principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiHubChatArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiHubChatArtifactArgs = {
+  input: DeleteAiHubChatArtifactInput;
+};
+
+
+export type MutationDeleteAiHubToolApprovalRuleArgs = {
+  ruleId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -2471,6 +2743,12 @@ export type MutationExportSharedWorkflowArgs = {
 };
 
 
+export type MutationGenerateAiHubChatTitleArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationGenerateFromDocumentationArgs = {
   input: GenerateFromDocumentationInput;
 };
@@ -2545,6 +2823,11 @@ export type MutationPublishAutomationWorkflowProjectArgs = {
 };
 
 
+export type MutationRecordReferencedAiHubChatArtifactArgs = {
+  input: RecordReferencedAiHubChatArtifactInput;
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -2563,6 +2846,14 @@ export type MutationRenameDataTableArgs = {
 
 export type MutationRenameDataTableColumnArgs = {
   input: RenameColumnInput;
+};
+
+
+export type MutationResolveAiHubToolApprovalArgs = {
+  approvalId: Scalars['ID']['input'];
+  approved: Scalars['Boolean']['input'];
+  comment?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2657,6 +2948,13 @@ export type MutationTestWorkflowNodeScriptArgs = {
 };
 
 
+export type MutationTruncateAiHubChatMessagesArgs = {
+  fromMessageIndex: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateA2aProjectArgs = {
   id: Scalars['ID']['input'];
   input: UpdateA2aProjectInput;
@@ -2729,6 +3027,11 @@ export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
 
 export type MutationUpdateAiAutoMemoryArgs = {
   input: UpdateAiAutoMemoryInput;
+};
+
+
+export type MutationUpdateAiHubChatArgs = {
+  input: AiHubChatPatchInput;
 };
 
 
@@ -3328,6 +3631,21 @@ export type Query = {
    */
   aiAutoMemoryPrincipals: Array<AiAutoMemoryPrincipal>;
   aiDefaultModel?: Maybe<AiDefaultModel>;
+  /**
+   * Returns the artifact log for a chat, ordered newest-first. A chat the caller may not view is reported as
+   * not found.
+   */
+  aiHubChatArtifactsByAiHubChat: Array<AiHubChatArtifact>;
+  /** Returns the message history for a chat. A chat the caller may not view is reported as not found. */
+  aiHubChatMessages: Array<AiHubChatMessage>;
+  /**
+   * Lists the caller's chats in the given workspace, scoped to the supplied environment, filtered by
+   * lifecycle status (default {@code ACTIVE}).
+   */
+  aiHubChats: Array<AiHubChat>;
+  aiHubToolApprovalDefaultToolNames: Array<Scalars['String']['output']>;
+  aiHubToolApprovalRules: Array<AiHubToolApprovalRule>;
+  aiHubToolApprovals: Array<AiHubToolApproval>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
@@ -3600,6 +3918,36 @@ export type QueryAiAutoMemoryPrincipalsArgs = {
 
 export type QueryAiDefaultModelArgs = {
   environment: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubChatArtifactsByAiHubChatArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubChatMessagesArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubChatsArgs = {
+  environment: Scalars['Int']['input'];
+  status?: InputMaybe<AiHubChatStatus>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubToolApprovalRulesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubToolApprovalsArgs = {
+  chatId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4370,6 +4718,21 @@ export type QueryWorkspaceToolInvocationLogsArgs = {
   surface?: InputMaybe<Scalars['String']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
   type: PlatformType;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type RecordReferencedAiHubChatArtifactInput = {
+  artifactId: Scalars['String']['input'];
+  artifactName: Scalars['String']['input'];
+  chatId: Scalars['ID']['input'];
+  kind: AiHubChatArtifactKind;
+  /**
+   * Optional JSON map of side-channel context the artifact needs to be quick-openable from the sidebar.
+   * For WORKFLOW_REFERENCED this carries `projectId` and `projectWorkflowId` so the sidebar row can open
+   * the workflow tab (which routes by parent project); for other kinds it's currently unused but
+   * schema-symmetric with the agent-driven `record(...)` path. Persisted as-is in `metadata_json`.
+   */
+  metadataJson?: InputMaybe<Scalars['String']['input']>;
   workspaceId: Scalars['ID']['input'];
 };
 
