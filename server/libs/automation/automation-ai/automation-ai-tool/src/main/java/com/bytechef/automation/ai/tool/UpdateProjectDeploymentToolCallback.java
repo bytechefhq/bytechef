@@ -47,7 +47,7 @@ public class UpdateProjectDeploymentToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "projectDeploymentId": {"type": "string", "description": "Numeric project deployment id from listProjectDeployments"},
+                    "projectDeploymentId": {"type": "integer", "description": "Numeric project deployment id from listProjectDeployments"},
                     "name": {"type": "string", "description": "New deployment name (optional; leave omitted to keep)"},
                     "description": {"type": "string", "description": "New description (optional; leave omitted to keep)"}
                 },

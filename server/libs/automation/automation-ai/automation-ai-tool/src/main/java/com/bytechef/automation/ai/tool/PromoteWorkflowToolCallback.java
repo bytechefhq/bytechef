@@ -56,7 +56,7 @@ public class PromoteWorkflowToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "projectId": {"type": "string", "description": "Numeric project id"},
+                    "projectId": {"type": "integer", "description": "Numeric project id"},
                     "projectVersion": {"type": "integer", "description": "A PUBLISHED project version (not the current DRAFT)"},
                     "targetEnvironment": {"type": "string", "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION"},
                     "enable": {"type": "boolean", "description": "Optional. When true, the deployment is toggled on after creation. Default: false."},
