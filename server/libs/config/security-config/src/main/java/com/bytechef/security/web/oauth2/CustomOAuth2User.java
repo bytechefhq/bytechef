@@ -17,6 +17,8 @@
 package com.bytechef.security.web.oauth2;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,7 +42,7 @@ public class CustomOAuth2User implements OAuth2User {
 
         this.login = login;
         this.authorities = List.copyOf(authorities);
-        this.attributes = Map.copyOf(attributes);
+        this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(attributes));
     }
 
     @Override
