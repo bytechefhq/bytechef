@@ -67,7 +67,8 @@ final class IntelligentToolAskCapabilityTest {
 
             String prompt = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-            assertThat(prompt).contains("no selectConnection", "askUserQuestion");
+            assertThat(prompt).contains("You do not have these tools: selectConnection")
+                .doesNotContain("askUserQuestion");
         }
     }
 

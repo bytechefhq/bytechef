@@ -40,6 +40,7 @@ import com.bytechef.ai.copilot.tool.SampleOutputTools;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -92,6 +93,23 @@ import org.springframework.core.io.Resource;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotConfiguration {
+
+    private static final String BUILD_WORKFLOW_SUBAGENT_ASK_SECTION = """
+
+        ## Asking the user
+
+        When a choice is genuinely the user's and you hold 2 to 4 real options for it (values lookupPropertyOptions
+        returned in this delegation, or fixed options from the property definition),
+        ask ONE question with askUserQuestion and stop. Every option must be one of those values.
+        """;
+
+    private static final String BUILD_WORKFLOW_SUBAGENT_NO_ASK_SECTION = """
+
+        ## Asking the user
+
+        You do not have these tools: askUserQuestion.
+        Never ask the user a question. Leave a choice that is genuinely the user's empty and name it in your report.
+        """;
 
     private static final String BUILD_WORKFLOW_SUBAGENT_ADDENDUM = """
 
@@ -760,28 +778,33 @@ public class CopilotConfiguration {
 
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
-        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools) {
+        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
 
         return buildWorkflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools);
+            chatModel, projectWorkflowTools, taskTools, scriptTools, hasAskTool(subAgentAskRelayProvider));
     }
 
     @Bean
     IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
         @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools) {
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+
+        boolean askToolAvailable = hasAskTool(subAgentAskRelayProvider);
 
         return candidateChatModel -> candidateChatModel == null
             ? workflowEditorBuildSubAgentChatClient
             : buildWorkflowEditorBuildSubAgentChatClient(
-                candidateChatModel, projectWorkflowTools, taskTools, scriptTools);
+                candidateChatModel, projectWorkflowTools, taskTools, scriptTools, askToolAvailable);
     }
 
     private ChatClient buildWorkflowEditorBuildSubAgentChatClient(
-        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools) {
+        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        boolean askToolAvailable) {
 
         return ChatClient.builder(chatModel)
-            .defaultSystem(buildWorkflowSubAgentSystemPrompt())
+            .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
             .defaultTools(
                 projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)
@@ -792,9 +815,14 @@ public class CopilotConfiguration {
             .build();
     }
 
-    String buildWorkflowSubAgentSystemPrompt() {
+    private static boolean hasAskTool(ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+        return subAgentAskRelayProvider.getIfAvailable() != null;
+    }
+
+    String buildWorkflowSubAgentSystemPrompt(boolean askToolAvailable) {
         return workflowEditorBuildSystemPrompt + "\n\n" + workflowEditorBuildSubAgentSystemPrompt +
-            BUILD_WORKFLOW_SUBAGENT_ADDENDUM;
+            BUILD_WORKFLOW_SUBAGENT_ADDENDUM + (askToolAvailable
+                ? BUILD_WORKFLOW_SUBAGENT_ASK_SECTION : BUILD_WORKFLOW_SUBAGENT_NO_ASK_SECTION);
     }
 
     @Bean
