@@ -4,6 +4,7 @@ import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.event.BaseEvent;
+import com.agui.core.event.RunErrorEvent;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.function.FunctionCall;
 import com.agui.core.message.*;
@@ -204,7 +205,15 @@ public class SpringAIAgent extends LocalAgent {
 
     private void onError(RunAgentInput input, Throwable throwable, AgentSubscriber subscriber) {
         try {
-            this.emitEvent(runErrorEvent(this.runErrorMessage(input, throwable)), subscriber);
+            RunErrorEvent runErrorEvent = runErrorEvent(this.runErrorMessage(input, throwable));
+
+            try {
+                runErrorEvent.setCode(this.runErrorCode(input, throwable));
+            } catch (RuntimeException codeException) {
+                log.warn("Agent '{}' could not resolve a RUN_ERROR code; emitting it without one", this.agentId, codeException);
+            }
+
+            this.emitEvent(runErrorEvent, subscriber);
         } finally {
             subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
         }
@@ -220,6 +229,18 @@ public class SpringAIAgent extends LocalAgent {
      */
     protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
         return throwable.getMessage();
+    }
+
+    /**
+     * Hook for subclasses to attach the optional AG-UI error code to a RUN_ERROR event. Default returns null, so the
+     * event carries no code.
+     *
+     * @param input     the current run input
+     * @param throwable the failure that ended the run
+     * @return the error code sent to the client, or null for none
+     */
+    protected String runErrorCode(RunAgentInput input, Throwable throwable) {
+        return null;
     }
 
     /**
