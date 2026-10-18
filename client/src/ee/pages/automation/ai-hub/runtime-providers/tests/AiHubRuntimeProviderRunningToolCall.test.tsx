@@ -92,4 +92,82 @@ describe('a live AI Hub turn running buildWorkflow', () => {
 
         expect(container).toBeEmptyDOMElement();
     });
+
+    it('keeps the text before a tool call and puts the text after it in a new bubble', () => {
+        const subscriber = buildAiHubSubscriber({
+            addMessage: aiHubStore.getState().addMessage,
+            appendToLastAssistantMessage: aiHubStore.getState().appendToLastAssistantMessage,
+            assistantMessageIndex: 1,
+            chatId: 'thread-1',
+            getLastUserMessage: () => 'Build me a workflow',
+        });
+
+        const textEvent = (type: EventType, delta?: string) =>
+            ({
+                ...baseParams,
+                event: {delta, messageId: 'm', type},
+                textMessageBuffer: '',
+            }) as never;
+
+        subscriber.onTextMessageStartEvent!(textEvent(EventType.TEXT_MESSAGE_START));
+        subscriber.onTextMessageContentEvent!(
+            textEvent(EventType.TEXT_MESSAGE_CONTENT, "Now I'll build the workflow.")
+        );
+        subscriber.onTextMessageEndEvent?.(textEvent(EventType.TEXT_MESSAGE_END));
+
+        subscriber.onToolCallStartEvent!({
+            ...baseParams,
+            event: {toolCallId: 'call-build', toolCallName: 'buildWorkflow', type: EventType.TOOL_CALL_START},
+        } as unknown as SubscriberParamsType);
+
+        subscriber.onTextMessageStartEvent!(textEvent(EventType.TEXT_MESSAGE_START));
+        subscriber.onTextMessageContentEvent!(textEvent(EventType.TEXT_MESSAGE_CONTENT, 'The workflow is ready.'));
+
+        const projectedMessages = projectMessagesWithToolCalls(
+            aiHubStore.getState().messages,
+            Object.values(aiChatToolCallStore.getState().toolCalls)
+        );
+
+        expect(projectedMessages).toHaveLength(3);
+        expect(projectedMessages[1].content).toEqual([
+            {text: "Now I'll build the workflow.", type: 'text'},
+            expect.objectContaining({toolName: 'buildWorkflow', type: 'tool-call'}),
+        ]);
+        expect(projectedMessages[2]).toEqual({content: 'The workflow is ready.', role: 'assistant'});
+    });
+
+    it('puts text after a tool call that opened the turn in its own bubble below the tool call', () => {
+        const subscriber = buildAiHubSubscriber({
+            addMessage: aiHubStore.getState().addMessage,
+            appendToLastAssistantMessage: aiHubStore.getState().appendToLastAssistantMessage,
+            assistantMessageIndex: 1,
+            chatId: 'thread-1',
+            getLastUserMessage: () => 'Build me a workflow',
+        });
+
+        subscriber.onToolCallStartEvent!({
+            ...baseParams,
+            event: {toolCallId: 'call-build', toolCallName: 'buildWorkflow', type: EventType.TOOL_CALL_START},
+        } as unknown as SubscriberParamsType);
+
+        subscriber.onTextMessageStartEvent!({
+            ...baseParams,
+            event: {messageId: 'm', type: EventType.TEXT_MESSAGE_START},
+        } as unknown as Parameters<NonNullable<AgentSubscriber['onTextMessageStartEvent']>>[0]);
+        subscriber.onTextMessageContentEvent!({
+            ...baseParams,
+            event: {delta: 'Done.', messageId: 'm', type: EventType.TEXT_MESSAGE_CONTENT},
+            textMessageBuffer: '',
+        } as unknown as Parameters<NonNullable<AgentSubscriber['onTextMessageContentEvent']>>[0]);
+
+        const projectedMessages = projectMessagesWithToolCalls(
+            aiHubStore.getState().messages,
+            Object.values(aiChatToolCallStore.getState().toolCalls)
+        );
+
+        expect(projectedMessages[1].content).toEqual([
+            expect.objectContaining({toolName: 'buildWorkflow', type: 'tool-call'}),
+        ]);
+        expect(projectedMessages[2]).toEqual({content: 'Done.', role: 'assistant'});
+    });
 });
