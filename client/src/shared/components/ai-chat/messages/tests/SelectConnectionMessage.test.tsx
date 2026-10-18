@@ -60,4 +60,19 @@ describe('SelectConnectionMessage', () => {
         expect(screen.getByText('Slack prod')).toBeInTheDocument();
         expect(screen.queryByText('OpenAI (provider)')).not.toBeInTheDocument();
     });
+
+    it('renders the picked state for a restored pick', () => {
+        render(
+            <SelectConnectionMessage
+                data={{...data, pickedLabel: 'Slack Engineering'}}
+                name="select-connection"
+                status={{type: 'complete'}}
+                type="data"
+            />
+        );
+
+        expect(screen.getByText('Slack Engineering')).toBeInTheDocument();
+        expect(screen.getByText(/Picked:/)).toBeInTheDocument();
+        expect(screen.queryByText('Slack prod')).not.toBeInTheDocument();
+    });
 });

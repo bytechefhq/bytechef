@@ -12,6 +12,7 @@ export interface SelectPropertyOptionDataI {
     componentName: string;
     kind: 'select-property-option';
     options: SelectPropertyOptionItemI[];
+    pickedLabel?: string;
     propertyName: string;
     truncated?: boolean;
 }
@@ -38,13 +39,15 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
         });
     }, [aui]);
 
-    if (picked) {
+    const pickedLabel = picked?.label ?? data.pickedLabel;
+
+    if (pickedLabel) {
         return (
             <div className="mt-2 flex items-center gap-2 text-sm">
                 <CheckIcon className="size-4 text-content-success-primary" />
 
                 <span>
-                    Picked: <span className="font-medium">{picked.label}</span>
+                    Picked: <span className="font-medium">{pickedLabel}</span>
                 </span>
             </div>
         );
