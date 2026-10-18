@@ -1,0 +1,48 @@
+{
+    "label": "Playwright Property Formula Modes Workflow",
+    "description": "",
+    "inputs": [],
+    "triggers": [
+        {
+            "description": "",
+            "label": "Manual",
+            "name": "trigger_1",
+            "type": "manual/v1/manual"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Var",
+            "name": "var_1",
+            "parameters": {
+                "type": "OBJECT",
+                "value": {
+                    "Flag": true,
+                    "Number": 7,
+                    "String": "foo"
+                }
+            },
+            "type": "var/v1/set",
+            "metadata": {
+                "ui": {
+                    "dynamicPropertyTypes": {
+                        "value.Flag": "BOOLEAN",
+                        "value.Number": "NUMBER",
+                        "value.String": "STRING"
+                    }
+                }
+            }
+        },
+        {
+            "label": "Property Testing",
+            "name": "propertyTesting_1",
+            "parameters": {
+                "numberMinNumPrecision": "${var_1.Number} ms",
+                "objectNoPredefinedProperties": {
+                    "key": "value"
+                }
+            },
+            "type": "propertyTesting/v1/testingAction"
+        }
+    ]
+}

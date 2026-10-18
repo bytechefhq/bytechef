@@ -77,7 +77,7 @@ export async function openPropertyTestingPanel(page: Page, anchorPropertyLabel: 
         trigger: propertyTestingNode,
     });
 
-    const propertiesTabButton = configurationPanel.getByRole('button', {name: 'Properties'});
+    const propertiesTabButton = configurationPanel.getByRole('button', {exact: true, name: 'Properties'});
     const anchorProperty = configurationPanel.getByLabel(anchorPropertyLabel);
 
     // The panel renders a skeleton tab row until the operation definition resolves, so the Properties

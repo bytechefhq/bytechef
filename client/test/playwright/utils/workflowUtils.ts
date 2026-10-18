@@ -222,7 +222,7 @@ export async function addObjectSubPropertyViaPopover({
 }
 
 export async function openPropertiesTab(componentConfigurationPanel: Locator): Promise<void> {
-    const propertiesTabButton = componentConfigurationPanel.getByRole('button', {name: 'Properties'});
+    const propertiesTabButton = componentConfigurationPanel.getByRole('button', {exact: true, name: 'Properties'});
 
     const typeProperty = componentConfigurationPanel.getByLabel('type property');
 

@@ -99,7 +99,7 @@ export async function importWorkflow({
 
     await page.waitForTimeout(1000);
 
-    const workflowCreationOptionsButton = projectItem.getByRole('button', {name: 'Workflow Creation Actions'});
+    const workflowCreationOptionsButton = page.getByRole('button', {name: 'More Workflow Creation Actions'});
 
     await expect(workflowCreationOptionsButton).toBeVisible({timeout: 10000});
 
