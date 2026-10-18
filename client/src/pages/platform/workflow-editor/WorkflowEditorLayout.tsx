@@ -25,6 +25,7 @@ import useCopilotStateContributorRegistry from '@/shared/components/copilot/stor
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
@@ -177,6 +178,8 @@ const WorkflowEditorLayout = ({
                         queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId, +integrationWorkflowId),
                     });
                 }
+
+                queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
             });
         }
 
@@ -184,6 +187,8 @@ const WorkflowEditorLayout = ({
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
+
+            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
         });
     }, [integrationId, integrationWorkflowId, projectId, projectWorkflowId, queryClient]);
 
