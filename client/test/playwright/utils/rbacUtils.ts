@@ -1,4 +1,4 @@
-import {APIRequestContext, Browser, BrowserContext, Page, expect, request} from '@playwright/test';
+import {APIRequestContext, APIResponse, Browser, BrowserContext, Page, expect, request} from '@playwright/test';
 import {readFileSync} from 'fs';
 
 import {readInvitationKey} from './accountUtils';
@@ -47,7 +47,11 @@ async function getXsrfToken(apiContext: APIRequestContext): Promise<string> {
     return storageState.cookies.find((cookie) => cookie.name === 'XSRF-TOKEN')?.value || '';
 }
 
-export async function createAdminApiContext(baseURL: string): Promise<APIRequestContext> {
+export async function createUserApiContext(
+    baseURL: string,
+    email: string,
+    password: string
+): Promise<APIRequestContext> {
     const apiContext = await request.newContext({baseURL});
 
     const healthResponse = await apiContext.get('/actuator/health').catch(() => undefined);
@@ -60,16 +64,62 @@ export async function createAdminApiContext(baseURL: string): Promise<APIRequest
     const xsrfToken = await getXsrfToken(apiContext);
 
     const response = await apiContext.post('/api/authentication', {
-        form: {password: ADMIN_PASSWORD, 'remember-me': 'false', username: ADMIN_EMAIL},
+        form: {password, 'remember-me': 'false', username: email},
         headers: {'X-XSRF-TOKEN': xsrfToken},
     });
 
-    expect(response.ok(), `admin login failed: ${response.status()}`).toBeTruthy();
+    expect(response.ok(), `login of ${email} failed: ${response.status()}`).toBeTruthy();
 
     return apiContext;
 }
 
-async function graphql<T>(
+export async function createAdminApiContext(baseURL: string): Promise<APIRequestContext> {
+    return createUserApiContext(baseURL, ADMIN_EMAIL, ADMIN_PASSWORD);
+}
+
+export async function createRoleUserApiContext(baseURL: string, roleUser: RoleUserI): Promise<APIRequestContext> {
+    return createUserApiContext(baseURL, roleUser.email, roleUser.password);
+}
+
+export interface GraphQlErrorI {
+    extensions?: Record<string, unknown>;
+    message: string;
+}
+
+export interface GraphQlResponseI<T> {
+    data: T | null;
+    errors?: GraphQlErrorI[];
+}
+
+export async function postGraphQl<T = Record<string, unknown>>(
+    apiContext: APIRequestContext,
+    query: string,
+    variables: Record<string, unknown> = {}
+): Promise<GraphQlResponseI<T>> {
+    const xsrfToken = await getXsrfToken(apiContext);
+
+    const response = await apiContext.post('/graphql', {
+        data: {query, variables},
+        headers: {'X-XSRF-TOKEN': xsrfToken},
+    });
+
+    expect(response.status(), `POST /graphql answered ${response.status()}: ${await response.text()}`).toBe(200);
+
+    return response.json();
+}
+
+export async function sendInternalApi(
+    apiContext: APIRequestContext,
+    method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT',
+    path: string,
+    data?: unknown
+): Promise<APIResponse> {
+    const xsrfToken = await getXsrfToken(apiContext);
+
+    return apiContext.fetch(path, {data, headers: {'X-XSRF-TOKEN': xsrfToken}, method});
+}
+
+export async function graphql<T>(
     apiContext: APIRequestContext,
     query: string,
     variables: Record<string, unknown>
@@ -88,9 +138,9 @@ async function graphql<T>(
     return body.data as T;
 }
 
-async function internalApi<T>(
+export async function internalApi<T>(
     apiContext: APIRequestContext,
-    method: 'DELETE' | 'GET' | 'POST' | 'PUT',
+    method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT',
     path: string,
     data?: unknown
 ): Promise<T> {
@@ -152,7 +202,7 @@ export async function deleteRbacWorkspace(apiContext: APIRequestContext, workspa
     await internalApi(apiContext, 'DELETE', `/workspaces/${workspace.id}`).catch(() => undefined);
 }
 
-async function readClaimKey(email: string): Promise<string> {
+export async function readClaimKey(email: string): Promise<string> {
     const {key} = await readInvitationKey(email);
 
     return key;
@@ -199,7 +249,51 @@ export async function createRoleUser(
 
     await claimAccount(baseURL, email);
 
-    return {email, login: userLogin, password: ROLE_USER_PASSWORD, role};
+    return {
+        email,
+        login: userLogin,
+        password: ROLE_USER_PASSWORD,
+        role,
+        userId: await fetchUserId(apiContext, userLogin),
+    };
+}
+
+export async function fetchUserId(apiContext: APIRequestContext, login: string): Promise<string> {
+    const data = await graphql<{user: {id: string} | null}>(
+        apiContext,
+        'query User($login: String!) { user(login: $login) { id } }',
+        {login}
+    );
+
+    expect(data.user, `no user with login ${login}`).toBeTruthy();
+
+    return data.user!.id;
+}
+
+export async function createAccount(
+    apiContext: APIRequestContext,
+    baseURL: string,
+    authority: 'ROLE_ADMIN' | 'ROLE_USER' = 'ROLE_USER'
+): Promise<RoleUserI> {
+    const email = `rbac_account_${getRandomString().slice(0, 8)}@localhost.com`;
+
+    const userLogin = email;
+
+    await graphql(
+        apiContext,
+        'mutation InviteUser($email: String!, $role: String!) { inviteUser(email: $email, role: $role) }',
+        {email, role: authority}
+    );
+
+    await claimAccount(baseURL, email);
+
+    return {
+        email,
+        login: userLogin,
+        password: ROLE_USER_PASSWORD,
+        role: authority,
+        userId: await fetchUserId(apiContext, userLogin),
+    };
 }
 
 export async function deleteRoleUser(apiContext: APIRequestContext, roleUser: RoleUserI): Promise<void> {
@@ -418,10 +512,40 @@ export async function requestWorkflowUpdateAs(page: Page, workflowId: string): P
     return updateResponse.status();
 }
 
+export async function requestNodeParameterUpdateAs(page: Page, workflowId: string): Promise<number> {
+    const cookies = await page.context().cookies();
+
+    const xsrfToken = cookies.find((cookie) => cookie.name === 'XSRF-TOKEN')?.value || '';
+
+    const response = await page.request.patch(
+        `/api/platform/internal/workflows/${workflowId}/workflow-nodes/var_1/parameters?environmentId=0`,
+        {
+            data: {path: 'value.String', type: 'STRING', value: 'foo'},
+            headers: {'X-XSRF-TOKEN': xsrfToken},
+        }
+    );
+
+    return response.status();
+}
+
+export async function requestWorkflowTestAs(page: Page, workflowId: string): Promise<number> {
+    const cookies = await page.context().cookies();
+
+    const xsrfToken = cookies.find((cookie) => cookie.name === 'XSRF-TOKEN')?.value || '';
+
+    const response = await page.request.post(`/api/platform/internal/workflows/${workflowId}/tests?environmentId=0`, {
+        data: {},
+        headers: {'X-XSRF-TOKEN': xsrfToken},
+    });
+
+    return response.status();
+}
+
 export const PAGE_BODY_TEXT = {
-    connections: /^(No Connections|Filter by:)$/,
+    apiCollections: /^(No API Collections|Filter by:)$/,
+    connections: /^(Connect your first app|Filter by:)$/,
     dataTables: /^(No Data Tables|Filter by:)$/,
-    deployments: /^(No Project Deployments|Filter by:)$/,
+    deployments: /^(Nothing to deploy yet|Publish a project to deploy it|Create your first deployment|Filter by:)$/,
     mcpServers: /^(No MCP Servers|Filter by:)$/,
     workspaceUsers: /^(Email|You do not have permission to manage members of this workspace\.)$/,
 };
