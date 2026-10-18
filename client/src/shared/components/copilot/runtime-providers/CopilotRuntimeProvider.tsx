@@ -1,5 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
+import {toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
@@ -151,13 +151,12 @@ export function CopilotRuntimeProvider({
 
                 runFailed = true;
 
-                const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
-                const message =
-                    rawMessage.length > 0
-                        ? humanizeAgentErrorMessage(rawMessage)
-                        : 'The agent run failed before completing this turn.';
-
-                addMessage({content: [{data: {message}, type: 'data-run-error'}], role: 'assistant'});
+                addMessage({
+                    content: [
+                        {data: toRunErrorData({code: event?.code, message: event?.message}), type: 'data-run-error'},
+                    ],
+                    role: 'assistant',
+                });
             },
             onTextMessageContentEvent: ({event, textMessageBuffer}) => {
                 if (isStaleRun()) {
