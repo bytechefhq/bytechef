@@ -14,7 +14,7 @@ const WorkspaceList = ({workspaces}: {workspaces: Workspace[]}) => {
     const displayedCurrentWorkspaceId = previousCurrentWorkspaceId ?? currentWorkspaceId;
 
     const handleWorkspaceOpen = (workspaceId: number) => {
-        setPreviousCurrentWorkspaceId(currentWorkspaceId);
+        setPreviousCurrentWorkspaceId(currentWorkspaceId ?? null);
 
         openWorkspaceProjects(workspaceId);
     };
