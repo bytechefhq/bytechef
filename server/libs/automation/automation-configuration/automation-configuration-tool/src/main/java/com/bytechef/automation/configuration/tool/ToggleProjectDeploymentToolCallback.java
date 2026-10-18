@@ -43,7 +43,7 @@ public class ToggleProjectDeploymentToolCallback implements ToolCallback {
         {
             "type": "object",
             "properties": {
-                "projectDeploymentId": {"type": "string", "description": "Numeric project deployment id"},
+                "projectDeploymentId": {"type": "integer", "description": "Numeric project deployment id"},
                 "enabled": {"type": "boolean", "description": "Target enabled state"}
             },
             "required": ["projectDeploymentId", "enabled"]

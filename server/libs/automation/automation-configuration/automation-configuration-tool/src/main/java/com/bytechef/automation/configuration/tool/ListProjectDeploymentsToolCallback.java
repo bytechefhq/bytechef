@@ -50,7 +50,7 @@ public class ListProjectDeploymentsToolCallback implements ToolCallback {
         {
             "type": "object",
             "properties": {
-                "projectId": {"type": "string", "description": "Optional numeric project id to filter by"}
+                "projectId": {"type": "integer", "description": "Optional numeric project id to filter by"}
             }
         }""";
 

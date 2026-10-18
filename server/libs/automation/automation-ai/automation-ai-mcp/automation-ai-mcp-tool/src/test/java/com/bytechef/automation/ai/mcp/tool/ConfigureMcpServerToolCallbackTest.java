@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +37,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Ivica Cardic
@@ -63,6 +66,21 @@ class ConfigureMcpServerToolCallbackTest {
         assertThat(requestCaptor.getValue())
             .contains("MCP server 7")
             .endsWith("Prefer short names.");
+    }
+
+    @Test
+    void testMcpServerIdIsAdvertisedAsAnInteger() {
+        ConfigureMcpServerToolCallback callback =
+            new ConfigureMcpServerToolCallback(chatModel -> mock(ChatClient.class), null);
+
+        ToolDefinition toolDefinition = callback.getToolDefinition();
+
+        JsonNode mcpServerIdJsonNode = JsonUtils.readTree(toolDefinition.inputSchema())
+            .path("properties")
+            .path("mcpServerId");
+
+        assertThat(mcpServerIdJsonNode.path("type")
+            .asString()).isEqualTo("integer");
     }
 
     @Test
