@@ -183,7 +183,8 @@ public interface PermissionService {
     boolean hasResourceRole(long id, String resourceType, String minimumRole);
 
     /**
-     * Returns whether the current user has {@code scope} in the workspace that owns the workflow.
+     * Returns whether the current user has {@code scope} in the workspace that owns the workflow and may see the
+     * project the workflow belongs to.
      *
      * @param workflowId the workflow whose owning workspace is checked
      * @param scope      the scope name the user must hold in that workspace

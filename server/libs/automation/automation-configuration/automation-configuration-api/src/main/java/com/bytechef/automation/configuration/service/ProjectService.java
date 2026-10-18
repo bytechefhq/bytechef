@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -94,4 +95,5 @@ public interface ProjectService {
      */
     void updateLastModified(long id);
 
+    Project updateVisibility(long id, ResourceVisibility visibility);
 }
