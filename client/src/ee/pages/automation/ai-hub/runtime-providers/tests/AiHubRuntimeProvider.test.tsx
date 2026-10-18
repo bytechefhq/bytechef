@@ -7,7 +7,7 @@ import RunErrorMessage from '@/shared/components/ai-chat/messages/RunErrorMessag
 import {RunErrorDataI, toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useAiChatRetryableErrorStore';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
-import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -760,7 +760,7 @@ describe('buildStateToSend', () => {
     it('includes the workspace, environment, mode and source', () => {
         environmentStore.setState({currentEnvironmentId: 3});
 
-        const state = buildStateToSend({mode: MODE.ASK, workspaceId: 7});
+        const state = buildStateToSend({mode: MODE.ASK, providerCatalog: undefined, workspaceId: 7});
 
         expect(state).toEqual({
             activeTab: null,
@@ -781,7 +781,7 @@ describe('buildStateToSend', () => {
             .getState()
             .openWorkflowTab({name: 'B', projectId: '2', projectWorkflowId: 2, workflowId: 'wf-b'});
 
-        const state = buildStateToSend({mode: MODE.BUILD, workspaceId: 1});
+        const state = buildStateToSend({mode: MODE.BUILD, providerCatalog: undefined, workspaceId: 1});
 
         expect(state.currentTabs).toEqual([
             {id: 'wf-a', kind: 'workflow', name: 'A'},
@@ -794,18 +794,29 @@ describe('buildStateToSend', () => {
         aiHubChatsStore.getState().setCurrentChatId(5);
         aiHubChatsStore.getState().setChatLlmSelection(5, 'anthropic', 'claude');
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).toMatchObject({
+        expect(buildStateToSend({mode: MODE.BUILD, providerCatalog: undefined, workspaceId: 1})).toMatchObject({
             userSelectedLlmModel: 'claude',
             userSelectedLlmProvider: 'anthropic',
         });
 
         aiHubChatsStore.getState().setChatLlmSelection(5, 'anthropic', null);
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).not.toHaveProperty('userSelectedLlmModel');
+        expect(buildStateToSend({mode: MODE.BUILD, providerCatalog: undefined, workspaceId: 1})).not.toHaveProperty(
+            'userSelectedLlmModel'
+        );
     });
 });
 
 describe('buildStateToSend model selection', () => {
+    const anthropicProvider = {
+        enabled: true,
+        icon: null,
+        key: 'ai.provider.anthropic',
+        models: [{label: 'Claude Sonnet 4.6', name: 'claude-sonnet-4-6'}],
+        name: 'Anthropic',
+        supportsModelById: false,
+    };
+
     beforeEach(() => {
         localStorage.clear();
 
@@ -813,51 +824,84 @@ describe('buildStateToSend model selection', () => {
         aiHubChatsStore.getState().reset();
     });
 
-    it('sends the remembered model the picker shows when nothing was picked for the chat', () => {
+    it('sends an available remembered model when nothing was picked for the chat', () => {
+        writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-sonnet-4-6');
+
+        aiHubChatsStore.getState().setCurrentChatId(5);
+
+        expect(
+            buildStateToSend({mode: MODE.BUILD, providerCatalog: [anthropicProvider], workspaceId: 1})
+        ).toMatchObject({
+            userSelectedLlmModel: 'claude-sonnet-4-6',
+            userSelectedLlmProvider: 'ai.provider.anthropic',
+        });
+        expect(readLastUsedModel(1)).not.toBeNull();
+    });
+
+    it('drops and clears a remembered model the catalog no longer offers, so no model is sent', () => {
         writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-nonexistent-9');
 
         aiHubChatsStore.getState().setCurrentChatId(5);
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).toMatchObject({
-            userSelectedLlmModel: 'claude-nonexistent-9',
-            userSelectedLlmProvider: 'ai.provider.anthropic',
-        });
+        const state = buildStateToSend({mode: MODE.BUILD, providerCatalog: [anthropicProvider], workspaceId: 1});
+
+        expect(state).not.toHaveProperty('userSelectedLlmModel');
+        expect(state).not.toHaveProperty('userSelectedLlmProvider');
+        expect(readLastUsedModel(1)).toBeNull();
     });
 
-    it('sends the remembered model on the home view before a chat exists', () => {
+    it('drops and clears a remembered model whose provider is disabled', () => {
         writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-sonnet-4-6');
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).toMatchObject({
-            userSelectedLlmModel: 'claude-sonnet-4-6',
-            userSelectedLlmProvider: 'ai.provider.anthropic',
+        const state = buildStateToSend({
+            mode: MODE.BUILD,
+            providerCatalog: [{...anthropicProvider, enabled: false}],
+            workspaceId: 1,
         });
+
+        expect(state).not.toHaveProperty('userSelectedLlmModel');
+        expect(readLastUsedModel(1)).toBeNull();
     });
 
-    it('lets an explicit pick for the chat win over the remembered model', () => {
+    it('does not send the remembered model before the catalog has loaded', () => {
+        writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-sonnet-4-6');
+
+        const state = buildStateToSend({mode: MODE.BUILD, providerCatalog: undefined, workspaceId: 1});
+
+        expect(state).not.toHaveProperty('userSelectedLlmModel');
+        expect(readLastUsedModel(1)).not.toBeNull();
+    });
+
+    it('sends an explicit pick for the chat as is, even when the catalog does not offer it', () => {
         writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-sonnet-4-6');
 
         aiHubChatsStore.getState().setCurrentChatId(5);
         aiHubChatsStore.getState().setChatLlmSelection(5, 'ai.provider.openAi', 'gpt-5');
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).toMatchObject({
+        expect(
+            buildStateToSend({mode: MODE.BUILD, providerCatalog: [anthropicProvider], workspaceId: 1})
+        ).toMatchObject({
             userSelectedLlmModel: 'gpt-5',
             userSelectedLlmProvider: 'ai.provider.openAi',
         });
     });
 
-    it('sends no model when nothing is remembered or picked, so the environment default applies', () => {
-        aiHubChatsStore.getState().setCurrentChatId(5);
-
-        const state = buildStateToSend({mode: MODE.BUILD, workspaceId: 1});
-
-        expect(state).not.toHaveProperty('userSelectedLlmModel');
-        expect(state).not.toHaveProperty('userSelectedLlmProvider');
-    });
-
     it("does not read another workspace's remembered model", () => {
         writeLastUsedModel(2, 'ai.provider.anthropic', 'claude-sonnet-4-6');
 
-        expect(buildStateToSend({mode: MODE.BUILD, workspaceId: 1})).not.toHaveProperty('userSelectedLlmModel');
+        const state = buildStateToSend({mode: MODE.BUILD, providerCatalog: [anthropicProvider], workspaceId: 1});
+
+        expect(state).not.toHaveProperty('userSelectedLlmModel');
+        expect(readLastUsedModel(2)).not.toBeNull();
+    });
+
+    it('sends no model when nothing is remembered or picked, so the environment default applies', () => {
+        aiHubChatsStore.getState().setCurrentChatId(5);
+
+        const state = buildStateToSend({mode: MODE.BUILD, providerCatalog: [anthropicProvider], workspaceId: 1});
+
+        expect(state).not.toHaveProperty('userSelectedLlmModel');
+        expect(state).not.toHaveProperty('userSelectedLlmProvider');
     });
 });
 
