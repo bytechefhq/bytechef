@@ -17,6 +17,7 @@
 package com.bytechef.ee.embedded.configuration.callback;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.UUID;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Order(1)
 @Component
+@ConditionalOnEEVersion
 public class IntegrationWorkflowCallback implements BeforeConvertCallback<IntegrationWorkflow> {
 
     @Override
