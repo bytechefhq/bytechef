@@ -17,6 +17,8 @@ query identityProvider($id: ID!) {
         mfaRequired
         name
         nameIdFormat
+        registrationId
+        scimEnabled
         scopes
         signingCertificate
         type

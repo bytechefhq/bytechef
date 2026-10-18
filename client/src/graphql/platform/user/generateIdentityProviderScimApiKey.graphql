@@ -1,0 +1,3 @@
+mutation generateIdentityProviderScimApiKey($id: ID!) {
+    generateIdentityProviderScimApiKey(id: $id)
+}
