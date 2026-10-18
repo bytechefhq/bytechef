@@ -676,6 +676,15 @@ export type GrantConnectionAccessMutationVariables = Exact<{
 
 export type GrantConnectionAccessMutation = { grantConnectionAccess: boolean };
 
+export type GrantProjectAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  userId: string | number;
+}>;
+
+
+export type GrantProjectAccessMutation = { grantProjectAccess: boolean };
+
 export type ImportProjectTemplateMutationVariables = Exact<{
   id: string;
   workspaceId: string | number;
@@ -814,6 +823,14 @@ export type ProjectByIdQueryVariables = Exact<{
 
 export type ProjectByIdQuery = { project: { id: string, name: string } | null };
 
+export type ProjectGrantsQueryVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+}>;
+
+
+export type ProjectGrantsQuery = { projectGrants: Array<any> };
+
 export type ProjectTemplateQueryVariables = Exact<{
   id: string;
   sharedProject: boolean;
@@ -874,6 +891,15 @@ export type RevokeConnectionAccessMutationVariables = Exact<{
 
 export type RevokeConnectionAccessMutation = { revokeConnectionAccess: boolean };
 
+export type RevokeProjectAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  userId: string | number;
+}>;
+
+
+export type RevokeProjectAccessMutation = { revokeProjectAccess: boolean };
+
 export type SetConnectionVisibilityMutationVariables = Exact<{
   workspaceId: string | number;
   connectionId: string | number;
@@ -882,6 +908,15 @@ export type SetConnectionVisibilityMutationVariables = Exact<{
 
 
 export type SetConnectionVisibilityMutation = { setConnectionVisibility: boolean };
+
+export type SetProjectVisibilityMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  visibility: Types.ResourceVisibility;
+}>;
+
+
+export type SetProjectVisibilityMutation = { setProjectVisibility: boolean };
 
 export type SetWorkspaceUserEnvironmentRoleMutationVariables = Exact<{
   workspaceId: string | number;
@@ -5664,6 +5699,29 @@ export const useGrantConnectionAccessMutation = <
   }
     )};
 
+export const GrantProjectAccessDocument = new TypedDocumentString(`
+    mutation GrantProjectAccess($workspaceId: ID!, $projectId: ID!, $userId: ID!) {
+  grantProjectAccess(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    userId: $userId
+  )
+}
+    `);
+
+export const useGrantProjectAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GrantProjectAccessMutation, TError, GrantProjectAccessMutationVariables, TContext>) => {
+    
+    return useMutation<GrantProjectAccessMutation, TError, GrantProjectAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['GrantProjectAccess'],
+    mutationFn: (variables?: GrantProjectAccessMutationVariables) => fetcher<GrantProjectAccessMutation, GrantProjectAccessMutationVariables>(GrantProjectAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ImportProjectTemplateDocument = new TypedDocumentString(`
     mutation importProjectTemplate($id: String!, $workspaceId: ID!, $sharedProject: Boolean!) {
   importProjectTemplate(
@@ -6220,6 +6278,28 @@ export const useProjectByIdQuery = <
   }
     )};
 
+export const ProjectGrantsDocument = new TypedDocumentString(`
+    query ProjectGrants($workspaceId: ID!, $projectId: ID!) {
+  projectGrants(workspaceId: $workspaceId, projectId: $projectId)
+}
+    `);
+
+export const useProjectGrantsQuery = <
+      TData = ProjectGrantsQuery,
+      TError = unknown
+    >(
+      variables: ProjectGrantsQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectGrantsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectGrantsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectGrantsQuery, TError, TData>(
+      {
+    queryKey: ['ProjectGrants', variables],
+    queryFn: fetcher<ProjectGrantsQuery, ProjectGrantsQueryVariables>(ProjectGrantsDocument, variables),
+    ...options
+  }
+    )};
+
 export const ProjectTemplateDocument = new TypedDocumentString(`
     query projectTemplate($id: String!, $sharedProject: Boolean!) {
   projectTemplate(id: $id, sharedProject: $sharedProject) {
@@ -6435,6 +6515,29 @@ export const useRevokeConnectionAccessMutation = <
   }
     )};
 
+export const RevokeProjectAccessDocument = new TypedDocumentString(`
+    mutation RevokeProjectAccess($workspaceId: ID!, $projectId: ID!, $userId: ID!) {
+  revokeProjectAccess(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    userId: $userId
+  )
+}
+    `);
+
+export const useRevokeProjectAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeProjectAccessMutation, TError, RevokeProjectAccessMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeProjectAccessMutation, TError, RevokeProjectAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['RevokeProjectAccess'],
+    mutationFn: (variables?: RevokeProjectAccessMutationVariables) => fetcher<RevokeProjectAccessMutation, RevokeProjectAccessMutationVariables>(RevokeProjectAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const SetConnectionVisibilityDocument = new TypedDocumentString(`
     mutation SetConnectionVisibility($workspaceId: ID!, $connectionId: ID!, $visibility: ResourceVisibility!) {
   setConnectionVisibility(
@@ -6454,6 +6557,29 @@ export const useSetConnectionVisibilityMutation = <
       {
     mutationKey: ['SetConnectionVisibility'],
     mutationFn: (variables?: SetConnectionVisibilityMutationVariables) => fetcher<SetConnectionVisibilityMutation, SetConnectionVisibilityMutationVariables>(SetConnectionVisibilityDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetProjectVisibilityDocument = new TypedDocumentString(`
+    mutation SetProjectVisibility($workspaceId: ID!, $projectId: ID!, $visibility: ResourceVisibility!) {
+  setProjectVisibility(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    visibility: $visibility
+  )
+}
+    `);
+
+export const useSetProjectVisibilityMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetProjectVisibilityMutation, TError, SetProjectVisibilityMutationVariables, TContext>) => {
+    
+    return useMutation<SetProjectVisibilityMutation, TError, SetProjectVisibilityMutationVariables, TContext>(
+      {
+    mutationKey: ['SetProjectVisibility'],
+    mutationFn: (variables?: SetProjectVisibilityMutationVariables) => fetcher<SetProjectVisibilityMutation, SetProjectVisibilityMutationVariables>(SetProjectVisibilityDocument, variables)(),
     ...options
   }
     )};

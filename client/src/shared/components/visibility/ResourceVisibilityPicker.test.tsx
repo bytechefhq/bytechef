@@ -3,19 +3,19 @@ import userEvent from '@testing-library/user-event';
 import {useState} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import ConnectionVisibilityPicker, {deriveVisibilityState} from './ConnectionVisibilityPicker';
+import ResourceVisibilityPicker, {deriveVisibilityState} from './ResourceVisibilityPicker';
 
 const MEMBERS = [
     {label: 'ana@example.com', userId: 8},
     {label: 'marko@example.com', userId: 9},
 ];
 
-const renderPicker = (props: Partial<Parameters<typeof ConnectionVisibilityPicker>[0]> = {}) => {
+const renderPicker = (props: Partial<Parameters<typeof ResourceVisibilityPicker>[0]> = {}) => {
     const onGrantedUserIdsChange = vi.fn();
     const onVisibilityChange = vi.fn();
 
     render(
-        <ConnectionVisibilityPicker
+        <ResourceVisibilityPicker
             grantedUserIds={[]}
             onGrantedUserIdsChange={onGrantedUserIdsChange}
             onVisibilityChange={onVisibilityChange}
@@ -38,13 +38,11 @@ describe('deriveVisibilityState', () => {
     });
 
     it('ignores grants once the connection is workspace-visible', () => {
-        // Grants survive promotion so demoting restores the audience, but they are inert meanwhile — the state
-        // shown must be the reach, not the leftover rows.
         expect(deriveVisibilityState('WORKSPACE', [8])).toBe('WORKSPACE');
     });
 });
 
-describe('ConnectionVisibilityPicker', () => {
+describe('ResourceVisibilityPicker', () => {
     it('preselects Shared with workspace for a new connection', () => {
         renderPicker();
 
@@ -70,7 +68,6 @@ describe('ConnectionVisibilityPicker', () => {
 
         await user.click(screen.getByRole('radio', {name: /specific people/i}));
 
-        // Specific people is not a fourth stored value; it is PRIVATE plus grants.
         expect(onVisibilityChange).toHaveBeenCalledWith('PRIVATE');
     });
 
@@ -97,9 +94,6 @@ describe('ConnectionVisibilityPicker', () => {
     });
 
     it('keeps Specific people selected after switching to it from Shared, before anyone is named', async () => {
-        // Regression: "Specific people" stores as PRIVATE with no grants yet, which derives back to PRIVATE. Without
-        // holding the intent, the radio snapped to Private the instant it was clicked and the people picker was
-        // unreachable — you could never name the first person.
         const user = userEvent.setup();
 
         const ControlledHarness = () => {
@@ -107,7 +101,7 @@ describe('ConnectionVisibilityPicker', () => {
             const [grantedUserIds, setGrantedUserIds] = useState<number[]>([]);
 
             return (
-                <ConnectionVisibilityPicker
+                <ResourceVisibilityPicker
                     grantedUserIds={grantedUserIds}
                     onGrantedUserIdsChange={setGrantedUserIds}
                     onVisibilityChange={setVisibility}
