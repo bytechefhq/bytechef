@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.concurrent.ConcurrentHashMap;
+import tools.jackson.databind.json.JsonMapper;
 
 import static com.agui.server.EventFactory.*;
 import static java.util.stream.Collectors.toList;
@@ -169,7 +171,7 @@ public class SpringAIAgent extends LocalAgent {
             subscriber
         );
 
-        final List<BaseEvent> deferredEvents = new ArrayList<>();
+        final List<BaseEvent> deferredEvents = Collections.synchronizedList(new ArrayList<>());
 
         var textMessageStream = new TextMessageStream(messageId, subscriber);
 
@@ -448,15 +450,8 @@ public class SpringAIAgent extends LocalAgent {
                 chatRequest = chatRequest.toolCallbacks(
                     mergedCallbacks
                         .stream()
-                        .map(toolCallback -> new AgUiFunctionToolCallback(toolCallback, (AgUiToolCallbackParams params) -> {
-                            var toolCallId = UUID.randomUUID().toString();
-                            var parentMessageId = textMessageStream.messageId();
-                            toolEventConsumer.accept(toolCallStartEvent(parentMessageId, toolCallback.getToolDefinition().name(), toolCallId));
-                            toolEventConsumer.accept(toolCallArgsEvent(params.arguments(), toolCallId));
-                            toolEventConsumer.accept(toolCallEndEvent(toolCallId));
-                            toolEventConsumer.accept(toolCallResultEvent(toolCallId, params.result(), parentMessageId, Role.tool));
-
-                        }))
+                        .map(toolCallback -> new AgUiFunctionToolCallback(
+                            toolCallback, new ToolCallEventEmitter(textMessageStream, toolEventConsumer)))
                         .collect(toList())
                 );
             } catch (RuntimeException e) {
@@ -527,6 +522,51 @@ public class SpringAIAgent extends LocalAgent {
                 new TurnEndingToolCallingManager(ToolCallingManager.builder().build(), this::endsTurn))
             .conversationHistoryEnabled(!hasDownstreamMemoryAdvisor)
             .build();
+    }
+
+    private static final class ToolCallEventEmitter implements AgUiToolCallListener {
+
+        private static final JsonMapper ERROR_JSON_MAPPER = JsonMapper.builder().build();
+
+        private final TextMessageStream textMessageStream;
+        private final Consumer<BaseEvent> toolEventConsumer;
+        private final Map<String, String> parentMessageIds = new ConcurrentHashMap<>();
+
+        private ToolCallEventEmitter(TextMessageStream textMessageStream, Consumer<BaseEvent> toolEventConsumer) {
+            this.textMessageStream = textMessageStream;
+            this.toolEventConsumer = toolEventConsumer;
+        }
+
+        @Override
+        public void onToolCallStarted(String toolCallId, String toolName, String arguments) {
+            var parentMessageId = textMessageStream.messageId();
+
+            parentMessageIds.put(toolCallId, parentMessageId);
+
+            toolEventConsumer.accept(toolCallStartEvent(parentMessageId, toolName, toolCallId));
+            toolEventConsumer.accept(toolCallArgsEvent(arguments, toolCallId));
+            toolEventConsumer.accept(toolCallEndEvent(toolCallId));
+        }
+
+        @Override
+        public void onToolCallFinished(String toolCallId, String result) {
+            emitResult(toolCallId, result);
+        }
+
+        @Override
+        public void onToolCallFailed(String toolCallId, RuntimeException exception) {
+            var message = exception.getMessage() == null ? exception.getClass().getSimpleName() : exception.getMessage();
+
+            emitResult(toolCallId, ERROR_JSON_MAPPER.writeValueAsString(Map.of("error", message)));
+        }
+
+        private void emitResult(String toolCallId, String content) {
+            var parentMessageId = parentMessageIds.remove(toolCallId);
+
+            toolEventConsumer.accept(toolCallResultEvent(
+                toolCallId, content, parentMessageId == null ? textMessageStream.messageId() : parentMessageId,
+                Role.tool));
+        }
     }
 
     private final class TextMessageStream {
