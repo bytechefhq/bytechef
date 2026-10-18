@@ -6,18 +6,18 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.lang.Nullable;
 
-import java.util.function.Consumer;
+import java.util.UUID;
 
 public class AgUiFunctionToolCallback implements ToolCallback {
 
     private final ToolCallback toolCallback;
 
-    private final Consumer<AgUiToolCallbackParams> callback;
+    private final AgUiToolCallListener listener;
 
-    public AgUiFunctionToolCallback(final ToolCallback toolCallback, final Consumer<AgUiToolCallbackParams> callback) {
+    public AgUiFunctionToolCallback(final ToolCallback toolCallback, final AgUiToolCallListener listener) {
         this.toolCallback = toolCallback;
 
-        this.callback = callback;
+        this.listener = listener;
     }
 
     @Override
@@ -31,9 +31,21 @@ public class AgUiFunctionToolCallback implements ToolCallback {
     }
 
     public String call(String toolInput, @Nullable ToolContext toolContext) {
-        var result = this.toolCallback.call(toolInput, toolContext);
+        var toolCallId = UUID.randomUUID().toString();
 
-        this.callback.accept(new AgUiToolCallbackParams(result, toolInput));
+        this.listener.onToolCallStarted(toolCallId, getToolDefinition().name(), toolInput);
+
+        String result;
+
+        try {
+            result = this.toolCallback.call(toolInput, toolContext);
+        } catch (RuntimeException exception) {
+            this.listener.onToolCallFailed(toolCallId, exception);
+
+            throw exception;
+        }
+
+        this.listener.onToolCallFinished(toolCallId, result);
 
         return result;
     }
