@@ -15,6 +15,7 @@ import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
@@ -38,12 +39,14 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerServiceImpl;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorageImpl;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -169,7 +172,8 @@ class ProjectBeforeDeleteEventListenerIntTest {
             ProjectGitConfigurationService projectGitConfigurationService) {
 
             return new ProjectBeforeDeleteEventListener(
-                codeWorkflowContainerFacade, projectCodeWorkflowService, projectGitConfigurationService);
+                codeWorkflowContainerFacade, projectCodeWorkflowService, projectGitConfigurationService,
+                mock(ResourceGrantService.class));
         }
 
         @Bean
@@ -188,7 +192,9 @@ class ProjectBeforeDeleteEventListenerIntTest {
 
         @Bean
         ProjectService projectService(ApplicationContext applicationContext, ProjectRepository projectRepository) {
-            return new ProjectServiceImpl(applicationContext, projectRepository);
+            return new ProjectServiceImpl(
+                applicationContext, projectRepository,
+                new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy())));
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

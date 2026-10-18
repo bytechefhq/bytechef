@@ -273,6 +273,10 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
+        if (!isResourceVisible(projectId, PROJECT)) {
+            return false;
+        }
+
         Long workspaceId = projectRepository.findById(projectId)
             .map(Project::getWorkspaceId)
             .orElse(null);
@@ -302,6 +306,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (isEmbeddedProject(projectId)) {
+            return false;
+        }
+
+        if (!isResourceVisible(projectId, PROJECT)) {
             return false;
         }
 
@@ -463,17 +471,13 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (!(id instanceof Number number)) {
-            return false;
-        }
-
-        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+        return resourceVisibilityProvider.fetchVisibility(id)
             .map(visibilityRecord -> {
                 // workspaceId is unused by both resolver implementations — they resolve against the current
                 // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
                 // implementation.
                 Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
-                    resourceType, 0L, List.of(visibilityRecord));
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
 
                 return !visibleIds.isEmpty();
             })
@@ -606,15 +610,10 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope);
+        return projectRepository.findByWorkflowId(workflowId)
+            .map(Project::getId)
+            .map(projectId -> hasResourceScope(projectId, PROJECT, scope))
+            .orElse(false);
     }
 
     @Override

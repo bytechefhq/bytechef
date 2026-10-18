@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
@@ -53,6 +55,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnCEVersion
 public class PermissionServiceImpl implements PermissionService {
 
+    private final ProjectRepository projectRepository;
     private final UserService userService;
     private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
     private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
@@ -60,10 +63,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
-        UserService userService, List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        ProjectRepository projectRepository, UserService userService,
+        List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceVisibilityProvider> resourceVisibilityProviders,
         ResourceVisibilityResolver resourceVisibilityResolver) {
 
+        this.projectRepository = projectRepository;
         this.userService = userService;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
@@ -113,15 +118,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        return hasResourceScope(projectId, "Project", scope);
     }
 
-    /**
-     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
-     */
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasResourceScope(projectId, "Project", scope);
     }
 
     @Override
@@ -196,17 +198,13 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (!(id instanceof Number number)) {
-            return false;
-        }
-
-        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+        return resourceVisibilityProvider.fetchVisibility(id)
             .map(visibilityRecord -> {
                 // workspaceId is unused by both resolver implementations — they resolve against the current
                 // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
                 // implementation.
                 Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
-                    resourceType, 0L, List.of(visibilityRecord));
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
 
                 return !visibleIds.isEmpty();
             })
@@ -230,7 +228,14 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        if (!SecurityUtils.isAuthenticated()) {
+            return false;
+        }
+
+        return projectRepository.findByWorkflowId(workflowId)
+            .map(Project::getId)
+            .map(projectId -> hasResourceScope(projectId, "Project", scope))
+            .orElse(true);
     }
 
     @Override

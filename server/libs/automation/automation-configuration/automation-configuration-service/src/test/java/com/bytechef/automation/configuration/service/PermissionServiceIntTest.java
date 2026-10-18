@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.WorkspaceApiKeyIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
@@ -72,6 +73,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private UserService userService;
@@ -132,10 +136,9 @@ class PermissionServiceIntTest {
     }
 
     @Test
-    void testHasWorkspaceScopeForProjectTrueForAuthenticatedUser() {
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "ANY_UNRECOGNIZED_SCOPE")).isTrue();
+    void testHasWorkspaceScopeForProjectDeniesAProjectThatCannotBeResolved() {
+        assertThat(permissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "PROJECT_DELETE")).isFalse();
     }
 
     @Test
@@ -221,7 +224,7 @@ class PermissionServiceIntTest {
     @Test
     void testCePermissionServiceAcceptsTwoResolversForOneType() {
         PermissionService twoResolverPermissionService = new PermissionServiceImpl(
-            userService,
+            projectRepository, userService,
             List.of(resolver("Connection", ResourceOwner.unknown()),
                 resolver("Connection", ResourceOwner.ofWorkspace(42L))),
             List.of(), permissiveResolver());
@@ -234,7 +237,7 @@ class PermissionServiceIntTest {
         setCurrentUser(99L);
 
         PermissionService visibilityPermissionService = new PermissionServiceImpl(
-            userService, List.of(resolver("Connection", ResourceOwner.ofUser(OWNER_USER_ID))),
+            projectRepository, userService, List.of(resolver("Connection", ResourceOwner.ofUser(OWNER_USER_ID))),
             List.of(visibilityProvider("Connection")), permissiveResolver());
 
         assertThat(visibilityPermissionService.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();

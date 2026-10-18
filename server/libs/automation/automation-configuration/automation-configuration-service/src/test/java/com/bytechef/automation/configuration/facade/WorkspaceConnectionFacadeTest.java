@@ -46,6 +46,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -216,7 +217,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "WORKSPACE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -260,7 +261,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, requestDto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "PRIVATE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -303,7 +304,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "PRIVATE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -466,5 +467,19 @@ class WorkspaceConnectionFacadeTest {
 
         when(workspace.getId()).thenReturn(WORKSPACE_ID);
         when(workspaceFacade.getUserWorkspaces(99L)).thenReturn(List.of(workspace));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDelegatesToConnectionFacade() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setType(PlatformType.AUTOMATION);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
+
+        verify(connectionFacade).updateCredentials(5L, Map.of("apiKey", "new"), 3);
     }
 }
