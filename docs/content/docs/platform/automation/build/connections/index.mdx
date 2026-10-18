@@ -40,13 +40,33 @@ The **Connections** page lists every connection with its component icon, name, t
 
 Each connection has an ellipsis (three-dots) menu with the following actions:
 
-- **Edit**: Rename the connection or update its tags.
-- **Disconnect from all**: Detach the connection from every workflow currently using it. A connection must be disconnected before it can be deleted.
+- **Edit**: Rename the connection or update its tags. The edit dialog also offers **Update credentials** (see below).
+- **Disconnect from all**: Detach the connection from every workflow currently using it. A connection must be disconnected before it can be deleted. Only organization admins are offered this action.
 - **Delete**: Permanently remove the connection.
+
+In the Enterprise Edition, **Edit** needs the `CONNECTION_EDIT` scope and **Delete** the `CONNECTION_DELETE` scope in the connection's workspace, **and** you must be the connection's owner (the member who created it, or the member it was reassigned to) or an organization admin (the `ROLE_ADMIN` authority). Both conditions apply: an owner without the scope cannot change the connection, and a member who holds the scope but does not own the connection cannot either. With the built-in roles, both scopes come with Editor, so an Editor or Admin can edit and delete the connections they own, and a Viewer cannot. Organization admins pass the scope check in every workspace. The row offers only the actions you may use; if none is available, it shows no menu.
+
+### Replacing a connection's credentials
+
+<Callout type="warn" title="Coming soon">
+  Credential replacement is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+</Callout>
+
+When an account's password, API key or token changes, replace the credentials instead of creating a new connection. The connection keeps its id, so every workflow and deployment that uses it picks up the new credentials without being rewired.
+
+1. Open the connection's menu and choose **Edit**.
+2. Click **Update credentials**. The name and tag fields are replaced by the connection's authorization fields.
+3. Enter the new credentials (an OAuth2 connection repeats the consent step) and save.
+
+The authorization fields you submit replace the stored ones as a whole: a credential you leave empty is cleared, not kept. Connection-level settings outside the authorization fields are unchanged. Saving reports **Credentials updated** and marks the connection's credentials as valid again; the new values are verified the next time the connection runs. If the connection's credentials were already rejected, the edit dialog opens straight into this mode.
+
+Replacing credentials follows the same rule as **Edit**: the `CONNECTION_EDIT` scope in the connection's workspace, and being the connection's owner or an organization admin. Platform-managed connections do not offer **Update credentials**. A connection that is not active (for example, one waiting to be reassigned) cannot have its credentials replaced.
 
 <Callout type="warn" title="Coming soon">
   Connection visibility is on the upcoming release track and is not yet available in the latest released version of ByteChef. Once available, an Enterprise Edition connection carries a **visibility** scope shown as a badge on its row, and a **Change visibility** control offers **Shared with workspace** (the default), **Private**, and **Specific people** - the last granting named workspace members access to a connection that stays private to everyone else.
 </Callout>
+
+Connection visibility is set per connection at the workspace level: **Private**, **Shared with workspace**, or **Organization** for connections an organization admin creates under **Settings → Connections**. There is no project-level connection visibility; a connection is shared with a workspace, not with a project. The visibility control is offered to the connection's owner and to organization admins. See [Settings → Connections](/platform/settings/connections) for the full model, including what happens to a member's connections when they leave a workspace.
 
 ## Who can see and replace credentials
 
