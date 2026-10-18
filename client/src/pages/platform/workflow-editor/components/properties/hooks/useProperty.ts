@@ -1196,10 +1196,20 @@ export const useProperty = ({
         // Back to the native control: a pill (or text around one) has no constant to turn into.
         dispatchValueAction({type: 'valueCleared'});
 
-        if (typeof propertyParameterValue === 'string' && propertyParameterValue !== '') {
+        const encodedPath = path ? encodePath(path) : undefined;
+
+        const storedValue =
+            currentNode?.parameters && encodedPath
+                ? safeResolvePath(encodeParameters(currentNode.parameters), encodedPath)
+                : undefined;
+
+        if (
+            (typeof propertyParameterValue === 'string' && propertyParameterValue !== '') ||
+            (typeof storedValue === 'string' && storedValue !== '')
+        ) {
             saveResolvedValue(null);
         }
-    }, [mentionInput, propertyParameterValue, saveResolvedValue, startPillEntry]);
+    }, [currentNode?.parameters, mentionInput, path, propertyParameterValue, saveResolvedValue, startPillEntry]);
 
     const validateMentionInputValue = useCallback(
         (value: string | number) => {

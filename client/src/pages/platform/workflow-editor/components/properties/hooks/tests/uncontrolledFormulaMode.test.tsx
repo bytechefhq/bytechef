@@ -452,6 +452,42 @@ describe('uncontrolled Text/Formula', () => {
                 expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
             });
 
+            it('turned off right after the saved pill is deleted still saves the clear', () => {
+                const settingsProperty = {
+                    controlType: 'OBJECT_BUILDER',
+                    expressionEnabled: true,
+                    name: 'settings',
+                    type: 'OBJECT',
+                } as PropertyAllType;
+
+                useWorkflowNodeDetailsPanelStore.setState({
+                    currentNode: {
+                        name: 'httpClient_1',
+                        parameters: {settings: '${trigger_1.settings}'},
+                        workflowNodeName: 'httpClient_1',
+                    },
+                } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+
+                const {result} = renderHook(
+                    () =>
+                        useProperty({
+                            parameterValue: '${trigger_1.settings}',
+                            path: 'settings',
+                            property: settingsProperty,
+                        }),
+                    {wrapper}
+                );
+
+                act(() => result.current.handleMentionInputValueChange(''));
+
+                expect(result.current.propertyParameterValue).toBe('');
+
+                act(() => result.current.handleDynamicSwitch());
+
+                expect(result.current.inputMode.renderer).toBe('native');
+                expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
+            });
+
             it('on an empty builder opens the one-pill editor, and turned off saves nothing', () => {
                 const {result} = renderSelect(
                     {
