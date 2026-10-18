@@ -259,6 +259,34 @@ const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, too
     );
 };
 
+const RUNNING_TOOL_CALL_LABELS: Record<string, string> = {
+    buildWorkflow: 'Building workflow...',
+    importWorkflow: 'Importing workflow...',
+};
+
+interface RunningToolCallRowProps {
+    toolCallId?: string;
+    toolName: string;
+}
+
+const RunningToolCallRow = ({toolCallId, toolName}: RunningToolCallRowProps) => {
+    const isRunning = useAiChatToolCallStore((state) =>
+        toolCallId ? state.toolCalls[toolCallId]?.status === 'running' : false
+    );
+
+    if (!isRunning) {
+        return null;
+    }
+
+    return (
+        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" role="status">
+            <Loader2Icon className="size-4 animate-spin" />
+
+            <span>{RUNNING_TOOL_CALL_LABELS[toolName] ?? `Running ${toolName}...`}</span>
+        </div>
+    );
+};
+
 export const AiHubToolCallFallback = ({
     args,
     argsText,
@@ -270,7 +298,7 @@ export const AiHubToolCallFallback = ({
     const showToolCalls = useAiHubSettingsStore((state) => state.showToolCalls);
 
     if (!showToolCalls && !ARTIFACT_OPEN_META[toolName]) {
-        return null;
+        return <RunningToolCallRow toolCallId={toolCallId} toolName={toolName} />;
     }
 
     return (
