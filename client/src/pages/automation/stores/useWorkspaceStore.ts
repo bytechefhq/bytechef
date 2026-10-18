@@ -5,7 +5,7 @@ import {devtools, persist} from 'zustand/middleware';
 interface WorkspaceStateI {
     clearCurrentWorkspaceId: () => void;
 
-    currentWorkspaceId: number;
+    currentWorkspaceId: number | undefined;
     setCurrentWorkspaceId: (currentWorkspaceId: number) => void;
 }
 
