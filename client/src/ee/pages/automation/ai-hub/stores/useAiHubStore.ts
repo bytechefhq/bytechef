@@ -1,4 +1,8 @@
 /* eslint-disable sort-keys */
+import {
+    type ToolApprovalResolutionI,
+    stampToolApprovalResolution,
+} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
@@ -21,6 +25,7 @@ interface AiHubStateI {
     addMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (text: string) => void;
     editUserMessage: (index: number, content: string) => void;
+    markToolApprovalResolved: (approvalId: number, resolution: ToolApprovalResolutionI) => void;
     resetMessages: () => void;
 
     /** True while a chat switch is fetching that chat's history, so the thread shows a loading placeholder. */
@@ -84,6 +89,11 @@ export const aiHubStore = create<AiHubStateI>()(
 
                 return {...state, messages: truncated};
             }),
+        markToolApprovalResolved: (approvalId, resolution) =>
+            set((state) => ({
+                ...state,
+                messages: stampToolApprovalResolution(state.messages, approvalId, resolution),
+            })),
         resetMessages: () => set({messages: [], messagesLoading: false}),
 
         messagesLoading: false,
