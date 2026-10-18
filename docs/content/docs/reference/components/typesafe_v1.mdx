@@ -1,0 +1,263 @@
+---
+title: "TypeSafe AI"
+description: "TypeSafe AI answers typed questions about a piece of content with structured values instead of generated text: a truth value (Noul), a selected label (Choice) or a position on a rubric (Score)."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: typesafe/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING | Your TypeSafe AI API key. | true |
+
+
+
+## Connection Setup
+
+1. Sign in to your [TypeSafe AI](https://typesafe.ai) account.
+2. Open the API keys page of the dashboard.
+3. Create a new API key and copy it.
+4. Use the key as the **Token** of a new TypeSafe AI connection in ByteChef.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Noul
+Name: noul
+
+`Ask a yes/no question about the state. The answer is a truth value between 0 and 1 rather than a boolean; there is no separate confidence, because the value already is the certainty.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
+| instructions | Instructions | STRING | The yes/no question to ask, e.g. "Does this message convey urgency?" | true |
+| whenTrue | When True | STRING | What a true answer means, written as a statement about the state, e.g. "The customer needs help within the hour". | false |
+| whenFalse | When False | STRING | What a false answer means, written as a statement about the state, e.g. "The request can wait for the normal queue". | false |
+| threshold | Threshold | NUMBER | The truth value at or above which Is True is reported as true. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Noul",
+  "name" : "noul",
+  "parameters" : {
+    "model" : "",
+    "state" : "",
+    "instructions" : "",
+    "whenTrue" : "",
+    "whenFalse" : "",
+    "threshold" : 0.0
+  },
+  "type" : "typesafe/v1/noul"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The answer type, always `noul`. |
+| noul | NUMBER | The truth value, between 0 (false) and 1 (true). |
+| isTrue | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the truth value reached the threshold. |
+| model | STRING | The model version the request resolved to, e.g. `jev-1.13.0` for `jev-latest`. |
+| usage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(input_tokens), INTEGER\(output_tokens)&#125; </details> | Token usage of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "noul" : 0.0,
+  "isTrue" : false,
+  "model" : "",
+  "usage" : {
+    "input_tokens" : 1,
+    "output_tokens" : 1
+  }
+}
+```
+
+
+
+
+### Choice
+Name: choice
+
+`Pick exactly one label from a fixed set of options. Returns the selected label, a probability for every option and a confidence. A choice always names a winner, even when no option fits; ask a separate Noul if "none of these" is a real outcome.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
+| instructions | Instructions | STRING | The question to answer by picking an option, e.g. "Which team should handle this?" | true |
+| options | Options | ARRAY <details> <summary> Items </summary> [&#123;STRING\(label), STRING\(description)&#125;] </details> | The labels to choose from. Labels must be unique. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Choice",
+  "name" : "choice",
+  "parameters" : {
+    "model" : "",
+    "state" : "",
+    "instructions" : "",
+    "options" : [ {
+      "label" : "",
+      "description" : ""
+    } ]
+  },
+  "type" : "typesafe/v1/choice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The answer type, always `choice`. |
+| choice | STRING | The label of the selected option. |
+| probabilities | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The probability of every option, keyed by label; they sum to one. |
+| confidence | NUMBER | How concentrated the probabilities are on the selected option, 0 to 1. |
+| model | STRING | The model version the request resolved to, e.g. `jev-1.13.0` for `jev-latest`. |
+| usage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(input_tokens), INTEGER\(output_tokens)&#125; </details> | Token usage of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "choice" : "",
+  "probabilities" : { },
+  "confidence" : 0.0,
+  "model" : "",
+  "usage" : {
+    "input_tokens" : 1,
+    "output_tokens" : 1
+  }
+}
+```
+
+
+
+
+### Score
+Name: score
+
+`Place the state on an ordered rubric. The score is continuous and probability-weighted: 1.1 on a three-level rubric sits just past level 1, leaning toward level 2, so a threshold such as 2.0 is a real threshold rather than a rounding artefact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
+| instructions | Instructions | STRING | The question the rubric answers, e.g. "How frustrated is the customer?" | true |
+| levels | Levels | ARRAY <details> <summary> Items </summary> [STRING] </details> | The rubric, ordered from the lowest level (0) to the highest. Keep the levels genuine degrees of one thing; if they are alternatives, use Choice instead. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Score",
+  "name" : "score",
+  "parameters" : {
+    "model" : "",
+    "state" : "",
+    "instructions" : "",
+    "levels" : [ "" ]
+  },
+  "type" : "typesafe/v1/score"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The answer type, always `score`. |
+| score | NUMBER | The probability-weighted level, between 0 and the highest level index. |
+| legend | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The description of every level, keyed by level index. |
+| probabilities | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The probability of every level, keyed by level index. |
+| confidence | NUMBER | How concentrated the probabilities are, 0 to 1. |
+| nearestLevel | INTEGER | The index of the most probable level. |
+| nearestLabel | STRING | The description of the most probable level. |
+| model | STRING | The model version the request resolved to, e.g. `jev-1.13.0` for `jev-latest`. |
+| usage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(input_tokens), INTEGER\(output_tokens)&#125; </details> | Token usage of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "score" : 0.0,
+  "legend" : { },
+  "probabilities" : { },
+  "confidence" : 0.0,
+  "nearestLevel" : 1,
+  "nearestLabel" : "",
+  "model" : "",
+  "usage" : {
+    "input_tokens" : 1,
+    "output_tokens" : 1
+  }
+}
+```
+
+
+
+
+
+
