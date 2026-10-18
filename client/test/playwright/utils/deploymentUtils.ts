@@ -195,11 +195,7 @@ export async function deployProject({
 }: DeployProjectProps): Promise<DeployedProjectI> {
     const projectVersion = await publishProject(page, projectId);
 
-    const versionWorkflows = await apiJson<ProjectWorkflowI[]>({
-        method: 'GET',
-        page,
-        path: `${AUTOMATION_API_PATH}/projects/${projectId}/versions/${projectVersion}/workflows`,
-    });
+    const versionWorkflows = await getProjectVersionWorkflows(page, projectId, projectVersion);
 
     const projectDeploymentWorkflows = [];
 
@@ -281,4 +277,16 @@ export async function deleteDeployment(page: Page, deploymentId: number): Promis
     });
 
     await apiFetch({method: 'DELETE', page, path: `${AUTOMATION_API_PATH}/project-deployments/${deploymentId}`});
+}
+
+export async function getProjectVersionWorkflows(
+    page: Page,
+    projectId: string,
+    projectVersion: number
+): Promise<ProjectWorkflowI[]> {
+    return apiJson<ProjectWorkflowI[]>({
+        method: 'GET',
+        page,
+        path: `${AUTOMATION_API_PATH}/projects/${projectId}/versions/${projectVersion}/workflows`,
+    });
 }
