@@ -4503,9 +4503,15 @@ public class ApplicationProperties {
             }
 
             /**
-             * OAuth2 provider credentials.
+             * OAuth2 provider credentials and, optionally, endpoints that replace the provider's public ones (for
+             * example a GitHub Enterprise Server).
              */
             public static class Provider {
+
+                /**
+                 * Authorization endpoint override
+                 */
+                private String authorizationUri;
 
                 /**
                  * OAuth2 client ID
@@ -4517,6 +4523,30 @@ public class ApplicationProperties {
                  */
                 private String clientSecret;
 
+                /**
+                 * OIDC issuer override, checked against the ID token's issuer (Google only)
+                 */
+                private String issuerUri;
+
+                /**
+                 * JWK set endpoint override (Google only)
+                 */
+                private String jwkSetUri;
+
+                /**
+                 * Token endpoint override
+                 */
+                private String tokenUri;
+
+                /**
+                 * User info endpoint override. For GitHub the primary email is read from this URI plus /emails
+                 */
+                private String userInfoUri;
+
+                public String getAuthorizationUri() {
+                    return authorizationUri;
+                }
+
                 public String getClientId() {
                     return clientId;
                 }
@@ -4525,12 +4555,48 @@ public class ApplicationProperties {
                     return clientSecret;
                 }
 
+                public String getIssuerUri() {
+                    return issuerUri;
+                }
+
+                public String getJwkSetUri() {
+                    return jwkSetUri;
+                }
+
+                public String getTokenUri() {
+                    return tokenUri;
+                }
+
+                public String getUserInfoUri() {
+                    return userInfoUri;
+                }
+
+                public void setAuthorizationUri(String authorizationUri) {
+                    this.authorizationUri = authorizationUri;
+                }
+
                 public void setClientId(String clientId) {
                     this.clientId = clientId;
                 }
 
                 public void setClientSecret(String clientSecret) {
                     this.clientSecret = clientSecret;
+                }
+
+                public void setIssuerUri(String issuerUri) {
+                    this.issuerUri = issuerUri;
+                }
+
+                public void setJwkSetUri(String jwkSetUri) {
+                    this.jwkSetUri = jwkSetUri;
+                }
+
+                public void setTokenUri(String tokenUri) {
+                    this.tokenUri = tokenUri;
+                }
+
+                public void setUserInfoUri(String userInfoUri) {
+                    this.userInfoUri = userInfoUri;
                 }
             }
         }

@@ -46,24 +46,28 @@ class SocialLoginOAuth2ClientConfiguration {
         Provider google = socialLogin.getGoogle();
 
         if (google != null && StringUtils.hasText(google.getClientId())) {
-            clientRegistrations.add(
-                CommonOAuth2Provider.GOOGLE.getBuilder("google")
-                    .clientId(google.getClientId())
-                    .clientSecret(google.getClientSecret())
-                    .scope("openid", "profile", "email")
-                    .build());
+            ClientRegistration.Builder builder = CommonOAuth2Provider.GOOGLE.getBuilder("google")
+                .clientId(google.getClientId())
+                .clientSecret(google.getClientSecret())
+                .scope("openid", "profile", "email");
+
+            applyEndpointOverrides(builder, google);
+
+            clientRegistrations.add(builder.build());
         }
 
         Provider github = socialLogin.getGithub();
 
         if (github != null && StringUtils.hasText(github.getClientId())) {
-            clientRegistrations.add(
-                CommonOAuth2Provider.GITHUB.getBuilder("github")
-                    .clientId(github.getClientId())
-                    .clientSecret(github.getClientSecret())
-                    .scope("user:email", "read:user")
-                    .userInfoUri("https://api.github.com/user")
-                    .build());
+            ClientRegistration.Builder builder = CommonOAuth2Provider.GITHUB.getBuilder("github")
+                .clientId(github.getClientId())
+                .clientSecret(github.getClientSecret())
+                .scope("user:email", "read:user")
+                .userInfoUri("https://api.github.com/user");
+
+            applyEndpointOverrides(builder, github);
+
+            clientRegistrations.add(builder.build());
         }
 
         if (clientRegistrations.isEmpty()) {
@@ -74,5 +78,27 @@ class SocialLoginOAuth2ClientConfiguration {
         }
 
         return new InMemoryClientRegistrationRepository(clientRegistrations);
+    }
+
+    private static void applyEndpointOverrides(ClientRegistration.Builder builder, Provider provider) {
+        if (StringUtils.hasText(provider.getAuthorizationUri())) {
+            builder.authorizationUri(provider.getAuthorizationUri());
+        }
+
+        if (StringUtils.hasText(provider.getIssuerUri())) {
+            builder.issuerUri(provider.getIssuerUri());
+        }
+
+        if (StringUtils.hasText(provider.getJwkSetUri())) {
+            builder.jwkSetUri(provider.getJwkSetUri());
+        }
+
+        if (StringUtils.hasText(provider.getTokenUri())) {
+            builder.tokenUri(provider.getTokenUri());
+        }
+
+        if (StringUtils.hasText(provider.getUserInfoUri())) {
+            builder.userInfoUri(provider.getUserInfoUri());
+        }
     }
 }

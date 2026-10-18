@@ -49,8 +49,6 @@ import org.springframework.web.client.RestTemplate;
 @ConditionalOnExpression("${bytechef.security.social-login.enabled:false} or ${bytechef.security.sso.enabled:false}")
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private static final String GITHUB_EMAILS_URL = "https://api.github.com/user/emails";
-
     private final RestTemplate restTemplate;
     private final SocialUserProvisioner socialUserProvisioner;
 
@@ -186,9 +184,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         headers.setBearerAuth(accessToken);
 
+        String userInfoUri = userRequest.getClientRegistration()
+            .getProviderDetails()
+            .getUserInfoEndpoint()
+            .getUri();
+
         try {
             ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-                GITHUB_EMAILS_URL, HttpMethod.GET, new HttpEntity<>(headers),
+                userInfoUri + "/emails", HttpMethod.GET, new HttpEntity<>(headers),
                 new ParameterizedTypeReference<>() {});
 
             List<Map<String, Object>> emails = response.getBody();
