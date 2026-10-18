@@ -203,6 +203,30 @@ class AiHubTurnToolDispatchTest {
     }
 
     @Test
+    void testTurnWithoutAnActivatedProviderCodesItsRunErrorNoAiProvider() {
+        List<BaseEvent> events = runTurn("BUILD", null);
+
+        assertThat(events).filteredOn(RunErrorEvent.class::isInstance)
+            .singleElement()
+            .extracting(event -> ((RunErrorEvent) event).getCode())
+            .isEqualTo("NO_AI_PROVIDER");
+    }
+
+    @Test
+    void testTurnFailingForAnUnrelatedReasonEmitsARunErrorWithoutACode() {
+        activateDefaultProvider();
+
+        providerChatModel.streamFailure = new IllegalStateException("Provider outage");
+
+        List<BaseEvent> events = runTurn("BUILD", null);
+
+        assertThat(events).filteredOn(RunErrorEvent.class::isInstance)
+            .singleElement()
+            .extracting(event -> ((RunErrorEvent) event).getCode())
+            .isNull();
+    }
+
+    @Test
     void testTurnWithAnUnusableSelectedModelEndsWithARunErrorInsteadOfTheEnvironmentDefault() {
         activateDefaultProvider();
 
@@ -285,6 +309,8 @@ class AiHubTurnToolDispatchTest {
 
         private final List<Prompt> prompts = new CopyOnWriteArrayList<>();
 
+        private volatile @Nullable RuntimeException streamFailure;
+
         @Override
         public ChatResponse call(Prompt prompt) {
             prompts.add(prompt);
@@ -295,6 +321,12 @@ class AiHubTurnToolDispatchTest {
         @Override
         public Flux<ChatResponse> stream(Prompt prompt) {
             prompts.add(prompt);
+
+            RuntimeException failure = streamFailure;
+
+            if (failure != null) {
+                return Flux.error(failure);
+            }
 
             return Flux.just(chatResponse());
         }
