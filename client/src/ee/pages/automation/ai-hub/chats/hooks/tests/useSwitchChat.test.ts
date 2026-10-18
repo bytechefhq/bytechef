@@ -1,6 +1,7 @@
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -708,6 +709,22 @@ describe('useSwitchChat', () => {
         expect(aiHubStore.getState().messages).toEqual([]);
         expect(aiHubStore.getState().messagesLoading).toBe(false);
         expect(aiHubChatsStore.getState().currentChatId).toBe(7);
+    });
+
+    it('loads nothing and reports failure while the workspace id is unset', async () => {
+        vi.mocked(useWorkspaceStore).mockImplementation(((
+            selector: (state: {currentWorkspaceId: number | undefined}) => unknown
+        ) => selector({currentWorkspaceId: undefined})) as typeof useWorkspaceStore);
+
+        const returned = await switchTo(buildChat());
+
+        vi.mocked(useWorkspaceStore).mockImplementation(((
+            selector: (state: {currentWorkspaceId: number | undefined}) => unknown
+        ) => selector({currentWorkspaceId: 99})) as typeof useWorkspaceStore);
+
+        expect(returned).toBe(false);
+        expect(mockGetChatMessages).not.toHaveBeenCalled();
+        expect(mockGetToolApprovals).not.toHaveBeenCalled();
     });
 
     it('returns true on success', async () => {
