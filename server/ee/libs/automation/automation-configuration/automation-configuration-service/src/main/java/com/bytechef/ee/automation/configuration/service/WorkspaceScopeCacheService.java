@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.service.PermissionService.UserWorks
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @version ee
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional(readOnly = true)
 public class WorkspaceScopeCacheService {
 
@@ -130,10 +132,6 @@ public class WorkspaceScopeCacheService {
         Cache cache = cacheManager.getCache(WORKSPACE_SCOPES_CACHE);
 
         if (cache != null) {
-            // Key must mirror the @Cacheable read path. That path declares no explicit key, so it falls through to the
-            // globally-configured TenantKeyGenerator (CacheConfiguration), which stores under the tenant-prefixed
-            // "<tenantId>_<userId>_<workspaceId>". A bare SimpleKey(userId, workspaceId) would never match it, so the
-            // eviction would silently no-op and stale scopes would be served until the TTL expires.
             cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId));
         }
     }
