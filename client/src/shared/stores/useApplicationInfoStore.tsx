@@ -68,9 +68,15 @@ export interface ApplicationInfoI {
         enabled: boolean;
         providers: SocialLoginProviderType[];
     };
+    sso: {
+        enabled: boolean;
+    };
     templatesSubmissionForm: {
         projects: string | undefined;
         workflows: string | undefined;
+    };
+    twoFactorAuthentication: {
+        enabled: boolean;
     };
     userGuiding: {
         containerId: string | undefined;
@@ -193,7 +199,13 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.socialLogin?.enabled === 'true',
                                 providers: toSocialLoginProviders(json.socialLoginProviders),
                             },
+                            sso: {
+                                enabled: json.sso?.enabled === 'true',
+                            },
                             templatesSubmissionForm: json.templatesSubmissionForm,
+                            twoFactorAuthentication: {
+                                enabled: json.twoFactorAuthentication?.enabled === 'true',
+                            },
                             userGuiding: {
                                 containerId: json.userGuiding?.containerId,
                                 enabled: json.userGuiding?.enabled === 'true',
@@ -221,9 +233,15 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     enabled: false,
                     providers: [],
                 },
+                sso: {
+                    enabled: false,
+                },
                 templatesSubmissionForm: {
                     projects: undefined,
                     workflows: undefined,
+                },
+                twoFactorAuthentication: {
+                    enabled: false,
                 },
                 userGuiding: {
                     containerId: undefined,

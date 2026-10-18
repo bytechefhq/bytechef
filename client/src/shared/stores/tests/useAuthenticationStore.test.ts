@@ -317,6 +317,27 @@ describe('authenticationStore', () => {
             expect(state.loginError).toBe(true);
         });
 
+        it('keeps the server message of a refused login, such as an SSO-enforced domain', async () => {
+            stubFetch().mockResolvedValueOnce(
+                new Response(JSON.stringify({message: 'Your organization requires SSO login.'}), {status: 403})
+            );
+
+            await authenticationStore.getState().login(LOGIN_EMAIL, LOGIN_CREDENTIAL, false);
+
+            const state = authenticationStore.getState();
+
+            expect(state.loginError).toBe(true);
+            expect(state.loginErrorMessage).toBe('Your organization requires SSO login.');
+        });
+
+        it('has no login error message for bad credentials', async () => {
+            stubFetch().mockResolvedValueOnce(emptyResponse(401));
+
+            await authenticationStore.getState().login(LOGIN_EMAIL, LOGIN_CREDENTIAL, false);
+
+            expect(authenticationStore.getState().loginErrorMessage).toBeUndefined();
+        });
+
         it('does not reuse an account request started before the login succeeded', async () => {
             const preLoginDeferred = createDeferred<Response>();
             const fetchMock = stubFetch()
@@ -433,7 +454,7 @@ describe('authenticationStore', () => {
             expect(authenticationStore.getState().authenticated).toBe(true);
         });
 
-        it('flags a login error when the code is rejected', async () => {
+        it('keeps the code prompt open without a login error when the code is rejected', async () => {
             authenticationStore.setState({mfaRequired: true});
 
             stubFetch().mockResolvedValueOnce(emptyResponse(401));
@@ -441,7 +462,7 @@ describe('authenticationStore', () => {
             const account = await authenticationStore.getState().verifyMfa('000000');
 
             expect(account).toBeUndefined();
-            expect(authenticationStore.getState().loginError).toBe(true);
+            expect(authenticationStore.getState().loginError).toBe(false);
             expect(authenticationStore.getState().mfaRequired).toBe(true);
         });
 
@@ -466,17 +487,17 @@ describe('authenticationStore', () => {
             const state = authenticationStore.getState();
 
             expect(state.authenticated).toBe(false);
-            expect(state.loginError).toBe(true);
+            expect(state.loginError).toBe(false);
             expect(state.mfaRequired).toBe(true);
         });
 
-        it('flags a login error when the request fails', async () => {
+        it('keeps the code prompt open without a login error when the request fails', async () => {
             stubFetch().mockRejectedValueOnce(new TypeError('Failed to fetch'));
 
             const account = await authenticationStore.getState().verifyMfa('123456');
 
             expect(account).toBeUndefined();
-            expect(authenticationStore.getState().loginError).toBe(true);
+            expect(authenticationStore.getState().loginError).toBe(false);
         });
     });
 
