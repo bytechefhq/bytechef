@@ -88,7 +88,8 @@ export async function deleteProjectViaApi(page: Page, projectId: string): Promis
 export async function createConnection(
     page: Page,
     workspaceId: number,
-    componentName: ConnectionComponentNameType
+    componentName: ConnectionComponentNameType,
+    parameterOverrides: Record<string, unknown> = {}
 ): Promise<number> {
     const connectionTemplate = CONNECTION_TEMPLATES[componentName];
 
@@ -99,7 +100,7 @@ export async function createConnection(
             connectionVersion: 1,
             environmentId: DEVELOPMENT_ENVIRONMENT_ID,
             name: `playwright-${componentName}-${getRandomString()}`,
-            parameters: connectionTemplate.parameters(),
+            parameters: {...connectionTemplate.parameters(), ...parameterOverrides},
             workspaceId,
         },
         method: 'POST',
