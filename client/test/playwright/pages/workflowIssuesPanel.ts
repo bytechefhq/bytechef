@@ -30,11 +30,11 @@ export class WorkflowIssuesPanel {
         return this.page.getByRole('img', {exact: true, name: issueCountLabel});
     }
 
-    issuesNote(summary: string): Locator {
-        return this.page.getByText(`${summary} in this workflow`);
+    issuesNote(summary?: string): Locator {
+        return summary ? this.page.getByText(`${summary} in this workflow`) : this.page.getByText(/ in this workflow$/);
     }
 
-    async openSidebarFromNote(summary: string): Promise<void> {
+    async openSidebarFromNote(summary?: string): Promise<void> {
         const issuesNote = this.issuesNote(summary);
 
         await expect(issuesNote).toBeVisible({timeout: TIMEOUTS.EDITOR_CANVAS_READY});
