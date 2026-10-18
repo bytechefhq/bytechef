@@ -19,8 +19,10 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {aiChatAskedQuestionsStore} from '@/shared/components/ai-chat/stores/useAiChatAskedQuestionsStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {MessageSquareOffIcon} from 'lucide-react';
+import {BuildingIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {type PanelImperativeHandle} from 'react-resizable-panels';
 import {Link, useNavigate, useParams} from 'react-router-dom';
@@ -71,6 +73,28 @@ const AiHubChatNotFound = () => (
     </div>
 );
 
+interface AiHubWorkspaceUnavailableProps {
+    loadFailed: boolean;
+}
+
+const AiHubWorkspaceUnavailable = ({loadFailed}: AiHubWorkspaceUnavailableProps) => (
+    <div className="flex size-full flex-col items-center justify-center gap-4 px-4 text-center">
+        <BuildingIcon className="size-10 text-content-neutral-secondary" />
+
+        <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium text-content-neutral-primary">
+                {loadFailed ? 'Workspaces could not be loaded' : 'No workspace available'}
+            </p>
+
+            <p className="text-sm text-content-neutral-secondary">
+                {loadFailed
+                    ? 'Check your connection and reload the page to try again.'
+                    : 'The AI Hub needs a workspace. Ask an administrator to add you to one, then reload the page.'}
+            </p>
+        </div>
+    </div>
+);
+
 /**
  * The AI Hub page: the chats sidebar, the home view or the active chat, and the collapsible workflow resource panel.
  * The runtime provider and its error boundary sit above the home / chat swap, so the first message's turn survives the
@@ -103,6 +127,7 @@ const AiHub = () => {
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const account = useAuthenticationStore((state) => state.account);
 
     const navigate = useNavigate();
     const {chatId: urlChatIdParam} = useParams<{chatId?: string}>();
@@ -118,6 +143,11 @@ const AiHub = () => {
         'ARCHIVED'
     );
 
+    const {data: userWorkspaces, isError: userWorkspacesError} = useGetUserWorkspacesQuery(
+        account?.id ?? -1,
+        account?.id != null
+    );
+
     const switchChat = useSwitchChat();
 
     useResetAiHubStoresOnWorkspaceChange();
@@ -131,7 +161,12 @@ const AiHub = () => {
 
     const chats = useMemo(() => [...(activeChats ?? []), ...(archivedChats ?? [])], [activeChats, archivedChats]);
 
-    const chatsLoading = !isWorkspaceIdKnown(currentWorkspaceId) || activeChatsLoading || archivedChatsLoading;
+    const isWorkspaceKnown = isWorkspaceIdKnown(currentWorkspaceId);
+
+    const isWorkspaceUnavailable =
+        !isWorkspaceKnown && (userWorkspacesError || (userWorkspaces !== undefined && userWorkspaces.length === 0));
+
+    const chatsLoading = !isWorkspaceKnown || activeChatsLoading || archivedChatsLoading;
 
     const urlChatId = urlChatIdParam ? Number(urlChatIdParam) : undefined;
     const isUrlChatKnown = chats.some((chat) => chat.id === urlChatId);
@@ -255,7 +290,9 @@ const AiHub = () => {
 
     let mainBody;
 
-    if (chatNotFound) {
+    if (isWorkspaceUnavailable) {
+        mainBody = <AiHubWorkspaceUnavailable loadFailed={userWorkspacesError} />;
+    } else if (chatNotFound) {
         mainBody = <AiHubChatNotFound />;
     } else if (pendingUrlChat) {
         mainBody = <AiHubChatLoading />;
