@@ -9,7 +9,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CopilotRuntimeProvider} from './CopilotRuntimeProvider';
 
 interface FakeSubscriberI {
-    onRunErrorEvent?: (params: {event: {message?: string}}) => void;
+    onRunErrorEvent?: (params: {event: {code?: string; message?: string}}) => void;
     onTextMessageContentEvent?: (params: {event: {delta: string}; textMessageBuffer: string}) => void;
 }
 
@@ -250,6 +250,37 @@ describe('CopilotRuntimeProvider', () => {
                 role: 'assistant',
             });
             expect(postTurnCallback).not.toHaveBeenCalled();
+        });
+
+        it('renders the next step for a RUN_ERROR that carries a known code', async () => {
+            renderProvider();
+
+            const agent = hoisted.agents[0];
+            const sendPromise = startSend();
+
+            act(() =>
+                agent.subscriber?.onRunErrorEvent?.({
+                    event: {
+                        code: 'MODEL_SELECTION_INCOMPLETE',
+                        message: 'The model selection is incomplete (provider=openai, model=null). Pick a model again.',
+                    },
+                })
+            );
+
+            await finishRun(agent, sendPromise);
+
+            expect(useCopilotStore.getState().messages.at(-1)).toEqual({
+                content: [
+                    {
+                        data: {
+                            code: 'MODEL_SELECTION_INCOMPLETE',
+                            message: 'Your model selection is incomplete. Pick a model again.',
+                        },
+                        type: 'data-run-error',
+                    },
+                ],
+                role: 'assistant',
+            });
         });
 
         it('renders the fallback text when the RUN_ERROR message is empty', async () => {
