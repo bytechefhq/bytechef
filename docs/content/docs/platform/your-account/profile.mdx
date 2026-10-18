@@ -6,7 +6,8 @@ description: Your own account - name and email, password, two-factor authenticat
 **Your Account → Profile** is where you change the things that belong to you rather than to the
 deployment. It is reachable by every signed-in user; nothing on it requires an administrator.
 
-The page is headed **Your profile** and stacks four sections.
+The page is headed **Your profile** and stacks up to four sections. **Two-Factor Authentication** appears when the
+server has two-factor authentication enabled, and **Linked Accounts** when it has social login enabled.
 
 ![The Profile page - the Profile and Change password sections](profile/profile.png)
 
@@ -52,7 +53,11 @@ Described as "Add an extra layer of security to your account using an authentica
 2. Scan it, then type the rotating code into the verification field and click **Verify & Enable**.
    **Cancel** abandons the setup.
 3. Once enabled, the section reads "Two-factor authentication is enabled." and offers **Disable 2FA**,
-   which asks for your password and a current code before turning it off.
+   which asks for your password and a current code before turning it off. An account that signs in only
+   through Google, GitHub, or SSO has no password of its own, so for it the current code is enough.
+
+While 2FA is enabled, **Set up 2FA** is not offered again: disable it first to move to a new
+authenticator. The code is asked for after every sign-in, including Google, GitHub, and SSO sign-ins.
 
 ## Linked Accounts
 

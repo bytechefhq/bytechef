@@ -443,8 +443,8 @@ ceiling is not retryable.
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
-| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC). Enterprise Edition only; Community Edition supports local login and social login | `false` |
-| `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
+| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC), the **Identity Providers** settings page, and the SCIM 2.0 API (`/api/scim/v2`). Enterprise Edition only; Community Edition supports local login and social login | `false` |
+| `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable TOTP two-factor authentication. When on, users can enroll in their profile and the code is required after password, social, and SSO sign-in | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 

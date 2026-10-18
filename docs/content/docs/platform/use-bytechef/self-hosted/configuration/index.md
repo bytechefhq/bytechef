@@ -127,7 +127,7 @@ A few instance-wide switches shape the whole deployment:
 
 | Setting | Effect | Default |
 |---|---|---|
-| `BYTECHEF_EDITION` | Selects Community (`CE`) or Enterprise (`EE`) behavior. EE-only features (SSO, connection visibility scopes, S3 file storage) require `EE`. | `EE` |
+| `BYTECHEF_EDITION` | Selects Community (`CE`) or Enterprise (`EE`) behavior. EE-only features (SSO, SCIM provisioning, connection visibility scopes, S3 file storage) require `EE`. | `EE` |
 | `BYTECHEF_TENANT_MODE` | `SINGLE` for one tenant per instance, `MULTI` for multi-tenant. | `SINGLE` |
 | `BYTECHEF_ENVIRONMENT` | Optionally pin the instance to a single environment (`DEVELOPMENT`, `STAGING`, `PRODUCTION`). | - |
 | `BYTECHEF_SIGN_UP_ENABLED` | Whether visitors can self-register from the login screen. | `true` |
