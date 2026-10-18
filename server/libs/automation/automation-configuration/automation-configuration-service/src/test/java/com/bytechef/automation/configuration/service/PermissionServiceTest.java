@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
@@ -47,7 +48,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class PermissionServiceTest {
 
     private final PermissionService permissionService =
-        new PermissionServiceImpl(mock(UserService.class), List.of(), List.of(), permissiveResolver());
+        new PermissionServiceImpl(mock(ProjectRepository.class), mock(UserService.class), List.of(), List.of(),
+            permissiveResolver());
 
     @BeforeEach
     void setUp() {
@@ -82,10 +84,9 @@ class PermissionServiceTest {
     }
 
     @Test
-    void testHasWorkspaceScopeForProjectTrueForAuthenticatedUser() {
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "ANY_UNRECOGNIZED_SCOPE")).isTrue();
+    void testHasWorkspaceScopeForProjectDeniesAProjectThatCannotBeResolved() {
+        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isFalse();
     }
 
     @Test
@@ -161,7 +162,8 @@ class PermissionServiceTest {
         private final UserService userService = mock(UserService.class);
 
         private PermissionService createService(ResourceOwnershipResolver... resolvers) {
-            return new PermissionServiceImpl(userService, List.of(resolvers), List.of(), permissiveResolver());
+            return new PermissionServiceImpl(
+                mock(ProjectRepository.class), userService, List.of(resolvers), List.of(), permissiveResolver());
         }
 
         private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -216,7 +218,7 @@ class PermissionServiceTest {
             when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
 
             PermissionService service = new PermissionServiceImpl(
-                userService, List.of(resolver("Connection", ResourceOwner.ofUser(7L))),
+                mock(ProjectRepository.class), userService, List.of(resolver("Connection", ResourceOwner.ofUser(7L))),
                 List.of(visibilityProvider("Connection")), permissiveResolver());
 
             assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();

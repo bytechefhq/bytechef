@@ -21,6 +21,8 @@ import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.connection.audit.WorkflowPausedAuditMapper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
@@ -300,10 +302,6 @@ public class ConnectionServiceImpl implements ConnectionService {
             return List.of();
         }
 
-        // Connection.getStatus() is total: it throws IllegalStateException for a corrupted INT ordinal
-        // rather than returning null, so a simple != ACTIVE filter captures every non-ACTIVE status
-        // including any future value added by append-only enum extension. A corrupted row surfaces
-        // loudly here rather than silently masking as ACTIVE.
         return connectionRepository.findAllByIdIn(connectionIds)
             .stream()
             .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
@@ -311,8 +309,9 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    @Audited(event = WorkflowPausedAuditMapper.WORKFLOW_PAUSED, mapper = WorkflowPausedAuditMapper.class)
     @Transactional(readOnly = true)
-    public void validateConnectionsActive(List<Long> connectionIds) {
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         List<Connection> inactive = getInactiveConnections(connectionIds);
 
         if (inactive.isEmpty()) {

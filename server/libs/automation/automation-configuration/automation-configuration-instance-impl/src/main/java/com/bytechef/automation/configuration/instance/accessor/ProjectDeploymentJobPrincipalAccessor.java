@@ -24,7 +24,6 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -138,12 +137,6 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
             .map(ProjectDeploymentWorkflowConnection::getConnectionId)
             .toList();
 
-        List<Connection> inactiveConnections = connectionService.getInactiveConnections(connectionIds);
-
-        if (inactiveConnections.isEmpty()) {
-            return;
-        }
-
-        connectionService.validateConnectionsActive(connectionIds);
+        connectionService.validateConnectionsActive(jobPrincipalId, workflowId, connectionIds);
     }
 }

@@ -32,6 +32,7 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -57,6 +58,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,6 +115,9 @@ class WorkspaceConnectionFacadeIntTest {
     private static final String TENANT_ADMIN_LOGIN = "root";
     private static final long TENANT_ADMIN_USER_ID = 10L;
 
+    private static final PermissionScopeRegistry BUILT_IN_ROLE_SCOPES = new PermissionScopeRegistry(
+        List.of(new ConnectionPermissionScopeProvider()));
+
     private static final String[] GATED_METHODS = {
         "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
     };
@@ -148,9 +153,8 @@ class WorkspaceConnectionFacadeIntTest {
             user(TENANT_ADMIN_USER_ID, TENANT_ADMIN_LOGIN))) {
 
             when(userService.getUser(user.getLogin())).thenReturn(user);
+            when(userService.fetchUserByLogin(user.getLogin())).thenReturn(Optional.of(user));
         }
-
-        when(userService.fetchUserByLogin(OWNER_LOGIN)).thenReturn(Optional.of(user(OWNER_USER_ID, OWNER_LOGIN)));
 
         Connection connection = new Connection();
 
@@ -165,6 +169,7 @@ class WorkspaceConnectionFacadeIntTest {
 
         doThrow(new IllegalStateException(BODY_REACHED)).when(resourceGrantService)
             .deleteGrants(CONNECTION_TYPE, CONNECTION_ID);
+        when(connectionService.getConnection(CONNECTION_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
 
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(ADMIN_USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(ADMIN_USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
@@ -207,12 +212,12 @@ class WorkspaceConnectionFacadeIntTest {
 
     @ParameterizedTest
     @MethodSource("gatedMethods")
-    void testGateDeniesTheOwnerWhenTheUserLookupIsUnsupported(String methodName) {
+    void testGateRefusesTheOwnerWhenTheUserLookupIsUnsupported(String methodName) {
         when(userService.fetchUserByLogin(OWNER_LOGIN)).thenThrow(new UnsupportedOperationException());
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> invokeGatedMethod(methodName)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> invokeGatedMethod(methodName)).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @ParameterizedTest
@@ -235,8 +240,8 @@ class WorkspaceConnectionFacadeIntTest {
     void testEveryGatedMethodIsEvaluated() {
         List<String> annotatedMethods = Arrays.stream(WorkspaceConnectionFacadeImpl.class.getDeclaredMethods())
             .filter(method -> method.getAnnotation(PreAuthorize.class) != null)
-            .filter(method -> !method.getName()
-                .equals("delete"))
+            .filter(method -> !Set.of("create", "delete", "updateConnectionCredentials")
+                .contains(method.getName()))
             .map(Method::getName)
             .distinct()
             .sorted()
@@ -248,31 +253,108 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    void testDeleteAllowsTheConnectionOwner() {
+    void testDeleteAllowsAnEditorOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
+
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
         assertBodyReached(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID));
     }
 
     @Test
-    void testDeleteAllowsAMemberHoldingTheDeleteScope() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
-            .thenReturn(Set.of("CONNECTION_DELETE"));
+    void testDeleteDeniesAViewerOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.VIEWER));
 
-        authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
-        assertBodyReached(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID));
+        assertThatThrownBy(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
-    void testDeleteDeniesAMemberWithoutTheDeleteScope() {
+    void testDeleteDeniesAnAdminWhoIsNotTheOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.ADMIN));
+
+        authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testDeleteDeniesAnEditorWhoIsNotTheOwner() {
         when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
-            .thenReturn(Set.of("CONNECTION_EDIT", "CONNECTION_VIEW"));
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
 
         assertThatThrownBy(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID))
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testDeleteAllowsATenantAdmin() {
+        authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
+
+        assertBodyReached(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsAnEditorOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
+
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
+
+        assertBodyReached(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDeniesAViewerOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.VIEWER));
+
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDeniesAnAdminWhoIsNotTheOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.ADMIN));
+
+        authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDeniesAnEditorWhoIsNotTheOwner() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
+
+        authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsATenantAdmin() {
+        authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
+
+        assertBodyReached(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0));
     }
 
     @Nested
@@ -340,6 +422,10 @@ class WorkspaceConnectionFacadeIntTest {
                 UsernamePasswordAuthenticationToken.authenticated(
                     new org.springframework.security.core.userdetails.User(login, "", authorities), null,
                     authorities));
+    }
+
+    private static Set<String> builtInRoleScopes(WorkspaceRole workspaceRole) {
+        return BUILT_IN_ROLE_SCOPES.getScopeNames(workspaceRole);
     }
 
     private static User user(long id, String login) {

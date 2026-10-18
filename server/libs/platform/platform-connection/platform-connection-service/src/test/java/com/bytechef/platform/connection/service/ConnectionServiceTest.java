@@ -225,7 +225,7 @@ class ConnectionServiceTest {
 
         when(connectionRepository.findAllByIdIn(List.of(CONNECTION_ID))).thenReturn(List.of(connection));
 
-        connectionService.validateConnectionsActive(List.of(CONNECTION_ID));
+        connectionService.validateConnectionsActive(1L, "workflow-1", List.of(CONNECTION_ID));
     }
 
     @Test
@@ -237,7 +237,7 @@ class ConnectionServiceTest {
 
         when(connectionRepository.findAllByIdIn(List.of(CONNECTION_ID))).thenReturn(List.of(connection));
 
-        assertThatThrownBy(() -> connectionService.validateConnectionsActive(List.of(CONNECTION_ID)))
+        assertThatThrownBy(() -> connectionService.validateConnectionsActive(1L, "workflow-1", List.of(CONNECTION_ID)))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining("PENDING_REASSIGNMENT")
             .extracting("errorKey")
@@ -246,8 +246,8 @@ class ConnectionServiceTest {
 
     @Test
     void testValidateConnectionsActiveShortCircuitsOnEmpty() {
-        connectionService.validateConnectionsActive(List.of());
-        connectionService.validateConnectionsActive(null);
+        connectionService.validateConnectionsActive(1L, "workflow-1", List.of());
+        connectionService.validateConnectionsActive(1L, "workflow-1", null);
     }
 
     @Test

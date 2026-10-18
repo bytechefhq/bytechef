@@ -24,16 +24,49 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.SystemProjects;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
+ * A deployment is exactly as visible as the project it deploys, in search as everywhere else.
+ *
  * @author Ivica Cardic
  */
 class ProjectDeploymentSearchAssetProviderTest {
+
+    private static final long HIDDEN_PROJECT_ID = 2L;
+    private static final long VISIBLE_PROJECT_ID = 1L;
+
+    @Test
+    void testSearchDropsDeploymentsOfProjectsTheFilterHides() {
+        ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectDeploymentService.getProjectDeployments()).thenReturn(
+            List.of(projectDeployment(10L, VISIBLE_PROJECT_ID), projectDeployment(11L, HIDDEN_PROJECT_ID)));
+        when(projectService.getProjects(List.of(VISIBLE_PROJECT_ID, HIDDEN_PROJECT_ID)))
+            .thenReturn(List.of(project(VISIBLE_PROJECT_ID), project(HIDDEN_PROJECT_ID)));
+
+        ProjectDeploymentSearchAssetProvider projectDeploymentSearchAssetProvider =
+            new ProjectDeploymentSearchAssetProvider(
+                projectDeploymentService, projectService,
+                new ProjectVisibilityFilter(objectProvider(visibleOnly(VISIBLE_PROJECT_ID))));
+
+        List<ProjectDeploymentSearchResult> projectDeploymentSearchResults =
+            projectDeploymentSearchAssetProvider.search("project", 10, Set.of(9L));
+
+        assertThat(projectDeploymentSearchResults).extracting(ProjectDeploymentSearchResult::id)
+            .containsExactly(10L);
+    }
 
     @Test
     void testDeploymentSearchSkipsConnectedUserDeployments() {
@@ -41,44 +74,73 @@ class ProjectDeploymentSearchAssetProviderTest {
         ProjectService projectService = mock(ProjectService.class);
 
         List<ProjectDeployment> deployments = List.of(
-            createDeployment(1L, 100L), createDeployment(2L, 200L), createDeployment(3L, 300L),
-            createDeployment(4L, 400L));
+            projectDeployment(1L, 100L), projectDeployment(2L, 200L), projectDeployment(3L, 300L),
+            projectDeployment(4L, 400L));
 
         when(projectDeploymentService.getProjectDeployments()).thenReturn(deployments);
 
         List<Project> projects = List.of(
-            createProject(100L, "Orders"),
-            createProject(200L, SystemProjects.EMBEDDED_CONNECTED_USER_NAME_PREFIX + "Orders ext-1"),
-            createProject(300L, SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "Orders"),
-            createProject(400L, "Orders again"));
+            project(100L, "Orders"),
+            project(200L, SystemProjects.EMBEDDED_CONNECTED_USER_NAME_PREFIX + "Orders ext-1"),
+            project(300L, SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + "Orders"),
+            project(400L, "Orders again"));
 
         when(projectService.getProjects(anyList())).thenReturn(projects);
 
         ProjectDeploymentSearchAssetProvider provider = new ProjectDeploymentSearchAssetProvider(
-            projectDeploymentService, projectService);
+            projectDeploymentService, projectService, new ProjectVisibilityFilter(objectProvider(allVisible())));
 
-        List<ProjectDeploymentSearchResult> results = provider.search("orders", 10, Set.of(10L));
+        List<ProjectDeploymentSearchResult> results = provider.search("orders", 10, Set.of(9L));
 
         assertThat(results).extracting(ProjectDeploymentSearchResult::id)
             .containsExactly(1L, 4L);
     }
 
-    private static ProjectDeployment createDeployment(long id, long projectId) {
-        ProjectDeployment projectDeployment = mock(ProjectDeployment.class);
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<ResourceVisibilityResolver> objectProvider(
+        ResourceVisibilityResolver resourceVisibilityResolver) {
 
-        when(projectDeployment.getId()).thenReturn(id);
-        when(projectDeployment.getProjectId()).thenReturn(projectId);
+        ObjectProvider<ResourceVisibilityResolver> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(resourceVisibilityResolver);
+
+        return objectProvider;
+    }
+
+    private static Project project(long id) {
+        return project(id, "project-" + id);
+    }
+
+    private static Project project(long id, String name) {
+        Project project = new Project();
+
+        project.setId(id);
+        project.setName(name);
+        project.setWorkspaceId(9L);
+        project.setVisibility(ResourceVisibility.WORKSPACE);
+
+        return project;
+    }
+
+    private static ProjectDeployment projectDeployment(long id, long projectId) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setId(id);
+        projectDeployment.setProjectId(projectId);
 
         return projectDeployment;
     }
 
-    private static Project createProject(long id, String name) {
-        Project project = mock(Project.class);
+    private static ResourceVisibilityResolver allVisible() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+    }
 
-        when(project.getId()).thenReturn(id);
-        when(project.getName()).thenReturn(name);
-        when(project.getWorkspaceId()).thenReturn(10L);
-
-        return project;
+    private static ResourceVisibilityResolver visibleOnly(long visibleId) {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .filter(id -> id == visibleId)
+            .collect(Collectors.toSet());
     }
 }

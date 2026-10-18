@@ -8,7 +8,9 @@
 package com.bytechef.ee.automation.configuration.event;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
@@ -26,16 +28,24 @@ import org.springframework.stereotype.Component;
 public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventListener<Project> {
 
     private final ProjectGitConfigurationService projectGitConfigurationService;
+    private final ResourceGrantService resourceGrantService;
 
     @SuppressFBWarnings("EI")
-    public ProjectBeforeDeleteEventListener(ProjectGitConfigurationService projectGitConfigurationService) {
+    public ProjectBeforeDeleteEventListener(
+        ProjectGitConfigurationService projectGitConfigurationService, ResourceGrantService resourceGrantService) {
+
         this.projectGitConfigurationService = projectGitConfigurationService;
+        this.resourceGrantService = resourceGrantService;
     }
 
     @Override
     protected void onBeforeDelete(BeforeDeleteEvent<Project> event) {
         Identifier identifier = event.getId();
 
-        projectGitConfigurationService.delete((Long) identifier.getValue());
+        long projectId = (Long) identifier.getValue();
+
+        resourceGrantService.deleteGrants(ProjectVisibilityFilter.PROJECT, projectId);
+
+        projectGitConfigurationService.delete(projectId);
     }
 }
