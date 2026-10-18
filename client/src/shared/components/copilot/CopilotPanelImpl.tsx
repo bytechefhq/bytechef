@@ -9,7 +9,12 @@ import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/mode
 import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBoundary';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {
+    MODE,
+    Source,
+    isWorkflowEditorSource,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
@@ -97,14 +102,18 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
     };
 
     const closeGlobalPanel = useCallback(() => {
-        const {globalPanelConversationToken, restoreConversationState, setGlobalPanelConversationToken} =
-            useCopilotStore.getState();
+        const {
+            context: currentContext,
+            globalPanelConversationToken,
+            restoreConversationState,
+            setGlobalPanelConversationToken,
+        } = useCopilotStore.getState();
 
         if (globalPanelConversationToken) {
             restoreConversationState(globalPanelConversationToken);
         } else {
             setContext({
-                mode: MODE.ASK,
+                mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
                 parameters: {},
                 source: Source.WORKFLOW_EDITOR,
             });
