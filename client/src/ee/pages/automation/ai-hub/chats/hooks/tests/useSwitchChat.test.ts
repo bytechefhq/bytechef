@@ -1,3 +1,4 @@
+import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {act, renderHook} from '@testing-library/react';
@@ -232,6 +233,7 @@ describe('useSwitchChat', () => {
                 componentName: null,
                 decidedByUserId: 1,
                 executionError: null,
+                expiresAt: null,
                 id: 4,
                 status: 'APPROVED',
                 toolName: 'deleteWorkflow',
@@ -332,11 +334,39 @@ describe('useSwitchChat', () => {
     describe('tool approval cards whose gated tool result was never persisted', () => {
         const DELETE_ARGUMENTS = '{"workflowId": "a5667d0f"}';
 
+        const gatedCallToolEventsJson = JSON.stringify([
+            {arguments: DELETE_ARGUMENTS, id: 'call-delete', kind: 'call', name: 'deleteWorkflow'},
+        ]);
+
         const gatedCallRow = buildMessage({
+            content: 'Deleting the workflow "H6 Check".',
+            role: 'ASSISTANT',
+            toolEventsJson: gatedCallToolEventsJson,
+        });
+
+        const gatedCallOnUserRow = buildMessage({
+            content: 'Delete the workflow "H6 Check".',
+            role: 'USER',
+            toolEventsJson: gatedCallToolEventsJson,
+        });
+
+        const persistedEnvelopeRow = buildMessage({
             content: 'Delete the workflow "H6 Check".',
             role: 'USER',
             toolEventsJson: JSON.stringify([
                 {arguments: DELETE_ARGUMENTS, id: 'call-delete', kind: 'call', name: 'deleteWorkflow'},
+                {
+                    id: 'call-delete',
+                    kind: 'result',
+                    name: 'deleteWorkflow',
+                    response: JSON.stringify({
+                        approvalId: 3,
+                        arguments: {workflowId: 'a5667d0f'},
+                        awaitingApproval: true,
+                        kind: 'tool-approval-request',
+                        toolName: 'deleteWorkflow',
+                    }),
+                },
             ]),
         });
 
@@ -345,6 +375,7 @@ describe('useSwitchChat', () => {
             componentName: null,
             decidedByUserId: 1,
             executionError: null,
+            expiresAt: null,
             id: 3,
             status: 'REJECTED',
             toolName: 'deleteWorkflow',
@@ -373,42 +404,48 @@ describe('useSwitchChat', () => {
                 return text.startsWith('[tool-approval #');
             });
 
-        it('rebuilds the resolved card in place of the continuation status row', async () => {
-            mockGetChatMessages.mockResolvedValue([
-                gatedCallRow,
-                buildMessage({content: '[tool-approval #3 rejected]\nTool: deleteWorkflow', role: 'USER'}),
-                buildMessage({content: 'The deletion was rejected.', role: 'ASSISTANT'}),
-            ]);
-            mockGetToolApprovals.mockResolvedValue([buildApproval()]);
+        it.each([
+            ['an assistant row', gatedCallRow],
+            ['the user row it was attached to', gatedCallOnUserRow],
+        ])(
+            'rebuilds the resolved card in place of the continuation status row (call on %s)',
+            async (_label, callRow) => {
+                mockGetChatMessages.mockResolvedValue([
+                    callRow,
+                    buildMessage({content: '[tool-approval #3 rejected]\nTool: deleteWorkflow', role: 'USER'}),
+                    buildMessage({content: 'The deletion was rejected.', role: 'ASSISTANT'}),
+                ]);
+                mockGetToolApprovals.mockResolvedValue([buildApproval()]);
 
-            await switchTo(buildChat());
+                await switchTo(buildChat());
 
-            expect(findContinuationRows()).toEqual([]);
+                expect(findContinuationRows()).toEqual([]);
 
-            const cards = findApprovalCards();
+                const cards = findApprovalCards();
 
-            expect(cards).toHaveLength(1);
-            expect(cards[0]!.data).toMatchObject({
-                approvalId: 3,
-                arguments: {workflowId: 'a5667d0f'},
-                kind: 'tool-approval-request',
-                resolvedBy: '1',
-                resolvedStatus: 'REJECTED',
-                toolName: 'deleteWorkflow',
-            });
+                expect(cards).toHaveLength(1);
+                expect(cards[0]!.data).toMatchObject({
+                    approvalId: 3,
+                    arguments: {workflowId: 'a5667d0f'},
+                    kind: 'tool-approval-request',
+                    resolvedBy: '1',
+                    resolvedStatus: 'REJECTED',
+                    toolName: 'deleteWorkflow',
+                });
 
-            const messages = aiHubStore.getState().messages;
-            const cardMessageIndex = messages.findIndex(
-                (message) =>
-                    Array.isArray(message.content) &&
-                    (message.content as Array<{type?: string}>).some(
-                        (part) => part.type === 'data-tool-approval-request'
-                    )
-            );
+                const messages = aiHubStore.getState().messages;
+                const cardMessageIndex = messages.findIndex(
+                    (message) =>
+                        Array.isArray(message.content) &&
+                        (message.content as Array<{type?: string}>).some(
+                            (part) => part.type === 'data-tool-approval-request'
+                        )
+                );
 
-            expect(messages[cardMessageIndex]!.role).toBe('assistant');
-            expect(messages[cardMessageIndex + 1]!.content).toBe('The deletion was rejected.');
-        });
+                expect(messages[cardMessageIndex]!.role).toBe('assistant');
+                expect(messages[cardMessageIndex + 1]!.content).toBe('The deletion was rejected.');
+            }
+        );
 
         it('drops the continuation status row when the card was restored from the persisted tool result', async () => {
             mockGetChatMessages.mockResolvedValue([
@@ -440,6 +477,48 @@ describe('useSwitchChat', () => {
             expect(findContinuationRows()).toEqual([]);
             expect(findApprovalCards()).toHaveLength(1);
             expect(findApprovalCards()[0]!.data).toMatchObject({approvalId: 3, resolvedStatus: 'REJECTED'});
+        });
+
+        it.each(['SUPERSEDED', 'EXPIRED'] as const)(
+            'renders a %s approval with no continuation row from the persisted request',
+            async (status) => {
+                mockGetChatMessages.mockResolvedValue([
+                    persistedEnvelopeRow,
+                    buildMessage({content: 'Never mind, keep it.', role: 'USER'}),
+                ]);
+                mockGetToolApprovals.mockResolvedValue([buildApproval({decidedByUserId: null, status})]);
+
+                await switchTo(buildChat());
+
+                const cards = findApprovalCards();
+
+                expect(cards).toHaveLength(1);
+                expect(cards[0]!.data).toMatchObject({approvalId: 3, resolvedStatus: status});
+                expect(hasPendingToolApproval(aiHubStore.getState().messages)).toBe(false);
+            }
+        );
+
+        it('treats a pending approval past its expiry as expired, not actionable', async () => {
+            mockGetChatMessages.mockResolvedValue([persistedEnvelopeRow]);
+            mockGetToolApprovals.mockResolvedValue([
+                buildApproval({decidedByUserId: null, expiresAt: '2026-01-01T00:00:00.000Z', status: 'PENDING'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findApprovalCards()[0]!.data).toMatchObject({approvalId: 3, resolvedStatus: 'EXPIRED'});
+            expect(hasPendingToolApproval(aiHubStore.getState().messages)).toBe(false);
+        });
+
+        it('does not append an actionable card for an expired pending approval with no persisted request', async () => {
+            mockGetChatMessages.mockResolvedValue([gatedCallRow]);
+            mockGetToolApprovals.mockResolvedValue([
+                buildApproval({decidedByUserId: null, expiresAt: '2026-01-01T00:00:00.000Z', status: 'PENDING'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(hasPendingToolApproval(aiHubStore.getState().messages)).toBe(false);
         });
 
         it('rebuilds a still-pending card at the end of the transcript so it stays answerable', async () => {
