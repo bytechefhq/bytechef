@@ -75,7 +75,9 @@ const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSideba
 const POLYGLOT_CODE_WORKFLOW_LANGUAGES = ['JAVASCRIPT', 'PYTHON', 'RUBY'];
 
 interface WorkflowEditorLayoutProps {
+    customCanvasWidth?: number;
     enableUndoRedo?: boolean;
+    fitViewOnWorkflowChange?: boolean;
     includeComponents?: string[];
     internalOnlyVisible?: boolean;
     leftSidebarOpen?: boolean;
@@ -86,7 +88,9 @@ interface WorkflowEditorLayoutProps {
 }
 
 const WorkflowEditorLayout = ({
+    customCanvasWidth,
     enableUndoRedo,
+    fitViewOnWorkflowChange,
     includeComponents,
     internalOnlyVisible = false,
     leftSidebarOpen,
@@ -324,7 +328,9 @@ const WorkflowEditorLayout = ({
                         <Suspense>
                             <WorkflowEditor
                                 componentDefinitions={componentDefinitions}
+                                customCanvasWidth={customCanvasWidth}
                                 enableUndoRedo={enableUndoRedo}
+                                fitViewOnWorkflowChange={fitViewOnWorkflowChange}
                                 leftSidebarOpen={leftSidebarOpen}
                                 taskDispatcherDefinitions={taskDispatcherDefinitions}
                             />
