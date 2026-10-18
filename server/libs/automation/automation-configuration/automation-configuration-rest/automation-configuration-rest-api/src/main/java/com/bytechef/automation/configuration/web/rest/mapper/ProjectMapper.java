@@ -21,9 +21,12 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.ValueMapping;
 import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
@@ -37,6 +40,9 @@ public class ProjectMapper {
 
         @Override
         ProjectBasicModel convert(Project project);
+
+        @ValueMapping(source = "ORGANIZATION", target = MappingConstants.THROW_EXCEPTION)
+        ProjectBasicModel.VisibilityEnum map(ResourceVisibility resourceVisibility);
     }
 
     @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
@@ -49,5 +55,8 @@ public class ProjectMapper {
         @DelegatingConverter
         @Mapping(target = "projectVersions", ignore = true)
         ProjectDTO invertConvert(ProjectModel projectModel);
+
+        @ValueMapping(source = "ORGANIZATION", target = MappingConstants.THROW_EXCEPTION)
+        ProjectModel.VisibilityEnum map(ResourceVisibility resourceVisibility);
     }
 }

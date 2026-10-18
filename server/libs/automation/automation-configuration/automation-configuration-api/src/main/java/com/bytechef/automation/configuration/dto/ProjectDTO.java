@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.platform.category.domain.Category;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -34,7 +35,7 @@ public record ProjectDTO(
     String description, Integer developmentDeploymentCount, Long id, String name, String lastModifiedBy,
     Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, int lastProjectVersion,
     List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags, String uuid, int version,
-    Long workspaceId, boolean unpublishedChanges) {
+    ResourceVisibility visibility, Long workspaceId, boolean unpublishedChanges) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
         this(category, project, projectWorkflowIds, tags, null, false, null);
@@ -63,7 +64,8 @@ public record ProjectDTO(
             project.getDescription(), developmentDeploymentCount, project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
             project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(),
-            projectWorkflowIds, tags, project.getUuid(), project.getVersion(), project.getWorkspaceId(), false);
+            projectWorkflowIds, tags, project.getUuid(), project.getVersion(),
+            project.getVisibility(), project.getWorkspaceId(), false);
     }
 
     public ProjectDTO(Project project) {
@@ -73,7 +75,7 @@ public record ProjectDTO(
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
             project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
             project.getProjectVersions(), List.of(), List.of(), project.getUuid(), project.getVersion(),
-            project.getWorkspaceId(), false);
+            project.getVisibility(), project.getWorkspaceId(), false);
     }
 
     public static Builder builder() {
@@ -84,8 +86,8 @@ public record ProjectDTO(
         return new ProjectDTO(
             category, codeWorkflow, codeWorkflowLanguage, createdBy, createdDate, description,
             developmentDeploymentCount, id, name, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus,
-            lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid, version, workspaceId,
-            unpublishedChanges);
+            lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid, version, visibility,
+            workspaceId, unpublishedChanges);
     }
 
     public Project toProject() {
@@ -97,6 +99,7 @@ public record ProjectDTO(
         project.setName(name);
         project.setProjectVersions(projectVersions == null ? List.of() : projectVersions);
         project.setVersion(version);
+        project.setVisibility(visibility == null ? ResourceVisibility.WORKSPACE : visibility);
         project.setTags(tags);
         project.setWorkspaceId(workspaceId);
 
@@ -121,6 +124,7 @@ public record ProjectDTO(
         private List<Tag> tags;
         private String uuid;
         private int version;
+        private ResourceVisibility visibility = ResourceVisibility.WORKSPACE;
         private List<ProjectVersion> projectVersions;
         private List<Long> projectWorkflowIds;
         private Long workspaceId;
@@ -236,6 +240,12 @@ public record ProjectDTO(
             return this;
         }
 
+        public Builder visibility(ResourceVisibility visibility) {
+            this.visibility = visibility;
+
+            return this;
+        }
+
         public Builder workspaceId(long workspaceId) {
             this.workspaceId = workspaceId;
 
@@ -246,7 +256,8 @@ public record ProjectDTO(
             return new ProjectDTO(
                 category, codeWorkflow, codeWorkflowLanguage, createdBy, createdDate, description, null, id, name,
                 lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastProjectVersion, projectVersions,
-                projectWorkflowIds, tags, uuid, version, workspaceId, false);
+                projectWorkflowIds, tags, uuid, version, visibility, workspaceId,
+                false);
         }
     }
 }

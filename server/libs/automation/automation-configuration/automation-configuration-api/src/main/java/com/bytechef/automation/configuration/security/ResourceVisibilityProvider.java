@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -38,7 +39,8 @@ public interface ResourceVisibilityProvider {
 
     /**
      * Discriminator matching {@code ResourceOwnershipResolver.resourceType()} and
-     * {@code ResourceVisibilityPolicy.resourceType()} — e.g. {@code "Connection"}. Must be unique across providers.
+     * {@code ResourceVisibilityPolicy.resourceType()} — e.g. {@code "Connection"}, {@code "Project"},
+     * {@code "Workflow"}. Must be unique across providers.
      */
     String resourceType();
 
@@ -46,4 +48,22 @@ public interface ResourceVisibilityProvider {
      * The resource's visibility and creator, or empty when it does not exist.
      */
     Optional<VisibilityRecord> fetchVisibility(long id);
+
+    /**
+     * The resource's visibility and creator for an id of any shape, or empty when it does not exist.
+     */
+    default Optional<VisibilityRecord> fetchVisibility(Serializable id) {
+        if (id instanceof Number number) {
+            return fetchVisibility(number.longValue());
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * The resource type under which the returned record's visibility and grants are stored.
+     */
+    default String visibilityResourceType() {
+        return resourceType();
+    }
 }
