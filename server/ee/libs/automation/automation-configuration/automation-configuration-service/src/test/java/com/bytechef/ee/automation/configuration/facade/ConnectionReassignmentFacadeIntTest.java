@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
@@ -53,7 +54,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     properties = "bytechef.edition=ee")
 @MockitoBean(types = {
     ConnectionService.class, ProjectDeploymentWorkflowService.class, UserService.class, WorkflowService.class,
-    WorkspaceConnectionService.class
+    WorkspaceConnectionService.class, WorkspaceUserService.class
 })
 class ConnectionReassignmentFacadeIntTest {
 
@@ -80,9 +81,17 @@ class ConnectionReassignmentFacadeIntTest {
     @Autowired
     private WorkspaceConnectionService workspaceConnectionService;
 
+    @Autowired
+    private WorkspaceUserService workspaceUserService;
+
     @BeforeEach
     void beforeEach() {
-        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(new User()));
+        User newOwner = new User();
+
+        newOwner.setId(7L);
+
+        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(newOwner));
+        when(workspaceUserService.isWorkspaceMember(7L, WORKSPACE_ID)).thenReturn(true);
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
             .thenThrow(new IllegalStateException(BODY_REACHED));
         when(connectionService.getConnection(CONNECTION_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
@@ -134,7 +143,7 @@ class ConnectionReassignmentFacadeIntTest {
             case "markConnectionsPendingReassignment" ->
                 connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
             case "markSingleConnectionPendingReassignment" ->
-                connectionReassignmentFacade.markSingleConnectionPendingReassignment(CONNECTION_ID);
+                connectionReassignmentFacade.markSingleConnectionPendingReassignment(CONNECTION_ID, USER_LOGIN);
             case "reassignAllConnections" ->
                 connectionReassignmentFacade.reassignAllConnections(WORKSPACE_ID, USER_LOGIN, NEW_OWNER_LOGIN);
             case "reassignConnection" ->

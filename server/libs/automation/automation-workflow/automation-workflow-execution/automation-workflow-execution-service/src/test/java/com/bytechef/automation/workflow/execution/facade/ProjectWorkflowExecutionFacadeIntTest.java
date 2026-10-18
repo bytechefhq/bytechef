@@ -66,6 +66,7 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerCon
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
@@ -95,6 +96,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
@@ -1328,6 +1330,11 @@ class ProjectWorkflowExecutionFacadeIntTest {
         @Bean
         JobService jobService(JobRepository jobRepository) {
             return new JobServiceImpl(jobRepository);
+        }
+
+        @Bean
+        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry() {
+            return new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy()));
         }
 
         @Bean

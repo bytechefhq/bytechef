@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Workspace-scoped connection CRUD. The base contract carries only edition-agnostic operations (create, register,
@@ -44,6 +45,8 @@ public interface WorkspaceConnectionFacade {
     List<Tag> getConnectionTags(long workspaceId, Long environmentId);
 
     void update(long connectionId, String name, List<Tag> tags, int version);
+
+    void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version);
 
     void updateTags(long connectionId, List<Tag> tags);
 }

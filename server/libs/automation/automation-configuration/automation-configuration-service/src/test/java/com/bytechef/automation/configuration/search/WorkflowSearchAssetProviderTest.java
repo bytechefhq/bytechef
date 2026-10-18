@@ -23,12 +23,18 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -52,9 +58,10 @@ class WorkflowSearchAssetProviderTest {
 
         when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(projectWorkflows);
         when(workflowService.getWorkflows(anyList())).thenReturn(workflows);
+        when(projectService.getProjects(List.of(200L))).thenReturn(List.of(createProject(200L)));
 
         WorkflowSearchAssetProvider workflowSearchAssetProvider = new WorkflowSearchAssetProvider(
-            projectService, projectWorkflowService, workflowService);
+            projectService, permissiveProjectVisibilityFilter(), projectWorkflowService, workflowService);
 
         List<WorkflowSearchResult> results = workflowSearchAssetProvider.search("order", 1, Set.of(10L));
 
@@ -79,5 +86,27 @@ class WorkflowSearchAssetProviderTest {
         when(workflow.getLabel()).thenReturn(label);
 
         return workflow;
+    }
+
+    private static ProjectVisibilityFilter permissiveProjectVisibilityFilter() {
+        ResourceVisibilityResolver resourceVisibilityResolver = (resourceType, workspaceId, candidates) -> candidates
+            .stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ResourceVisibilityResolver> resourceVisibilityResolverProvider = mock(ObjectProvider.class);
+
+        when(resourceVisibilityResolverProvider.getIfAvailable()).thenReturn(resourceVisibilityResolver);
+
+        return new ProjectVisibilityFilter(resourceVisibilityResolverProvider);
+    }
+
+    private static Project createProject(long id) {
+        Project project = new Project();
+
+        project.setId(id);
+
+        return project;
     }
 }

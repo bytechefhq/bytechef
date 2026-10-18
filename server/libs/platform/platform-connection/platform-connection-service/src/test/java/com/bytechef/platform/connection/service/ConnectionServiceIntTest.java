@@ -23,6 +23,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -134,6 +135,40 @@ class ConnectionServiceIntTest {
             .hasFieldOrPropertyWithValue("name", name)
             .hasFieldOrPropertyWithValue("parameters", parameters)
             .hasFieldOrPropertyWithValue("type", type);
+    }
+
+    @Test
+    void testUpdateConnectionStatusIfOwnedByMarksAConnectionItsOwnerStillHolds() {
+        Connection connection = connectionRepository.save(getConnection());
+        long connectionId = Validate.notNull(connection.getId(), "id");
+
+        connectionService.reassignOwner(connectionId, "departing@example.com");
+
+        assertThat(
+            connectionService.updateConnectionStatusIfOwnedBy(
+                connectionId, "departing@example.com", ConnectionStatus.PENDING_REASSIGNMENT))
+                    .isTrue();
+        assertThat(connectionService.getConnection(connectionId)
+            .getStatus()).isEqualTo(ConnectionStatus.PENDING_REASSIGNMENT);
+    }
+
+    @Test
+    void testUpdateConnectionStatusIfOwnedByLeavesAReassignedConnectionAlone() {
+        Connection connection = connectionRepository.save(getConnection());
+        long connectionId = Validate.notNull(connection.getId(), "id");
+
+        connectionService.reassignOwner(connectionId, "departing@example.com");
+        connectionService.reassignOwner(connectionId, "new-owner@example.com");
+
+        assertThat(
+            connectionService.updateConnectionStatusIfOwnedBy(
+                connectionId, "departing@example.com", ConnectionStatus.PENDING_REASSIGNMENT))
+                    .isFalse();
+
+        Connection storedConnection = connectionService.getConnection(connectionId);
+
+        assertThat(storedConnection.getStatus()).isEqualTo(ConnectionStatus.ACTIVE);
+        assertThat(storedConnection.getCreatedBy()).isEqualTo("new-owner@example.com");
     }
 
     @Test

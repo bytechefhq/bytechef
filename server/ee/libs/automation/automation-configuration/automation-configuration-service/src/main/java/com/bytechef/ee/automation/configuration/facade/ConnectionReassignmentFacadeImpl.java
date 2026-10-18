@@ -14,15 +14,20 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditMapper;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO.BulkReassignFailureDTO;
+import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -60,6 +65,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     private final UserService userService;
     private final WorkflowService workflowService;
     private final WorkspaceConnectionService workspaceConnectionService;
+    private final WorkspaceUserService workspaceUserService;
 
     // Self-reference via the interface so AOP advice (@Transactional propagation for the per-row
     // REQUIRES_NEW worker) fires on internal re-entry (bulk mark-pending → markSingleConnectionPendingReassignment).
@@ -89,7 +95,8 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     public ConnectionReassignmentFacadeImpl(ConnectionService connectionService,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, UserService userService,
-        WorkflowService workflowService, WorkspaceConnectionService workspaceConnectionService) {
+        WorkflowService workflowService, WorkspaceConnectionService workspaceConnectionService,
+        WorkspaceUserService workspaceUserService) {
 
         this.connectionService = connectionService;
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
@@ -97,6 +104,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
         this.userService = userService;
         this.workflowService = workflowService;
         this.workspaceConnectionService = workspaceConnectionService;
+        this.workspaceUserService = workspaceUserService;
     }
 
     @Override
@@ -164,7 +172,8 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
         // "updated" row at commit time — poisoning the partial-failure contract this DTO advertises.
         for (ConnectionReassignmentItem item : connections) {
             try {
-                MarkPendingOutcome outcome = self().markSingleConnectionPendingReassignment(item.connectionId());
+                MarkPendingOutcome outcome =
+                    self().markSingleConnectionPendingReassignment(item.connectionId(), userLogin);
 
                 if (outcome == MarkPendingOutcome.UPDATED) {
                     updated++;
@@ -222,7 +231,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId) {
+    public MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId, String expectedOwnerLogin) {
         // Re-read current status inside the REQUIRES_NEW tx so a row whose status changed between the enumeration
         // and this per-row call is classified on what it is now. Rehydrated from a primitive INT code by
         // Connection.getStatus, so no null-guard.
@@ -239,24 +248,35 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
             return MarkPendingOutcome.SKIPPED;
         }
 
-        connectionService.updateConnectionStatus(connectionId, ConnectionStatus.PENDING_REASSIGNMENT);
+        if (!connectionService.updateConnectionStatusIfOwnedBy(
+            connectionId, expectedOwnerLogin, ConnectionStatus.PENDING_REASSIGNMENT)) {
+
+            if (log.isInfoEnabled()) {
+                log.info(
+                    "Skipping connection id={}: no longer owned by {}", connectionId, expectedOwnerLogin);
+            }
+
+            return MarkPendingOutcome.SKIPPED;
+        }
 
         return MarkPendingOutcome.UPDATED;
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_REASSIGNED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reassignConnection(long workspaceId, long connectionId, String newOwnerLogin) {
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
-        validateUserExists(newOwnerLogin);
+        validateNewOwnerIsWorkspaceMember(workspaceId, newOwnerLogin);
 
         applyReassignment(connectionId, newOwnerLogin);
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_REASSIGNED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reassignAllConnections(long workspaceId, String userLogin, String newOwnerLogin) {
-        validateUserExists(newOwnerLogin);
+        validateNewOwnerIsWorkspaceMember(workspaceId, newOwnerLogin);
 
         List<ConnectionReassignmentItem> unresolvedConnections = getUnresolvedConnections(workspaceId, userLogin);
 
@@ -293,11 +313,19 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
         }
     }
 
-    private void validateUserExists(String login) {
-        userService.fetchUserByLogin(login)
+    private void validateNewOwnerIsWorkspaceMember(long workspaceId, String login) {
+        User newOwner = userService.fetchUserByLogin(login)
             .orElseThrow(() -> new ConfigurationException(
                 "User with login '%s' does not exist".formatted(login),
                 ConnectionErrorType.INVALID_CONNECTION));
+
+        Long newOwnerId = newOwner.getId();
+
+        if (newOwnerId == null || !workspaceUserService.isWorkspaceMember(newOwnerId, workspaceId)) {
+            throw new ConfigurationException(
+                "User with login '%s' is not a member of workspace id=%s".formatted(login, workspaceId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
     }
 
     @Override

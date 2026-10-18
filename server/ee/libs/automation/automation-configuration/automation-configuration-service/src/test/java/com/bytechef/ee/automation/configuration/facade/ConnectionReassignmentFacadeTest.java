@@ -12,7 +12,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +29,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade.AffectedWorkflow;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade.ConnectionReassignmentItem;
+import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
@@ -37,6 +40,7 @@ import com.bytechef.platform.user.service.UserService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,6 +60,7 @@ class ConnectionReassignmentFacadeTest {
     private static final long WORKSPACE_ID = 1L;
     private static final String USER_LOGIN = "departing-user@example.com";
     private static final String NEW_OWNER_LOGIN = "new-owner@example.com";
+    private static final long NEW_OWNER_ID = 77L;
 
     @Mock
     private ConnectionService connectionService;
@@ -72,6 +77,9 @@ class ConnectionReassignmentFacadeTest {
     @Mock
     private WorkspaceConnectionService workspaceConnectionService;
 
+    @Mock
+    private WorkspaceUserService workspaceUserService;
+
     private ConnectionReassignmentFacadeImpl connectionReassignmentFacade;
 
     @BeforeEach
@@ -80,7 +88,10 @@ class ConnectionReassignmentFacadeTest {
 
         connectionReassignmentFacade = new ConnectionReassignmentFacadeImpl(connectionService, meterRegistryProvider,
             projectDeploymentWorkflowService,
-            userService, workflowService, workspaceConnectionService);
+            userService, workflowService, workspaceConnectionService, workspaceUserService);
+
+        lenient().when(workspaceUserService.isWorkspaceMember(anyLong(), anyLong()))
+            .thenReturn(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -212,7 +223,50 @@ class ConnectionReassignmentFacadeTest {
 
         connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
 
-        verify(connectionService).updateConnectionStatus(10L, ConnectionStatus.PENDING_REASSIGNMENT);
+        verify(connectionService)
+            .updateConnectionStatusIfOwnedBy(10L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT);
+    }
+
+    @Test
+    void testMarkConnectionsPendingReassignmentSkipsAConnectionReassignedAfterItWasListed() {
+        WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
+
+        when(workspaceConnection.getConnectionId()).thenReturn(10L);
+
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(workspaceConnection));
+
+        Connection listedConnection = mock(Connection.class);
+
+        when(listedConnection.getId()).thenReturn(10L);
+        when(listedConnection.getName()).thenReturn("Test");
+        when(listedConnection.getCreatedBy()).thenReturn(USER_LOGIN);
+        when(listedConnection.getVisibility()).thenReturn(ResourceVisibility.PRIVATE);
+        when(listedConnection.getEnvironmentId()).thenReturn(1);
+
+        Connection reassignedConnection = mock(Connection.class);
+
+        when(reassignedConnection.getCreatedBy()).thenReturn(NEW_OWNER_LOGIN);
+        when(reassignedConnection.getStatus()).thenReturn(ConnectionStatus.ACTIVE);
+
+        when(connectionService.getConnections(List.of(10L))).thenReturn(List.of(listedConnection));
+        when(connectionService.getConnection(10L)).thenReturn(reassignedConnection);
+        when(connectionService.updateConnectionStatusIfOwnedBy(
+            eq(10L), anyString(), eq(ConnectionStatus.PENDING_REASSIGNMENT)))
+                .thenAnswer(invocation -> Objects.equals(
+                    reassignedConnection.getCreatedBy(), invocation.getArgument(1)));
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflowsByConnectionIds(List.of(10L)))
+            .thenReturn(List.of());
+
+        var result = connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
+
+        verify(connectionService, never()).updateConnectionStatus(eq(10L), any());
+        verify(connectionService)
+            .updateConnectionStatusIfOwnedBy(10L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT);
+        assertThat(result.updated()).isEqualTo(0);
+        assertThat(result.skipped()).isEqualTo(1);
+        assertThat(result.failed()).isEqualTo(0);
     }
 
     @Test
@@ -243,7 +297,7 @@ class ConnectionReassignmentFacadeTest {
 
         var result = connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
 
-        verify(connectionService, never()).updateConnectionStatus(eq(10L), any());
+        verify(connectionService, never()).updateConnectionStatusIfOwnedBy(eq(10L), any(), any());
         assertThat(result.total()).isEqualTo(1);
         assertThat(result.updated()).isEqualTo(0);
         assertThat(result.skipped()).isEqualTo(1);
@@ -259,7 +313,7 @@ class ConnectionReassignmentFacadeTest {
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
             .thenReturn(List.of(workspaceConnection));
 
-        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(mock(User.class)));
+        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(newOwner()));
 
         Connection connection = mock(Connection.class);
 
@@ -281,7 +335,7 @@ class ConnectionReassignmentFacadeTest {
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
             .thenReturn(List.of(workspaceConnection));
 
-        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(mock(User.class)));
+        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(newOwner()));
 
         Connection connection = mock(Connection.class);
 
@@ -390,6 +444,37 @@ class ConnectionReassignmentFacadeTest {
     }
 
     @Test
+    void testReassignConnectionToAUserOutsideTheWorkspaceThrows() {
+        WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
+
+        when(workspaceConnection.getConnectionId()).thenReturn(10L);
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(workspaceConnection));
+        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(newOwner()));
+        when(workspaceUserService.isWorkspaceMember(NEW_OWNER_ID, WORKSPACE_ID)).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 10L, NEW_OWNER_LOGIN))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("is not a member of workspace");
+
+        verify(connectionService, never()).reassignOwner(anyLong(), any());
+    }
+
+    @Test
+    void testReassignAllConnectionsToAUserOutsideTheWorkspaceThrows() {
+        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(newOwner()));
+        when(workspaceUserService.isWorkspaceMember(NEW_OWNER_ID, WORKSPACE_ID)).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> connectionReassignmentFacade.reassignAllConnections(WORKSPACE_ID, USER_LOGIN, NEW_OWNER_LOGIN))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("is not a member of workspace");
+
+        verify(connectionService, never()).reassignOwner(anyLong(), any());
+    }
+
+    @Test
     void testReassignConnectionNotInWorkspaceThrows() {
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID)).thenReturn(List.of());
 
@@ -436,15 +521,17 @@ class ConnectionReassignmentFacadeTest {
         when(projectDeploymentWorkflowService.getProjectDeploymentWorkflowsByConnectionIds(anyList()))
             .thenReturn(List.of());
 
-        when(connectionService.updateConnectionStatus(10L, ConnectionStatus.PENDING_REASSIGNMENT))
+        when(connectionService.updateConnectionStatusIfOwnedBy(10L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT))
             .thenThrow(new IllegalStateException("Invalid state transition"));
-        when(connectionService.updateConnectionStatus(20L, ConnectionStatus.PENDING_REASSIGNMENT))
-            .thenReturn(connection2);
+        when(connectionService.updateConnectionStatusIfOwnedBy(20L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT))
+            .thenReturn(true);
 
         var result = connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
 
-        verify(connectionService).updateConnectionStatus(10L, ConnectionStatus.PENDING_REASSIGNMENT);
-        verify(connectionService).updateConnectionStatus(20L, ConnectionStatus.PENDING_REASSIGNMENT);
+        verify(connectionService)
+            .updateConnectionStatusIfOwnedBy(10L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT);
+        verify(connectionService)
+            .updateConnectionStatusIfOwnedBy(20L, USER_LOGIN, ConnectionStatus.PENDING_REASSIGNMENT);
         assertThat(result.total()).isEqualTo(2);
         assertThat(result.updated()).isEqualTo(1);
         assertThat(result.skipped()).isEqualTo(0);
@@ -463,17 +550,17 @@ class ConnectionReassignmentFacadeTest {
 
     /**
      * Pins {@code @Transactional(propagation = REQUIRES_NEW)} on
-     * {@link ConnectionReassignmentFacadeImpl#markSingleConnectionPendingReassignment(long)} via reflection. The
-     * per-row REQUIRES_NEW boundary is load-bearing for partial-failure semantics: without it, one failing row flips
-     * the outer transaction to rollback-only and discards every previously "updated" row at commit, even though the DTO
-     * the caller receives claims success. The pure-Mockito tests in this class cannot exercise Spring's transactional
-     * proxy, so this reflection check is the regression guard — mirroring the pattern
+     * {@link ConnectionReassignmentFacadeImpl#markSingleConnectionPendingReassignment(long, String)} via reflection.
+     * The per-row REQUIRES_NEW boundary is load-bearing for partial-failure semantics: without it, one failing row
+     * flips the outer transaction to rollback-only and discards every previously "updated" row at commit, even though
+     * the DTO the caller receives claims success. The pure-Mockito tests in this class cannot exercise Spring's
+     * transactional proxy, so this reflection check is the regression guard — mirroring the pattern
      * ConnectionGraphQlControllerAuthorizationTest uses for {@code @PreAuthorize}.
      */
     @Test
     void testMarkSingleConnectionPendingReassignmentRequiresNewTransactionBoundary() throws NoSuchMethodException {
         java.lang.reflect.Method method = ConnectionReassignmentFacadeImpl.class.getDeclaredMethod(
-            "markSingleConnectionPendingReassignment", long.class);
+            "markSingleConnectionPendingReassignment", long.class, String.class);
 
         org.springframework.transaction.annotation.Transactional transactional = method.getAnnotation(
             org.springframework.transaction.annotation.Transactional.class);
@@ -491,5 +578,14 @@ class ConnectionReassignmentFacadeTest {
                     + "outer batch transaction, so a per-row throw would flip it to rollback-only and discard every "
                     + "previously updated row when the batch method commits.")
             .isEqualTo(org.springframework.transaction.annotation.Propagation.REQUIRES_NEW);
+    }
+
+    private static User newOwner() {
+        User user = new User();
+
+        user.setId(NEW_OWNER_ID);
+        user.setLogin(NEW_OWNER_LOGIN);
+
+        return user;
     }
 }

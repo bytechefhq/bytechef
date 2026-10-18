@@ -129,6 +129,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public boolean updateConnectionStatusIfOwnedBy(long connectionId, String ownerLogin, ConnectionStatus status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection reassignOwner(long id, String newOwnerLogin) {
         throw new UnsupportedOperationException();
     }
@@ -154,7 +159,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public void validateConnectionsActive(List<Long> connectionIds) {
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

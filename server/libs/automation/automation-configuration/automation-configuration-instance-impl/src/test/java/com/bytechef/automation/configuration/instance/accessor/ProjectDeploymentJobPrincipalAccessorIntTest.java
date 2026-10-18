@@ -18,11 +18,8 @@ package com.bytechef.automation.configuration.instance.accessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -37,7 +34,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
@@ -131,30 +127,29 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
     }
 
     @Test
-    void testValidateConnectionsForJobPassesWhenEveryConnectionIsActive() {
+    void testValidateConnectionsForJobPassesTheRunContextToTheGuard() {
+        String workflowId = "workflow-" + UUID.randomUUID();
         UUID workflowUuid = UUID.randomUUID();
 
-        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowUuid, 10L);
-
-        when(connectionService.getInactiveConnections(List.of(10L))).thenReturn(List.of());
+        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowId, workflowUuid, 10L);
 
         projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(projectDeploymentId, workflowUuid.toString());
 
-        verify(connectionService, never()).validateConnectionsActive(anyList());
+        verify(connectionService).validateConnectionsActive(projectDeploymentId, workflowId, List.of(10L));
     }
 
     @Test
     void testValidateConnectionsForJobRejectsAnInactiveConnection() {
+        String workflowId = "workflow-" + UUID.randomUUID();
         UUID workflowUuid = UUID.randomUUID();
 
-        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowUuid, 11L);
+        long projectDeploymentId = createDeployedWorkflowUsingConnection(workflowId, workflowUuid, 11L);
 
         ConfigurationException inactiveConnections = new ConfigurationException(
             "inactive", ConnectionErrorType.CONNECTION_NOT_ACTIVE);
 
-        when(connectionService.getInactiveConnections(List.of(11L))).thenReturn(List.of(new Connection()));
         doThrow(inactiveConnections).when(connectionService)
-            .validateConnectionsActive(List.of(11L));
+            .validateConnectionsActive(projectDeploymentId, workflowId, List.of(11L));
 
         assertThatThrownBy(
             () -> projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(projectDeploymentId,
@@ -162,12 +157,10 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
                     .isSameAs(inactiveConnections);
     }
 
-    private long createDeployedWorkflowUsingConnection(UUID workflowUuid, long connectionId) {
+    private long createDeployedWorkflowUsingConnection(String workflowId, UUID workflowUuid, long connectionId) {
         Project project = createProject("CRM " + UUID.randomUUID());
 
         ProjectDeployment projectDeployment = createProjectDeployment(project);
-
-        String workflowId = "workflow-" + UUID.randomUUID();
 
         projectWorkflowService.addWorkflow(project.getId(), 3, workflowId, workflowUuid);
 

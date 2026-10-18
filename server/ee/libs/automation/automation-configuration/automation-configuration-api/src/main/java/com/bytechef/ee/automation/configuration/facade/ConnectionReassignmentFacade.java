@@ -55,7 +55,7 @@ public interface ConnectionReassignmentFacade {
      * it, a single failing row would flip the outer transaction to rollback-only and discard every previously-updated
      * row in the same batch.
      */
-    MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId);
+    MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId, String expectedOwnerLogin);
 
     void reassignConnection(long workspaceId, long connectionId, String newOwnerLogin);
 

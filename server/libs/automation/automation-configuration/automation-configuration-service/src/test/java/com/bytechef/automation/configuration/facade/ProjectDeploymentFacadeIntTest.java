@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -40,11 +41,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
@@ -62,6 +65,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -69,11 +73,14 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -335,6 +342,11 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testGetWorkspaceProjectDeploymentsHidesDeploymentsOfEmbeddedAutomationWorkflowProjects() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
         ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
@@ -358,6 +370,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testGetProjectDeploymentsReturnsOnlyTheNonEmbeddedDeploymentsOfTheEnvironment() {
+        authenticate("owner");
+
         ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO productionProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
@@ -385,6 +399,45 @@ public class ProjectDeploymentFacadeIntTest {
         assertThat(projectDeployments).extracting(ProjectDeployment::getName)
             .contains("plain")
             .doesNotContain("admin", "production");
+    }
+
+    @Test
+    public void testGetProjectDeploymentsHidesDeploymentsOfProjectsTheCallerCannotSee() {
+        authenticate("owner");
+
+        ProjectDTO privateProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO workspaceProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO privateDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), privateProjectDTO);
+        ProjectDeploymentDTO workspaceDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), workspaceProjectDTO);
+
+        renameProjectDeployment(privateDeploymentDTO.id(), "private");
+        renameProjectDeployment(workspaceDeploymentDTO.id(), "workspace");
+
+        Project privateProject = projectRepository.findById(privateProjectDTO.id())
+            .orElseThrow();
+
+        privateProject.setVisibility(ResourceVisibility.PRIVATE);
+
+        projectRepository.save(privateProject);
+
+        authenticate("viewer");
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
+            workspace.getId(), Environment.DEVELOPMENT, null, null);
+
+        assertThat(projectDeployments).extracting(ProjectDeployment::getName)
+            .contains("workspace")
+            .doesNotContain("private");
+    }
+
+    private static void authenticate(String login) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    login, "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
     }
 
     @Test
@@ -1299,8 +1352,14 @@ public class ProjectDeploymentFacadeIntTest {
         private static final String WORKFLOW_ID = "workflow-1";
         private static final long WORKSPACE_ID = 5L;
 
+        @Autowired
+        private ConnectionService connectionService;
+
         @MockitoBean
         private PermissionService permissionService;
+
+        @Autowired
+        private PrincipalJobFacade principalJobFacade;
 
         @MockitoBean
         private ProjectDeploymentService projectDeploymentService;
@@ -1376,6 +1435,40 @@ public class ProjectDeploymentFacadeIntTest {
                 () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testCreateProjectDeploymentWorkflowJobRefusesAnInactiveConnection() {
+            grant("DEPLOYMENT_EDIT");
+            stubDeploymentWorkflowWithConnection(9L);
+
+            doThrow(new ConfigurationException("blocked", ConnectionErrorType.CONNECTION_NOT_ACTIVE))
+                .when(connectionService)
+                .validateConnectionsActive(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, List.of(9L));
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
+                    .isInstanceOf(ConfigurationException.class);
+
+            verify(principalJobFacade, never()).createJob(
+                any(JobParametersDTO.class), anyLong(), any(PlatformType.class));
+        }
+
+        @Test
+        void testCreateProjectDeploymentWorkflowJobRunsWhenEveryConnectionIsActive() {
+            grant("DEPLOYMENT_EDIT");
+            stubDeploymentWorkflowWithConnection(9L);
+
+            doNothing().when(connectionService)
+                .validateConnectionsActive(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, List.of(9L));
+            when(principalJobFacade.createJob(
+                any(JobParametersDTO.class), eq(PROJECT_DEPLOYMENT_ID), eq(PlatformType.AUTOMATION)))
+                    .thenReturn(11L);
+
+            assertThat(projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
+                .isEqualTo(11L);
+
+            verify(connectionService).validateConnectionsActive(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID, List.of(9L));
         }
 
         @Test
@@ -1582,6 +1675,18 @@ public class ProjectDeploymentFacadeIntTest {
             assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(BODY_REACHED);
+        }
+
+        private void stubDeploymentWorkflowWithConnection(long connectionId) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(connectionId, "connection", "node_1")));
+
+            doReturn(projectDeploymentWorkflow).when(projectDeploymentWorkflowService)
+                .getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID);
+            doReturn(new ProjectDeployment()).when(projectDeploymentService)
+                .getProjectDeployment(PROJECT_DEPLOYMENT_ID);
         }
 
         private void allowConnectionUsageInWorkflow() {

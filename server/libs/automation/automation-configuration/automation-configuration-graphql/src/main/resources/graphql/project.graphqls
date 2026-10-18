@@ -17,6 +17,7 @@ type Project {
     name: String!
     category: Category
     tags: [Tag]
+    visibility: ResourceVisibility!
 }
 
 type ProjectTemplate {

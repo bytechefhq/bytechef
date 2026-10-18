@@ -47,6 +47,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
@@ -105,6 +106,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -480,7 +482,8 @@ class ConnectedUserAccessDeciderIntTest {
             PermissionServiceImpl.class, ProjectDeploymentEnvironmentResolver.class,
             ProjectDeploymentOwnershipResolver.class, ProjectDeploymentServiceImpl.class,
             ProjectOwnershipResolver.class,
-            ProjectPermissionScopeProvider.class, ProjectServiceImpl.class, ProjectWorkflowServiceImpl.class,
+            ProjectPermissionScopeProvider.class, ProjectServiceImpl.class, ProjectVisibilityPolicy.class,
+            ResourceVisibilityConfiguration.class, ProjectWorkflowServiceImpl.class,
             WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
             WorkspaceScopeCacheService.class, EmbeddedScopeCacheService.class
         })
@@ -782,6 +785,8 @@ class ConnectedUserAccessDeciderIntTest {
             ProjectDeploymentOwnershipResolver.class, ProjectDeploymentServiceImpl.class,
             ProjectDeploymentWorkflowServiceImpl.class, ProjectOwnershipResolver.class,
             ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectServiceImpl.class,
+            ProjectVisibilityPolicy.class,
+            ResourceVisibilityConfiguration.class,
             ProjectWorkflowCallback.class, ProjectWorkflowServiceImpl.class, WorkflowPermissionScopeProvider.class,
             WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class, EmbeddedScopeCacheService.class
         })
@@ -905,7 +910,8 @@ class ConnectedUserAccessDeciderIntTest {
                         ProjectDeploymentFacade.class, projectDeploymentFacade,
                         ProjectDeploymentService.class, projectDeploymentService, ProjectService.class, projectService,
                         ProjectWorkflowFacade.class, projectWorkflowFacade,
-                        ProjectWorkflowService.class, projectWorkflowService, WorkflowService.class, workflowService));
+                        ProjectWorkflowService.class, projectWorkflowService, String.class, "EE",
+                        WorkflowService.class, workflowService));
             }
 
             @Bean
