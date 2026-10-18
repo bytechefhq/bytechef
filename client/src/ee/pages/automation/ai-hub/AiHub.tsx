@@ -8,6 +8,7 @@ import AiHubChatsSidebar from '@/ee/pages/automation/ai-hub/chats/AiHubChatsSide
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import useRecordReferencedArtifacts from '@/ee/pages/automation/ai-hub/chats/hooks/useRecordReferencedArtifacts';
 import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {useResetAiHubChatOnEnvironmentChange} from '@/ee/pages/automation/ai-hub/hooks/useResetAiHubChatOnEnvironmentChange';
 import {useResetAiHubStoresOnWorkspaceChange} from '@/ee/pages/automation/ai-hub/hooks/useResetAiHubStoresOnWorkspaceChange';
@@ -121,7 +122,7 @@ const AiHub = () => {
 
     useResetAiHubStoresOnWorkspaceChange();
     useResetAiHubChatOnEnvironmentChange();
-    useRecordReferencedArtifacts(currentChatId, currentWorkspaceId ?? 0);
+    useRecordReferencedArtifacts(currentChatId, currentWorkspaceId);
 
     const hasActiveChat = currentChatId != null || hasMessages;
     const hasResourceContent = hasActiveChat || hasOpenTabs;
@@ -130,7 +131,7 @@ const AiHub = () => {
 
     const chats = useMemo(() => [...(activeChats ?? []), ...(archivedChats ?? [])], [activeChats, archivedChats]);
 
-    const chatsLoading = activeChatsLoading || archivedChatsLoading;
+    const chatsLoading = !isWorkspaceIdKnown(currentWorkspaceId) || activeChatsLoading || archivedChatsLoading;
 
     const urlChatId = urlChatIdParam ? Number(urlChatIdParam) : undefined;
     const isUrlChatKnown = chats.some((chat) => chat.id === urlChatId);
