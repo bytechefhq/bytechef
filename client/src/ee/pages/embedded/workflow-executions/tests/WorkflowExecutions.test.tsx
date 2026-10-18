@@ -241,18 +241,25 @@ describe('WorkflowExecutions', () => {
         expect(new URLSearchParams(currentSearch).get('connectedUserId')).toBe('7');
     });
 
-    it('keeps the connected user when the environment changes', async () => {
+    it.each([
+        ['automations', '1'],
+        ['integrations', '0'],
+    ])('clears the connected user of the %s when the environment changes', async (_type, automations) => {
         let environmentChangeCallback: (() => void) | undefined;
 
         useOnEnvironmentChangeMock.mockImplementation((callback: () => void) => {
             environmentChangeCallback = callback;
         });
 
-        renderWorkflowExecutions('automations=1&connectedUserId=7');
+        renderWorkflowExecutions(`automations=${automations}&connectedUserId=7`);
 
         act(() => environmentChangeCallback?.());
 
-        await expectConnectedUserKeptInTheUrl();
+        await waitFor(() => {
+            expect(new URLSearchParams(currentSearch).get('connectedUserId')).toBe('');
+        });
+
+        expect(lastWorkflowExecutionsRequest()).toEqual(expect.objectContaining({connectedUserId: undefined}));
     });
 
     it('lists the connected users workflows once each in the automations workflow filter', async () => {

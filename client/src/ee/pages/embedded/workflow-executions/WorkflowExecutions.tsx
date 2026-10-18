@@ -526,6 +526,7 @@ export const WorkflowExecutions = () => {
     };
 
     useOnEnvironmentChange(() => {
+        setFilterConnectedUserId(undefined);
         setFilterIntegrationInstanceConfigurationId(undefined);
         setFilterPageNumber(undefined);
         setFilterWorkflowId(undefined);
@@ -537,7 +538,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             undefined,
-            filterConnectedUserId,
+            undefined,
             undefined,
             undefined
         );
