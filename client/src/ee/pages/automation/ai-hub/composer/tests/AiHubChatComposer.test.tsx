@@ -8,10 +8,11 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubChatComposer from '../AiHubChatComposer';
 
-const {cancelAiHubRunMock, cancelRunMock, composerTextRef, setTextMock} = vi.hoisted(() => ({
+const {cancelAiHubRunMock, cancelRunMock, composerTextRef, currentWorkspaceIdRef, setTextMock} = vi.hoisted(() => ({
     cancelAiHubRunMock: vi.fn(),
     cancelRunMock: vi.fn(),
     composerTextRef: {current: ''},
+    currentWorkspaceIdRef: {current: 3 as number | undefined},
     setTextMock: vi.fn(),
 }));
 
@@ -35,8 +36,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
-    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
-        selector({currentWorkspaceId: 3}),
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | undefined}) => unknown) =>
+        selector({currentWorkspaceId: currentWorkspaceIdRef.current}),
 }));
 
 const PENDING_APPROVAL_MESSAGE = {
@@ -61,6 +62,7 @@ describe('AiHubChatComposer', () => {
         vi.clearAllMocks();
 
         composerTextRef.current = '';
+        currentWorkspaceIdRef.current = 3;
 
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
         aiHubChatsStore.setState({currentChatId: 7});
@@ -75,6 +77,15 @@ describe('AiHubChatComposer', () => {
         expect(screen.getByRole('switch', {name: 'Build mode on'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Send message'})).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Stop generating'})).toBeNull();
+    });
+
+    it.each([undefined, 0])('disables the input and Send while the workspace id is %s', (workspaceId) => {
+        currentWorkspaceIdRef.current = workspaceId;
+
+        renderComposer();
+
+        expect(screen.getByRole('textbox', {name: 'Message input'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Send message'})).toBeDisabled();
     });
 
     it('switches between Build and Ask mode', () => {

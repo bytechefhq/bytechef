@@ -9,24 +9,28 @@ import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {archivedChatsQueryRef, chatsQueryRef, currentWorkspaceIdRef, switchChatMock} = vi.hoisted(() => ({
-    archivedChatsQueryRef: {
-        current: {data: [], error: null, isLoading: false} as {
-            data: AiHubChatI[] | undefined;
-            error: Error | null;
-            isLoading: boolean;
+const {archivedChatsQueryRef, chatsQueryRef, currentWorkspaceIdRef, switchChatMock, userWorkspacesQueryRef} =
+    vi.hoisted(() => ({
+        archivedChatsQueryRef: {
+            current: {data: [], error: null, isLoading: false} as {
+                data: AiHubChatI[] | undefined;
+                error: Error | null;
+                isLoading: boolean;
+            },
         },
-    },
-    chatsQueryRef: {
-        current: {data: [], error: null, isLoading: false} as {
-            data: AiHubChatI[] | undefined;
-            error: Error | null;
-            isLoading: boolean;
+        chatsQueryRef: {
+            current: {data: [], error: null, isLoading: false} as {
+                data: AiHubChatI[] | undefined;
+                error: Error | null;
+                isLoading: boolean;
+            },
         },
-    },
-    currentWorkspaceIdRef: {current: 1 as number | undefined},
-    switchChatMock: vi.fn(),
-}));
+        currentWorkspaceIdRef: {current: 1 as number | undefined},
+        switchChatMock: vi.fn(),
+        userWorkspacesQueryRef: {
+            current: {data: undefined, isError: false} as {data: Array<{id: number}> | undefined; isError: boolean},
+        },
+    }));
 
 vi.mock('@/ee/pages/automation/ai-hub/AiHubHomePanel', () => ({default: () => <div data-testid="home-panel" />}));
 vi.mock('@/ee/pages/automation/ai-hub/AiHubPanel', () => ({default: () => <div data-testid="chat-panel" />}));
@@ -54,6 +58,9 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | undefined}) => unknown) =>
         selector({currentWorkspaceId: currentWorkspaceIdRef.current}),
+}));
+vi.mock('@/shared/queries/automation/workspaces.queries', () => ({
+    useGetUserWorkspacesQuery: () => userWorkspacesQueryRef.current,
 }));
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
@@ -105,6 +112,7 @@ describe('AiHub', () => {
         switchChatMock.mockReset();
 
         currentWorkspaceIdRef.current = 1;
+        userWorkspacesQueryRef.current = {data: undefined, isError: false};
 
         chatsQueryRef.current = {data: [], error: null, isLoading: false};
         archivedChatsQueryRef.current = {data: [], error: null, isLoading: false};
@@ -190,6 +198,29 @@ describe('AiHub', () => {
 
             expect(screen.getByTestId('ai-hub-chat-loading')).toBeInTheDocument();
             expect(screen.queryByText('Chat not found')).toBeNull();
+        });
+
+        it('shows a no-workspace state once the workspace list loads empty', () => {
+            currentWorkspaceIdRef.current = undefined;
+            userWorkspacesQueryRef.current = {data: [], isError: false};
+
+            renderAt('/automation/ai-hub/chats/7');
+
+            expect(screen.getByText('No workspace available')).toBeInTheDocument();
+            expect(screen.queryByTestId('ai-hub-chat-loading')).toBeNull();
+            expect(screen.queryByTestId('home-panel')).toBeNull();
+        });
+
+        it('shows a load-failure state on the home view when the workspace list fails to load', () => {
+            currentWorkspaceIdRef.current = undefined;
+            userWorkspacesQueryRef.current = {data: undefined, isError: true};
+
+            renderAt('/automation/ai-hub');
+
+            expect(screen.getByText('Workspaces could not be loaded')).toBeInTheDocument();
+            expect(screen.queryByText('No workspace available')).toBeNull();
+            expect(screen.queryByText(/Ask an administrator/)).toBeNull();
+            expect(screen.queryByTestId('home-panel')).toBeNull();
         });
 
         it('shows the not-found state for a chat the API does not return to this user (FORBIDDEN)', () => {
