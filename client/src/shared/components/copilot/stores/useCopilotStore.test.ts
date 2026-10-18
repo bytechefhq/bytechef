@@ -194,6 +194,22 @@ describe('useCopilotStore', () => {
         });
     });
 
+    describe('generateConversationId', () => {
+        it('should return a new conversation to Ask', () => {
+            useCopilotStore.setState({
+                context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
+            });
+
+            useCopilotStore.getState().generateConversationId();
+
+            expect(useCopilotStore.getState().context).toEqual({
+                mode: MODE.ASK,
+                parameters: {},
+                source: Source.WORKFLOW_EDITOR,
+            });
+        });
+    });
+
     describe('setGlobalPanelConversationToken', () => {
         it('should store and clear the global panel conversation token', () => {
             useCopilotStore.getState().setGlobalPanelConversationToken('token-1');
