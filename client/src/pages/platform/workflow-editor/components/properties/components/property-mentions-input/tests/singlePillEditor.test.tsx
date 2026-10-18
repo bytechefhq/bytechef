@@ -199,6 +199,30 @@ describe('single-pill editor', () => {
         expect(handled).toBe(true);
     });
 
+    it('takes text pasted into a legacy value with text around a pill', async () => {
+        const {getEditor} = renderSinglePill({
+            controlType: 'TEXT',
+            legacyMixed: true,
+            singlePill: false,
+            type: 'INTEGER',
+            value: 'count ${old.pill}',
+        });
+
+        await settle();
+
+        act(() => {
+            getEditor().commands.focus('end');
+        });
+
+        act(() => {
+            pasteText(getEditor(), ' more');
+        });
+
+        await settle();
+
+        expect(getEditor().state.doc.textContent).toContain(' more');
+    });
+
     it('deletes the pill on Backspace and reports an empty value', async () => {
         const {getEditor, onValueChange} = renderSinglePill({value: '${old.pill}'});
 
