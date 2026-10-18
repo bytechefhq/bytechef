@@ -9,7 +9,12 @@ import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/us
 import filterWorkflowNodeOutputs from '@/pages/platform/workflow-editor/utils/filterWorkflowNodeOutputs';
 import openIssuesSidebar from '@/pages/platform/workflow-editor/utils/openIssuesSidebar';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {
+    MODE,
+    Source,
+    isWorkflowEditorSource,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -170,7 +175,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
         setContext({
             ...currentContext,
-            mode: MODE.ASK,
+            mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
             parameters: {},
             source: Source.WORKFLOW_EDITOR,
         });
