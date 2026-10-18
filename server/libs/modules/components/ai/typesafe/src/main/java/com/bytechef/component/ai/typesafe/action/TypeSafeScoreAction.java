@@ -110,6 +110,19 @@ public class TypeSafeScoreAction {
 
         List<String> levels = inputParameters.getRequiredList(LEVELS, new TypeReference<>() {});
 
+        Map<String, Object> question = createQuestion(inputParameters.getRequiredString(INSTRUCTIONS), levels);
+
+        Map<String, Object> answer = TypeSafeUtils.askQuestion(inputParameters, question, context);
+
+        putNearestLevel(answer, levels);
+
+        return answer;
+    }
+
+    /**
+     * Builds the wire form of a Score question, whose criteria are the rubric levels from lowest to highest.
+     */
+    public static Map<String, Object> createQuestion(String instructions, List<String> levels) {
         if (levels.size() < 2) {
             throw new IllegalArgumentException("A score needs at least two levels");
         }
@@ -117,17 +130,17 @@ public class TypeSafeScoreAction {
         Map<String, Object> question = new LinkedHashMap<>();
 
         question.put(TYPE, SCORE);
-        question.put(INSTRUCTIONS, inputParameters.getRequiredString(INSTRUCTIONS));
+        question.put(INSTRUCTIONS, instructions);
         question.put(CRITERIA, levels);
 
-        Map<String, Object> answer = TypeSafeUtils.askQuestion(inputParameters, question, context);
+        return question;
+    }
 
+    public static void putNearestLevel(Map<String, Object> answer, List<String> levels) {
         int nearestLevel = getNearestLevel(answer.get(PROBABILITIES));
 
         answer.put(NEAREST_LEVEL, nearestLevel);
         answer.put(NEAREST_LABEL, nearestLevel >= 0 && nearestLevel < levels.size() ? levels.get(nearestLevel) : null);
-
-        return answer;
     }
 
     /**

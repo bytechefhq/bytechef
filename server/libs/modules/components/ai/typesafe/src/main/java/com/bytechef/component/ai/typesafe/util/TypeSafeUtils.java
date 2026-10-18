@@ -85,10 +85,28 @@ public final class TypeSafeUtils {
     public static Map<String, Object> askQuestion(
         Parameters inputParameters, Map<String, Object> question, Context context) {
 
+        Map<String, Object> responseBody = askQuestions(
+            inputParameters, Map.of(QUESTION_NAME, question), context);
+
+        Map<String, Object> result = getAnswer(responseBody, QUESTION_NAME);
+
+        result.put(MODEL, responseBody.get(MODEL));
+        result.put(USAGE, responseBody.get(USAGE));
+
+        return result;
+    }
+
+    /**
+     * Asks every named question against the input's state in one request and returns the raw response body, failing
+     * when it carries no {@code answers} map.
+     */
+    public static Map<String, Object> askQuestions(
+        Parameters inputParameters, Map<String, Map<String, Object>> questions, Context context) {
+
         Map<String, Object> requestBody = new LinkedHashMap<>();
 
         requestBody.put(MODEL, inputParameters.getRequiredString(MODEL));
-        requestBody.put(QUESTIONS, Map.of(QUESTION_NAME, question));
+        requestBody.put(QUESTIONS, questions);
         requestBody.put(STATE, toState(inputParameters.getRequired(STATE)));
 
         Map<String, Object> responseBody = context.http(http -> http.post("/v1/systemone"))
@@ -97,10 +115,22 @@ public final class TypeSafeUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (responseBody == null || !(responseBody.get(ANSWERS) instanceof Map<?, ?> answers) ||
-            !(answers.get(QUESTION_NAME) instanceof Map<?, ?> answer)) {
-
+        if (responseBody == null || !(responseBody.get(ANSWERS) instanceof Map<?, ?>)) {
             throw new IllegalStateException("TypeSafe response did not contain an answer: " + responseBody);
+        }
+
+        return responseBody;
+    }
+
+    /**
+     * Copies the answer to the named question out of a response body into a mutable map.
+     */
+    public static Map<String, Object> getAnswer(Map<String, Object> responseBody, String questionName) {
+        if (!(responseBody.get(ANSWERS) instanceof Map<?, ?> answers) ||
+            !(answers.get(questionName) instanceof Map<?, ?> answer)) {
+
+            throw new IllegalStateException(
+                "TypeSafe response did not contain an answer to '%s': %s".formatted(questionName, responseBody));
         }
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -108,9 +138,6 @@ public final class TypeSafeUtils {
         for (Map.Entry<?, ?> entry : answer.entrySet()) {
             result.put(String.valueOf(entry.getKey()), entry.getValue());
         }
-
-        result.put(MODEL, responseBody.get(MODEL));
-        result.put(USAGE, responseBody.get(USAGE));
 
         return result;
     }

@@ -19,6 +19,7 @@ package com.bytechef.component.ai.typesafe;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.typesafe.action.TypeSafeAskQuestionsAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeChoiceAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeNoulAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeScoreAction;
@@ -48,7 +49,8 @@ public class TypeSafeComponentHandler implements ComponentHandler {
         .actions(
             TypeSafeNoulAction.ACTION_DEFINITION,
             TypeSafeChoiceAction.ACTION_DEFINITION,
-            TypeSafeScoreAction.ACTION_DEFINITION);
+            TypeSafeScoreAction.ACTION_DEFINITION,
+            TypeSafeAskQuestionsAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
