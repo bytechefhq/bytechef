@@ -1325,6 +1325,8 @@ export type IdentityProviderType = {
   mfaRequired: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   nameIdFormat?: Maybe<Scalars['String']['output']>;
+  registrationId: Scalars['String']['output'];
+  scimEnabled: Scalars['Boolean']['output'];
   scopes?: Maybe<Scalars['String']['output']>;
   signingCertificate?: Maybe<Scalars['String']['output']>;
   type: Scalars['String']['output'];
@@ -1815,6 +1817,7 @@ export type Mutation = {
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
+  generateIdentityProviderScimApiKey: Scalars['String']['output'];
   generateSpecification: GenerateSpecificationResponse;
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
@@ -2455,6 +2458,11 @@ export type MutationExportSharedWorkflowArgs = {
 
 export type MutationGenerateFromDocumentationArgs = {
   input: GenerateFromDocumentationInput;
+};
+
+
+export type MutationGenerateIdentityProviderScimApiKeyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 

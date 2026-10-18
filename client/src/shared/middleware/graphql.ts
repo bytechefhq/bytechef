@@ -2308,17 +2308,24 @@ export type DeleteUserMutationVariables = Exact<{
 
 export type DeleteUserMutation = { deleteUser: boolean };
 
+export type GenerateIdentityProviderScimApiKeyMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GenerateIdentityProviderScimApiKeyMutation = { generateIdentityProviderScimApiKey: string };
+
 export type IdentityProviderQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null };
+export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, signingCertificate: string | null, type: string } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, signingCertificate: string | null, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
@@ -10826,6 +10833,25 @@ export const useDeleteUserMutation = <
   }
     )};
 
+export const GenerateIdentityProviderScimApiKeyDocument = new TypedDocumentString(`
+    mutation generateIdentityProviderScimApiKey($id: ID!) {
+  generateIdentityProviderScimApiKey(id: $id)
+}
+    `);
+
+export const useGenerateIdentityProviderScimApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GenerateIdentityProviderScimApiKeyMutation, TError, GenerateIdentityProviderScimApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<GenerateIdentityProviderScimApiKeyMutation, TError, GenerateIdentityProviderScimApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['generateIdentityProviderScimApiKey'],
+    mutationFn: (variables?: GenerateIdentityProviderScimApiKeyMutationVariables) => fetcher<GenerateIdentityProviderScimApiKeyMutation, GenerateIdentityProviderScimApiKeyMutationVariables>(GenerateIdentityProviderScimApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const IdentityProviderDocument = new TypedDocumentString(`
     query identityProvider($id: ID!) {
   identityProvider(id: $id) {
@@ -10846,6 +10872,8 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     mfaRequired
     name
     nameIdFormat
+    registrationId
+    scimEnabled
     scopes
     signingCertificate
     type
@@ -10889,6 +10917,8 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     mfaRequired
     name
     nameIdFormat
+    registrationId
+    scimEnabled
     scopes
     signingCertificate
     type
