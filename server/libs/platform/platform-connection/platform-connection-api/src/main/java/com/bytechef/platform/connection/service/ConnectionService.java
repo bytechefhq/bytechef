@@ -69,6 +69,13 @@ public interface ConnectionService {
 
     Connection updateConnectionStatus(long connectionId, ConnectionStatus status);
 
+    /**
+     * Moves the connection to {@code status} only while {@code ownerLogin} still owns it. Returns {@code false}, and
+     * leaves the row untouched, when the connection has meanwhile been handed to someone else; a concurrent owner
+     * change that commits during the call fails the save's version check instead.
+     */
+    boolean updateConnectionStatusIfOwnedBy(long connectionId, String ownerLogin, ConnectionStatus status);
+
     Connection reassignOwner(long id, String newOwnerLogin);
 
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
@@ -81,9 +88,9 @@ public interface ConnectionService {
      * Returns connections whose status is not {@link ConnectionStatus#ACTIVE}. {@link Connection#getStatus()} is total
      * (it throws {@link IllegalStateException} on a corrupted ordinal rather than returning null), so callers can rely
      * on each returned row having a usable status label. Returns an empty list for null/empty input or when all
-     * connections are active. Callers use this to emit per-connection audit events before rejecting the operation.
+     * connections are active.
      */
     List<Connection> getInactiveConnections(List<Long> connectionIds);
 
-    void validateConnectionsActive(List<Long> connectionIds);
+    void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds);
 }

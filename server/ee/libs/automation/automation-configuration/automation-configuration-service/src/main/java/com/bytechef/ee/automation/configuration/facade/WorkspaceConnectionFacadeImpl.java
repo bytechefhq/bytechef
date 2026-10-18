@@ -15,12 +15,16 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditMapper;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -32,6 +36,7 @@ import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -94,6 +99,7 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_VISIBILITY_CHANGED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
         "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
@@ -120,6 +126,7 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_ACCESS_GRANTED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
         "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void grantConnectionAccess(long workspaceId, long connectionId, long userId) {
@@ -130,6 +137,7 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_ACCESS_REVOKED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
         "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void revokeConnectionAccess(long workspaceId, long connectionId, long userId) {
@@ -151,14 +159,28 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, mapper = ConnectionAuditMapper.class)
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
+    public long create(long workspaceId, ConnectionDTO connectionDTO) {
+        return super.create(workspaceId, connectionDTO);
+    }
+
+    @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, mapper = ConnectionAuditMapper.class)
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void delete(long connectionId) {
-        // Grants first: resource_grant.resource_id is polymorphic and carries no foreign key, so a grant left
-        // behind would attach to whatever later recycles this id.
         resourceGrantService.deleteGrants(CONNECTION, connectionId);
 
         super.delete(connectionId);
+    }
+
+    @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, mapper = ConnectionAuditMapper.class)
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        super.updateConnectionCredentials(connectionId, parameters, version);
     }
 
     @Override

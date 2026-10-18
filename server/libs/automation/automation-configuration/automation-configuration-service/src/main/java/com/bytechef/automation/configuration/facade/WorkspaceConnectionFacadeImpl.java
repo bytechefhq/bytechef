@@ -29,6 +29,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -47,6 +48,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -149,8 +151,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void delete(long connectionId) {
         requireAutomation(connectionId);
 
@@ -210,8 +212,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     private boolean canEditConnection(long connectionId) {
-        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT) ||
-            permissionService.isResourceOwner(CONNECTION_TYPE, connectionId);
+        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT) &&
+            (permissionService.isResourceOwner(CONNECTION_TYPE, connectionId) || permissionService.isTenantAdmin());
     }
 
     protected List<Long> getSharedConnectionIds() {
@@ -282,8 +284,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomation(connectionId);
 
@@ -291,8 +293,31 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || " +
-        "isResourceOwner(#connectionId, 'Connection')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        requireAutomation(connectionId);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        if (connection.getStatus() != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Credentials cannot be replaced on a connection with status %s".formatted(connection.getStatus()),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        if (connection.getVersion() != version) {
+            throw new ConfigurationException(
+                "Connection id=%s was modified by someone else; reload and try again".formatted(connectionId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, parameters);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateTags(long connectionId, List<Tag> tags) {
         requireAutomation(connectionId);
 
