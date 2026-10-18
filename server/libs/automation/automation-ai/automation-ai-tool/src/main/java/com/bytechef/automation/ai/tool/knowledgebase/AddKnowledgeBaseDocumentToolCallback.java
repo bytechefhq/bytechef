@@ -56,7 +56,7 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "knowledgeBaseId": {"type": "string", "description": "Knowledge base id obtained from listKnowledgeBases"},
+                    "knowledgeBaseId": {"type": "integer", "description": "Knowledge base id obtained from listKnowledgeBases"},
                     "name": {"type": "string", "description": "File name for the document (e.g. guide.md)"},
                     "content": {"type": "string", "description": "Text content of the document"},
                     "mimeType": {"type": "string", "description": "MIME type: text/markdown, text/plain, text/html, or application/json"}
