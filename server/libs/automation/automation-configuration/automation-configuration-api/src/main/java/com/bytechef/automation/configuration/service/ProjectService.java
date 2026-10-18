@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,4 +85,5 @@ public interface ProjectService {
 
     Project update(Project project);
 
+    Project updateVisibility(long id, ResourceVisibility visibility);
 }

@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-19T08:58:25.710402+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;
@@ -58,6 +58,43 @@ public class ProjectModel {
   private @Nullable Integer lastProjectVersion;
 
   private @Nullable String uuid;
+
+  /**
+   * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+   */
+  public enum VisibilityEnum {
+    PRIVATE("PRIVATE"),
+    
+    WORKSPACE("WORKSPACE");
+
+    private final String value;
+
+    VisibilityEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static VisibilityEnum fromValue(String value) {
+      for (VisibilityEnum b : VisibilityEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable VisibilityEnum visibility;
 
   private @Nullable CategoryModel category;
 
@@ -312,6 +349,27 @@ public class ProjectModel {
     this.uuid = uuid;
   }
 
+  public ProjectModel visibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /**
+   * The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.
+   * @return visibility
+   */
+  
+  @Schema(name = "visibility", description = "The visibility scope of the project: WORKSPACE (default, shared with every member of the owning workspace) or PRIVATE (owner plus named grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility GraphQL mutation. CE always persists WORKSPACE.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("visibility")
+  public @Nullable VisibilityEnum getVisibility() {
+    return visibility;
+  }
+
+  @JsonProperty("visibility")
+  public void setVisibility(@Nullable VisibilityEnum visibility) {
+    this.visibility = visibility;
+  }
+
   public ProjectModel category(@Nullable CategoryModel category) {
     this.category = category;
     return this;
@@ -453,6 +511,7 @@ public class ProjectModel {
         Objects.equals(this.lastStatus, project.lastStatus) &&
         Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
         Objects.equals(this.uuid, project.uuid) &&
+        Objects.equals(this.visibility, project.visibility) &&
         Objects.equals(this.category, project.category) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
@@ -462,7 +521,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, visibility, category, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -480,6 +539,7 @@ public class ProjectModel {
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
     sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("    visibility: ").append(toIndentedString(visibility)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");

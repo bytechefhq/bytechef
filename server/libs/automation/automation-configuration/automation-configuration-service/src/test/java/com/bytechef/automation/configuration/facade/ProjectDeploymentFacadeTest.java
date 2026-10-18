@@ -24,25 +24,36 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,7 +71,13 @@ class ProjectDeploymentFacadeTest {
     private ApplicationProperties applicationProperties;
 
     @Mock
+    private ConnectionService connectionService;
+
+    @Mock
     private PermissionService permissionService;
+
+    @Mock
+    private PrincipalJobFacade principalJobFacade;
 
     @Mock
     private ProjectDeploymentService projectDeploymentService;
@@ -69,10 +86,39 @@ class ProjectDeploymentFacadeTest {
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @Mock
+    private ProjectService projectService;
+
+    @Mock
+    private ProjectVisibilityFilter projectVisibilityFilter;
+
+    @Mock
     private TagService tagService;
 
     @InjectMocks
     private ProjectDeploymentFacadeImpl projectDeploymentFacade;
+
+    @Test
+    void testGetProjectDeploymentsHidesDeploymentsOfProjectsTheCallerCannotSee() {
+        ProjectDeployment visibleProjectDeployment = new ProjectDeployment();
+
+        visibleProjectDeployment.setProjectId(1L);
+
+        ProjectDeployment hiddenProjectDeployment = new ProjectDeployment();
+
+        hiddenProjectDeployment.setProjectId(2L);
+
+        List<Project> projects = List.of(new Project(), new Project());
+
+        when(projectDeploymentService.getProjectDeployments(false, Environment.PRODUCTION, null, null, 7L))
+            .thenReturn(List.of(visibleProjectDeployment, hiddenProjectDeployment));
+        when(projectService.getProjects(List.of(1L, 2L)))
+            .thenReturn(projects);
+        when(projectVisibilityFilter.visibleProjectIds(projects))
+            .thenReturn(Set.of(1L));
+
+        assertThat(projectDeploymentFacade.getProjectDeployments(7L, Environment.PRODUCTION, null, null))
+            .containsExactly(visibleProjectDeployment);
+    }
 
     @Test
     void testUpdateProjectDeploymentWorkflowRefusesAConnectionTheWorkflowMayNotUse() {
@@ -102,6 +148,47 @@ class ProjectDeploymentFacadeTest {
             .isInstanceOf(AccessDeniedException.class);
 
         verify(projectDeploymentWorkflowService, never()).update(any(ProjectDeploymentWorkflow.class));
+    }
+
+    @Test
+    void testCreateProjectDeploymentWorkflowJobRefusesAnInactiveConnection() {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(9L, "connection", "node_1")));
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(3L, "workflow-1"))
+            .thenReturn(projectDeploymentWorkflow);
+        when(projectDeploymentService.getProjectDeployment(3L))
+            .thenReturn(new ProjectDeployment());
+        doThrow(new ConfigurationException("blocked", ConnectionErrorType.CONNECTION_NOT_ACTIVE))
+            .when(connectionService)
+            .validateConnectionsActive(3L, "workflow-1", List.of(9L));
+
+        assertThatThrownBy(() -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(3L, "workflow-1"))
+            .isInstanceOf(ConfigurationException.class);
+
+        verify(principalJobFacade, never()).createJob(
+            any(JobParametersDTO.class), anyLong(), any(PlatformType.class));
+    }
+
+    @Test
+    void testCreateProjectDeploymentWorkflowJobRunsWhenEveryConnectionIsActive() {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(9L, "connection", "node_1")));
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(3L, "workflow-1"))
+            .thenReturn(projectDeploymentWorkflow);
+        when(projectDeploymentService.getProjectDeployment(3L))
+            .thenReturn(new ProjectDeployment());
+        when(principalJobFacade.createJob(any(JobParametersDTO.class), eq(3L), eq(PlatformType.AUTOMATION)))
+            .thenReturn(11L);
+
+        assertThat(projectDeploymentFacade.createProjectDeploymentWorkflowJob(3L, "workflow-1")).isEqualTo(11L);
+
+        verify(connectionService).validateConnectionsActive(3L, "workflow-1", List.of(9L));
     }
 
     @Test

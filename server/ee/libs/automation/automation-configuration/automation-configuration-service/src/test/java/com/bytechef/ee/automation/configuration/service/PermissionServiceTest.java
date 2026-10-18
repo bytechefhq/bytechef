@@ -350,14 +350,37 @@ class PermissionServiceTest {
     void testHasWorkspaceScopeForProjectResolvesOwningWorkspace() {
         Project project = new Project();
 
+        project.setId(PROJECT_ID);
         project.setWorkspaceId(WORKSPACE_ID);
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_EDIT"));
 
-        assertThat(permissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT")).isTrue();
-        assertThat(permissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_DELETE")).isFalse();
+        PermissionServiceImpl projectPermissionService = createProjectAwareService();
+
+        assertThat(projectPermissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT")).isTrue();
+        assertThat(projectPermissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_DELETE")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectDeniesWithoutAProjectResolver() {
+        assertThat(permissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT")).isFalse();
+    }
+
+    private PermissionServiceImpl createProjectAwareService() {
+        return new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository,
+            List.of(
+                new ProjectOwnershipResolver(
+                    new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+                    userService)),
+            List.of(), permissiveResolver(), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     @Test
@@ -805,11 +828,14 @@ class PermissionServiceTest {
 
         project.setWorkspaceId(WORKSPACE_ID);
 
+        project.setId(PROJECT_ID);
+
         when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_EDIT"));
 
-        assertThat(permissionService.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+        assertThat(createProjectAwareService().hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
     }
 
     @Test
@@ -2064,7 +2090,8 @@ class PermissionServiceTest {
 
         private List<ResourceOwnershipResolver> ownershipResolvers() {
             return List.of(new ProjectOwnershipResolver(
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+                mock(UserService.class)));
         }
     }
 
@@ -3016,12 +3043,17 @@ class PermissionServiceTest {
 
             Project project = mock(Project.class);
 
+            when(project.getId()).thenReturn(5L);
             when(project.getWorkspaceId()).thenReturn(42L);
             when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+            when(projectRepository.findById(5L)).thenReturn(Optional.of(project));
             when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L))
                 .thenReturn(Set.of("WORKFLOW_EDIT"));
 
-            PermissionServiceImpl service = createStubbedUserService();
+            PermissionServiceImpl service = createStubbedUserService(
+                new ProjectOwnershipResolver(
+                    new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+                    userService));
 
             assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
         }

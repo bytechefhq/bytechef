@@ -81,9 +81,9 @@ public interface ConnectionService {
      * Returns connections whose status is not {@link ConnectionStatus#ACTIVE}. {@link Connection#getStatus()} is total
      * (it throws {@link IllegalStateException} on a corrupted ordinal rather than returning null), so callers can rely
      * on each returned row having a usable status label. Returns an empty list for null/empty input or when all
-     * connections are active. Callers use this to emit per-connection audit events before rejecting the operation.
+     * connections are active.
      */
     List<Connection> getInactiveConnections(List<Long> connectionIds);
 
-    void validateConnectionsActive(List<Long> connectionIds);
+    void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds);
 }

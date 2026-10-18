@@ -17,9 +17,7 @@
 package com.bytechef.automation.configuration.instance.accessor;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +27,6 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.List;
@@ -75,12 +72,10 @@ class ProjectDeploymentJobPrincipalAccessorTest {
     }
 
     @Test
-    void testValidateConnectionsForJobPassesWhenEveryConnectionIsActive() {
-        when(connectionService.getInactiveConnections(List.of(10L))).thenReturn(List.of());
-
+    void testValidateConnectionsForJobPassesTheRunContextToTheGuard() {
         projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(1L, "workflow-uuid");
 
-        verify(connectionService, never()).validateConnectionsActive(anyList());
+        verify(connectionService).validateConnectionsActive(1L, "workflow-id", List.of(10L));
     }
 
     @Test
@@ -88,9 +83,8 @@ class ProjectDeploymentJobPrincipalAccessorTest {
         ConfigurationException inactiveConnections = new ConfigurationException(
             "inactive", ConnectionErrorType.CONNECTION_NOT_ACTIVE);
 
-        when(connectionService.getInactiveConnections(List.of(10L))).thenReturn(List.of(new Connection()));
         doThrow(inactiveConnections).when(connectionService)
-            .validateConnectionsActive(List.of(10L));
+            .validateConnectionsActive(1L, "workflow-id", List.of(10L));
 
         assertThatThrownBy(() -> projectDeploymentJobPrincipalAccessor.validateConnectionsForJob(1L, "workflow-uuid"))
             .isSameAs(inactiveConnections);

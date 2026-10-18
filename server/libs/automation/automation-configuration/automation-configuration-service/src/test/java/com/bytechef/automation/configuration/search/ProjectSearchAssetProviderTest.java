@@ -21,10 +21,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +47,8 @@ class ProjectSearchAssetProviderTest {
 
         when(projectService.getProjects(false, null, null, null, null, null)).thenReturn(projects);
 
-        ProjectSearchAssetProvider projectSearchAssetProvider = new ProjectSearchAssetProvider(projectService);
+        ProjectSearchAssetProvider projectSearchAssetProvider = new ProjectSearchAssetProvider(
+            projectService, permissiveProjectVisibilityFilter());
 
         List<ProjectSearchResult> results = projectSearchAssetProvider.search("sales", 2, Set.of(10L));
 
@@ -58,5 +64,19 @@ class ProjectSearchAssetProviderTest {
         when(project.getWorkspaceId()).thenReturn(workspaceId);
 
         return project;
+    }
+
+    private static ProjectVisibilityFilter permissiveProjectVisibilityFilter() {
+        ResourceVisibilityResolver resourceVisibilityResolver = (resourceType, workspaceId, candidates) -> candidates
+            .stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
+
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ResourceVisibilityResolver> resourceVisibilityResolverProvider = mock(ObjectProvider.class);
+
+        when(resourceVisibilityResolverProvider.getIfAvailable()).thenReturn(resourceVisibilityResolver);
+
+        return new ProjectVisibilityFilter(resourceVisibilityResolverProvider);
     }
 }

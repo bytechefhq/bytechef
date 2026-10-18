@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260817000001-01" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="project" columnName="visibility"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="project">
+            <column name="visibility" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <comment>
+            Projects default to WORKSPACE (1) — shared with the owning workspace, which is the pre-visibility behaviour
+            for every existing row. PRIVATE (0) is opt-in via setProjectVisibility (EE). Ordinal of ResourceVisibility.
+        </comment>
+        <!--
+            Deliberately an EMPTY rollback, not a dropColumn, and not an omitted block.
+
+            The precondition above means this changeset cannot know whether it created the column. When it fires
+            (visibility already present, added by hand or by a restored dump) the changeset is MARK_RAN without doing
+            anything, and a rollback that drops the column would then destroy every project's visibility setting,
+            data this changeset never wrote. Omitting the block does not avoid that: Liquibase auto-generates the
+            inverse of addColumn, so the drop would still happen, just invisibly.
+
+            The cost of the empty block is an inert leftover column after a rollback. It is NOT NULL with a default of
+            1, so pre-visibility code that never names it still inserts fine, and re-applying this changeset is a no-op
+            through the same precondition. Recoverable either way, where the drop is not.
+        -->
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

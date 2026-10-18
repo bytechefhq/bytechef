@@ -17,16 +17,20 @@
 package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -243,6 +247,58 @@ public class ProjectServiceIntTest {
         assertThat(projects)
             .extracting(Project::getId)
             .contains(project.getId());
+    }
+
+    @Test
+    public void testUpdateCannotChangeVisibility() {
+        Project project = getProject();
+
+        project.setVisibility(ResourceVisibility.PRIVATE);
+
+        project = projectRepository.save(project);
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        project.setName("name2");
+        project.setVisibility(ResourceVisibility.WORKSPACE);
+
+        projectService.update(project);
+
+        Project updatedProject = projectRepository.findById(projectId)
+            .orElseThrow();
+
+        assertThat(updatedProject.getName()).isEqualTo("name2");
+        assertThat(updatedProject.getVisibility()).isEqualTo(ResourceVisibility.PRIVATE);
+    }
+
+    @Test
+    public void testUpdateVisibilityRejectsUnsupportedRung() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        assertThatThrownBy(() -> projectService.updateVisibility(projectId, ResourceVisibility.ORGANIZATION))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(
+                exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                    .isEqualTo(ProjectErrorType.UNSUPPORTED_VISIBILITY.getErrorKey()));
+
+        assertThat(projectRepository.findById(projectId)
+            .orElseThrow()
+            .getVisibility()).isEqualTo(ResourceVisibility.WORKSPACE);
+    }
+
+    @Test
+    public void testUpdateVisibilityWritesSupportedRung() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        projectService.updateVisibility(projectId, ResourceVisibility.PRIVATE);
+
+        assertThat(projectRepository.findById(projectId)
+            .orElseThrow()
+            .getVisibility()).isEqualTo(ResourceVisibility.PRIVATE);
     }
 
     private Project getProject() {

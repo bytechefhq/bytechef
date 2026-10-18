@@ -22,9 +22,12 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +48,16 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ApplicationContext applicationContext;
     private final ProjectRepository projectRepository;
+    private final ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry;
 
     @SuppressFBWarnings("EI")
-    public ProjectServiceImpl(ApplicationContext applicationContext, ProjectRepository projectRepository) {
+    public ProjectServiceImpl(
+        ApplicationContext applicationContext, ProjectRepository projectRepository,
+        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry) {
+
         this.applicationContext = applicationContext;
         this.projectRepository = projectRepository;
+        this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
     }
 
     @Override
@@ -238,4 +246,18 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(curProject);
     }
 
+    @Override
+    public Project updateVisibility(long id, ResourceVisibility visibility) {
+        if (!resourceVisibilityPolicyRegistry.supports(ProjectVisibilityFilter.PROJECT, visibility)) {
+            throw new ConfigurationException(
+                "Project does not support %s visibility".formatted(visibility),
+                ProjectErrorType.UNSUPPORTED_VISIBILITY);
+        }
+
+        Project project = getProject(id);
+
+        project.setVisibility(visibility);
+
+        return projectRepository.save(project);
+    }
 }
