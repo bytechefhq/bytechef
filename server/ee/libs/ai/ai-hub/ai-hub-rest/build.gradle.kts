@@ -15,6 +15,10 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
 
+    testImplementation("com.jayway.jsonpath:json-path")
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework:spring-test")
+    testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
 }
