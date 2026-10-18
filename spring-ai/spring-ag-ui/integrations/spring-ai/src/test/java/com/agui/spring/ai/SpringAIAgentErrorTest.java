@@ -111,6 +111,110 @@ class SpringAIAgentErrorTest {
     }
 
     @Test
+    void shouldEmitRunErrorWithTheHookCodeWhenOneIsResolved() throws AGUIException, InterruptedException {
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new FailingStreamChatModel())
+            .systemMessage("system")
+            .state(new State());
+
+        var agent = new SpringAIAgent(builder) {
+            @Override
+            protected String runErrorCode(RunAgentInput input, Throwable throwable) {
+                return "MODEL_UNAVAILABLE";
+            }
+        };
+
+        var events = new CopyOnWriteArrayList<BaseEvent>();
+        var finalized = new CountDownLatch(1);
+
+        agent.run(newInput(), new AgentSubscriber() {
+            @Override
+            public void onEvent(BaseEvent event) {
+                events.add(event);
+            }
+
+            @Override
+            public void onRunFinalized(AgentSubscriberParams params) {
+                finalized.countDown();
+            }
+        });
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(((RunErrorEvent) events.get(2)).getCode()).isEqualTo("MODEL_UNAVAILABLE");
+    }
+
+    @Test
+    void shouldStillEmitRunErrorWhenTheCodeHookThrows() throws AGUIException {
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new UnusedChatModel())
+            .systemMessage("system")
+            .state(new State());
+
+        var agent = new SpringAIAgent(builder) {
+            @Override
+            protected SystemMessage createSystemMessage(State state, List<Context> context) {
+                throw new IllegalStateException("boom");
+            }
+
+            @Override
+            protected String runErrorCode(RunAgentInput input, Throwable throwable) {
+                throw new IllegalArgumentException("code hook failed");
+            }
+        };
+
+        var events = new ArrayList<BaseEvent>();
+        var finalized = new AtomicBoolean(false);
+
+        agent.run(newInput(), new AgentSubscriber() {
+            @Override
+            public void onEvent(BaseEvent event) {
+                events.add(event);
+            }
+
+            @Override
+            public void onRunFinalized(AgentSubscriberParams params) {
+                finalized.set(true);
+            }
+        });
+
+        assertThat(events)
+            .extracting(BaseEvent::getType)
+            .containsExactly(EventType.RUN_STARTED, EventType.TEXT_MESSAGE_START, EventType.RUN_ERROR);
+        assertThat(((RunErrorEvent) events.get(2)).getError()).isEqualTo("boom");
+        assertThat(((RunErrorEvent) events.get(2)).getCode()).isNull();
+        assertThat(finalized).isTrue();
+    }
+
+    @Test
+    void shouldEmitRunErrorWithoutACodeByDefault() throws AGUIException {
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new UnusedChatModel())
+            .systemMessage("system")
+            .state(new State());
+
+        var agent = new SpringAIAgent(builder) {
+            @Override
+            protected SystemMessage createSystemMessage(State state, List<Context> context) {
+                throw new IllegalStateException("boom");
+            }
+        };
+
+        var events = new ArrayList<BaseEvent>();
+
+        agent.run(newInput(), new AgentSubscriber() {
+            @Override
+            public void onEvent(BaseEvent event) {
+                events.add(event);
+            }
+        });
+
+        assertThat(((RunErrorEvent) events.get(2)).getCode()).isNull();
+    }
+
+    @Test
     void shouldStartTheRunBeforeReportingAMissingUserMessage() throws AGUIException {
         var builder = SpringAIAgent.builder()
             .agentId("test")
