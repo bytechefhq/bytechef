@@ -329,6 +329,150 @@ describe('useSwitchChat', () => {
             expect(pickerData).toMatchObject({componentName: 'slack'});
             expect(pickerData?.pickedLabel).toBeUndefined();
         });
+
+        const SLACK_PICKER = {
+            awaitingAnswer: true,
+            componentLabel: 'Slack',
+            componentName: 'slack',
+            kind: 'select-connection',
+        };
+
+        const CHANNEL_PICKER = {
+            awaitingAnswer: true,
+            componentName: 'slack',
+            kind: 'select-property-option',
+            options: [{label: 'general', value: 'C1'}],
+            propertyName: 'channel',
+        };
+
+        const findDataParts = (type: string) =>
+            aiHubStore
+                .getState()
+                .messages.flatMap((message) =>
+                    Array.isArray(message.content)
+                        ? (message.content as unknown as Array<{data?: Record<string, unknown>; type?: string}>)
+                        : []
+                )
+                .filter((part) => part.type === type);
+
+        it('restores a property option picker whose value contains a closing parenthesis', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Pick the channel', role: 'USER'}),
+                pickerRow('selectPropertyOption', CHANNEL_PICKER),
+                buildMessage({content: 'User picked: general (value: f(x))', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataPart('data-select-property-option')?.data).toMatchObject({pickedLabel: 'general'});
+        });
+
+        it('drops an answered picker when the user replied with free text instead of a pick', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind a Slack connection', role: 'USER'}),
+                pickerRow('selectConnection', SLACK_PICKER),
+                buildMessage({content: 'Actually, use Gmail instead.', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataParts('data-select-connection')).toEqual([]);
+        });
+
+        it('does not label a stale picker from a following row that is not its kind of pick', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind a Slack connection', role: 'USER'}),
+                pickerRow('selectConnection', SLACK_PICKER),
+                buildMessage({content: 'User picked: general (value: C1)', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataParts('data-select-connection')).toEqual([]);
+        });
+
+        it('does not copy one pick onto two pickers of the same kind in one row', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind Slack and Gmail', role: 'USER'}),
+                buildMessage({
+                    content: 'Pick both:',
+                    role: 'ASSISTANT',
+                    toolEventsJson: JSON.stringify([
+                        {arguments: '{}', id: 'call-slack', kind: 'call', name: 'selectConnection'},
+                        {arguments: '{}', id: 'call-gmail', kind: 'call', name: 'selectConnection'},
+                        {
+                            id: 'call-slack',
+                            kind: 'result',
+                            name: 'selectConnection',
+                            response: JSON.stringify(SLACK_PICKER),
+                        },
+                        {
+                            id: 'call-gmail',
+                            kind: 'result',
+                            name: 'selectConnection',
+                            response: JSON.stringify({
+                                ...SLACK_PICKER,
+                                componentLabel: 'Gmail',
+                                componentName: 'gmail',
+                            }),
+                        },
+                    ]),
+                }),
+                buildMessage({content: 'User picked: Slack Engineering (ID: 1)', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataParts('data-select-connection').filter((part) => part.data?.pickedLabel != null)).toEqual(
+                []
+            );
+        });
+
+        it('labels only the picker whose kind matches the pick when a row holds one of each', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind Slack and pick the channel', role: 'USER'}),
+                buildMessage({
+                    content: 'Pick both:',
+                    role: 'ASSISTANT',
+                    toolEventsJson: JSON.stringify([
+                        {arguments: '{}', id: 'call-connection', kind: 'call', name: 'selectConnection'},
+                        {arguments: '{}', id: 'call-channel', kind: 'call', name: 'selectPropertyOption'},
+                        {
+                            id: 'call-connection',
+                            kind: 'result',
+                            name: 'selectConnection',
+                            response: JSON.stringify(SLACK_PICKER),
+                        },
+                        {
+                            id: 'call-channel',
+                            kind: 'result',
+                            name: 'selectPropertyOption',
+                            response: JSON.stringify(CHANNEL_PICKER),
+                        },
+                    ]),
+                }),
+                buildMessage({content: 'User picked: Slack Engineering (ID: 1)', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataParts('data-select-connection')).toEqual([
+                expect.objectContaining({data: expect.objectContaining({pickedLabel: 'Slack Engineering'})}),
+            ]);
+            expect(findDataParts('data-select-property-option')).toEqual([]);
+        });
+
+        it('does not label a stale picker from an approval continuation row', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind a Slack connection', role: 'USER'}),
+                pickerRow('selectConnection', SLACK_PICKER),
+                buildMessage({content: '[tool-approval #3 rejected]\nTool: deleteWorkflow', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataParts('data-select-connection')).toEqual([]);
+        });
     });
 
     describe('tool approval cards whose gated tool result was never persisted', () => {
