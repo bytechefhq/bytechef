@@ -39,6 +39,9 @@ export enum Source {
     COMPONENT_RULE = 'COMPONENT_RULE',
 }
 
+export const isWorkflowEditorSource = (source: Source) =>
+    source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
+
 export interface CodeEditorCopilotParametersI {
     language: string;
 }
@@ -152,7 +155,12 @@ export const useCopilotStore = create<CopilotStateI>()(
             // New conversation = reset the picker too. The picker is "per conversation" by design, so a
             // user who picked GPT-4o in one conversation lands on the workspace default in the next one
             // rather than carrying the selection across unrelated threads.
-            set({conversationId: generateRandomId(), selectedLlmModel: null, selectedLlmProvider: null});
+            set((state) => ({
+                context: {...state.context, mode: MODE.ASK},
+                conversationId: generateRandomId(),
+                selectedLlmModel: null,
+                selectedLlmProvider: null,
+            }));
         },
 
         context: {
