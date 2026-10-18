@@ -228,4 +228,42 @@ describe('toToolResultDataPart', () => {
     it('ignores a JSON result with an unknown kind', () => {
         expect(toToolResultDataPart('someTool', JSON.stringify({kind: 'something-else'}))).toBeUndefined();
     });
+
+    it('maps a tool-approval-request payload from any tool name', () => {
+        const result = toToolResultDataPart(
+            'sendEmail',
+            JSON.stringify({
+                approvalId: 42,
+                arguments: {to: 'a@b.c'},
+                awaitingApproval: true,
+                componentName: 'gmail',
+                expiresAt: '2026-10-18T10:00:00Z',
+                kind: 'tool-approval-request',
+                toolName: 'sendEmail',
+            })
+        );
+
+        expect(result).toEqual({
+            data: {
+                approvalId: 42,
+                arguments: {to: 'a@b.c'},
+                awaitingApproval: true,
+                componentName: 'gmail',
+                expiresAt: '2026-10-18T10:00:00Z',
+                kind: 'tool-approval-request',
+                toolName: 'sendEmail',
+            },
+            ok: true,
+            type: 'data-tool-approval-request',
+        });
+    });
+
+    it('leaves a tool-approval-request payload without a numeric approvalId undefined', () => {
+        expect(
+            toToolResultDataPart(
+                'sendEmail',
+                JSON.stringify({approvalId: 'abc', kind: 'tool-approval-request', toolName: 'sendEmail'})
+            )
+        ).toBeUndefined();
+    });
 });
