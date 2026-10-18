@@ -4,6 +4,7 @@ query aiHubToolApprovals($workspaceId: ID!, $chatId: ID!) {
         chatId
         toolName
         componentName
+        arguments
         status
         decidedByUserId
         decidedAt

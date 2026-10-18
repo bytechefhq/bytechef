@@ -337,7 +337,7 @@ export type AiHubToolApprovalsQueryVariables = Exact<{
 }>;
 
 
-export type AiHubToolApprovalsQuery = { aiHubToolApprovals: Array<{ id: string, chatId: string, toolName: string, componentName: string | null, status: Types.AiHubToolApprovalStatus, decidedByUserId: any, decidedAt: any, comment: string | null, expiresAt: any, executionError: string | null }> };
+export type AiHubToolApprovalsQuery = { aiHubToolApprovals: Array<{ id: string, chatId: string, toolName: string, componentName: string | null, arguments: string, status: Types.AiHubToolApprovalStatus, decidedByUserId: any, decidedAt: any, comment: string | null, expiresAt: any, executionError: string | null }> };
 
 export type CreateAiHubToolApprovalRuleMutationVariables = Exact<{
   workspaceId: string | number;
@@ -3815,6 +3815,7 @@ export const AiHubToolApprovalsDocument = new TypedDocumentString(`
     chatId
     toolName
     componentName
+    arguments
     status
     decidedByUserId
     decidedAt
