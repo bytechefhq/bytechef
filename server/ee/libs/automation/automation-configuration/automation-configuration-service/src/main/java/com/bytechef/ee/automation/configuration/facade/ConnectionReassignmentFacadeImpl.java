@@ -14,10 +14,13 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditMapper;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO.BulkReassignFailureDTO;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
@@ -245,6 +248,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_REASSIGNED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reassignConnection(long workspaceId, long connectionId, String newOwnerLogin) {
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
@@ -254,6 +258,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_REASSIGNED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reassignAllConnections(long workspaceId, String userLogin, String newOwnerLogin) {
         validateUserExists(newOwnerLogin);

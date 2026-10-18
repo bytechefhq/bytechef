@@ -132,7 +132,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public void validateConnectionsActive(List<Long> connectionIds) {
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

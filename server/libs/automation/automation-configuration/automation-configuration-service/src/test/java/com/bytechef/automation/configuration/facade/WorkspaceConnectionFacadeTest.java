@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -36,6 +37,7 @@ import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -46,6 +48,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -216,7 +219,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "WORKSPACE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -260,7 +263,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, requestDto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "PRIVATE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -303,7 +306,7 @@ class WorkspaceConnectionFacadeTest {
 
             facadeWithMetrics.create(WORKSPACE_ID, dto);
 
-            assertThat(registry.find("bytechef_connection_create")
+            assertThat(registry.get("bytechef_connection_create")
                 .tag("visibility", "PRIVATE")
                 .counter()
                 .count()).isEqualTo(1.0);
@@ -466,5 +469,52 @@ class WorkspaceConnectionFacadeTest {
 
         when(workspace.getId()).thenReturn(WORKSPACE_ID);
         when(workspaceFacade.getUserWorkspaces(99L)).thenReturn(List.of(workspace));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDelegatesToConnectionFacade() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(3);
+        connection.setStatus(ConnectionStatus.ACTIVE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
+
+        verify(connectionFacade).replaceAuthorizationParameters(5L, Map.of("apiKey", "new"));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRejectsStaleVersion() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(4);
+        connection.setStatus(ConnectionStatus.ACTIVE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(ConfigurationException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRejectsConnectionPendingReassignment() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setVersion(3);
+        connection.setStatus(ConnectionStatus.PENDING_REASSIGNMENT);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(ConfigurationException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
     }
 }
