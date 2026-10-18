@@ -20,7 +20,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {MessageSquareOffIcon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {type PanelImperativeHandle} from 'react-resizable-panels';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -76,8 +76,9 @@ const AiHubChatNotFound = () => (
  * switch from the home view to the chat view.
  *
  * <p>The route's chat id and the chats store are kept in sync by one effect: a store change (row click, chat
- * creation, delete) pushes the URL first; otherwise a URL chat id switches the store once the chats list holds it; a
- * URL with no chat id resets the store on a transition home or on mount. A URL chat id the list does not hold (another
+ * creation, delete) pushes the URL first; otherwise a URL chat id switches the store once the active or archived chats
+ * list holds it; a
+ * URL with no chat id resets the store on a transition home or on mount. A URL chat id neither list holds (another
  * user's chat, a deleted one, a refused request) shows the not-found state.</p>
  */
 const AiHub = () => {
@@ -105,11 +106,16 @@ const AiHub = () => {
     const navigate = useNavigate();
     const {chatId: urlChatIdParam} = useParams<{chatId?: string}>();
 
-    const {
-        data: chats,
-        error: chatsError,
-        isLoading: chatsLoading,
-    } = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const {data: activeChats, isLoading: activeChatsLoading} = useAiHubChatsQuery(
+        currentWorkspaceId,
+        currentEnvironmentId,
+        'ACTIVE'
+    );
+    const {data: archivedChats, isLoading: archivedChatsLoading} = useAiHubChatsQuery(
+        currentWorkspaceId,
+        currentEnvironmentId,
+        'ARCHIVED'
+    );
 
     const switchChat = useSwitchChat();
 
@@ -122,14 +128,16 @@ const AiHub = () => {
     const showResourcePanel = rightPanelOpen && hasResourceContent;
     const resourcePanelMounted = hasResourceContent || resourcePanelMountedState;
 
+    const chats = useMemo(() => [...(activeChats ?? []), ...(archivedChats ?? [])], [activeChats, archivedChats]);
+
+    const chatsLoading = activeChatsLoading || archivedChatsLoading;
+
     const urlChatId = urlChatIdParam ? Number(urlChatIdParam) : undefined;
-    const isUrlChatKnown = chats?.some((chat) => chat.id === urlChatId) ?? false;
+    const isUrlChatKnown = chats.some((chat) => chat.id === urlChatId);
     const isUrlChatCurrent = urlChatId != null && urlChatId === currentChatId;
 
     const chatNotFound =
-        !!urlChatIdParam &&
-        !isUrlChatCurrent &&
-        (Number.isNaN(urlChatId) || chatsError != null || (!chatsLoading && !isUrlChatKnown));
+        !!urlChatIdParam && !isUrlChatCurrent && (Number.isNaN(urlChatId) || (!chatsLoading && !isUrlChatKnown));
 
     const pendingUrlChat = !hasActiveChat && !!urlChatIdParam && !chatNotFound && (chatsLoading || isUrlChatKnown);
 
@@ -226,7 +234,7 @@ const AiHub = () => {
             const idNumber = Number(urlChatIdParam);
 
             if (!Number.isNaN(idNumber) && idNumber !== currentChatId) {
-                const chat = chats?.find((candidate) => candidate.id === idNumber);
+                const chat = chats.find((candidate) => candidate.id === idNumber);
 
                 if (chat) {
                     void switchChat(chat);

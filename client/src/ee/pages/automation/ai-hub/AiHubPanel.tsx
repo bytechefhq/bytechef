@@ -24,7 +24,15 @@ import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ArchiveIcon, MoreVerticalIcon, PanelRightOpenIcon, PencilIcon, Trash2Icon, WrenchIcon} from 'lucide-react';
+import {
+    ArchiveIcon,
+    ArchiveRestoreIcon,
+    MoreVerticalIcon,
+    PanelRightOpenIcon,
+    PencilIcon,
+    Trash2Icon,
+    WrenchIcon,
+} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -57,13 +65,14 @@ const AiHubPanel = () => {
 
     const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
 
-    const {data: chats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const {data: activeChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
+    const {data: archivedChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ARCHIVED');
 
     const chatActions = useAiHubChatActions();
 
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
-    const currentChat = chats?.find((chat) => chat.id === currentChatId);
+    const currentChat = [...(activeChats ?? []), ...(archivedChats ?? [])].find((chat) => chat.id === currentChatId);
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 
@@ -120,9 +129,15 @@ const AiHubPanel = () => {
                                         <PencilIcon /> Rename
                                     </DropdownMenuItem>
 
-                                    <DropdownMenuItem onClick={() => chatActions.archiveChat(currentChat)}>
-                                        <ArchiveIcon /> Archive
-                                    </DropdownMenuItem>
+                                    {currentChat.status === 'ARCHIVED' ? (
+                                        <DropdownMenuItem onClick={() => chatActions.unarchiveChat(currentChat)}>
+                                            <ArchiveRestoreIcon /> Unarchive
+                                        </DropdownMenuItem>
+                                    ) : (
+                                        <DropdownMenuItem onClick={() => chatActions.archiveChat(currentChat)}>
+                                            <ArchiveIcon /> Archive
+                                        </DropdownMenuItem>
+                                    )}
                                 </>
                             )}
 
