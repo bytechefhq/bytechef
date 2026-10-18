@@ -3,6 +3,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useVisibilityFeatureEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
@@ -13,6 +14,7 @@ import {
     GitPullRequestArrowIcon,
     HistoryIcon,
     LayoutTemplateIcon,
+    LockIcon,
     PlusIcon,
     Share2Icon,
     Trash2Icon,
@@ -20,6 +22,7 @@ import {
 } from 'lucide-react';
 
 const ProjectTabButtons = ({
+    canManageVisibility,
     importN8nWorkflowDisabled,
     onDeleteProjectClick,
     onDuplicateProjectClick,
@@ -32,9 +35,11 @@ const ProjectTabButtons = ({
     onShowEditProjectDialogClick,
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
+    onShowVisibilityDialog,
     projectGitConfigurationEnabled,
     projectId,
 }: {
+    canManageVisibility: boolean;
     importN8nWorkflowDisabled: boolean;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
@@ -47,6 +52,7 @@ const ProjectTabButtons = ({
     onShowEditProjectDialogClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
+    onShowVisibilityDialog: () => void;
     projectGitConfigurationEnabled: boolean;
     projectId: number;
 }) => {
@@ -82,6 +88,8 @@ const ProjectTabButtons = ({
     const canConfigureProjectGit = useHasWorkspaceScope(currentWorkspaceId, 'WORKSPACE_MANAGE');
     const canPullProjectFromGit = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PULL');
 
+    const {enabled: visibilityFeatureEnabled} = useVisibilityFeatureEnabled();
+
     return (
         <>
             {canEditProject && (
@@ -94,6 +102,10 @@ const ProjectTabButtons = ({
 
             {canManageProjectSettings && (
                 <DropdownMenuItem icon={<Share2Icon />} label="Share" onSelect={onShareProject} />
+            )}
+
+            {visibilityFeatureEnabled && canManageVisibility && (
+                <DropdownMenuItem icon={<LockIcon />} label="Visibility" onSelect={onShowVisibilityDialog} />
             )}
 
             {templatesSubmissionForm && (

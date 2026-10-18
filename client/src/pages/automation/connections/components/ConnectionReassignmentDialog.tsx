@@ -10,19 +10,47 @@ import {
 } from '@/components/Dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
 import {
+    UsersDocument,
+    UsersQuery,
+    UsersQueryVariables,
     useAffectedWorkflowsQuery,
     useReassignAllConnectionsMutation,
     useUnresolvedConnectionsQuery,
-    useUsersQuery,
+    useWorkspaceUsersQuery,
 } from '@/shared/middleware/graphql';
+import {fetcher} from '@/shared/middleware/graphqlFetcher';
 import {ConnectionKeys} from '@/shared/queries/automation/connections.queries';
-import {useQueryClient} from '@tanstack/react-query';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {AlertTriangleIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import ConnectionScopeBadge from './ConnectionScopeBadge';
+const USERS_PAGE_SIZE = 500;
+
+type UserType = NonNullable<NonNullable<UsersQuery['users']>['content'][number]>;
+
+const fetchAllUsers = async (): Promise<UserType[]> => {
+    const users: UserType[] = [];
+
+    let pageNumber = 0;
+    let totalPages = 1;
+
+    while (pageNumber < totalPages) {
+        const usersQuery = await fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, {
+            pageNumber,
+            pageSize: USERS_PAGE_SIZE,
+        })();
+
+        users.push(...(usersQuery.users?.content ?? []).filter((user): user is UserType => user != null));
+
+        totalPages = usersQuery.users?.totalPages ?? 0;
+        pageNumber++;
+    }
+
+    return users;
+};
 
 interface ConnectionReassignmentDialogProps {
     onClose: () => void;
@@ -47,7 +75,9 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
         {enabled: open}
     );
 
-    const {data: usersData} = useUsersQuery({pageSize: 500}, {enabled: open});
+    const {data: allUsers} = useQuery({enabled: open, queryFn: fetchAllUsers, queryKey: ['users', 'all']});
+
+    const {data: workspaceUsersData} = useWorkspaceUsersQuery({workspaceId: String(workspaceId)}, {enabled: open});
 
     const {isPending: isReassigning, mutate: reassignAll} = useReassignAllConnectionsMutation({
         // Keep an inline banner; the global toast from useFetchInterceptor can be missed while the
@@ -75,13 +105,18 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
     );
 
     const availableUsers = useMemo(() => {
-        const allUsers = usersData?.users?.content ?? [];
-
-        return allUsers.filter(
-            (user): user is NonNullable<typeof user> & {login: string} =>
-                user != null && user.login != null && user.login !== userLogin && user.activated === true
+        const workspaceMemberIds = new Set(
+            (workspaceUsersData?.workspaceUsers ?? []).map((workspaceUser) => String(workspaceUser.userId))
         );
-    }, [usersData, userLogin]);
+
+        return (allUsers ?? []).filter(
+            (user): user is UserType & {login: string} =>
+                user.login != null &&
+                user.login !== userLogin &&
+                user.activated === true &&
+                workspaceMemberIds.has(String(user.id))
+        );
+    }, [allUsers, userLogin, workspaceUsersData]);
 
     const handleReassignAll = () => {
         if (!newOwnerLogin) {
@@ -182,7 +217,7 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
                                                 </TableCell>
 
                                                 <TableCell className="px-3 py-2">
-                                                    <ConnectionScopeBadge visibility={connection.visibility} />
+                                                    <ResourceVisibilityBadge visibility={connection.visibility} />
                                                 </TableCell>
 
                                                 <TableCell className="px-3 py-2 text-sm text-muted-foreground">

@@ -18,19 +18,20 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ConnectionScopeBadge from '@/pages/automation/connections/components/ConnectionScopeBadge';
-import {useIsVisibilityEditionEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
-import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsResourceOwnerOrTenantAdmin} from '@/shared/hooks/useIsResourceOwnerOrTenantAdmin';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {
     Authorization,
     AuthorizationType,
@@ -153,11 +154,14 @@ const ConnectionDialog = ({
 
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
     const isTenantAdmin = useIsTenantAdmin();
-    const canEditWorkspaceConnection = useHasWorkspaceScope(
+    const hasWorkspaceConnectionEditScope = useHasWorkspaceScope(
         currentWorkspaceId,
         'CONNECTION_EDIT',
         connection?.environmentId
     );
+    const isConnectionOwnerOrTenantAdmin = useIsResourceOwnerOrTenantAdmin(connection?.createdBy);
+
+    const canEditWorkspaceConnection = hasWorkspaceConnectionEditScope && isConnectionOwnerOrTenantAdmin;
 
     // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
     // edition check in one hook means a future migration away from EditionType.EE updates the
@@ -751,7 +755,7 @@ const ConnectionDialog = ({
                                             <FormLabel>Visibility</FormLabel>
 
                                             <FormControl>
-                                                <ConnectionScopeBadge visibility={fixedVisibility} />
+                                                <ResourceVisibilityBadge visibility={fixedVisibility} />
                                             </FormControl>
                                         </FormItem>
                                     )}
@@ -769,7 +773,7 @@ const ConnectionDialog = ({
                                                             an id, so creation offers reach only; the list-page
                                                             picker adds people afterwards. */}
 
-                                                        <ConnectionVisibilityPicker
+                                                        <ResourceVisibilityPicker
                                                             grantedUserIds={[]}
                                                             onGrantedUserIdsChange={() => undefined}
                                                             onVisibilityChange={field.onChange}
@@ -789,7 +793,7 @@ const ConnectionDialog = ({
                                             <FormLabel>Visibility</FormLabel>
 
                                             <FormControl>
-                                                <ConnectionScopeBadge visibility={connection.visibility} />
+                                                <ResourceVisibilityBadge visibility={connection.visibility} />
                                             </FormControl>
 
                                             <p className="text-xs text-muted-foreground">
