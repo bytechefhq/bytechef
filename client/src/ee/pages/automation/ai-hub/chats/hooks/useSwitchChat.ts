@@ -32,9 +32,12 @@ interface OpenToolCallI {
     toolName: string;
 }
 
-const PICKED_LABEL_PATTERN = /^User picked: (.+) \((?:ID|value): [^)]*\)$/s;
+const PICK_PATTERN = /^User picked: (.+) \((ID|value): .*\)$/s;
 
-const PICKER_DATA_PART_TYPES = new Set(['data-select-connection', 'data-select-property-option']);
+const PICK_SUFFIX_DATA_PART_TYPES: Record<string, string> = {
+    ID: 'data-select-connection',
+    value: 'data-select-property-option',
+};
 
 const TOOL_APPROVAL_CONTINUATION_PATTERN = /^\[tool-approval #(\d+)[\s\]]/;
 
@@ -83,6 +86,9 @@ function buildRestoredToolParts(
 
     const parts: RestoredPartType[] = [];
 
+    const answeredPick = !allowInteractive && followingUserText ? readAnsweredPick(followingUserText) : undefined;
+    const answeredPickers: Array<{data: object; position: number}> = [];
+
     events.forEach((event, eventIndex) => {
         if (event.kind !== 'call' || !event.name || ARTIFACT_OPEN_TOOL_NAMES.has(event.name)) {
             return;
@@ -129,20 +135,28 @@ function buildRestoredToolParts(
 
             if (dataPart?.ok && (allowInteractive || !INTERACTIVE_DATA_PART_TYPES.has(dataPart.type))) {
                 parts.push({data: dataPart.data, type: dataPart.type as `data-${string}`} as RestoredPartType);
-            } else if (dataPart?.ok && PICKER_DATA_PART_TYPES.has(dataPart.type)) {
-                const pickedLabel = followingUserText ? PICKED_LABEL_PATTERN.exec(followingUserText)?.[1] : undefined;
-
-                if (pickedLabel) {
-                    parts.push({
-                        data: {...dataPart.data, pickedLabel},
-                        type: dataPart.type as `data-${string}`,
-                    } as RestoredPartType);
-                }
+            } else if (dataPart?.ok && dataPart.type === answeredPick?.dataPartType) {
+                answeredPickers.push({data: dataPart.data, position: parts.length});
             }
         }
     });
 
+    if (answeredPick && answeredPickers.length === 1) {
+        const [{data, position}] = answeredPickers;
+
+        parts.splice(position, 0, {
+            data: {...data, pickedLabel: answeredPick.label},
+            type: answeredPick.dataPartType as `data-${string}`,
+        } as RestoredPartType);
+    }
+
     return parts;
+}
+
+function readAnsweredPick(text: string): {dataPartType: string; label: string} | undefined {
+    const match = PICK_PATTERN.exec(text);
+
+    return match ? {dataPartType: PICK_SUFFIX_DATA_PART_TYPES[match[2]], label: match[1]} : undefined;
 }
 
 function mapServerRoleToClient(role: string): 'user' | 'assistant' | 'system' | null {
@@ -167,6 +181,18 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
         -1
     );
 
+    const followingUserTexts: Array<string | undefined> = new Array(messages.length);
+
+    let nextUserText: string | undefined;
+
+    for (let index = messages.length - 1; index >= 0; index--) {
+        followingUserTexts[index] = nextUserText;
+
+        if (mapServerRoleToClient(messages[index].role) === 'user') {
+            nextUserText = messages[index].content;
+        }
+    }
+
     const mapped: ThreadMessageLike[] = [];
 
     messages.forEach((serverMessage, rowIndex) => {
@@ -176,13 +202,9 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
             return;
         }
 
-        const followingUserRow = messages
-            .slice(rowIndex + 1)
-            .find((message) => mapServerRoleToClient(message.role) === 'user');
-
         const toolParts = buildRestoredToolParts(parseRestoredToolEvents(serverMessage.toolEventsJson), {
             allowInteractive: rowIndex >= lastUserRowIndex,
-            followingUserText: followingUserRow?.content,
+            followingUserText: followingUserTexts[rowIndex],
             rowIndex,
         });
 
