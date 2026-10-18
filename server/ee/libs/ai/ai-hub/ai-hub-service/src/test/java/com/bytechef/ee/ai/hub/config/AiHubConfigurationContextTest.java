@@ -1,0 +1,126 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.hub.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.agui.server.LocalAgent;
+import com.bytechef.ai.copilot.config.InteractivePickerToolCallbacks;
+import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.ProjectTools;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
+import com.bytechef.automation.ai.tool.ReadProjectTools;
+import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.util.Mode;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
+import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+
+/**
+ * Starts {@link AiHubConfiguration} in a real application context: the beans exist only behind both toggles, the
+ * session memory bean is registered, and a BUILD tool list without {@code buildWorkflow} stops the context.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+class AiHubConfigurationContextTest {
+
+    @Test
+    void testRegistersAgentsSessionMemoryAndPinnedToolsWhenHubAndCopilotAreEnabled() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context).hasBean("aiHubSessionMemory");
+                assertThat(context).hasSingleBean(AiHubSessionMemory.class);
+                assertThat(context.getBeansOfType(LocalAgent.class)).containsOnlyKeys(
+                    "aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent");
+
+                AiHubSpringAIAgent askAgent = context.getBean("aiHubAskSpringAIAgent", AiHubSpringAIAgent.class);
+                AiHubSpringAIAgent buildAgent = context.getBean("aiHubBuildSpringAIAgent", AiHubSpringAIAgent.class);
+
+                assertThat(askAgent.getAgentId()).isEqualTo("ai_hub_ask");
+                assertThat(buildAgent.getAgentId()).isEqualTo("ai_hub_build");
+
+                AiHubPinnedToolCallbacks pinnedToolCallbacks = context.getBean(AiHubPinnedToolCallbacks.class);
+
+                assertThat(pinnedToolCallbacks.pinnedToolCallbacks(Mode.ASK)).isEqualTo(
+                    askAgent.pinnedToolCallbacks());
+                assertThat(pinnedToolCallbacks.pinnedToolCallbacks(Mode.BUILD)).isEqualTo(
+                    buildAgent.pinnedToolCallbacks());
+            });
+    }
+
+    @Test
+    void testRegistersNothingWhenCopilotIsDisabled() {
+        contextRunner(AiHubAgentFixtures.withBuildWorkflow())
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=false")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context).doesNotHaveBean("aiHubSessionMemory");
+                assertThat(context).doesNotHaveBean(LocalAgent.class);
+            });
+    }
+
+    @Test
+    void testStartupFailsWhenBuildWorkflowIsMissing() {
+        contextRunner(new AiHubAgentFixtures(Set.of("importWorkflow")))
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> assertThat(context).getFailure()
+                .rootCause()
+                .hasMessageContaining("buildWorkflow")
+                .hasMessageContaining("bytechef.ai.hub.enabled")
+                .hasMessageContaining("bytechef.ai.copilot.enabled"));
+    }
+
+    @Test
+    void testSessionMemorySitsInsideTheToolCallingLoop() {
+        SessionMemoryAdvisor sessionMemoryAdvisor = AiHubAgentFixtures.withBuildWorkflow().sessionMemory
+            .createSessionMemoryAdvisor();
+
+        assertThat(sessionMemoryAdvisor).isInstanceOf(MemoryAdvisor.class);
+        assertThat(sessionMemoryAdvisor.getOrder()).isGreaterThan(ToolCallingAdvisor.DEFAULT_ORDER);
+    }
+
+    private static ApplicationContextRunner contextRunner(AiHubAgentFixtures fixtures) {
+        return new ApplicationContextRunner()
+            .withPropertyValues("bytechef.ai.memory.provider=in_memory")
+            .withUserConfiguration(AiHubConfiguration.class)
+            .withBean(ChatModel.class, () -> fixtures.chatModel)
+            .withBean(ReadProjectTools.class, () -> fixtures.readProjectTools)
+            .withBean(ReadProjectWorkflowTools.class, () -> fixtures.readProjectWorkflowTools)
+            .withBean(ProjectTools.class, () -> fixtures.projectTools)
+            .withBean(ProjectWorkflowLifecycleTools.class, () -> fixtures.projectWorkflowLifecycleTools)
+            .withBean(
+                DeploymentToolCallbacksFactory.class,
+                () -> new DeploymentToolCallbacksFactory(fixtures.projectDeploymentFacade))
+            .withBean(InteractivePickerToolCallbacks.class, () -> fixtures.interactivePickerToolCallbacks)
+            .withBean(IntelligentToolCatalog.class, () -> fixtures.intelligentToolCatalog)
+            .withBean(WorkspaceFacade.class, () -> fixtures.workspaceFacade)
+            .withBean(ProjectWorkflowFacade.class, () -> fixtures.projectWorkflowFacade)
+            .withBean(AiHubChatArtifactRecorder.class, () -> fixtures.artifactRecorder)
+            .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
+            .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate);
+    }
+}

@@ -1,0 +1,128 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.hub.agent;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.agui.core.state.State;
+import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClient;
+
+/**
+ * Pins the precedence rules for {@link AiHubChatClientResolver#resolve(State)} against the catalog resolver:
+ *
+ * <pre>
+ *   user-selected (USER_SELECTED_LLM_*_KEY)        ← highest
+ *     ↓ absent
+ *   null (caller falls back to workspace @Primary ChatModel)   ← lowest
+ * </pre>
+ *
+ * Half-set states fall back to the workspace default. The resolver never throws — every defensive branch returns null
+ * so the conversation continues on the workspace default.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+class AiHubChatClientResolverTest {
+
+    private static final int ENVIRONMENT_ID = 1;
+    private static final long WORKSPACE_ID = 42L;
+    private static final String OPENAI_KEY = "ai.provider.openAi";
+    private static final String OPENAI_MODEL = "gpt-4o";
+
+    private CatalogChatClientResolver catalogChatClientResolver;
+
+    private ChatClient openAiChatClient;
+
+    private AiHubChatClientResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        catalogChatClientResolver = mock(CatalogChatClientResolver.class);
+
+        openAiChatClient = mock(ChatClient.class);
+
+        resolver = new AiHubChatClientResolver(catalogChatClientResolver);
+    }
+
+    @Test
+    void testUserSelectedResolvesViaCatalog() {
+        when(catalogChatClientResolver.resolve(OPENAI_KEY, OPENAI_MODEL, ENVIRONMENT_ID)).thenReturn(openAiChatClient);
+
+        State state = newState();
+
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY, OPENAI_KEY);
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY, OPENAI_MODEL);
+
+        assertSame(openAiChatClient, resolver.resolve(state));
+    }
+
+    @Test
+    void testHalfSetUserStateReturnsNull() {
+        State state = newState();
+
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY, OPENAI_KEY);
+
+        assertNull(resolver.resolve(state));
+        verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    void testNoOverridesReturnsNull() {
+        assertNull(resolver.resolve(newState()));
+        verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    void testUserSelectedWithoutEnvironmentReturnsNull() {
+        State state = new State();
+
+        state.set(AiHubStateKeys.VERIFIED_WORKSPACE_ID, WORKSPACE_ID);
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY, OPENAI_KEY);
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY, OPENAI_MODEL);
+
+        assertNull(resolver.resolve(state));
+        verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    void testMissingWorkspaceIdReturnsNull() {
+        State state = new State();
+
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, ENVIRONMENT_ID);
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY, OPENAI_KEY);
+        state.set(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY, OPENAI_MODEL);
+
+        assertNull(resolver.resolve(state));
+    }
+
+    @Test
+    void testNullStateReturnsNull() {
+        assertNull(resolver.resolve(null));
+    }
+
+    private static State newState() {
+        State state = new State();
+
+        state.set(AiHubStateKeys.VERIFIED_WORKSPACE_ID, WORKSPACE_ID);
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, ENVIRONMENT_ID);
+
+        return state;
+    }
+}
