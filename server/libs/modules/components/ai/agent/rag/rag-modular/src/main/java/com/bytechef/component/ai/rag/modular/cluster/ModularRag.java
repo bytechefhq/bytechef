@@ -18,6 +18,7 @@ package com.bytechef.component.ai.rag.modular.cluster;
 
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
 import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentJoinerFunction.DOCUMENT_JOINER;
+import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentPostProcessorFunction.DOCUMENT_POST_PROCESSOR;
 import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentRetrieverFunction.DOCUMENT_RETRIEVER;
 import static com.bytechef.platform.component.definition.ai.agent.rag.QueryAugmenterFunction.QUERY_AUGMENTER;
 import static com.bytechef.platform.component.definition.ai.agent.rag.QueryExpanderFunction.QUERY_EXPANDER;
@@ -30,6 +31,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.definition.ai.agent.rag.DocumentJoinerFunction;
+import com.bytechef.platform.component.definition.ai.agent.rag.DocumentPostProcessorFunction;
 import com.bytechef.platform.component.definition.ai.agent.rag.DocumentRetrieverFunction;
 import com.bytechef.platform.component.definition.ai.agent.rag.QueryAugmenterFunction;
 import com.bytechef.platform.component.definition.ai.agent.rag.QueryExpanderFunction;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
+import org.springframework.ai.rag.postretrieval.document.DocumentPostProcessor;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.retrieval.join.DocumentJoiner;
@@ -74,8 +77,35 @@ public class ModularRag {
             .queryExpander(getQueryExpander(extensions, componentConnections))
             .documentRetriever(getDocumentRetriever(extensions, componentConnections))
             .documentJoiner(getDocumentJoiner(extensions, componentConnections))
+            .documentPostProcessors(getDocumentPostProcessors(extensions, componentConnections))
             .queryAugmenter(getQueryAugmenter(extensions, componentConnections))
             .build();
+    }
+
+    private List<DocumentPostProcessor> getDocumentPostProcessors(
+        Parameters extensions, Map<String, ComponentConnection> componentConnections) throws Exception {
+
+        List<DocumentPostProcessor> documentPostProcessors = new ArrayList<>();
+
+        List<ClusterElement> clusterElements = ClusterElementMap.of(extensions)
+            .getClusterElements(DOCUMENT_POST_PROCESSOR);
+
+        for (ClusterElement clusterElement : clusterElements) {
+            DocumentPostProcessorFunction documentPostProcessorFunction =
+                clusterElementDefinitionService.getClusterElement(
+                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                    clusterElement.getClusterElementName());
+
+            ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
+
+            documentPostProcessors.add(
+                documentPostProcessorFunction.apply(
+                    ParametersFactory.create(clusterElement.getParameters()),
+                    ParametersFactory.create(
+                        componentConnection == null ? Map.of() : componentConnection.getParameters())));
+        }
+
+        return documentPostProcessors;
     }
 
     private DocumentJoiner getDocumentJoiner(

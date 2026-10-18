@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentJoinerFunction.DOCUMENT_JOINER;
+import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentPostProcessorFunction.DOCUMENT_POST_PROCESSOR;
 import static com.bytechef.platform.component.definition.ai.agent.rag.DocumentRetrieverFunction.DOCUMENT_RETRIEVER;
 import static com.bytechef.platform.component.definition.ai.agent.rag.QueryAugmenterFunction.QUERY_AUGMENTER;
 import static com.bytechef.platform.component.definition.ai.agent.rag.QueryExpanderFunction.QUERY_EXPANDER;
@@ -32,6 +33,8 @@ public interface ModularRagComponentDefinition extends ClusterRootComponentDefin
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(DOCUMENT_JOINER, DOCUMENT_RETRIEVER, QUERY_AUGMENTER, QUERY_EXPANDER, QUERY_TRANSFORMER);
+        return List.of(
+            DOCUMENT_JOINER, DOCUMENT_POST_PROCESSOR, DOCUMENT_RETRIEVER, QUERY_AUGMENTER, QUERY_EXPANDER,
+            QUERY_TRANSFORMER);
     }
 }
