@@ -8,16 +8,14 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
-import com.bytechef.ee.platform.user.scim.audit.ScimGroupAuditEvents;
-import com.bytechef.ee.platform.user.scim.audit.ScimGroupAuditMapper;
+import com.bytechef.ee.platform.user.domain.ScimApiKey;
+import com.bytechef.ee.platform.user.scim.ScimException;
 import com.bytechef.ee.platform.user.scim.audit.ScimUserAuditEvents;
 import com.bytechef.ee.platform.user.scim.audit.ScimUserAuditMapper;
-import com.bytechef.ee.platform.user.scim.facade.ScimGroupFacade;
 import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.web.filter.ScimBearerTokenAuthenticationFilter;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
@@ -52,7 +50,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -72,9 +69,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = {
-    AuditIntTestConfiguration.class, ScimAuditIntTest.Config.class
-})
+@SpringBootTest(
+    classes = {
+        AuditIntTestConfiguration.class, ScimAuditIntTest.Config.class
+    }, properties = "bytechef.security.sso.enabled=true")
 @ActiveProfiles("testint")
 @Import(PostgreSQLContainerConfiguration.class)
 public class ScimAuditIntTest {
@@ -82,7 +80,7 @@ public class ScimAuditIntTest {
     private static final String DEFAULT_SCHEMA = "public";
     private static final long IDENTITY_PROVIDER_ID = 5L;
     private static final MediaType SCIM_JSON = MediaType.parseMediaType("application/scim+json");
-    private static final String SCIM_API_KEY = "scim-api-key-value";
+    private static final String SCIM_API_KEY = "bcscim_000001_scim-api-key-value";
     private static final String SCIM_PRINCIPAL = "scim:Okta (5)";
     private static final String TENANT_ID = "000001";
     private static final String TENANT_SCHEMA = "bytechef_" + TENANT_ID;
@@ -125,9 +123,10 @@ public class ScimAuditIntTest {
         jdbcTemplate.update(
             "INSERT INTO " + TENANT_SCHEMA + ".identity_provider (id, name, issuer_uri, client_id, client_secret, " +
                 "scim_api_key) VALUES (?, 'Okta', 'https://okta.example.com', 'client', 'secret', ?)",
-            IDENTITY_PROVIDER_ID, SCIM_API_KEY);
+            IDENTITY_PROVIDER_ID, ScimApiKey.hash(SCIM_API_KEY));
 
         when(tenantService.getTenantIds()).thenReturn(List.of(TenantContext.DEFAULT_TENANT_ID, TENANT_ID));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .addFilters(new ScimBearerTokenAuthenticationFilter(identityProviderService, tenantService))
@@ -176,14 +175,15 @@ public class ScimAuditIntTest {
     }
 
     @Test
-    public void testFailedCreateUserRollsBackAndRecordsAnErrorWithTheRequestedLogin() {
+    public void testRefusedCreateUserRecordsAnErrorWithTheRequestedLogin() throws Exception {
         createUser("jane", "jane@example.com", true);
 
-        assertThatThrownBy(() -> mockMvc.perform(
-            scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
-                .content(userJson("jane", "jane.other@example.com", "Jane", "Doe", true))))
-                    .rootCause()
-                    .hasMessageContaining("user_login_key");
+        mockMvc
+            .perform(
+                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Users"))
+                    .content(userJson("jane", "jane.other@example.com", "Jane", "Doe", true)))
+            .andExpect(MockMvcResultMatchers.status()
+                .isConflict());
 
         assertThat(countUsers(TENANT_SCHEMA, "jane")).isEqualTo(1);
         assertThat(
@@ -197,7 +197,7 @@ public class ScimAuditIntTest {
         assertThat(auditEventRow.principal()).isEqualTo(SCIM_PRINCIPAL);
         assertThat(auditEventRow.data())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", DuplicateKeyException.class.getName())
+            .containsEntry("errorClass", ScimException.class.getName())
             .containsEntry("login", "jane")
             .containsEntry("externalId", "00u-external");
     }
@@ -397,86 +397,6 @@ public class ScimAuditIntTest {
         assertNoAuditEvents();
     }
 
-    @Test
-    public void testCreateGroupRecordsTheCreatedGroup() throws Exception {
-        mockMvc
-            .perform(
-                scimRequest(MockMvcRequestBuilders.post("/api/scim/v2/Groups"))
-                    .content(groupJson("ROLE_ENGINEERING")))
-            .andExpect(MockMvcResultMatchers.status()
-                .isCreated());
-
-        assertThat(countAuthorities(DEFAULT_SCHEMA, "ROLE_ENGINEERING")).isZero();
-
-        Long groupId = jdbcTemplate.queryForObject(
-            "SELECT id FROM " + TENANT_SCHEMA + ".authority WHERE name = ?", Long.class, "ROLE_ENGINEERING");
-
-        AuditEventRow auditEventRow = getSingleAuditEvent();
-
-        assertThat(auditEventRow.eventType()).isEqualTo(ScimGroupAuditEvents.SCIM_GROUP_CREATED);
-        assertThat(auditEventRow.principal()).isEqualTo(SCIM_PRINCIPAL);
-        assertThat(auditEventRow.data())
-            .containsEntry("result", "SUCCESS")
-            .containsEntry("groupId", String.valueOf(groupId))
-            .containsEntry("name", "ROLE_ENGINEERING");
-    }
-
-    @Test
-    public void testReplaceGroupRecordsThePreviousName() throws Exception {
-        long groupId = createGroup("ROLE_ENGINEERING");
-
-        mockMvc
-            .perform(
-                scimRequest(MockMvcRequestBuilders.put("/api/scim/v2/Groups/" + groupId))
-                    .content(groupJson("ROLE_PLATFORM")))
-            .andExpect(MockMvcResultMatchers.status()
-                .isOk());
-
-        assertThat(countAuthorities(TENANT_SCHEMA, "ROLE_PLATFORM")).isEqualTo(1);
-        assertThat(countAuthorities(TENANT_SCHEMA, "ROLE_ENGINEERING")).isZero();
-
-        AuditEventRow auditEventRow = getSingleAuditEvent();
-
-        assertThat(auditEventRow.eventType()).isEqualTo(ScimGroupAuditEvents.SCIM_GROUP_UPDATED);
-        assertThat(auditEventRow.principal()).isEqualTo(SCIM_PRINCIPAL);
-        assertThat(auditEventRow.data())
-            .containsEntry("result", "SUCCESS")
-            .containsEntry("groupId", String.valueOf(groupId))
-            .containsEntry("name", "ROLE_PLATFORM")
-            .containsEntry("previousName", "ROLE_ENGINEERING");
-    }
-
-    @Test
-    public void testDeleteGroupRecordsTheGroupCapturedBeforeTheDelete() throws Exception {
-        long groupId = createGroup("ROLE_ENGINEERING");
-
-        mockMvc
-            .perform(scimRequest(MockMvcRequestBuilders.delete("/api/scim/v2/Groups/" + groupId)))
-            .andExpect(MockMvcResultMatchers.status()
-                .isNoContent());
-
-        assertThat(countAuthorities(TENANT_SCHEMA, "ROLE_ENGINEERING")).isZero();
-
-        AuditEventRow auditEventRow = getSingleAuditEvent();
-
-        assertThat(auditEventRow.eventType()).isEqualTo(ScimGroupAuditEvents.SCIM_GROUP_DELETED);
-        assertThat(auditEventRow.principal()).isEqualTo(SCIM_PRINCIPAL);
-        assertThat(auditEventRow.data())
-            .containsEntry("result", "SUCCESS")
-            .containsEntry("groupId", String.valueOf(groupId))
-            .containsEntry("name", "ROLE_ENGINEERING");
-    }
-
-    @Test
-    public void testDeleteOfMissingGroupRecordsNothing() throws Exception {
-        mockMvc
-            .perform(scimRequest(MockMvcRequestBuilders.delete("/api/scim/v2/Groups/" + Long.MAX_VALUE)))
-            .andExpect(MockMvcResultMatchers.status()
-                .isNotFound());
-
-        assertNoAuditEvents();
-    }
-
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private void assignGroup(long userId, long groupId) {
         jdbcTemplate.update(
@@ -491,12 +411,6 @@ public class ScimAuditIntTest {
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private Integer countAuditEvents(String schema) {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + schema + ".persistent_audit_event", Integer.class);
-    }
-
-    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    private Integer countAuthorities(String schema, String name) {
-        return jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM " + schema + ".authority WHERE name = ?", Integer.class, name);
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
@@ -572,16 +486,6 @@ public class ScimAuditIntTest {
         return new AuditEventRow((String) auditEvent.get("event_type"), (String) auditEvent.get("principal"), data);
     }
 
-    private static String groupJson(String displayName) {
-        return """
-            { \
-              "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"], \
-              "displayName": "%s", \
-              "members": [] \
-            } \
-            """.formatted(displayName);
-    }
-
     private static String patchJson(String operationBody) {
         return """
             { \
@@ -618,9 +522,8 @@ public class ScimAuditIntTest {
     @EnableWebMvc
     @TestConfiguration(proxyBeanMethods = false)
     @Import({
-        AuthorityServiceImpl.class, IdentityProviderServiceImpl.class, ScimGroupAuditMapper.class,
-        ScimGroupFacade.class, ScimUserAuditMapper.class, ScimUserFacade.class, UserCallback.class,
-        UserServiceImpl.class
+        AuthorityServiceImpl.class, IdentityProviderServiceImpl.class, ScimUserAuditMapper.class,
+        ScimUserFacade.class, UserCallback.class, UserServiceImpl.class
     })
     static class Config {
 

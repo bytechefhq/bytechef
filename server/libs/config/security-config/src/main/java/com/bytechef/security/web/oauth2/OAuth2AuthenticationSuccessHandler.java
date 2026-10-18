@@ -16,6 +16,8 @@
 
 package com.bytechef.security.web.oauth2;
 
+import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.security.web.authentication.TwoFactorAuthenticationSupport;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,20 +32,27 @@ import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * OAuth2 authentication success handler. Binds the session to the signed-in user's tenant in multi-tenant mode (the
- * internal API resolves its tenant from the session), triggers remember-me for persistent sessions and redirects to the
- * frontend OAuth2 redirect page.
+ * internal API resolves its tenant from the session), sends a user with TOTP enabled to the code prompt instead of into
+ * the application, and otherwise triggers remember-me and redirects to the frontend OAuth2 redirect page.
  *
  * @author Ivica Cardic
  */
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    static final String MFA_REQUIRED_URL = "/login?mfa=required";
+
     private final RememberMeServices rememberMeServices;
     private final TenantService tenantService;
+    private final TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer;
 
     @SuppressFBWarnings("EI")
-    public OAuth2AuthenticationSuccessHandler(RememberMeServices rememberMeServices, TenantService tenantService) {
+    public OAuth2AuthenticationSuccessHandler(
+        RememberMeServices rememberMeServices, TenantService tenantService,
+        TwoFactorAuthenticationCustomizer twoFactorAuthenticationCustomizer) {
+
         this.rememberMeServices = rememberMeServices;
         this.tenantService = tenantService;
+        this.twoFactorAuthenticationCustomizer = twoFactorAuthenticationCustomizer;
     }
 
     @Override
@@ -62,6 +71,16 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
             request.getSession()
                 .setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantId.get());
+        }
+
+        if (twoFactorAuthenticationCustomizer != null &&
+            twoFactorAuthenticationCustomizer.isTotpEnabled(authentication)) {
+
+            TwoFactorAuthenticationSupport.beginSecondFactor(request, response, authentication);
+
+            response.sendRedirect(MFA_REQUIRED_URL);
+
+            return;
         }
 
         rememberMeServices.loginSuccess(request, response, authentication);

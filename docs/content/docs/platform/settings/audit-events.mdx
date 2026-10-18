@@ -63,7 +63,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | **Users** | `USER_INVITED`, `USER_ROLE_UPDATED`, `USER_DELETED` |
 | **Identity providers** | `IDENTITY_PROVIDER_CREATED`, `IDENTITY_PROVIDER_UPDATED`, `IDENTITY_PROVIDER_DELETED` |
 | **OAuth2 clients** | `OAUTH2_CLIENT_DELETED`, `OAUTH2_CLIENT_GRANT_REVOKED`, `OAUTH2_CLIENT_ALL_GRANTS_REVOKED` - deleting a client that does not exist is not recorded |
-| **SCIM provisioning** | `SCIM_USER_CREATED`, `SCIM_USER_UPDATED`, `SCIM_USER_PATCHED`, `SCIM_USER_DEACTIVATED`, `SCIM_USER_DELETED`, `SCIM_GROUP_CREATED`, `SCIM_GROUP_UPDATED`, `SCIM_GROUP_DELETED` - recorded under the `scim:<identity provider name> (<identity provider id>)` principal; a PUT or PATCH that deactivates an active user is recorded once, as `SCIM_USER_DEACTIVATED` |
+| **SCIM provisioning** | `SCIM_USER_CREATED`, `SCIM_USER_UPDATED`, `SCIM_USER_PATCHED`, `SCIM_USER_DEACTIVATED`, `SCIM_USER_DELETED` - recorded under the `scim:<identity provider name> (<identity provider id>)` principal; a PUT or PATCH that deactivates an active user is recorded once, as `SCIM_USER_DEACTIVATED` |
 | **Workspaces** | `WORKSPACE_CREATED`, `WORKSPACE_UPDATED`, `WORKSPACE_DELETED` |
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_MEMBERSHIPS_REMOVED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Embedded membership** | `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED` |

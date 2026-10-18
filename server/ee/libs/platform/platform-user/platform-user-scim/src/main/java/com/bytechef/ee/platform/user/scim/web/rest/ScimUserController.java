@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.ScimConstants;
+import com.bytechef.ee.platform.user.scim.ScimException;
 import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -21,12 +23,14 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,7 +43,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * SCIM 2.0 User resource endpoints (RFC 7644 Section 3).
+ * SCIM 2.0 Users endpoint (RFC 7644). Every operation requires the {@code ROLE_SCIM} authority, which only the SCIM
+ * bearer token filter grants, and runs in the tenant of that token.
  *
  * @version ee
  *
@@ -48,7 +53,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/scim/v2/Users", produces = "application/scim+json")
 @ConditionalOnEEVersion
-class ScimUserController {
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
+@PreAuthorize("hasAuthority(\"" + ScimConstants.SCIM_AUTHORITY + "\")")
+class ScimUserController extends AbstractScimController {
 
     private final ScimUserFacade scimUserFacade;
     private final UserService userService;
@@ -61,56 +68,44 @@ class ScimUserController {
 
     @GetMapping
     ResponseEntity<ScimListResponse<ScimUser>> listUsers(
-        @RequestParam(defaultValue = "1") int startIndex,
-        @RequestParam(defaultValue = "100") int count,
+        @RequestParam(defaultValue = "1") int startIndex, @RequestParam(defaultValue = "100") int count,
         @RequestParam(required = false) String filter) {
 
-        if (filter != null) {
+        int normalizedStartIndex = Math.max(1, startIndex);
+
+        if (filter != null && !filter.isBlank()) {
             ScimFilter scimFilter = ScimFilterParser.parse(filter);
 
-            if (scimFilter != null && "userName".equalsIgnoreCase(scimFilter.attributeName())) {
-                Optional<User> user = userService.fetchUserByLogin(scimFilter.value());
-
-                if (user.isPresent()) {
-                    return ResponseEntity.ok(ScimListResponse.of(List.of(toScimUser(user.get())), startIndex));
-                }
-
-                return ResponseEntity.ok(ScimListResponse.of(List.of(), startIndex));
+            if (scimFilter == null) {
+                throw ScimException.invalidFilter("Only 'attribute eq \"value\"' filters are supported");
             }
 
-            if (scimFilter != null && "externalId".equalsIgnoreCase(scimFilter.attributeName())) {
-                Optional<User> user = userService.fetchUserByEmail(scimFilter.value());
+            List<ScimUser> scimUsers = findByFilter(scimFilter).map(this::toScimUser)
+                .stream()
+                .toList();
 
-                if (user.isPresent()) {
-                    return ResponseEntity.ok(ScimListResponse.of(List.of(toScimUser(user.get())), startIndex));
-                }
-
-                return ResponseEntity.ok(ScimListResponse.of(List.of(), startIndex));
-            }
+            return ResponseEntity.ok(ScimListResponse.of(scimUsers, normalizedStartIndex));
         }
 
-        int pageIndex = Math.max(0, (startIndex - 1) / count);
+        if (count <= 0) {
+            Page<User> userPage = userService.getAllManagedUsers(PageRequest.of(0, 1));
 
-        Page<User> userPage = userService.getAllActiveUsers(PageRequest.of(pageIndex, count));
+            return ResponseEntity.ok(ScimListResponse.of(List.of(), normalizedStartIndex, userPage.getTotalElements()));
+        }
+
+        Page<User> userPage = userService.getAllManagedUsers(PageRequest.of((normalizedStartIndex - 1) / count, count));
 
         List<ScimUser> scimUsers = userPage.getContent()
             .stream()
             .map(this::toScimUser)
             .toList();
 
-        return ResponseEntity.ok(ScimListResponse.of(scimUsers, startIndex));
+        return ResponseEntity.ok(ScimListResponse.of(scimUsers, normalizedStartIndex, userPage.getTotalElements()));
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Object> getUser(@PathVariable long id) {
-        Optional<User> user = userService.fetchUser(id);
-
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("User", String.valueOf(id)));
-        }
-
-        return ResponseEntity.ok(toScimUser(user.get()));
+    ResponseEntity<ScimUser> getUser(@PathVariable long id) {
+        return ResponseEntity.ok(toScimUser(getExistingUser(id)));
     }
 
     @PostMapping
@@ -122,61 +117,68 @@ class ScimUserController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Object> replaceUser(@PathVariable long id, @RequestBody ScimUser scimUser) {
-        Optional<User> existingUser = userService.fetchUser(id);
+    ResponseEntity<ScimUser> replaceUser(@PathVariable long id, @RequestBody ScimUser scimUser) {
+        User user = getExistingUser(id);
 
-        if (existingUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("User", String.valueOf(id)));
-        }
-
-        Optional<User> updatedUser = ScimUserFacade.isDeactivation(existingUser.get(), scimUser)
+        Optional<User> updatedUser = ScimUserFacade.isDeactivation(user, scimUser)
             ? scimUserFacade.deactivateUser(id, scimUser) : scimUserFacade.replaceUser(id, scimUser);
 
-        if (updatedUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("User", String.valueOf(id)));
-        }
-
-        return ResponseEntity.ok(toScimUser(updatedUser.get()));
+        return ResponseEntity.ok(toScimUser(updatedUser.orElseThrow(() -> userNotFound(id))));
     }
 
     @PatchMapping("/{id}")
-    ResponseEntity<Object> patchUser(@PathVariable long id, @RequestBody ScimPatchRequest patchRequest) {
-        Optional<User> existingUser = userService.fetchUser(id);
+    ResponseEntity<ScimUser> patchUser(@PathVariable long id, @RequestBody ScimPatchRequest patchRequest) {
+        if (patchRequest == null || patchRequest.operations() == null || patchRequest.operations()
+            .isEmpty()) {
 
-        if (existingUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("User", String.valueOf(id)));
+            throw ScimException.invalidSyntax("PATCH request has no Operations");
         }
 
-        Optional<User> patchedUser = ScimUserFacade.isDeactivation(existingUser.get(), patchRequest)
+        User user = getExistingUser(id);
+
+        Optional<User> patchedUser = ScimUserFacade.isDeactivation(user, patchRequest)
             ? scimUserFacade.deactivateUser(id, patchRequest) : scimUserFacade.patchUser(id, patchRequest);
 
-        if (patchedUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(notFoundError("User", String.valueOf(id)));
-        }
-
-        return ResponseEntity.ok(toScimUser(patchedUser.get()));
+        return ResponseEntity.ok(toScimUser(patchedUser.orElseThrow(() -> userNotFound(id))));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUser(@PathVariable long id) {
         if (!scimUserFacade.deleteUser(id)) {
-            return ResponseEntity.notFound()
-                .build();
+            throw userNotFound(id);
         }
 
         return ResponseEntity.noContent()
             .build();
     }
 
-    private Map<String, Object> notFoundError(String resourceType, String id) {
-        return Map.of(
-            "schemas", List.of("urn:ietf:params:scim:api:messages:2.0:Error"),
-            "detail", resourceType + " " + id + " not found",
-            "status", "404");
+    private Optional<User> findByFilter(ScimFilter scimFilter) {
+        String value = scimFilter.value();
+
+        return switch (scimFilter.attributeName()) {
+            case "userName" -> userService.fetchUserByLogin(value.toLowerCase(Locale.ROOT));
+            case "emails.value", "emails", "externalId" -> userService.fetchUserByEmail(value);
+            case "id" -> parseId(value).flatMap(userService::fetchUser);
+            default -> throw ScimException.invalidFilter(
+                "Filtering by '" + scimFilter.attributeName() + "' is not supported");
+        };
+    }
+
+    private User getExistingUser(long id) {
+        return userService.fetchUser(id)
+            .orElseThrow(() -> userNotFound(id));
+    }
+
+    private static ScimException userNotFound(long id) {
+        return ScimException.notFound("User " + id + " not found");
+    }
+
+    private static Optional<Long> parseId(String value) {
+        try {
+            return Optional.of(Long.parseLong(value));
+        } catch (NumberFormatException numberFormatException) {
+            return Optional.empty();
+        }
     }
 
     private ScimUser toScimUser(User user) {
@@ -200,7 +202,7 @@ class ScimUserController {
             "/api/scim/v2/Users/" + user.getId());
 
         return new ScimUser(
-            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), user.getEmail(), user.getLogin(), scimName,
+            List.of(ScimUser.SCHEMA), String.valueOf(user.getId()), null, user.getLogin(), scimName,
             scimName.formatted(), emails, user.isActivated(), List.of(), meta);
     }
 }

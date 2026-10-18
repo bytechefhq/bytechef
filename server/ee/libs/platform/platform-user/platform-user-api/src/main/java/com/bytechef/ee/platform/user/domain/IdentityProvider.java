@@ -199,6 +199,14 @@ public class IdentityProvider {
         this.clientSecret = clientSecret;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public void setDefaultAuthority(String defaultAuthority) {
         this.defaultAuthority = defaultAuthority;
     }

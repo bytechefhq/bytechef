@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.security.sso.web.filter;
 
-import com.bytechef.ee.platform.user.domain.IdentityProvider;
-import com.bytechef.ee.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.security.sso.IdentityProviderLocator;
+import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,11 +28,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class SsoEnforcementFilter extends OncePerRequestFilter {
 
-    private final IdentityProviderService identityProviderService;
+    private final IdentityProviderLocator identityProviderLocator;
 
     @SuppressFBWarnings("EI")
-    public SsoEnforcementFilter(IdentityProviderService identityProviderService) {
-        this.identityProviderService = identityProviderService;
+    public SsoEnforcementFilter(IdentityProviderLocator identityProviderLocator) {
+        this.identityProviderLocator = identityProviderLocator;
     }
 
     @Override
@@ -45,9 +45,11 @@ public class SsoEnforcementFilter extends OncePerRequestFilter {
             if (username != null && username.contains("@")) {
                 String domain = username.substring(username.lastIndexOf('@') + 1);
 
-                Optional<IdentityProvider> identityProvider = identityProviderService.fetchByDomain(domain);
+                Optional<LocatedIdentityProvider> locatedIdentityProvider =
+                    identityProviderLocator.findByDomain(domain);
 
-                if (identityProvider.isPresent() && identityProvider.get()
+                if (locatedIdentityProvider.isPresent() && locatedIdentityProvider.get()
+                    .identityProvider()
                     .isEnforced()) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("application/json");

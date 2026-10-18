@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
@@ -308,9 +309,17 @@ public class AccountController {
 
     @PostMapping("/account/mfa/setup")
     public MfaSetupResponse setupMfa() {
+        validateTwoFactorAuthenticationEnabled();
+
         User user = userService.fetchCurrentUser()
             .orElseThrow(() -> new AccountResourceException(
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
+
+        if (user.isTotpEnabled()) {
+            throw new AccountResourceException(
+                "Two-factor authentication is already enabled; disable it before setting it up again",
+                AccountErrorType.TOTP_ALREADY_ENABLED);
+        }
 
         String secret = userService.generateTotpSecret(user.getLogin());
 
@@ -340,6 +349,8 @@ public class AccountController {
     @PostMapping("/account/mfa/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enableMfa(@RequestBody MfaVerifyRequest mfaVerifyRequest) {
+        validateTwoFactorAuthenticationEnabled();
+
         User user = userService.fetchCurrentUser()
             .orElseThrow(() -> new AccountResourceException(
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
@@ -360,7 +371,9 @@ public class AccountController {
             .orElseThrow(() -> new AccountResourceException(
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(mfaDisableRequest.password(), user.getPassword())) {
+        if (isPasswordAccount(user) &&
+            !passwordEncoder.matches(mfaDisableRequest.password(), user.getPassword())) {
+
             throw new AccountResourceException("Invalid password", AccountErrorType.INVALID_PASSWORD);
         }
 
@@ -371,6 +384,28 @@ public class AccountController {
         }
 
         userService.disableTotp(user.getLogin());
+    }
+
+    private void validateTwoFactorAuthenticationEnabled() {
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        if (security == null || !security.getTwoFactorAuthentication()
+            .isEnabled()) {
+
+            throw new AccountResourceException(
+                "Two-factor authentication is disabled on this server",
+                AccountErrorType.TWO_FACTOR_AUTHENTICATION_DISABLED);
+        }
+    }
+
+    /**
+     * Whether the user signs in with a ByteChef password. Accounts created through social login or SSO hold a random
+     * password nobody knows, so disabling two-factor authentication there rests on the TOTP code alone.
+     */
+    private static boolean isPasswordAccount(User user) {
+        String authProvider = user.getAuthProvider();
+
+        return authProvider == null || UserConstants.AUTH_PROVIDER_LOCAL.equals(authProvider);
     }
 
     @GetMapping("/account/mfa/status")

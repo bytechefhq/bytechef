@@ -27,8 +27,12 @@ public record ScimListResponse<T>(
     @JsonProperty("Resources") List<T> resources) {
 
     public static <T> ScimListResponse<T> of(List<T> resources, int startIndex) {
+        return of(resources, startIndex, resources.size());
+    }
+
+    public static <T> ScimListResponse<T> of(List<T> resources, int startIndex, long totalResults) {
         return new ScimListResponse<>(
             List.of("urn:ietf:params:scim:api:messages:2.0:ListResponse"),
-            resources.size(), startIndex, resources.size(), resources);
+            Math.toIntExact(totalResults), startIndex, resources.size(), resources);
     }
 }

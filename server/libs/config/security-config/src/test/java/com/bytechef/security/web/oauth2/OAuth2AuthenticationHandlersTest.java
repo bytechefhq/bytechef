@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.security.web.authentication.TwoFactorAuthentication;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -52,7 +54,7 @@ class OAuth2AuthenticationHandlersTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService)
+        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, null)
             .onAuthenticationSuccess(request, response, AUTHENTICATION);
 
         assertThat(response.getRedirectedUrl()).isEqualTo("/oauth2/redirect");
@@ -70,7 +72,7 @@ class OAuth2AuthenticationHandlersTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.getTenantIdsByUserLogin("someone@example.com")).thenReturn(List.of("000003"));
 
-        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService)
+        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, null)
             .onAuthenticationSuccess(request, response, AUTHENTICATION);
 
         assertThat(request.getSession()
@@ -86,12 +88,29 @@ class OAuth2AuthenticationHandlersTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.getTenantIdsByUserLogin("someone@example.com")).thenReturn(List.of());
 
-        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService)
+        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, null)
             .onAuthenticationSuccess(request, response, AUTHENTICATION);
 
         assertThat(response.getRedirectedUrl()).isEqualTo("/login?error=oauth2");
 
         verify(rememberMeServices, never()).loginSuccess(any(), any(), any());
+    }
+
+    @Test
+    void testSuccessForUserWithTotpAsksForTheCodeInsteadOfSigningIn() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        new OAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, authentication -> true)
+            .onAuthenticationSuccess(request, response, AUTHENTICATION);
+
+        assertThat(response.getRedirectedUrl()).isEqualTo("/login?mfa=required");
+        assertThat(SecurityContextHolder.getContext()
+            .getAuthentication()).isInstanceOf(TwoFactorAuthentication.class);
+
+        verify(rememberMeServices, never()).loginSuccess(any(), any(), any());
+
+        SecurityContextHolder.clearContext();
     }
 
     @Test

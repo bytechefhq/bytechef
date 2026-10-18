@@ -7,10 +7,12 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.MediaType;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/scim/v2", produces = "application/scim+json")
 @ConditionalOnEEVersion
-class ScimServiceProviderConfigController {
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
+@PreAuthorize("hasAuthority(\"" + ScimConstants.SCIM_AUTHORITY + "\")")
+class ScimServiceProviderConfigController extends AbstractScimController {
 
     @GetMapping("/ServiceProviderConfig")
     Map<String, Object> getServiceProviderConfig() {
@@ -67,7 +71,7 @@ class ScimServiceProviderConfigController {
                     "schema", "urn:ietf:params:scim:schemas:core:2.0:Group")));
     }
 
-    @GetMapping(value = "/Schemas", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/Schemas")
     Map<String, Object> getSchemas() {
         return Map.of(
             "schemas", List.of("urn:ietf:params:scim:api:messages:2.0:ListResponse"),

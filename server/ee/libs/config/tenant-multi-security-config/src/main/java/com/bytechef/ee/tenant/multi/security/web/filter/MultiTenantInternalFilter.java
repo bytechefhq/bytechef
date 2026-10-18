@@ -42,10 +42,11 @@ public class MultiTenantInternalFilter implements Filter {
             return;
         }
 
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         String authorizationHeader = request.getHeader("Authorization");
 
-        String sessionCurrentTenantId = (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
+        String sessionCurrentTenantId =
+            session == null ? null : (String) session.getAttribute(TenantConstants.CURRENT_TENANT_ID);
         boolean shouldRunAsTenantId = false;
 
         if (requestURI.startsWith("/api/") && requestURI.contains("/internal/") &&

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261018000000-1" author="Ivica Cardic">
+        <dropNotNullConstraint tableName="identity_provider" columnName="issuer_uri" columnDataType="VARCHAR(1024)"/>
+        <dropNotNullConstraint tableName="identity_provider" columnName="client_id" columnDataType="VARCHAR(255)"/>
+        <dropNotNullConstraint tableName="identity_provider" columnName="client_secret" columnDataType="VARCHAR(1024)"/>
+    </changeSet>
+</databaseChangeLog>
