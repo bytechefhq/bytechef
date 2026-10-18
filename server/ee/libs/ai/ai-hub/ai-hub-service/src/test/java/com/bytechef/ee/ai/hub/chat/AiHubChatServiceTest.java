@@ -22,6 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
@@ -82,6 +83,9 @@ class AiHubChatServiceTest {
     private AiHubToolApprovalService approvalService;
 
     @Mock
+    private InFlightAiHubRunRegistry inFlightRunRegistry;
+
+    @Mock
     private ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
 
     @Mock
@@ -105,7 +109,8 @@ class AiHubChatServiceTest {
             .thenReturn(sessionRepository);
 
         chatService = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
+            inFlightRunRegistry);
     }
 
     @AfterEach
@@ -616,5 +621,38 @@ class AiHubChatServiceTest {
             .isInstanceOf(NotFoundException.class);
 
         verify(sessionRepository, never()).appendEvent(any());
+    }
+
+    @Test
+    void testCancelAiHubRunCancelsTheOwnersRunThroughTheRegistry() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+        when(inFlightRunRegistry.cancel(THREAD_ID, "run-1")).thenReturn(true);
+
+        assertThat(chatService.cancelAiHubRun(1L, WORKSPACE_ID, USER_ID, "run-1")).isTrue();
+
+        verify(inFlightRunRegistry).cancel(THREAD_ID, "run-1");
+    }
+
+    @Test
+    void testCancelAiHubRunRefusesAnotherUser() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        assertThatThrownBy(() -> chatService.cancelAiHubRun(1L, WORKSPACE_ID, OTHER_USER_ID, "run-1"))
+            .isInstanceOf(NotFoundException.class);
+
+        verify(inFlightRunRegistry, never()).cancel(any(), any());
+    }
+
+    @Test
+    void testCancelAiHubRunRefusesAChatInAnotherWorkspace() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        assertThatThrownBy(() -> chatService.cancelAiHubRun(1L, OTHER_WORKSPACE_ID, USER_ID, "run-1"))
+            .isInstanceOf(NotFoundException.class);
+
+        verify(inFlightRunRegistry, never()).cancel(any(), any());
     }
 }
