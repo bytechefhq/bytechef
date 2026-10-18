@@ -8,8 +8,11 @@
 package com.bytechef.ee.automation.configuration.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +30,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.aspect.AuditedMethodValidator;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -121,6 +125,81 @@ class WorkspaceUserAuditIntTest {
             .containsEntry("workspaceId", "1")
             .containsEntry("userId", "2")
             .containsEntry("role", "VIEWER");
+    }
+
+    @Test
+    void testRemoveRecordsTheRemovedMemberAndTheirPreviousRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
+
+        assertThat(workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID)).isTrue();
+
+        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED);
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("workspaceId", "1")
+            .containsEntry("userId", "2")
+            .containsEntry("previousRole", "VIEWER")
+            .doesNotContainKey("role");
+    }
+
+    @Test
+    void testAddingAnExistingMemberRecordsAnErrorAndStillFails() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
+
+        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
+            .isInstanceOf(ConfigurationException.class);
+
+        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED);
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", ConfigurationException.class.getName())
+            .containsEntry("role", "EDITOR");
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testRemovingTheLastAdminRecordsAnErrorWithThePreviousRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
+        when(workspaceUserRepository.countByWorkspaceIdAndWorkspaceRole(WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal()))
+            .thenReturn(1L);
+
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+            .isInstanceOf(ConfigurationException.class);
+
+        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", ConfigurationException.class.getName())
+            .containsEntry("previousRole", "ADMIN");
+
+        verify(workspaceUserRepository, never()).deleteByUserIdAndWorkspaceId(anyLong(), anyLong());
+    }
+
+    @Test
+    void testMembershipChangeWithoutAnAuthenticatedUserIsRecordedUnderSystem() {
+        SecurityContextHolder.clearContext();
+
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
+
+        workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
+
+        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+        assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED);
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("SYSTEM");
+        assertThat(persistentAuditEvent.getData()).containsEntry("result", "SUCCESS");
     }
 
     @SuppressWarnings("unchecked")

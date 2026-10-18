@@ -173,6 +173,31 @@ class AuditedMethodValidatorTest {
         }
     }
 
+    @Test
+    void testMisconfiguredAuditedMethodFailsApplicationContextStartup() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(UnhandledEventService.class);
+            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
+            genericApplicationContext.registerBean(AuditedMethodValidator.class);
+
+            assertThatThrownBy(genericApplicationContext::refresh)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("UnhandledEventService.write")
+                .hasMessageContaining("does not handle");
+        }
+    }
+
+    @Test
+    void testCorrectlyConfiguredAuditedMethodLetsTheApplicationContextStart() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(HandledEventService.class);
+            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
+            genericApplicationContext.registerBean(AuditedMethodValidator.class);
+
+            assertThatCode(genericApplicationContext::refresh).doesNotThrowAnyException();
+        }
+    }
+
     private static void validate(GenericApplicationContext genericApplicationContext) {
         new AuditedMethodValidator(genericApplicationContext.getBeanFactory()).afterSingletonsInstantiated();
     }
