@@ -8,6 +8,10 @@ export const createMockApplicationInfoStore = (overrides = {}) => {
             activationRequired: false,
             enabled: true,
         },
+        socialLogin: {
+            enabled: false,
+            providers: [],
+        },
     };
 
     return {
