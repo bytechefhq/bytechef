@@ -108,11 +108,11 @@ export interface AiHubChatMessageI {
 export type AiHubToolApprovalStatusType = 'APPROVED' | 'EXPIRED' | 'FAILED' | 'PENDING' | 'REJECTED' | 'SUPERSEDED';
 
 export interface AiHubToolApprovalI {
-    /** The gated call's arguments as the JSON object string the gate recorded. */
     arguments: string;
     componentName: string | null;
     decidedByUserId: number | null;
     executionError: string | null;
+    expiresAt: string | null;
     id: number;
     status: AiHubToolApprovalStatusType;
     toolName: string;
@@ -246,6 +246,7 @@ export async function getToolApprovals({
         componentName: approval.componentName ?? null,
         decidedByUserId: approval.decidedByUserId != null ? Number(approval.decidedByUserId) : null,
         executionError: approval.executionError ?? null,
+        expiresAt: approval.expiresAt != null ? toIsoString(approval.expiresAt) : null,
         id: Number(approval.id),
         status: approval.status as AiHubToolApprovalStatusType,
         toolName: approval.toolName,
