@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.search;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.search.SearchAssetProvider;
@@ -38,14 +39,16 @@ import org.springframework.stereotype.Component;
 class WorkflowSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
     WorkflowSearchAssetProvider(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService) {
+        ProjectService projectService, ProjectVisibilityFilter projectVisibilityFilter,
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
@@ -81,7 +84,15 @@ class WorkflowSearchAssetProvider implements SearchAssetProvider {
         Map<String, Workflow> workflowIdToWorkflow = workflows.stream()
             .collect(Collectors.toMap(Workflow::getId, Function.identity()));
 
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(
+            projectService.getProjects(
+                projectWorkflows.stream()
+                    .map(ProjectWorkflow::getProjectId)
+                    .distinct()
+                    .toList()));
+
         return projectWorkflows.stream()
+            .filter(projectWorkflow -> visibleProjectIds.contains(projectWorkflow.getProjectId()))
             .filter(projectWorkflow -> {
                 Workflow workflow = workflowIdToWorkflow.get(projectWorkflow.getWorkflowId());
 

@@ -114,13 +114,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "environmentId"
-          description: "The id of an environment."
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-            format: "int64"
       responses:
         "200":
           description: "The list of connection tags."
@@ -250,13 +243,6 @@ paths:
           description: "The id of a workspace."
           in: "path"
           required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "environmentId"
-          description: "The id of an environment."
-          in: "query"
-          required: false
           schema:
             type: "integer"
             format: "int64"
@@ -1499,6 +1485,15 @@ components:
         uuid:
           description: "The uuid of a project."
           type: "string"
+        visibility:
+          description: "The visibility scope of the project: WORKSPACE (default, shared\
+            \ with every member of the owning workspace) or PRIVATE (owner plus named\
+            \ grantees, EE). Accepted on create; changed afterwards via the setProjectVisibility\
+            \ GraphQL mutation. CE always persists WORKSPACE."
+          type: "string"
+          enum:
+            - "PRIVATE"
+            - "WORKSPACE"
     ProjectDeployment:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."

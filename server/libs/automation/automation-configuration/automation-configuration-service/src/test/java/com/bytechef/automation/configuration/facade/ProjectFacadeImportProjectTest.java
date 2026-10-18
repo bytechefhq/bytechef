@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -42,6 +44,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.ByteArrayOutputStream;
@@ -81,10 +84,12 @@ class ProjectFacadeImportProjectTest {
     @BeforeEach
     void setUp() {
         projectFacade = new ProjectFacadeImpl(
-            mock(ApplicationProperties.class), mock(CategoryService.class), mock(ComponentDefinitionHelper.class),
+            "CE", mock(ApplicationProperties.class), mock(CategoryService.class), mock(ComponentDefinitionHelper.class),
             mock(PreBuiltTemplateService.class), projectCodeWorkflowInfoSupplierProvider,
             mock(ProjectWorkflowService.class), mock(ProjectDeploymentService.class),
             mock(ProjectOwnershipService.class), projectService, mock(ProjectVersionWorkflowChangeFacade.class),
+            mock(ProjectVisibilityFilter.class),
+            new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy())),
             mock(ProjectDeploymentFacade.class), projectWorkflowFacade, mock(SharedTemplateFileStorage.class),
             mock(SharedTemplateService.class), mock(TagService.class), mock(WorkflowService.class),
             mock(WorkflowTestConfigurationService.class), mock(WorkflowNodeTestOutputService.class), List.of());

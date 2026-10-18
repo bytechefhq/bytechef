@@ -8,10 +8,12 @@
 package com.bytechef.ee.automation.configuration.event;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -32,15 +34,17 @@ public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventLis
     private final CodeWorkflowContainerFacade codeWorkflowContainerFacade;
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final ProjectGitConfigurationService projectGitConfigurationService;
+    private final ResourceGrantService resourceGrantService;
 
     @SuppressFBWarnings("EI")
     public ProjectBeforeDeleteEventListener(
         CodeWorkflowContainerFacade codeWorkflowContainerFacade, ProjectCodeWorkflowService projectCodeWorkflowService,
-        ProjectGitConfigurationService projectGitConfigurationService) {
+        ProjectGitConfigurationService projectGitConfigurationService, ResourceGrantService resourceGrantService) {
 
         this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectGitConfigurationService = projectGitConfigurationService;
+        this.resourceGrantService = resourceGrantService;
     }
 
     @Override
@@ -48,6 +52,8 @@ public class ProjectBeforeDeleteEventListener extends AbstractRelationalEventLis
         Identifier identifier = event.getId();
 
         long projectId = (Long) identifier.getValue();
+
+        resourceGrantService.deleteGrants(ProjectVisibilityFilter.PROJECT, projectId);
 
         projectGitConfigurationService.delete(projectId);
 

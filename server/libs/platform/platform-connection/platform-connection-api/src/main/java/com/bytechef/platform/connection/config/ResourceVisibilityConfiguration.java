@@ -25,22 +25,11 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Assembles the {@link ResourceVisibilityPolicyRegistry} from every {@link ResourceVisibilityPolicy} on the classpath.
  *
- * <p>
- * The registry itself lives in {@code platform-api}, which carries no Spring stereotypes and is not component-scanned,
- * so it needs an explicit {@code @Bean} somewhere that is. This module is that somewhere because it owns the only
- * policy today. When a second resource family gains visibility and can be deployed without connections, move this
- * declaration to a module both depend on rather than adding a second registry.
- *
  * @author Ivica Cardic
  */
 @Configuration
 public class ResourceVisibilityConfiguration {
 
-    /**
-     * Injecting {@code List<ResourceVisibilityPolicy>} yields an empty list when no module contributes one, which the
-     * registry accepts — an application with no visibility-bearing resources gets an empty registry rather than a
-     * startup failure.
-     */
     @Bean
     ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry(
         List<ResourceVisibilityPolicy> resourceVisibilityPolicies) {

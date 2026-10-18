@@ -47,6 +47,8 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
@@ -76,7 +78,6 @@ import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScop
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkspacePermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -105,6 +106,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -114,6 +116,7 @@ import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Constructor;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -140,6 +143,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @version ee
@@ -472,7 +476,8 @@ class ConnectedUserAccessDeciderIntTest {
         @Import({
             ApiKeyPermissionScopeProvider.class, ApiPlatformPermissionScopeProvider.class,
             ConnectedUserAccessDeciderImpl.class, ConnectedUserConnectionServiceImpl.class,
-            ConnectedUserProjectServiceImpl.class, ConnectionPermissionScopeProvider.class, CurrentUserResolver.class,
+            ConnectedUserProjectServiceImpl.class, ConnectionPermissionScopeProvider.class,
+            CurrentUserResolverImpl.class,
             CustomRoleScopeResolverImpl.class,
             DataTablePermissionScopeProvider.class, DeploymentPermissionScopeProvider.class,
             ExecutionPermissionScopeProvider.class, IntegrationInstanceServiceImpl.class,
@@ -480,7 +485,8 @@ class ConnectedUserAccessDeciderIntTest {
             PermissionServiceImpl.class, ProjectDeploymentEnvironmentResolver.class,
             ProjectDeploymentOwnershipResolver.class, ProjectDeploymentServiceImpl.class,
             ProjectOwnershipResolver.class,
-            ProjectPermissionScopeProvider.class, ProjectServiceImpl.class, ProjectWorkflowServiceImpl.class,
+            ProjectPermissionScopeProvider.class, ProjectServiceImpl.class, ProjectVisibilityPolicy.class,
+            ResourceVisibilityConfiguration.class, ProjectWorkflowServiceImpl.class,
             WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
             WorkspaceScopeCache.class, EmbeddedScopeCacheService.class
         })
@@ -542,11 +548,18 @@ class ConnectedUserAccessDeciderIntTest {
                 ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade)
                 throws ReflectiveOperationException {
 
+                WorkflowService workflowService = mock(WorkflowService.class);
+
+                when(workflowService.getWorkflow(anyString()))
+                    .thenAnswer(
+                        invocation -> new Workflow(invocation.getArgument(0), DEFINITION, Workflow.Format.JSON));
+
                 return instantiate(
                     ProjectWorkflowFacadeImpl.class,
                     Map.of(
                         ProjectDeploymentService.class, projectDeploymentService, ProjectService.class, projectService,
-                        ProjectWorkflowService.class, projectWorkflowService, WorkflowFacade.class, workflowFacade));
+                        ProjectWorkflowService.class, projectWorkflowService, WorkflowFacade.class, workflowFacade,
+                        WorkflowService.class, workflowService));
             }
 
             @Bean
@@ -655,11 +668,11 @@ class ConnectedUserAccessDeciderIntTest {
 
             when(workflowFacade.getWorkflow(anyString())).thenReturn(mock(WorkflowDTO.class));
             when(workflowService.create(anyString(), any(), any()))
-                .thenAnswer(invocation -> new Workflow(
-                    String.valueOf(UUID.randomUUID()), invocation.getArgument(0), Workflow.Format.JSON));
+                .thenAnswer(invocation -> storedWorkflow(invocation.getArgument(0)));
             when(workflowService.duplicateWorkflow(anyString()))
-                .thenAnswer(
-                    invocation -> new Workflow(String.valueOf(UUID.randomUUID()), DEFINITION, Workflow.Format.JSON));
+                .thenAnswer(invocation -> storedWorkflow(DEFINITION));
+            when(workflowService.duplicateWorkflowPreservingAudit(anyString()))
+                .thenAnswer(invocation -> storedWorkflow(DEFINITION));
             when(workflowService.getWorkflow(anyString()))
                 .thenAnswer(invocation -> new Workflow(invocation.getArgument(0), DEFINITION, Workflow.Format.JSON));
         }
@@ -766,6 +779,19 @@ class ConnectedUserAccessDeciderIntTest {
                 .setAuthentication(authentication);
         }
 
+        private static Workflow storedWorkflow(String definition) {
+            Workflow workflow = new Workflow(String.valueOf(UUID.randomUUID()), definition, Workflow.Format.JSON);
+
+            Instant now = Instant.now();
+
+            ReflectionTestUtils.setField(workflow, "createdBy", "connected-user");
+            ReflectionTestUtils.setField(workflow, "createdDate", now);
+            ReflectionTestUtils.setField(workflow, "lastModifiedBy", "connected-user");
+            ReflectionTestUtils.setField(workflow, "lastModifiedDate", now);
+
+            return workflow;
+        }
+
         @TestConfiguration
         @EnableMethodSecurity
         @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
@@ -774,7 +800,7 @@ class ConnectedUserAccessDeciderIntTest {
             ConnectedUserAccessDeciderImpl.class, ConnectedUserConnectionMembership.class,
             ConnectedUserConnectionServiceImpl.class, ConnectedUserProjectServiceImpl.class,
             ConnectedUserProjectWorkflowServiceImpl.class, ConnectedUserServiceImpl.class,
-            ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, CustomRoleScopeResolverImpl.class,
+            ConnectionPermissionScopeProvider.class, CurrentUserResolverImpl.class, CustomRoleScopeResolverImpl.class,
             DataTablePermissionScopeProvider.class, DeploymentPermissionScopeProvider.class,
             ExecutionPermissionScopeProvider.class, IntegrationInstanceServiceImpl.class,
             KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
@@ -782,6 +808,8 @@ class ConnectedUserAccessDeciderIntTest {
             ProjectDeploymentOwnershipResolver.class, ProjectDeploymentServiceImpl.class,
             ProjectDeploymentWorkflowServiceImpl.class, ProjectOwnershipResolver.class,
             ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectServiceImpl.class,
+            ProjectVisibilityPolicy.class,
+            ResourceVisibilityConfiguration.class,
             ProjectWorkflowCallback.class, ProjectWorkflowServiceImpl.class, WorkflowPermissionScopeProvider.class,
             WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class, EmbeddedScopeCacheService.class
         })
@@ -905,7 +933,8 @@ class ConnectedUserAccessDeciderIntTest {
                         ProjectDeploymentFacade.class, projectDeploymentFacade,
                         ProjectDeploymentService.class, projectDeploymentService, ProjectService.class, projectService,
                         ProjectWorkflowFacade.class, projectWorkflowFacade,
-                        ProjectWorkflowService.class, projectWorkflowService, WorkflowService.class, workflowService));
+                        ProjectWorkflowService.class, projectWorkflowService, String.class, "EE",
+                        WorkflowService.class, workflowService));
             }
 
             @Bean

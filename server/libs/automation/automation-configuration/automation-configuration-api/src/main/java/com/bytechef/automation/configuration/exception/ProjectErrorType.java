@@ -25,11 +25,18 @@ import com.bytechef.exception.AbstractErrorType;
 public class ProjectErrorType extends AbstractErrorType {
 
     public static final ProjectErrorType PROJECT_VERSION_NOT_FOUND = new ProjectErrorType(100);
+
     public static final ProjectErrorType PROJECT_VERSION_NOT_PUBLISHED = new ProjectErrorType(101);
+
     public static final ProjectErrorType PROJECT_VERSION_DEPLOYED = new ProjectErrorType(102);
+
     public static final ProjectErrorType PROJECT_VERSION_WORKFLOW_NOT_FOUND = new ProjectErrorType(103);
     public static final ProjectErrorType INVALID_PROJECT_FILE = new ProjectErrorType(104);
     public static final ProjectErrorType INVALID_WORKFLOW_DEFINITION = new ProjectErrorType(105);
+
+    public static final ProjectErrorType INVALID_PROJECT = new ProjectErrorType(104);
+
+    public static final ProjectErrorType UNSUPPORTED_VISIBILITY = new ProjectErrorType(105);
 
     private ProjectErrorType(int errorKey) {
         super(Project.class, errorKey);

@@ -7,9 +7,6 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
-import java.util.stream.Collectors;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,6 +42,8 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -76,6 +75,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -623,6 +623,16 @@ class PermissionServiceIntTest {
 
         assertThat(permissionService.hasWorkspaceScopeForProject(project.getId(), "WORKFLOW_VIEW")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(project.getId(), "WORKFLOW_DELETE")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeForProjectDeniesAProjectThatCannotBeResolved() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.ofWorkspace(workspaceId)));
+
+        assertThat(resourcePermissionService.hasWorkspaceScopeForProject(Long.MAX_VALUE, "WORKFLOW_EDIT")).isFalse();
     }
 
     @Test
@@ -1705,7 +1715,8 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
-            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(), resourceEnvironmentResolvers,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
@@ -1745,7 +1756,8 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
-            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(), resourceEnvironmentResolvers,
+            workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(),
+            resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             embeddedResourceResolverBeanFactory.getBeanProvider(EmbeddedResourceResolver.class),
@@ -1761,7 +1773,8 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
-            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
+            workspaceUserRepository, List.of(resolver("Project", ResourceOwner.ofWorkspace(workspaceId))), List.of(),
+            permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),

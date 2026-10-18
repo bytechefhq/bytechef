@@ -7,9 +7,6 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
-import java.util.stream.Collectors;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,13 +17,19 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
@@ -49,6 +52,7 @@ class ProjectResourceScopeTest {
     private final CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
     private final PermissionScopeRegistry permissionScopeRegistry = mock(PermissionScopeRegistry.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
+    private final ProjectService projectService = mock(ProjectService.class);
     private final WorkspaceScopeCache workspaceScopeCache = mock(WorkspaceScopeCache.class);
     private final WorkspaceUserRepository workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
@@ -74,6 +78,7 @@ class ProjectResourceScopeTest {
     @Test
     void testProjectScopeIsRefusedForAnUnknownProject() {
         when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
+        when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.empty());
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.empty());
         when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
@@ -106,6 +111,7 @@ class ProjectResourceScopeTest {
         project.setWorkspaceId(WORKSPACE_ID);
 
         when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
+        when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.of(project));
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
     }
 
@@ -115,7 +121,7 @@ class ProjectResourceScopeTest {
 
     private PermissionServiceImpl service(List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
+            currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
             workspaceUserRepository, resourceOwnershipResolvers, List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
@@ -125,7 +131,8 @@ class ProjectResourceScopeTest {
 
     private List<ResourceOwnershipResolver> ownershipResolvers() {
         return List.of(new ProjectOwnershipResolver(
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+            mock(UserService.class)));
     }
 
     private static ResourceVisibilityResolver permissiveResolver() {
