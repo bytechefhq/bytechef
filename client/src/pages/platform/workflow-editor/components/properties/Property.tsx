@@ -395,6 +395,7 @@ const Property = ({
                     isFromAi={isFromAi}
                     label={label || name}
                     leadingIcon={typeIcon}
+                    legacyMixed={inputMode.legacyMixed}
                     onSinglePillAbandoned={handleSinglePillAbandoned}
                     onValueChange={handleMentionInputValueChange}
                     path={calculatedPath}

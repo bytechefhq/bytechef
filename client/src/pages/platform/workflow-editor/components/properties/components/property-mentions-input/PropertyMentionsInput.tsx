@@ -60,6 +60,7 @@ interface PropertyMentionsInputProps {
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
+    legacyMixed?: boolean;
     onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
     path?: string;
@@ -97,6 +98,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             isFromAi,
             label,
             leadingIcon,
+            legacyMixed,
             onSinglePillAbandoned,
             onValueChange,
             path,
@@ -364,6 +366,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             isFormulaMode={isFormulaMode}
                             isFromAi={isFromAi}
                             labelId={labelId}
+                            legacyMixed={legacyMixed}
                             onChange={(editorValue) => handleEditorValueChange(editorValue)}
                             onFocus={onFocus}
                             onSinglePillAbandoned={onSinglePillAbandoned}

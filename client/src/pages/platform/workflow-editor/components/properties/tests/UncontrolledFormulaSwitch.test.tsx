@@ -230,6 +230,30 @@ describe('uncontrolled Formula switch', () => {
         expect(editorElement.querySelector('[data-id="trigger_1.total"]')).not.toBeNull();
     });
 
+    it('takes typed text in a legacy value with text around a pill', async () => {
+        const {container} = renderProperty(countProperty, '${trigger_1.count} ms');
+
+        await settle();
+
+        const keyPressEvent = new KeyboardEvent('keypress', {bubbles: true, cancelable: true, charCode: 120, key: 'x'});
+
+        getEditorElement(container).dispatchEvent(keyPressEvent);
+
+        expect(keyPressEvent.defaultPrevented).toBe(false);
+    });
+
+    it('keeps refusing typed text next to a lone pill on an INTEGER field', async () => {
+        const {container} = renderProperty(countProperty, '${trigger_1.count}');
+
+        await settle();
+
+        const keyPressEvent = new KeyboardEvent('keypress', {bubbles: true, cancelable: true, charCode: 120, key: 'x'});
+
+        getEditorElement(container).dispatchEvent(keyPressEvent);
+
+        expect(keyPressEvent.defaultPrevented).toBe(true);
+    });
+
     it.each([
         ['a STRING text field', uriProperty, 'https://example.com'],
         ['an INTEGER field', countProperty, 5],

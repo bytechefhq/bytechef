@@ -65,6 +65,7 @@ interface PropertyMentionsInputEditorProps {
     isFormulaMode?: boolean;
     isFromAi?: boolean;
     labelId?: string;
+    legacyMixed?: boolean;
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
@@ -131,6 +132,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             isFormulaMode,
             isFromAi = false,
             labelId,
+            legacyMixed = false,
             onChange,
             onFocus,
             onSinglePillAbandoned,
@@ -594,7 +596,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         return;
                     }
 
-                    const restrictsToOnePill = singlePill || type !== 'STRING';
+                    const restrictsToOnePill = singlePill || (type !== 'STRING' && !legacyMixed);
 
                     if (restrictsToOnePill && (mentionCount || event.key !== '$')) {
                         event.preventDefault();
