@@ -1,5 +1,6 @@
 import AiHubArtifactRow from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactRow';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {ChevronDownIcon, ChevronUpIcon} from 'lucide-react';
 
@@ -16,7 +17,7 @@ const AiHubArtifactsCard = () => {
 
     const {artifacts, visible, workspaceId} = useAiHubArtifactsCard();
 
-    if (!visible) {
+    if (!visible || !isWorkspaceIdKnown(workspaceId)) {
         return null;
     }
 

@@ -889,7 +889,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             const persistedChatId = aiHubChatsStore.getState().currentChatId;
 
-            if (persistedChatId != null) {
+            if (persistedChatId != null && isWorkspaceIdKnown(currentWorkspaceId)) {
                 queryClient.invalidateQueries({
                     queryKey: AiHubChatsKeys.artifacts(persistedChatId, currentWorkspaceId),
                 });

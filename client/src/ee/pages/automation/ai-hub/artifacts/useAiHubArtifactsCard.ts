@@ -8,7 +8,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 export interface AiHubArtifactsCardStateI {
     artifacts: AiHubChatArtifactI[];
     visible: boolean;
-    workspaceId: number;
+    workspaceId: number | undefined;
 }
 
 /**
