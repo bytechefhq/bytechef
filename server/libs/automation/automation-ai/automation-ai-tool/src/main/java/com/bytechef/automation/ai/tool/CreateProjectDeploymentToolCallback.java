@@ -56,7 +56,7 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "projectId": {"type": "string", "description": "Numeric project id"},
+                    "projectId": {"type": "integer", "description": "Numeric project id"},
                     "projectVersion": {"type": "integer", "description": "A PUBLISHED project version (not the current DRAFT)"},
                     "environment": {"type": "string", "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION"},
                     "name": {"type": "string", "description": "Optional human-readable deployment name"},
