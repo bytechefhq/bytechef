@@ -92,7 +92,7 @@ ByteChef separates two things that are easy to confuse:
 - The **organization role** (`ROLE_ADMIN` / `ROLE_USER`) - the authority assigned on this page. It governs the administrative surfaces: Settings pages, user management, licensing.
 - The **workspace role** - assigned per workspace, and what governs day-to-day work on projects, workflows, connections, and data.
 
-Permissions are scoped to **workspaces**. There are no per-project roles and no per-resource ACLs: a user can be an admin in one workspace, an editor in another, and have no access at all to a third.
+Permissions are scoped to **workspaces**. There are no per-project roles: a user can be an admin in one workspace, an editor in another, and have no access at all to a third. In the Enterprise Edition a project or connection can also be made private and shared with named members; that decides who can see it, while the workspace role still decides what they can do with it. See [Project visibility](/platform/automation/build/workflows/projects#project-visibility) and [Connections](/platform/settings/connections).
 
 ### The built-in workspace roles
 
@@ -233,7 +233,7 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Delete an API collection | `API_PLATFORM_DELETE` | Admin |
 | Delete a data table | `DATA_TABLE_DELETE` | Admin |
 | Delete a knowledge base | `KNOWLEDGE_BASE_DELETE` | Admin |
-| Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE` | Editor |
+| Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE`, **and** being the connection's owner or an organization admin | Editor |
 | View or replace a connection's credentials | Being the connection's creator, plus `CONNECTION_EDIT` | Editor |
 | Enable, disable or update a deployment; stop or restart a job | `DEPLOYMENT_EDIT` | Editor |
 | Create or import a workflow | `WORKFLOW_CREATE` in Development | Editor |
