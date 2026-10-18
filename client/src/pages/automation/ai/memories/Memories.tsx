@@ -391,28 +391,32 @@ const Memories = () => {
                 </div>
             </PageLoader>
 
-            <MemoryDetailDialog
-                memory={viewTarget}
-                onClose={() => setViewTargetId(null)}
-                open={viewTarget !== null}
-                workspaceId={currentWorkspaceId}
-            />
+            {currentWorkspaceId !== undefined && (
+                <>
+                    <MemoryDetailDialog
+                        memory={viewTarget}
+                        onClose={() => setViewTargetId(null)}
+                        open={viewTarget !== null}
+                        workspaceId={currentWorkspaceId}
+                    />
 
-            <MemoryEditDialog
-                environmentId={currentEnvironmentId}
-                memory={editTarget}
-                onClose={() => setEditTargetId(null)}
-                open={editTargetId !== null}
-                workspaceId={currentWorkspaceId}
-            />
+                    <MemoryEditDialog
+                        environmentId={currentEnvironmentId}
+                        memory={editTarget}
+                        onClose={() => setEditTargetId(null)}
+                        open={editTargetId !== null}
+                        workspaceId={currentWorkspaceId}
+                    />
 
-            <MemoryDeleteDialog
-                environmentId={currentEnvironmentId}
-                memory={deleteTarget}
-                onClose={() => setDeleteTargetId(null)}
-                open={deleteTarget !== null}
-                workspaceId={currentWorkspaceId}
-            />
+                    <MemoryDeleteDialog
+                        environmentId={currentEnvironmentId}
+                        memory={deleteTarget}
+                        onClose={() => setDeleteTargetId(null)}
+                        open={deleteTarget !== null}
+                        workspaceId={currentWorkspaceId}
+                    />
+                </>
+            )}
         </LayoutContainer>
     );
 };
