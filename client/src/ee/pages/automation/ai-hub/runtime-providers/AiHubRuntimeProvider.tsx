@@ -744,6 +744,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             const {approval, continuationStarted} = result.resolveAiHubToolApproval;
 
+            useAiHubStore
+                .getState()
+                .markToolApprovalResolved(approvalId, {
+                    executionError: approval.executionError,
+                    status: approval.status,
+                });
+
             if (continuationStarted) {
                 addMessage({content: '', role: 'assistant'});
 
