@@ -1,0 +1,37 @@
+import {AiHubChatArtifactI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {useAiHubChatArtifactsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+
+export interface AiHubArtifactsCardStateI {
+    artifacts: AiHubChatArtifactI[];
+    visible: boolean;
+    workspaceId: number;
+}
+
+/**
+ * Whether the {@link AiHubArtifactsCard} shows, and the artifacts it shows.
+ *
+ * <p>Extracted from the card so {@link AiHubPanel} can answer the same question without rendering it: the card floats
+ * over the transcript, so the thread insets its content by the card's width while it is up. Both callers hit the same
+ * react-query key, so the second call is a cache read.</p>
+ *
+ * <p>The card is hidden whenever the resource panel is open (its tab strip already lists what has been opened, and the
+ * chat pane is too narrow for the overlay), on the home view, and when the chat has no artifacts at all.</p>
+ */
+export default function useAiHubArtifactsCard(): AiHubArtifactsCardStateI {
+    const rightPanelOpen = useAiHubTabsStore((state) => state.rightPanelOpen);
+    const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const enabled = currentChatId != null && currentWorkspaceId != null && !rightPanelOpen;
+
+    const {data: artifacts} = useAiHubChatArtifactsQuery(currentChatId, currentWorkspaceId ?? 0, enabled);
+
+    return {
+        artifacts: artifacts ?? [],
+        visible: enabled && !!artifacts && artifacts.length > 0,
+        workspaceId: currentWorkspaceId,
+    };
+}
