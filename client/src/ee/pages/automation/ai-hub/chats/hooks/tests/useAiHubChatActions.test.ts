@@ -6,8 +6,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiHubChatI} from '../../api/chats.api';
 
-const {cancelAiHubRunMock, deleteChatMock, navigateMock, patchChatMock} = vi.hoisted(() => ({
+const {cancelAiHubRunMock, currentWorkspaceIdRef, deleteChatMock, navigateMock, patchChatMock} = vi.hoisted(() => ({
     cancelAiHubRunMock: vi.fn(),
+    currentWorkspaceIdRef: {current: 3 as number | undefined},
     deleteChatMock: vi.fn(),
     navigateMock: vi.fn(),
     patchChatMock: vi.fn(),
@@ -18,8 +19,8 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
-    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
-        selector({currentWorkspaceId: 3}),
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | undefined}) => unknown) =>
+        selector({currentWorkspaceId: currentWorkspaceIdRef.current}),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -54,6 +55,8 @@ describe('useAiHubChatActions', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        currentWorkspaceIdRef.current = 3;
+
         aiHubChatsStore.setState({chatActivity: {}, currentChatId: 7});
         aiHubRunStateStore.setState({runIdByChat: {}, runningByChat: {}});
         aiHubStore.setState({chatId: 'thread-7', messages: [{content: 'hi', role: 'user'}]});
@@ -68,6 +71,30 @@ describe('useAiHubChatActions', () => {
 
         expect(patchChatMock).toHaveBeenCalledWith({chatId: 7, patch: {status: 'ARCHIVED'}, workspaceId: 3});
         expect(aiHubChatsStore.getState().currentChatId).toBeUndefined();
+    });
+
+    it('sends no chat mutation while the workspace id is unset', () => {
+        currentWorkspaceIdRef.current = undefined;
+
+        const {result} = renderHook(() => useAiHubChatActions());
+
+        act(() => {
+            result.current.archiveChat(CHAT);
+            result.current.unarchiveChat(CHAT);
+            result.current.requestRename(CHAT);
+        });
+
+        act(() => {
+            result.current.submitRename('New title');
+            result.current.requestDelete(CHAT);
+        });
+
+        act(() => {
+            result.current.confirmDelete();
+        });
+
+        expect(patchChatMock).not.toHaveBeenCalled();
+        expect(deleteChatMock).not.toHaveBeenCalled();
     });
 
     it('unarchives a chat', () => {
