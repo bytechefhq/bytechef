@@ -44,6 +44,10 @@ Each entry contains:
 
 **Search** matches the principal and the values in the **Data** map.
 
+### Bulk operations
+
+A single admin action that changes many resources is recorded as one entry that lists them. Reassigning every connection a former member owned, for example, records one `CONNECTION_REASSIGNED` entry whose data holds the affected `connectionIds` and their `connectionCount`.
+
 ## Event types
 
 The **Event type** group of the filter menu is populated from the events your instance has actually recorded. The full set the platform can emit:
@@ -58,7 +62,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_MEMBERSHIPS_REMOVED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Embedded membership** | `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED` |
 | **Custom roles** | `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, `CUSTOM_ROLE_DELETED` |
-| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_PUBLISHED`, `PROJECT_VERSION_DELETED`, `PROJECT_EXPORTED`, `PROJECT_SHARED_EXPORTED`, `PROJECT_IMPORTED`, `PROJECT_TEMPLATE_IMPORTED`, `PROJECT_DUPLICATED`, `PROJECT_SHARED_DELETED`, `PROJECT_VERSION_RESTORED` - publishing records the new project version; a duplicate records the source and the new project |
+| **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED`, `PROJECT_PUBLISHED`, `PROJECT_VERSION_DELETED`, `PROJECT_EXPORTED`, `PROJECT_SHARED_EXPORTED`, `PROJECT_IMPORTED`, `PROJECT_TEMPLATE_IMPORTED`, `PROJECT_DUPLICATED`, `PROJECT_SHARED_DELETED`, `PROJECT_VERSION_RESTORED`, `PROJECT_VISIBILITY_CHANGED`, `PROJECT_ACCESS_GRANTED`, `PROJECT_ACCESS_REVOKED` - publishing records the new project version; a duplicate records the source and the new project |
 | **Workflows** | `WORKFLOW_CREATED`, `WORKFLOW_DELETED`, `WORKFLOW_DUPLICATED`, `WORKFLOW_VERSION_RESTORED`, `WORKFLOW_EXPORTED`, `WORKFLOW_SHARED`, `WORKFLOW_UNSHARED`, `WORKFLOW_TEMPLATE_IMPORTED`, `INTEGRATION_WORKFLOW_CREATED`, `INTEGRATION_WORKFLOW_DELETED`, `AUTOMATION_PERMISSION_EXPRESSION_UPDATED`, `INTEGRATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED` - `AUTOMATION_PERMISSION_EXPRESSION_UPDATED` covers the workflows of embedded automation projects; edits to a workflow definition are not recorded one by one; an export, share or template import records the workflow or template id, never the definition; publishing the project or integration records the result |
 | **Deployments** | `DEPLOYMENT_CREATED`, `DEPLOYMENT_UPDATED`, `DEPLOYMENT_ENABLED_UPDATED`, `DEPLOYMENT_WORKFLOW_ENABLED_UPDATED`, `DEPLOYMENT_WORKFLOW_RUN`, `DEPLOYMENT_DELETED` - enabling or disabling records `enabled` as `true` or `false`; running a workflow by hand records who ran it and the `jobId` |
 | **Git** | `GIT_CONFIGURATION_SAVED`, `PROJECT_GIT_CONFIGURATION_SAVED`, `PROJECT_GIT_PUSHED`, `PROJECT_GIT_PULLED` - a workspace's repository settings, a project's branch and sync flag, and the commit a push created; the repository URL, username and password are never recorded |
@@ -104,6 +108,26 @@ A guarded call that is denied or fails is recorded with `DENIED` or `ERROR` as i
 A successful operation with its own event type, such as `CONNECTION_CREATED` or `USER_DELETED`, is not allowed to change anything without its entry. When it runs in a read-write transaction and its entry cannot be saved, for example because the database rejects the insert, the transaction is rolled back and the call fails with an error saying the audit event could not be recorded. When the operation runs inside a caller's transaction, the caller's transaction is rolled back as well.
 
 The other entries are saved on a best-effort basis: if one cannot be saved, the operation still goes ahead and the server logs an `AUDIT PERSISTENCE FAILURE` line. This covers denied and failed attempts, `PERMISSION_CHECK`, operations that do not run in a read-write transaction, job and trigger events, sign-ins and `CREDENTIAL_USED`.
+
+### Connection and project sharing events
+
+These events are recorded under the login of the user who acted. Every entry also carries `method` (the operation that ran) and `result` (`SUCCESS`, `DENIED` or `ERROR`, or `ROLLED_BACK` when an enclosing transaction rolled back; an error adds `errorClass`), so an attempt the platform refused is recorded as well as one it allowed.
+
+| Event | Recorded when | Data |
+|---|---|---|
+| `CONNECTION_CREATED` | A workspace or organization connection is created. | `connectionId`, `workspaceId` (workspace connections only), `visibility` as stored |
+| `CONNECTION_DELETED` | A workspace or organization connection is deleted. | `connectionId` |
+| `CONNECTION_VISIBILITY_CHANGED` | A connection's visibility is changed. | `connectionId`, `workspaceId`, `fromVisibility`, `toVisibility` |
+| `CONNECTION_ACCESS_GRANTED` | A member is named on a private connection. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_ACCESS_REVOKED` | A member's access to a private connection is removed. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_CREDENTIALS_UPDATED` | A connection's credentials are replaced. No credential values are recorded. | `connectionId` |
+| `CONNECTION_REASSIGNED` | An organization admin gives a connection a new owner. | `connectionId`, `workspaceId`, `newOwnerUserId`; for a bulk reassignment, `previousOwnerUserId`, `connectionIds` and `connectionCount` instead of `connectionId` |
+| `WORKFLOW_PAUSED` | A deployed workflow run is refused because a connection it uses is not active. The `result` is `ERROR`. | `jobPrincipalId` (the project deployment), `workflowId`, `connectionIds`, `connectionStatuses` |
+| `PROJECT_VISIBILITY_CHANGED` | A project's visibility is changed. | `workspaceId`, `projectId`, `fromVisibility`, `toVisibility` |
+| `PROJECT_ACCESS_GRANTED` | A member is named on a private project. | `workspaceId`, `projectId`, `targetUserId` |
+| `PROJECT_ACCESS_REVOKED` | A member's access to a private project is removed. | `workspaceId`, `projectId`, `targetUserId` |
+
+Users are recorded by id, never by email address. `WORKFLOW_PAUSED` for a manual run is recorded under the user who started it; for a run fired by a webhook trigger it is recorded under `anonymousUser`, the principal of the webhook request, and under `SYSTEM` where no security context exists.
 
 ## What is not logged
 
