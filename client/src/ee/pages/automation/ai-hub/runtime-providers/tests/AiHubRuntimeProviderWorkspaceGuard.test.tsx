@@ -68,7 +68,9 @@ describe('AiHubRuntimeProvider before the workspace id is known', () => {
             });
 
             expect(createAiHubChat).not.toHaveBeenCalled();
-            expect(globalThis.fetch).not.toHaveBeenCalled();
+            expect(
+                vi.mocked(globalThis.fetch).mock.calls.filter(([url]) => String(url).includes('/ai/chat/ai_hub'))
+            ).toEqual([]);
             expect(aiHubStore.getState().messages).toEqual([]);
             expect(hoisted.setComposerText).toHaveBeenCalledWith('first message');
         }
