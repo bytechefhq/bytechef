@@ -93,7 +93,23 @@ Existing local accounts are matched by email. Once SSO is live, tick **Enforce S
     Social login is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 </Callout>
 
-In addition to local email/password, users can sign in with **Google** or **GitHub**. Enable it with `bytechef.security.social-login.enabled` (`BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED`) and supply each provider's client id and secret. This is separate from the IdP federation above - social login targets Community Edition and small teams, where a full IdP is overkill.
+In addition to local email/password, users can sign in with **Google** or **GitHub**. Enable it with `bytechef.security.social-login.enabled` (`BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED`) and supply the client id and secret of at least one provider; the server refuses to start with social login enabled and no provider configured. This is separate from the IdP federation above - social login targets Community Edition and small teams, where a full IdP is overkill.
+
+Register these redirect URIs with the providers:
+
+- Google: `{your ByteChef URL}/login/oauth2/code/google`
+- GitHub: `{your ByteChef URL}/login/oauth2/code/github`
+
+The login and sign-up pages show a button only for the providers that have a client id.
+
+**Who can sign in.** A Google or GitHub identity signs in to the ByteChef account with the same email, or the account already linked to it. In a multi-tenant deployment the user lands in the tenant that holds that account. A pending invitation is accepted by signing in with the invited email. Deactivated accounts are refused, and so is a Google account whose email is not verified, so an unverified address cannot take over an existing account.
+
+**Who can sign up.** Social sign-up follows the same rules as email sign-up:
+
+- **Single tenant** - only the first user of an empty instance can sign up, and becomes its administrator. After that, people need an account or an invitation.
+- **Multi tenant** - when sign-up is enabled (`BYTECHEF_SIGN_UP_ENABLED`) and the sign-up webhook accepts the email domain, signing up creates a new tenant with the user as its administrator.
+
+When a sign-in is refused, the login page says why - no account yet, account deactivated, email not verified, sign-up disabled, email domain not allowed, or SSO required for the domain.
 
 ## Two-factor authentication
 

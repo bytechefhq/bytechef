@@ -438,7 +438,7 @@ ceiling is not retryable.
 |---|---|---|
 | `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive). Generated on first start and kept in `~/.bytechef/remember-me-key` when unset. Set it explicitly across replicas, or a remember-me cookie signed by one is rejected by the others. | generated |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED` | Enable social login | `false` |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED` | Enable Google/GitHub social login and sign-up. At least one provider client ID must be set, or the server does not start. Redirect URI: `{public URL}/login/oauth2/code/google` or `/github`. Sign-up follows `BYTECHEF_SIGN_UP_ENABLED` | `false` |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_ID` | Google OAuth2 client ID (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
@@ -461,7 +461,7 @@ System administrator is used for accessing protected data reachable through /act
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED` | Require account activation | `false` |
-| `BYTECHEF_SIGN_UP_ENABLED` | Enable sign up | `true` |
+| `BYTECHEF_SIGN_UP_ENABLED` | Enable sign up, by email or social login. Single tenant: only the first user of an empty instance can sign up regardless. Multi tenant: each sign-up creates a new tenant | `true` |
 
 ## Tenant Configuration
 
