@@ -60,7 +60,7 @@ public class ConfigureMcpServerToolCallback implements ToolCallback {
                 "type": "object",
                 "properties": {
                     "mcpServerId": {
-                        "type": "number",
+                        "type": "integer",
                         "description": "Numeric id of the MCP server whose attached workflows should be mapped."
                     },
                     "instruction": {

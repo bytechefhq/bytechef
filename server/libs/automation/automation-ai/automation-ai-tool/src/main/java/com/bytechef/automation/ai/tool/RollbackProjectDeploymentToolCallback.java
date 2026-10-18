@@ -47,7 +47,7 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         {
             "type": "object",
             "properties": {
-                "projectDeploymentId": {"type": "string", "description": "Numeric project deployment id"},
+                "projectDeploymentId": {"type": "integer", "description": "Numeric project deployment id"},
                 "projectVersion": {"type": "integer", "description": "Target PUBLISHED project version"}
             },
             "required": ["projectDeploymentId", "projectVersion"]
