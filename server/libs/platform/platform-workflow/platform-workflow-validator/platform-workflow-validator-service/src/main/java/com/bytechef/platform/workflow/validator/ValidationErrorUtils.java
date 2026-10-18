@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for building validation messages with consistent formatting.
@@ -26,6 +27,13 @@ import java.util.List;
 class ValidationErrorUtils {
 
     private ValidationErrorUtils() {
+    }
+
+    public static String invalidOptionValue(String propertyPath, String value, List<Object> optionValues) {
+        return "Property '" + propertyPath + "' has value " + value + " that is not one of the allowed options: " +
+            optionValues.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
     }
 
     /**
