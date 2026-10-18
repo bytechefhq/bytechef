@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.user.web.rest.webhook;
 
+import com.bytechef.platform.user.service.SignUpEmailDomainValidator;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +29,7 @@ import org.springframework.web.client.RestClient;
  * @author Ivica Cardic
  */
 @Component
-public class SignUpWebhook {
+public class SignUpWebhook implements SignUpEmailDomainValidator {
 
     private final Resource resource;
     private final RestClient restClient;
@@ -43,6 +44,7 @@ public class SignUpWebhook {
         this.restClient = restClientBuilder.build();
     }
 
+    @Override
     public boolean isEmailDomainValid(String email) {
         if (resource == null || !resource.exists()) {
             return true;

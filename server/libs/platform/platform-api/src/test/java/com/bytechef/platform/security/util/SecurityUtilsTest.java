@@ -22,11 +22,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -53,6 +55,20 @@ class SecurityUtilsTest {
         Optional<String> login = SecurityUtils.fetchCurrentUserLogin();
 
         assertThat(login).contains("admin");
+    }
+
+    @Test
+    void testFetchCurrentUserLoginFromSocialLoginPrincipal() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        AuthenticatedPrincipal authenticatedPrincipal = () -> "admin@example.com";
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                authenticatedPrincipal, null, List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThat(SecurityUtils.fetchCurrentUserLogin()).contains("admin@example.com");
     }
 
     @Test

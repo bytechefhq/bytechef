@@ -16,10 +16,8 @@
 
 package com.bytechef.security.web.oauth2;
 
-import com.bytechef.platform.user.domain.Authority;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.oauth2.SocialUserProvisioner.ProvisionedUser;
+import com.bytechef.security.web.oauth2.SocialUserProvisioner.SocialIdentity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
@@ -32,7 +30,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -54,13 +51,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private static final String GITHUB_EMAILS_URL = "https://api.github.com/user/emails";
 
-    private final AuthorityService authorityService;
     private final RestTemplate restTemplate;
-    private final UserService userService;
+    private final SocialUserProvisioner socialUserProvisioner;
 
     @SuppressFBWarnings("EI")
-    public CustomOAuth2UserService(AuthorityService authorityService, UserService userService) {
-        this.authorityService = authorityService;
+    public CustomOAuth2UserService(SocialUserProvisioner socialUserProvisioner) {
 
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 
@@ -68,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         requestFactory.setReadTimeout(Duration.ofSeconds(5));
 
         this.restTemplate = new RestTemplate(requestFactory);
-        this.userService = userService;
+        this.socialUserProvisioner = socialUserProvisioner;
     }
 
     @Override
@@ -95,19 +90,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Email not available from OAuth2 provider " + registrationId);
         }
 
-        User user = SocialUserResolver.resolveInvitedUser(
-            userService, email, firstName, lastName, imageUrl, registrationId, providerId);
+        ProvisionedUser provisionedUser = socialUserProvisioner.provision(
+            new SocialIdentity(registrationId, providerId, email, firstName, lastName, imageUrl));
 
-        List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
-            .stream()
-            .map(authorityId -> authorityService.fetchAuthority(authorityId)
-                .orElseThrow(() -> new OAuth2AuthenticationException(
-                    "Unknown authority id " + authorityId + " for user " + user.getLogin())))
-            .map(Authority::getName)
-            .map(SimpleGrantedAuthority::new)
-            .toList();
-
-        return new CustomOAuth2User(user.getLogin(), grantedAuthorities, attributes);
+        return new CustomOAuth2User(provisionedUser.login(), provisionedUser.authorities(), attributes);
     }
 
     private String extractEmail(

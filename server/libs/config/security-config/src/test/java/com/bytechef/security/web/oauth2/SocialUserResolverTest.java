@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -37,37 +38,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 class SocialUserResolverTest {
 
     private static final String EMAIL = "someone@example.com";
-
-    @Test
-    void testResolveInvitedUserDisablesAutoProvisioning() {
-        UserService userService = mock(UserService.class);
-
-        when(
-            userService.findOrCreateSocialUser(
-                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(),
-                anyString()))
-                    .thenReturn(new User());
-
-        SocialUserResolver.resolveInvitedUser(
-            userService, EMAIL, "Some", "One", "https://example.com/avatar.png", "GOOGLE", "provider-id");
-
-        ArgumentCaptor<Boolean> autoProvisionCaptor = ArgumentCaptor.forClass(Boolean.class);
-        ArgumentCaptor<String> defaultAuthorityCaptor = ArgumentCaptor.forClass(String.class);
-
-        verify(userService).findOrCreateSocialUser(
-            anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-            autoProvisionCaptor.capture(), defaultAuthorityCaptor.capture());
-
-        assertThat(autoProvisionCaptor.getValue())
-            .as("auto-provisioning must stay off: this path asks for %s, so provisioning through social login would "
-                + "grant instance admin to any account at the configured provider", AuthorityConstants.ADMIN)
-            .isFalse();
-
-        assertThat(defaultAuthorityCaptor.getValue())
-            .as("unused while auto-provisioning is off, but pinned so that turning provisioning on here has to be a "
-                + "reviewed change rather than a silent grant of %s", AuthorityConstants.ADMIN)
-            .isEqualTo(AuthorityConstants.ADMIN);
-    }
 
     @Test
     void testResolveUserPassesProvisioningSettingsThrough() {
@@ -102,7 +72,7 @@ class SocialUserResolverTest {
     }
 
     @Test
-    void testResolveInvitedUserRejectsUnknownEmail() {
+    void testResolveUserRejectsRefusedProvisioning() {
         UserService userService = mock(UserService.class);
 
         IllegalStateException illegalStateException = new IllegalStateException("Auto-provisioning is disabled");
@@ -116,9 +86,30 @@ class SocialUserResolverTest {
         // The failure has to arrive as an AuthenticationException, or OAuth2AuthenticationFailureHandler never sees it
         // and the unknown-account case surfaces as a 500 instead of a redirect back to the login page.
         assertThatThrownBy(
-            () -> SocialUserResolver.resolveInvitedUser(
-                userService, EMAIL, "Some", "One", "https://example.com/avatar.png", "GOOGLE", "provider-id"))
+            () -> SocialUserResolver.resolveUser(
+                userService, EMAIL, "Some", "One", "https://example.com/avatar.png", "GOOGLE", "provider-id", false,
+                AuthorityConstants.ADMIN))
                     .isInstanceOf(OAuth2AuthenticationException.class)
                     .hasCause(illegalStateException);
+    }
+
+    @Test
+    void testResolveUserMapsDeactivatedAccountToAccountDisabled() {
+        UserService userService = mock(UserService.class);
+
+        when(
+            userService.findOrCreateSocialUser(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyBoolean(),
+                anyString()))
+                    .thenThrow(new UserNotActivatedException("deactivated"));
+
+        assertThatThrownBy(
+            () -> SocialUserResolver.resolveUser(
+                userService, EMAIL, "Some", "One", "https://example.com/avatar.png", "GOOGLE", "provider-id", false,
+                AuthorityConstants.ADMIN))
+                    .isInstanceOf(OAuth2AuthenticationException.class)
+                    .extracting(exception -> ((OAuth2AuthenticationException) exception).getError()
+                        .getErrorCode())
+                    .isEqualTo(SocialUserResolver.ACCOUNT_DISABLED_ERROR_CODE);
     }
 }
