@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -255,7 +256,7 @@ class AiHubChatServiceTest {
         List<SessionEvent> events =
             List.of(sessionEvent(MessageType.USER, "Hello", now));
 
-        when(sessionService.getEvents(THREAD_ID, EventFilter.active())).thenReturn(events);
+        when(sessionService.getEvents(THREAD_ID, EventFilter.all())).thenReturn(events);
 
         List<AiHubChatMessage> messages = chatService.loadMessages(1L, WORKSPACE_ID, USER_ID);
 
@@ -264,6 +265,33 @@ class AiHubChatServiceTest {
             .role()).isEqualTo("USER");
         assertThat(messages.get(0)
             .content()).isEqualTo("Hello");
+    }
+
+    @Test
+    void testLoadMessagesKeepsTheLatestMessagesInConversationOrderWhenTheChatExceedsTheLimit() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        Instant start = Instant.parse("2026-04-23T10:00:00Z");
+
+        List<SessionEvent> events = IntStream.range(0, 502)
+            .mapToObj(index -> sessionEvent(
+                index % 2 == 0 ? MessageType.USER : MessageType.ASSISTANT, "message " + index,
+                start.plusSeconds(index)))
+            .toList();
+
+        when(sessionService.getEvents(THREAD_ID, EventFilter.all())).thenReturn(events);
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(1L, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).hasSize(500);
+        assertThat(messages.getFirst()
+            .content()).isEqualTo("message 2");
+        assertThat(messages.getLast()
+            .content()).isEqualTo("message 501");
+        assertThat(messages).extracting(AiHubChatMessage::timestamp)
+            .isSorted();
     }
 
     @Test

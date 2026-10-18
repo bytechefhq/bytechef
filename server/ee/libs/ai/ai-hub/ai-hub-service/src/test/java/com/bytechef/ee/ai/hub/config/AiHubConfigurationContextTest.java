@@ -45,6 +45,7 @@ import com.bytechef.ee.ai.hub.chat.TitleGenerationService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatArtifactRepository;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatArtifactGraphQlController;
@@ -52,6 +53,7 @@ import com.bytechef.ee.ai.hub.web.graphql.AiHubChatGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalRuleGraphQlController;
 import com.bytechef.platform.user.service.UserService;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
@@ -59,6 +61,7 @@ import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -157,6 +160,26 @@ class AiHubConfigurationContextTest {
                 .hasMessageContaining("buildWorkflow")
                 .hasMessageContaining("bytechef.ai.hub.enabled")
                 .hasMessageContaining("bytechef.ai.copilot.enabled"));
+    }
+
+    @Test
+    void testBothAgentsRegisterTheTurnEndingToolResultAdvisor() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                for (String agentBeanName : List.of("aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent")) {
+                    AiHubSpringAIAgent agent = context.getBean(agentBeanName, AiHubSpringAIAgent.class);
+
+                    List<?> advisors = (List<?>) ReflectionTestUtils.getField(agent, "advisors");
+
+                    assertThat(advisors).as(agentBeanName)
+                        .hasAtLeastOneElementOfType(AiHubTurnEndingToolResultAdvisor.class);
+                }
+            });
     }
 
     @Test
