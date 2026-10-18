@@ -134,13 +134,14 @@ describe('chats.api', () => {
         mockGraphQlResponse({
             aiHubToolApprovals: [
                 {
+                    arguments: '{"workflowId":"wf-1"}',
                     chatId: '101',
                     comment: null,
                     componentName: null,
                     decidedAt: null,
                     decidedByUserId: '3',
                     executionError: null,
-                    expiresAt: null,
+                    expiresAt: 1716000000000,
                     id: '4',
                     status: 'APPROVED',
                     toolName: 'deleteWorkflow',
@@ -152,9 +153,11 @@ describe('chats.api', () => {
 
         expect(approvals).toEqual([
             {
+                arguments: '{"workflowId":"wf-1"}',
                 componentName: null,
                 decidedByUserId: 3,
                 executionError: null,
+                expiresAt: new Date(1716000000000).toISOString(),
                 id: 4,
                 status: 'APPROVED',
                 toolName: 'deleteWorkflow',
