@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import OrganizationConnectionDeleteDialog from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionDeleteDialog';
 import OrganizationConnectionsTable from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionsTable';
@@ -169,6 +170,7 @@ const OrganizationConnections = () => {
                     connectionsQueryKey={ConnectionKeys.connections}
                     fixedVisibility="ORGANIZATION"
                     onClose={() => setIsCreateDialogOpen(false)}
+                    platformType={PlatformType.AUTOMATION}
                     useCreateConnectionMutation={useCreateOrganizationConnectionAdapter}
                     useGetConnectionTagsQuery={() => connectionTagsQueryResult}
                 />
