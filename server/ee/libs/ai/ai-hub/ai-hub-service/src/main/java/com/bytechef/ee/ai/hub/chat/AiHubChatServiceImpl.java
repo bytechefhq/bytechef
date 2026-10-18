@@ -23,8 +23,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +64,6 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private static final int LIST_LIMIT = 100;
 
     private static final int MESSAGE_LIMIT = 500;
-
-    private static final EventFilter TOOL_EVENTS_FILTER = EventFilter.builder()
-        .messageTypes(Set.of(MessageType.TOOL))
-        .build();
 
     private final AiHubChatRepository chatRepository;
     private final AiHubChatAccessPolicy accessPolicy;
@@ -164,9 +160,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         List<SessionEvent> allEvents = withDisplayOnlyToolResults(
             sessionMemory.sessionService()
-                .getEvents(chat.getThreadId(), EventFilter.active()),
-            sessionMemory.sessionService()
-                .getEvents(chat.getThreadId(), TOOL_EVENTS_FILTER));
+                .getEvents(chat.getThreadId(), EventFilter.all()));
 
         List<SessionEvent> visibleEvents = new ArrayList<>();
         List<List<Map<String, String>>> toolEventsPerRow = new ArrayList<>();
@@ -213,61 +207,58 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return messages;
     }
 
-    private static List<SessionEvent> withDisplayOnlyToolResults(
-        List<SessionEvent> activeEvents, List<SessionEvent> toolEvents) {
+    private static List<SessionEvent> withDisplayOnlyToolResults(List<SessionEvent> events) {
+        List<SessionEvent> mergedEvents = new ArrayList<>(events.size());
+        Map<String, Integer> openToolCallCounts = new HashMap<>();
 
-        List<SessionEvent> displayOnlyEvents = new ArrayList<>(toolEvents.stream()
-            .filter(AiHubTurnEndingToolResultAdvisor::isDisplayOnly)
-            .filter(event -> event.getMessage() instanceof ToolResponseMessage)
-            .toList());
+        for (SessionEvent event : events) {
+            Message message = event.getMessage();
 
-        if (displayOnlyEvents.isEmpty()) {
-            return activeEvents;
-        }
+            if (!event.isArchived()) {
+                mergedEvents.add(event);
 
-        Set<String> answeredToolCallIds = new HashSet<>();
+                if (message instanceof AssistantMessage assistantMessage) {
+                    for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
+                        if (toolCall.id() != null && !toolCall.id()
+                            .isBlank()) {
 
-        for (SessionEvent event : activeEvents) {
-            if (event.getMessage() instanceof ToolResponseMessage toolResponseMessage) {
-                toolResponseMessage.getResponses()
-                    .forEach(toolResponse -> answeredToolCallIds.add(toolResponse.id()));
-            }
-        }
+                            openToolCallCounts.merge(toolCall.id(), 1, Integer::sum);
+                        }
+                    }
+                } else if (message instanceof ToolResponseMessage toolResponseMessage) {
+                    toolResponseMessage.getResponses()
+                        .forEach(toolResponse -> closeToolCall(openToolCallCounts, toolResponse.id()));
+                }
 
-        List<SessionEvent> mergedEvents = new ArrayList<>(activeEvents.size() + displayOnlyEvents.size());
-
-        for (SessionEvent event : activeEvents) {
-            mergedEvents.add(event);
-
-            if (!(event.getMessage() instanceof AssistantMessage assistantMessage)
-                || !assistantMessage.hasToolCalls()) {
                 continue;
             }
 
-            Set<String> toolCallIds = new HashSet<>();
+            if (!AiHubTurnEndingToolResultAdvisor.isDisplayOnly(event)
+                || !(message instanceof ToolResponseMessage toolResponseMessage)) {
 
-            assistantMessage.getToolCalls()
-                .forEach(toolCall -> toolCallIds.add(toolCall.id()));
+                continue;
+            }
 
-            for (Iterator<SessionEvent> iterator = displayOnlyEvents.iterator(); iterator.hasNext();) {
-                SessionEvent displayOnlyEvent = iterator.next();
+            List<ToolResponseMessage.ToolResponse> toolResponses = toolResponseMessage.getResponses();
 
-                List<ToolResponseMessage.ToolResponse> toolResponses =
-                    ((ToolResponseMessage) displayOnlyEvent.getMessage()).getResponses();
+            boolean answersOpenToolCalls = !toolResponses.isEmpty() && toolResponses.stream()
+                .allMatch(toolResponse -> toolResponse.id() != null && !toolResponse.id()
+                    .isBlank() && openToolCallCounts.getOrDefault(toolResponse.id(), 0) > 0);
 
-                boolean answersThisCall = !toolResponses.isEmpty() && toolResponses.stream()
-                    .allMatch(toolResponse -> toolCallIds.contains(toolResponse.id())
-                        && !answeredToolCallIds.contains(toolResponse.id()));
+            if (answersOpenToolCalls) {
+                mergedEvents.add(event);
 
-                if (answersThisCall) {
-                    mergedEvents.add(displayOnlyEvent);
-
-                    iterator.remove();
-                }
+                toolResponses.forEach(toolResponse -> closeToolCall(openToolCallCounts, toolResponse.id()));
             }
         }
 
         return mergedEvents;
+    }
+
+    private static void closeToolCall(Map<String, Integer> openToolCallCounts, @Nullable String toolCallId) {
+        if (toolCallId != null) {
+            openToolCallCounts.computeIfPresent(toolCallId, (id, count) -> count > 1 ? count - 1 : null);
+        }
     }
 
     private static void appendToolEvents(List<Map<String, String>> target, SessionEvent event) {
