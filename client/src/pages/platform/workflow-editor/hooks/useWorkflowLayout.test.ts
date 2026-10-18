@@ -1,4 +1,5 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useCopilotWorkflowEditorBinding from '@/shared/components/copilot/hooks/useCopilotWorkflowEditorBinding';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {act, renderHook} from '@testing-library/react';
@@ -95,5 +96,31 @@ describe('useWorkflowLayout', () => {
             parameters: {},
             source: Source.WORKFLOW_EDITOR,
         });
+    });
+
+    it('reopens the Copilot in Ask with an empty transcript after switching workflows while the panel was closed', () => {
+        useCopilotStore.setState({
+            context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
+            messages: [{content: 'build workflow A', role: 'user'}],
+            workflowEditorWorkflowKey: undefined,
+        });
+
+        const {rerender} = renderHook(({workflowKey}) => useCopilotWorkflowEditorBinding(workflowKey), {
+            initialProps: {workflowKey: 'project:1:2'},
+        });
+
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '3'};
+
+        rerender({workflowKey: 'project:1:3'});
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context.mode).toBe(MODE.ASK);
+        expect(useCopilotStore.getState().messages).toEqual([]);
+        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
     });
 });
