@@ -1,0 +1,3 @@
+mutation truncateAiHubChatMessages($workspaceId: ID!, $id: ID!, $messageId: String!, $keepMessage: Boolean!) {
+    truncateAiHubChatMessages(workspaceId: $workspaceId, id: $id, messageId: $messageId, keepMessage: $keepMessage)
+}

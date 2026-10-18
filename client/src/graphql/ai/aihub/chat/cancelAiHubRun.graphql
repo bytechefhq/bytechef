@@ -1,0 +1,3 @@
+mutation cancelAiHubRun($workspaceId: ID!, $id: ID!, $runId: String) {
+    cancelAiHubRun(workspaceId: $workspaceId, id: $id, runId: $runId)
+}

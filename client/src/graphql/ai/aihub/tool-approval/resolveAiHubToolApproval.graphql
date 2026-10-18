@@ -1,0 +1,11 @@
+mutation resolveAiHubToolApproval($workspaceId: ID!, $approvalId: ID!, $approved: Boolean!, $comment: String) {
+    resolveAiHubToolApproval(workspaceId: $workspaceId, approvalId: $approvalId, approved: $approved, comment: $comment) {
+        continuationStarted
+        runId
+        approval {
+            id
+            status
+            executionError
+        }
+    }
+}
