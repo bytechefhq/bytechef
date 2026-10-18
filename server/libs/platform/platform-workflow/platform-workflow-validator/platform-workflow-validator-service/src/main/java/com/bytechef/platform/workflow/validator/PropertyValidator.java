@@ -235,7 +235,7 @@ class PropertyValidator {
         } else if ("ARRAY".equalsIgnoreCase(type)) {
             ArrayPropertyValidator.validate(valueJsonNode, propertyInfo, propertyPath, errors, warnings);
         } else {
-            TypeValidator.validateType(valueJsonNode, type, propertyPath, errors);
+            TypeValidator.validateType(valueJsonNode, propertyInfo, propertyPath, errors, warnings);
         }
     }
 
