@@ -300,11 +300,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     record SelectedLlm(String provider, String model) {
     }
 
-    /**
-     * Returns the per-request {@link ChatClient} from the override resolver, falling back to the builder-time default
-     * only when no resolver is registered or it returns null. A resolver failure is rethrown so the turn ends with a
-     * RUN_ERROR.
-     */
+    @Override
+    protected boolean splitsTextAtToolCalls() {
+        return true;
+    }
+
     @Override
     protected @Nullable String runErrorCode(RunAgentInput input, Throwable throwable) {
         CopilotRunErrorCode copilotRunErrorCode = CopilotRunErrorCode.of(throwable);
@@ -312,6 +312,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         return copilotRunErrorCode == null ? null : copilotRunErrorCode.name();
     }
 
+    /**
+     * Returns the per-request {@link ChatClient} from the override resolver, falling back to the builder-time default
+     * only when no resolver is registered or it returns null. A resolver failure is rethrown so the turn ends with a
+     * RUN_ERROR.
+     */
     @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
         if (overrideChatClientResolver == null) {
