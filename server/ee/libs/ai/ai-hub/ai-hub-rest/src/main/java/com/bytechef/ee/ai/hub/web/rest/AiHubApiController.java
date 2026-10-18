@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -169,6 +170,7 @@ public class AiHubApiController {
     @ExceptionHandler(TurnInFlightException.class)
     public ResponseEntity<Map<String, Object>> handleTurnInFlight(TurnInFlightException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", "TURN_IN_FLIGHT"));
     }
 
@@ -178,17 +180,20 @@ public class AiHubApiController {
         String reason = exception.getReason();
 
         if (reason == null) {
-            return ResponseEntity.status(statusCode)
-                .build();
+            HttpStatus httpStatus = HttpStatus.resolve(statusCode.value());
+
+            reason = httpStatus == null ? String.valueOf(statusCode.value()) : httpStatus.getReasonPhrase();
         }
 
         return ResponseEntity.status(statusCode)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", reason));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", "Access denied"));
     }
 
@@ -197,6 +202,7 @@ public class AiHubApiController {
         log.error("Unexpected runtime exception in AiHubApiController: {}", exception.toString(), exception);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", "An unexpected error occurred while dispatching the agent"));
     }
 

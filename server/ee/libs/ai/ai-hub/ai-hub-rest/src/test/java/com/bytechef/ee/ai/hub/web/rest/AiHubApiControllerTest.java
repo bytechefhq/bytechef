@@ -21,11 +21,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.RunAgentParameters;
 import com.agui.core.state.State;
 import com.agui.core.tool.Tool;
+import com.agui.json.ObjectMapperFactory;
 import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -49,7 +55,12 @@ import org.mockito.InOrder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tools.jackson.databind.json.JsonMapper;
@@ -109,6 +120,26 @@ class AiHubApiControllerTest {
             new AiHubChatStreamer(inFlightRunRegistry, new JsonMapper()), inFlightRunRegistry,
             List.of(askAgent, buildAgent), chatService,
             accessPolicy, userService, permissionServiceProvider, toolApprovalService);
+    }
+
+    @Test
+    void testResponseStatusWithoutAReasonStillAnswersWithAnErrorBody() {
+        ResponseEntity<Map<String, String>> responseEntity =
+            controller.handleResponseStatus(new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(responseEntity.getHeaders()
+            .getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(responseEntity.getBody()).isEqualTo(Map.of("error", "Forbidden"));
+    }
+
+    @Test
+    void testResponseStatusWithAReasonAnswersWithTheReason() {
+        ResponseEntity<Map<String, String>> responseEntity = controller.handleResponseStatus(
+            new ResponseStatusException(HttpStatus.FORBIDDEN, "Workspace is not accessible to the current user"));
+
+        assertThat(responseEntity.getBody()).isEqualTo(
+            Map.of("error", "Workspace is not accessible to the current user"));
     }
 
     @Test
@@ -368,6 +399,77 @@ class AiHubApiControllerTest {
     }
 
     @Test
+    void testSecondConcurrentTurnOverHttpUnderEventStreamAcceptIs409Json() throws Exception {
+        stubExistingChat(chat(OWNER_USER_ID, WORKSPACE_ID));
+
+        inFlightRunRegistry.tryStart(THREAD_ID, "run-1");
+
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"ASK\",\"workspaceId\":" + WORKSPACE_ID + "}")))
+            .andExpect(status().isConflict())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("TURN_IN_FLIGHT"));
+
+        verify(askAgent, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testTurnWithoutAWorkspaceOverHttpUnderEventStreamAcceptIs400Json() throws Exception {
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"ASK\"}")))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("Missing workspaceId in request state"));
+    }
+
+    @Test
+    void testAttachWithoutARunOverHttpUnderEventStreamAcceptIs404Json() throws Exception {
+        when(chatService.findByThreadIdViewable(THREAD_ID, OWNER_USER_ID))
+            .thenReturn(Optional.of(chat(OWNER_USER_ID, WORKSPACE_ID)));
+
+        mockMvc().perform(
+            get("/internal/ai/chat/ai_hub/{threadId}/attach", THREAD_ID)
+                .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("No in-flight run for thread"));
+    }
+
+    @Test
+    void testAccessDeniedOverHttpUnderEventStreamAcceptIs403Json() throws Exception {
+        when(chatService.findByThreadId(THREAD_ID)).thenThrow(new AccessDeniedException("Not your chat"));
+
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"ASK\",\"workspaceId\":" + WORKSPACE_ID + "}")))
+            .andExpect(status().isForbidden())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("Access denied"));
+    }
+
+    @Test
+    void testUnexpectedFailureOverHttpUnderEventStreamAcceptIs500Json() throws Exception {
+        when(chatService.findByThreadId(THREAD_ID)).thenThrow(new IllegalStateException("database down"));
+
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"ASK\",\"workspaceId\":" + WORKSPACE_ID + "}")))
+            .andExpect(status().isInternalServerError())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("An unexpected error occurred while dispatching the agent"));
+    }
+
+    @Test
     void testAttachAnswersAnUnknownAndANonViewableThreadIdentically() {
         when(chatService.findByThreadIdViewable("unknown-thread", OWNER_USER_ID)).thenReturn(Optional.empty());
         when(chatService.findByThreadIdViewable(THREAD_ID, OWNER_USER_ID)).thenReturn(Optional.empty());
@@ -426,6 +528,21 @@ class AiHubApiControllerTest {
             .thenReturn(Optional.of(chat(OWNER_USER_ID, WORKSPACE_ID)));
 
         assertStatus(() -> controller.attach(THREAD_ID), HttpStatus.NOT_FOUND);
+    }
+
+    private MockMvc mockMvc() {
+        JsonMapper jsonMapper = JsonMapper.builder()
+            .addModule(ObjectMapperFactory.createModule())
+            .build();
+
+        return MockMvcBuilders.standaloneSetup(controller)
+            .setMessageConverters(new JacksonJsonHttpMessageConverter(jsonMapper))
+            .build();
+    }
+
+    private static String chatRequestBody(String stateJson) {
+        return "{\"threadId\":\"" + THREAD_ID + "\",\"runId\":\"run-2\",\"messages\":[],\"state\":" + stateJson +
+            "}";
     }
 
     private void stubExistingChat(AiHubChat chat) {
