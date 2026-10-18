@@ -19,6 +19,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import useCopilotWorkflowEditorBinding from '@/shared/components/copilot/hooks/useCopilotWorkflowEditorBinding';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
@@ -142,6 +143,14 @@ const WorkflowEditorLayout = ({
 
     const queryClient = useQueryClient();
     const {integrationId, integrationWorkflowId, projectId, projectWorkflowId} = useParams();
+
+    useCopilotWorkflowEditorBinding(
+        integrationWorkflowId
+            ? `integration:${integrationId}:${integrationWorkflowId}`
+            : projectWorkflowId
+              ? `project:${projectId}:${projectWorkflowId}`
+              : undefined
+    );
 
     const handleClosePlayground = useCallback(() => {
         setTestingPanelOpen(false);
