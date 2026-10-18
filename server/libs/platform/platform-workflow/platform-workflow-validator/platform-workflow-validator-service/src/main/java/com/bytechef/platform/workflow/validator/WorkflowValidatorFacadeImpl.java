@@ -28,6 +28,7 @@ import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -44,6 +45,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.BaseOption;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -839,7 +841,36 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return new PropertyInfo(
             baseProperty.getName(), type, baseProperty.getDescription(), baseProperty.getRequired(),
             baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), null, nestedPropertyInfos,
-            resourceType);
+            resourceType, getFixedOptionValues(baseProperty));
+    }
+
+    @Nullable
+    private static List<Object> getFixedOptionValues(BaseProperty baseProperty) {
+        boolean optionsDataSourcePresent = baseProperty instanceof OptionsDataSourceAware optionsDataSourceAware &&
+            optionsDataSourceAware.getOptionsDataSource() != null;
+
+        List<? extends BaseOption> options = switch (baseProperty) {
+            case ArrayProperty arrayProperty -> arrayProperty.getOptions();
+            case com.bytechef.platform.component.domain.BooleanProperty booleanProperty ->
+                booleanProperty.getOptions();
+            case com.bytechef.platform.component.domain.IntegerProperty integerProperty ->
+                integerProperty.getOptions();
+            case com.bytechef.platform.component.domain.NumberProperty numberProperty -> numberProperty.getOptions();
+            case com.bytechef.platform.component.domain.StringProperty stringProperty -> stringProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty ->
+                arrayProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty booleanProperty ->
+                booleanProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty integerProperty ->
+                integerProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty numberProperty ->
+                numberProperty.getOptions();
+            case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty stringProperty ->
+                stringProperty.getOptions();
+            default -> List.of();
+        };
+
+        return PropertyInfo.toFixedOptionValues(options, optionsDataSourcePresent);
     }
 
     private record NodeOutputMaps(Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
