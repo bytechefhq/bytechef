@@ -1,0 +1,3 @@
+mutation deleteAiHubChatArtifact($input: DeleteAiHubChatArtifactInput!) {
+    deleteAiHubChatArtifact(input: $input)
+}
