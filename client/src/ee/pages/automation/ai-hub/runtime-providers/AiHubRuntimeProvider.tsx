@@ -1,6 +1,7 @@
 import {createAiHubChat, generateAiHubChatTitle, patchChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {attachToInFlightRun} from '@/ee/pages/automation/ai-hub/runtime-providers/inFlightRunClient';
 import {
@@ -40,6 +41,8 @@ import {useShallow} from 'zustand/react/shallow';
 const AI_HUB_AGENT_ID = 'AI_HUB';
 
 export const TURN_IN_FLIGHT_MESSAGE = 'A turn is already running in this chat.';
+
+export const WORKSPACE_NOT_READY_MESSAGE = 'The workspace is still loading. Send again in a moment.';
 
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
@@ -744,12 +747,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             const {approval, continuationStarted} = result.resolveAiHubToolApproval;
 
-            useAiHubStore
-                .getState()
-                .markToolApprovalResolved(approvalId, {
-                    executionError: approval.executionError,
-                    status: approval.status,
-                });
+            useAiHubStore.getState().markToolApprovalResolved(approvalId, {
+                executionError: approval.executionError,
+                status: approval.status,
+            });
 
             if (continuationStarted) {
                 addMessage({content: '', role: 'assistant'});
@@ -904,6 +905,14 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         const input = message.content[0].text;
+
+        if (!isWorkspaceIdKnown(currentWorkspaceId)) {
+            toast.info(WORKSPACE_NOT_READY_MESSAGE);
+
+            runtime.thread.composer.setText(input);
+
+            return;
+        }
 
         if (!agent) {
             const errorMessage = 'AI Hub is not ready: missing chat id.';

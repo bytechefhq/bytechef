@@ -14,9 +14,9 @@ import {AiHubChatsKeys} from './useChats';
  * exists, and a per-mount seen set keeps a single open tab from re-firing the mutation across re-renders; the set is
  * cleared when the chat switches.</p>
  *
- * <p>Skips the home view, skips until the workspace store holds a real workspace id, and skips while the tabs store still mirrors another chat: on a switch this hook sees the new
- * {@code chatId} before the tabs store has swapped in that chat's tabs, and recording then would file the previous
- * chat's tabs under the new one.</p>
+ * <p>Skips the home view, skips until the workspace store holds a real workspace id, and skips while the tabs store
+ * still mirrors another chat: on a switch this hook sees the new {@code chatId} before the tabs store has swapped in
+ * that chat's tabs, and recording then would file the previous chat's tabs under the new one.</p>
  */
 export default function useRecordReferencedArtifacts(chatId: number | undefined, workspaceId: number | undefined) {
     const seenRef = useRef<Set<string>>(new Set());
