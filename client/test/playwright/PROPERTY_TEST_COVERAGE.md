@@ -7,7 +7,7 @@ Date: 2026-09-14
 
 ## Existing specs
 
-All live in `client/test/playwright/tests/properties/` (116 tests total).
+All live in `client/test/playwright/tests/properties/` (158 tests total).
 
 | Spec                                | Node exercised         | Tests | Sub-issue            |
 | ----------------------------------- | ---------------------- | ----- | -------------------- |
@@ -20,6 +20,7 @@ All live in `client/test/playwright/tests/properties/` (116 tests total).
 | `propertyOptions.spec.ts`           | `propertyTesting_1`    | 22    | untracked            |
 | `dataPillArrayIndex.spec.ts`        | `propertyTesting_1`    | 10    | #1629                |
 | `propertyMentions.spec.ts`          | `propertyTesting_1`    | 4     | untracked            |
+| `propertyFormulaModes.spec.ts`      | `propertyTesting_1`    | 42    | untracked            |
 
 Open sub-issues:
 
@@ -120,3 +121,18 @@ property.
 - The per-badge remove and "+ N more" clear buttons in `MultiSelect.tsx` were inert: the icons were
   direct `svg` children of `Badge`, whose base style sets `[&>svg]:pointer-events-none`, which beat the
   `[&_svg]:pointer-events-auto` on the trigger button. Both icons are now wrapped in a clickable `span`.
+
+## Behaviour uncovered by `propertyFormulaModes.spec.ts`
+
+The spec found four places where the editor did not behave as the Text/Formula modes design says; all are fixed:
+
+- Deleting the last pill of a one-pill editor brought the native input back without focusing it.
+- Clicking a pill in the panel blurred a STRING select's Dynamic editor, which dropped the text typed before the pill.
+  Text without a pill now stays in the editor until a pill joins it, unless a value was already saved.
+- Turning Dynamic off right after deleting a pill cancelled the pending save, so the deleted pill stayed stored.
+- A legacy non-string value that mixes a pill with text (`${a} ms`) showed in the editor, but typing was blocked,
+  because the keypress guard applied the one-pill rule to every type that is not STRING.
+
+Not covered, because the automation workflow editor cannot reach them: `fromAi` values and controlled forms (tools
+cluster elements, MCP tool forms, AI Hub connector tools with `formulaEnabled={false}`), and properties with
+`expressionEnabled: false`, which `PropertyTestingAction` does not declare.
