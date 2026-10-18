@@ -24,9 +24,11 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
@@ -48,9 +50,11 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -102,6 +106,38 @@ class CopilotConfigurationTest {
             .doesNotHaveDuplicates()
             .allSatisfy(agentId -> assertThat(copilotAgentTypeKeys).contains(agentId))
             .contains("workflow_code_editor_ask", "workflow_code_editor_build", "converter_build", "mcp_server_build");
+    }
+
+    @Test
+    void testBuildWorkflowSubAgentPromptForbidsInventedLookupOptions() {
+        CopilotConfiguration configuration = new CopilotConfiguration(
+            PROMPT_RESOURCE, new ClassPathResource("prompt_workflow_editor_build.txt"),
+            new ClassPathResource("prompt_workflow_editor_build_sub_agent.txt"), PROMPT_RESOURCE, PROMPT_RESOURCE,
+            PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+            PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+            mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
+            mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
+            mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
+            mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
+            mock(ScopedConnectionGuard.class));
+
+        LookupComponentPropertyOptionsToolCallback lookupComponentPropertyOptionsToolCallback =
+            new LookupComponentPropertyOptionsToolCallback(
+                mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class),
+                mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class),
+                mock(PropertyOptionsResolver.class), ToolStateVisibilityMetrics.NOOP,
+                mock(ScopedConnectionGuard.class));
+
+        ToolDefinition lookupToolDefinition = lookupComponentPropertyOptionsToolCallback.getToolDefinition();
+
+        String subAgentSystemPrompt = configuration.buildWorkflowSubAgentSystemPrompt();
+
+        assertThat(subAgentSystemPrompt)
+            .contains("Your only option lookup tool is " + lookupToolDefinition.name())
+            .doesNotContain("lookupComponentPropertyOptions")
+            .contains("NEVER invent values for a property whose options come from a lookup")
+            .contains("do not ask with made-up choices")
+            .contains("Fixed options listed in the property definition itself may be offered as they are");
     }
 
     private Object invokeWithStubs(Method method) throws ReflectiveOperationException {
