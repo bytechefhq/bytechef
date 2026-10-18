@@ -48,7 +48,7 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
                 "type": "object",
                 "properties": {
                     "mcpProjectId": {"type": "integer", "description": "Source MCP project id. Never invent ids."},
-                    "targetMcpServerId": {"type": "string", "description": "Numeric MCP server id where the clone should land. May equal the source's server."}
+                    "targetMcpServerId": {"type": "integer", "description": "Numeric MCP server id where the clone should land. May equal the source's server."}
                 },
                 "required": ["mcpProjectId", "targetMcpServerId"]
             }""";

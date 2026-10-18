@@ -47,8 +47,8 @@ public class CreateMcpProjectToolCallback implements ToolCallback {
         {
             "type": "object",
             "properties": {
-                "mcpServerId": {"type": "string", "description": "Numeric MCP server id"},
-                "projectId": {"type": "string", "description": "Numeric project id"},
+                "mcpServerId": {"type": "integer", "description": "Numeric MCP server id"},
+                "projectId": {"type": "integer", "description": "Numeric project id"},
                 "projectVersion": {"type": "integer", "description": "PUBLISHED project version"},
                 "workflowIds": {
                     "type": "array",
