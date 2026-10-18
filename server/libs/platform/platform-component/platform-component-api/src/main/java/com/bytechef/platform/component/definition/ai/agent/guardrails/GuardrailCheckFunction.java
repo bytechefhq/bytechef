@@ -54,4 +54,16 @@ public interface GuardrailCheckFunction extends StagedGuardrail {
             .map(List::of)
             .orElse(List.of());
     }
+
+    default boolean validatesInputByDefault() {
+        return true;
+    }
+
+    default boolean validatesOutputByDefault() {
+        return true;
+    }
+
+    default boolean validatesStreamedOutput() {
+        return false;
+    }
 }

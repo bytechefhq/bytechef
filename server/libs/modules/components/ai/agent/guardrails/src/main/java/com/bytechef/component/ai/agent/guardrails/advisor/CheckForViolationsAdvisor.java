@@ -16,8 +16,6 @@
 
 package com.bytechef.component.ai.agent.guardrails.advisor;
 
-import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.DEFAULT_VALIDATE_INPUT;
-import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.DEFAULT_VALIDATE_OUTPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_INPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_OUTPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VIOLATIONS_METADATA_KEY;
@@ -73,7 +71,9 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * <p>
  * Streaming: {@link #adviseStream} runs only PREFLIGHT (rule-based) output checks per chunk; chunks already shipped
- * cannot be recalled. Callers that need LLM-stage output validation must use {@link #adviseCall}.
+ * cannot be recalled. An LLM-stage output check runs on a stream only when it opts in through
+ * {@link GuardrailCheckFunction#validatesStreamedOutput()}; the stream is then held back until it completes and the
+ * check has passed on the whole answer.
  *
  * @author Ivica Cardic
  */
@@ -161,7 +161,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             return Flux.just(blockedResponse(request, inputOutcome, SIDE_INPUT));
         }
 
-        return chain.nextStream(request)
+        Flux<ChatClientResponse> checkedResponses = chain.nextStream(request)
             .concatMap(response -> {
                 CheckOutcome outputOutcome;
 
@@ -180,6 +180,61 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                 return Flux.just(response);
             })
             .takeUntil(CheckForViolationsAdvisor::isBlockedResponse);
+
+        if (!hasStreamedOutputChecks()) {
+            return checkedResponses;
+        }
+
+        return checkedResponses.collectList()
+            .flatMapMany(responses -> Flux.fromIterable(checkStreamedResponses(request, responses)));
+    }
+
+    private boolean hasStreamedOutputChecks() {
+        for (CheckEntry entry : checkEntries) {
+            if (isStreamedOutputCheck(entry)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean isStreamedOutputCheck(CheckEntry entry) {
+        return entry.function.stage() == GuardrailStage.LLM && entry.function.validatesStreamedOutput() &&
+            shouldRun(entry, VALIDATE_OUTPUT);
+    }
+
+    private List<ChatClientResponse> checkStreamedResponses(
+        ChatClientRequest request, List<ChatClientResponse> responses) {
+
+        if (responses.isEmpty() || isBlockedResponse(responses.getLast())) {
+            return responses;
+        }
+
+        StringBuilder responseText = new StringBuilder();
+
+        for (ChatClientResponse response : responses) {
+            responseText.append(extractAssistantText(response));
+        }
+
+        List<Violation> aggregated = new ArrayList<>();
+        List<CheckViolations> byCheck = new ArrayList<>();
+
+        for (CheckEntry entry : checkEntries) {
+            if (!isStreamedOutputCheck(entry)) {
+                continue;
+            }
+
+            runCheck(entry, responseText.toString(), entry.context, aggregated, byCheck);
+        }
+
+        logViolations(request, aggregated);
+
+        if (aggregated.isEmpty()) {
+            return responses;
+        }
+
+        return List.of(blockedResponse(request, new CheckOutcome(aggregated, byCheck), SIDE_OUTPUT));
     }
 
     private CheckOutcome safeRunChecks(ChatClientRequest request) {
@@ -292,22 +347,29 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                     ? entry.context
                     : entry.context.withConversationHistoryMessages(conversationHistoryMessages);
 
-            List<Violation> entryViolations = new ArrayList<>();
-
-            try {
-                List<Violation> results = entry.function.applyAll(text, effectiveContext);
-
-                entryViolations.addAll(Objects.requireNonNull(results));
-            } catch (OutOfMemoryError error) {
-                throw error;
-            } catch (Throwable throwable) {
-                LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
-
-                entryViolations.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
-            }
-
-            collect(entry, entryViolations, aggregated, byCheck);
+            runCheck(entry, text, effectiveContext, aggregated, byCheck);
         }
+    }
+
+    private static void runCheck(
+        CheckEntry entry, String text, GuardrailContext guardrailContext, List<Violation> aggregated,
+        List<CheckViolations> byCheck) {
+
+        List<Violation> entryViolations = new ArrayList<>();
+
+        try {
+            List<Violation> results = entry.function.applyAll(text, guardrailContext);
+
+            entryViolations.addAll(Objects.requireNonNull(results));
+        } catch (OutOfMemoryError error) {
+            throw error;
+        } catch (Throwable throwable) {
+            LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
+
+            entryViolations.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
+        }
+
+        collect(entry, entryViolations, aggregated, byCheck);
     }
 
     private static void collect(
@@ -324,10 +386,13 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     }
 
     private static boolean shouldRun(CheckEntry entry, String validateKey) {
-        boolean defaultValue = VALIDATE_INPUT.equals(validateKey) ? DEFAULT_VALIDATE_INPUT : DEFAULT_VALIDATE_OUTPUT;
+        Parameters inputParameters = entry.context.inputParameters();
 
-        return entry.context.inputParameters()
-            .getBoolean(validateKey, defaultValue);
+        if (VALIDATE_INPUT.equals(validateKey)) {
+            return inputParameters.getBoolean(VALIDATE_INPUT, entry.function.validatesInputByDefault());
+        }
+
+        return inputParameters.getBoolean(VALIDATE_OUTPUT, entry.function.validatesOutputByDefault());
     }
 
     private static String extractAssistantText(ChatClientResponse response) {
