@@ -146,6 +146,9 @@ interface CopilotStateI {
 
     globalPanelConversationToken: string | null;
     setGlobalPanelConversationToken: (token: string | null) => void;
+
+    workflowEditorWorkflowKey: string | undefined;
+    bindWorkflowEditorWorkflow: (workflowKey: string) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
@@ -310,5 +313,27 @@ export const useCopilotStore = create<CopilotStateI>()(
 
         globalPanelConversationToken: null,
         setGlobalPanelConversationToken: (token) => set({globalPanelConversationToken: token}),
+
+        workflowEditorWorkflowKey: undefined,
+        bindWorkflowEditorWorkflow: (workflowKey) =>
+            set((state) => {
+                if (state.workflowEditorWorkflowKey === workflowKey) {
+                    return state;
+                }
+
+                if (state.workflowEditorWorkflowKey === undefined) {
+                    return {...state, workflowEditorWorkflowKey: workflowKey};
+                }
+
+                return {
+                    ...state,
+                    context: {...state.context, mode: MODE.ASK},
+                    conversationId: generateRandomId(),
+                    messages: [],
+                    selectedLlmModel: null,
+                    selectedLlmProvider: null,
+                    workflowEditorWorkflowKey: workflowKey,
+                };
+            }),
     }))
 );
