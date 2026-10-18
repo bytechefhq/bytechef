@@ -23,27 +23,35 @@ import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.typesafe.util.TypeSafeUtils;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import java.util.List;
+import org.springaicommunity.typesafe.JevBatchOptions;
 
 /**
  * @author Ivica Cardic
  */
 public final class TypeSafeConstants {
 
+    public static final String ACTION_THRESHOLD = "actionThreshold";
     public static final String ANSWERS = "answers";
     public static final String ASK_QUESTIONS = "askQuestions";
     public static final String CHOICE = "choice";
+    public static final String CONCURRENCY = "concurrency";
     public static final String CONFIDENCE = "confidence";
+    public static final String CONTRADICTION_THRESHOLD = "contradictionThreshold";
     public static final String CRITERIA = "criteria";
     public static final String DESCRIPTION = "description";
+    public static final String EVIDENCE_THRESHOLD = "evidenceThreshold";
+    public static final String INJECTION_THRESHOLD = "injectionThreshold";
     public static final String INPUT_TOKENS = "input_tokens";
     public static final String INSTRUCTIONS = "instructions";
     public static final String IS_TRUE = "isTrue";
     public static final String LABEL = "label";
     public static final String LEGEND = "legend";
     public static final String LEVELS = "levels";
+    public static final String MINIMUM_SCORE = "minimumScore";
     public static final String MODEL = "model";
     public static final String MODELS = "models";
     public static final String NAME = "name";
@@ -54,9 +62,13 @@ public final class TypeSafeConstants {
     public static final String OUTPUT_TOKENS = "output_tokens";
     public static final String PROBABILITIES = "probabilities";
     public static final String QUESTIONS = "questions";
+    public static final String RELEVANCE_THRESHOLD = "relevanceThreshold";
+    public static final String REVIEW_THRESHOLD = "reviewThreshold";
     public static final String SCORE = "score";
+    public static final String SEVERITY_BLOCK_THRESHOLD = "severityBlockThreshold";
     public static final String STATE = "state";
     public static final String THRESHOLD = "threshold";
+    public static final String TOP_K = "topK";
     public static final String TYPE = "type";
     public static final String USAGE = "usage";
     public static final String WHEN_FALSE = "whenFalse";
@@ -77,6 +89,20 @@ public final class TypeSafeConstants {
         .options((OptionsFunction<String>) TypeSafeUtils::getModelOptions)
         .defaultValue(JEV_LATEST)
         .required(true);
+
+    public static final ModifiableStringProperty CLUSTER_ELEMENT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description(
+            "ID of the Jev model to use, e.g. `jev-latest`, `jev-preview` or a pinned version such as `jev-1.13.0`.")
+        .defaultValue(JEV_LATEST)
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty CONCURRENCY_PROPERTY = integer(CONCURRENCY)
+        .label("Concurrency")
+        .description("The number of Jev calls made at the same time, one per passage.")
+        .defaultValue(JevBatchOptions.DEFAULT_CONCURRENCY)
+        .minValue(1)
+        .advancedOption(true);
 
     public static final ModifiableStringProperty STATE_PROPERTY = string(STATE)
         .label("State")

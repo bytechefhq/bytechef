@@ -29,6 +29,7 @@ spring-shell = "4.0.3"
 springaicommunity-agent-utils = "0.13.0"
 springaicommunity-mcp-security = "0.1.14"
 springaicommunity-spring-ai-session = "0.10.0"
+springaicommunity-typesafe = "0.4.0"
 testcontainers = "1.21.3"
 
 [libraries]
@@ -78,6 +79,7 @@ org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:
 org-springaicommunity-spring-ai-agent-utils-docker-cli = { module = "org.springaicommunity:spring-ai-agent-utils-docker-cli", version.ref = "springaicommunity-agent-utils" }
 org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
+org-springaicommunity-typesafe-spring-ai = { module = "org.springaicommunity:typesafe-spring-ai", version.ref = "springaicommunity-typesafe" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
