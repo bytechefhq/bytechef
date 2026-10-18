@@ -80,7 +80,7 @@ const AuditEventsFilterBar = ({fromDate, onChange, toDate}: AuditEventsFilterBar
 
                 <Input
                     onChange={(event) => setPrincipal(event.target.value)}
-                    placeholder="e.g. admin@localhost.com"
+                    placeholder="e.g. admin"
                     value={principal}
                 />
             </div>
