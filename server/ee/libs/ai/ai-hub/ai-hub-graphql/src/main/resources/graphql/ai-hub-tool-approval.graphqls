@@ -1,0 +1,64 @@
+type AiHubToolApprovalRule {
+    id: ID!
+    workspaceId: Long!
+    toolKind: AiHubToolKind!
+    componentName: String
+    toolName: String!
+    mode: AiHubToolApprovalRuleMode!
+}
+
+enum AiHubToolKind {
+    CATALOG
+    COMPONENT
+}
+
+enum AiHubToolApprovalRuleMode {
+    REQUIRE
+    EXEMPT
+}
+
+type AiHubToolApproval {
+    id: ID!
+    chatId: ID!
+    requestedByUserId: Long!
+    toolKind: AiHubToolKind!
+    toolName: String!
+    componentName: String
+    arguments: String!
+    status: AiHubToolApprovalStatus!
+    decidedByUserId: Long
+    decidedAt: Long
+    comment: String
+    expiresAt: Long!
+    executionError: String
+    createdDate: Long!
+}
+
+enum AiHubToolApprovalStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    EXPIRED
+    SUPERSEDED
+    FAILED
+}
+
+type AiHubToolApprovalResolution {
+    approval: AiHubToolApproval!
+    continuationStarted: Boolean!
+    runId: String
+}
+
+extend type Query {
+    aiHubToolApprovalRules(workspaceId: ID!): [AiHubToolApprovalRule!]!
+    aiHubToolApprovalDefaultToolNames: [String!]!
+    aiHubToolApprovals(workspaceId: ID!, chatId: ID!): [AiHubToolApproval!]!
+}
+
+extend type Mutation {
+    createAiHubToolApprovalRule(
+        workspaceId: ID!, toolKind: AiHubToolKind!, toolName: String!, mode: AiHubToolApprovalRuleMode!
+    ): AiHubToolApprovalRule!
+    deleteAiHubToolApprovalRule(workspaceId: ID!, ruleId: ID!): Boolean!
+    resolveAiHubToolApproval(workspaceId: ID!, approvalId: ID!, approved: Boolean!, comment: String): AiHubToolApprovalResolution!
+}
