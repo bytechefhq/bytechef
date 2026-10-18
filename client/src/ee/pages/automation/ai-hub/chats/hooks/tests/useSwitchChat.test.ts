@@ -249,6 +249,86 @@ describe('useSwitchChat', () => {
         expect(approvalPart?.data).toMatchObject({resolvedBy: '1', resolvedStatus: 'APPROVED'});
     });
 
+    describe('picker cards restored from persisted turn-ending results', () => {
+        const pickerRow = (toolName: string, response: Record<string, unknown>) =>
+            buildMessage({
+                content: 'Please pick one:',
+                role: 'ASSISTANT',
+                toolEventsJson: JSON.stringify([
+                    {arguments: '{}', id: `call-${toolName}`, kind: 'call', name: toolName},
+                    {id: `call-${toolName}`, kind: 'result', name: toolName, response: JSON.stringify(response)},
+                ]),
+            });
+
+        const findDataPart = (type: string) =>
+            aiHubStore
+                .getState()
+                .messages.flatMap((message) =>
+                    Array.isArray(message.content)
+                        ? (message.content as unknown as Array<{data?: Record<string, unknown>; type?: string}>)
+                        : []
+                )
+                .find((part) => part.type === type);
+
+        it('restores an answered connection picker as picked, using the user pick that followed it', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind a Slack connection', role: 'USER'}),
+                pickerRow('selectConnection', {
+                    awaitingAnswer: true,
+                    componentLabel: 'Slack',
+                    componentName: 'slack',
+                    kind: 'select-connection',
+                }),
+                buildMessage({content: 'User picked: Slack Engineering (ID: 1051)', role: 'USER'}),
+                buildMessage({content: 'Bound.', role: 'ASSISTANT'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataPart('data-select-connection')?.data).toMatchObject({
+                componentName: 'slack',
+                pickedLabel: 'Slack Engineering',
+            });
+        });
+
+        it('restores an answered property option picker as picked', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Pick the channel', role: 'USER'}),
+                pickerRow('selectPropertyOption', {
+                    awaitingAnswer: true,
+                    componentName: 'slack',
+                    kind: 'select-property-option',
+                    options: [{label: 'general', value: 'C1'}],
+                    propertyName: 'channel',
+                }),
+                buildMessage({content: 'User picked: general (value: C1)', role: 'USER'}),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(findDataPart('data-select-property-option')?.data).toMatchObject({pickedLabel: 'general'});
+        });
+
+        it('keeps the latest unanswered picker interactive', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Bind a Slack connection', role: 'USER'}),
+                pickerRow('selectConnection', {
+                    awaitingAnswer: true,
+                    componentLabel: 'Slack',
+                    componentName: 'slack',
+                    kind: 'select-connection',
+                }),
+            ]);
+
+            await switchTo(buildChat());
+
+            const pickerData = findDataPart('data-select-connection')?.data;
+
+            expect(pickerData).toMatchObject({componentName: 'slack'});
+            expect(pickerData?.pickedLabel).toBeUndefined();
+        });
+    });
+
     describe('tool approval cards whose gated tool result was never persisted', () => {
         const DELETE_ARGUMENTS = '{"workflowId": "a5667d0f"}';
 
