@@ -8,14 +8,15 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.constant.CopilotConstants;
+import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
-import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
@@ -29,60 +30,43 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class AiHubChatClientResolver implements AiHubSpringAIAgent.OverrideChatClientResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(AiHubChatClientResolver.class);
+    private static final String NO_ENVIRONMENT_MESSAGE =
+        "The AI Hub run carries no environment, so no AI provider can be resolved for it.";
 
-    private final CatalogChatClientResolver catalogChatClientResolver;
+    private final OverrideChatClientResolver copilotChatClientResolver;
 
     @SuppressFBWarnings("EI")
-    public AiHubChatClientResolver(CatalogChatClientResolver catalogChatClientResolver) {
-        this.catalogChatClientResolver = catalogChatClientResolver;
+    public AiHubChatClientResolver(OverrideChatClientResolver copilotChatClientResolver) {
+        this.copilotChatClientResolver = copilotChatClientResolver;
     }
 
     @Override
-    public @Nullable ChatClient resolve(@Nullable State state) {
-        if (state == null || asLong(state.get(AiHubStateKeys.VERIFIED_WORKSPACE_ID)) == null) {
-            return null;
+    public ChatClient resolve(@Nullable State state) {
+        if (state == null) {
+            throw new ChatModelUnavailableException(NO_ENVIRONMENT_MESSAGE);
         }
 
-        String llmProvider = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY));
-        String llmModel = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY));
+        Long environmentId = NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID));
 
-        if ((llmProvider == null) != (llmModel == null)) {
-            log.warn(
-                "User-selected LLM half-set (provider={}, model={}); falling back to the workspace default",
-                llmProvider, llmModel);
+        if (environmentId == null) {
+            throw new ChatModelUnavailableException(NO_ENVIRONMENT_MESSAGE);
         }
 
-        if (llmProvider == null || llmModel == null) {
-            return null;
+        State copilotState = new State();
+
+        copilotState.set(CopilotConstants.STATE_ENVIRONMENT_ID, environmentId);
+        copilotState.set(
+            CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER,
+            state.get(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY));
+        copilotState.set(
+            CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, state.get(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY));
+
+        ChatClient chatClient = copilotChatClientResolver.resolve(copilotState);
+
+        if (chatClient == null) {
+            throw ChatModelUnavailableException.noProviderEnabled(environmentId);
         }
 
-        Long environment = asLong(state.get(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID));
-
-        if (environment == null) {
-            return null;
-        }
-
-        return catalogChatClientResolver.resolve(llmProvider, llmModel, environment.intValue());
-    }
-
-    private static @Nullable String asString(@Nullable Object value) {
-        return value == null ? null : value.toString();
-    }
-
-    private static @Nullable Long asLong(@Nullable Object value) {
-        if (value == null) {
-            return null;
-        }
-
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-
-        try {
-            return Long.parseLong(value.toString());
-        } catch (NumberFormatException exception) {
-            return null;
-        }
+        return chatClient;
     }
 }
