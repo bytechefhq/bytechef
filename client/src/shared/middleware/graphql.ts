@@ -221,6 +221,152 @@ export type UpdateAiAgentScenarioToolSimulationMutationVariables = Exact<{
 
 export type UpdateAiAgentScenarioToolSimulationMutation = { updateAiAgentScenarioToolSimulation: { id: string, toolName: string, responsePrompt: string, simulationModel: string | null } };
 
+export type DeleteAiHubChatArtifactMutationVariables = Exact<{
+  input: Types.DeleteAiHubChatArtifactInput;
+}>;
+
+
+export type DeleteAiHubChatArtifactMutation = { deleteAiHubChatArtifact: boolean };
+
+export type RecordReferencedAiHubChatArtifactMutationVariables = Exact<{
+  input: Types.RecordReferencedAiHubChatArtifactInput;
+}>;
+
+
+export type RecordReferencedAiHubChatArtifactMutation = { recordReferencedAiHubChatArtifact: { id: string, chatId: string, kind: Types.AiHubChatArtifactKind, status: Types.AiHubChatArtifactStatus, artifactId: string, artifactName: string, environmentId: any, createdAt: any } };
+
+export type AiHubChatArtifactsByAiHubChatQueryVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+}>;
+
+
+export type AiHubChatArtifactsByAiHubChatQuery = { aiHubChatArtifactsByAiHubChat: Array<{ id: string, chatId: string, kind: Types.AiHubChatArtifactKind, status: Types.AiHubChatArtifactStatus, artifactId: string, artifactName: string, metadataJson: string | null, environmentId: any, createdAt: any, statusChangedAt: any }> };
+
+export type AiHubChatMessagesQueryVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+}>;
+
+
+export type AiHubChatMessagesQuery = { aiHubChatMessages: Array<{ role: string, content: string, timestamp: any, toolEventsJson: string | null }> };
+
+export type AiHubChatsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+  status?: Types.AiHubChatStatus | null | undefined;
+}>;
+
+
+export type AiHubChatsQuery = { aiHubChats: Array<{ id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, ownerUserId: any, isOwner: boolean }> };
+
+export type AppendAiHubChatAssistantMessageMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  content: string;
+}>;
+
+
+export type AppendAiHubChatAssistantMessageMutation = { appendAiHubChatAssistantMessage: boolean };
+
+export type CancelAiHubRunMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  runId?: string | null | undefined;
+}>;
+
+
+export type CancelAiHubRunMutation = { cancelAiHubRun: boolean };
+
+export type CreateAiHubChatMutationVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+  threadId: string;
+}>;
+
+
+export type CreateAiHubChatMutation = { createAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, ownerUserId: any, isOwner: boolean } };
+
+export type DeleteAiHubChatMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+}>;
+
+
+export type DeleteAiHubChatMutation = { deleteAiHubChat: boolean };
+
+export type GenerateAiHubChatTitleMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+}>;
+
+
+export type GenerateAiHubChatTitleMutation = { generateAiHubChatTitle: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, ownerUserId: any, isOwner: boolean } };
+
+export type TruncateAiHubChatMessagesMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  fromMessageIndex: number;
+}>;
+
+
+export type TruncateAiHubChatMessagesMutation = { truncateAiHubChatMessages: number };
+
+export type UpdateAiHubChatMutationVariables = Exact<{
+  input: Types.AiHubChatPatchInput;
+}>;
+
+
+export type UpdateAiHubChatMutation = { updateAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, ownerUserId: any, isOwner: boolean } };
+
+export type AiHubToolApprovalDefaultToolNamesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiHubToolApprovalDefaultToolNamesQuery = { aiHubToolApprovalDefaultToolNames: Array<string> };
+
+export type AiHubToolApprovalRulesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiHubToolApprovalRulesQuery = { aiHubToolApprovalRules: Array<{ id: string, workspaceId: any, toolKind: Types.AiHubToolKind, componentName: string | null, toolName: string, mode: Types.AiHubToolApprovalRuleMode }> };
+
+export type AiHubToolApprovalsQueryVariables = Exact<{
+  workspaceId: string | number;
+  chatId: string | number;
+}>;
+
+
+export type AiHubToolApprovalsQuery = { aiHubToolApprovals: Array<{ id: string, chatId: string, toolName: string, componentName: string | null, status: Types.AiHubToolApprovalStatus, decidedByUserId: any, decidedAt: any, comment: string | null, expiresAt: any, executionError: string | null }> };
+
+export type CreateAiHubToolApprovalRuleMutationVariables = Exact<{
+  workspaceId: string | number;
+  toolKind: Types.AiHubToolKind;
+  toolName: string;
+  mode: Types.AiHubToolApprovalRuleMode;
+}>;
+
+
+export type CreateAiHubToolApprovalRuleMutation = { createAiHubToolApprovalRule: { id: string, workspaceId: any, toolKind: Types.AiHubToolKind, componentName: string | null, toolName: string, mode: Types.AiHubToolApprovalRuleMode } };
+
+export type DeleteAiHubToolApprovalRuleMutationVariables = Exact<{
+  workspaceId: string | number;
+  ruleId: string | number;
+}>;
+
+
+export type DeleteAiHubToolApprovalRuleMutation = { deleteAiHubToolApprovalRule: boolean };
+
+export type ResolveAiHubToolApprovalMutationVariables = Exact<{
+  workspaceId: string | number;
+  approvalId: string | number;
+  approved: boolean;
+  comment?: string | null | undefined;
+}>;
+
+
+export type ResolveAiHubToolApprovalMutation = { resolveAiHubToolApproval: { continuationStarted: boolean, runId: string | null, approval: { id: string, status: Types.AiHubToolApprovalStatus, executionError: string | null } } };
+
 export type AiAutoMemoriesQueryVariables = Exact<{
   workspaceId: string | number;
   environment: number;
@@ -3104,6 +3250,510 @@ export const useUpdateAiAgentScenarioToolSimulationMutation = <
       {
     mutationKey: ['updateAiAgentScenarioToolSimulation'],
     mutationFn: (variables?: UpdateAiAgentScenarioToolSimulationMutationVariables) => fetcher<UpdateAiAgentScenarioToolSimulationMutation, UpdateAiAgentScenarioToolSimulationMutationVariables>(UpdateAiAgentScenarioToolSimulationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiHubChatArtifactDocument = new TypedDocumentString(`
+    mutation deleteAiHubChatArtifact($input: DeleteAiHubChatArtifactInput!) {
+  deleteAiHubChatArtifact(input: $input)
+}
+    `);
+
+export const useDeleteAiHubChatArtifactMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiHubChatArtifactMutation, TError, DeleteAiHubChatArtifactMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiHubChatArtifactMutation, TError, DeleteAiHubChatArtifactMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiHubChatArtifact'],
+    mutationFn: (variables?: DeleteAiHubChatArtifactMutationVariables) => fetcher<DeleteAiHubChatArtifactMutation, DeleteAiHubChatArtifactMutationVariables>(DeleteAiHubChatArtifactDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RecordReferencedAiHubChatArtifactDocument = new TypedDocumentString(`
+    mutation recordReferencedAiHubChatArtifact($input: RecordReferencedAiHubChatArtifactInput!) {
+  recordReferencedAiHubChatArtifact(input: $input) {
+    id
+    chatId
+    kind
+    status
+    artifactId
+    artifactName
+    environmentId
+    createdAt
+  }
+}
+    `);
+
+export const useRecordReferencedAiHubChatArtifactMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RecordReferencedAiHubChatArtifactMutation, TError, RecordReferencedAiHubChatArtifactMutationVariables, TContext>) => {
+    
+    return useMutation<RecordReferencedAiHubChatArtifactMutation, TError, RecordReferencedAiHubChatArtifactMutationVariables, TContext>(
+      {
+    mutationKey: ['recordReferencedAiHubChatArtifact'],
+    mutationFn: (variables?: RecordReferencedAiHubChatArtifactMutationVariables) => fetcher<RecordReferencedAiHubChatArtifactMutation, RecordReferencedAiHubChatArtifactMutationVariables>(RecordReferencedAiHubChatArtifactDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiHubChatArtifactsByAiHubChatDocument = new TypedDocumentString(`
+    query aiHubChatArtifactsByAiHubChat($workspaceId: ID!, $id: ID!) {
+  aiHubChatArtifactsByAiHubChat(workspaceId: $workspaceId, id: $id) {
+    id
+    chatId
+    kind
+    status
+    artifactId
+    artifactName
+    metadataJson
+    environmentId
+    createdAt
+    statusChangedAt
+  }
+}
+    `);
+
+export const useAiHubChatArtifactsByAiHubChatQuery = <
+      TData = AiHubChatArtifactsByAiHubChatQuery,
+      TError = unknown
+    >(
+      variables: AiHubChatArtifactsByAiHubChatQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubChatArtifactsByAiHubChatQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubChatArtifactsByAiHubChatQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubChatArtifactsByAiHubChatQuery, TError, TData>(
+      {
+    queryKey: ['aiHubChatArtifactsByAiHubChat', variables],
+    queryFn: fetcher<AiHubChatArtifactsByAiHubChatQuery, AiHubChatArtifactsByAiHubChatQueryVariables>(AiHubChatArtifactsByAiHubChatDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubChatMessagesDocument = new TypedDocumentString(`
+    query aiHubChatMessages($workspaceId: ID!, $id: ID!) {
+  aiHubChatMessages(workspaceId: $workspaceId, id: $id) {
+    role
+    content
+    timestamp
+    toolEventsJson
+  }
+}
+    `);
+
+export const useAiHubChatMessagesQuery = <
+      TData = AiHubChatMessagesQuery,
+      TError = unknown
+    >(
+      variables: AiHubChatMessagesQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubChatMessagesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubChatMessagesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubChatMessagesQuery, TError, TData>(
+      {
+    queryKey: ['aiHubChatMessages', variables],
+    queryFn: fetcher<AiHubChatMessagesQuery, AiHubChatMessagesQueryVariables>(AiHubChatMessagesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubChatsDocument = new TypedDocumentString(`
+    query aiHubChats($workspaceId: ID!, $environment: Int!, $status: AiHubChatStatus) {
+  aiHubChats(
+    workspaceId: $workspaceId
+    environment: $environment
+    status: $status
+  ) {
+    id
+    workspaceId
+    userId
+    threadId
+    title
+    lastPreview
+    messageCount
+    status
+    environmentId
+    createdAt
+    updatedAt
+    autoTitled
+    ownerUserId
+    isOwner
+  }
+}
+    `);
+
+export const useAiHubChatsQuery = <
+      TData = AiHubChatsQuery,
+      TError = unknown
+    >(
+      variables: AiHubChatsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubChatsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubChatsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubChatsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubChats', variables],
+    queryFn: fetcher<AiHubChatsQuery, AiHubChatsQueryVariables>(AiHubChatsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppendAiHubChatAssistantMessageDocument = new TypedDocumentString(`
+    mutation appendAiHubChatAssistantMessage($workspaceId: ID!, $id: ID!, $content: String!) {
+  appendAiHubChatAssistantMessage(
+    workspaceId: $workspaceId
+    id: $id
+    content: $content
+  )
+}
+    `);
+
+export const useAppendAiHubChatAssistantMessageMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AppendAiHubChatAssistantMessageMutation, TError, AppendAiHubChatAssistantMessageMutationVariables, TContext>) => {
+    
+    return useMutation<AppendAiHubChatAssistantMessageMutation, TError, AppendAiHubChatAssistantMessageMutationVariables, TContext>(
+      {
+    mutationKey: ['appendAiHubChatAssistantMessage'],
+    mutationFn: (variables?: AppendAiHubChatAssistantMessageMutationVariables) => fetcher<AppendAiHubChatAssistantMessageMutation, AppendAiHubChatAssistantMessageMutationVariables>(AppendAiHubChatAssistantMessageDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CancelAiHubRunDocument = new TypedDocumentString(`
+    mutation cancelAiHubRun($workspaceId: ID!, $id: ID!, $runId: String) {
+  cancelAiHubRun(workspaceId: $workspaceId, id: $id, runId: $runId)
+}
+    `);
+
+export const useCancelAiHubRunMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CancelAiHubRunMutation, TError, CancelAiHubRunMutationVariables, TContext>) => {
+    
+    return useMutation<CancelAiHubRunMutation, TError, CancelAiHubRunMutationVariables, TContext>(
+      {
+    mutationKey: ['cancelAiHubRun'],
+    mutationFn: (variables?: CancelAiHubRunMutationVariables) => fetcher<CancelAiHubRunMutation, CancelAiHubRunMutationVariables>(CancelAiHubRunDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAiHubChatDocument = new TypedDocumentString(`
+    mutation createAiHubChat($workspaceId: ID!, $environment: Int!, $threadId: String!) {
+  createAiHubChat(
+    workspaceId: $workspaceId
+    environment: $environment
+    threadId: $threadId
+  ) {
+    id
+    workspaceId
+    userId
+    threadId
+    title
+    lastPreview
+    messageCount
+    status
+    environmentId
+    createdAt
+    updatedAt
+    autoTitled
+    ownerUserId
+    isOwner
+  }
+}
+    `);
+
+export const useCreateAiHubChatMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiHubChatMutation, TError, CreateAiHubChatMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiHubChatMutation, TError, CreateAiHubChatMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiHubChat'],
+    mutationFn: (variables?: CreateAiHubChatMutationVariables) => fetcher<CreateAiHubChatMutation, CreateAiHubChatMutationVariables>(CreateAiHubChatDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiHubChatDocument = new TypedDocumentString(`
+    mutation deleteAiHubChat($workspaceId: ID!, $id: ID!) {
+  deleteAiHubChat(workspaceId: $workspaceId, id: $id)
+}
+    `);
+
+export const useDeleteAiHubChatMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiHubChatMutation, TError, DeleteAiHubChatMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiHubChatMutation, TError, DeleteAiHubChatMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiHubChat'],
+    mutationFn: (variables?: DeleteAiHubChatMutationVariables) => fetcher<DeleteAiHubChatMutation, DeleteAiHubChatMutationVariables>(DeleteAiHubChatDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GenerateAiHubChatTitleDocument = new TypedDocumentString(`
+    mutation generateAiHubChatTitle($workspaceId: ID!, $id: ID!) {
+  generateAiHubChatTitle(workspaceId: $workspaceId, id: $id) {
+    id
+    workspaceId
+    userId
+    threadId
+    title
+    lastPreview
+    messageCount
+    status
+    environmentId
+    createdAt
+    updatedAt
+    autoTitled
+    ownerUserId
+    isOwner
+  }
+}
+    `);
+
+export const useGenerateAiHubChatTitleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GenerateAiHubChatTitleMutation, TError, GenerateAiHubChatTitleMutationVariables, TContext>) => {
+    
+    return useMutation<GenerateAiHubChatTitleMutation, TError, GenerateAiHubChatTitleMutationVariables, TContext>(
+      {
+    mutationKey: ['generateAiHubChatTitle'],
+    mutationFn: (variables?: GenerateAiHubChatTitleMutationVariables) => fetcher<GenerateAiHubChatTitleMutation, GenerateAiHubChatTitleMutationVariables>(GenerateAiHubChatTitleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TruncateAiHubChatMessagesDocument = new TypedDocumentString(`
+    mutation truncateAiHubChatMessages($workspaceId: ID!, $id: ID!, $fromMessageIndex: Int!) {
+  truncateAiHubChatMessages(
+    workspaceId: $workspaceId
+    id: $id
+    fromMessageIndex: $fromMessageIndex
+  )
+}
+    `);
+
+export const useTruncateAiHubChatMessagesMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TruncateAiHubChatMessagesMutation, TError, TruncateAiHubChatMessagesMutationVariables, TContext>) => {
+    
+    return useMutation<TruncateAiHubChatMessagesMutation, TError, TruncateAiHubChatMessagesMutationVariables, TContext>(
+      {
+    mutationKey: ['truncateAiHubChatMessages'],
+    mutationFn: (variables?: TruncateAiHubChatMessagesMutationVariables) => fetcher<TruncateAiHubChatMessagesMutation, TruncateAiHubChatMessagesMutationVariables>(TruncateAiHubChatMessagesDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiHubChatDocument = new TypedDocumentString(`
+    mutation updateAiHubChat($input: AiHubChatPatchInput!) {
+  updateAiHubChat(input: $input) {
+    id
+    workspaceId
+    userId
+    threadId
+    title
+    lastPreview
+    messageCount
+    status
+    environmentId
+    createdAt
+    updatedAt
+    autoTitled
+    ownerUserId
+    isOwner
+  }
+}
+    `);
+
+export const useUpdateAiHubChatMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiHubChatMutation, TError, UpdateAiHubChatMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiHubChatMutation, TError, UpdateAiHubChatMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiHubChat'],
+    mutationFn: (variables?: UpdateAiHubChatMutationVariables) => fetcher<UpdateAiHubChatMutation, UpdateAiHubChatMutationVariables>(UpdateAiHubChatDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiHubToolApprovalDefaultToolNamesDocument = new TypedDocumentString(`
+    query aiHubToolApprovalDefaultToolNames {
+  aiHubToolApprovalDefaultToolNames
+}
+    `);
+
+export const useAiHubToolApprovalDefaultToolNamesQuery = <
+      TData = AiHubToolApprovalDefaultToolNamesQuery,
+      TError = unknown
+    >(
+      variables?: AiHubToolApprovalDefaultToolNamesQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubToolApprovalDefaultToolNamesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubToolApprovalDefaultToolNamesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubToolApprovalDefaultToolNamesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiHubToolApprovalDefaultToolNames'] : ['aiHubToolApprovalDefaultToolNames', variables],
+    queryFn: fetcher<AiHubToolApprovalDefaultToolNamesQuery, AiHubToolApprovalDefaultToolNamesQueryVariables>(AiHubToolApprovalDefaultToolNamesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubToolApprovalRulesDocument = new TypedDocumentString(`
+    query aiHubToolApprovalRules($workspaceId: ID!) {
+  aiHubToolApprovalRules(workspaceId: $workspaceId) {
+    id
+    workspaceId
+    toolKind
+    componentName
+    toolName
+    mode
+  }
+}
+    `);
+
+export const useAiHubToolApprovalRulesQuery = <
+      TData = AiHubToolApprovalRulesQuery,
+      TError = unknown
+    >(
+      variables: AiHubToolApprovalRulesQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubToolApprovalRulesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubToolApprovalRulesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubToolApprovalRulesQuery, TError, TData>(
+      {
+    queryKey: ['aiHubToolApprovalRules', variables],
+    queryFn: fetcher<AiHubToolApprovalRulesQuery, AiHubToolApprovalRulesQueryVariables>(AiHubToolApprovalRulesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubToolApprovalsDocument = new TypedDocumentString(`
+    query aiHubToolApprovals($workspaceId: ID!, $chatId: ID!) {
+  aiHubToolApprovals(workspaceId: $workspaceId, chatId: $chatId) {
+    id
+    chatId
+    toolName
+    componentName
+    status
+    decidedByUserId
+    decidedAt
+    comment
+    expiresAt
+    executionError
+  }
+}
+    `);
+
+export const useAiHubToolApprovalsQuery = <
+      TData = AiHubToolApprovalsQuery,
+      TError = unknown
+    >(
+      variables: AiHubToolApprovalsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubToolApprovalsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubToolApprovalsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubToolApprovalsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubToolApprovals', variables],
+    queryFn: fetcher<AiHubToolApprovalsQuery, AiHubToolApprovalsQueryVariables>(AiHubToolApprovalsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiHubToolApprovalRuleDocument = new TypedDocumentString(`
+    mutation createAiHubToolApprovalRule($workspaceId: ID!, $toolKind: AiHubToolKind!, $toolName: String!, $mode: AiHubToolApprovalRuleMode!) {
+  createAiHubToolApprovalRule(
+    workspaceId: $workspaceId
+    toolKind: $toolKind
+    toolName: $toolName
+    mode: $mode
+  ) {
+    id
+    workspaceId
+    toolKind
+    componentName
+    toolName
+    mode
+  }
+}
+    `);
+
+export const useCreateAiHubToolApprovalRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiHubToolApprovalRuleMutation, TError, CreateAiHubToolApprovalRuleMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiHubToolApprovalRuleMutation, TError, CreateAiHubToolApprovalRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiHubToolApprovalRule'],
+    mutationFn: (variables?: CreateAiHubToolApprovalRuleMutationVariables) => fetcher<CreateAiHubToolApprovalRuleMutation, CreateAiHubToolApprovalRuleMutationVariables>(CreateAiHubToolApprovalRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiHubToolApprovalRuleDocument = new TypedDocumentString(`
+    mutation deleteAiHubToolApprovalRule($workspaceId: ID!, $ruleId: ID!) {
+  deleteAiHubToolApprovalRule(workspaceId: $workspaceId, ruleId: $ruleId)
+}
+    `);
+
+export const useDeleteAiHubToolApprovalRuleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiHubToolApprovalRuleMutation, TError, DeleteAiHubToolApprovalRuleMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiHubToolApprovalRuleMutation, TError, DeleteAiHubToolApprovalRuleMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiHubToolApprovalRule'],
+    mutationFn: (variables?: DeleteAiHubToolApprovalRuleMutationVariables) => fetcher<DeleteAiHubToolApprovalRuleMutation, DeleteAiHubToolApprovalRuleMutationVariables>(DeleteAiHubToolApprovalRuleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ResolveAiHubToolApprovalDocument = new TypedDocumentString(`
+    mutation resolveAiHubToolApproval($workspaceId: ID!, $approvalId: ID!, $approved: Boolean!, $comment: String) {
+  resolveAiHubToolApproval(
+    workspaceId: $workspaceId
+    approvalId: $approvalId
+    approved: $approved
+    comment: $comment
+  ) {
+    continuationStarted
+    runId
+    approval {
+      id
+      status
+      executionError
+    }
+  }
+}
+    `);
+
+export const useResolveAiHubToolApprovalMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ResolveAiHubToolApprovalMutation, TError, ResolveAiHubToolApprovalMutationVariables, TContext>) => {
+    
+    return useMutation<ResolveAiHubToolApprovalMutation, TError, ResolveAiHubToolApprovalMutationVariables, TContext>(
+      {
+    mutationKey: ['resolveAiHubToolApproval'],
+    mutationFn: (variables?: ResolveAiHubToolApprovalMutationVariables) => fetcher<ResolveAiHubToolApprovalMutation, ResolveAiHubToolApprovalMutationVariables>(ResolveAiHubToolApprovalDocument, variables)(),
     ...options
   }
     )};
