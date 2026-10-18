@@ -991,11 +991,13 @@ export const useProperty = ({
 
             if (inputMode.singlePill) {
                 if (value === '') {
+                    dispatchValueAction({type: 'valueCleared'});
+
                     if (!keepsEditor) {
                         setPillEntry(false);
-                    }
 
-                    dispatchValueAction({type: 'valueCleared'});
+                        requestAnimationFrame(() => inputRef.current?.focus());
+                    }
 
                     return;
                 }
