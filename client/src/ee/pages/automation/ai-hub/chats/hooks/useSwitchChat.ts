@@ -32,9 +32,12 @@ interface OpenToolCallI {
     toolName: string;
 }
 
-const PICKED_LABEL_PATTERN = /^User picked: (.+) \((?:ID|value): [^)]*\)$/s;
+const PICK_PATTERN = /^User picked: (.+) \((ID|value): .*\)$/s;
 
-const PICKER_DATA_PART_TYPES = new Set(['data-select-connection', 'data-select-property-option']);
+const PICK_SUFFIX_DATA_PART_TYPES: Record<string, string> = {
+    ID: 'data-select-connection',
+    value: 'data-select-property-option',
+};
 
 const TOOL_APPROVAL_CONTINUATION_PATTERN = /^\[tool-approval #(\d+)[\s\]]/;
 
@@ -67,9 +70,9 @@ type RestoredPartType = Exclude<ThreadMessageLike['content'], string>[number];
 
 /**
  * Rebuilds the message parts for the tool activity persisted alongside a transcript row: one `tool-call` part per call
- * plus, when the call has a persisted result that maps to an interactive or informational card, the same data part
- * the live stream would have appended. `allowInteractive` is true only for rows after the last user message, so a
- * pending question comes back answerable while questions the user already moved past stay as transcript text.
+ * plus the data part the live stream would have appended for its persisted result. Interactive parts come back
+ * answerable only when `allowInteractive`; otherwise a picker comes back picked, labelled from `followingUserText`,
+ * when it is the row's only picker of the kind that pick answers, and every other interactive part is dropped.
  */
 function buildRestoredToolParts(
     events: RestoredToolEventI[],
@@ -88,6 +91,9 @@ function buildRestoredToolParts(
     }
 
     const parts: RestoredPartType[] = [];
+
+    const answeredPick = !allowInteractive && followingUserText ? readAnsweredPick(followingUserText) : undefined;
+    const answeredPickers: Array<{data: object; position: number}> = [];
 
     events.forEach((event, eventIndex) => {
         if (event.kind !== 'call' || !event.name || ARTIFACT_OPEN_TOOL_NAMES.has(event.name)) {
@@ -135,20 +141,28 @@ function buildRestoredToolParts(
 
             if (dataPart?.ok && (allowInteractive || !INTERACTIVE_DATA_PART_TYPES.has(dataPart.type))) {
                 parts.push({data: dataPart.data, type: dataPart.type as `data-${string}`} as RestoredPartType);
-            } else if (dataPart?.ok && PICKER_DATA_PART_TYPES.has(dataPart.type)) {
-                const pickedLabel = followingUserText ? PICKED_LABEL_PATTERN.exec(followingUserText)?.[1] : undefined;
-
-                if (pickedLabel) {
-                    parts.push({
-                        data: {...dataPart.data, pickedLabel},
-                        type: dataPart.type as `data-${string}`,
-                    } as RestoredPartType);
-                }
+            } else if (dataPart?.ok && dataPart.type === answeredPick?.dataPartType) {
+                answeredPickers.push({data: dataPart.data, position: parts.length});
             }
         }
     });
 
+    if (answeredPick && answeredPickers.length === 1) {
+        const [{data, position}] = answeredPickers;
+
+        parts.splice(position, 0, {
+            data: {...data, pickedLabel: answeredPick.label},
+            type: answeredPick.dataPartType as `data-${string}`,
+        } as RestoredPartType);
+    }
+
     return parts;
+}
+
+function readAnsweredPick(text: string): {dataPartType: string; label: string} | undefined {
+    const match = PICK_PATTERN.exec(text);
+
+    return match ? {dataPartType: PICK_SUFFIX_DATA_PART_TYPES[match[2]], label: match[1]} : undefined;
 }
 
 function mapServerRoleToClient(role: string): 'user' | 'assistant' | 'system' | null {
@@ -178,6 +192,18 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
         -1
     );
 
+    const followingUserTexts: Array<string | undefined> = new Array(messages.length);
+
+    let nextUserText: string | undefined;
+
+    for (let index = messages.length - 1; index >= 0; index--) {
+        followingUserTexts[index] = nextUserText;
+
+        if (mapServerRoleToClient(messages[index].role) === 'user') {
+            nextUserText = messages[index].content;
+        }
+    }
+
     const mapped: ThreadMessageLike[] = [];
 
     messages.forEach((serverMessage, rowIndex) => {
@@ -187,13 +213,9 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
             return;
         }
 
-        const followingUserRow = messages
-            .slice(rowIndex + 1)
-            .find((message) => mapServerRoleToClient(message.role) === 'user');
-
         const toolParts = buildRestoredToolParts(parseRestoredToolEvents(serverMessage.toolEventsJson), {
             allowInteractive: rowIndex >= lastUserRowIndex,
-            followingUserText: followingUserRow?.content,
+            followingUserText: followingUserTexts[rowIndex],
             rowIndex,
         });
 
