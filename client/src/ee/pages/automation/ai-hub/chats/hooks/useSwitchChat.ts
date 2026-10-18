@@ -286,6 +286,14 @@ function toToolApprovalCardMessage(approval: AiHubToolApprovalI): ThreadMessageL
     } as ThreadMessageLike;
 }
 
+function withLapsedExpiry(approval: AiHubToolApprovalI, now: number): AiHubToolApprovalI {
+    if (approval.status !== 'PENDING' || approval.expiresAt == null || Date.parse(approval.expiresAt) > now) {
+        return approval;
+    }
+
+    return {...approval, status: 'EXPIRED'};
+}
+
 function restoreToolApprovalCards(
     messages: ThreadMessageLike[],
     approvalsById: Map<number, AiHubToolApprovalI>
@@ -432,7 +440,11 @@ async function loadChatTranscript({
         getToolApprovals({chatId, workspaceId}).catch((): AiHubToolApprovalI[] => []),
     ]);
 
-    const toolApprovalsById = new Map(toolApprovals.map((approval) => [approval.id, approval]));
+    const now = Date.now();
+
+    const toolApprovalsById = new Map(
+        toolApprovals.map((approval) => [approval.id, withLapsedExpiry(approval, now)] as const)
+    );
 
     return [
         ...applyToolApprovalStatuses(
