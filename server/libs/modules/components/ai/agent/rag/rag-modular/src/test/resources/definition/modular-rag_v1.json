@@ -9,6 +9,12 @@
     "multipleElements": false,
     "required": false
   }, {
+    "name": "DOCUMENT_POST_PROCESSOR",
+    "key": "documentPostProcessor",
+    "label": "Document Post-Processor",
+    "multipleElements": true,
+    "required": false
+  }, {
     "name": "DOCUMENT_RETRIEVER",
     "key": "documentRetriever",
     "label": "Document Retriever",

@@ -23,6 +23,8 @@ import com.bytechef.component.ai.typesafe.action.TypeSafeAskQuestionsAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeChoiceAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeNoulAction;
 import com.bytechef.component.ai.typesafe.action.TypeSafeScoreAction;
+import com.bytechef.component.ai.typesafe.cluster.TypeSafeDocumentFilter;
+import com.bytechef.component.ai.typesafe.cluster.TypeSafeDocumentReranker;
 import com.bytechef.component.ai.typesafe.connection.TypeSafeConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -47,7 +49,10 @@ public class TypeSafeComponentHandler implements ComponentHandler {
             TypeSafeNoulAction.ACTION_DEFINITION,
             TypeSafeChoiceAction.ACTION_DEFINITION,
             TypeSafeScoreAction.ACTION_DEFINITION,
-            TypeSafeAskQuestionsAction.ACTION_DEFINITION);
+            TypeSafeAskQuestionsAction.ACTION_DEFINITION)
+        .clusterElements(
+            TypeSafeDocumentFilter.CLUSTER_ELEMENT_DEFINITION,
+            TypeSafeDocumentReranker.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
