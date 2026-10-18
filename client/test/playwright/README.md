@@ -209,3 +209,59 @@ Fixtures are structured as:
 - **`workflowTest`** - Independent test object with `workflow` fixture (requires project)
 
 All fixtures are independent and can be combined in any order via `mergeTests`.
+
+## Authentication specs
+
+`tests/authentication` covers social login (Google, GitHub), SSO (OIDC and SAML), two-factor authentication and SCIM
+provisioning end to end. They need identity provider mocks and a server configured to use them, so they are skipped
+unless `BYTECHEF_E2E_AUTHENTICATION_MOCKS=1` is set.
+
+1. Start the mocks. `SAML_SP_BASE_URLS` is the browser origin of the client (the Playwright base URL); the SAML IdP
+   registers ByteChef under every SAML registration id for it.
+
+    ```bash
+    cd client/test/playwright/docker/authentication
+    SAML_SP_BASE_URLS=http://127.0.0.1:5173 docker compose up -d
+    ```
+
+    | Mock                        | Port  | Plays                                                                  |
+    | --------------------------- | ----- | ---------------------------------------------------------------------- |
+    | `oidc` (mock-oauth2-server) | 18090 | Google (issuer `/google`) and every OIDC SSO provider the specs create |
+    | `github`                    | 18091 | GitHub's OAuth2 endpoints                                              |
+    | `saml` (SimpleSAMLphp)      | 18080 | A SAML IdP with `user1`/`user1pass` (`user1@example.com`)              |
+
+2. Start the server (Enterprise Edition) with these settings, on a database of its own:
+
+    ```bash
+    BYTECHEF_PUBLIC_URL=http://127.0.0.1:5173
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED=true
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_ID=e2e-google
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET=e2e-google-secret
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_AUTHORIZATION_URI=http://localhost:18090/google/authorize
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_TOKEN_URI=http://localhost:18090/google/token
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_USER_INFO_URI=http://localhost:18090/google/userinfo
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_JWK_SET_URI=http://localhost:18090/google/jwks
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_ISSUER_URI=http://localhost:18090/google
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID=e2e-github
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET=e2e-github-secret
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_AUTHORIZATION_URI=http://localhost:18091/login/oauth/authorize
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_TOKEN_URI=http://localhost:18091/login/oauth/access_token
+    BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_USER_INFO_URI=http://localhost:18091/user
+    BYTECHEF_SECURITY_SSO_ENABLED=true
+    BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED=true
+    ```
+
+    Mail must reach Mailpit (the dev profile's default): invited users are claimed through the mailed claim link. Set
+    `PLAYWRIGHT_MAILPIT_URL` when Mailpit is not on `http://localhost:8025`.
+
+3. Run the specs:
+
+    ```bash
+    cd client
+    BYTECHEF_E2E_AUTHENTICATION_MOCKS=1 npx playwright test test/playwright/tests/authentication
+    ```
+
+The specs create uniquely named users and `*.e2e.example.com` SSO domains and delete the identity providers they
+create. The SAML spec uses the IdP's fixed `example.com` domain, so it runs serially and first removes SAML providers
+left over from an interrupted run. The admin account (`admin@localhost.com`) must not have two-factor authentication
+enabled.
