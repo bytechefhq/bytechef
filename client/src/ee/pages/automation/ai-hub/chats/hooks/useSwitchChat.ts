@@ -297,14 +297,15 @@ function toToolApprovalCardMessage(approval: AiHubToolApprovalI): ThreadMessageL
     } as ThreadMessageLike;
 }
 
-/**
- * Puts back the approval cards the transcript itself cannot restore. A gated call pauses the run before its result is
- * written to session memory, so the history usually holds only the gated call and, once decided, the
- * {@code [tool-approval #N ...]} continuation prompt the server posted. That prompt is replaced by the approval's
- * card, matching what the live stream showed; when the card did come back from a persisted result, the prompt is
- * dropped instead. A still-pending approval has no continuation yet, so its card goes at the end. Without the
- * approvals list (lookup failed) the transcript is left as is.
- */
+function withLapsedExpiry(approval: AiHubToolApprovalI, now: number): AiHubToolApprovalI {
+    if (approval.status !== 'PENDING' || approval.expiresAt == null || Date.parse(approval.expiresAt) > now) {
+        return approval;
+    }
+
+    return {...approval, status: 'EXPIRED'};
+}
+
+/** Rebuilds the approval cards the transcript lost, from the chat's approval records. */
 function restoreToolApprovalCards(
     messages: ThreadMessageLike[],
     approvalsById: Map<number, AiHubToolApprovalI>
@@ -470,7 +471,11 @@ async function loadChatTranscript({
         getToolApprovals({chatId, workspaceId}).catch((): AiHubToolApprovalI[] => []),
     ]);
 
-    const toolApprovalsById = new Map(toolApprovals.map((approval) => [approval.id, approval]));
+    const now = Date.now();
+
+    const toolApprovalsById = new Map(
+        toolApprovals.map((approval) => [approval.id, withLapsedExpiry(approval, now)] as const)
+    );
 
     return [
         ...applyToolApprovalStatuses(
