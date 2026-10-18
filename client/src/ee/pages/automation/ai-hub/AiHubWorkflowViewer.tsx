@@ -1,33 +1,40 @@
 import EmbeddableWorkflowEditor from '@/pages/platform/workflow-editor/EmbeddableWorkflowEditor';
-import {Workflow, WorkflowApi} from '@/shared/middleware/automation/configuration';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useQuery} from '@tanstack/react-query';
+import {ResponseError} from '@/shared/middleware/automation/configuration';
+import {useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 
 interface AiHubWorkflowViewerProps {
     projectId: string;
     projectWorkflowId: number;
 }
 
+const WORKFLOW_NOT_FOUND_STATUSES = [400, 404];
+
+const isWorkflowNotFoundError = (error: Error | null): boolean =>
+    error instanceof ResponseError && WORKFLOW_NOT_FOUND_STATUSES.includes(error.response.status);
+
 const ViewerMessage = ({message}: {message: string}) => (
     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">{message}</div>
 );
 
 /**
- * The workflow tab's body. The editor mounts only once the workflow has loaded, so a tab whose workflow was deleted
- * shows that it no longer exists instead of an empty editor that keeps refetching it. The editor is keyed by the
- * workflow so it re-mounts, and fits the new workflow to view, when an open tab re-points to another workflow of the
- * same project.
+ * The workflow tab's body. Mounts the embedded editor once the project workflow has loaded and keeps it mounted when
+ * a later refetch fails transiently. Shows that the workflow no longer exists when the server reports it as not found,
+ * or when it could never be loaded. The editor is keyed by the workflow, so it re-mounts when an open tab re-points to
+ * another workflow of the same project.
  */
 const AiHubWorkflowViewer = ({projectId, projectWorkflowId}: AiHubWorkflowViewerProps) => {
     const hasWorkflowReference = projectWorkflowId > 0;
 
-    const {isError: isWorkflowMissing, isPending: isWorkflowPending} = useQuery<Workflow, Error>({
-        enabled: hasWorkflowReference,
-        queryFn: () => new WorkflowApi().getProjectWorkflow({projectWorkflowId}),
-        queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId, projectWorkflowId),
-        refetchOnWindowFocus: false,
-        retry: false,
-    });
+    const {data: workflow, error: workflowError} = useGetProjectWorkflowQuery(
+        +projectId,
+        projectWorkflowId,
+        hasWorkflowReference,
+        undefined,
+        {refetchOnWindowFocus: false, retry: false}
+    );
+
+    const isWorkflowMissing =
+        workflowError != null && (workflow === undefined || isWorkflowNotFoundError(workflowError));
 
     return (
         <div className="flex size-full flex-col">
@@ -37,11 +44,11 @@ const AiHubWorkflowViewer = ({projectId, projectWorkflowId}: AiHubWorkflowViewer
                 <ViewerMessage message="This workflow no longer exists. It may have been deleted." />
             )}
 
-            {hasWorkflowReference && !isWorkflowMissing && isWorkflowPending && (
+            {hasWorkflowReference && !isWorkflowMissing && workflow === undefined && (
                 <ViewerMessage message="Loading workflow..." />
             )}
 
-            {hasWorkflowReference && !isWorkflowMissing && !isWorkflowPending && (
+            {hasWorkflowReference && !isWorkflowMissing && workflow !== undefined && (
                 <EmbeddableWorkflowEditor
                     key={`${projectId}-${projectWorkflowId}`}
                     projectId={+projectId}
