@@ -1,4 +1,5 @@
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 
 const KnowledgeBaseEmbeddingInactiveAlert = () => (
     <div className="flex size-full items-center justify-center p-4">
@@ -11,8 +12,8 @@ const KnowledgeBaseEmbeddingInactiveAlert = () => (
                     for this environment.
                 </span>
 
-                <a className="font-medium underline" href="/automation/settings/ai-providers">
-                    Go to AI Providers
+                <a className="font-medium underline" href={AI_PROVIDERS_SETTINGS_PATH}>
+                    {AI_PROVIDERS_LINK_LABEL}
                 </a>
             </AlertDescription>
         </Alert>
