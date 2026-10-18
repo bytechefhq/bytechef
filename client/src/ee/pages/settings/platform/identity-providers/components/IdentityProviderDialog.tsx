@@ -82,7 +82,7 @@ const IdentityProviderDialog = () => {
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
                 <DialogMain>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex min-h-0 flex-1 flex-col gap-4">
                         <DialogHeader title={isEditing ? 'Edit Identity Provider' : 'Add Identity Provider'} />
 
                         <DialogBody>
