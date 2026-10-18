@@ -1,6 +1,7 @@
 package com.agui.json.mixins;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -33,4 +34,7 @@ public interface RunErrorEventMixin {
     @JsonProperty("message")
     @JsonAlias("error")
     String getError();
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String getCode();
 }
