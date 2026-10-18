@@ -35,9 +35,12 @@ interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
     embedded?: boolean;
+    onWorkflowChange?: (projectWorkflowId: number) => void;
     projectId: number;
     projectWorkflowId: number;
     runDisabled: boolean;
+    showPublishDeploy?: boolean;
+    showWorkflowSelect?: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -45,9 +48,12 @@ const ProjectHeader = ({
     bottomResizablePanelRef,
     chatTrigger,
     embedded,
+    onWorkflowChange,
     projectId,
     projectWorkflowId,
     runDisabled,
+    showPublishDeploy,
+    showWorkflowSelect,
     updateWorkflowMutation,
 }: ProjectHeaderProps) => {
     const [projectDeploymentsSheetState, setProjectDeploymentsSheetState] = useState<
@@ -115,19 +121,34 @@ const ProjectHeader = ({
             )}
         >
             <div className="flex items-center gap-2">
-                <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
+                {!embedded && (
+                    <>
+                        <LeftSidebarButton
+                            onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)}
+                        />
 
-                {projectWorkflows && (
-                    <ProjectBreadcrumb
-                        itemSelect={
-                            <ProjectItemSelect
-                                currentLabel={workflow?.label}
-                                currentProjectWorkflowId={projectWorkflowId}
-                                onWorkflowValueChange={handleProjectWorkflowValueChange}
-                                projectWorkflows={projectWorkflows}
+                        {projectWorkflows && (
+                            <ProjectBreadcrumb
+                                itemSelect={
+                                    <ProjectItemSelect
+                                        currentLabel={workflow?.label}
+                                        currentProjectWorkflowId={projectWorkflowId}
+                                        onWorkflowValueChange={handleProjectWorkflowValueChange}
+                                        projectWorkflows={projectWorkflows}
+                                    />
+                                }
+                                project={project}
                             />
-                        }
-                        project={project}
+                        )}
+                    </>
+                )}
+
+                {embedded && showWorkflowSelect && projectWorkflows && (
+                    <ProjectItemSelect
+                        currentLabel={workflow?.label}
+                        currentProjectWorkflowId={projectWorkflowId}
+                        onWorkflowValueChange={onWorkflowChange ?? handleProjectWorkflowValueChange}
+                        projectWorkflows={projectWorkflows}
                     />
                 )}
 
@@ -143,26 +164,30 @@ const ProjectHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <ButtonGroup>
-                    <PublishPopover
-                        disabled={!hasUnpublishedChanges}
-                        isPending={publishProjectMutationIsPending}
-                        onPublishProjectSubmit={handlePublishProjectSubmit}
-                    />
+                {(!embedded || showPublishDeploy) && (
+                    <ButtonGroup>
+                        <PublishPopover
+                            disabled={!hasUnpublishedChanges}
+                            isPending={publishProjectMutationIsPending}
+                            onPublishProjectSubmit={handlePublishProjectSubmit}
+                        />
 
-                    <DeployButton onDeploymentSaved={openSavedProjectDeployment} project={project} />
+                        <DeployButton onDeploymentSaved={openSavedProjectDeployment} project={project} />
 
-                    <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
-                </ButtonGroup>
+                        <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
+                    </ButtonGroup>
+                )}
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
-                <SettingsMenu
-                    bottomResizablePanelRef={bottomResizablePanelRef}
-                    project={project}
-                    updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={workflow}
-                />
+                {!embedded && (
+                    <SettingsMenu
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        project={project}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow}
+                    />
+                )}
             </div>
 
             {projectDeploymentsSheetState && (
