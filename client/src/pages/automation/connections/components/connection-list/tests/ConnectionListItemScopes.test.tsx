@@ -7,7 +7,11 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectionListItem from '../ConnectionListItem';
 
-const ALL_SCOPES = ['CONNECTION_EDIT', 'CONNECTION_DELETE'];
+const ALL_SCOPES = ['CONNECTION_DELETE', 'CONNECTION_EDIT'];
+
+const EDITOR_SCOPES = ['CONNECTION_CREATE', 'CONNECTION_DELETE', 'CONNECTION_EDIT', 'CONNECTION_VIEW'];
+
+const VIEWER_SCOPES = ['CONNECTION_VIEW'];
 
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
@@ -21,7 +25,7 @@ const hoistedSharing = vi.hoisted(() => ({
     visibilityOptions: undefined as MutationOptionsType | undefined,
 }));
 
-vi.mock('@/pages/automation/connections/hooks/useVisibilityFeatureEnabled', () => ({
+vi.mock('@/shared/hooks/useVisibilityFeatureEnabled', () => ({
     useVisibilityFeatureEnabled: () =>
         hoistedSharing.visibilityEnabled
             ? {enabled: true, isAdmin: false, workspaceId: 1}
@@ -145,27 +149,52 @@ describe('ConnectionListItem', () => {
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     });
 
-    it('should hide Disconnect from all for a member who is not a tenant admin', async () => {
-        setTenantAdmin(false);
+    it('should show Edit and Delete but hide Disconnect from all for an EDITOR owner who is not a tenant admin', async () => {
+        hoistedScope.grantedScopes = EDITOR_SCOPES;
+
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_USER'], login: 'owner@example.com'} as never,
+            authenticated: true,
+        });
 
         const user = userEvent.setup();
 
-        renderConnectionListItem({active: true});
+        renderConnectionListItem({active: true, createdBy: 'owner@example.com'});
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'false');
 
         await user.click(screen.getByRole('button', {name: 'Connection actions'}));
 
-        expect(screen.queryByRole('menuitem', {name: 'Disconnect from all'})).not.toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Disconnect from all'})).not.toBeInTheDocument();
     });
 
-    it('should hide Edit and make tags read-only without CONNECTION_EDIT', async () => {
+    it('should hide Edit and Delete from a VIEWER owner, who lacks the connection scopes', () => {
+        hoistedScope.grantedScopes = VIEWER_SCOPES;
+
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_USER'], login: 'owner@example.com'} as never,
+            authenticated: true,
+        });
+
+        renderConnectionListItem({active: true, createdBy: 'owner@example.com'});
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
+        expect(screen.queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
+    });
+
+    it('should show Delete but hide Edit for an owner who holds only CONNECTION_DELETE', async () => {
         hoistedScope.grantedScopes = ['CONNECTION_DELETE'];
+
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_USER'], login: 'owner@example.com'} as never,
+            authenticated: true,
+        });
 
         const user = userEvent.setup();
 
-        renderConnectionListItem();
-
-        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
+        renderConnectionListItem({active: true, createdBy: 'owner@example.com'});
 
         await user.click(screen.getByRole('button', {name: 'Connection actions'}));
 
@@ -173,22 +202,21 @@ describe('ConnectionListItem', () => {
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     });
 
-    it('should hide Delete without CONNECTION_DELETE', async () => {
-        hoistedScope.grantedScopes = ['CONNECTION_EDIT'];
+    it('should hide Edit and Delete and make tags read-only for an EDITOR who is neither owner nor tenant admin', () => {
+        hoistedScope.grantedScopes = EDITOR_SCOPES;
 
-        const user = userEvent.setup();
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_USER'], login: 'member@example.com'} as never,
+            authenticated: true,
+        });
 
-        renderConnectionListItem();
+        renderConnectionListItem({active: true, createdBy: 'owner@example.com'});
 
-        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
-
-        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
+        expect(screen.queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
     });
 
     it('should hide the actions menu when no action is available', () => {
-        hoistedScope.grantedScopes = [];
-
         setTenantAdmin(false);
 
         renderConnectionListItem({active: true});
@@ -233,8 +261,7 @@ describe('ConnectionListItem sharing', () => {
         invalidateQueriesSpy.mockRestore();
     });
 
-    it('should not fetch grants or offer the visibility picker to a member who neither owns the connection nor holds CONNECTION_EDIT', () => {
-        hoistedScope.grantedScopes = [];
+    it('should not fetch grants or offer the visibility picker to a member who neither owns the connection nor is a tenant admin', () => {
         hoistedSharing.visibilityEnabled = true;
 
         setOwner();
@@ -246,7 +273,6 @@ describe('ConnectionListItem sharing', () => {
     });
 
     it('should fetch grants and offer the visibility picker to the owner', () => {
-        hoistedScope.grantedScopes = [];
         hoistedSharing.visibilityEnabled = true;
 
         setOwner();
@@ -258,7 +284,6 @@ describe('ConnectionListItem sharing', () => {
     });
 
     it('should load grants for a shared connection once the sharing menu is opened', async () => {
-        hoistedScope.grantedScopes = [];
         hoistedSharing.visibilityEnabled = true;
 
         setOwner();

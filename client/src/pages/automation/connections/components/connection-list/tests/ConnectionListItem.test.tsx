@@ -14,7 +14,7 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: () => true,
 }));
 
-vi.mock('@/pages/automation/connections/hooks/useVisibilityFeatureEnabled', () => ({
+vi.mock('@/shared/hooks/useVisibilityFeatureEnabled', () => ({
     useVisibilityFeatureEnabled: () => ({enabled: false, isAdmin: false, workspaceId: undefined}),
 }));
 
@@ -48,6 +48,7 @@ vi.mock('@/shared/mutations/automation/connectionTags.mutations', () => ({
 vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
     useDeleteConnectionMutation: () => ({isPending: false, mutate: hoisted.deleteConnectionMutate}),
     useDisconnectConnectionMutation: () => ({isPending: false, mutate: hoisted.disconnectConnectionMutate}),
+    useUpdateConnectionCredentialsMutation: vi.fn(),
     useUpdateConnectionMutation: vi.fn(),
 }));
 

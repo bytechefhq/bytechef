@@ -78,6 +78,7 @@ afterEach(() => {
 });
 
 const mockProps = {
+    canManageVisibility: true,
     importN8nWorkflowDisabled: false,
     onCloseDropdownMenuClick: vi.fn(),
     onDeleteProjectClick: vi.fn(),
@@ -91,6 +92,7 @@ const mockProps = {
     onShowEditProjectDialogClick: vi.fn(),
     onShowProjectGitConfigurationDialog: vi.fn(),
     onShowProjectVersionHistorySheet: vi.fn(),
+    onShowVisibilityDialog: vi.fn(),
     projectGitConfigurationEnabled: false,
     projectId: 123,
 };
@@ -397,5 +399,29 @@ describe('ProjectTabButtons Export Functionality', () => {
         expect(screen.getByText('Delete')).toBeInTheDocument();
         expect(screen.getByText('Duplicate')).toBeInTheDocument();
         expect(screen.getByText('Pull Project from Git')).toBeInTheDocument();
+    });
+});
+
+describe('ProjectTabButtons Visibility Item', () => {
+    it('offers Visibility to the project owner or a tenant admin in EE and calls its handler', async () => {
+        renderProjectTabButtons();
+
+        await userEvent.click(screen.getByLabelText('Project Visibility Button'));
+
+        expect(mockProps.onShowVisibilityDialog).toHaveBeenCalled();
+    });
+
+    it('hides Visibility from a member who neither owns the project nor is a tenant admin', () => {
+        renderProjectTabButtons({...mockProps, canManageVisibility: false});
+
+        expect(screen.queryByLabelText('Project Visibility Button')).not.toBeInTheDocument();
+    });
+
+    it('hides Visibility in CE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.CE}});
+
+        renderProjectTabButtons();
+
+        expect(screen.queryByLabelText('Project Visibility Button')).not.toBeInTheDocument();
     });
 });
