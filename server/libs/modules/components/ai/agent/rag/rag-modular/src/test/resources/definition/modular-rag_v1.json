@@ -35,13 +35,13 @@
   } ],
   "clusterElements": [ {
     "name": "rag",
-    "description": "Moduler RAG.",
+    "description": "Modular RAG.",
     "element": { },
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
     "properties": [ ],
-    "title": "Moduler RAG",
+    "title": "Modular RAG",
     "type": {
       "name": "RAG",
       "key": "rag",
