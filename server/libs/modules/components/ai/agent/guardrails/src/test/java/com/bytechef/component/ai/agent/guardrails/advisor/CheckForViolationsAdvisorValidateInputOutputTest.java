@@ -535,6 +535,226 @@ class CheckForViolationsAdvisorValidateInputOutputTest {
             .getText()).isEqualTo("BLOCKED");
     }
 
+    @Test
+    void inputOnlyCheckFunctionSkipsModelResponseWhenParametersOmitFlags() {
+        GuardrailCheckFunction inputOnly = new GuardrailCheckFunction() {
+
+            @Override
+            public Optional<Violation> apply(String text, GuardrailContext context) {
+                if (text.contains("unsafe-output")) {
+                    throw new AssertionError("an input-only check must not run on the model response");
+                }
+
+                return Optional.empty();
+            }
+
+            @Override
+            public GuardrailStage stage() {
+                return GuardrailStage.LLM;
+            }
+
+            @Override
+            public boolean validatesOutputByDefault() {
+                return false;
+            }
+        };
+
+        Parameters empty = ParametersFactory.create(Map.of());
+
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("inputOnly", inputOnly, empty, empty, empty, empty, Map.of(), null)
+            .context(mock(Context.class))
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("hello");
+        ChatClientResponse modelResponse = assistantResponse("unsafe-output");
+
+        when(chain.nextCall(request)).thenReturn(modelResponse);
+
+        ChatClientResponse response = advisor.adviseCall(request, chain);
+
+        assertThat(response).isSameAs(modelResponse);
+    }
+
+    @Test
+    void outputOnlyCheckFunctionSkipsUserInputWhenParametersOmitFlags() {
+        GuardrailCheckFunction outputOnly = new GuardrailCheckFunction() {
+
+            @Override
+            public Optional<Violation> apply(String text, GuardrailContext context) {
+                if (text.contains("bad")) {
+                    return Optional.of(Violation.ofMatch("outputOnly", "bad"));
+                }
+
+                return Optional.empty();
+            }
+
+            @Override
+            public GuardrailStage stage() {
+                return GuardrailStage.LLM;
+            }
+
+            @Override
+            public boolean validatesInputByDefault() {
+                return false;
+            }
+        };
+
+        Parameters empty = ParametersFactory.create(Map.of());
+
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("outputOnly", outputOnly, empty, empty, empty, empty, Map.of(), null)
+            .context(mock(Context.class))
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("bad input");
+        ChatClientResponse modelResponse = assistantResponse("fine");
+
+        when(chain.nextCall(request)).thenReturn(modelResponse);
+
+        ChatClientResponse response = advisor.adviseCall(request, chain);
+
+        assertThat(response).isSameAs(modelResponse);
+    }
+
+    @Test
+    void explicitValidateOutputParameterOverridesCheckFunctionDefault() {
+        GuardrailCheckFunction inputOnly = new GuardrailCheckFunction() {
+
+            @Override
+            public Optional<Violation> apply(String text, GuardrailContext context) {
+                if (text.contains("toxic")) {
+                    return Optional.of(Violation.ofMatch("inputOnly", "toxic"));
+                }
+
+                return Optional.empty();
+            }
+
+            @Override
+            public GuardrailStage stage() {
+                return GuardrailStage.LLM;
+            }
+
+            @Override
+            public boolean validatesOutputByDefault() {
+                return false;
+            }
+        };
+
+        Parameters withOutputCheck = ParametersFactory.create(Map.of(VALIDATE_OUTPUT, true));
+        Parameters empty = ParametersFactory.create(Map.of());
+
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("inputOnly", inputOnly, withOutputCheck, empty, empty, empty, Map.of(), null)
+            .context(mock(Context.class))
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("hello");
+
+        when(chain.nextCall(request)).thenReturn(assistantResponse("something toxic"));
+
+        ChatClientResponse response = advisor.adviseCall(request, chain);
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText()).isEqualTo("BLOCKED");
+    }
+
+    @Test
+    void streamedOutputCheckFunctionBlocksViolationSplitAcrossChunks() {
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("streamedOutput", streamedOutputCheck("toxic"), emptyParameters(), null, null)
+            .context(mock(Context.class))
+            .build();
+
+        StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("tell me a story");
+
+        when(streamChain.nextStream(request))
+            .thenReturn(Flux.just(assistantResponse("this is to"), assistantResponse("xic content")));
+
+        List<ChatClientResponse> responses = Objects.requireNonNull(
+            advisor.adviseStream(request, streamChain)
+                .collectList()
+                .block(),
+            "responses");
+
+        assertThat(responses).hasSize(1);
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(
+            responses.get(0)
+                .chatResponse(),
+            "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText()).isEqualTo("BLOCKED");
+    }
+
+    @Test
+    void streamedOutputCheckFunctionPassesCleanChunksThroughInOrder() {
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("streamedOutput", streamedOutputCheck("toxic"), emptyParameters(), null, null)
+            .context(mock(Context.class))
+            .build();
+
+        StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("hello");
+        ChatClientResponse chunk1 = assistantResponse("hello ");
+        ChatClientResponse chunk2 = assistantResponse("world");
+
+        when(streamChain.nextStream(request)).thenReturn(Flux.just(chunk1, chunk2));
+
+        List<ChatClientResponse> responses = advisor.adviseStream(request, streamChain)
+            .collectList()
+            .block();
+
+        assertThat(responses).containsExactly(chunk1, chunk2);
+    }
+
+    private static Parameters emptyParameters() {
+        return ParametersFactory.create(Map.of());
+    }
+
+    private static GuardrailCheckFunction streamedOutputCheck(String forbiddenText) {
+        return new GuardrailCheckFunction() {
+
+            @Override
+            public Optional<Violation> apply(String text, GuardrailContext context) {
+                if (text.contains(forbiddenText)) {
+                    return Optional.of(Violation.ofMatch("streamedOutput", forbiddenText));
+                }
+
+                return Optional.empty();
+            }
+
+            @Override
+            public GuardrailStage stage() {
+                return GuardrailStage.LLM;
+            }
+
+            @Override
+            public boolean validatesInputByDefault() {
+                return false;
+            }
+
+            @Override
+            public boolean validatesStreamedOutput() {
+                return true;
+            }
+        };
+    }
+
     private static ChatClientRequest requestWithUser(String text) {
         return ChatClientRequest.builder()
             .prompt(new Prompt(List.<Message>of(new UserMessage(text))))
