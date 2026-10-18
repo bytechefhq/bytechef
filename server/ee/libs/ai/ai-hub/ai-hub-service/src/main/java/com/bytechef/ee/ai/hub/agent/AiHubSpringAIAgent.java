@@ -276,6 +276,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected boolean splitsTextAtToolCalls() {
+        return true;
+    }
+
+    @Override
     protected @Nullable String runErrorCode(RunAgentInput input, Throwable throwable) {
         CopilotRunErrorCode copilotRunErrorCode = CopilotRunErrorCode.of(throwable);
 
