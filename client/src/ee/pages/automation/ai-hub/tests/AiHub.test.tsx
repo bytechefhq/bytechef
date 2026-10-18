@@ -9,7 +9,14 @@ import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {chatsQueryRef, switchChatMock} = vi.hoisted(() => ({
+const {archivedChatsQueryRef, chatsQueryRef, switchChatMock} = vi.hoisted(() => ({
+    archivedChatsQueryRef: {
+        current: {data: [], error: null, isLoading: false} as {
+            data: AiHubChatI[] | undefined;
+            error: Error | null;
+            isLoading: boolean;
+        },
+    },
     chatsQueryRef: {
         current: {data: [], error: null, isLoading: false} as {
             data: AiHubChatI[] | undefined;
@@ -40,7 +47,8 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat', () => ({
     useSwitchChat: () => switchChatMock,
 }));
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
-    useAiHubChatsQuery: () => chatsQueryRef.current,
+    useAiHubChatsQuery: (_workspaceId: number, _environmentId: number, status: 'ACTIVE' | 'ARCHIVED') =>
+        status === 'ARCHIVED' ? archivedChatsQueryRef.current : chatsQueryRef.current,
 }));
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
@@ -96,6 +104,7 @@ describe('AiHub', () => {
         switchChatMock.mockReset();
 
         chatsQueryRef.current = {data: [], error: null, isLoading: false};
+        archivedChatsQueryRef.current = {data: [], error: null, isLoading: false};
 
         aiHubChatsStore.setState({currentChatId: undefined});
         aiHubStore.setState({messages: [], messagesLoading: false});
@@ -183,8 +192,29 @@ describe('AiHub', () => {
             expect(switchChatMock).not.toHaveBeenCalled();
         });
 
+        it('opens a deep-linked archived chat instead of showing not-found', () => {
+            const archivedChat = buildChat({status: 'ARCHIVED'});
+
+            archivedChatsQueryRef.current = {data: [archivedChat], error: null, isLoading: false};
+
+            renderAt('/automation/ai-hub/chats/7');
+
+            expect(screen.queryByText('Chat not found')).toBeNull();
+            expect(switchChatMock).toHaveBeenCalledWith(archivedChat);
+        });
+
+        it('waits for the archived list before deciding a chat is not found', () => {
+            archivedChatsQueryRef.current = {data: undefined, error: null, isLoading: true};
+
+            renderAt('/automation/ai-hub/chats/7');
+
+            expect(screen.getByTestId('ai-hub-chat-loading')).toBeInTheDocument();
+            expect(screen.queryByText('Chat not found')).toBeNull();
+        });
+
         it('shows the not-found state when the chats request itself is refused', () => {
             chatsQueryRef.current = {data: undefined, error: new Error('FORBIDDEN'), isLoading: false};
+            archivedChatsQueryRef.current = {data: undefined, error: new Error('FORBIDDEN'), isLoading: false};
 
             renderAt('/automation/ai-hub/chats/7');
 
