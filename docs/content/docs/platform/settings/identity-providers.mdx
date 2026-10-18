@@ -60,7 +60,7 @@ For SAML, editing a saved provider exposes a **Download SP Metadata** button to 
 
 ### MCP servers
 
-Identity providers configured here are used for signing in to ByteChef. Their tokens are not accepted on MCP servers yet. To connect an MCP client with a token from an external issuer, the installation must list that issuer in its configuration - see [MCP Server → JWT from a trusted issuer](/platform/settings/mcp-server#jwt-from-a-trusted-issuer-optional).
+Identity providers configured here are used for signing in to ByteChef. Their tokens are not accepted on MCP servers yet. To connect an MCP client with a token from an external issuer, the installation must list that issuer in its configuration - see [MCP Server → JWT from a trusted issuer](/platform/settings/mcp-server#jwt-from-a-trusted-issuer-optional). Such a token acts as the ByteChef user whose email it carries, so a user who has signed in here once can then use their identity provider's tokens on MCP servers.
 
 ## What gets federated
 

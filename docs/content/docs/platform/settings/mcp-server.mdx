@@ -89,7 +89,34 @@ See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/env
 
 ### JWT from a trusted issuer (optional)
 
-The secret-key MCP endpoint can also accept JWTs from an external issuer (Okta, Microsoft Entra, Keycloak, …) that your installation trusts. List each trusted issuer and its claim mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays dormant until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`. Tokens from external issuers are accepted on the secret URL only; on the tenant-less URL they are rejected with `401`. A token for this server must carry the `mcp:management` scope. API keys keep working alongside JWTs.
+The secret-key MCP endpoint can also accept JWTs from an external issuer (Okta, Microsoft Entra, Keycloak, …) that your installation trusts. List each trusted issuer and its claim mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays dormant until at least one issuer is configured. API keys keep working alongside JWTs. Tokens from external issuers are accepted on the secret URL only; on the tenant-less URL they are rejected with `401`.
+
+A token is accepted only when all of these hold:
+
+- **Its issuer is listed** and its signature and expiry check out. A token from an issuer that is not listed is rejected with `401`.
+- **Its audience matches.** It must carry the issuer's configured `AUDIENCE` value, or - when none is configured - the URL of the MCP endpoint it is sent to. Otherwise `401`.
+- **It carries the `mcp:management` scope.** Otherwise `403`.
+- **It names an active ByteChef user.** The issuer's email claim (`email` unless you set `EMAIL_CLAIM`) must match the email of an active ByteChef user in your account, and the token must not mark that email as unverified (`email_verified: false`). Otherwise `401`.
+
+The request then runs as that ByteChef user, with that user's roles - exactly as if they had signed in through ByteChef. ByteChef never creates an account from an MCP token: the user must exist already, for example because they signed in once through [SSO](/platform/settings/identity-providers) or were invited.
+
+Machine clients that use the client-credentials grant have no user of their own. Give the client's service account an email address in your identity provider, and create a ByteChef user with that email for it to act as.
+
+#### Set up the identity provider
+
+The issuer must put these in the **access token** the MCP client receives:
+
+| What | Why | Keycloak | Okta (custom authorization server) | Microsoft Entra ID |
+|---|---|---|---|---|
+| The `mcp:management` scope (`mcp:automation` for automation MCP servers) | The scope check above | A client scope named `mcp:management` | A custom scope named `mcp:management` | An exposed API scope; the token carries it in `scp` |
+| An audience | The audience check above | An *Audience* mapper on the MCP client scopes, matched by `AUDIENCE` | The authorization server's audience, matched by `AUDIENCE` | The application ID URI, matched by `AUDIENCE` |
+| The user's email | Resolving the ByteChef user | A *User Property* mapper for `email` (and `emailVerified` as `email_verified`) on the MCP client scopes | Set `EMAIL_CLAIM=sub` when logins are email addresses | Set `EMAIL_CLAIM=upn` or `preferred_username` |
+
+Put the email claim on the MCP scopes themselves, not only on the `email` scope: an MCP client requests just the scope the server advertises, so claims tied to other scopes never reach its token.
+
+For an MCP client to sign in at your identity provider on its own, list that issuer first (index `0`) - the server advertises the first issuer - and let the client register itself: enable dynamic client registration for MCP clients, or pre-register a client and give its id to the MCP client. On Keycloak, anonymous registration is limited by the realm's *Client Registration* policies; allow the client's redirect host under *Trusted Hosts*, and remove *Consent Required* if you do not want a consent screen.
+
+If the identity provider is unreachable, ByteChef cannot load its signing keys, and tokens it has not validated before are rejected with `401` until it is back.
 
 > **Per-account identity providers are not used here yet.** Trusted issuers are set by whoever runs the ByteChef installation, in its configuration, and apply to every account. Identity providers added under [Settings → Identity Providers](/platform/settings/identity-providers) are used for signing in to ByteChef only; their tokens are not accepted on MCP servers.
 

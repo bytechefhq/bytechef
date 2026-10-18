@@ -363,13 +363,14 @@ does not support.
 | `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL/callback` |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
-| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server. When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `false` |
+| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server, so MCP clients can sign in through ByteChef itself. When disabled, its endpoints are not exposed; JWTs from the issuers listed below are still accepted on the MCP endpoints | `false` |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI` | Issuer identifier (`iss` claim / issuer URI) whose JWTs are trusted on the MCP endpoints. Repeat with `_1_`, `_2_`, … for additional issuers | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM` | JWT claim whose value is the ByteChef tenant id (for the embedded authorization server this is the minted `tenant_id` claim) | - |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_CLAIM` | JWT claim (e.g. `groups`, `roles`) whose values are mapped to granted authorities. When unset, authorities are resolved from the ByteChef user identified by `sub` | - |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_0` | Authority granted to every token from this issuer, in addition to any mapped from the authorities claim | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_EMAIL_CLAIM` | For an external issuer, the JWT claim whose value is matched against the email of a ByteChef user. Every token must resolve to an active ByteChef user in the endpoint's tenant, and the request runs as that user with that user's roles. A token without the claim, with `email_verified` set to `false`, or without a matching active user is rejected with `401`. Use e.g. `upn` or `preferred_username` for Microsoft Entra ID. Ignored for the self issuer, whose `sub` is the ByteChef login | `email` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_CLAIM` | JWT claim (e.g. `groups`, `roles`) whose values are added as granted authorities, on top of the roles of the ByteChef user the token resolves to. Values starting with `ROLE_` or `SCOPE_` are ignored | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_0` | Authority granted to every token from this issuer, on top of the user's roles and any mapped from the authorities claim | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF` | Whether this issuer is the ByteChef embedded authorization server; when `true`, audience validation enforces that a token's `aud` contains the requested MCP endpoint URL | `false` |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUDIENCE` | For an external issuer, the fixed audience value its tokens must carry. When unset, audience validation is skipped for this issuer | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUDIENCE` | For an external issuer, the fixed audience value its tokens must carry (e.g. a Keycloak audience mapper value or an Entra application ID URI). When unset, a token's `aud` must contain the URL of the MCP endpoint it is sent to | - |
 
 > **Coming soon.** The `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_*` and `BYTECHEF_OAUTH2_RESOURCE_SERVER_*` variables are on the upcoming release track and are not yet available in the latest released version of ByteChef.
 
