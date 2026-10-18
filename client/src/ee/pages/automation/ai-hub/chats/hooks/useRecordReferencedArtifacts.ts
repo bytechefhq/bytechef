@@ -3,9 +3,10 @@ import {AiHubChatArtifactKind, useRecordReferencedAiHubChatArtifactMutation} fro
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 
+import {isWorkspaceIdKnown} from '../isWorkspaceIdKnown';
 import {AiHubChatsKeys} from './useChats';
 
-export default function useRecordReferencedArtifacts(chatId: number | undefined, workspaceId: number) {
+export default function useRecordReferencedArtifacts(chatId: number | undefined, workspaceId: number | undefined) {
     const seenRef = useRef<Set<string>>(new Set());
     const previousChatIdRef = useRef<number | undefined>(chatId);
 
@@ -26,7 +27,7 @@ export default function useRecordReferencedArtifacts(chatId: number | undefined,
             previousChatIdRef.current = chatId;
         }
 
-        if (chatId == null || tabsActiveChatId !== chatId) {
+        if (chatId == null || tabsActiveChatId !== chatId || !isWorkspaceIdKnown(workspaceId)) {
             return;
         }
 

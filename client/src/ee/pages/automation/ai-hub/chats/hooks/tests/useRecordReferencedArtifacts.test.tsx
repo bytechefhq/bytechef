@@ -142,6 +142,24 @@ describe('useRecordReferencedArtifacts', () => {
         });
     });
 
+    it('does not record while the workspace id is unset and records once it is set', () => {
+        aiHubTabsStore.setState({activeChatId: 10, openTabs: [workflowTab]});
+
+        const {rerender} = renderHook(
+            ({workspaceId}: {workspaceId: number | undefined}) => useRecordReferencedArtifacts(10, workspaceId),
+            {initialProps: {workspaceId: undefined as number | undefined}, wrapper: wrap(new QueryClient())}
+        );
+
+        expect(mutateSpy).not.toHaveBeenCalled();
+
+        rerender({workspaceId: 1049});
+
+        expect(mutateSpy).toHaveBeenCalledTimes(1);
+        expect(mutateSpy).toHaveBeenCalledWith({
+            input: expect.objectContaining({chatId: '10', workspaceId: '1049'}),
+        });
+    });
+
     it('invalidates the artifact queries after a successful record', () => {
         const queryClient = new QueryClient();
 
