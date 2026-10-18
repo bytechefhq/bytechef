@@ -32,6 +32,8 @@ interface OpenToolCallI {
     toolName: string;
 }
 
+const TOOL_APPROVAL_CONTINUATION_PATTERN = /^\[tool-approval #(\d+)[\s\]]/;
+
 const INTERACTIVE_DATA_PART_TYPES = new Set([
     'data-ask-user-question',
     'data-create-connection',
@@ -203,6 +205,121 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
     return mapped;
 }
 
+function isToolApprovalRequestPart(part: unknown): part is {data: Record<string, unknown>; type: string} {
+    return (
+        typeof part === 'object' && part !== null && (part as {type?: unknown}).type === 'data-tool-approval-request'
+    );
+}
+
+function readContinuationApprovalId(message: ThreadMessageLike): number | undefined {
+    if (message.role !== 'user') {
+        return undefined;
+    }
+
+    const text =
+        typeof message.content === 'string'
+            ? message.content
+            : message.content.map((part) => (part.type === 'text' && 'text' in part ? part.text : '')).join('');
+
+    const match = TOOL_APPROVAL_CONTINUATION_PATTERN.exec(text);
+
+    return match ? Number(match[1]) : undefined;
+}
+
+function collectToolApprovalCardIds(messages: ThreadMessageLike[]): Set<number> {
+    const approvalIds = new Set<number>();
+
+    for (const message of messages) {
+        if (message.role !== 'assistant' || !Array.isArray(message.content)) {
+            continue;
+        }
+
+        for (const part of message.content) {
+            if (isToolApprovalRequestPart(part) && typeof part.data.approvalId === 'number') {
+                approvalIds.add(part.data.approvalId);
+            }
+        }
+    }
+
+    return approvalIds;
+}
+
+function parseApprovalArguments(argumentsJson: string): Record<string, unknown> {
+    try {
+        const parsedArguments = JSON.parse(argumentsJson);
+
+        return parsedArguments != null && typeof parsedArguments === 'object'
+            ? (parsedArguments as Record<string, unknown>)
+            : {};
+    } catch {
+        return {};
+    }
+}
+
+function toToolApprovalCardMessage(approval: AiHubToolApprovalI): ThreadMessageLike {
+    return {
+        content: [
+            {
+                data: {
+                    approvalId: approval.id,
+                    arguments: parseApprovalArguments(approval.arguments),
+                    awaitingApproval: true,
+                    componentName: approval.componentName,
+                    kind: 'tool-approval-request',
+                    toolName: approval.toolName,
+                },
+                type: 'data-tool-approval-request',
+            },
+        ],
+        role: 'assistant',
+    } as ThreadMessageLike;
+}
+
+/**
+ * Puts back the approval cards the transcript itself cannot restore. A gated call pauses the run before its result is
+ * written to session memory, so the history usually holds only the gated call and, once decided, the
+ * {@code [tool-approval #N ...]} continuation prompt the server posted. That prompt is replaced by the approval's
+ * card, matching what the live stream showed; when the card did come back from a persisted result, the prompt is
+ * dropped instead. A still-pending approval has no continuation yet, so its card goes at the end. Without the
+ * approvals list (lookup failed) the transcript is left as is.
+ */
+function restoreToolApprovalCards(
+    messages: ThreadMessageLike[],
+    approvalsById: Map<number, AiHubToolApprovalI>
+): ThreadMessageLike[] {
+    if (approvalsById.size === 0) {
+        return messages;
+    }
+
+    const cardApprovalIds = collectToolApprovalCardIds(messages);
+    const restored: ThreadMessageLike[] = [];
+
+    for (const message of messages) {
+        const continuationApprovalId = readContinuationApprovalId(message);
+        const approval = continuationApprovalId != null ? approvalsById.get(continuationApprovalId) : undefined;
+
+        if (!approval) {
+            restored.push(message);
+
+            continue;
+        }
+
+        if (!cardApprovalIds.has(approval.id)) {
+            restored.push(toToolApprovalCardMessage(approval));
+
+            cardApprovalIds.add(approval.id);
+        }
+    }
+
+    for (const approval of approvalsById.values()) {
+        if (approval.status === 'PENDING' && !cardApprovalIds.has(approval.id)) {
+            restored.push(toToolApprovalCardMessage(approval));
+        }
+    }
+
+    return restored;
+}
+
 /**
  * Stitches settled tool-approval outcomes onto the restored `data-tool-approval-request` parts. The restored part only
  * carries the original gated request, so without this a decided approval would render its Approve / Reject buttons
@@ -224,15 +341,11 @@ function applyToolApprovalStatuses(
         let changed = false;
 
         const content = message.content.map((part) => {
-            if (
-                typeof part !== 'object' ||
-                part === null ||
-                (part as {type?: unknown}).type !== 'data-tool-approval-request'
-            ) {
+            if (!isToolApprovalRequestPart(part)) {
                 return part;
             }
 
-            const data = (part as {data: Record<string, unknown>}).data;
+            const data = part.data;
             const approvalId = typeof data.approvalId === 'number' ? data.approvalId : null;
             const approval = approvalId != null ? approvalsById.get(approvalId) : undefined;
 
@@ -338,7 +451,10 @@ async function loadChatTranscript({
     const toolApprovalsById = new Map(toolApprovals.map((approval) => [approval.id, approval]));
 
     return [
-        ...applyToolApprovalStatuses(mapServerMessages(messages), toolApprovalsById),
+        ...applyToolApprovalStatuses(
+            restoreToolApprovalCards(mapServerMessages(messages), toolApprovalsById),
+            toolApprovalsById
+        ),
         ...buildArtifactLinkMessages(artifacts),
     ];
 }
