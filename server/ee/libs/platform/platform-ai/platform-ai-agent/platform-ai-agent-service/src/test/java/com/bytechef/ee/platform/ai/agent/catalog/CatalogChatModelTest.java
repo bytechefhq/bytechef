@@ -15,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.ai.llm.NoChatProviderActivatedException;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
@@ -79,7 +80,7 @@ class CatalogChatModelTest {
             .thenReturn(null);
 
         assertThatThrownBy(() -> catalogChatModel.call(new Prompt("hello")))
-            .isInstanceOf(IllegalStateException.class)
+            .isInstanceOf(NoChatProviderActivatedException.class)
             .hasMessageContaining("No chat provider is activated")
             .hasMessageContaining("PRODUCTION")
             .hasMessageContaining("bytechef.ai.provider.anthropic.api-key");
