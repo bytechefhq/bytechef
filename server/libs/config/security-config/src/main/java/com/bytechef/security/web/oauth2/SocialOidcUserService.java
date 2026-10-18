@@ -16,26 +16,22 @@
 
 package com.bytechef.security.web.oauth2;
 
-import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.user.domain.Authority;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.oauth2.SocialUserProvisioner.ProvisionedUser;
+import com.bytechef.security.web.oauth2.SocialUserProvisioner.SocialIdentity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 /**
- * OIDC user service for social login (Google, GitHub, ...): maps an OIDC provider user to an internal ByteChef user
- * with default provisioning ({@code autoProvision=true}, {@code ROLE_ADMIN}). External-IdP (SSO) provisioning that
- * reads {@code IdentityProvider} records is an enterprise capability and lives in the EE {@code CustomOidcUserService}.
+ * OIDC user service for social login (Google): maps an OIDC provider user to an internal ByteChef user through
+ * {@link SocialUserProvisioner}. External-IdP (SSO) provisioning that reads {@code IdentityProvider} records is an
+ * enterprise capability and lives in the EE {@code CustomOidcUserService}.
  *
  * @author Ivica Cardic
  */
@@ -43,13 +39,13 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
 public class SocialOidcUserService extends OidcUserService {
 
-    private final AuthorityService authorityService;
-    private final UserService userService;
+    static final String EMAIL_NOT_VERIFIED_ERROR_CODE = "email_not_verified";
+
+    private final SocialUserProvisioner socialUserProvisioner;
 
     @SuppressFBWarnings("EI")
-    public SocialOidcUserService(AuthorityService authorityService, UserService userService) {
-        this.authorityService = authorityService;
-        this.userService = userService;
+    public SocialOidcUserService(SocialUserProvisioner socialUserProvisioner) {
+        this.socialUserProvisioner = socialUserProvisioner;
     }
 
     @Override
@@ -60,27 +56,36 @@ public class SocialOidcUserService extends OidcUserService {
             throw new OAuth2AuthenticationException("No user returned by OIDC provider");
         }
 
+        return toCustomOidcUser(userRequest, oidcUser);
+    }
+
+    CustomOidcUser toCustomOidcUser(OidcUserRequest userRequest, OidcUser oidcUser) {
+        ProvisionedUser provisionedUser = socialUserProvisioner.provision(toSocialIdentity(userRequest, oidcUser));
+
+        return new CustomOidcUser(provisionedUser.login(), provisionedUser.authorities(), oidcUser);
+    }
+
+    /**
+     * Turns an OIDC social identity into a {@link SocialIdentity}, rejecting one without a verified email: sign-in
+     * links to an existing account by email, so an unverified address would hand that account to whoever claimed it.
+     */
+    public static SocialIdentity toSocialIdentity(OidcUserRequest userRequest, OidcUser oidcUser) {
         String email = oidcUser.getEmail();
 
         if (email == null) {
             throw new OAuth2AuthenticationException("Email not available from OIDC provider");
         }
 
+        if (Boolean.FALSE.equals(oidcUser.getEmailVerified())) {
+            throw new OAuth2AuthenticationException(
+                new OAuth2Error(EMAIL_NOT_VERIFIED_ERROR_CODE, "Email " + email + " is not verified", null));
+        }
+
         String registrationId = userRequest.getClientRegistration()
             .getRegistrationId();
 
-        User user = userService.findOrCreateSocialUser(
-            email, oidcUser.getGivenName(), oidcUser.getFamilyName(), oidcUser.getPicture(),
-            registrationId.toUpperCase(), oidcUser.getSubject(), true, AuthorityConstants.ADMIN);
-
-        List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
-            .stream()
-            .map(authorityService::fetchAuthority)
-            .map(Optional::get)
-            .map(Authority::getName)
-            .map(SimpleGrantedAuthority::new)
-            .toList();
-
-        return new CustomOidcUser(user.getLogin(), grantedAuthorities, oidcUser);
+        return new SocialIdentity(
+            registrationId.toUpperCase(Locale.ROOT), oidcUser.getSubject(), email, oidcUser.getGivenName(),
+            oidcUser.getFamilyName(), oidcUser.getPicture());
     }
 }
