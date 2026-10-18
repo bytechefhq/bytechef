@@ -1,9 +1,6 @@
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-// vi.hoisted ensures these setter references exist before the vi.mock factories evaluate — Vitest
-// hoists mocks above imports, so without hoisted state the factories would close over uninitialized
-// bindings. Each mock mutates its own slice of state so tests can drive each store independently.
 const mocks = vi.hoisted(() => ({
     _app: {application: null as {edition: 'CE' | 'EE'} | null},
     _auth: {account: null as {authorities?: string[]} | null},
@@ -75,7 +72,6 @@ describe('useVisibilityFeatureEnabled', () => {
         expect(result.current.enabled).toBe(true);
 
         if (result.current.enabled) {
-            // discriminated-union narrowing: workspaceId is guaranteed number when enabled
             expect(result.current.workspaceId).toBe(7);
         }
     });

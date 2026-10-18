@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useVisibilityFeatureEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
@@ -15,6 +16,7 @@ import {
     GitPullRequestArrowIcon,
     HistoryIcon,
     LayoutTemplateIcon,
+    LockIcon,
     PlusIcon,
     Share2Icon,
     Trash2Icon,
@@ -23,6 +25,7 @@ import {
 import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
+    canManageVisibility,
     importN8nWorkflowDisabled,
     onCloseDropdownMenuClick,
     onDeleteProjectClick,
@@ -36,9 +39,11 @@ const ProjectTabButtons = ({
     onShowEditProjectDialogClick,
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
+    onShowVisibilityDialog,
     projectGitConfigurationEnabled,
     projectId,
 }: {
+    canManageVisibility: boolean;
     importN8nWorkflowDisabled: boolean;
     onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
@@ -52,6 +57,7 @@ const ProjectTabButtons = ({
     onShowEditProjectDialogClick: () => void;
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
+    onShowVisibilityDialog: () => void;
     projectGitConfigurationEnabled: boolean;
     projectId: number;
 }) => {
@@ -86,6 +92,8 @@ const ProjectTabButtons = ({
     const canManageProjectSettings = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_SETTINGS');
     const canConfigureProjectGit = useHasWorkspaceScope(currentWorkspaceId, 'WORKSPACE_MANAGE');
     const canPullProjectFromGit = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PULL');
+
+    const {enabled: visibilityFeatureEnabled} = useVisibilityFeatureEnabled();
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -124,6 +132,17 @@ const ProjectTabButtons = ({
                     icon={<Share2Icon />}
                     label="Share"
                     onClick={onShareProject}
+                    variant="ghost"
+                />
+            )}
+
+            {visibilityFeatureEnabled && canManageVisibility && (
+                <Button
+                    aria-label="Project Visibility Button"
+                    className="dropdown-menu-item"
+                    icon={<LockIcon />}
+                    label="Visibility"
+                    onClick={onShowVisibilityDialog}
                     variant="ghost"
                 />
             )}

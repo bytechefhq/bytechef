@@ -2,16 +2,16 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
-import ConnectionScopeBadge from './ConnectionScopeBadge';
+import ResourceVisibilityBadge from './ResourceVisibilityBadge';
 
-const renderBadge = (props: Parameters<typeof ConnectionScopeBadge>[0]) =>
+const renderBadge = (props: Parameters<typeof ResourceVisibilityBadge>[0]) =>
     render(
         <TooltipProvider>
-            <ConnectionScopeBadge {...props} />
+            <ResourceVisibilityBadge {...props} />
         </TooltipProvider>
     );
 
-describe('ConnectionScopeBadge', () => {
+describe('ResourceVisibilityBadge', () => {
     it('renders the visibility label for each scope', () => {
         const {rerender} = renderBadge({visibility: 'PRIVATE'});
 
@@ -19,7 +19,7 @@ describe('ConnectionScopeBadge', () => {
 
         rerender(
             <TooltipProvider>
-                <ConnectionScopeBadge visibility="WORKSPACE" />
+                <ResourceVisibilityBadge visibility="WORKSPACE" />
             </TooltipProvider>
         );
 
@@ -27,7 +27,7 @@ describe('ConnectionScopeBadge', () => {
 
         rerender(
             <TooltipProvider>
-                <ConnectionScopeBadge visibility="ORGANIZATION" />
+                <ResourceVisibilityBadge visibility="ORGANIZATION" />
             </TooltipProvider>
         );
 
