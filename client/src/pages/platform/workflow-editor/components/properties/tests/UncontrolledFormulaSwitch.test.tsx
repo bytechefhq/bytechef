@@ -183,6 +183,29 @@ describe('uncontrolled Formula switch', () => {
         expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'false');
     });
 
+    it('brings back the focused native input when the pill is deleted', async () => {
+        const {container} = renderProperty(countProperty, '${trigger_1.count}');
+
+        await settle();
+
+        const editorElement = getEditorElement(container);
+
+        act(() => {
+            editorElement.editor.commands.focus('end');
+        });
+        act(() => {
+            editorElement.editor.commands.clearContent(true);
+        });
+
+        await settle();
+
+        const input = container.querySelector('input[type=number]');
+
+        expect(container.querySelector('.ProseMirror')).toBeNull();
+        expect(input).not.toBeNull();
+        expect(document.activeElement).toBe(input);
+    });
+
     it('keeps a legacy value with text around a pill in the editor and adds a clicked pill next to it', async () => {
         const {container} = renderProperty(countProperty, '${trigger_1.count} ms');
 
