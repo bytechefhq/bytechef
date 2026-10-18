@@ -59,6 +59,7 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
+    const ssoEnabled = useApplicationInfoStore((state) => state.sso.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
     const apiKeyViewGranted = useHasEmbeddedScope('API_KEY_VIEW');
     const embeddedMembersViewGranted = useHasEmbeddedScope('EMBEDDED_VIEW', UNION_ENVIRONMENT_ID);
@@ -117,7 +118,7 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
         }
 
         if (navItem.href === 'identity-providers') {
-            return isFeatureFlagEnabled('ff-1040');
+            return ssoEnabled;
         }
 
         if (navItem.href === 'billing') {

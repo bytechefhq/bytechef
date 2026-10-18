@@ -258,6 +258,18 @@ it('should fall back to the generic social sign-in message for an unknown error 
     ).toBeInTheDocument();
 });
 
+it('should ask for the TOTP code when a social or SSO login returns with mfa=required', async () => {
+    render(
+        <MemoryRouter initialEntries={['/login?mfa=required']}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Two-Factor Authentication')).toBeInTheDocument();
+});
+
 it('should show only the social login buttons of configured providers', async () => {
     const applicationInfoStore = createMockApplicationInfoStore({socialLogin: {enabled: true, providers: ['google']}});
 

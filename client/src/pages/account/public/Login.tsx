@@ -10,6 +10,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {getCookie} from '@/shared/util/cookie-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -37,9 +38,11 @@ const SOCIAL_LOGIN_ERROR_MESSAGES: Record<string, string> = {
     account_disabled: 'This account has been deactivated. Contact your administrator.',
     account_not_provisioned:
         'There is no account for this email yet. Ask your administrator to invite you, then sign in again.',
+    email_domain_not_allowed: 'Your email address is not on a domain of your organization identity provider.',
     email_not_verified: 'Your email address is not verified with the provider. Verify it there and try again.',
     invalid_email_domain: 'Sign-up is not available for this email domain.',
     sign_up_disabled: 'Sign-up is currently disabled. Ask your administrator to invite you.',
+    sso_required: 'Your organization requires SSO. Enter your work email to continue with your identity provider.',
 };
 
 const Login = () => {
@@ -48,11 +51,12 @@ const Login = () => {
     const lastCheckedEmailRef = useRef<string>('');
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const {authenticated, login, loginError, mfaRequired, reset, verifyMfa} = useAuthenticationStore(
+    const {authenticated, login, loginError, loginErrorMessage, mfaRequired, reset, verifyMfa} = useAuthenticationStore(
         useShallow((state) => ({
             authenticated: state.authenticated,
             login: state.login,
             loginError: state.loginError,
+            loginErrorMessage: state.loginErrorMessage,
             mfaRequired: state.mfaRequired,
             reset: state.reset,
             verifyMfa: state.verifyMfa,
@@ -107,6 +111,12 @@ const Login = () => {
         return false;
     };
 
+    const handleMfaBack = () => {
+        reset();
+
+        navigate('/login', {replace: true});
+    };
+
     const handleEmailBlur = useCallback(async () => {
         if (ceEdition) {
             return;
@@ -136,7 +146,7 @@ const Login = () => {
         try {
             const response = await fetch('/api/sso/discover', {
                 body: JSON.stringify({email}),
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json', 'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''},
                 method: 'POST',
                 signal: AbortSignal.any([abortController.signal, AbortSignal.timeout(5000)]),
             });
@@ -185,12 +195,16 @@ const Login = () => {
     }, [ceEdition, pageLocation.search, searchParams]);
 
     useEffect(() => {
-        if (searchParams.get('error') === 'oauth2') {
+        const error = searchParams.get('error');
+
+        if (error === 'oauth2' || error === 'saml') {
             navigate('/account-error', {
                 state: {
                     error:
                         SOCIAL_LOGIN_ERROR_MESSAGES[searchParams.get('code') || ''] ||
-                        'Failed to sign in with social provider. Please try again or use email/password.',
+                        (error === 'saml'
+                            ? 'Failed to sign in with your identity provider. Please try again.'
+                            : 'Failed to sign in with social provider. Please try again or use email/password.'),
                     fromInternalFlow: true,
                 },
             });
@@ -201,21 +215,21 @@ const Login = () => {
         if (loginError && !authenticated) {
             navigate('/account-error', {
                 state: {
-                    error: 'Failed to sign in, please check your credentials and try again.',
+                    error: loginErrorMessage || 'Failed to sign in, please check your credentials and try again.',
                     fromInternalFlow: true,
                 },
             });
 
             reset();
         }
-    }, [authenticated, loginError, navigate, reset]);
+    }, [authenticated, loginError, loginErrorMessage, navigate, reset]);
 
     if (authenticated) {
         return <Navigate replace to={from} />;
     }
 
-    if (mfaRequired) {
-        return <MfaVerification onBack={reset} onVerify={handleMfaVerify} />;
+    if (mfaRequired || searchParams.get('mfa') === 'required') {
+        return <MfaVerification onBack={handleMfaBack} onVerify={handleMfaVerify} />;
     }
 
     return (

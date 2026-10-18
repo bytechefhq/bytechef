@@ -5,15 +5,11 @@ import AccountProfilePassword from '@/pages/account/settings/AccountProfilePassw
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import React from 'react';
 
 const AccountProfile = () => {
     const socialLoginEnabled = useApplicationInfoStore((state) => state.socialLogin.enabled);
-
-    const isFeatureFlagEnabled = useFeatureFlagsStore();
-
-    const identityProvidersEnabled = isFeatureFlagEnabled('ff-1040');
+    const twoFactorAuthenticationEnabled = useApplicationInfoStore((state) => state.twoFactorAuthentication.enabled);
 
     return (
         <LayoutContainer
@@ -26,7 +22,7 @@ const AccountProfile = () => {
 
                     <AccountProfilePassword />
 
-                    {identityProvidersEnabled && <AccountProfileMfa />}
+                    {twoFactorAuthenticationEnabled && <AccountProfileMfa />}
 
                     {socialLoginEnabled && <AccountProfileLinkedAccounts />}
                 </div>

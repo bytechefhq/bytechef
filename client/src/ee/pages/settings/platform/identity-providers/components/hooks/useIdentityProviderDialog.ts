@@ -15,6 +15,8 @@ interface UseIdentityProviderDialogI {
     domainInput: string;
     domains: string[];
     editingProviderId: string | null;
+    editingRegistrationId: string | null;
+    editingScimEnabled: boolean;
     handleAddDomain: () => void;
     handleClose: () => void;
     handleOpenChange: (open: boolean) => void;
@@ -203,6 +205,8 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
         domainInput,
         domains,
         editingProviderId: identityProvider?.id || null,
+        editingRegistrationId: identityProvider?.registrationId || null,
+        editingScimEnabled: identityProvider?.scimEnabled || false,
         handleAddDomain,
         handleClose,
         handleOpenChange,
