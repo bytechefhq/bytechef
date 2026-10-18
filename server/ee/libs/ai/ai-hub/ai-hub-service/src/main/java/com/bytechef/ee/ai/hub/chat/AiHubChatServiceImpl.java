@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.chat;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
@@ -80,17 +81,20 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private final AiHubToolApprovalService approvalService;
     private final Clock clock;
     private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
+    private final InFlightAiHubRunRegistry inFlightRunRegistry;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubChatServiceImpl(
         AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
-        AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider) {
+        AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
+        InFlightAiHubRunRegistry inFlightRunRegistry) {
 
         this.chatRepository = chatRepository;
         this.accessPolicy = accessPolicy;
         this.approvalService = approvalService;
         this.clock = Clock.systemUTC();
         this.aiHubSessionMemoryProvider = aiHubSessionMemoryProvider;
+        this.inFlightRunRegistry = inFlightRunRegistry;
     }
 
     @Override
@@ -364,6 +368,16 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         chat.setUpdatedAt(LocalDateTime.now(clock));
         chatRepository.save(chat);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean cancelAiHubRun(
+        long chatId, long requesterWorkspaceId, long requesterUserId, @Nullable String runId) {
+
+        AiHubChat chat = loadParticipable(chatId, requesterWorkspaceId, requesterUserId);
+
+        return inFlightRunRegistry.cancel(chat.getThreadId(), runId);
     }
 
     @Override
