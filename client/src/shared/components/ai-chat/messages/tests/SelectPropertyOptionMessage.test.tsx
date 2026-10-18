@@ -70,4 +70,14 @@ describe('SelectPropertyOptionMessage', () => {
 
         expect(JSON.stringify(appendCalls[0])).toContain('User picked: general (value: C06H2PR8LSV)');
     });
+
+    it('renders the picked state for a restored pick', () => {
+        render(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            <SelectPropertyOptionMessage {...({data: {...DATA, pickedLabel: 'general'}} as any)} />
+        );
+
+        expect(screen.getByText(/Picked:/)).toHaveTextContent('Picked: general');
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    });
 });
