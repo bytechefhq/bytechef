@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.config;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.InMemorySessionRepository;
@@ -134,18 +136,56 @@ public final class AiHubAgentFixtures {
     }
 
     public AiHubSpringAIAgent askAgent() throws AGUIException {
-        return configuration.aiHubAskSpringAIAgent(
-            sessionMemory, chatModel, readProjectTools, readProjectWorkflowTools,
-            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
-            securityContextRehydrator, approvalGate, emptyProvider());
+        return askAgent(chatModel, emptyProvider());
+    }
+
+    /**
+     * Builds the ASK agent over {@code defaultChatModel} with {@code overrideChatClientResolver} registered, as the
+     * running hub does when the resolver bean is present.
+     */
+    public AiHubSpringAIAgent askAgent(
+        ChatModel defaultChatModel, AiHubSpringAIAgent.OverrideChatClientResolver overrideChatClientResolver)
+        throws AGUIException {
+
+        return askAgent(defaultChatModel, providerOf(overrideChatClientResolver));
     }
 
     public AiHubSpringAIAgent buildAgent() throws AGUIException {
+        return buildAgent(chatModel, emptyProvider());
+    }
+
+    /**
+     * Builds the BUILD agent over {@code defaultChatModel} with {@code overrideChatClientResolver} registered, as the
+     * running hub does when the resolver bean is present.
+     */
+    public AiHubSpringAIAgent buildAgent(
+        ChatModel defaultChatModel, AiHubSpringAIAgent.OverrideChatClientResolver overrideChatClientResolver)
+        throws AGUIException {
+
+        return buildAgent(defaultChatModel, providerOf(overrideChatClientResolver));
+    }
+
+    private AiHubSpringAIAgent askAgent(
+        ChatModel defaultChatModel,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        return configuration.aiHubAskSpringAIAgent(
+            sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
+            deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
+            securityContextRehydrator, approvalGate, overrideChatClientResolverProvider);
+    }
+
+    private AiHubSpringAIAgent buildAgent(
+        ChatModel defaultChatModel,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
         return configuration.aiHubBuildSpringAIAgent(
-            sessionMemory, chatModel, projectTools, projectWorkflowLifecycleTools,
+            sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, artifactRecorder, securityContextRehydrator, approvalGate,
-            emptyProvider());
+            overrideChatClientResolverProvider);
     }
 
     @SuppressWarnings("unchecked")
@@ -160,6 +200,23 @@ public final class AiHubAgentFixtures {
     @SuppressWarnings("unchecked")
     private static ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> emptyProvider() {
         return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> providerOf(
+        AiHubSpringAIAgent.OverrideChatClientResolver overrideChatClientResolver) {
+
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> provider = mock(ObjectProvider.class);
+
+        doAnswer(invocation -> {
+            invocation.<Consumer<AiHubSpringAIAgent.OverrideChatClientResolver>>getArgument(0)
+                .accept(overrideChatClientResolver);
+
+            return null;
+        }).when(provider)
+            .ifAvailable(any());
+
+        return provider;
     }
 
     private static ToolCallback stubToolCallback(String name) {
