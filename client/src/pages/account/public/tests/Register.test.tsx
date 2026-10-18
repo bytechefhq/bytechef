@@ -1,5 +1,4 @@
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
@@ -23,12 +22,6 @@ const renderRegisterPage = () => {
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: vi.fn(),
 }));
-
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: vi.fn(),
-}));
-
-(useFeatureFlagsStore as unknown as Mock).mockReturnValue(vi.fn());
 
 beforeEach(() => {
     mockApplicationInfoStore();
@@ -104,15 +97,47 @@ it('should set type as password initially and toggle between types when "show pa
     });
 });
 
-it('should show socials login buttons with correct feature flag', async () => {
-    (useFeatureFlagsStore as unknown as Mock).mockReturnValue((featureFlag: string) => {
-        return featureFlag === 'ff-1874';
+it('should show only the social login buttons of configured providers', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({socialLogin: {enabled: true, providers: ['google']}});
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
+
+    renderRegisterPage();
+
+    expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).not.toBeInTheDocument();
+});
+
+it('should show both social login buttons when both providers are configured', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({
+        socialLogin: {enabled: true, providers: ['github', 'google']},
     });
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
 
     renderRegisterPage();
 
     expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
     expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
+});
+
+it('should hide social login buttons when social login is disabled', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({
+        socialLogin: {enabled: false, providers: ['github', 'google']},
+    });
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
+
+    renderRegisterPage();
+
+    expect(screen.queryByText('Continue with Google')).not.toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).not.toBeInTheDocument();
 });
 
 it('should navigate to the account error page with a message when registration fails without an error body', async () => {

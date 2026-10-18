@@ -1,5 +1,5 @@
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -8,7 +8,7 @@ import AccountErrorPage from '../AccountErrorPage';
 import Login from '../Login';
 import PasswordResetInit from '../PasswordResetInit';
 import Register from '../Register';
-import {mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
+import {createMockApplicationInfoStore, mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
 import {mockAuthenticationStore} from '../tests/mocks/mockAuthenticationStore';
 
 screen.debug();
@@ -31,12 +31,6 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: vi.fn(),
 }));
-
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: vi.fn(),
-}));
-
-(useFeatureFlagsStore as unknown as Mock).mockReturnValue(vi.fn());
 
 beforeEach(() => {
     mockApplicationInfoStore();
@@ -232,15 +226,79 @@ it('should redirect to account-error page when ?error=oauth2 is present', async 
     });
 });
 
-it('should show socials login buttons with correct feature flag', async () => {
-    (useFeatureFlagsStore as unknown as Mock).mockReturnValue((featureFlag: string) => {
-        return featureFlag === 'ff-1874';
+it('should show a specific message when social sign-in is refused for a deactivated account', async () => {
+    render(
+        <MemoryRouter initialEntries={['/login?error=oauth2&code=account_disabled']}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+
+                <Route element={<AccountErrorPage />} path="/account-error" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    expect(
+        await screen.findByText('This account has been deactivated. Contact your administrator.')
+    ).toBeInTheDocument();
+});
+
+it('should fall back to the generic social sign-in message for an unknown error code', async () => {
+    render(
+        <MemoryRouter initialEntries={['/login?error=oauth2&code=something_else']}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+
+                <Route element={<AccountErrorPage />} path="/account-error" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    expect(
+        await screen.findByText('Failed to sign in with social provider. Please try again or use email/password.')
+    ).toBeInTheDocument();
+});
+
+it('should show only the social login buttons of configured providers', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({socialLogin: {enabled: true, providers: ['google']}});
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
+
+    renderLoginPage();
+
+    expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).not.toBeInTheDocument();
+});
+
+it('should show both social login buttons when both providers are configured', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({
+        socialLogin: {enabled: true, providers: ['github', 'google']},
     });
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
 
     renderLoginPage();
 
     expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
     expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
+});
+
+it('should hide social login buttons when social login is disabled', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({
+        socialLogin: {enabled: false, providers: ['github', 'google']},
+    });
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
+
+    renderLoginPage();
+
+    expect(screen.queryByText('Continue with Google')).not.toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).not.toBeInTheDocument();
 });
 
 const renderAuthenticatedLoginPage = (initialEntry: string | {pathname: string; search?: string; state?: unknown}) => {
