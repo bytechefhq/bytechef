@@ -232,6 +232,13 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         return message == null ? "The copilot run failed. Reference: " + input.runId() : message;
     }
 
+    @Override
+    protected @Nullable String runErrorCode(RunAgentInput input, Throwable throwable) {
+        CopilotRunErrorCode copilotRunErrorCode = CopilotRunErrorCode.of(throwable);
+
+        return copilotRunErrorCode == null ? null : copilotRunErrorCode.name();
+    }
+
     private @Nullable Integer getEnvironmentId(RunAgentInput input) {
         State state = input.state();
 

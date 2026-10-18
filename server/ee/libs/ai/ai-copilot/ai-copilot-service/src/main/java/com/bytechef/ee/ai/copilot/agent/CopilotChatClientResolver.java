@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.copilot.agent;
 
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.IncompleteChatModelSelectionException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
@@ -82,9 +83,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
                 "Copilot user-selected LLM half-set (provider={}, model={}) in environment {}", llmProvider, llmModel,
                 environmentId);
 
-            throw new ChatModelUnavailableException(
-                "The model selection is incomplete (provider=%s, model=%s). Pick a model again.".formatted(
-                    llmProvider, llmModel));
+            throw new IncompleteChatModelSelectionException(llmProvider, llmModel);
         }
 
         return resolveEnvironmentDefault(environmentId);
@@ -97,7 +96,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
         try {
             chatModel = catalogChatClientResolver.resolveDefaultChatModel(defaultProvider, environmentId);
         } catch (RuntimeException exception) {
-            throw ChatModelUnavailableException.noProviderEnabled(environmentId, exception);
+            throw unresolvable(environmentId, exception);
         }
 
         if (chatModel == null) {
@@ -113,7 +112,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
         try {
             selected = catalogChatClientResolver.resolve(llmProvider, llmModel, Math.toIntExact(environmentId));
         } catch (RuntimeException exception) {
-            throw new SelectedChatModelUnavailableException(llmProvider, llmModel, environmentId, exception);
+            throw unresolvable(environmentId, exception);
         }
 
         if (selected == null) {
@@ -150,9 +149,15 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
                 return environmentDefault;
             }
         } catch (RuntimeException exception) {
-            throw ChatModelUnavailableException.noProviderEnabled(environmentId, exception);
+            throw unresolvable(environmentId, exception);
         }
 
         throw ChatModelUnavailableException.noProviderEnabled(environmentId);
+    }
+
+    private static ChatModelUnavailableException unresolvable(long environmentId, RuntimeException exception) {
+        return new ChatModelUnavailableException(
+            "Could not resolve the AI model in environment %d: %s".formatted(environmentId, exception.getMessage()),
+            exception);
     }
 }
