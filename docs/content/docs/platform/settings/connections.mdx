@@ -25,9 +25,13 @@ The page is headed **Organization Connections**, described as "Manage organizati
 
 Creating one opens the standard connection dialog, so an organization connection gets the same component picker, the component's real connection properties, and the same OAuth2 flow as any other connection. Organization connections are **deleted rather than demoted** - this scope is terminal.
 
+Organization connections are listed on every workspace's **Connections** page. Creating, renaming and deleting them is reserved for organization admins (the `ROLE_ADMIN` authority).
+
 {/* TODO screenshot: Settings → Connections - the Organization Connections table with Name / Component / Environment / Created By / Last Modified columns, and the New Connection button */}
 
 ## The visibility model
+
+Visibility is a property of the connection and is set at the workspace level. There is no project-level connection visibility: a connection is shared with its workspace (or the whole organization), never with a single project, and every project in the workspace that can see the connection can use it.
 
 Every connection carries exactly one visibility, ordered `PRIVATE < WORKSPACE < ORGANIZATION`:
 
@@ -60,7 +64,7 @@ Both overrides are applied in the facade, ignoring the request body, so a hand-c
 
 ### What sharing actually exposes
 
-`WORKSPACE` grants **use plus existence**, not read plus write. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else. Only the member who created a connection sees its secret values and can replace them. Organization connections are the exception: every organization admin can view and replace their secrets.
+`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else. Only the member who created a connection sees its secret values and can replace them. Organization connections are the exception: every organization admin can view and replace their secrets.
 
 | Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
 |---|---|---|---|
@@ -69,7 +73,36 @@ Both overrides are applied in the facade, ignoring the request body, so a hand-c
 | An organization connection | Every organization admin | Every member | Organization admins |
 | An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
-Visibility is also a **precondition** of the permission check, not a filter running beside it - without that, a member holding `CONNECTION_EDIT` would pass a by-id check for a connection the list correctly hides.
+Visibility is also a **precondition** of the permission check, not a filter running beside it: a member who cannot see a connection is refused by id even where their workspace role would otherwise allow the action.
+
+## Who can edit, delete or re-authorize a connection
+
+Each of these actions needs two things at once:
+
+1. the matching scope in the connection's workspace: `CONNECTION_EDIT` to rename, retag or replace credentials, `CONNECTION_DELETE` to delete; **and**
+2. being the connection's **owner** (the member who created it, or the member it was reassigned to) or an **organization admin** (the `ROLE_ADMIN` authority).
+
+With the built-in roles, `CONNECTION_EDIT` and `CONNECTION_DELETE` come with Editor, so an Editor or Admin can change the connections they own; a Viewer who owns a connection cannot change it, and neither an Editor nor a workspace Admin can change a connection someone else owns. A custom role can carry the scopes too. Organization admins pass both checks. The **Connections** list offers **Edit** and **Delete** only to those who may use them, and a request from anyone else is refused (HTTP 403, or a GraphQL `FORBIDDEN` error).
+
+Replacing credentials keeps the connection's id, so every workflow and deployment that uses it follows the new credentials. The submitted authorization fields replace the stored ones as a whole, the connection's credentials are marked valid again, and the operation is refused for a connection that is not active. It is available in the edit dialog as **Update credentials**, and through the `updateConnectionCredentials` GraphQL mutation, which takes the connection's current version so a concurrent change is rejected rather than overwritten. See [Connections](/platform/automation/build/connections#replacing-a-connections-credentials).
+
+## When a member leaves a workspace
+
+Removing a member from a workspace does two things to the connections in that workspace:
+
+1. Every grant naming that member on the workspace's connections is revoked at once.
+2. Every connection the member owns moves to **Pending reassignment** (status `PENDING_REASSIGNMENT`). A former member no longer counts as the owner.
+
+A pending connection stays in place, but workflows cannot run on it (see the next section). An organization admin resolves it from the connection's menu with **Reassign owner**, choosing a new owner from the workspace; the connection becomes active again and the new owner can edit it. A connection whose status is `REVOKED` cannot be reassigned.
+
+## Runs are blocked while a connection is not active
+
+Before a deployed workflow runs, every connection it uses must be active. If any of them is pending reassignment or revoked, the run is refused instead of starting:
+
+- a manual run returns the error "Workflow execution blocked: ... non-ACTIVE connection(s) ... Reassign or reactivate to resume.", and
+- a run started by a trigger does not start a job and fails with the same error.
+
+Each refused run is recorded in the audit log as `WORKFLOW_PAUSED`. Reassigning the connection lets the next run go through.
 
 ## Changing visibility
 
@@ -82,7 +115,7 @@ Every connection in the automation **Connections** list carries a **scope badge*
 | **Workspace** | building | "Visible to every member of the current workspace." |
 | **Organization** | globe | "Visible to every member across all workspaces in the organization." |
 
-The badge is a button. Click it and the visibility picker opens beneath, with the same three choices as the creation dialog.
+For the connection's owner and for organization admins the badge is a button: click it and the visibility picker opens beneath, with the same three choices as the creation dialog. Everyone else sees the same badge as plain text.
 
 **To share a connection with the whole workspace**, click the badge and choose **Shared with workspace**.
 
@@ -92,11 +125,11 @@ The badge is a button. Click it and the visibility picker opens beneath, with th
 
 Changes apply as you make them - there is no separate save step. Adding or removing people is applied as a difference against the current list rather than as a wholesale replacement, so the platform never revokes and re-adds every grant on each edit.
 
-Where the feature is unavailable - Community Edition, or any surface with no workspace context - **no badge appears at all**. There is no read-only fallback: a connection simply shows its name, and visibility is not part of the UI. A badge that renders without opening a picker means something else: the feature is on, but the connection has no id yet, as with one that has not been saved.
+Where the feature is unavailable - Community Edition, or any surface with no workspace context - **no badge appears at all**: a connection simply shows its name, and visibility is not part of the UI.
 
 ### At the API level
 
-The picker is backed by four operations, all owner-or-admin:
+The picker is backed by four operations. Each is allowed for the connection's owner, a workspace admin of the owning workspace, or an organization admin; the UI offers the picker to the owner and organization admins.
 
 | Operation | Effect |
 |---|---|
@@ -113,19 +146,21 @@ Grants are deleted with the connection.
 
 ## What gets audited
 
-| Event | When |
-|---|---|
-| `CONNECTION_CREATED` | A connection was created. |
-| `CONNECTION_DELETED` | A connection was deleted. |
-| `CONNECTION_VISIBILITY_CHANGED` | A connection's reach changed. |
-| `CONNECTION_ACCESS_GRANTED` | A user was named on a private connection. |
-| `CONNECTION_ACCESS_REVOKED` | A user's grant was removed. |
-| `CONNECTION_REASSIGNED` | A connection's owner changed. |
+Every one of these actions is recorded under the acting user's login. Besides the keys below, each entry carries `method` (the operation that ran) and `result` (`SUCCESS`, `DENIED` or `ERROR`, or `ROLLED_BACK` when an enclosing transaction rolled back, plus `errorClass` on an error), so a refused attempt is recorded too. No credential material is ever recorded.
 
-Every one of these except `CONNECTION_CREATED` and `CONNECTION_ACCESS_GRANTED` is **strict-audit**: if the entry cannot be written, the operation fails rather than proceeding unrecorded. Those are exactly the events that can remove someone's access. See [Audit Events](/platform/settings/audit-events).
+| Event | When | Data |
+|---|---|---|
+| `CONNECTION_CREATED` | A workspace or organization connection was created. | `connectionId`, `workspaceId` (workspace connections), `visibility` (as stored) |
+| `CONNECTION_DELETED` | A workspace or organization connection was deleted. | `connectionId` |
+| `CONNECTION_VISIBILITY_CHANGED` | A connection's reach changed. | `connectionId`, `workspaceId`, `fromVisibility`, `toVisibility` |
+| `CONNECTION_ACCESS_GRANTED` | A user was named on a private connection. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_ACCESS_REVOKED` | A user's grant was removed. | `connectionId`, `workspaceId`, `targetUserId` |
+| `CONNECTION_CREDENTIALS_UPDATED` | A connection's credentials were replaced. | `connectionId` |
+| `CONNECTION_REASSIGNED` | An organization admin gave a connection a new owner. | `connectionId`, `workspaceId`, `newOwnerUserId`; a bulk reassignment of everything a former member owned records one entry with `previousOwnerUserId`, `connectionIds` and `connectionCount` instead of `connectionId` |
+| `WORKFLOW_PAUSED` | A deployed workflow run was refused because a connection it uses is not active. | `jobPrincipalId` (the project deployment), `workflowId`, `connectionIds`, `connectionStatuses` |
+
+A refused manual run is recorded under the user who started it. A refused run fired by a webhook trigger is recorded under `anonymousUser`, the principal of the incoming webhook request; where no security context exists at all, the principal is `SYSTEM`. Writing an audit entry never fails the operation it describes; a failed write is counted on the `bytechef_audit_failure` metric. See [Audit Events](/platform/settings/audit-events).
 
 ## Metrics
 
 `bytechef_connection_create` (counter) increments on every connection created through the workspace facade, tagged `visibility=PRIVATE|WORKSPACE`, so you can watch how much credential sharing actually happens against how much stays private. The tag reads the *persisted* visibility rather than the request body, so it reflects the CE and embedded overrides. Organization connections are created through their own facade and are not counted here.
-
-Failed audit writes on non-strict events are counted on `bytechef_connection_audit_failed`.
