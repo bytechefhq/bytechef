@@ -56,6 +56,14 @@ describe('AI Hub chat queries before the workspace store hydrates', () => {
         expect(listChatsMock).toHaveBeenCalledWith({environment: 2, status: 'ACTIVE', workspaceId: 1049});
     });
 
+    it('treats workspace id 0 as unknown and does not list chats', async () => {
+        renderHook(() => useAiHubChatsQuery(0, 2, 'ACTIVE'), {wrapper: createWrapper()});
+
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(listChatsMock).not.toHaveBeenCalled();
+    });
+
     it('does not load chat messages while the workspace id is unset and loads them once it is set', async () => {
         const {rerender} = renderHook(
             ({workspaceId}: {workspaceId: number | undefined}) => useAiHubChatMessagesQuery(1052, workspaceId),
