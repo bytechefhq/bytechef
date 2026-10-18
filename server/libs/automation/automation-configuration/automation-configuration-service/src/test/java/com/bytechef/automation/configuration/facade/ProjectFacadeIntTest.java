@@ -58,6 +58,7 @@ import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.FileItem;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -94,6 +95,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -107,6 +109,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 public class ProjectFacadeIntTest {
 
     @Autowired
@@ -1306,8 +1309,8 @@ public class ProjectFacadeIntTest {
         private static final Set<String> GUARDED_METHOD_NAMES = Set.of(
             "createProject", "deleteProject", "deleteProjectVersion", "deleteSharedProject", "duplicateProject",
             "exportProject", "exportSharedProject", "getNonSystemProjects", "getProject", "getProjectEntity",
-            "getProjects", "getWorkspaceProjectWorkflows", "getWorkspaceProjects", "importProject",
-            "importProjectTemplate", "publishProject", "restoreProjectVersion", "updateProject");
+            "getProjectVersions", "getProjects", "getWorkspaceProjectWorkflows", "getWorkspaceProjects",
+            "importProject", "importProjectTemplate", "publishProject", "restoreProjectVersion", "updateProject");
         private static final String PROJECT_CREATE = "PROJECT_CREATE";
         private static final String PROJECT_DELETE = "PROJECT_DELETE";
         private static final long PROJECT_ID = 42L;
@@ -1341,6 +1344,7 @@ public class ProjectFacadeIntTest {
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.create(any(Project.class))).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProjectVersions(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProjects()).thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectService.getProjects(any(), any(), any(), any(), any(), any()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
@@ -1540,6 +1544,20 @@ public class ProjectFacadeIntTest {
             grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
 
             assertBodyReached(() -> projectFacade.getProjectEntity(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectVersionsDeniesWithoutTheViewScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getProjectVersions(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectVersionsAllowsWithTheViewScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.getProjectVersions(PROJECT_ID));
         }
 
         @Test

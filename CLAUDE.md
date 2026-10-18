@@ -357,8 +357,14 @@ public class ExampleComponentHandler implements ComponentHandler {
 
 Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <
 ORGANIZATION`, in `platform-api`). Every resource is created **WORKSPACE-visible** — shared with its
-workspace unless its owner withholds it. The model is resource-agnostic; connections are the only
-resource wired to it so far.
+workspace unless its owner withholds it. The model is resource-agnostic; connections and projects are
+wired to it. Connection visibility is workspace-level (there is no project-level connection visibility).
+Projects support `PRIVATE` and `WORKSPACE` only (`ProjectVisibilityPolicy`); project workflows,
+deployments and jobs have no visibility of their own and return their owning project's record from their
+`ResourceVisibilityProvider` (`visibilityResourceType() == "Project"`), so grants resolve against the
+project. There is no `Workflow` token: `hasWorkflowScope` resolves the workflow's project and checks
+`hasResourceScope(projectId, "Project", scope)`. Project sharing lives on the EE `ProjectSharingFacade`; grants are deleted with the project by
+`ProjectBeforeDeleteEventListener`. List surfaces filter through `ProjectVisibilityFilter`.
 
 - **CE**: `ConnectionFacadeImpl.create()` force-writes `WORKSPACE`. No picker, no grants — CE has no
   authorization boundary between workspace members, so everything is workspace-public.
@@ -372,9 +378,11 @@ resource wired to it so far.
   not a workspace member, so workspace reach would be wrong in a way that crosses customers.
 
 **What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
-controllers obfuscate `authorizationParameters` and null `parameters`, and no caller-facing method accepts
-new credentials after creation (only token refresh rewrites them). A member can run a workflow against a
-colleague's account; they cannot extract or repoint the credential. Attaching a connection to a project
+controllers obfuscate `authorizationParameters` and null `parameters`. A member can run a workflow against
+a colleague's account; they cannot extract or repoint the credential. Renaming and replacing the credentials of a
+connection (`updateConnectionCredentials`) need `CONNECTION_EDIT`, deleting needs `CONNECTION_DELETE`, and
+both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>) && (isResourceOwner(#connectionId,
+'Connection') || isTenantAdmin())`. Attaching a connection to a project
 workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
 connection cannot be bound by id.
 
@@ -388,7 +396,7 @@ they own move to `PENDING_REASSIGNMENT` for a tenant admin to reassign. A creato
 workspace no longer counts as the owner.
 
 **Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
-it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
+it. Without that, a member holding a workspace scope would pass the by-id check for a resource the
 list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
 `ResourceVisibilityProvider`; a type with a `ResourceOwnershipResolver` but no visibility provider
 keeps it. API keys are such a type: `ApiKeyOwnershipResolver` claims the `"ApiKey"` token and fills the
@@ -397,6 +405,11 @@ owner, and no visibility provider exists for it, so CE `hasResourceScope` answer
 and `ResourceTokenResolverCoverageTest.OWNER_ISOLATED_BY_DESIGN` pins the exemption.
 The `VisibilityPrecondition` nest of the EE `PermissionServiceTest` is the regression guard for the visibility
 precondition.
+
+**Auditing**: connection and project sharing events are `@Audited` on the EE facades with
+`ConnectionAuditMapper` / `ProjectAuditMapper`; `WORKFLOW_PAUSED` is `@Audited` on
+`ConnectionService.validateConnectionsActive(jobPrincipalId, workflowId, connectionIds)` with the CE
+`WorkflowPausedAuditMapper`, which records only when a connection is not `ACTIVE`.
 
 **GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
 - `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set

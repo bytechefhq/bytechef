@@ -21,6 +21,8 @@ import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.connection.audit.WorkflowPausedAuditMapper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -229,6 +232,28 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public boolean updateConnectionStatusIfOwnedBy(long connectionId, String ownerLogin, ConnectionStatus status) {
+        Assert.notNull(status, "'status' must not be null");
+
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + connectionId));
+
+        if (!Objects.equals(connection.getCreatedBy(), ownerLogin)) {
+            return false;
+        }
+
+        try {
+            connection.setStatus(status);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionRepository.save(connection);
+
+        return true;
+    }
+
+    @Override
     public Connection reassignOwner(long id, String newOwnerLogin) {
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
@@ -297,10 +322,6 @@ public class ConnectionServiceImpl implements ConnectionService {
             return List.of();
         }
 
-        // Connection.getStatus() is total: it throws IllegalStateException for a corrupted INT ordinal
-        // rather than returning null, so a simple != ACTIVE filter captures every non-ACTIVE status
-        // including any future value added by append-only enum extension. A corrupted row surfaces
-        // loudly here rather than silently masking as ACTIVE.
         return connectionRepository.findAllByIdIn(connectionIds)
             .stream()
             .filter(connection -> connection.getStatus() != ConnectionStatus.ACTIVE)
@@ -308,8 +329,9 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    @Audited(event = WorkflowPausedAuditMapper.WORKFLOW_PAUSED, mapper = WorkflowPausedAuditMapper.class)
     @Transactional(readOnly = true)
-    public void validateConnectionsActive(List<Long> connectionIds) {
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         List<Connection> inactive = getInactiveConnections(connectionIds);
 
         if (inactive.isEmpty()) {

@@ -8,8 +8,11 @@
 package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.ConnectionAuditMapper;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
@@ -45,6 +48,7 @@ public class OrganizationConnectionFacadeImpl implements OrganizationConnectionF
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional
     public long create(ConnectionDTO connectionDTO) {
@@ -56,6 +60,7 @@ public class OrganizationConnectionFacadeImpl implements OrganizationConnectionF
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional
     public void delete(long connectionId) {

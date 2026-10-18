@@ -15,4 +15,15 @@ enum ResourceVisibility {
 extend type Mutation {
     """Unlink a connection from all deployed workflows and test configurations, without deleting the connection itself."""
     disconnectConnection(connectionId: ID!): Boolean!
+    """Replace an existing connection's authorization parameters. Connection owner or tenant admin only.
+
+    The submitted parameters replace the connection's authorization parameters wholesale: a credential the caller
+    does not resubmit is cleared, not kept. Connection-level properties are untouched."""
+    updateConnectionCredentials(input: UpdateConnectionCredentialsInput!): Boolean!
+}
+
+input UpdateConnectionCredentialsInput {
+    connectionId: ID!
+    parameters: Map!
+    version: Int!
 }

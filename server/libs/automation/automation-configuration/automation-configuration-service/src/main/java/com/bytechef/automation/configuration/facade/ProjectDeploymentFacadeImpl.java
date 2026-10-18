@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -109,6 +110,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -125,8 +127,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         JobService jobService, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectOwnershipService projectOwnershipService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, TagService tagService,
-        TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
+        ProjectVisibilityFilter projectVisibilityFilter, ProjectWorkflowService projectWorkflowService,
+        TagService tagService, TriggerDefinitionService triggerDefinitionService,
+        TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, PermissionService permissionService,
         WorkflowService workflowService,
@@ -145,6 +148,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -236,12 +240,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .map(ProjectDeploymentWorkflowConnection::getConnectionId)
             .toList();
 
-        List<Connection> inactiveConnections = connectionService.getInactiveConnections(connectionIds);
-
-        if (!inactiveConnections.isEmpty()) {
-
-            connectionService.validateConnectionsActive(connectionIds);
-        }
+        connectionService.validateConnectionsActive(id, workflowId, connectionIds);
 
         return principalJobFacade.createJob(
             new JobParametersDTO(
@@ -359,7 +358,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     public List<ProjectDeployment> getProjectDeployments(
         long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId) {
 
-        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
+        return filterVisibleProjectDeployments(
+            projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId));
     }
 
     @Override
@@ -426,8 +426,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, projectId, tagId, id);
+        List<ProjectDeployment> projectDeployments = filterVisibleProjectDeployments(
+            projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, id));
 
         if (includeAllFields) {
             List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
@@ -966,12 +966,25 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .orElse(null);
     }
 
+    private List<ProjectDeployment> filterVisibleProjectDeployments(List<ProjectDeployment> projectDeployments) {
+        if (projectDeployments.isEmpty()) {
+            return projectDeployments;
+        }
+
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(getProjects(projectDeployments));
+
+        return projectDeployments.stream()
+            .filter(projectDeployment -> visibleProjectIds.contains(projectDeployment.getProjectId()))
+            .toList();
+    }
+
     private List<Project> getProjects(List<ProjectDeployment> projectDeployments) {
         return projectService.getProjects(
             projectDeployments
                 .stream()
                 .map(ProjectDeployment::getProjectId)
                 .filter(Objects::nonNull)
+                .distinct()
                 .toList());
     }
 
