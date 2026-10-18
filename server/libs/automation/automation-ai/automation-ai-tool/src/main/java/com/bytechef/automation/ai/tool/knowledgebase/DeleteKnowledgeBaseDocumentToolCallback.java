@@ -51,8 +51,8 @@ public class DeleteKnowledgeBaseDocumentToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "knowledgeBaseId": {"type": "string", "description": "Knowledge base id obtained from listKnowledgeBases"},
-                    "documentId": {"type": "string", "description": "The document id to delete"}
+                    "knowledgeBaseId": {"type": "integer", "description": "Knowledge base id obtained from listKnowledgeBases"},
+                    "documentId": {"type": "integer", "description": "The document id to delete"}
                 },
                 "required": ["knowledgeBaseId", "documentId"]
             }""";

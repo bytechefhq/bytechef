@@ -47,7 +47,7 @@ public class DeleteProjectDeploymentToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "projectDeploymentId": {"type": "string", "description": "Numeric project deployment id from listProjectDeployments"}
+                    "projectDeploymentId": {"type": "integer", "description": "Numeric project deployment id from listProjectDeployments"}
                 },
                 "required": ["projectDeploymentId"]
             }""";
