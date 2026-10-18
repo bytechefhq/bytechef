@@ -4,8 +4,8 @@
  */
 
 export const TEST_USER = {
-    email: 'admin@localhost.com',
-    password: 'admin',
+    email: process.env.PLAYWRIGHT_USER_EMAIL || 'admin@localhost.com',
+    password: process.env.PLAYWRIGHT_USER_PASSWORD || 'admin',
 } as const;
 
 export const ROUTES = {
@@ -14,6 +14,8 @@ export const ROUTES = {
         `/automation/projects/${projectId}/project-workflows/${workflowId}`,
     projects: '/automation/projects',
 } as const;
+
+export const PROPERTY_FORMULA_MODES_WORKFLOW_PATH = 'test/playwright/propertyFormulaModesWorkflow.json';
 
 export const PROPERTY_MENTIONS_WORKFLOW_PATH = 'test/playwright/propertyMentionsWorkflow.json';
 
