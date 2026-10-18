@@ -75,12 +75,12 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private static final String AWAITING_APPROVAL_KEY = "awaitingApproval";
 
     /**
-     * Per-request resolver for an override {@link ChatClient}, used for the user's per-conversation model selection.
+     * Per-request resolver for the turn's {@link ChatClient}: the user's per-conversation model selection or the
+     * environment default.
      *
      * <p>
-     * Returning {@code null} means "no override, use the agent's builder-time default ChatClient." Implementations are
-     * expected to tolerate any input where they can't resolve the override (state keys missing, provider not found) by
-     * returning {@code null} so the agent falls back to the default cleanly.
+     * Returning {@code null} means "use the agent's builder-time default ChatClient." A thrown exception fails the turn
+     * with a RUN_ERROR.
      *
      * <p>
      * Deliberately hub-local rather than the Copilot's {@code OverrideChatClientResolver}: the Copilot resolves that
@@ -140,10 +140,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Binds the verified environment for the whole turn so the fallback default ChatModel (resolved per environment
-     * from {@link EnvironmentContext}) picks the right environment's API key. Restores the thread's previous
-     * environment rather than clearing it: the common pool is shared, so a worker that arrives already bound must leave
-     * as it arrived.
+     * Binds the verified environment to {@link EnvironmentContext} on the agent thread for the turn. Restores the
+     * thread's previous environment rather than clearing it: the common pool is shared, so a worker that arrives
+     * already bound must leave as it arrived.
      */
     private void runWithEnvironment(RunAgentInput input, AgentSubscriber subscriber) {
         Integer environmentOrdinal = environmentOrdinal(input);
@@ -275,9 +274,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     /**
      * The (provider, model) pair a subagent delegate should be handed. Precedence mirrors
-     * {@link AiHubChatClientResolver#resolve(State)}: the user's per-conversation selection. A half-set pair yields
-     * null after a single warning log, so the delegate inherits the workspace default exactly as the resolver's own
-     * fallback does.
+     * {@link AiHubChatClientResolver#resolve(State)}: the user's per-conversation selection, or null for the
+     * environment default. The resolver fails a turn with a half-set pair before any delegate runs.
      */
     static @Nullable SelectedLlm resolveSelectedLlm(@Nullable State state) {
         if (state == null) {
@@ -286,12 +284,6 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         String llmProvider = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_PROVIDER_KEY));
         String llmModel = asString(state.get(AiHubStateKeys.USER_SELECTED_LLM_MODEL_KEY));
-
-        if ((llmProvider == null) != (llmModel == null)) {
-            log.warn(
-                "User-selected LLM half-set (provider={}, model={}); falling back to the workspace default",
-                llmProvider, llmModel);
-        }
 
         if (llmProvider == null || llmModel == null) {
             return null;
@@ -308,8 +300,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Returns the per-request {@link ChatClient}. Tries the override resolver first (the user's per-conversation model
-     * selection) and falls back to the builder-time default whenever the resolver is absent, returns null, or throws.
+     * Returns the per-request {@link ChatClient} from the override resolver, falling back to the builder-time default
+     * only when no resolver is registered or it returns null. A resolver failure is rethrown so the turn ends with a
+     * RUN_ERROR.
      */
     @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
@@ -317,16 +310,18 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             return resolveDefaultChatClient(input);
         }
 
-        try {
-            ChatClient override = overrideChatClientResolver.resolve(input.state());
+        ChatClient override;
 
-            if (override != null) {
-                return override;
-            }
+        try {
+            override = overrideChatClientResolver.resolve(input.state());
         } catch (RuntimeException exception) {
-            log.warn(
-                "AiHubSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
-                exception.getMessage());
+            log.warn("{}: resolving the chat model failed: {}", getAgentId(), exception.getMessage());
+
+            throw exception;
+        }
+
+        if (override != null) {
+            return override;
         }
 
         return resolveDefaultChatClient(input);
