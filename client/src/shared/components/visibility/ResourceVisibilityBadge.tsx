@@ -1,18 +1,15 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ConnectionVisibilityEnum} from '@/shared/middleware/automation/configuration';
+import {ResourceVisibilityValueType} from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {BuildingIcon, GlobeIcon, LockIcon, UsersIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-interface ConnectionScopeBadgePropsI {
+interface ResourceVisibilityBadgePropsI {
     grantedUserCount?: number;
-    visibility: ConnectionVisibilityEnum;
+    visibility: ResourceVisibilityValueType;
 }
 
-// Keyed on the generated enum so a server-side enum extension fails the type check at codegen time
-// instead of silently falling back to the runtime default. VISIBILITY_CONFIG as a fully-satisfied
-// Record<ConnectionVisibilityEnum, …> forces the developer to add UI config for any new visibility.
 const VISIBILITY_CONFIG: Record<
-    ConnectionVisibilityEnum,
+    ResourceVisibilityValueType,
     {className: string; icon: typeof LockIcon; label: string; tooltip: string}
 > = {
     ORGANIZATION: {
@@ -42,13 +39,9 @@ const SPECIFIC_PEOPLE_CONFIG = {
     tooltip: 'Withheld from the workspace and shared with named colleagues.',
 };
 
-const ConnectionScopeBadge = ({grantedUserCount = 0, visibility}: ConnectionScopeBadgePropsI) => {
-    // "Specific people" is not a stored value — it is PRIVATE with grants — so it is resolved here rather than
-    // living in VISIBILITY_CONFIG, which stays a total mapping of the server enum.
+const ResourceVisibilityBadge = ({grantedUserCount = 0, visibility}: ResourceVisibilityBadgePropsI) => {
     const isSpecificPeople = visibility === 'PRIVATE' && grantedUserCount > 0;
 
-    // Defensive fallback: server may add a new visibility value before the client is deployed. Falling back to
-    // PRIVATE keeps the list renderable instead of undefined destructuring.
     const {
         className,
         icon: IconComponent,
@@ -75,4 +68,4 @@ const ConnectionScopeBadge = ({grantedUserCount = 0, visibility}: ConnectionScop
     );
 };
 
-export default ConnectionScopeBadge;
+export default ResourceVisibilityBadge;
