@@ -10,8 +10,10 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {mockChatsDataRef} = vi.hoisted(() => ({
+const {mockArchivedChatsDataRef, mockChatsDataRef, unarchiveMutateMock} = vi.hoisted(() => ({
+    mockArchivedChatsDataRef: {current: [] as AiHubChatI[]},
     mockChatsDataRef: {current: [] as AiHubChatI[]},
+    unarchiveMutateMock: vi.fn(),
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubThread', () => ({
@@ -35,9 +37,12 @@ vi.mock('@/shared/components/ai/model-picker/ModelPicker', () => ({
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
-    useAiHubChatsQuery: () => ({data: mockChatsDataRef.current, isLoading: false}),
+    useAiHubChatsQuery: (_workspaceId: number, _environmentId: number, status: 'ACTIVE' | 'ARCHIVED') => ({
+        data: status === 'ARCHIVED' ? mockArchivedChatsDataRef.current : mockChatsDataRef.current,
+        isLoading: false,
+    }),
     useDeleteAiHubChatMutation: () => ({mutate: vi.fn()}),
-    usePatchAiHubChatMutation: () => ({mutate: vi.fn()}),
+    usePatchAiHubChatMutation: () => ({mutate: unarchiveMutateMock}),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -90,7 +95,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    mockArchivedChatsDataRef.current = [];
     mockChatsDataRef.current = [];
+    unarchiveMutateMock.mockReset();
     aiHubChatsStore.getState().reset();
 });
 
@@ -154,6 +161,22 @@ describe('AiHubPanel chat options menu', () => {
         expect(screen.getByRole('menuitem', {name: 'Archive'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
         expect(screen.queryByRole('menuitem', {name: /Share/})).toBeNull();
+    });
+
+    it('shows an open archived chat with its title and offers unarchive, rename and delete', async () => {
+        mockArchivedChatsDataRef.current = [buildChat({id: 43, status: 'ARCHIVED', title: 'Archived chat'})];
+        aiHubChatsStore.getState().setCurrentChatId(43);
+
+        const user = await openMenu();
+
+        expect(screen.getByRole('heading', {hidden: true, name: 'Archived chat'})).toBeInTheDocument();
+        expect(await screen.findByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Archive'})).toBeNull();
+
+        await user.click(screen.getByRole('menuitem', {name: 'Unarchive'}));
+
+        expect(unarchiveMutateMock).toHaveBeenCalledWith({chatId: 43, patch: {status: 'ACTIVE'}, workspaceId: 1});
     });
 
     it('offers none of rename/archive/delete for a chat the caller does not own', async () => {
