@@ -86,6 +86,17 @@ describe('AiHubArtifactRow', () => {
         expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
     });
 
+    it('renders the open and remove controls as sibling buttons', () => {
+        renderRow(<AiHubArtifactRow artifact={buildArtifact({kind: 'WORKFLOW_REFERENCED'})} workspaceId={1} />);
+
+        const openButton = screen.getByRole('button', {name: 'Lead Scoring'});
+        const removeButton = screen.getByRole('button', {name: 'Remove Lead Scoring'});
+
+        expect(openButton.contains(removeButton)).toBe(false);
+        expect(removeButton.closest('button')).toBe(removeButton);
+        expect(removeButton).toHaveClass('focus-visible:opacity-100');
+    });
+
     it('renders a non-clickable artifact as static text', () => {
         renderRow(<AiHubArtifactRow artifact={buildArtifact({metadataJson: null})} workspaceId={1} />);
 
