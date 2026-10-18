@@ -17,6 +17,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.AssistantMessage.ToolCall;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -39,7 +41,9 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.session.CreateSessionRequest;
 import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
@@ -166,6 +170,76 @@ class AiHubTurnEndingToolResultHistoryTest {
         assertThat(messages).hasSize(1);
         assertThat(messages.getFirst()
             .toolEventsJson()).isNull();
+    }
+
+    @Test
+    void testKeptResultsPairWithTheirOwnCallsWhenToolCallIdsRepeat() {
+        appendEvent(new UserMessage("First pick"));
+        appendEvent(toolCallMessage("Pick one:", "repeated-id"));
+        appendDisplayOnlyResult("repeated-id", "{\"kind\":\"first-result\"}");
+        appendEvent(new UserMessage("Second pick"));
+        appendEvent(toolCallMessage("Pick another:", "repeated-id"));
+        appendDisplayOnlyResult("repeated-id", "{\"kind\":\"second-result\"}");
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).hasSize(4);
+        assertThat(messages.get(1)
+            .toolEventsJson()).contains("first-result")
+                .doesNotContain("second-result");
+        assertThat(messages.get(3)
+            .toolEventsJson()).contains("second-result")
+                .doesNotContain("first-result");
+    }
+
+    @Test
+    void testKeptResultWithABlankToolCallIdIsNotShown() {
+        appendEvent(new UserMessage("Pick"));
+        appendEvent(toolCallMessage("Pick one:", ""));
+        appendDisplayOnlyResult("", "{\"kind\":\"blank-result\"}");
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages.get(1)
+            .toolEventsJson()).doesNotContain("blank-result");
+    }
+
+    private void appendEvent(Message message) {
+        if (sessionMemory.sessionService()
+            .findById(THREAD_ID) == null) {
+
+            sessionMemory.sessionService()
+                .create(CreateSessionRequest.builder()
+                    .id(THREAD_ID)
+                    .userId(AiHubSessionMemory.SESSION_USER_ID)
+                    .build());
+        }
+
+        sessionMemory.sessionService()
+            .appendEvent(SessionEvent.builder()
+                .sessionId(THREAD_ID)
+                .message(message)
+                .build());
+    }
+
+    private void appendDisplayOnlyResult(String toolCallId, String responseData) {
+        sessionMemory.sessionService()
+            .appendEvent(SessionEvent.builder()
+                .sessionId(THREAD_ID)
+                .message(ToolResponseMessage.builder()
+                    .responses(List.of(new ToolResponseMessage.ToolResponse(
+                        toolCallId, "selectConnection", responseData)))
+                    .build())
+                .metadata(AiHubTurnEndingToolResultAdvisor.DISPLAY_ONLY_METADATA_KEY, true)
+                .archived(true)
+                .build());
+    }
+
+    private static AssistantMessage toolCallMessage(String text, String toolCallId) {
+        return AssistantMessage.builder()
+            .content(text)
+            .toolCalls(List.of(new ToolCall(toolCallId, "function", "selectConnection", "{}")))
+            .build();
     }
 
     private void runTurn(String userText, ToolCallback toolCallback) {

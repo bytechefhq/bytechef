@@ -32,14 +32,9 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import reactor.core.publisher.Flux;
 
 /**
- * Stores the result of a tool call that ended the turn, so a reloaded chat can rebuild the card the live stream showed.
- *
- * <p>
- * A turn-ending result returns directly from the tool-calling loop, so the session memory advisor inside the loop never
- * stores it. This advisor sits outside the loop and appends that result as an archived TOOL event marked
- * {@link #DISPLAY_ONLY_METADATA_KEY}. Archived events never reach the model's prompt, so what the model sees is
- * unchanged; {@code AiHubChatServiceImpl.loadMessages} reads them back for display only.
- * </p>
+ * Stores each result of a tool call that ended the turn as an archived TOOL event tagged
+ * {@link #DISPLAY_ONLY_METADATA_KEY}, for display in the chat history only. A reader of archived session events, such
+ * as a recall tool, must skip events with that tag.
  *
  * @version ee
  *
