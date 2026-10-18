@@ -20,6 +20,7 @@ import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.agent.tool.AgentTypeRegistry;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
+import com.bytechef.ai.copilot.agent.CopilotRunErrorCode;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.commons.util.JsonUtils;
@@ -272,6 +273,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     record SelectedLlm(String provider, String model) {
+    }
+
+    @Override
+    protected @Nullable String runErrorCode(RunAgentInput input, Throwable throwable) {
+        CopilotRunErrorCode copilotRunErrorCode = CopilotRunErrorCode.of(throwable);
+
+        return copilotRunErrorCode == null ? null : copilotRunErrorCode.name();
     }
 
     @Override
