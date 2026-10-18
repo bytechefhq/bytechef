@@ -306,6 +306,10 @@ export const buildAiHubSubscriber = ({
 }: BuildSubscriberDepsI): AgentSubscriber => {
     const toolCallNamesById = new Map<string, string>();
 
+    let currentAssistantMessageIndex = assistantMessageIndex;
+    let currentAssistantMessageHasOutput = false;
+    let startsNewAssistantMessage = false;
+
     const isStaleChat = () => subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId;
 
     const surfaceToolFailure = (toolName: string, reason: string, rawContent?: unknown) => {
@@ -421,7 +425,26 @@ export const buildAiHubSubscriber = ({
                 return;
             }
 
-            appendToLastAssistantMessage(textMessageBuffer + event.delta);
+            const text = textMessageBuffer + event.delta;
+
+            if (startsNewAssistantMessage) {
+                startsNewAssistantMessage = false;
+
+                addMessage({content: text, role: 'assistant'});
+
+                currentAssistantMessageIndex = useAiHubStore.getState().messages.length - 1;
+            } else {
+                appendToLastAssistantMessage(text);
+            }
+
+            currentAssistantMessageHasOutput = true;
+        },
+        onTextMessageStartEvent: () => {
+            if (isStaleChat()) {
+                return;
+            }
+
+            startsNewAssistantMessage = currentAssistantMessageHasOutput;
         },
         onToolCallEndEvent: ({event, toolCallArgs}) => {
             if (isStaleChat()) {
@@ -480,7 +503,9 @@ export const buildAiHubSubscriber = ({
 
             aiChatToolCallStore
                 .getState()
-                .startToolCall(event.toolCallId, event.toolCallName, assistantMessageIndex, subscriberChatId);
+                .startToolCall(event.toolCallId, event.toolCallName, currentAssistantMessageIndex, subscriberChatId);
+
+            currentAssistantMessageHasOutput = true;
         },
     };
 };
