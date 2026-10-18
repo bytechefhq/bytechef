@@ -33,6 +33,7 @@ import java.util.List;
 public final class TypeSafeConstants {
 
     public static final String ANSWERS = "answers";
+    public static final String ASK_QUESTIONS = "askQuestions";
     public static final String CHOICE = "choice";
     public static final String CONFIDENCE = "confidence";
     public static final String CRITERIA = "criteria";

@@ -104,20 +104,28 @@ public class TypeSafeNoulAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        Map<String, Object> question = createQuestion(
+            inputParameters.getRequiredString(INSTRUCTIONS), inputParameters.getString(WHEN_TRUE),
+            inputParameters.getString(WHEN_FALSE));
+
+        Map<String, Object> answer = TypeSafeUtils.askQuestion(inputParameters, question, context);
+
+        putIsTrue(answer, inputParameters.getDouble(THRESHOLD, 0.5));
+
+        return answer;
+    }
+
+    public static Map<String, Object> createQuestion(String instructions, String whenTrue, String whenFalse) {
         Map<String, Object> question = new LinkedHashMap<>();
 
         question.put(TYPE, NOUL);
-        question.put(INSTRUCTIONS, inputParameters.getRequiredString(INSTRUCTIONS));
+        question.put(INSTRUCTIONS, instructions);
 
         Map<String, Object> criteria = new LinkedHashMap<>();
-
-        String whenTrue = inputParameters.getString(WHEN_TRUE);
 
         if (whenTrue != null && !whenTrue.isBlank()) {
             criteria.put("true", whenTrue);
         }
-
-        String whenFalse = inputParameters.getString(WHEN_FALSE);
 
         if (whenFalse != null && !whenFalse.isBlank()) {
             criteria.put("false", whenFalse);
@@ -127,12 +135,10 @@ public class TypeSafeNoulAction {
             question.put(CRITERIA, criteria);
         }
 
-        Map<String, Object> answer = TypeSafeUtils.askQuestion(inputParameters, question, context);
+        return question;
+    }
 
-        double threshold = inputParameters.getDouble(THRESHOLD, 0.5);
-
+    public static void putIsTrue(Map<String, Object> answer, double threshold) {
         answer.put(IS_TRUE, answer.get(NOUL) instanceof Number value && value.doubleValue() >= threshold);
-
-        return answer;
     }
 }

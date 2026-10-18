@@ -259,5 +259,77 @@ Type: OBJECT
 
 
 
+### Ask Questions
+Name: askQuestions
+
+`Ask several named questions about the state in one request, each a Noul, a Choice or a Score. Jev answers them all from the same read of the state, so several narrow questions cost about as much as one and are cheaper and faster than separate actions.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
+| questions | Questions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type), STRING\(instructions), STRING\(whenTrue), STRING\(whenFalse), NUMBER\(threshold), [&#123;STRING\(label), STRING\(description)&#125;]\(options), [STRING]\(levels)&#125;] </details> | The questions to ask. Each answer is returned under the question's name. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Ask Questions",
+  "name" : "askQuestions",
+  "parameters" : {
+    "model" : "",
+    "state" : "",
+    "questions" : [ {
+      "name" : "",
+      "type" : "",
+      "instructions" : "",
+      "whenTrue" : "",
+      "whenFalse" : "",
+      "threshold" : 0.0,
+      "options" : [ {
+        "label" : "",
+        "description" : ""
+      } ],
+      "levels" : [ "" ]
+    } ]
+  },
+  "type" : "typesafe/v1/askQuestions"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| answers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The answer to every question, keyed by its name. Each answer has the shape the matching Noul, Choice or Score action returns, without model and usage. |
+| model | STRING | The model version the request resolved to, e.g. `jev-1.13.0` for `jev-latest`. |
+| usage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(input_tokens), INTEGER\(output_tokens)&#125; </details> | Token usage of the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "answers" : { },
+  "model" : "",
+  "usage" : {
+    "input_tokens" : 1,
+    "output_tokens" : 1
+  }
+}
+```
+
+
+
+
 
 
