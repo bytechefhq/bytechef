@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("tools.jackson.core:jackson-databind")
     implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation("org.springframework:spring-webmvc")
