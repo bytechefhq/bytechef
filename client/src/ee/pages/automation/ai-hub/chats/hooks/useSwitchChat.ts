@@ -1,4 +1,5 @@
 import {isWorkflowArtifactKind, parseArtifactMetadata} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
@@ -521,6 +522,10 @@ export function useSwitchChat() {
 
     return useCallback(
         async (chat: AiHubChatI): Promise<boolean> => {
+            if (!isWorkspaceIdKnown(currentWorkspaceId)) {
+                return false;
+            }
+
             aiHubStore.setState({
                 chatId: chat.threadId,
                 messages: [],

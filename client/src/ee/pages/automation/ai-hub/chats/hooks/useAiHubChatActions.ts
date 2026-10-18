@@ -1,5 +1,6 @@
 import {type AiHubChatI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useDeleteAiHubChatMutation, usePatchAiHubChatMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {
     aiHubRunStateStore,
@@ -74,6 +75,10 @@ export function useAiHubChatActions(): AiHubChatActionsI {
     const patchChatMutation = usePatchAiHubChatMutation();
 
     const archiveChat = (chat: AiHubChatI) => {
+        if (!isWorkspaceIdKnown(currentWorkspaceId)) {
+            return;
+        }
+
         patchChatMutation.mutate({
             chatId: chat.id,
             patch: {status: 'ARCHIVED'},
@@ -86,6 +91,10 @@ export function useAiHubChatActions(): AiHubChatActionsI {
     };
 
     const unarchiveChat = (chat: AiHubChatI) => {
+        if (!isWorkspaceIdKnown(currentWorkspaceId)) {
+            return;
+        }
+
         patchChatMutation.mutate({
             chatId: chat.id,
             patch: {status: 'ACTIVE'},
@@ -100,7 +109,7 @@ export function useAiHubChatActions(): AiHubChatActionsI {
 
         const trimmedTitle = title.trim();
 
-        if (trimmedTitle && trimmedTitle !== (renameTarget.title ?? '')) {
+        if (isWorkspaceIdKnown(currentWorkspaceId) && trimmedTitle && trimmedTitle !== (renameTarget.title ?? '')) {
             patchChatMutation.mutate({
                 chatId: renameTarget.id,
                 patch: {title: trimmedTitle},
@@ -112,7 +121,7 @@ export function useAiHubChatActions(): AiHubChatActionsI {
     };
 
     const confirmDelete = () => {
-        if (!deleteTarget) {
+        if (!deleteTarget || !isWorkspaceIdKnown(currentWorkspaceId)) {
             return;
         }
 
