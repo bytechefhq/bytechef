@@ -54,8 +54,8 @@ public class ModularRag {
 
     public final ClusterElementDefinition<RagFunction> clusterElementDefinition =
         ComponentDsl.<RagFunction>clusterElement("rag")
-            .title("Moduler RAG")
-            .description("Moduler RAG.")
+            .title("Modular RAG")
+            .description("Modular RAG.")
             .type(RAG)
             .object(() -> this::apply);
 
