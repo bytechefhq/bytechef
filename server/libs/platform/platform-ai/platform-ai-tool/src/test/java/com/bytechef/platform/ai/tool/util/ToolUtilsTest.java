@@ -16,22 +16,59 @@
 
 package com.bytechef.platform.ai.tool.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.ai.tool.util.ToolUtils.PropertyDecorator;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.BooleanProperty;
 import com.bytechef.platform.component.domain.IntegerProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.StringProperty;
+import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ToolUtilsTest {
+
+    @Test
+    void testConvertToPropertyInfoCarriesFixedOptionValues() {
+        IntegerProperty countProperty = new IntegerProperty(
+            ComponentDsl.integer("count")
+                .options(ComponentDsl.option("Ten", 10), ComponentDsl.option("Twenty", 20)));
+
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(countProperty);
+
+        assertThat(propertyInfo.optionValues()).containsExactly(10L, 20L);
+    }
+
+    @Test
+    void testConvertToPropertyInfoOmitsOptionValuesWithoutOptions() {
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(
+            new IntegerProperty(ComponentDsl.integer("count")));
+
+        assertThat(propertyInfo.optionValues()).isNull();
+    }
+
+    @Test
+    void testConvertToPropertyInfoOmitsOptionValuesForDynamicOptions() {
+        StringProperty sheetNameProperty = mock(StringProperty.class);
+
+        when(sheetNameProperty.getName()).thenReturn("sheetName");
+        when(sheetNameProperty.getOptions()).thenReturn(List.of(new Option(ComponentDsl.option("Sheet1", "Sheet1"))));
+        when(sheetNameProperty.getOptionsDataSource()).thenReturn(mock(OptionsDataSource.class));
+
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(sheetNameProperty);
+
+        assertThat(propertyInfo.optionValues()).isNull();
+    }
 
     @Test
     void testListDisplayConditionsEmptyGet() {
