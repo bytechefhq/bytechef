@@ -1,4 +1,4 @@
-import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -136,7 +136,7 @@ describe('AuditEvents', () => {
     it('trims typed filters and drops blank ones after the debounce', async () => {
         render(<AuditEvents />);
 
-        await userEvent.type(screen.getByPlaceholderText('e.g. admin@localhost.com'), '  alice  ');
+        await userEvent.type(screen.getByPlaceholderText('e.g. admin'), '  alice  ');
         await userEvent.type(screen.getByPlaceholderText('match any data value'), '   ');
 
         await waitFor(() => expect(lastQueryVariables()).toMatchObject({dataSearch: undefined, principal: 'alice'}));
@@ -167,5 +167,55 @@ describe('AuditEvents', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Retry'}));
 
         expect(hoisted.refetchMock).toHaveBeenCalled();
+    });
+
+    it('opens the event details with every recorded data entry when a row is clicked', async () => {
+        render(<AuditEvents />);
+
+        await userEvent.click(screen.getByText('alice@example.com'));
+
+        const dialog = await screen.findByRole('dialog');
+
+        expect(within(dialog).getByText('PERMISSION_CHECK')).toBeInTheDocument();
+        expect(within(dialog).getByText('alice@example.com')).toBeInTheDocument();
+        expect(within(dialog).getByText('DENIED')).toBeInTheDocument();
+        expect(within(dialog).getByText('method')).toBeInTheDocument();
+        expect(within(dialog).getByText('com.bytechef.ProjectFacade.delete')).toBeInTheDocument();
+    });
+
+    it('tells the viewer when no audit events match the filters', () => {
+        hoisted.auditEventsQueryResult = {
+            data: {auditEvents: {content: [], number: 0, size: 25, totalElements: 0, totalPages: 0}},
+            isError: false,
+            isLoading: false,
+            refetch: hoisted.refetchMock,
+        };
+
+        render(<AuditEvents />);
+
+        expect(screen.getByText('No audit events match the current filters.')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
+    });
+
+    it('clears every filter and requests the unfiltered first page', async () => {
+        render(<AuditEvents />);
+
+        await userEvent.type(screen.getByPlaceholderText('e.g. admin'), 'alice');
+
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({principal: 'alice'}));
+
+        await userEvent.click(screen.getByRole('button', {name: /Clear filters/}));
+
+        await waitFor(() =>
+            expect(lastQueryVariables()).toMatchObject({
+                dataSearch: undefined,
+                eventType: undefined,
+                fromDate: undefined,
+                page: 0,
+                principal: undefined,
+                toDate: undefined,
+            })
+        );
+        expect(screen.getByPlaceholderText('e.g. admin')).toHaveValue('');
     });
 });
