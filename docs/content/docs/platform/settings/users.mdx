@@ -43,6 +43,8 @@ Nobody chooses a password for the invitee and no password travels by email. The 
 
 The link is valid for 3 days and works once. After that it no longer works: delete the pending user and invite them again to send a new one. A nightly cleanup at 01:00 also removes accounts whose invitation expired, together with their workspace memberships, in every tenant. Inviting an email address that already has an account is rejected.
 
+When [social login](/platform/settings/identity-providers#social-login) is enabled, the invitee can instead accept by signing in with Google or GitHub using the invited email; that activates the account without a password.
+
 An invited account occupies a seat against the deployment's member quota from the moment the invitation is sent, not from the moment it is claimed.
 
 ## Change a user's role
