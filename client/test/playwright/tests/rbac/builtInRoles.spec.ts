@@ -12,6 +12,7 @@ import {
 } from '../../utils/rbacUtils';
 
 interface RoleExpectationsI {
+    createApiCollection: boolean;
     createDataTable: boolean;
     createDeployment: boolean;
     createMcpServer: boolean;
@@ -28,6 +29,7 @@ interface RoleExpectationsI {
 
 const ROLE_EXPECTATIONS: Record<BuiltInRoleType, RoleExpectationsI> = {
     ADMIN: {
+        createApiCollection: true,
         createDataTable: true,
         createDeployment: true,
         createMcpServer: true,
@@ -42,6 +44,7 @@ const ROLE_EXPECTATIONS: Record<BuiltInRoleType, RoleExpectationsI> = {
         shareProject: true,
     },
     EDITOR: {
+        createApiCollection: true,
         createDataTable: true,
         createDeployment: true,
         createMcpServer: true,
@@ -56,6 +59,7 @@ const ROLE_EXPECTATIONS: Record<BuiltInRoleType, RoleExpectationsI> = {
         shareProject: false,
     },
     VIEWER: {
+        createApiCollection: false,
         createDataTable: false,
         createDeployment: false,
         createMcpServer: false,
@@ -145,6 +149,12 @@ for (const role of ['VIEWER', 'EDITOR', 'ADMIN'] as BuiltInRoleType[]) {
             await openPage(page, '/automation/datatables', PAGE_BODY_TEXT.dataTables);
 
             await expectPresence(page, /^(New|Create) Table$/, expectations.createDataTable, 'button');
+        });
+
+        test('API collections page offers create only to roles that may create collections', async () => {
+            await openPage(page, '/automation/api-platform/api-collections', PAGE_BODY_TEXT.apiCollections);
+
+            await expectPresence(page, 'New API Collection', expectations.createApiCollection, 'button');
         });
 
         test('connections page offers create to every role', async () => {
