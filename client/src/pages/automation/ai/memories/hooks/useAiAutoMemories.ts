@@ -111,7 +111,7 @@ export const AiAutoMemoriesKeys = {
     detailPrefix: (memoryId: number, workspaceId: number) =>
         [...AiAutoMemoriesKeys.all, 'detail', memoryId, workspaceId] as const,
     list: (
-        workspaceId: number,
+        workspaceId: number | undefined,
         environmentId: number,
         memoryType?: AiAutoMemoryTypeType,
         principalType?: AiAutoMemoryPrincipalTypeType,
@@ -127,13 +127,13 @@ export const AiAutoMemoriesKeys = {
             principalId ?? 'ALL_OWNERS',
         ] as const,
     listPrefix: (workspaceId: number) => [...AiAutoMemoriesKeys.all, 'list', workspaceId] as const,
-    principals: (workspaceId: number, environmentId: number) =>
+    principals: (workspaceId: number | undefined, environmentId: number) =>
         [...AiAutoMemoriesKeys.all, 'principals', workspaceId, environmentId] as const,
     principalsPrefix: (workspaceId: number) => [...AiAutoMemoriesKeys.all, 'principals', workspaceId] as const,
 };
 
 export function useAiAutoMemoriesQuery(
-    workspaceId: number,
+    workspaceId: number | undefined,
     environmentId: number,
     memoryType?: AiAutoMemoryTypeType,
     principalType?: AiAutoMemoryPrincipalTypeType,
@@ -150,7 +150,7 @@ export function useAiAutoMemoriesQuery(
             workspaceId: String(workspaceId),
         },
         {
-            enabled: workspaceId > 0,
+            enabled: workspaceId !== undefined && workspaceId > 0,
             queryKey: AiAutoMemoriesKeys.list(workspaceId, environmentId, memoryType, principalType, principalId),
             select: (data: AiAutoMemoriesQuery) => data.aiAutoMemories.map(toMemory),
             staleTime: 60_000,
@@ -182,11 +182,11 @@ export function useAiAutoMemoryDetailQuery(memory: AiAutoMemoryI | null, workspa
     );
 }
 
-export function useAiAutoMemoryPrincipalsQuery(workspaceId: number, environmentId: number) {
+export function useAiAutoMemoryPrincipalsQuery(workspaceId: number | undefined, environmentId: number) {
     return useGeneratedAiAutoMemoryPrincipalsQuery<AiAutoMemoryPrincipalI[], Error>(
         {environment: environmentId, workspaceId: String(workspaceId)},
         {
-            enabled: workspaceId > 0,
+            enabled: workspaceId !== undefined && workspaceId > 0,
             queryKey: AiAutoMemoriesKeys.principals(workspaceId, environmentId),
             select: (data: AiAutoMemoryPrincipalsQuery) =>
                 data.aiAutoMemoryPrincipals.map((principal) => ({
