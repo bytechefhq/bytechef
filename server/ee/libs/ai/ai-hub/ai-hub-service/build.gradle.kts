@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin"))
     implementation(project(":server:libs:modules:components:ai:llm"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
@@ -37,6 +38,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-liquibase")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }
