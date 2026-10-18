@@ -1,0 +1,36 @@
+# Identity provider mocks for the authentication Playwright specs (tests/authentication). See the "Authentication
+# specs" section of test/playwright/README.md for the matching server settings.
+name: bytechef-e2e-authentication
+
+services:
+    # Plays Google (issuer /google) and every OIDC SSO provider the specs create (any other issuer path).
+    oidc:
+        image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+        environment:
+            JSON_CONFIG: '{"interactiveLogin": true}'
+        ports:
+            - '18090:8080'
+
+    # GitHub's OAuth2 endpoints (GitHub is not OIDC, which the OIDC mock requires).
+    github:
+        image: node:24-alpine
+        command: ['node', '/github-mock.mjs']
+        environment:
+            PORT: '8080'
+        ports:
+            - '18091:8080'
+        volumes:
+            - ./github-mock.mjs:/github-mock.mjs:ro
+
+    # SAML IdP with users user1/user1pass (user1@example.com) and user2/user2pass (user2@example.com).
+    saml:
+        image: kristophjunge/test-saml-idp:1.15
+        platform: linux/amd64
+        environment:
+            SAML_SP_BASE_URLS: ${SAML_SP_BASE_URLS:-http://127.0.0.1:5173}
+            SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: http://unused.invalid/acs
+            SIMPLESAMLPHP_SP_ENTITY_ID: http://unused.invalid/sp
+        ports:
+            - '18080:8080'
+        volumes:
+            - ./saml20-sp-remote.php:/var/www/simplesamlphp/metadata/saml20-sp-remote.php:ro
