@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration;
 
 /**
  * @version ee
@@ -244,8 +247,123 @@ public class AuditEventGraphQlControllerIntTest {
             .containsExactly("CONNECTION_CREATED", "PERMISSION_CHECK");
     }
 
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    public void testAuditEventsReturnPrincipalsUnmaskedByDefault() {
+        when(auditEventFacade.fetchAuditEvents(any(), any()))
+            .thenReturn(new PageImpl<>(List.of(createWorkspaceUserRemovedEvent("alice@example.com"))));
+
+        graphQlTester
+            .document("""
+                query {
+                    auditEvents {
+                        content {
+                            principal
+                            outcome
+                            data {
+                                key
+                                value
+                            }
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("auditEvents.content[0].principal")
+            .entity(String.class)
+            .isEqualTo("alice@example.com")
+            .path("auditEvents.content[0].outcome")
+            .entity(String.class)
+            .isEqualTo("SUCCESS")
+            .path("auditEvents.content[0].data[*].key")
+            .entityList(String.class)
+            .containsExactly("result", "userId", "workspaceId")
+            .path("auditEvents.content[0].data[*].value")
+            .entityList(String.class)
+            .containsExactly("SUCCESS", "2", "1");
+    }
+
     private static LocalDateTime toLocalDateTime(long epochMillis) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault());
+    }
+
+    private static PersistentAuditEvent createWorkspaceUserRemovedEvent(String principal) {
+        PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
+
+        persistentAuditEvent.setData(Map.of("workspaceId", "1", "userId", "2", "result", "SUCCESS"));
+        persistentAuditEvent.setEventDate(LocalDateTime.now());
+        persistentAuditEvent.setEventType("WORKSPACE_USER_REMOVED");
+        persistentAuditEvent.setId(1L);
+        persistentAuditEvent.setPrincipal(principal);
+
+        return persistentAuditEvent;
+    }
+
+    @Nested
+    @NestedTestConfiguration(EnclosingConfiguration.OVERRIDE)
+    @ContextConfiguration(classes = {
+        AuditGraphQlTestConfiguration.class,
+        AuditEventGraphQlController.class
+    })
+    @GraphQlTest(
+        controllers = AuditEventGraphQlController.class,
+        properties = {
+            "bytechef.coordinator.enabled=true",
+            "bytechef.edition=ee",
+            "spring.graphql.schema.locations=classpath*:/graphql/"
+        })
+    @Import(MaskedPrincipals.MaskedPrincipalsTestConfig.class)
+    class MaskedPrincipals {
+
+        @Autowired
+        private GraphQlTester graphQlTester;
+
+        @Autowired
+        private AuditEventFacade auditEventFacade;
+
+        @Test
+        @WithMockUser(authorities = "ROLE_ADMIN")
+        public void testAuditEventsMaskPrincipals() {
+            when(auditEventFacade.fetchAuditEvents(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(
+                    createWorkspaceUserRemovedEvent("alice@example.com"), createWorkspaceUserRemovedEvent("alice"),
+                    createWorkspaceUserRemovedEvent(" "))));
+
+            graphQlTester
+                .document("""
+                    query {
+                        auditEvents {
+                            content {
+                                principal
+                            }
+                        }
+                    }
+                    """)
+                .execute()
+                .path("auditEvents.content[*].principal")
+                .entityList(String.class)
+                .containsExactly("a***@example.com", "a***", " ");
+        }
+
+        @TestConfiguration
+        static class MaskedPrincipalsTestConfig {
+
+            @Bean
+            ApplicationProperties applicationProperties() {
+                ApplicationProperties applicationProperties = new ApplicationProperties();
+
+                ApplicationProperties.Audit audit = applicationProperties.getAudit();
+
+                audit.setMaskPrincipals(true);
+
+                return applicationProperties;
+            }
+
+            @Bean
+            AuditEventFacade auditEventFacade() {
+                return mock(AuditEventFacade.class);
+            }
+        }
     }
 
     @TestConfiguration

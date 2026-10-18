@@ -15,6 +15,7 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -46,6 +47,28 @@ public class PersistenceAuditEventRepositoryIntTest {
     @AfterEach
     public void afterEach() {
         persistenceAuditEventRepository.deleteAll();
+    }
+
+    @Test
+    public void testUpgradeCreatesTheEventDatePrincipalAndEventTypeIndexes() {
+        Map<String, String> indexDefinitions = new HashMap<>();
+
+        jdbcTemplate.query(
+            "SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'persistent_audit_event'",
+            resultSet -> {
+                indexDefinitions.put(resultSet.getString("indexname"), resultSet.getString("indexdef"));
+            });
+
+        assertThat(indexDefinitions)
+            .hasEntrySatisfying(
+                "idx_persistent_audit_event_event_date_id",
+                indexDefinition -> assertThat(indexDefinition).contains("(event_date DESC, id DESC)"))
+            .hasEntrySatisfying(
+                "idx_persistent_audit_event_principal_event_date",
+                indexDefinition -> assertThat(indexDefinition).contains("(principal, event_date DESC)"))
+            .hasEntrySatisfying(
+                "idx_persistent_audit_event_event_type_event_date",
+                indexDefinition -> assertThat(indexDefinition).contains("(event_type, event_date DESC)"));
     }
 
     @Test
