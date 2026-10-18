@@ -16,24 +16,50 @@
 
 package com.bytechef.security.web.oauth2;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 /**
- * OAuth2 authentication failure handler. Redirects to the login page with an error indicator.
+ * OAuth2 authentication failure handler. Redirects to the login page with an error indicator and, when the failure
+ * carries one, the OAuth2 error code so the page can tell "no account" apart from a provider error.
  *
  * @author Ivica Cardic
  */
 public class OAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
 
+    static final String LOGIN_ERROR_URL = "/login?error=oauth2";
+
+    private static final Pattern ERROR_CODE_PATTERN = Pattern.compile("[a-z_]{1,64}");
+
     @Override
+    @SuppressFBWarnings(
+        value = "UNVALIDATED_REDIRECT",
+        justification = "The Location is this application's login page; only a [a-z_] error code is appended")
     public void onAuthenticationFailure(
         HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
         throws IOException {
 
-        response.sendRedirect("/login?error=oauth2");
+        String redirectUrl = LOGIN_ERROR_URL;
+
+        if (exception instanceof OAuth2AuthenticationException oAuth2AuthenticationException) {
+            String errorCode = oAuth2AuthenticationException.getError()
+                .getErrorCode();
+
+            if (errorCode != null && ERROR_CODE_PATTERN.matcher(errorCode)
+                .matches()) {
+
+                redirectUrl += "&code=" + URLEncoder.encode(errorCode, StandardCharsets.UTF_8);
+            }
+        }
+
+        response.sendRedirect(redirectUrl);
     }
 }

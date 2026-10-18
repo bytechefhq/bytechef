@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -212,6 +213,8 @@ public final class SecurityUtils {
             return springSecurityUser.getUsername();
         } else if (authentication.getPrincipal() instanceof String s) {
             return s;
+        } else if (authentication.getPrincipal() instanceof AuthenticatedPrincipal authenticatedPrincipal) {
+            return authenticatedPrincipal.getName();
         }
 
         return null;

@@ -17,11 +17,13 @@
 package com.bytechef.platform.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
@@ -40,6 +42,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +66,9 @@ class UserServiceIntTest {
     private AuthorityRepository authorityRepository;
 
     @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
     private PersistentTokenRepository persistentTokenRepository;
 
     @Autowired
@@ -77,6 +84,14 @@ class UserServiceIntTest {
 
     @BeforeEach
     public void init() {
+        for (String cacheName : cacheManager.getCacheNames()) {
+            Cache cache = cacheManager.getCache(cacheName);
+
+            if (cache != null) {
+                cache.clear();
+            }
+        }
+
         persistentTokenRepository.deleteAll();
 
         user = new User();
@@ -347,5 +362,76 @@ class UserServiceIntTest {
         token.setUserAgent("Test agent");
 
         persistentTokenRepository.save(token);
+    }
+
+    @Test
+    @Transactional
+    void testFindOrCreateSocialUserAcceptsPendingInvitation() {
+        user.setActivated(false);
+        user.setActivationKey(RandomUtils.generateActivationKey());
+
+        userRepository.save(user);
+
+        User socialUser = userService.findOrCreateSocialUser(
+            DEFAULT_EMAIL, "John", "Doe", DEFAULT_IMAGEURL, "GOOGLE", "google-subject", false, "ROLE_ADMIN");
+
+        assertThat(socialUser.isActivated()).isTrue();
+        assertThat(socialUser.getActivationKey()).isNull();
+        assertThat(socialUser.getAuthProvider()).isEqualTo("GOOGLE");
+    }
+
+    @Test
+    @Transactional
+    void testFindOrCreateSocialUserRefusesDeactivatedUserMatchedByEmail() {
+        user.setActivated(false);
+        user.setActivationKey(null);
+
+        userRepository.save(user);
+
+        assertThatThrownBy(
+            () -> userService.findOrCreateSocialUser(
+                DEFAULT_EMAIL, "John", "Doe", DEFAULT_IMAGEURL, "GOOGLE", "google-subject", false, "ROLE_ADMIN"))
+                    .isInstanceOf(UserNotActivatedException.class);
+
+        assertThat(userRepository.findByLogin(DEFAULT_LOGIN))
+            .hasValueSatisfying(storedUser -> assertThat(storedUser.isActivated()).isFalse());
+    }
+
+    @Test
+    @Transactional
+    void testFindOrCreateSocialUserRefusesDeactivatedUserMatchedByProviderId() {
+        user.setActivated(false);
+        user.setActivationKey(null);
+        user.setAuthProvider("GITHUB");
+        user.setProviderId("4242");
+
+        userRepository.save(user);
+
+        assertThatThrownBy(
+            () -> userService.findOrCreateSocialUser(
+                "other@localhost", "John", "Doe", DEFAULT_IMAGEURL, "GITHUB", "4242", false, "ROLE_ADMIN"))
+                    .isInstanceOf(UserNotActivatedException.class);
+    }
+
+    @Test
+    @Transactional
+    void testFindOrCreateSocialUserRefusesUnknownEmailWithoutProvisioning() {
+        assertThatThrownBy(
+            () -> userService.findOrCreateSocialUser(
+                "stranger@localhost", "Str", "Anger", null, "GOOGLE", "stranger-subject", false, "ROLE_ADMIN"))
+                    .isInstanceOf(IllegalStateException.class);
+
+        assertThat(userRepository.findByEmailIgnoreCase("stranger@localhost")).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testFindOrCreateSocialUserProvisionsUnknownEmail() {
+        User socialUser = userService.findOrCreateSocialUser(
+            "Newcomer@Localhost", "New", "Comer", null, "GOOGLE", "newcomer-subject", true, "ROLE_ADMIN");
+
+        assertThat(socialUser.getLogin()).isEqualTo("newcomer@localhost");
+        assertThat(socialUser.isActivated()).isTrue();
+        assertThat(userRepository.findByLogin("newcomer@localhost")).isPresent();
     }
 }

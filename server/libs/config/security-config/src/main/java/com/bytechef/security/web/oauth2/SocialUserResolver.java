@@ -16,7 +16,7 @@
 
 package com.bytechef.security.web.oauth2;
 
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -35,31 +35,17 @@ import org.springframework.security.oauth2.core.OAuth2Error;
  */
 public final class SocialUserResolver {
 
-    private static final String ACCOUNT_NOT_PROVISIONED_ERROR_CODE = "account_not_provisioned";
+    static final String ACCOUNT_DISABLED_ERROR_CODE = "account_disabled";
+    static final String ACCOUNT_NOT_PROVISIONED_ERROR_CODE = "account_not_provisioned";
 
     private SocialUserResolver() {
     }
 
     /**
-     * Resolves a social-login identity: social login signs an invited user in rather than provisioning a new one, so
-     * auto-provisioning is off and an unknown email is rejected. The two are coupled — the authority this path asks for
-     * is {@code ROLE_ADMIN}, so provisioning here would let anyone holding an account at the configured provider, on
-     * any email domain, self-escalate to instance admin. An email that already has a ByteChef account keeps the
-     * authorities it already holds.
-     */
-    static User resolveInvitedUser(
-        UserService userService, String email, String firstName, String lastName, String imageUrl, String authProvider,
-        String providerId) {
-
-        return resolveUser(
-            userService, email, firstName, lastName, imageUrl, authProvider, providerId, false,
-            AuthorityConstants.ADMIN);
-    }
-
-    /**
-     * Resolves an identity under caller-chosen provisioning settings, for the SSO path where they come from the
-     * tenant's {@code IdentityProvider} record. Both are passed through untouched — an administrator who turned
-     * auto-provisioning off gets a rejected login rather than a provisioned account.
+     * Resolves an identity under caller-chosen provisioning settings: {@link SocialUserProvisioner} decides them for
+     * social login from the sign-up policy, the SSO path takes them from the tenant's {@code IdentityProvider} record.
+     * Both are passed through untouched — a caller that turned provisioning off gets a rejected login rather than a
+     * provisioned account.
      */
     public static User resolveUser(
         UserService userService, String email, String firstName, String lastName, String imageUrl, String authProvider,
@@ -68,6 +54,11 @@ public final class SocialUserResolver {
         try {
             return userService.findOrCreateSocialUser(
                 email, firstName, lastName, imageUrl, authProvider, providerId, autoProvision, defaultAuthority);
+        } catch (UserNotActivatedException userNotActivatedException) {
+            throw new OAuth2AuthenticationException(
+                new OAuth2Error(ACCOUNT_DISABLED_ERROR_CODE, "The ByteChef account for " + email + " is deactivated",
+                    null),
+                userNotActivatedException);
         } catch (IllegalStateException illegalStateException) {
             throw new OAuth2AuthenticationException(
                 new OAuth2Error(ACCOUNT_NOT_PROVISIONED_ERROR_CODE, "No ByteChef account exists for " + email, null),

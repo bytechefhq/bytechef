@@ -19,6 +19,7 @@ package com.bytechef.platform.user.service;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
@@ -334,6 +335,8 @@ public class UserServiceImpl implements UserService {
         if (existingUser.isPresent()) {
             User user = existingUser.get();
 
+            acceptPendingInvitation(user);
+
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setImageUrl(imageUrl);
@@ -356,10 +359,7 @@ public class UserServiceImpl implements UserService {
             user.setLastName(lastName);
             user.setImageUrl(imageUrl);
 
-            if (!user.isActivated()) {
-                user.setActivated(true);
-                user.setActivationKey(null);
-            }
+            acceptPendingInvitation(user);
 
             user = userRepository.save(user);
 
@@ -399,6 +399,23 @@ public class UserServiceImpl implements UserService {
         log.debug("Created social login user: {}", newUser);
 
         return newUser;
+    }
+
+    /**
+     * A social sign-in may accept a pending invitation (not activated, activation key still set), but must not bring
+     * back an account that was deactivated after activation, which no longer has a key.
+     */
+    private static void acceptPendingInvitation(User user) {
+        if (user.isActivated()) {
+            return;
+        }
+
+        if (user.getActivationKey() == null) {
+            throw new UserNotActivatedException("User " + user.getLogin() + " is deactivated");
+        }
+
+        user.setActivated(true);
+        user.setActivationKey(null);
     }
 
     @Override

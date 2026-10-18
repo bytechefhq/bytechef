@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.util.StringUtils;
 
@@ -38,7 +37,7 @@ import org.springframework.util.StringUtils;
 class SocialLoginOAuth2ClientConfiguration {
 
     @Bean
-    ClientRegistrationRepository clientRegistrationRepository(ApplicationProperties applicationProperties) {
+    InMemoryClientRegistrationRepository clientRegistrationRepository(ApplicationProperties applicationProperties) {
         SocialLogin socialLogin = applicationProperties.getSecurity()
             .getSocialLogin();
 
@@ -65,6 +64,13 @@ class SocialLoginOAuth2ClientConfiguration {
                     .scope("user:email", "read:user")
                     .userInfoUri("https://api.github.com/user")
                     .build());
+        }
+
+        if (clientRegistrations.isEmpty()) {
+            throw new IllegalStateException(
+                "bytechef.security.social-login.enabled is true but no provider is configured: set " +
+                    "bytechef.security.social-login.google.client-id and/or " +
+                    "bytechef.security.social-login.github.client-id");
         }
 
         return new InMemoryClientRegistrationRepository(clientRegistrations);
