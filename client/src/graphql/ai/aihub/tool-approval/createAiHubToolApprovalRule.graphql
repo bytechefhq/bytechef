@@ -1,0 +1,12 @@
+mutation createAiHubToolApprovalRule(
+    $workspaceId: ID!, $toolKind: AiHubToolKind!, $toolName: String!, $mode: AiHubToolApprovalRuleMode!
+) {
+    createAiHubToolApprovalRule(workspaceId: $workspaceId, toolKind: $toolKind, toolName: $toolName, mode: $mode) {
+        id
+        workspaceId
+        toolKind
+        componentName
+        toolName
+        mode
+    }
+}
