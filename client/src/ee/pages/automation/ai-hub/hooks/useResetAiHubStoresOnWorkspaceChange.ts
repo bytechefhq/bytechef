@@ -5,6 +5,7 @@ import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatT
 import {useEffect, useRef} from 'react';
 
 import {aiHubChatsStore} from '../chats/stores/useAiHubChatsStore';
+import {aiHubComposerStore} from '../composer/stores/useAiHubComposerStore';
 import {aiHubStore} from '../stores/useAiHubStore';
 import {aiHubTabsStore} from '../stores/useAiHubTabsStore';
 
@@ -34,6 +35,7 @@ export function useResetAiHubStoresOnWorkspaceChange(): void {
             return;
         }
 
+        aiHubComposerStore.getState().clear();
         aiHubChatsStore.getState().reset();
         aiChatRetryableErrorStore.getState().clearError();
         aiHubTabsStore.getState().reset();

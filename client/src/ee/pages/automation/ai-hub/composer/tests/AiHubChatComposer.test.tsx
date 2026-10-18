@@ -1,7 +1,9 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {aiHubRunStateStore} from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {MODE, aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
+import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -31,6 +33,14 @@ vi.mock('@assistant-ui/react', () => ({
     }),
 }));
 
+vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () => ({
+    default: ({open, trigger}: {open?: boolean; trigger: ReactNode}) => (
+        <div data-open={String(Boolean(open))} data-testid="resource-picker-menu">
+            {trigger}
+        </div>
+    ),
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
     useCancelAiHubRunMutation: () => ({mutate: cancelAiHubRunMock}),
 }));
@@ -50,6 +60,8 @@ const PENDING_APPROVAL_MESSAGE = {
     role: 'assistant' as const,
 };
 
+const LEAD_SYNC_TAB = {name: 'Lead Sync', projectId: 'project-9', projectWorkflowId: 42, workflowId: 'wf-3'};
+
 const renderComposer = (modelPicker?: ReactNode) =>
     render(
         <TooltipProvider>
@@ -67,6 +79,8 @@ describe('AiHubChatComposer', () => {
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
         aiHubChatsStore.setState({currentChatId: 7});
         aiHubRunStateStore.setState({runIdByChat: {}, runningByChat: {}});
+        aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false});
+        aiHubTabsStore.getState().reset();
     });
 
     it('renders the input, the model picker slot, the mode switch and Send when idle', () => {
@@ -203,5 +217,110 @@ describe('AiHubChatComposer', () => {
         });
 
         expect(setTextMock).toHaveBeenCalledWith('');
+    });
+
+    describe('resource references', () => {
+        it('renders the "Add resources" button in the footer next to the model picker', () => {
+            renderComposer(<div data-testid="model-picker" />);
+
+            expect(screen.getByRole('button', {name: 'Add resources'})).toBeInTheDocument();
+        });
+
+        it("opens the resource picker when '@' is typed at a word boundary", () => {
+            renderComposer();
+
+            const input = screen.getByRole('textbox', {name: 'Message input'});
+
+            fireEvent.keyDown(input, {key: '@'});
+
+            expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(true);
+            expect(screen.getByTestId('resource-picker-menu')).toHaveAttribute('data-open', 'true');
+        });
+
+        it("leaves '@' inside a word as ordinary text", () => {
+            renderComposer();
+
+            const input = screen.getByRole('textbox', {name: 'Message input'}) as HTMLTextAreaElement;
+
+            fireEvent.change(input, {target: {value: 'support'}});
+
+            input.setSelectionRange(7, 7);
+
+            fireEvent.keyDown(input, {key: '@'});
+
+            expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(false);
+        });
+
+        it('shows a chip for each referenced workflow', () => {
+            aiHubComposerStore.setState({referencedResources: [{id: 'wf-3', kind: 'workflow', name: 'Lead Sync'}]});
+
+            renderComposer();
+
+            const chips = screen.getByTestId('reference-chips');
+
+            expect(chips).toHaveTextContent('Workflow:');
+            expect(chips).toHaveTextContent('Lead Sync');
+        });
+
+        it('removing a chip closes the tab the chip opened', () => {
+            const tabId = aiHubTabsStore.getState().openWorkflowTab(LEAD_SYNC_TAB);
+
+            aiHubComposerStore.setState({
+                referencedResources: [{id: 'wf-3', kind: 'workflow', name: 'Lead Sync', ownsTab: true, tabId}],
+            });
+
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Remove Lead Sync'}));
+
+            expect(aiHubComposerStore.getState().referencedResources).toEqual([]);
+            expect(aiHubTabsStore.getState().openTabs).toEqual([]);
+            expect(screen.queryByTestId('reference-chips')).toBeNull();
+        });
+
+        it('removing a chip only detaches a tab the user already had open', () => {
+            const tabId = aiHubTabsStore.getState().openWorkflowTab(LEAD_SYNC_TAB);
+
+            aiHubComposerStore.setState({
+                referencedResources: [{id: 'wf-3', kind: 'workflow', name: 'Lead Sync', ownsTab: false, tabId}],
+            });
+
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Remove Lead Sync'}));
+
+            expect(aiHubComposerStore.getState().referencedResources).toEqual([]);
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(1);
+        });
+
+        it('keeps an owned tab that now shows another workflow', () => {
+            const tabId = aiHubTabsStore.getState().openWorkflowTab(LEAD_SYNC_TAB);
+
+            aiHubTabsStore.getState().openWorkflowTab({...LEAD_SYNC_TAB, name: 'Lead Cleanup', workflowId: 'wf-4'});
+
+            aiHubComposerStore.setState({
+                referencedResources: [{id: 'wf-3', kind: 'workflow', name: 'Lead Sync', ownsTab: true, tabId}],
+            });
+
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Remove Lead Sync'}));
+
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(1);
+        });
+
+        it('clears the chips when the chat changes, but not on first render', () => {
+            aiHubComposerStore.setState({referencedResources: [{id: 'wf-3', kind: 'workflow', name: 'Lead Sync'}]});
+
+            renderComposer();
+
+            expect(aiHubComposerStore.getState().referencedResources).toHaveLength(1);
+
+            act(() => {
+                aiHubStore.setState({chatId: 'thread-8'});
+            });
+
+            expect(aiHubComposerStore.getState().referencedResources).toEqual([]);
+        });
     });
 });
