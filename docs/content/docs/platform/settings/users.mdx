@@ -127,8 +127,7 @@ Scopes are contributed per module at startup rather than listed in a central enu
 | `EXECUTION_VIEW` | Viewer |
 | `EXECUTION_DELETE` | Admin |
 | `CONNECTION_VIEW` | Viewer |
-| `CONNECTION_CREATE` | Editor |
-| `CONNECTION_EDIT`, `CONNECTION_DELETE` | Admin |
+| `CONNECTION_CREATE`, `CONNECTION_EDIT`, `CONNECTION_DELETE` | Editor |
 | `DATA_TABLE_VIEW`, `KNOWLEDGE_BASE_VIEW`, `MCP_VIEW`, `API_PLATFORM_VIEW` | Viewer |
 | `DATA_TABLE_CREATE`, `DATA_TABLE_EDIT` | Editor |
 | `DATA_TABLE_DELETE` | Admin |
@@ -223,7 +222,7 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Delete an API collection | `API_PLATFORM_DELETE` | Admin |
 | Delete a data table | `DATA_TABLE_DELETE` | Admin |
 | Delete a knowledge base | `KNOWLEDGE_BASE_DELETE` | Admin |
-| Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE` | Admin |
+| Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE` | Editor |
 | Enable, disable or update a deployment; stop or restart a job | `DEPLOYMENT_EDIT` | Editor |
 | Create or import a workflow | `WORKFLOW_CREATE` in Development | Editor |
 | Duplicate a workflow | `WORKFLOW_CREATE` and `WORKFLOW_VIEW` in Development | Editor |
