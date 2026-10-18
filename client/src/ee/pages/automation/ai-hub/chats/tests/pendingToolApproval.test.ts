@@ -2,7 +2,7 @@ import {type AiHubChatI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api'
 import {type ThreadMessageLike} from '@assistant-ui/react';
 import {describe, expect, it} from 'vitest';
 
-import {canResolveToolApproval, hasPendingToolApproval} from '../pendingToolApproval';
+import {canResolveToolApproval, hasPendingToolApproval, stampToolApprovalResolution} from '../pendingToolApproval';
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
@@ -92,5 +92,49 @@ describe('canResolveToolApproval', () => {
 
     it('is false when there is no chat', () => {
         expect(canResolveToolApproval(undefined)).toBe(false);
+    });
+});
+
+describe('stampToolApprovalResolution', () => {
+    it('stamps the decided status onto the matching approval part only', () => {
+        const messages = [
+            approvalMessage({approvalId: 1, awaitingApproval: true}),
+            approvalMessage({approvalId: 2, awaitingApproval: true}),
+        ];
+
+        const stampedMessages = stampToolApprovalResolution(messages, 2, {executionError: null, status: 'REJECTED'});
+
+        expect(stampedMessages[0]).toBe(messages[0]);
+        expect((stampedMessages[1].content as unknown as Array<{data: Record<string, unknown>}>)[0].data).toEqual({
+            approvalId: 2,
+            awaitingApproval: true,
+            executionError: undefined,
+            resolvedStatus: 'REJECTED',
+        });
+        expect(hasPendingToolApproval(stampedMessages)).toBe(true);
+        expect(hasPendingToolApproval(stampToolApprovalResolution(stampedMessages, 1, {status: 'APPROVED'}))).toBe(
+            false
+        );
+    });
+
+    it('carries the execution error of a call that failed after approval', () => {
+        const stampedMessages = stampToolApprovalResolution(
+            [approvalMessage({approvalId: 3, awaitingApproval: true})],
+            3,
+            {executionError: 'Workflow not found', status: 'FAILED'}
+        );
+
+        expect((stampedMessages[0].content as unknown as Array<{data: Record<string, unknown>}>)[0].data).toMatchObject(
+            {
+                executionError: 'Workflow not found',
+                resolvedStatus: 'FAILED',
+            }
+        );
+    });
+
+    it('leaves the transcript untouched for a PENDING status', () => {
+        const messages = [approvalMessage({approvalId: 1, awaitingApproval: true})];
+
+        expect(stampToolApprovalResolution(messages, 1, {status: 'PENDING'})).toBe(messages);
     });
 });
