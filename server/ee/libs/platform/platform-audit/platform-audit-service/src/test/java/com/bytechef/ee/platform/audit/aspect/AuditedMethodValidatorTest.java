@@ -16,6 +16,7 @@ import com.bytechef.platform.audit.Audited;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
@@ -163,6 +164,21 @@ class AuditedMethodValidatorTest {
     }
 
     @Test
+    void testJdkProxiedBeanIsValidatedOnItsTargetClass() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(
+                "jdkProxiedService", WriteOperations.class, AuditedMethodValidatorTest::createJdkProxiedService);
+            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
+            genericApplicationContext.refresh();
+
+            assertThatThrownBy(() -> validate(genericApplicationContext))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("JdkProxiedService.write")
+                .hasMessageContaining("does not handle");
+        }
+    }
+
+    @Test
     void testEventTheMapperHandlesPasses() {
         try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
             genericApplicationContext.registerBean(HandledEventService.class);
@@ -171,6 +187,39 @@ class AuditedMethodValidatorTest {
 
             assertThatCode(() -> validate(genericApplicationContext)).doesNotThrowAnyException();
         }
+    }
+
+    @Test
+    void testMisconfiguredAuditedMethodFailsApplicationContextStartup() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(UnhandledEventService.class);
+            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
+            genericApplicationContext.registerBean(AuditedMethodValidator.class);
+
+            assertThatThrownBy(genericApplicationContext::refresh)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("UnhandledEventService.write")
+                .hasMessageContaining("does not handle");
+        }
+    }
+
+    @Test
+    void testCorrectlyConfiguredAuditedMethodLetsTheApplicationContextStart() {
+        try (GenericApplicationContext genericApplicationContext = new GenericApplicationContext()) {
+            genericApplicationContext.registerBean(HandledEventService.class);
+            genericApplicationContext.registerBean(OtherEventsAuditMapper.class);
+            genericApplicationContext.registerBean(AuditedMethodValidator.class);
+
+            assertThatCode(genericApplicationContext::refresh).doesNotThrowAnyException();
+        }
+    }
+
+    private static WriteOperations createJdkProxiedService() {
+        ProxyFactory proxyFactory = new ProxyFactory(new JdkProxiedService());
+
+        proxyFactory.setInterfaces(WriteOperations.class);
+
+        return (WriteOperations) proxyFactory.getProxy();
     }
 
     private static void validate(GenericApplicationContext genericApplicationContext) {
@@ -216,6 +265,20 @@ class AuditedMethodValidatorTest {
         @Override
         public void write() {
             // Scanned for its interface's annotation only.
+        }
+    }
+
+    interface WriteOperations {
+
+        void write();
+    }
+
+    static class JdkProxiedService implements WriteOperations {
+
+        @Audited(event = "TEST_EVENT", mapper = OtherEventsAuditMapper.class)
+        @Override
+        public void write() {
+            // Scanned for its annotation only, behind a JDK proxy.
         }
     }
 

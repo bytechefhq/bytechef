@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
@@ -68,5 +69,22 @@ class JobStatusAuditListenerIntTest {
         assertThat(page.getContent())
             .allSatisfy(persistentAuditEvent -> assertThat(persistentAuditEvent.getData())
                 .containsEntry("jobId", "7"));
+    }
+
+    @Test
+    void testFailedAndStoppedJobsAreStoredUnderTheSystemPrincipal() {
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(8L, Job.Status.FAILED));
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(9L, Job.Status.STOPPED));
+
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository
+            .findAllFiltered(new AuditEventFilter("SYSTEM", null, null, null, null), PageRequest.of(0, 25));
+
+        assertThat(page.getContent())
+            .extracting(
+                PersistentAuditEvent::getEventType, persistentAuditEvent -> persistentAuditEvent.getData()
+                    .get("jobId"),
+                persistentAuditEvent -> persistentAuditEvent.getData()
+                    .get("status"))
+            .containsExactlyInAnyOrder(tuple("JOB_FAILED", "8", "FAILED"), tuple("JOB_STOPPED", "9", "STOPPED"));
     }
 }

@@ -92,6 +92,9 @@ class AuditAspectIntTest {
     class ProxyChain {
 
         @Autowired
+        private ClassGuardedTestService classGuardedTestService;
+
+        @Autowired
         private GuardedTestService guardedTestService;
 
         @Autowired
@@ -133,6 +136,25 @@ class AuditAspectIntTest {
             assertThat(captured.getPrincipal()).isEqualTo("bob");
         }
 
+        @Test
+        void testClassLevelPreAuthorizeRecordsAllowedAuditEvent() {
+            authenticate("alice", "ROLE_ADMIN");
+
+            assertThat(classGuardedTestService.updateSetting()).isEqualTo("ok");
+
+            assertThat(captureSavedEvent().getData()).containsEntry("result", "ALLOWED");
+        }
+
+        @Test
+        void testClassLevelPreAuthorizeRecordsDeniedAuditEvent() {
+            authenticate("bob", "ROLE_USER");
+
+            assertThatThrownBy(() -> classGuardedTestService.updateSetting())
+                .isInstanceOf(AccessDeniedException.class);
+
+            assertThat(captureSavedEvent().getData()).containsEntry("result", "DENIED");
+        }
+
         private void authenticate(String principal, String authority) {
             SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -168,6 +190,9 @@ class AuditAspectIntTest {
 
         @Autowired
         private AuditedCaller auditedCaller;
+
+        @Autowired
+        private AuditedBusinessService auditedBusinessService;
 
         @Autowired
         private OuterGuardedService outerGuardedService;
@@ -313,6 +338,46 @@ class AuditAspectIntTest {
                 .containsExactlyInAnyOrder("ERROR", "ROLLED_BACK");
         }
 
+        @Test
+        void testFailedAuditedCallIsStoredAsAnErrorAfterItsOwnTransactionRollsBack() {
+            authenticate("ROLE_ADMIN");
+
+            assertThatThrownBy(() -> auditedBusinessService.writeThenFail())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("business failed");
+
+            Page<PersistentAuditEvent> page =
+                persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .singleElement()
+                .satisfies(persistentAuditEvent -> {
+                    assertThat(persistentAuditEvent.getEventType()).isEqualTo("BUSINESS_TEST");
+                    assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
+                    assertThat(persistentAuditEvent.getData())
+                        .containsEntry("result", "ERROR")
+                        .containsEntry("errorClass", IllegalStateException.class.getName())
+                        .containsEntry("method", AuditedBusinessService.class.getName() + ".writeThenFail");
+                });
+        }
+
+        @Test
+        void testAuditedCallWithoutASecurityContextIsStoredUnderTheSystemPrincipal() {
+            assertThat(auditedBusinessService.write()).isEqualTo("written");
+
+            Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+                new AuditEventFilter(null, "BUSINESS_TEST", null, null, null), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .singleElement()
+                .satisfies(persistentAuditEvent -> {
+                    assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("SYSTEM");
+                    assertThat(persistentAuditEvent.getData())
+                        .containsEntry("result", "SUCCESS")
+                        .containsEntry("method", AuditedBusinessService.class.getName() + ".write");
+                });
+        }
+
         private void authenticate(String authority) {
             SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -347,8 +412,21 @@ class AuditAspectIntTest {
         }
 
         @Bean
+        ClassGuardedTestService classGuardedTestService() {
+            return new ClassGuardedTestService();
+        }
+
+        @Bean
         GuardedTestService guardedTestService() {
             return new GuardedTestService();
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    static class ClassGuardedTestService {
+
+        public String updateSetting() {
+            return "ok";
         }
     }
 
@@ -396,6 +474,13 @@ class AuditAspectIntTest {
         @Bean
         AuditedCaller auditedCaller(InnerGuardedService innerGuardedService) {
             return new AuditedCaller(innerGuardedService);
+        }
+
+        @Bean
+        AuditedBusinessService auditedBusinessService(
+            PersistenceAuditEventRepository persistenceAuditEventRepository) {
+
+            return new AuditedBusinessService(persistenceAuditEventRepository);
         }
     }
 
@@ -539,6 +624,36 @@ class AuditAspectIntTest {
             innerGuardedService.auditedAdminOnly();
 
             throw new IllegalStateException("caller failed");
+        }
+    }
+
+    static class AuditedBusinessService {
+
+        private final PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+        AuditedBusinessService(PersistenceAuditEventRepository persistenceAuditEventRepository) {
+            this.persistenceAuditEventRepository = persistenceAuditEventRepository;
+        }
+
+        @Audited(event = "BUSINESS_TEST", mapper = CountingAuditMapper.class)
+        @Transactional
+        public String write() {
+            return "written";
+        }
+
+        @Audited(event = "BUSINESS_TEST", mapper = CountingAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String writeThenFail() {
+            PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
+
+            persistentAuditEvent.setEventDate(LocalDateTime.now());
+            persistentAuditEvent.setEventType("BUSINESS_WRITE");
+            persistentAuditEvent.setPrincipal("alice");
+
+            persistenceAuditEventRepository.save(persistentAuditEvent);
+
+            throw new IllegalStateException("business failed");
         }
     }
 
