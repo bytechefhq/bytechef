@@ -1,0 +1,3 @@
+mutation deleteAiHubChat($workspaceId: ID!, $id: ID!) {
+    deleteAiHubChat(workspaceId: $workspaceId, id: $id)
+}
