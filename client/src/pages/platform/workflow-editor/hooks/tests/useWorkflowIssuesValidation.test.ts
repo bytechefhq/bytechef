@@ -18,6 +18,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
     },
 }));
 
+vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
+    useGetWorkflowTestConfigurationQuery: () => ({data: undefined}),
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+    useQueryClient: () => ({invalidateQueries: vi.fn()}),
+}));
+
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
         selector({currentEnvironmentId: 2}),
