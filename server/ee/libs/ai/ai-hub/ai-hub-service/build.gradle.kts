@@ -35,7 +35,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-actuator")
     testImplementation("org.springframework.boot:spring-boot-liquibase")
     testImplementation("org.springframework.boot:spring-boot-test")
+    testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-graphql")) {
+        exclude(module = "ai-hub-service")
+    }
     testImplementation(project(":server:libs:test:test-support"))
 }
