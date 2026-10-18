@@ -5,16 +5,19 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {useVisibilityFeatureEnabled} from '@/pages/automation/connections/hooks/useVisibilityFeatureEnabled';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
-import ConnectionVisibilityPicker from '@/shared/components/connection/ConnectionVisibilityPicker';
 import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
+import {useCanManageResourceSharing} from '@/shared/hooks/useCanManageResourceSharing';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsResourceOwnerOrTenantAdmin} from '@/shared/hooks/useIsResourceOwnerOrTenantAdmin';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useVisibilityFeatureEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {
     ConnectionWorkflowUsage,
@@ -37,14 +40,12 @@ import {
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Link2OffIcon, Trash2Icon, UserCogIcon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
 import ConnectionReassignmentDialog from '../ConnectionReassignmentDialog';
-import ConnectionScopeBadge from '../ConnectionScopeBadge';
 
 const CONNECTION_WORKFLOWS_QUERY_KEY = ['ConnectionWorkflows'];
 
@@ -63,19 +64,18 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showReassignmentDialog, setShowReassignmentDialog] = useState(false);
     const [showVisibilityMenu, setShowVisibilityMenu] = useState(false);
 
-    const account = useAuthenticationStore((state) => state.account);
-
     const {enabled: visibilityFeatureEnabled, workspaceId: currentWorkspaceId} = useVisibilityFeatureEnabled();
 
-    const hasConnectionEditScope = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
     const hasConnectionDeleteScope = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
+    const hasConnectionEditScope = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
+    const canManageResourceSharing = useCanManageResourceSharing(connection.createdBy);
+    const isConnectionOwnerOrTenantAdmin = useIsResourceOwnerOrTenantAdmin(connection.createdBy);
     const isTenantAdmin = useIsTenantAdmin();
 
-    const isConnectionOwner = account?.login != null && account.login === connection.createdBy;
-
-    const canEdit = hasConnectionEditScope || isConnectionOwner;
-    const canDelete = hasConnectionDeleteScope || isConnectionOwner;
-    const canManageSharing = visibilityFeatureEnabled && (isConnectionOwner || isTenantAdmin || hasConnectionEditScope);
+    const canEdit = hasConnectionEditScope && isConnectionOwnerOrTenantAdmin;
+    const canDelete = hasConnectionDeleteScope && isConnectionOwnerOrTenantAdmin;
+    const canManageSharing =
+        visibilityFeatureEnabled && canManageResourceSharing && connection.visibility !== 'ORGANIZATION';
 
     const queryClient = useQueryClient();
     const {openProjectWorkflow} = useOpenInProject();
@@ -228,8 +228,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         [connectionWorkflowsData, openProjectWorkflow]
     );
 
-    const canReplaceCredentials = isTenantAdmin || (!!connection.createdBy && connection.createdBy === account?.login);
-
     const canDisconnect = isTenantAdmin && connection.active === true;
     const canReassign =
         visibilityFeatureEnabled &&
@@ -281,7 +279,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
         return (
             <div className="min-w-64 p-3">
-                <ConnectionVisibilityPicker
+                <ResourceVisibilityPicker
                     grantedUserIds={grantedUserIds}
                     onGrantedUserIdsChange={(nextUserIds) => {
                         // Diff rather than replace: the server has no set-grants operation, and expressing it as
@@ -336,7 +334,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 className="cursor-pointer rounded-sm hover:bg-gray-100"
                                 type="button"
                             >
-                                <ConnectionScopeBadge
+                                <ResourceVisibilityBadge
                                     grantedUserCount={grantedUserIds.length}
                                     visibility={connection.visibility || 'WORKSPACE'}
                                 />
@@ -348,7 +346,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         </DropdownMenuContent>
                     </DropdownMenu>
                 ) : (
-                    <ConnectionScopeBadge visibility={connection.visibility || 'WORKSPACE'} />
+                    <ResourceVisibilityBadge visibility={connection.visibility || 'WORKSPACE'} />
                 ))
             }
             createdDate={connection.createdDate}
@@ -478,7 +476,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     platformType={PlatformType.AUTOMATION}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     useUpdateConnectionCredentialsMutation={
-                        canReplaceCredentials ? useUpdateConnectionCredentialsMutation : undefined
+                        canEdit ? useUpdateConnectionCredentialsMutation : undefined
                     }
                     useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />

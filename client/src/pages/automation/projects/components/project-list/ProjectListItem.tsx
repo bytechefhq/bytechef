@@ -27,12 +27,15 @@ import ProjectListItemTabs, {
 import {useProjectListItemScopes} from '@/pages/automation/projects/hooks/useProjectListItemScopes';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import {ProjectGitConfigurationI, getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
+import {useProjectVisibility} from '@/shared/hooks/useProjectVisibility';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -132,6 +135,12 @@ const ProjectListItem = ({
         canPublishProject,
         canPullProjectFromGit,
     } = useProjectListItemScopes(currentWorkspaceId);
+
+    const projectVisibility = useProjectVisibility({
+        createdBy: project.createdBy,
+        projectId: project.id,
+        visibility: project.visibility,
+    });
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
@@ -289,6 +298,24 @@ const ProjectListItem = ({
         [activeTab, onTabChange, showProjectDeploymentDialog]
     );
 
+    const renderVisibilityPicker = () => {
+        if (!projectVisibility.canManage) {
+            return null;
+        }
+
+        return (
+            <div className="min-w-64 p-3">
+                <ResourceVisibilityPicker
+                    grantedUserIds={projectVisibility.grantedUserIds}
+                    onGrantedUserIdsChange={projectVisibility.onGrantedUserIdsChange}
+                    onVisibilityChange={projectVisibility.onVisibilityChange}
+                    visibility={project.visibility || 'WORKSPACE'}
+                    workspaceMembers={projectVisibility.workspaceMembers}
+                />
+            </div>
+        );
+    };
+
     return (
         <>
             <div
@@ -347,6 +374,33 @@ const ProjectListItem = ({
                                     styleType="secondary-filled"
                                     weight="semibold"
                                 />
+                            )}
+
+                            {projectVisibility.enabled && !projectVisibility.canManage && (
+                                <ResourceVisibilityBadge visibility={project.visibility || 'WORKSPACE'} />
+                            )}
+
+                            {projectVisibility.canManage && (
+                                <div onClick={(event) => event.stopPropagation()}>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                aria-label="Change visibility"
+                                                className="cursor-pointer rounded-sm hover:bg-surface-neutral-primary-hover"
+                                                type="button"
+                                            >
+                                                <ResourceVisibilityBadge
+                                                    grantedUserCount={projectVisibility.grantedUserIds.length}
+                                                    visibility={project.visibility || 'WORKSPACE'}
+                                                />
+                                            </button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="start" className="p-0">
+                                            {renderVisibilityPicker()}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             )}
                         </div>
 
