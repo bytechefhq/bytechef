@@ -237,6 +237,15 @@ class PermissionScopeRegistryTest {
         }
 
         @Test
+        void testConnectionScopesAreGrantedFromViewerAndEditor() {
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).contains("CONNECTION_VIEW");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
+                "CONNECTION_CREATE", "CONNECTION_EDIT", "CONNECTION_DELETE");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).contains(
+                "CONNECTION_VIEW", "CONNECTION_CREATE", "CONNECTION_EDIT", "CONNECTION_DELETE");
+        }
+
+        @Test
         void testViewerSubsetEditorSubsetAdmin() {
             Set<String> viewerScopeNames = shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER);
             Set<String> editorScopeNames = shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR);
