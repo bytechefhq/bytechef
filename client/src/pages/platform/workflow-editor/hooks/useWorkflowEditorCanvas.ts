@@ -13,7 +13,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
-import {Node, NodeChange, XYPosition, useReactFlow} from '@xyflow/react';
+import {Node, NodeChange, XYPosition, useNodesInitialized, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -82,6 +82,7 @@ interface UseWorkflowEditorCanvasParamsI {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     fitViewOnLoad?: boolean;
+    fitViewOnWorkflowChange?: boolean;
     leftSidebarOpen?: boolean;
     readOnlyLayoutDirection?: LayoutDirectionType;
     readOnlyWorkflow?: Workflow;
@@ -157,6 +158,7 @@ const useWorkflowEditorCanvas = ({
     componentDefinitions,
     customCanvasWidth,
     fitViewOnLoad,
+    fitViewOnWorkflowChange,
     leftSidebarOpen,
     readOnlyLayoutDirection,
     readOnlyWorkflow,
@@ -187,7 +189,9 @@ const useWorkflowEditorCanvas = ({
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const resetWorkflowLayout = useWorkflowEditorStore((state) => state.resetWorkflowLayout);
 
-    const {getInternalNode, screenToFlowPosition} = useReactFlow();
+    const {fitView, getInternalNode, screenToFlowPosition} = useReactFlow();
+
+    const nodesInitialized = useNodesInitialized();
 
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
@@ -738,7 +742,21 @@ const useWorkflowEditorCanvas = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowUuid]);
 
-    useInitialViewport({canvasHeight, enabled: !fitViewOnLoad, getViewportOffsetX, workflowUuid});
+    useInitialViewport({
+        canvasHeight,
+        enabled: !fitViewOnLoad && !fitViewOnWorkflowChange,
+        getViewportOffsetX,
+        workflowUuid,
+    });
+
+    useEffect(() => {
+        if (!fitViewOnWorkflowChange || !nodesInitialized) {
+            return;
+        }
+
+        fitView({maxZoom: 1, minZoom: 0.2, padding: {bottom: 0.2, left: 0.2, right: 0.2, top: '72px'}});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fitViewOnWorkflowChange, nodesInitialized, workflowUuid, customCanvasWidth]);
 
     return {
         edgeTypes,
