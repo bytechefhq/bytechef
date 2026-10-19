@@ -36,6 +36,13 @@ final class ChatMemoryRewinder {
     }
 
     static void rewind(ChatMemory chatMemory, String conversationId, List<String> previousUserTexts) {
+        synchronized (ConversationLocks.get(conversationId)) {
+            rewindLocked(chatMemory, conversationId, previousUserTexts);
+        }
+    }
+
+    private static void rewindLocked(ChatMemory chatMemory, String conversationId, List<String> previousUserTexts) {
+
         List<Message> messages = chatMemory.get(conversationId);
 
         List<Integer> userMessageIndexes = new ArrayList<>();

@@ -263,6 +263,10 @@ public class SpringAIAgent extends LocalAgent {
     protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
     }
 
+    protected ChatMemory chatMemoryForRun(RunAgentInput input, ChatMemory chatMemory) {
+        return chatMemory;
+    }
+
     /**
      * Hook for subclasses to contribute per-invocation values into Spring AI's
      * {@link org.springframework.ai.chat.model.ToolContext}. The returned map is merged into the request via
@@ -485,10 +489,12 @@ public class SpringAIAgent extends LocalAgent {
 
         if (Objects.nonNull(this.chatMemory)) {
             try {
-                this.prepareChatMemory(input, this.chatMemory, this.conversationId(input));
+                ChatMemory runChatMemory = this.chatMemoryForRun(input, this.chatMemory);
+
+                this.prepareChatMemory(input, runChatMemory, this.conversationId(input));
 
                 chatRequest.advisors(
-                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+                    MessageChatMemoryAdvisor.builder(runChatMemory).build()
                 );
 
                 chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, this.conversationId(input)));
