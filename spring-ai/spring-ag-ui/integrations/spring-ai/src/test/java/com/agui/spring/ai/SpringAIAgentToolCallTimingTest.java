@@ -114,6 +114,63 @@ class SpringAIAgentToolCallTimingTest {
         assertThat(events.indexOf(resultEvent)).isGreaterThan(events.indexOf(startEvent));
     }
 
+    @Test
+    void shouldEmitAnErrorResultForTheStartedCallWhenTheToolThrowsAnError() throws Exception {
+        var events = new CopyOnWriteArrayList<BaseEvent>();
+        var finalized = new CountDownLatch(1);
+
+        var agent = newAgent(true, new ErrorThrowingToolCallback());
+
+        agent.run(newInput(), collector(events, finalized));
+
+        var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+
+        while (events.stream().noneMatch(event -> event instanceof ToolCallResultEvent) && System.nanoTime() < deadline) {
+            Thread.sleep(10);
+        }
+
+        var startEvent = (ToolCallStartEvent) single(events, ToolCallStartEvent.class);
+        var resultEvent = (ToolCallResultEvent) single(events, ToolCallResultEvent.class);
+
+        assertThat(resultEvent.getToolCallId()).isEqualTo(startEvent.getToolCallId());
+        assertThat(resultEvent.getContent()).contains("\"error\"").contains("tool blew up");
+    }
+
+    @Test
+    void shouldLetTheAgentChooseTheToolErrorMessage() throws Exception {
+        var events = new CopyOnWriteArrayList<BaseEvent>();
+        var finalized = new CountDownLatch(1);
+
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new TextToolTextChatModel())
+            .systemMessage("system")
+            .state(new State())
+            .toolCallback(new FailingToolCallback());
+
+        var agent = new SpringAIAgent(builder) {
+            @Override
+            protected boolean splitsTextAtToolCalls() {
+                return true;
+            }
+
+            @Override
+            protected String toolErrorMessage(RunAgentInput input, Throwable throwable) {
+                return "The tool failed. Reference: " + input.runId();
+            }
+        };
+
+        agent.run(newInput(), collector(events, finalized));
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+
+        var resultEvent = (ToolCallResultEvent) single(events, ToolCallResultEvent.class);
+
+        assertThat(resultEvent.getContent())
+            .contains("The tool failed. Reference: run")
+            .doesNotContain("search index unavailable");
+    }
+
     private static void assertToolCallEventsShareOneIdInOrder(List<BaseEvent> events, String expectedResult) {
         var startEvent = (ToolCallStartEvent) single(events, ToolCallStartEvent.class);
         var argsEvent = (ToolCallArgsEvent) single(events, ToolCallArgsEvent.class);
@@ -255,6 +312,19 @@ class SpringAIAgentToolCallTimingTest {
             }
 
             return "{\"tasks\":[]}";
+        }
+    }
+
+    private static class ErrorThrowingToolCallback implements ToolCallback {
+
+        @Override
+        public ToolDefinition getToolDefinition() {
+            return searchTasksDefinition();
+        }
+
+        @Override
+        public String call(String toolInput) {
+            throw new AssertionError("tool blew up");
         }
     }
 
