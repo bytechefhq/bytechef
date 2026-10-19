@@ -3,7 +3,7 @@ import {
     type ToolApprovalResolutionI,
     stampToolApprovalResolution,
 } from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
-import {getServerRowIndex, withServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
+import {generateMessageId} from '@/ee/pages/automation/ai-hub/stores/messageId';
 import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
@@ -22,18 +22,20 @@ interface AiHubStateI {
     mode: MODE;
     setMode: (mode: MODE) => void;
 
+    /** The focused chat's thread. Every message carries an id; a message added without one gets a fresh one. */
     messages: ThreadMessageLike[];
     addMessage: (message: ThreadMessageLike) => void;
     appendToLastAssistantMessage: (text: string) => void;
-    editUserMessage: (index: number, content: string) => void;
+    /** Replaces the user message at `index` with `content` under `messageId` and drops every message after it. */
+    editUserMessage: (index: number, content: string, messageId: string) => void;
     markToolApprovalResolved: (approvalId: number, resolution: ToolApprovalResolutionI) => void;
     resetMessages: () => void;
 
-    /** The server transcript row index the next persisted user or assistant message will take. */
-    nextServerRowIndex: number;
-    setNextServerRowIndex: (nextServerRowIndex: number) => void;
-    /** Marks the message at `index` with the next server row index, unless it is already marked. */
-    tagServerRow: (index: number) => void;
+    /**
+     * Counts the transcripts the thread has shown. A chat switch or reset starts a new one, so a turn subscriber built
+     * for an earlier transcript stops writing even when the user comes back to its chat.
+     */
+    transcriptGeneration: number;
 
     /** True while a chat switch is fetching that chat's history, so the thread shows a loading placeholder. */
     messagesLoading: boolean;
@@ -54,7 +56,7 @@ export const aiHubStore = create<AiHubStateI>()(
         addMessage: (message) =>
             set((state) => ({
                 ...state,
-                messages: [...state.messages, message],
+                messages: [...state.messages, message.id == null ? {...message, id: generateMessageId()} : message],
             })),
         appendToLastAssistantMessage: (text: string) =>
             set((state) => {
@@ -74,11 +76,11 @@ export const aiHubStore = create<AiHubStateI>()(
                     }
                 }
 
-                messages.push({role: 'assistant', content: text} as ThreadMessageLike);
+                messages.push({content: text, id: generateMessageId(), role: 'assistant'} as ThreadMessageLike);
 
                 return {...state, messages};
             }),
-        editUserMessage: (index, content) =>
+        editUserMessage: (index, content, messageId) =>
             set((state) => {
                 if (index < 0 || index >= state.messages.length) {
                     return state;
@@ -92,7 +94,7 @@ export const aiHubStore = create<AiHubStateI>()(
 
                 const truncated = state.messages.slice(0, index);
 
-                truncated.push({...target, content} as ThreadMessageLike);
+                truncated.push({...target, content, id: messageId} as ThreadMessageLike);
 
                 return {...state, messages: truncated};
             }),
@@ -101,24 +103,14 @@ export const aiHubStore = create<AiHubStateI>()(
                 ...state,
                 messages: stampToolApprovalResolution(state.messages, approvalId, resolution),
             })),
-        resetMessages: () => set({messages: [], messagesLoading: false, nextServerRowIndex: 0}),
+        resetMessages: () =>
+            set((state) => ({
+                messages: [],
+                messagesLoading: false,
+                transcriptGeneration: state.transcriptGeneration + 1,
+            })),
 
-        nextServerRowIndex: 0,
-        setNextServerRowIndex: (nextServerRowIndex) => set({nextServerRowIndex}),
-        tagServerRow: (index) =>
-            set((state) => {
-                const message = state.messages[index];
-
-                if (message == null || getServerRowIndex(message) != null) {
-                    return state;
-                }
-
-                const messages = [...state.messages];
-
-                messages[index] = withServerRowIndex(message, state.nextServerRowIndex);
-
-                return {...state, messages, nextServerRowIndex: state.nextServerRowIndex + 1};
-            }),
+        transcriptGeneration: 0,
 
         messagesLoading: false,
         setMessagesLoading: (messagesLoading) => set({messagesLoading}),

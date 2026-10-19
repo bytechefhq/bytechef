@@ -55,7 +55,7 @@ describe('useTruncateAiHubChatMessagesMutation', () => {
         renderHook(() => useTruncateAiHubChatMessagesMutation(), {wrapper: wrap(queryClient)});
 
         act(() => {
-            capturedOnSuccess?.(undefined, {fromMessageIndex: 3, id: '42', workspaceId: '7'});
+            capturedOnSuccess?.(undefined, {id: '42', keepMessage: false, messageId: 'event-3', workspaceId: '7'});
         });
 
         expect(invalidateSpy).toHaveBeenCalledWith({

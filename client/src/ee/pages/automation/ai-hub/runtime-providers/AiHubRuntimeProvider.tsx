@@ -12,7 +12,7 @@ import {
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {sanitizeAssistantMessages} from '@/ee/pages/automation/ai-hub/runtime-providers/stripLeakedToolMarkup';
 import {isParsedToolResultValue} from '@/ee/pages/automation/ai-hub/runtime-providers/toolResultValue';
-import {getServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
+import {generateMessageId} from '@/ee/pages/automation/ai-hub/stores/messageId';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -50,6 +50,9 @@ const AI_HUB_AGENT_ID = 'AI_HUB';
 export const TURN_IN_FLIGHT_MESSAGE = 'A turn is already running in this chat.';
 
 export const WORKSPACE_NOT_READY_MESSAGE = 'The workspace is still loading. Send again in a moment.';
+
+export const EDIT_NOT_SENT_MESSAGE =
+    'The chat changed while your edit was being saved, so the edited message was not sent. Open the chat to send it again.';
 
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
@@ -147,18 +150,37 @@ export function stampOptimisticTurnMarker(message: ThreadMessageLike, marker: st
 
 /** Removes every message tagged with `marker` from the store. */
 export function removeOptimisticTurnMessages(marker: string): void {
-    useAiHubStore.setState((state) => {
-        const removedServerRowIndexes = state.messages
-            .filter((message) => getOptimisticTurnMarker(message) === marker)
-            .map((message) => getServerRowIndex(message))
-            .filter((serverRowIndex): serverRowIndex is number => serverRowIndex != null);
+    useAiHubStore.setState((state) => ({
+        messages: state.messages.filter((message) => getOptimisticTurnMarker(message) !== marker),
+    }));
+}
 
-        return {
-            messages: state.messages.filter((message) => getOptimisticTurnMarker(message) !== marker),
-            nextServerRowIndex:
-                removedServerRowIndexes.length > 0 ? Math.min(...removedServerRowIndexes) : state.nextServerRowIndex,
-        };
-    });
+/** The text of a message: its string content, or its text parts joined by newlines. */
+export function getMessageText(message: ThreadMessageLike): string {
+    if (typeof message.content === 'string') {
+        return message.content;
+    }
+
+    return message.content
+        .filter((part): part is {text: string; type: 'text'} => part?.type === 'text')
+        .map((part) => part.text)
+        .join('\n');
+}
+
+/**
+ * The index of the user message a reload regenerates the reply to: the nearest user message at or before the reloaded
+ * reply's parent, walking back over tool-only and data rows. -1 when there is none.
+ */
+export function findReloadedUserMessageIndex(messages: ThreadMessageLike[], parentId: string | null): number {
+    const parentIndex = parentId == null ? -1 : messages.findIndex((message) => message.id === parentId);
+
+    for (let index = parentIndex; index >= 0; index--) {
+        if (messages[index].role === 'user') {
+            return index;
+        }
+    }
+
+    return -1;
 }
 
 interface BuildSubscriberDepsI {
@@ -166,7 +188,10 @@ interface BuildSubscriberDepsI {
     appendToLastAssistantMessage: (text: string) => void;
     /** Index of the assistant message that owns the tool calls of this turn. */
     assistantMessageIndex?: number;
-    /** AG-UI thread id this turn belongs to; events arriving after a switch to another chat are dropped. */
+    /**
+     * AG-UI thread id this turn belongs to; events arriving after a switch to another chat are dropped, and so are
+     * events arriving after the transcript the subscriber was built for was replaced, even by the same chat's.
+     */
     chatId?: string;
     getLastUserMessage: () => string;
     /** Fires instead of the red error bubble when the server rejects the turn with 409 TURN_IN_FLIGHT. */
@@ -326,10 +351,24 @@ export const buildAiHubSubscriber = ({
     const unrecoveredToolFailures = new Map<string, string>();
 
     let currentAssistantMessageIndex = assistantMessageIndex;
+    let currentAssistantMessageId = useAiHubStore.getState().messages[assistantMessageIndex]?.id;
     let currentAssistantMessageHasOutput = false;
     let startsNewAssistantMessage = false;
 
-    const isStaleChat = () => subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId;
+    const subscriberTranscriptGeneration = useAiHubStore.getState().transcriptGeneration;
+
+    const resolveCurrentAssistantMessageIndex = () => {
+        const messageIndex =
+            currentAssistantMessageId == null
+                ? -1
+                : useAiHubStore.getState().messages.findIndex((message) => message.id === currentAssistantMessageId);
+
+        return messageIndex >= 0 ? messageIndex : currentAssistantMessageIndex;
+    };
+
+    const isStaleChat = () =>
+        (subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId) ||
+        useAiHubStore.getState().transcriptGeneration !== subscriberTranscriptGeneration;
 
     const recordToolFailure = (toolName: string, reason: string) => {
         unrecoveredToolFailures.delete(toolName);
@@ -460,13 +499,12 @@ export const buildAiHubSubscriber = ({
 
                 addMessage({content: text, role: 'assistant'});
 
-                currentAssistantMessageIndex = useAiHubStore.getState().messages.length - 1;
+                const {messages} = useAiHubStore.getState();
+
+                currentAssistantMessageIndex = messages.length - 1;
+                currentAssistantMessageId = messages[currentAssistantMessageIndex]?.id;
             } else {
                 appendToLastAssistantMessage(text);
-            }
-
-            if (text.trim().length > 0) {
-                useAiHubStore.getState().tagServerRow(currentAssistantMessageIndex);
             }
 
             currentAssistantMessageHasOutput = true;
@@ -537,7 +575,12 @@ export const buildAiHubSubscriber = ({
 
             aiChatToolCallStore
                 .getState()
-                .startToolCall(event.toolCallId, event.toolCallName, currentAssistantMessageIndex, subscriberChatId);
+                .startToolCall(
+                    event.toolCallId,
+                    event.toolCallName,
+                    resolveCurrentAssistantMessageIndex(),
+                    subscriberChatId
+                );
 
             currentAssistantMessageHasOutput = true;
         },
@@ -831,8 +874,6 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             });
 
             if (continuationStarted) {
-                useAiHubStore.getState().setNextServerRowIndex(useAiHubStore.getState().nextServerRowIndex + 1);
-
                 addMessage({content: '', role: 'assistant'});
 
                 aiHubChatsStore.getState().setActivityState(currentChatId, 'running');
@@ -887,9 +928,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
     /**
      * Handles a 409 TURN_IN_FLIGHT once per turn: releases the run, rolls back this turn's optimistic messages,
-     * hands the text back to the composer and tells the user a turn is already running in this chat.
+     * hands {@code composerTextOnRollback} back to the composer when given and tells the user a turn is already
+     * running in this chat.
      */
-    const createTurnInFlightHandler = (optimisticTurnMarker: string, input: string) => {
+    const createTurnInFlightHandler = (optimisticTurnMarker: string, composerTextOnRollback: string | undefined) => {
         let handled = false;
 
         const handleTurnInFlight = () => {
@@ -913,25 +955,32 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             removeOptimisticTurnMessages(optimisticTurnMarker);
 
-            runtime.thread.composer.setText(input);
+            if (composerTextOnRollback !== undefined) {
+                runtime.thread.composer.setText(composerTextOnRollback);
+            }
         };
 
         return {handleTurnInFlight, wasHandled: () => handled};
     };
 
     const runTurn = async ({
+        composerTextOnRollback,
         input,
         onFailure,
         optimisticTurnMarker,
         runId,
     }: {
+        composerTextOnRollback?: string;
         input: string;
         onFailure: (errorMessage: string) => void;
         optimisticTurnMarker: string;
         runId: string;
     }): Promise<{turnInFlight: boolean}> => {
         const turnController = startTurnController();
-        const {handleTurnInFlight, wasHandled} = createTurnInFlightHandler(optimisticTurnMarker, input);
+        const {handleTurnInFlight, wasHandled} = createTurnInFlightHandler(
+            optimisticTurnMarker,
+            composerTextOnRollback
+        );
 
         agent!.setState(
             buildStateToSend({
@@ -1014,10 +1063,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const runId = getRandomId();
         const optimisticTurnMarker = getRandomId();
+        const userMessageId = generateMessageId();
 
-        addMessage(stampOptimisticTurnMarker({content: input, role: 'user'}, optimisticTurnMarker));
-
-        useAiHubStore.getState().tagServerRow(useAiHubStore.getState().messages.length - 1);
+        addMessage(stampOptimisticTurnMarker({content: input, id: userMessageId, role: 'user'}, optimisticTurnMarker));
 
         const turnStarted = await bootstrapAiHubTurnRunState({
             createChatIfNeeded: async () => {
@@ -1065,11 +1113,12 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             return;
         }
 
-        agent.addMessage({content: input, id: getRandomId(), role: 'user'});
+        agent.addMessage({content: input, id: userMessageId, role: 'user'});
 
         aiHubComposerStore.getState().clear();
 
         const {turnInFlight} = await runTurn({
+            composerTextOnRollback: input,
             input,
             onFailure: (errorMessage) =>
                 aiChatRetryableErrorStore
@@ -1093,24 +1142,89 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     };
 
     /**
-     * Re-runs a turn against the current {@code agent.messages}; onEdit / onReload stage the transcript first.
+     * Re-runs a turn for the user message {@code userMessage}, which is the only message the run sends: the server
+     * takes the history from its session memory. A user message the server already holds is not saved again, since
+     * the server keys a sent user row by its AG-UI message id.
      */
-    const reRunAgentTurn = async (lastUserInput: string) => {
+    const reRunAgentTurn = async (userMessage: {content: string; id: string}) => {
         if (!agent) {
             return;
         }
 
         const runId = getRandomId();
 
+        agent.setMessages([{content: userMessage.content, id: userMessage.id, role: 'user'}]);
+
         markChatRunning(runId);
 
-        await runTurn({input: lastUserInput, onFailure: () => undefined, optimisticTurnMarker: getRandomId(), runId});
+        await runTurn({
+            input: userMessage.content,
+            onFailure: () => undefined,
+            optimisticTurnMarker: getRandomId(),
+            runId,
+        });
     };
 
     /**
-     * Edit-and-resend: truncates the server-side history at the edited message's server row, rewinds the local store
-     * and the AG-UI transcript, then re-runs the turn. The external-store runtime assigns each message id =
-     * String(index); the server row comes from the message's server row index.
+     * Truncates the saved chat at the user message at {@code messageIndex}: after it when {@code keepMessage}, from it
+     * otherwise. A chat not created yet has nothing saved. The server refuses while a turn runs, before deleting
+     * anything. When it holds no message with that id, because the run that sent it failed before saving it, nothing
+     * was saved after it either, so the last user message may go ahead; an earlier one no longer lines up with the
+     * server and is refused. Returns whether the edit or reload may go ahead.
+     */
+    const truncateSavedChat = async ({
+        keepMessage,
+        messageIndex,
+        messages,
+        refusal,
+    }: {
+        keepMessage: boolean;
+        messageIndex: number;
+        messages: ThreadMessageLike[];
+        refusal: string;
+    }): Promise<boolean> => {
+        const persistedChatId = aiHubChatsStore.getState().currentChatId;
+
+        if (persistedChatId == null) {
+            return true;
+        }
+
+        if (!isWorkspaceIdKnown(currentWorkspaceId)) {
+            toast.info(WORKSPACE_NOT_READY_MESSAGE);
+
+            return false;
+        }
+
+        const result = await truncateChatMessagesMutation.mutateAsync({
+            id: String(persistedChatId),
+            keepMessage,
+            messageId: messages[messageIndex].id!,
+            workspaceId: String(currentWorkspaceId),
+        });
+
+        if (result.truncateAiHubChatMessages != null) {
+            return true;
+        }
+
+        const isLastUserMessage = messages.slice(messageIndex + 1).every((message) => message.role !== 'user');
+
+        if (!isLastUserMessage) {
+            toast.error(refusal);
+        }
+
+        return isLastUserMessage;
+    };
+
+    /** Drops the tool calls live turns attached to the thread messages from {@code fromMessageIndex} on. */
+    const dropToolCallsFrom = (fromMessageIndex: number) => {
+        if (chatId != null) {
+            aiChatToolCallStore.getState().removeFromMessageIndex(chatId, fromMessageIndex);
+        }
+    };
+
+    /**
+     * Edit-and-resend: replaces the edited user message, found by the id the runtime passes as {@code sourceId}, and
+     * drops everything after it, on the server too, then sends the new text as a new message under a new id.
      */
     const onEdit = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -1125,50 +1239,52 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             return;
         }
 
-        const editedIndex = Number(message.sourceId);
+        const currentMessages = useAiHubStore.getState().messages;
+        const editedIndex = currentMessages.findIndex((storeMessage) => storeMessage.id === message.sourceId);
 
-        if (!Number.isInteger(editedIndex) || editedIndex < 0) {
+        if (editedIndex < 0 || currentMessages[editedIndex].role !== 'user') {
             toast.error('Could not resolve edited message');
 
             return;
         }
 
         const input = message.content[0].text;
-        const persistedChatId = aiHubChatsStore.getState().currentChatId;
-        const editedServerRowIndex = getServerRowIndex(useAiHubStore.getState().messages[editedIndex]);
-
-        if (persistedChatId != null && editedServerRowIndex == null) {
-            toast.error('Could not resolve edited message');
-
-            return;
-        }
+        const transcriptGeneration = useAiHubStore.getState().transcriptGeneration;
 
         try {
-            if (persistedChatId != null && editedServerRowIndex != null && currentWorkspaceId != null) {
-                await truncateChatMessagesMutation.mutateAsync({
-                    fromMessageIndex: editedServerRowIndex,
-                    id: String(persistedChatId),
-                    workspaceId: String(currentWorkspaceId),
-                });
+            const truncated = await truncateSavedChat({
+                keepMessage: false,
+                messageIndex: editedIndex,
+                messages: currentMessages,
+                refusal: 'This message was not saved, so it cannot be edited.',
+            });
+
+            if (!truncated) {
+                return;
             }
 
-            editUserMessage(editedIndex, input);
+            if (useAiHubStore.getState().transcriptGeneration !== transcriptGeneration) {
+                toast.error(EDIT_NOT_SENT_MESSAGE);
 
-            useAiHubStore.getState().setNextServerRowIndex((editedServerRowIndex ?? 0) + 1);
+                return;
+            }
 
-            agent.setMessages(agent.messages.slice(0, editedIndex));
-            agent.addMessage({content: input, id: getRandomId(), role: 'user'});
+            const editedMessageId = generateMessageId();
 
-            await reRunAgentTurn(input);
+            dropToolCallsFrom(editedIndex);
+
+            editUserMessage(editedIndex, input, editedMessageId);
+
+            await reRunAgentTurn({content: input, id: editedMessageId});
         } catch (error) {
             toast.error(`Failed to update message: ${error instanceof Error ? error.message : String(error)}`);
         }
     };
 
     /**
-     * Regenerates the reply to the user message at {@code parentId}: drops everything after it locally and in the AG-UI
-     * transcript, and on the server drops the user message itself too, since the re-run persists it again, then
-     * re-runs the turn.
+     * Regenerates the reply to the nearest user message at or before {@code parentId}, walking back over tool-only and
+     * data rows: drops everything after that message, on the server too, and re-sends it under its own id, which the
+     * server keeps rather than saving again. With no such message there is nothing to regenerate.
      */
     const onReload = async (parentId: string | null) => {
         if (!agent) {
@@ -1177,51 +1293,35 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             return;
         }
 
-        const parentIndex = parentId == null ? -1 : Number(parentId);
-
-        if (!Number.isInteger(parentIndex) || parentIndex < -1) {
-            toast.error('Could not resolve message to refresh');
-
-            return;
-        }
-
-        const persistedChatId = aiHubChatsStore.getState().currentChatId;
         const currentMessages = useAiHubStore.getState().messages;
-        const parentServerRowIndex = parentIndex < 0 ? 0 : getServerRowIndex(currentMessages[parentIndex]);
+        const userMessageIndex = findReloadedUserMessageIndex(currentMessages, parentId);
 
-        if (persistedChatId != null && parentServerRowIndex == null) {
+        if (userMessageIndex < 0) {
             toast.error('Could not resolve message to refresh');
 
             return;
         }
-        const lastUserContent = currentMessages[parentIndex]?.content;
-        const lastUserInput =
-            typeof lastUserContent === 'string'
-                ? lastUserContent
-                : Array.isArray(lastUserContent)
-                  ? lastUserContent
-                        .filter((part): part is {text: string; type: 'text'} => part?.type === 'text')
-                        .map((part) => part.text)
-                        .join('\n')
-                  : '';
+
+        const userMessage = currentMessages[userMessageIndex];
+        const transcriptGeneration = useAiHubStore.getState().transcriptGeneration;
 
         try {
-            if (persistedChatId != null && parentServerRowIndex != null && currentWorkspaceId != null) {
-                await truncateChatMessagesMutation.mutateAsync({
-                    fromMessageIndex: parentServerRowIndex,
-                    id: String(persistedChatId),
-                    workspaceId: String(currentWorkspaceId),
-                });
-            }
-
-            useAiHubStore.setState({
-                messages: currentMessages.slice(0, parentIndex + 1),
-                nextServerRowIndex: (parentServerRowIndex ?? 0) + (parentIndex < 0 ? 0 : 1),
+            const truncated = await truncateSavedChat({
+                keepMessage: true,
+                messageIndex: userMessageIndex,
+                messages: currentMessages,
+                refusal: 'This message was not saved, so its reply cannot be refreshed.',
             });
 
-            agent.setMessages(agent.messages.slice(0, parentIndex + 1));
+            if (!truncated || useAiHubStore.getState().transcriptGeneration !== transcriptGeneration) {
+                return;
+            }
 
-            await reRunAgentTurn(lastUserInput);
+            dropToolCallsFrom(userMessageIndex + 1);
+
+            useAiHubStore.setState({messages: currentMessages.slice(0, userMessageIndex + 1)});
+
+            await reRunAgentTurn({content: getMessageText(userMessage), id: userMessage.id!});
         } catch (error) {
             toast.error(`Failed to refresh response: ${error instanceof Error ? error.message : String(error)}`);
         }

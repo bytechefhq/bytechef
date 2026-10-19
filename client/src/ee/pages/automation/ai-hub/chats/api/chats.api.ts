@@ -99,6 +99,8 @@ export interface AiHubChatI {
 
 export interface AiHubChatMessageI {
     content: string;
+    /** The id of the server row; a user row keeps the AG-UI message id it was sent with. */
+    id: string;
     role: string;
     timestamp: string;
     /** Nullable JSON array of tool activity attached to this row. */
@@ -219,6 +221,7 @@ export async function getChatMessages({
 
     return result.aiHubChatMessages.map((message) => ({
         content: message.content,
+        id: message.id,
         role: message.role,
         timestamp: toIsoString(message.timestamp),
         toolEventsJson: message.toolEventsJson ?? null,

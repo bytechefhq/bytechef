@@ -5,8 +5,8 @@ import {useQueryClient} from '@tanstack/react-query';
 import {AiHubChatsKeys} from './useChats';
 
 /**
- * Edit-and-resend support: truncates a chat's history at the supplied message index so the next run starts from the
- * edit point, then invalidates the chat's loaded messages.
+ * Edit and reload support: truncates a chat's history at the message with the supplied id, keeping that message for a
+ * reload, so the next run starts from that point, then invalidates the chat's loaded messages.
  */
 export function useTruncateAiHubChatMessagesMutation() {
     const queryClient = useQueryClient();
