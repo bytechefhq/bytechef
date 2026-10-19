@@ -20,6 +20,7 @@ import {
     useUpdateMcpServerMutation,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
@@ -50,6 +51,8 @@ const McpServerDialog = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const ff_6383 = useFeatureFlagsStore()('ff-6383');
 
     const open = externalOpen !== undefined ? externalOpen : internalOpen;
     const setOpen = externalOnOpenChange || setInternalOpen;
@@ -176,7 +179,7 @@ const McpServerDialog = ({
                                     )}
                                 />
 
-                                {mcpServer && (
+                                {mcpServer && ff_6383 && (
                                     <FormField
                                         control={form.control}
                                         name="enforceToolAuthorization"
