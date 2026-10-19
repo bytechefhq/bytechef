@@ -3,6 +3,7 @@ import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
     ConnectionDefinition,
+    Property,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 
@@ -21,7 +22,15 @@ export type ComponentCatalogType = {
         componentVersion?: number
     ): Promise<ConnectionDefinition | undefined>;
     getDefinition(componentName: string, componentVersion?: number): Promise<ComponentDefinition | undefined>;
+    getOperationProperties(
+        componentName: string,
+        componentVersion: number | undefined,
+        operationName: string,
+        operationKind: OperationKindType
+    ): Promise<Property[]>;
 };
+
+export type OperationKindType = 'action' | 'trigger';
 
 export interface ScriptCompletionContextI {
     components: ComponentCatalogType;

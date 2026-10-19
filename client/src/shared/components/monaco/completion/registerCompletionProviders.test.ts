@@ -103,6 +103,7 @@ describe('buildCompletionProvider', () => {
                 components: [{name: 'x', title: 'X', version: 1} as ComponentDefinitionBasic],
                 getConnectionDefinition: vi.fn().mockRejectedValue(new Error('boom')),
                 getDefinition: vi.fn().mockRejectedValue(new Error('boom')),
+                getOperationProperties: vi.fn(async () => []),
             },
             connections: [],
             input: {},
@@ -139,6 +140,7 @@ describe('buildCompletionProvider', () => {
                     async () =>
                         ({actions: [{name: 'sendEmail', title: 'Send Email'}]}) as unknown as ComponentDefinition
                 ),
+                getOperationProperties: vi.fn(async () => []),
             },
             format: 'json',
             functions: [

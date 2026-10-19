@@ -6,14 +6,18 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useComponentCatalog} from './useComponentCatalog';
 
 const {
+    getComponentActionDefinitionMock,
     getComponentConnectionDefinitionMock,
     getComponentDefinitionMock,
     getComponentDefinitionsMock,
+    getComponentTriggerDefinitionMock,
     getEmbeddedComponentDefinitionsMock,
 } = vi.hoisted(() => ({
+    getComponentActionDefinitionMock: vi.fn(),
     getComponentConnectionDefinitionMock: vi.fn(),
     getComponentDefinitionMock: vi.fn(),
     getComponentDefinitionsMock: vi.fn(),
+    getComponentTriggerDefinitionMock: vi.fn(),
     getEmbeddedComponentDefinitionsMock: vi.fn(),
 }));
 
@@ -30,11 +34,17 @@ vi.mock('@/shared/middleware/automation/configuration', () => ({
 }));
 
 vi.mock('@/shared/middleware/platform/configuration', () => ({
+    ActionDefinitionApi: class {
+        getComponentActionDefinition = getComponentActionDefinitionMock;
+    },
     ComponentDefinitionApi: class {
         getComponentDefinition = getComponentDefinitionMock;
     },
     ConnectionDefinitionApi: class {
         getComponentConnectionDefinition = getComponentConnectionDefinitionMock;
+    },
+    TriggerDefinitionApi: class {
+        getComponentTriggerDefinition = getComponentTriggerDefinitionMock;
     },
 }));
 
@@ -56,6 +66,48 @@ describe('useComponentCatalog', () => {
         getEmbeddedComponentDefinitionsMock.mockResolvedValue([{name: 'embedded-one', version: 2}]);
         getComponentDefinitionMock.mockResolvedValue({name: 'slack'});
         getComponentConnectionDefinitionMock.mockResolvedValue({name: 'slack'});
+        getComponentActionDefinitionMock.mockResolvedValue({name: 'sendMessage', properties: [{name: 'text'}]});
+        getComponentTriggerDefinitionMock.mockResolvedValue({name: 'newMessage', properties: [{name: 'channel'}]});
+    });
+
+    it('fetches an action definition once and returns its properties', async () => {
+        const {result} = renderHook(() => useComponentCatalog(), {wrapper});
+
+        await waitFor(() => expect(result.current.components).toHaveLength(1));
+
+        expect(await result.current.getOperationProperties('slack', undefined, 'sendMessage', 'action')).toEqual([
+            {name: 'text'},
+        ]);
+
+        await result.current.getOperationProperties('slack', undefined, 'sendMessage', 'action');
+
+        expect(getComponentActionDefinitionMock).toHaveBeenCalledTimes(1);
+        expect(getComponentActionDefinitionMock).toHaveBeenCalledWith({
+            actionName: 'sendMessage',
+            componentName: 'slack',
+            componentVersion: 1,
+        });
+    });
+
+    it('fetches a trigger definition with an explicit version', async () => {
+        const {result} = renderHook(() => useComponentCatalog(), {wrapper});
+
+        expect(await result.current.getOperationProperties('slack', 2, 'newMessage', 'trigger')).toEqual([
+            {name: 'channel'},
+        ]);
+
+        expect(getComponentTriggerDefinitionMock).toHaveBeenCalledWith({
+            componentName: 'slack',
+            componentVersion: 2,
+            triggerName: 'newMessage',
+        });
+    });
+
+    it('resolves an empty list without fetching for an unknown component without a version', async () => {
+        const {result} = renderHook(() => useComponentCatalog(), {wrapper});
+
+        expect(await result.current.getOperationProperties('unknown', undefined, 'x', 'action')).toEqual([]);
+        expect(getComponentActionDefinitionMock).not.toHaveBeenCalled();
     });
 
     it('exposes the component list and fetches a definition once per component', async () => {
