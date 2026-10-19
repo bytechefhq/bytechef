@@ -10,5 +10,5 @@ public interface AgUiToolCallListener {
 
     void onToolCallFinished(String toolCallId, String result);
 
-    void onToolCallFailed(String toolCallId, RuntimeException exception);
+    void onToolCallFailed(String toolCallId, Throwable throwable);
 }
