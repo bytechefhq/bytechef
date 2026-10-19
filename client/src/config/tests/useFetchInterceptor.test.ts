@@ -860,6 +860,158 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.navigate).not.toHaveBeenCalled();
         });
 
+        it('does not retry or log out when the AI Hub chat turn endpoint refuses the turn itself', async () => {
+            const innerFetch = vi.fn().mockResolvedValueOnce(
+                createMockResponse({
+                    jsonData: {error: 'Workspace is not accessible to the current user'},
+                    status: 403,
+                    url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                })
+            );
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('reads the AI Hub refusal from a clone, leaving the body for the caller', async () => {
+            const refusalResponse = new Response(
+                JSON.stringify({error: 'AiHubChat is not accessible to the current user'}),
+                {
+                    headers: {'Content-Type': 'application/json'},
+                    status: 403,
+                }
+            );
+
+            const innerFetch = vi.fn().mockResolvedValueOnce(refusalResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(result.bodyUsed).toBe(false);
+            await expect(result.json()).resolves.toEqual({error: 'AiHubChat is not accessible to the current user'});
+        });
+
+        it('replays a CSRF 403 without a JSON body from the AI Hub chat turn endpoint', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonRejects: true,
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/platform/internal/ai/chat/ai_hub'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(innerFetch).toHaveBeenNthCalledWith(2, '/api/account', {method: 'GET'});
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('does not log out when the replay of a CSRF 403 is the AI Hub controller refusing the turn', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonRejects: true,
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonData: {error: 'Workspace is not accessible to the current user'},
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                );
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('replays a 403 from the AI Hub chat turn endpoint whose JSON body is not the controller refusal', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonData: {
+                            error: 'Forbidden',
+                            path: '/api/platform/internal/ai/chat/ai_hub',
+                            status: 403,
+                            timestamp: '2026-10-19T12:00:00.000+00:00',
+                        },
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/ai_hub'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+        });
+
+        it('still replays and escalates a 403 from another agent chat endpoint', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/copilot'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/copilot'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/copilot', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+        });
+
         it('does not retry a non-403 response', async () => {
             const innerFetch = vi.fn().mockResolvedValueOnce({status: 200, url: 'http://localhost/graphql'});
 
