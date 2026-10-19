@@ -11,6 +11,7 @@ import WorkflowCodeEditorSheet from '../WorkflowCodeEditorSheet';
 
 const hoisted = vi.hoisted(() => ({
     editorFocus: vi.fn(),
+    editorOptions: {current: undefined as Record<string, unknown> | undefined},
     sheetState: {
         copilotEnabled: false,
         copilotPanelOpen: false,
@@ -90,20 +91,30 @@ vi.mock(
 );
 
 vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
-    default: ({onMount}: {onMount: (editor: {focus: () => void; getModel: () => unknown}) => void}) => (
-        <button
-            data-testid="mount-btn"
-            onClick={() =>
-                onMount({
-                    focus: hoisted.editorFocus,
-                    getModel: () => ({uri: {toString: () => 'inmemory://test'}}),
-                })
-            }
-            type="button"
-        >
-            Mount
-        </button>
-    ),
+    default: ({
+        onMount,
+        options,
+    }: {
+        onMount: (editor: {focus: () => void; getModel: () => unknown}) => void;
+        options?: Record<string, unknown>;
+    }) => {
+        hoisted.editorOptions.current = options;
+
+        return (
+            <button
+                data-testid="mount-btn"
+                onClick={() =>
+                    onMount({
+                        focus: hoisted.editorFocus,
+                        getModel: () => ({uri: {toString: () => 'inmemory://test'}}),
+                    })
+                }
+                type="button"
+            >
+                Mount
+            </button>
+        );
+    },
 }));
 
 const renderSheet = (workflow: Partial<Workflow>) =>
@@ -145,6 +156,26 @@ describe('WorkflowCodeEditorSheet', () => {
         fireEvent.click(await screen.findByTestId('mount-btn'));
 
         expect(getCompletionContext('inmemory://test')).toMatchObject({format: 'json', kind: 'workflowDefinition'});
+    });
+
+    it('lets YAML suggest while typing a plain value and drops the word list', async () => {
+        renderSheet({format: WorkflowFormat.Yaml});
+
+        await screen.findByTestId('mount-btn');
+
+        expect(hoisted.editorOptions.current).toMatchObject({
+            quickSuggestions: {comments: 'off', other: 'on', strings: 'on'},
+            wordBasedSuggestions: 'off',
+        });
+    });
+
+    it('keeps the default suggestion options for JSON', async () => {
+        renderSheet({});
+
+        await screen.findByTestId('mount-btn');
+
+        expect(hoisted.editorOptions.current?.quickSuggestions).toBeUndefined();
+        expect(hoisted.editorOptions.current?.wordBasedSuggestions).toBeUndefined();
     });
 
     it('focuses the editor on mount', async () => {

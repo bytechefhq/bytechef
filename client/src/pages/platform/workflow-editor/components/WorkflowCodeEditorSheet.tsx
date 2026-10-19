@@ -249,6 +249,10 @@ const WorkflowCodeEditorSheet = ({
                                         options={{
                                             folding: true,
                                             foldingStrategy: 'indentation',
+                                            ...(workflow.format?.toLowerCase() === 'yaml' && {
+                                                quickSuggestions: {comments: 'off', other: 'on', strings: 'on'},
+                                                wordBasedSuggestions: 'off',
+                                            }),
                                         }}
                                         value={definition}
                                     />
