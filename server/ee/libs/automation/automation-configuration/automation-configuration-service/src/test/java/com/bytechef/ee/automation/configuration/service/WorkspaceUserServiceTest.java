@@ -44,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -1027,6 +1028,46 @@ class WorkspaceUserServiceTest {
     }
 
     @Test
+    void testSetEnvironmentRoleInOneEnvironmentKeepsTheSoleAdminRowOfAnotherEnvironment() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(false);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(
+            List.of(
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.DEVELOPMENT),
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.setEnvironmentRole(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT, WorkspaceRole.EDITOR, null);
+
+        assertThat(result.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
+
+        verify(workspaceUserRepository, never()).countAdminsForEnvironment(anyLong(), anyInt(), anyInt());
+    }
+
+    @Test
+    void testSetEnvironmentRoleRefusesDemotingTheSoleAdminOfThatEnvironment() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(false);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(
+            List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+        when(workspaceUserRepository.countAdminsForEnvironment(
+            WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal(), Environment.PRODUCTION.ordinal()))
+                .thenReturn(1L);
+
+        assertThatThrownBy(
+            () -> workspaceUserService.setEnvironmentRole(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION, WorkspaceRole.EDITOR, null))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("without an admin");
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
     void testSetEnvironmentRoleAllowsLoweringYourOwnRoleThere() {
         // The guard is about raising, not about touching your own row: narrowing your own reach takes nothing away from
         // anybody else and cannot be an escalation.
@@ -1500,7 +1541,7 @@ class WorkspaceUserServiceTest {
         }
 
         @Test
-        void testRefusesToRemoveTheOnlyEnvironmentRole() {
+        void testRemovingTheLastEnvironmentRowKeepsItsRoleInEveryEnvironment() {
             WorkspaceUser onlyWorkspaceUser =
                 WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
 
@@ -1509,15 +1550,89 @@ class WorkspaceUserServiceTest {
             when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
                 .thenReturn(List.of(onlyWorkspaceUser));
 
+            workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT);
+
+            ArgumentCaptor<WorkspaceUser> workspaceUserArgumentCaptor = ArgumentCaptor.forClass(WorkspaceUser.class);
+
+            verify(workspaceUserRepository).delete(onlyWorkspaceUser);
+            verify(workspaceUserRepository).save(workspaceUserArgumentCaptor.capture());
+
+            WorkspaceUser workspaceWideWorkspaceUser = workspaceUserArgumentCaptor.getValue();
+
+            assertThat(workspaceWideWorkspaceUser.getEnvironment()).isNull();
+            assertThat(workspaceWideWorkspaceUser.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
+            assertThat(workspaceWideWorkspaceUser.getCustomRoleId()).isNull();
+            verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+        }
+
+        @Test
+        void testRemovingTheLastCustomRoleEnvironmentRowKeepsTheCustomRoleInEveryEnvironment() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 7L, Environment.PRODUCTION);
+
+            when(customRoleRepository.findById(7L))
+                .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+
+            workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+            ArgumentCaptor<WorkspaceUser> workspaceUserArgumentCaptor = ArgumentCaptor.forClass(WorkspaceUser.class);
+
+            verify(workspaceUserRepository).delete(onlyWorkspaceUser);
+            verify(workspaceUserRepository).save(workspaceUserArgumentCaptor.capture());
+
+            WorkspaceUser workspaceWideWorkspaceUser = workspaceUserArgumentCaptor.getValue();
+
+            assertThat(workspaceWideWorkspaceUser.getEnvironment()).isNull();
+            assertThat(workspaceWideWorkspaceUser.getCustomRoleId()).isEqualTo(7L);
+            assertThat(workspaceWideWorkspaceUser.getWorkspaceRole()).isNull();
+            verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+        }
+
+        @Test
+        void testRefusesToWidenTheLastEnvironmentRowWithoutMemberManagementInEveryEnvironment() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
+
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+            when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "WORKSPACE_MEMBER_MANAGE"))
+                .thenReturn(false);
+
             assertThatThrownBy(
                 () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
-                    .isInstanceOf(ConfigurationException.class)
-                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                    .isEqualTo(WorkspaceUserErrorType.LAST_ENVIRONMENT_ROLE.getErrorKey());
+                    .isInstanceOf(AccessDeniedException.class);
 
             verify(workspaceUserRepository, never()).delete(any());
             verify(workspaceUserRepository, never()).save(any());
             verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+        }
+
+        @Test
+        void testRefusesToWidenTheLastEnvironmentRowBeyondTheCallersScopes() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
+
+            when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).thenReturn(Set.of("WORKFLOW_EDIT"));
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
+                .thenReturn(false);
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+
+            assertThatThrownBy(
+                () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("PRODUCTION");
+
+            verify(workspaceUserRepository, never()).delete(any());
+            verify(workspaceUserRepository, never()).save(any());
         }
 
         @Test

@@ -16,6 +16,17 @@ import {
     setEnvironmentRole,
 } from '../../utils/rbacUtils';
 
+const WORKSPACE_USERS = `
+    query WorkspaceUsers($workspaceId: ID!) {
+        workspaceUsers(workspaceId: $workspaceId) {
+            customRoleId
+            environment
+            userId
+            workspaceRole
+        }
+    }
+`;
+
 async function expectStillSignedIn(page: Page) {
     await expect(page).not.toHaveURL(/\/login/);
 
@@ -159,7 +170,7 @@ test.describe('Member with per-environment roles', () => {
         });
     });
 
-    test('the last environment role cannot be removed while another one can', async ({
+    test('removing the last environment role turns it into a workspace-wide role', async ({
         adminApi,
         browser,
         rbacWorkspace,
@@ -180,37 +191,94 @@ test.describe('Member with per-environment roles', () => {
         await openPage(page, '/automation/settings/workspace-users', new RegExp(roleUser.email));
 
         const memberRow = page.getByRole('row').filter({hasText: roleUser.email});
-
-        await expect(memberRow.getByText('Development')).toBeVisible();
-        await expect(memberRow.getByText('Staging')).toBeVisible();
-
-        await memberRow.getByRole('button', {name: 'Remove Staging role'}).click();
-
         const alertDialog = page.getByRole('alertdialog');
 
-        await expect(alertDialog).toContainText('Remove the Staging role?');
-        await expect(alertDialog).toContainText(
-            'They will lose access to Staging. Their roles in the other environments are unchanged.'
-        );
+        await test.step('removing one of two environment roles denies only that environment', async () => {
+            await expect(memberRow.getByText('Development')).toBeVisible();
+            await expect(memberRow.getByText('Staging')).toBeVisible();
 
-        await alertDialog.getByRole('button', {name: 'Remove'}).click();
+            await memberRow.getByRole('button', {name: 'Remove Staging role'}).click();
 
-        await expect(memberRow.getByText('Staging')).toHaveCount(0);
-        await expect(memberRow.getByText('Development')).toBeVisible();
-        await expect(memberRow.getByRole('combobox', {name: 'Development role'})).toContainText('Editor');
-        await expect(memberRow.getByRole('button', {name: 'Remove Development role'})).toHaveCount(0);
+            await expect(alertDialog).toContainText('Remove the Staging role?');
+            await expect(alertDialog).toContainText(
+                'They will lose access to Staging. Their roles in the other environments are unchanged.'
+            );
 
-        const response = await postGraphQl(
-            adminApi,
-            `
-                mutation RemoveWorkspaceUserEnvironmentRole($workspaceId: ID!, $userId: ID!, $environment: EnvironmentEnum!) {
-                    removeWorkspaceUserEnvironmentRole(workspaceId: $workspaceId, userId: $userId, environment: $environment)
-                }
-            `,
-            {environment: 'DEVELOPMENT', userId: roleUser.userId, workspaceId: String(rbacWorkspace.id)}
-        );
+            await alertDialog.getByRole('button', {name: 'Remove'}).click();
 
-        expect(response.errors?.[0]?.extensions).toMatchObject({classification: 'BAD_REQUEST'});
-        expect(response.errors?.[0]?.message).toContain('is the only role user');
+            await expect(memberRow.getByText('Staging')).toHaveCount(0);
+            await expect(memberRow.getByRole('combobox', {name: 'Development role'})).toContainText('Editor');
+        });
+
+        await test.step('removing the last environment role keeps it in every environment', async () => {
+            await memberRow.getByRole('button', {name: 'Remove Development role'}).click();
+
+            await expect(alertDialog).toContainText('Remove the Development role?');
+            await expect(alertDialog).toContainText(
+                'This is their only environment role, so it becomes a workspace-wide role. They will keep the ' +
+                    'Editor role in every environment.'
+            );
+
+            await alertDialog.getByRole('button', {name: 'Remove'}).click();
+
+            await expect(memberRow.getByText('Development')).toHaveCount(0);
+            await expect(memberRow.getByText('All environments')).toBeVisible();
+            await expect(memberRow.getByRole('combobox').first()).toContainText('Editor');
+        });
+
+        await test.step('the server holds one workspace-wide Editor row', async () => {
+            const response = await postGraphQl<{
+                workspaceUsers: {
+                    customRoleId: string | null;
+                    environment: string | null;
+                    userId: string;
+                    workspaceRole: string | null;
+                }[];
+            }>(adminApi, WORKSPACE_USERS, {workspaceId: String(rbacWorkspace.id)});
+
+            expect(response.errors).toBeUndefined();
+
+            const memberRows = response.data!.workspaceUsers.filter(
+                (workspaceUser) => workspaceUser.userId === roleUser!.userId
+            );
+
+            expect(memberRows).toEqual([
+                expect.objectContaining({customRoleId: null, environment: null, workspaceRole: 'EDITOR'}),
+            ]);
+        });
+
+        await adminSession.context.close();
+
+        for (const environment of ['STAGING', 'PRODUCTION'] as const) {
+            await test.step(`the member keeps the Editor role in ${environment}`, async () => {
+                const roleUserSession = await openAsRoleUser(
+                    browser,
+                    RBAC_BASE_URL,
+                    roleUser!,
+                    rbacWorkspace,
+                    environment
+                );
+
+                context = roleUserSession.context;
+
+                await openPage(roleUserSession.page, '/automation/deployments', PAGE_BODY_TEXT.deployments);
+
+                await expect
+                    .poll(() =>
+                        roleUserSession.page.evaluate(
+                            () =>
+                                JSON.parse(window.localStorage.getItem('bytechef.environment') || '{}').state
+                                    ?.currentEnvironmentId
+                        )
+                    )
+                    .toBe(environment === 'STAGING' ? 1 : 2);
+
+                await expectPresence(roleUserSession.page, /^(New|Create) Deployment$/, true, 'button');
+
+                await expectStillSignedIn(roleUserSession.page);
+
+                await roleUserSession.context.close();
+            });
+        }
     });
 });
