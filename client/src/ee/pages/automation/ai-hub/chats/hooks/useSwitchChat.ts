@@ -2,6 +2,7 @@ import {isWorkflowArtifactKind, parseArtifactMetadata} from '@/ee/pages/automati
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
+import {withServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
@@ -221,7 +222,7 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
         });
 
         if (clientRole !== 'assistant') {
-            mapped.push({content: serverMessage.content, role: clientRole});
+            mapped.push(withServerRowIndex({content: serverMessage.content, role: clientRole}, rowIndex));
 
             if (toolParts.length > 0) {
                 mapped.push({content: toolParts, role: 'assistant'});
@@ -231,7 +232,7 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
         }
 
         if (toolParts.length === 0) {
-            mapped.push({content: serverMessage.content, role: clientRole});
+            mapped.push(withServerRowIndex({content: serverMessage.content, role: clientRole}, rowIndex));
 
             return;
         }
@@ -244,7 +245,7 @@ function mapServerMessages(messages: AiHubChatMessageI[]): ThreadMessageLike[] {
 
         parts.push(...toolParts);
 
-        mapped.push({content: parts, role: 'assistant'});
+        mapped.push(withServerRowIndex({content: parts, role: 'assistant'} as ThreadMessageLike, rowIndex));
     });
 
     return mapped;
@@ -487,7 +488,7 @@ async function loadChatTranscript({
 }: {
     chatId: number;
     workspaceId: number;
-}): Promise<ThreadMessageLike[]> {
+}): Promise<{messages: ThreadMessageLike[]; serverRowCount: number}> {
     const [messages, artifacts, toolApprovals] = await Promise.all([
         getChatMessages({chatId, workspaceId}),
         getChatArtifacts({chatId, workspaceId}).catch((): AiHubChatArtifactI[] => []),
@@ -500,13 +501,16 @@ async function loadChatTranscript({
         toolApprovals.map((approval) => [approval.id, withLapsedExpiry(approval, now)] as const)
     );
 
-    return [
-        ...applyToolApprovalStatuses(
-            restoreToolApprovalCards(mapServerMessages(messages), toolApprovalsById),
-            toolApprovalsById
-        ),
-        ...buildArtifactLinkMessages(artifacts),
-    ];
+    return {
+        messages: [
+            ...applyToolApprovalStatuses(
+                restoreToolApprovalCards(mapServerMessages(messages), toolApprovalsById),
+                toolApprovalsById
+            ),
+            ...buildArtifactLinkMessages(artifacts),
+        ],
+        serverRowCount: messages.length,
+    };
 }
 
 /**
@@ -537,12 +541,13 @@ export function useSwitchChat() {
             navigate(`/automation/ai-hub/chats/${chat.id}`);
 
             try {
-                const loadedMessages = await loadChatTranscript({chatId: chat.id, workspaceId: currentWorkspaceId});
+                const loadedTranscript = await loadChatTranscript({chatId: chat.id, workspaceId: currentWorkspaceId});
 
                 if (aiHubStore.getState().chatId === chat.threadId) {
                     aiHubStore.setState({
-                        messages: loadedMessages,
+                        messages: loadedTranscript.messages,
                         messagesLoading: false,
+                        nextServerRowIndex: loadedTranscript.serverRowCount,
                     });
                 }
 
