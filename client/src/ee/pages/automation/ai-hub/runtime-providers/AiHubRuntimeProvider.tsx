@@ -2,6 +2,7 @@ import {createAiHubChat, generateAiHubChatTitle, patchChat} from '@/ee/pages/aut
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
+import {toToolApprovalConflictResolution} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {attachToInFlightRun} from '@/ee/pages/automation/ai-hub/runtime-providers/inFlightRunClient';
@@ -32,6 +33,7 @@ import {
     useAiProviderCatalogQuery,
     useResolveAiHubToolApprovalMutation,
 } from '@/shared/middleware/graphql';
+import {GraphQlResponseError} from '@/shared/middleware/graphqlFetcher';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -123,6 +125,10 @@ export function isTurnInFlightError(source: {message?: string; payload?: unknown
     }
 }
 
+export function isToolApprovalConflictError(error: unknown): error is GraphQlResponseError {
+    return error instanceof GraphQlResponseError && error.errorCode === 'CONFLICT';
+}
+
 export function getOptimisticTurnMarker(message: ThreadMessageLike): string | undefined {
     const marker = message.metadata?.custom?.optimisticTurnMarker;
 
@@ -180,6 +186,11 @@ interface BuildSubscriberDepsI {
      */
     chatId?: string;
     getLastUserMessage: () => string;
+    /**
+     * Fires on RUN_STARTED of a turn still showing in the thread: the server has accepted the turn, and with it
+     * superseded any approval that was waiting for a decision.
+     */
+    onRunStarted?: () => void;
     /** Fires instead of the red error bubble when the server rejects the turn with 409 TURN_IN_FLIGHT. */
     onTurnInFlight?: (threadId: string) => void;
     /** Fires with the raw tool result after a successful {@code buildWorkflow} or {@code importWorkflow}. */
@@ -301,6 +312,7 @@ export const buildAiHubSubscriber = ({
     assistantMessageIndex = 0,
     chatId: subscriberChatId,
     getLastUserMessage,
+    onRunStarted,
     onTurnInFlight,
     onWorkflowMutated,
     runLifecycle,
@@ -445,6 +457,13 @@ export const buildAiHubSubscriber = ({
             if (subscriberChatId != null && aiHubChatsStore.getState().chatActivity[subscriberChatId] !== 'paused') {
                 aiHubChatsStore.getState().clearActivityState(subscriberChatId);
             }
+        },
+        onRunStartedEvent: () => {
+            if (isStaleChat()) {
+                return;
+            }
+
+            onRunStarted?.();
         },
         onTextMessageContentEvent: ({event, textMessageBuffer}) => {
             if (isStaleChat()) {
@@ -797,12 +816,28 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 throw new Error('No active chat');
             }
 
-            const result = await resolveToolApprovalMutation.mutateAsync({
-                approvalId: String(approvalId),
-                approved,
-                comment,
-                workspaceId: String(currentWorkspaceId),
-            });
+            let result;
+
+            try {
+                result = await resolveToolApprovalMutation.mutateAsync({
+                    approvalId: String(approvalId),
+                    approved,
+                    comment,
+                    workspaceId: String(currentWorkspaceId),
+                });
+            } catch (error) {
+                if (!isToolApprovalConflictError(error)) {
+                    throw error;
+                }
+
+                const conflictResolution = toToolApprovalConflictResolution(error.message);
+
+                aiHubChatsStore.getState().clearActivityState(currentChatId);
+
+                useAiHubStore.getState().markToolApprovalResolved(approvalId, conflictResolution);
+
+                return conflictResolution;
+            }
 
             aiHubChatsStore.getState().clearActivityState(currentChatId);
 
@@ -933,6 +968,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
             chatId,
             getLastUserMessage: () => input,
+            onRunStarted: () => useAiHubStore.getState().markPendingToolApprovalsSuperseded(),
             onTurnInFlight: handleTurnInFlight,
             onWorkflowMutated: handleWorkflowMutated,
             runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(chatId, false)},
