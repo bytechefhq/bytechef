@@ -101,6 +101,17 @@ public class AiHubToolApprovalServiceImpl implements AiHubToolApprovalService {
     }
 
     @Override
+    public void recordToolCallId(long approvalId, String toolCallId) {
+        repository.findById(approvalId)
+            .filter(approval -> approval.getToolCallId() == null)
+            .ifPresent(approval -> {
+                approval.setToolCallId(toolCallId);
+
+                repository.save(approval);
+            });
+    }
+
+    @Override
     public void deleteByChat(long chatId) {
         repository.deleteAllByChatId(chatId);
     }

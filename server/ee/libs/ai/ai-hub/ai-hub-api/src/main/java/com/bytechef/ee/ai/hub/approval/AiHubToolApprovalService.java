@@ -55,6 +55,12 @@ public interface AiHubToolApprovalService {
     int supersedePending(long chatId);
 
     /**
+     * Records {@code toolCallId}, the id of the model's tool call the approval holds, unless the approval already has
+     * one. An unknown approval id is ignored.
+     */
+    void recordToolCallId(long approvalId, String toolCallId);
+
+    /**
      * Deletes every approval recorded for the chat. Called from the chat's own delete path, since the approval table
      * carries no foreign key to the chat.
      */
