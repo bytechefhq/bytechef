@@ -16,6 +16,7 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -87,11 +88,14 @@ const ProjectsLeftSidebar = ({
         workflowFileInputRef,
     } = useImportProjectWorkflow(targetProjectId);
 
+    const {captureProjectImported} = useAnalytics();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
+            captureProjectImported();
+
             void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Project is imported.');

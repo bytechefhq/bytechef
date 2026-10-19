@@ -31,7 +31,8 @@ const ProjectTemplate = ({
     const importProjectTemplateMutation = useImportProjectTemplateMutation({
         onSuccess: () => {
             captureProjectCreatedFromTemplate();
-            captureProjectWorkflowCreatedFromTemplate();
+
+            projectTemplate?.workflows.forEach(() => captureProjectWorkflowCreatedFromTemplate());
 
             navigate('/automation/projects');
         },
