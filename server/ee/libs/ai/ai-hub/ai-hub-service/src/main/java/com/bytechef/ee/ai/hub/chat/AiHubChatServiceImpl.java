@@ -613,21 +613,22 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         String threadId = chat.getThreadId();
 
-        inFlightRunRegistry.discardReleaseActions(threadId);
-        inFlightRunRegistry.cancel(threadId);
+        boolean cleanupScheduled = scheduleCompletionCleanup(chatId, threadId);
+
+        inFlightRunRegistry.retireThread(threadId);
 
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
 
-        scheduleCleanupAfterCommit(chatId, threadId);
+        if (!cleanupScheduled) {
+            deleteSessionMessages(threadId);
+        }
     }
 
-    private void scheduleCleanupAfterCommit(long chatId, String threadId) {
+    private boolean scheduleCompletionCleanup(long chatId, String threadId) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            deleteSessionMessages(threadId);
-
-            return;
+            return false;
         }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -637,7 +638,16 @@ public class AiHubChatServiceImpl implements AiHubChatService {
                 deleteSessionMessages(threadId);
                 deleteLeftoverApprovals(chatId);
             }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    inFlightRunRegistry.reinstateThread(threadId);
+                }
+            }
         });
+
+        return true;
     }
 
     private void deleteLeftoverApprovals(long chatId) {
