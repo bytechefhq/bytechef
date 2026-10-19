@@ -15,7 +15,7 @@ const withResolution = (
         approvalId: number,
         approved: boolean,
         comment?: string
-    ) => Promise<{executionError?: string | null; status: string}>
+    ) => Promise<{executionError?: string | null; resolutionNote?: string | null; status: string}>
 ) =>
     function Wrapper({children}: {children: ReactNode}) {
         return (
@@ -86,6 +86,43 @@ describe('ToolApprovalRequestMessage', () => {
 
         expect(screen.getByText(/Superseded/)).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Approve'})).not.toBeInTheDocument();
+    });
+
+    it('shows why the approval can no longer be decided when the resolve says so', async () => {
+        const resolveToolApproval = vi.fn().mockResolvedValue({
+            resolutionNote: 'This approval can no longer be decided: Approval 1234 is already SUPERSEDED',
+            status: 'SUPERSEDED',
+        });
+
+        render(<ToolApprovalRequestMessage {...toProps(data())} />, {
+            wrapper: withResolution(resolveToolApproval),
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'Approve'}));
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+            'This approval can no longer be decided: Approval 1234 is already SUPERSEDED'
+        );
+        expect(screen.queryByRole('button', {name: 'Approve'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('shows the stamped resolution note in place of the status line', () => {
+        render(
+            <ToolApprovalRequestMessage
+                {...toProps({
+                    ...data(),
+                    resolutionNote: 'This approval can no longer be decided: Approval 1234 has expired',
+                    resolvedStatus: 'SUPERSEDED',
+                })}
+            />,
+            {wrapper: withResolution(vi.fn())}
+        );
+
+        expect(screen.getByRole('status')).toHaveTextContent(
+            'This approval can no longer be decided: Approval 1234 has expired'
+        );
+        expect(screen.queryByText('Superseded by a newer message.')).not.toBeInTheDocument();
     });
 });
 

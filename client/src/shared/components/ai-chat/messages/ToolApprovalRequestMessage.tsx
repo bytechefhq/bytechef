@@ -23,6 +23,7 @@ export interface ToolApprovalRequestDataI {
  */
 type ToolApprovalRequestMessageDataType = ToolApprovalRequestDataI & {
     executionError?: string;
+    resolutionNote?: string;
     resolvedBy?: string;
     resolvedStatus?: string;
 };
@@ -90,6 +91,7 @@ const ToolApprovalArgumentRow = ({label, value}: {label: string; value: string})
 /** This session's own Approve/Reject outcome, as actually returned by the resolve mutation. */
 interface LocalResolutionI {
     executionError?: string | null;
+    resolutionNote?: string | null;
     status: string;
 }
 
@@ -116,10 +118,13 @@ const ToolApprovalRequestMessage = ({data}: DataMessagePartProps<ToolApprovalReq
 
     const {approvalId, arguments: toolArguments, componentName, toolName} = data;
 
-    const statusMessage = resolvedStatusMessage(
-        data.resolvedStatus ?? localResolution?.status,
-        data.executionError ?? localResolution?.executionError
-    );
+    const statusMessage =
+        data.resolutionNote ??
+        localResolution?.resolutionNote ??
+        resolvedStatusMessage(
+            data.resolvedStatus ?? localResolution?.status,
+            data.executionError ?? localResolution?.executionError
+        );
 
     const resolve = async (approved: boolean) => {
         setSubmitting(true);

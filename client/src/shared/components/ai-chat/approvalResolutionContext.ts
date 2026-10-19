@@ -36,13 +36,14 @@ export interface ApprovalResolutionContextI {
      *
      * <p>Resolves with the row's actual terminal {@code status} (and {@code executionError} when the tool then
      * failed) rather than {@code void}; approving a call that goes on to fail is still a real outcome the card
-     * must render honestly, not "Approved" just because the mutation itself returned 2xx.
+     * must render honestly, not "Approved" just because the mutation itself returned 2xx. When the approval can no
+     * longer be decided it resolves with that status and a {@code resolutionNote} the card shows instead.
      */
     resolveToolApproval?: (
         approvalId: number,
         approved: boolean,
         comment?: string
-    ) => Promise<{executionError?: string | null; status: string}>;
+    ) => Promise<{executionError?: string | null; resolutionNote?: string | null; status: string}>;
 }
 
 /**

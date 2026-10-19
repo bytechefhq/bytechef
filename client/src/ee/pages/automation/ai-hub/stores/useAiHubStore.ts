@@ -2,6 +2,7 @@
 import {
     type ToolApprovalResolutionI,
     stampToolApprovalResolution,
+    supersedePendingToolApprovals,
 } from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {generateMessageId} from '@/ee/pages/automation/ai-hub/stores/messageId';
 import {generateRandomId} from '@/shared/util/random-utils';
@@ -29,6 +30,8 @@ interface AiHubStateI {
     /** Replaces the user message at `index` with `content` under `messageId` and drops every message after it. */
     editUserMessage: (index: number, content: string, messageId: string) => void;
     markToolApprovalResolved: (approvalId: number, resolution: ToolApprovalResolutionI) => void;
+    /** Stamps every approval still awaiting a decision as superseded, as the server does when it accepts a turn. */
+    markPendingToolApprovalsSuperseded: () => void;
     resetMessages: () => void;
 
     /**
@@ -102,6 +105,11 @@ export const aiHubStore = create<AiHubStateI>()(
             set((state) => ({
                 ...state,
                 messages: stampToolApprovalResolution(state.messages, approvalId, resolution),
+            })),
+        markPendingToolApprovalsSuperseded: () =>
+            set((state) => ({
+                ...state,
+                messages: supersedePendingToolApprovals(state.messages),
             })),
         resetMessages: () =>
             set((state) => ({
