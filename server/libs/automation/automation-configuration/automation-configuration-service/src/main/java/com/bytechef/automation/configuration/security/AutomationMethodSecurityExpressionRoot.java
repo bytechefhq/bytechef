@@ -184,9 +184,13 @@ public final class AutomationMethodSecurityExpressionRoot
         return permissionService.hasEmbeddedScope(scope);
     }
 
-    public boolean hasEmbeddedScopeInEnvironment(String scope, Environment environment) {
+    public boolean hasEmbeddedScopeInEnvironment(String scope, @Nullable Environment environment) {
         if (isAuthorizationSkipped()) {
             return true;
+        }
+
+        if (environment == null) {
+            return permissionService.hasEmbeddedScopeInEveryEnvironment(scope);
         }
 
         return permissionService.hasEmbeddedScope(scope, environment);
@@ -200,13 +204,7 @@ public final class AutomationMethodSecurityExpressionRoot
         Environment[] environments = Environment.values();
 
         if (environmentId == null) {
-            for (Environment environment : environments) {
-                if (!permissionService.hasEmbeddedScope(scope, environment)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return permissionService.hasEmbeddedScopeInEveryEnvironment(scope);
         }
 
         if (environmentId < 0 || environmentId >= environments.length) {

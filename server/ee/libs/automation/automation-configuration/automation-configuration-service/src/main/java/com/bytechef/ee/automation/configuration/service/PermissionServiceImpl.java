@@ -687,6 +687,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasEmbeddedScope(String scope, Environment environment) {
+        if (environment == null) {
+            return hasEmbeddedScopeInEveryEnvironment(scope);
+        }
+
         return checkEmbeddedScope(scope, environment);
     }
 
