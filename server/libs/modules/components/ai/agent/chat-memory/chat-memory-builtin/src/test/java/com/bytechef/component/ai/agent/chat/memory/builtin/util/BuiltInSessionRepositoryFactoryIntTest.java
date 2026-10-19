@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.sql.BaseDataSource;
@@ -55,6 +56,7 @@ class BuiltInSessionRepositoryFactoryIntTest {
     private static final String FIRST_TENANT_SCHEMA = "bytechef_000001";
     private static final String SECOND_TENANT_ID = "000002";
     private static final String SECOND_TENANT_SCHEMA = "bytechef_000002";
+    private static final String SHARED_EVENT_ID = "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed";
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>(
@@ -96,6 +98,38 @@ class BuiltInSessionRepositoryFactoryIntTest {
         assertThat(findMessageTexts(sessionRepository, SECOND_TENANT_ID)).containsExactly("second tenant message");
         assertThat(countSessions(FIRST_TENANT_ID)).isEqualTo(1);
         assertThat(countSessions(SECOND_TENANT_ID)).isEqualTo(1);
+    }
+
+    @Test
+    void testJdbcProviderRejectsAnEventIdOwnedByAnotherSessionAndWritesItNowhere() {
+        SessionRepository sessionRepository = createJdbcSessionRepository();
+
+        TenantContext.runWithTenantId(FIRST_TENANT_ID, () -> {
+            saveSession(sessionRepository, "first-session");
+            saveSession(sessionRepository, "second-session");
+
+            sessionRepository.appendEvent(SessionEvent.builder()
+                .id(SHARED_EVENT_ID)
+                .sessionId("first-session")
+                .message(new UserMessage("first session message"))
+                .build());
+
+            assertThatThrownBy(() -> sessionRepository.appendEvent(SessionEvent.builder()
+                .id(SHARED_EVENT_ID)
+                .sessionId("second-session")
+                .message(new UserMessage("second session message"))
+                .build()))
+                    .isInstanceOf(IllegalStateException.class);
+        });
+
+        assertThat(findMessageTexts(sessionRepository, FIRST_TENANT_ID, "first-session"))
+            .containsExactly("first session message");
+        assertThat(findMessageTexts(sessionRepository, FIRST_TENANT_ID, "second-session")).isEmpty();
+
+        TenantContext.runWithTenantId(FIRST_TENANT_ID, () -> {
+            sessionRepository.delete("first-session");
+            sessionRepository.delete("second-session");
+        });
     }
 
     @Test
@@ -162,12 +196,16 @@ class BuiltInSessionRepositoryFactoryIntTest {
         saveSessionWithMessage(sessionRepository, CONVERSATION_ID, text);
     }
 
-    private static void saveSessionWithMessage(SessionRepository sessionRepository, String sessionId, String text) {
+    private static void saveSession(SessionRepository sessionRepository, String sessionId) {
         sessionRepository.save(Session.builder()
             .id(sessionId)
             .userId("bytechef")
             .createdAt(Instant.now())
             .build());
+    }
+
+    private static void saveSessionWithMessage(SessionRepository sessionRepository, String sessionId, String text) {
+        saveSession(sessionRepository, sessionId);
 
         sessionRepository.appendEvent(SessionEvent.builder()
             .sessionId(sessionId)
