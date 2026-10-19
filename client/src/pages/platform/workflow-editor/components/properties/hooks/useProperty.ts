@@ -1,13 +1,22 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
-import getInitialControlledDynamicMode from '@/pages/platform/workflow-editor/components/properties/getInitialControlledDynamicMode';
+import {useFormulaEnabledContext} from '@/pages/platform/workflow-editor/components/properties/FormulaEnabledContext';
+import getInitialFormulaMode from '@/pages/platform/workflow-editor/components/properties/getInitialFormulaMode';
 import {
     INPUT_PROPERTY_CONTROL_TYPES,
     ParameterValueContextI,
     getInitialPropertyValueState,
     propertyValueReducer,
 } from '@/pages/platform/workflow-editor/components/properties/hooks/propertyValueReducer';
-import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
+import {
+    PropertyInputModeI,
+    fromFormulaValue,
+    getPropertyInputMode,
+    isSingleDataPill,
+    isStringSelect,
+    shouldIncludeInMetadata,
+    toFormulaValue,
+} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -38,6 +47,7 @@ import {usePrevious} from '@uidotdev/usehooks';
 import {
     ChangeEvent,
     Dispatch,
+    KeyboardEvent,
     ReactNode,
     RefObject,
     SetStateAction,
@@ -50,45 +60,62 @@ import {
 } from 'react';
 import {Control, FieldValues, FormState} from 'react-hook-form';
 import {useDebouncedCallback} from 'use-debounce';
-import {useShallow} from 'zustand/react/shallow';
 
 import {getTask} from '../../../utils/getTask';
 import {computeFromAiToggle} from './fromAiToggle';
 
+const isSavedFormulaValue = (value: unknown): boolean =>
+    typeof value === 'string' && value.startsWith('=') && !value.startsWith('=fromAi(');
+
 type UsePropertyReturnType = {
     calculatedPath: string | undefined;
     controlledBlurError: string | undefined;
-    controlledDynamicMode: boolean;
-    controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledExpressionExitRef: RefObject<boolean>;
+    controlledFormulaOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentNode: NodeDataType | undefined;
     defaultValue: string;
     description?: string;
     displayCondition?: string;
+    editorFocusRequest: {initialInput?: string; token: number} | undefined;
+    editorPendingSaveCancelRef: RefObject<(() => void) | null>;
     editorRef: RefObject<Editor | null>;
     errorMessage: string;
     formattedOptions: Array<Option> | undefined;
     fromAiExpression: string;
     handleCodeEditorChange: (value?: string) => void;
     handleControlledBlur: (value: unknown) => void;
-    handleControlledModeSwitch: (toDynamic: boolean) => void;
+    handleControlledBuilderFormulaSwitch: () => void;
+    handleControlledFormulaSwitch: (fieldValue: unknown, fieldOnChange: (value: unknown) => void) => void;
+    handleControlledNativeKeyDown: (
+        event: KeyboardEvent<HTMLInputElement>,
+        fieldValue: unknown,
+        fieldOnChange: (value: unknown) => void
+    ) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
+    handleDynamicSwitch: () => void;
+    hasDynamicSwitch: boolean;
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
+    handleFormulaSwitch: () => void;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
+    handleControlledNativeFromAiClick: (fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputClear: () => void;
-    handleInputTypeSwitchButtonClick: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
     handleMentionInputValueChange: (value: string | number) => void;
     handleMultiSelectChange: (value: string[]) => void;
+    handleNativeKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
     handleSelectChange: (value: string, name: string) => void;
+    handleSelectKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+    handleSinglePillAbandoned: () => boolean;
     expressionEnabled: boolean | undefined;
     hasError: boolean;
     hidden: boolean | undefined;
+    inputMode: PropertyInputModeI;
     inputRef: RefObject<HTMLInputElement | null>;
     inputValue: string;
+    insertPillValue: (mentionId: string) => void;
     isFormulaMode: boolean;
     isFromAi: boolean;
     isLoadingDisplayCondition: boolean;
@@ -120,9 +147,11 @@ type UsePropertyReturnType = {
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
     setLookupDependsOnValues: Dispatch<SetStateAction<Array<unknown> | undefined>>;
     setSelectValue: (value: string) => void;
-    showInputTypeSwitchButton: boolean;
+    showFormulaSwitch: boolean;
+    startPillEntry: (initialInput?: string) => void;
     type?: PropertyAllType['type'];
     typeIcon: ReactNode;
+    validateMentionInputValue: (value: string | number) => boolean;
     validatePropertyValue: (value: string | number) => boolean;
     workflow: Workflow;
 };
@@ -161,10 +190,21 @@ export const useProperty = ({
     property,
     toolsMode,
 }: UsePropertyProps): UsePropertyReturnType => {
+    const [editorFocusRequest, setEditorFocusRequest] = useState<{initialInput?: string; token: number} | undefined>();
     const [errorMessage, setErrorMessage] = useState('');
+    const [formulaModeState, setFormulaModeState] = useState(() =>
+        getInitialFormulaMode({
+            control,
+            controlPath,
+            controlType: property.controlType,
+            parameterValue,
+            propertyName: property.name?.replace(/\s/g, '_'),
+            propertyType: property.type,
+        })
+    );
     const [hasError, setHasError] = useState(false);
-    const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
+    const [pillEntry, setPillEntry] = useState(false);
 
     const [valueState, dispatchValueAction] = useReducer(
         propertyValueReducer,
@@ -172,48 +212,31 @@ export const useProperty = ({
         getInitialPropertyValueState
     );
 
-    const {inputValue, mentionInput, mentionInputValue, multiSelectValue, propertyParameterValue, selectValue} =
-        valueState;
+    const {inputValue, mentionInputValue, multiSelectValue, propertyParameterValue, selectValue} = valueState;
 
-    const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
-        !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
-    );
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
     const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
-    const [controlledDynamicMode, setControlledDynamicMode] = useState(() =>
-        getInitialControlledDynamicMode({
-            control,
-            controlPath,
-            propertyName: property.name?.replace(/\s/g, '_'),
-            propertyType: property.type,
-            toolsMode,
-        })
-    );
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
-    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
     const controlledExpressionExitRef = useRef(false);
+    const controlledFormulaOnChangeRef = useRef<((value: string) => void) | null>(null);
+    const editorPendingSaveCancelRef = useRef<(() => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
 
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
     const parameterValueRef = useRef(parameterValue);
+    const pillEntryKeepsOptionRef = useRef(false);
 
     parameterValueRef.current = parameterValue;
 
     const previousPropertyPathForParameterSyncRef = useRef<string | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
-    const {currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            currentNode: state.currentNode,
-            setFocusedInput: state.setFocusedInput,
-            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-        }))
-    );
-    const openDataPillPanel = useOpenDataPillPanel();
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
+    const formulaEnabledOverride = useFormulaEnabledContext();
 
     const isToolsClusterElement = !hideFromAi && (toolsMode || currentNode?.clusterElementType === 'tools');
 
@@ -246,7 +269,6 @@ export const useProperty = ({
         optionsDataSource,
         optionsLoadedDynamically,
         placeholder = '',
-        properties,
         propertiesDataSource,
         regex,
         required = false,
@@ -371,19 +393,6 @@ export const useProperty = ({
         [controlType]
     );
 
-    const isNumericalInput = useMemo(
-        () => !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER'),
-        [mentionInput, controlType]
-    );
-
-    const parameterValueContext = useMemo<ParameterValueContextI>(
-        () => ({controlType, isNumericalInput, type}),
-        [controlType, isNumericalInput, type]
-    );
-
-    const parameterValueContextRef = useRef(parameterValueContext);
-    parameterValueContextRef.current = parameterValueContext;
-
     const setInputValue = useCallback((value: string) => {
         dispatchValueAction({type: 'inputValueChanged', value});
     }, []);
@@ -392,23 +401,22 @@ export const useProperty = ({
         dispatchValueAction({type: 'mentionInputValueChanged', value});
     }, []);
 
-    const setMentionInput = useCallback((nextMentionInput: boolean) => {
-        dispatchValueAction({mentionInput: nextMentionInput, type: 'mentionInputModeChanged'});
-    }, []);
-
     const setSelectValue = useCallback((value: string) => {
         dispatchValueAction({type: 'selectValueChanged', value});
     }, []);
 
-    const resolveParameterValue = useCallback((value: unknown, options?: {authoritativeValue?: unknown}) => {
-        dispatchValueAction({
-            authoritativeValue: options?.authoritativeValue,
-            context: parameterValueContextRef.current,
-            syncDisplayValues: !isSavingRef.current,
-            type: 'parameterValueResolved',
-            value,
-        });
-    }, []);
+    const resolveParameterValue = useCallback(
+        (value: unknown, options?: {authoritativeValue?: unknown; context?: Partial<ParameterValueContextI>}) => {
+            dispatchValueAction({
+                authoritativeValue: options?.authoritativeValue,
+                context: {...parameterValueContextRef.current, ...options?.context},
+                syncDisplayValues: !isSavingRef.current,
+                type: 'parameterValueResolved',
+                value,
+            });
+        },
+        []
+    );
 
     const typeIcon = useMemo(() => {
         if (controlType === 'MULTI_SELECT') {
@@ -429,6 +437,83 @@ export const useProperty = ({
 
         return propertyParameterValue === fromAiExpression;
     }, [controlledFromAi, currentNode?.metadata?.ui?.fromAi, fromAiExpression, path, propertyParameterValue]);
+
+    const inputMode: PropertyInputModeI = useMemo(
+        () =>
+            getPropertyInputMode({
+                controlType,
+                formulaMode: formulaModeState,
+                hasControl: !!control,
+                isFromAi: !control && isFromAi,
+                pillEntry,
+                type,
+                value: control ? undefined : propertyParameterValue,
+            }),
+        [control, controlType, formulaModeState, isFromAi, pillEntry, propertyParameterValue, type]
+    );
+
+    const stringSelect = isStringSelect(controlType, type);
+
+    // A select or a builder has nothing on screen to type `$` into, so it carries a Dynamic switch, and its pill
+    // editor stays up until that switch is turned off. An array item's object has no label row to hold the switch.
+    const hasDynamicSwitch =
+        !control &&
+        expressionEnabled !== false &&
+        (controlType === 'SELECT' ||
+            controlType === 'ARRAY_BUILDER' ||
+            controlType === 'JSON_SCHEMA_BUILDER' ||
+            (controlType === 'OBJECT_BUILDER' && name !== '__item'));
+
+    const mentionInput = !control && inputMode.renderer === 'mentions';
+    const isFormulaMode = inputMode.mode === 'formula';
+
+    const formulaEnabled = formulaEnabledOverride ?? (control ? isToolsClusterElement : true);
+
+    const showFormulaSwitch =
+        formulaEnabled &&
+        expressionEnabled !== false &&
+        !isFromAi &&
+        controlType !== 'FORMULA_MODE' &&
+        controlType !== 'NULL' &&
+        controlType !== 'CODE_EDITOR' &&
+        controlType !== 'FILE_ENTRY' &&
+        type !== 'DYNAMIC_PROPERTIES';
+
+    const isNumericalInput = useMemo(
+        () => !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER'),
+        [mentionInput, controlType]
+    );
+
+    const parameterValueContext = useMemo<ParameterValueContextI>(
+        () => ({controlType, formulaMode: formulaModeState, isNumericalInput, mentionInput, type}),
+        [controlType, formulaModeState, isNumericalInput, mentionInput, type]
+    );
+
+    const parameterValueContextRef = useRef(parameterValueContext);
+    parameterValueContextRef.current = parameterValueContext;
+
+    const liveValue = useMemo(() => {
+        if (mentionInput) {
+            return isFormulaMode && mentionInputValue ? `=${mentionInputValue}` : mentionInputValue;
+        }
+
+        return isValidControlType && inputValue !== '' ? inputValue : propertyParameterValue;
+    }, [inputValue, isFormulaMode, isValidControlType, mentionInput, mentionInputValue, propertyParameterValue]);
+
+    const setIsFormulaMode: Dispatch<SetStateAction<boolean>> = useCallback(
+        (value) => {
+            if (property.controlType === 'FORMULA_MODE') {
+                return;
+            }
+
+            setFormulaModeState(value);
+
+            if (value === false && !mentionInputValue.trim()) {
+                dispatchValueAction({type: 'valueCleared'});
+            }
+        },
+        [mentionInputValue, property.controlType]
+    );
 
     const currentNodeName = currentNode?.name;
     const currentNodeClusterElementType = currentNode?.clusterElementType;
@@ -657,44 +742,6 @@ export const useProperty = ({
         [validatePropertyValue]
     );
 
-    const handleControlledModeSwitch = useCallback(
-        (toDynamic: boolean) => {
-            resetOnModeChangeRef.current = true;
-
-            const wasFromAi = controlledFromAi === true;
-
-            setControlledDynamicMode(toDynamic);
-            setControlledFromAi(undefined);
-
-            if (
-                wasFromAi &&
-                path &&
-                workflow.id &&
-                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
-            ) {
-                saveProperty({
-                    fromAi: false,
-                    includeInMetadata: custom,
-                    path,
-                    type,
-                    updateClusterElementParameterMutation,
-                    updateWorkflowNodeParameterMutation,
-                    value: toDynamic ? '=' : '',
-                    workflowId: workflow.id,
-                });
-            }
-        },
-        [
-            controlledFromAi,
-            custom,
-            path,
-            type,
-            updateClusterElementParameterMutation,
-            updateWorkflowNodeParameterMutation,
-            workflow.id,
-        ]
-    );
-
     const handleFromAiToggle = useCallback(
         (fromAi: boolean, fieldOnChange: (value: string) => void) => {
             setControlledFromAi(fromAi);
@@ -738,6 +785,15 @@ export const useProperty = ({
         ]
     );
 
+    const handleControlledNativeFromAiClick = useCallback(
+        (fieldOnChange: (value: string) => void) => {
+            setIsFormulaMode(true);
+
+            handleFromAiToggle(true, fieldOnChange);
+        },
+        [handleFromAiToggle, setIsFormulaMode]
+    );
+
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
         if (
             !currentNode ||
@@ -763,30 +819,6 @@ export const useProperty = ({
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
-
-        if (isNumericalInput && value && value.startsWith('=') && expressionEnabled) {
-            setMentionInput(true);
-            setIsFormulaMode(true);
-
-            const expressionContent = value.substring(1);
-
-            setMentionInputValue(expressionContent);
-
-            setTimeout(() => {
-                if (editorRef.current) {
-                    editorRef.current.commands.setContent(expressionContent);
-                    editorRef.current.commands.focus();
-
-                    setFocusedInput(editorRef.current);
-
-                    if (workflowNodeDetailsPanelOpen) {
-                        openDataPillPanel();
-                    }
-                }
-            }, 50);
-
-            return;
-        }
 
         if (isNumericalInput && value) {
             const numericValue = parseFloat(value);
@@ -881,6 +913,47 @@ export const useProperty = ({
         (value: string | number) => {
             setMentionInputValue(typeof value === 'number' ? String(value) : value);
 
+            if (typeof value === 'string' && value.includes('${')) {
+                pillEntryKeepsOptionRef.current = false;
+            }
+
+            const keepsEditor = hasDynamicSwitch && !isFormulaMode;
+
+            // Emptied, the editor of a field with a Dynamic switch stays up: only the switch takes it down.
+            if (keepsEditor) {
+                setPillEntry(true);
+            }
+
+            if (value === '' && pillEntryKeepsOptionRef.current) {
+                editorPendingSaveCancelRef.current?.();
+
+                return;
+            }
+
+            if (inputMode.singlePill) {
+                if (value === '') {
+                    dispatchValueAction({type: 'valueCleared'});
+
+                    if (!keepsEditor) {
+                        setPillEntry(false);
+
+                        requestAnimationFrame(() => inputRef.current?.focus());
+                    }
+
+                    return;
+                }
+
+                if (typeof value === 'string' && isSingleDataPill(value)) {
+                    if (!keepsEditor) {
+                        setPillEntry(false);
+                    }
+
+                    dispatchValueAction({type: 'pillValueSet', value});
+
+                    return;
+                }
+            }
+
             const stringValue = typeof value === 'string' ? value : '';
             const isExpression = typeof value === 'string' && (value.startsWith('=') || value.includes('${'));
 
@@ -910,118 +983,339 @@ export const useProperty = ({
             setHasError(hasValidationError);
             setErrorMessage(errorMessage);
         },
-        [INCORRECT_VALUE, maxLength, minLength, regex, setMentionInputValue, VALUE_DOES_NOT_MATCH_PATTERN]
+        [
+            hasDynamicSwitch,
+            INCORRECT_VALUE,
+            inputMode.singlePill,
+            isFormulaMode,
+            maxLength,
+            minLength,
+            regex,
+            setMentionInputValue,
+            VALUE_DOES_NOT_MATCH_PATTERN,
+        ]
     );
 
-    const handleInputTypeSwitchButtonClick = () => {
-        const switchingToDynamic = !mentionInput;
+    const requestEditorFocus = useCallback((initialInput?: string) => {
+        setEditorFocusRequest({initialInput, token: Date.now()});
+    }, []);
 
-        if (switchingToDynamic && isFromAi) {
-            dispatchValueAction({
-                mentionInput: switchingToDynamic,
-                mentionInputValue: fromAiExpression.substring(1),
-                propertyParameterValue: fromAiExpression,
-                type: 'inputTypeSwitched',
+    const saveResolvedValue = useCallback(
+        (value: unknown) => {
+            if (
+                !path ||
+                !workflow.id ||
+                !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
+                return;
+            }
+
+            saveProperty({
+                includeInMetadata: shouldIncludeInMetadata(value, custom),
+                path,
+                type,
+                updateClusterElementParameterMutation,
+                updateWorkflowNodeParameterMutation,
+                value,
+                workflowId: workflow.id,
             });
+        },
+        [custom, path, type, updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation, workflow.id]
+    );
 
-            setTimeout(() => {
-                setFocusedInput(editorRef.current);
-            }, 50);
+    const handleFormulaSwitch = useCallback(() => {
+        saveInputValue.cancel();
+
+        editorPendingSaveCancelRef.current?.();
+
+        const toFormula = !isFormulaMode;
+
+        pillEntryKeepsOptionRef.current = false;
+
+        const convertedValue = toFormula ? toFormulaValue(liveValue, type) : fromFormulaValue(liveValue, type);
+
+        setIsFormulaMode(toFormula);
+        setPillEntry(false);
+
+        if (convertedValue === undefined) {
+            dispatchValueAction({type: 'valueCleared'});
+        } else {
+            dispatchValueAction({
+                context: {...parameterValueContextRef.current, formulaMode: toFormula, mentionInput: toFormula},
+                type: 'parameterValueResolved',
+                value: convertedValue,
+            });
+        }
+
+        saveResolvedValue(convertedValue === undefined ? null : convertedValue);
+
+        const nextRenderer = getPropertyInputMode({
+            controlType,
+            formulaMode: toFormula,
+            isFromAi: false,
+            value: convertedValue ?? '',
+        }).renderer;
+
+        if (nextRenderer === 'mentions') {
+            requestEditorFocus();
+        } else {
+            requestAnimationFrame(() => inputRef.current?.focus());
+        }
+    }, [
+        controlType,
+        isFormulaMode,
+        liveValue,
+        requestEditorFocus,
+        saveInputValue,
+        saveResolvedValue,
+        setIsFormulaMode,
+        type,
+    ]);
+
+    const insertPillValue = useCallback(
+        (mentionId: string) => {
+            const pillValue = `\${${mentionId}}`;
+
+            saveInputValue.cancel();
+
+            pillEntryKeepsOptionRef.current = false;
+
+            setPillEntry(false);
+
+            dispatchValueAction({type: 'pillValueSet', value: pillValue});
+
+            saveResolvedValue(pillValue);
+
+            requestEditorFocus();
+        },
+        [requestEditorFocus, saveInputValue, saveResolvedValue]
+    );
+
+    // `$` typed into a field carries over into the editor; the Dynamic switch opens it empty, for a pill from the panel.
+    const startPillEntry = useCallback(
+        (initialInput?: string) => {
+            if (controlType === 'SELECT') {
+                // A select always holds an option, which the pill entry replaces only once a pill is chosen.
+                pillEntryKeepsOptionRef.current = true;
+
+                dispatchValueAction({type: 'mentionInputSyncedFromValue', value: ''});
+            }
+
+            setPillEntry(true);
+
+            requestEditorFocus(initialInput);
+        },
+        [controlType, requestEditorFocus]
+    );
+
+    const handleNativeKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLInputElement>) => {
+            const isEmpty = (event.currentTarget as HTMLInputElement).value === '';
 
             if (
-                currentNode &&
-                name &&
+                !isNumericalInput ||
+                !isEmpty ||
+                expressionEnabled === false ||
+                (event.key !== '$' && event.key !== '=')
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (event.key === '=') {
+                setIsFormulaMode(true);
+
+                requestEditorFocus();
+
+                return;
+            }
+
+            startPillEntry('$');
+        },
+        [expressionEnabled, isNumericalInput, requestEditorFocus, setIsFormulaMode, startPillEntry]
+    );
+
+    const handleSelectKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLElement>) => {
+            if (event.key !== '$' || expressionEnabled === false) {
+                return;
+            }
+
+            event.preventDefault();
+
+            startPillEntry('$');
+        },
+        [expressionEnabled, startPillEntry]
+    );
+
+    // The editor lost focus without a pill and dropped whatever text it held.
+    const handleSinglePillAbandoned = useCallback(() => {
+        if (hasDynamicSwitch && !isFormulaMode) {
+            // The editor stays up until the Dynamic switch is turned off; focus moves away when a pill is picked from
+            // the panel, too. A select keeps its option until a pill replaces it.
+            const hasSavedValue = typeof propertyParameterValue === 'string' && propertyParameterValue !== '';
+            const keepsEditorText = !hasSavedValue && !inputMode.singlePill;
+
+            if (pillEntryKeepsOptionRef.current || keepsEditorText) {
+                return keepsEditorText;
+            }
+
+            dispatchValueAction({type: 'valueCleared'});
+
+            // Text left without a pill is never saved (validateMentionInputValue), so the stored value may still
+            // hold the last pill.
+            if (hasSavedValue) {
+                saveResolvedValue(null);
+            }
+
+            return false;
+        }
+
+        setPillEntry(false);
+
+        dispatchValueAction({type: 'valueCleared'});
+
+        requestAnimationFrame(() => inputRef.current?.focus());
+
+        return false;
+    }, [hasDynamicSwitch, inputMode.singlePill, isFormulaMode, propertyParameterValue, saveResolvedValue]);
+
+    const handleDynamicSwitch = useCallback(() => {
+        if (!mentionInput) {
+            startPillEntry();
+
+            return;
+        }
+
+        editorPendingSaveCancelRef.current?.();
+
+        setPillEntry(false);
+
+        if (pillEntryKeepsOptionRef.current) {
+            pillEntryKeepsOptionRef.current = false;
+
+            return;
+        }
+
+        // Back to the native control: a pill (or text around one) has no constant to turn into.
+        dispatchValueAction({type: 'valueCleared'});
+
+        const encodedPath = path ? encodePath(path) : undefined;
+
+        const storedValue =
+            currentNode?.parameters && encodedPath
+                ? safeResolvePath(encodeParameters(currentNode.parameters), encodedPath)
+                : undefined;
+
+        if (
+            (typeof propertyParameterValue === 'string' && propertyParameterValue !== '') ||
+            (typeof storedValue === 'string' && storedValue !== '')
+        ) {
+            saveResolvedValue(null);
+        }
+    }, [currentNode?.parameters, mentionInput, path, propertyParameterValue, saveResolvedValue, startPillEntry]);
+
+    const validateMentionInputValue = useCallback(
+        (value: string | number) => {
+            const holdsNoPill =
+                stringSelect && typeof value === 'string' && !value.startsWith('=') && !value.includes('${');
+
+            return !holdsNoPill && validatePropertyValue(value);
+        },
+        [stringSelect, validatePropertyValue]
+    );
+
+    const handleControlledFormulaSwitch = useCallback(
+        (fieldValue: unknown, fieldOnChange: (value: unknown) => void) => {
+            const isStringToolExpression =
+                isToolsClusterElement &&
+                type === 'STRING' &&
+                typeof fieldValue === 'string' &&
+                fieldValue.startsWith('=');
+
+            const toFormula = !(isFormulaMode || isStringToolExpression);
+            const wasFromAi = controlledFromAi === true;
+
+            let convertedValue = toFormula ? toFormulaValue(fieldValue, type) : fromFormulaValue(fieldValue, type);
+
+            if (
+                !toFormula &&
+                controlType === 'SELECT' &&
+                (typeof convertedValue === 'boolean' || typeof convertedValue === 'number')
+            ) {
+                convertedValue = String(convertedValue);
+            }
+
+            setIsFormulaMode(toFormula);
+            setControlledFromAi(undefined);
+
+            fieldOnChange(convertedValue ?? (toFormula ? '=' : ''));
+
+            if (toFormula) {
+                requestEditorFocus();
+            } else {
+                controlledExpressionExitRef.current = true;
+            }
+
+            if (
+                wasFromAi &&
                 path &&
-                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-                workflow.id
+                workflow.id &&
+                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
             ) {
                 saveProperty({
-                    fromAi: true,
-                    includeInMetadata: true,
+                    fromAi: false,
+                    includeInMetadata: custom,
                     path,
                     type,
                     updateClusterElementParameterMutation,
                     updateWorkflowNodeParameterMutation,
-                    value: fromAiExpression,
-                    workflowId: workflow.id!,
+                    value: convertedValue ?? null,
+                    workflowId: workflow.id,
                 });
             }
-
-            return;
-        }
-
-        dispatchValueAction({
-            mentionInput: switchingToDynamic,
-            mentionInputValue: '',
-            propertyParameterValue: '',
-            type: 'inputTypeSwitched',
-        });
-
-        if (!switchingToDynamic) {
-            setIsFormulaMode(false);
-        }
-
-        if (mentionInput) {
-            setTimeout(() => {
-                if (inputRef.current) {
-                    inputRef.current.value = '';
-                    inputRef.current.focus();
-                }
-            }, 50);
-        } else {
-            setTimeout(() => {
-                setFocusedInput(editorRef.current);
-
-                editorRef.current?.commands.setContent('');
-                editorRef.current?.commands.focus();
-
-                if (workflowNodeDetailsPanelOpen) {
-                    openDataPillPanel();
-                }
-            }, 50);
-        }
-
-        if (
-            !currentNode ||
-            !name ||
-            !path ||
-            !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
-            !workflow.id
-        ) {
-            return;
-        }
-
-        const parentParameterValue = safeResolvePath(encodeParameters(currentNode.parameters ?? {}), encodePath(path));
-
-        if (mentionInput && !mentionInputValue) {
-            return;
-        } else if (!mentionInput && isNumericalInput && !inputValue) {
-            return;
-        } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
-            return;
-        } else if (!parentParameterValue) {
-            return;
-        }
-
-        saveProperty({
+        },
+        [
+            controlType,
+            controlledFromAi,
+            custom,
+            isFormulaMode,
+            isToolsClusterElement,
             path,
-            successCallback: () => {
-                dispatchValueAction({
-                    mentionInput: switchingToDynamic,
-                    mentionInputValue: '',
-                    propertyParameterValue: '',
-                    type: 'inputTypeSwitched',
-                });
-
-                setInputValue('');
-                setSelectValue('');
-            },
+            requestEditorFocus,
+            setIsFormulaMode,
             type,
+            updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
-            value: null,
-            workflowId: workflow.id!,
-        });
-    };
+            workflow.id,
+        ]
+    );
+
+    const handleControlledBuilderFormulaSwitch = useCallback(() => {
+        resetOnModeChangeRef.current = true;
+
+        setIsFormulaMode(!isFormulaMode);
+    }, [isFormulaMode, setIsFormulaMode]);
+
+    const handleControlledNativeKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLInputElement>, fieldValue: unknown, fieldOnChange: (value: unknown) => void) => {
+            const isEmpty = fieldValue === '' || fieldValue === null || fieldValue === undefined;
+
+            if (event.key !== '=' || !isNumericalInput || !showFormulaSwitch || !isEmpty) {
+                return;
+            }
+
+            event.preventDefault();
+
+            setIsFormulaMode(true);
+
+            fieldOnChange('=');
+
+            requestEditorFocus();
+        },
+        [isNumericalInput, requestEditorFocus, setIsFormulaMode, showFormulaSwitch]
+    );
 
     const handleSelectChange = useCallback(
         (value: string, name: string) => {
@@ -1201,14 +1495,11 @@ export const useProperty = ({
                 editorRef.current?.setEditable(false);
             } else {
                 // "Customize AI generation": reveal the =fromAi(...) expression as an editable formula.
-                // Raw setter (not the setIsFormulaMode wrapper, declared below) to avoid a TDZ reference.
-                setIsFormulaModeInternal(true);
+                setFormulaModeState(true);
 
                 editorRef.current?.commands.setContent(editorContent);
                 editorRef.current?.setEditable(true);
                 editorRef.current?.commands.focus();
-
-                setFocusedInput(editorRef.current);
             }
 
             if (savePayload) {
@@ -1226,8 +1517,7 @@ export const useProperty = ({
             custom,
             fromAiExpression,
             path,
-            setFocusedInput,
-            setIsFormulaModeInternal,
+            setFormulaModeState,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
@@ -1251,72 +1541,6 @@ export const useProperty = ({
             return nextValues;
         });
     }, []);
-
-    const setIsFormulaMode: Dispatch<SetStateAction<boolean>> = useCallback(
-        (value) => {
-            if (property.controlType === 'FORMULA_MODE') {
-                return;
-            }
-
-            setIsFormulaModeInternal(value);
-        },
-        [property.controlType]
-    );
-
-    // set default mentionInput state
-    useEffect(() => {
-        if (control || mentionInput) {
-            return;
-        }
-
-        if (propertyParameterValue) {
-            const isStringValue = typeof propertyParameterValue === 'string';
-
-            const hasDataPill = isStringValue && propertyParameterValue.includes('${');
-            const hasExpression = isStringValue && propertyParameterValue.startsWith('=');
-            const hasFormula = isStringValue && propertyParameterValue.includes('#{');
-
-            const shouldUseMentionInput = hasDataPill || hasExpression || hasFormula;
-
-            if (shouldUseMentionInput) {
-                setMentionInput(true);
-
-                if (hasExpression) {
-                    setMentionInputValue(propertyParameterValue.substring(1));
-
-                    setIsFormulaMode(true);
-                } else {
-                    dispatchValueAction({type: 'mentionInputSyncedFromValue', value: propertyParameterValue});
-                }
-
-                return;
-            } else {
-                setMentionInput(false);
-            }
-        }
-
-        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
-            setMentionInput(true);
-
-            return;
-        }
-
-        if (
-            controlType === 'SELECT' ||
-            controlType === 'MULTI_SELECT' ||
-            controlType === 'JSON_SCHEMA_BUILDER' ||
-            controlType === 'OBJECT_BUILDER'
-        ) {
-            if (
-                propertyParameterValue &&
-                typeof propertyParameterValue === 'string' &&
-                propertyParameterValue.includes('${')
-            ) {
-                setMentionInput(true);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [controlType, properties?.length, propertyParameterValue]);
 
     // set error state
     useEffect(() => {
@@ -1352,6 +1576,10 @@ export const useProperty = ({
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
             if (parameterValue === undefined) {
                 if (!path || !encodedPath) {
+                    if (isSavedFormulaValue(parameters[name])) {
+                        setFormulaModeState(true);
+                    }
+
                     resolveParameterValue(parameters[name]);
 
                     return;
@@ -1360,22 +1588,21 @@ export const useProperty = ({
                 const valueFromDefinition = safeResolvePath(encodedParameters, encodedPath);
 
                 if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
-                    if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
-                        setMentionInput(true);
-
-                        setIsFormulaMode(true);
+                    if (isSavedFormulaValue(valueFromDefinition)) {
+                        setFormulaModeState(true);
                     }
 
                     resolveParameterValue(valueFromDefinition);
                 } else {
+                    if (isSavedFormulaValue(encodedParameters[name])) {
+                        setFormulaModeState(true);
+                    }
+
                     resolveParameterValue(encodedParameters[name]);
                 }
             }
         } else if (isExpressionValue) {
-            setMentionInput(true);
             setMentionInputValue(propertyParameterValue.substring(1));
-
-            setIsFormulaMode(true);
         }
 
         const canSaveDefaultValue =
@@ -1451,36 +1678,47 @@ export const useProperty = ({
 
         const effectiveValue = parameterValue !== undefined ? parameterValue : valueFromDefinition;
 
+        const nextFormulaMode = controlType === 'FORMULA_MODE' || isSavedFormulaValue(effectiveValue);
+
+        setFormulaModeState(nextFormulaMode);
+
+        const getNextContext = (nextValue: unknown): Partial<ParameterValueContextI> => {
+            const nextMentionInput =
+                getPropertyInputMode({controlType, formulaMode: nextFormulaMode, isFromAi: false, value: nextValue})
+                    .renderer === 'mentions';
+
+            return {
+                formulaMode: nextFormulaMode,
+                isNumericalInput: !nextMentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER'),
+                mentionInput: nextMentionInput,
+            };
+        };
+
         if (effectiveValue !== undefined && effectiveValue !== null) {
             if (type === 'BOOLEAN' && typeof effectiveValue === 'boolean') {
-                resolveParameterValue(effectiveValue.toString());
+                resolveParameterValue(effectiveValue.toString(), {context: getNextContext(effectiveValue.toString())});
 
                 return;
             }
 
-            if (typeof effectiveValue === 'string' && effectiveValue.startsWith('=')) {
-                setMentionInput(true);
-
-                setIsFormulaMode(true);
-            }
-
-            resolveParameterValue(effectiveValue);
+            resolveParameterValue(effectiveValue, {context: getNextContext(effectiveValue)});
 
             return;
         }
 
         const fallbackParameterValue = parameterValue !== undefined ? parameterValue : defaultValue;
 
-        resolveParameterValue(fallbackParameterValue);
+        dispatchValueAction({type: 'valueCleared'});
+
+        resolveParameterValue(fallbackParameterValue, {context: getNextContext(fallbackParameterValue)});
     }, [
         control,
+        controlType,
         currentNode?.parameters,
         defaultValue,
         parameterValue,
         path,
         resolveParameterValue,
-        setIsFormulaMode,
-        setMentionInput,
         type,
     ]);
 
@@ -1603,35 +1841,6 @@ export const useProperty = ({
         setLookupDependsOnValuesIfChanged,
     ]);
 
-    // set showInputTypeSwitchButton state depending on the controlType
-    useEffect(() => {
-        if (control) {
-            return;
-        }
-
-        if (controlType === 'FILE_ENTRY') {
-            setShowInputTypeSwitchButton(false);
-        }
-
-        if (expressionEnabled) {
-            if (controlType === 'JSON_SCHEMA_BUILDER') {
-                setShowInputTypeSwitchButton(true);
-            }
-
-            if (controlType === 'SELECT') {
-                setShowInputTypeSwitchButton(true);
-            }
-        }
-
-        if (controlType === 'NULL') {
-            setShowInputTypeSwitchButton(false);
-        }
-
-        if (controlType === 'FORMULA_MODE') {
-            setShowInputTypeSwitchButton(false);
-        }
-    }, [control, controlType, expressionEnabled]);
-
     // Sync propertyParameterValue from workflow definition whenever it changes (including on mount,
     // so that remounted Property components pick up the latest saved values after tab switching).
     useEffect(() => {
@@ -1714,11 +1923,12 @@ export const useProperty = ({
     }, [displayCondition, currentNode?.displayConditions, isDisplayConditionsSuccess]);
 
     useEffect(() => {
-        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
+        if (isFormulaMode && resetOnModeChangeRef.current && controlledFormulaOnChangeRef.current) {
             resetOnModeChangeRef.current = false;
-            controlledDynamicOnChangeRef.current('=');
+
+            controlledFormulaOnChangeRef.current('=');
         }
-    }, [controlledDynamicMode, resetOnModeChangeRef]);
+    }, [isFormulaMode, resetOnModeChangeRef]);
 
     const isLoadingDisplayCondition = !!(
         displayCondition &&
@@ -1734,14 +1944,15 @@ export const useProperty = ({
         calculatedPath: path,
         controlType,
         controlledBlurError,
-        controlledDynamicMode,
-        controlledDynamicOnChangeRef,
         controlledExpressionExitRef,
+        controlledFormulaOnChangeRef,
         controlledFromAi,
         currentNode,
         defaultValue,
         description,
         displayCondition,
+        editorFocusRequest,
+        editorPendingSaveCancelRef,
         editorRef,
         errorMessage,
         expressionEnabled,
@@ -1749,21 +1960,31 @@ export const useProperty = ({
         fromAiExpression,
         handleCodeEditorChange,
         handleControlledBlur,
-        handleControlledModeSwitch,
+        handleControlledBuilderFormulaSwitch,
+        handleControlledFormulaSwitch,
+        handleControlledNativeFromAiClick,
+        handleControlledNativeKeyDown,
         handleDeleteCustomPropertyClick,
+        handleDynamicSwitch,
+        handleFormulaSwitch,
         handleFromAiClick: hideFromAi ? undefined : handleFromAiClick,
         handleFromAiToggle,
         handleInputChange,
         handleInputClear,
-        handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
         handleMentionInputValueChange,
         handleMultiSelectChange,
+        handleNativeKeyDown,
         handleSelectChange,
+        handleSelectKeyDown,
+        handleSinglePillAbandoned,
+        hasDynamicSwitch,
         hasError,
         hidden,
+        inputMode,
         inputRef,
         inputValue,
+        insertPillValue,
         isFormulaMode,
         isFromAi,
         isLoadingDisplayCondition,
@@ -1794,9 +2015,11 @@ export const useProperty = ({
         setIsFormulaMode,
         setLookupDependsOnValues,
         setSelectValue,
-        showInputTypeSwitchButton,
+        showFormulaSwitch,
+        startPillEntry,
         type,
         typeIcon,
+        validateMentionInputValue,
         validatePropertyValue,
         workflow,
     };

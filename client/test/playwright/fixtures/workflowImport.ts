@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks -- Playwright fixtures use 'use' callback, not React hooks */
 import {test as base} from '@playwright/test';
 
+import propertyFormulaModesWorkflow from '../propertyFormulaModesWorkflow.json';
 import propertyMentionsWorkflow from '../propertyMentionsWorkflow.json';
 import sampleWorkflow from '../sampleWorkflow.json';
 import selectableIndexWorkflow from '../selectableIndexWorkflow.json';
 import {
+    PROPERTY_FORMULA_MODES_WORKFLOW_PATH,
     PROPERTY_MENTIONS_WORKFLOW_PATH,
     SAMPLE_WORKFLOW_PATH,
     SELECTABLE_INDEX_WORKFLOW_PATH,
@@ -44,4 +46,9 @@ export const importSelectableIndexWorkflowTest = createImportWorkflowTest({
 export const importPropertyMentionsWorkflowTest = createImportWorkflowTest({
     workflowFilePath: PROPERTY_MENTIONS_WORKFLOW_PATH,
     workflowName: propertyMentionsWorkflow.label,
+});
+
+export const importPropertyFormulaModesWorkflowTest = createImportWorkflowTest({
+    workflowFilePath: PROPERTY_FORMULA_MODES_WORKFLOW_PATH,
+    workflowName: propertyFormulaModesWorkflow.label,
 });

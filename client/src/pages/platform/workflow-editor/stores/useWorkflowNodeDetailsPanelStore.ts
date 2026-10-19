@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
+import {PillTargetI} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
 import {NodeDataType} from '@/shared/types';
-import {Editor} from '@tiptap/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -20,8 +20,9 @@ interface WorkflowNodeDetailsPanelStoreI {
             NodeDataType | undefined | ((previousCurrentNode: NodeDataType | undefined) => NodeDataType | undefined)
     ) => void;
 
-    focusedInput: Editor | null;
-    setFocusedInput: (focusedInput: Editor | null) => void;
+    pillTarget: PillTargetI | null;
+    clearPillTarget: (owner: unknown) => void;
+    setPillTarget: (pillTarget: PillTargetI | null) => void;
 
     operationChangeInProgress: boolean;
     setOperationChangeInProgress: (operationChangeInProgress: boolean) => void;
@@ -60,8 +61,10 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                     currentNode: typeof currentNode === 'function' ? currentNode(state.currentNode) : currentNode,
                 })),
 
-            focusedInput: null,
-            setFocusedInput: (focusedInput) => set((state) => ({...state, focusedInput})),
+            pillTarget: null,
+            clearPillTarget: (owner) =>
+                set((state) => (state.pillTarget?.owner === owner ? {...state, pillTarget: null} : state)),
+            setPillTarget: (pillTarget) => set((state) => ({...state, pillTarget})),
 
             operationChangeInProgress: false,
             setOperationChangeInProgress: (operationChangeInProgress) =>
@@ -88,7 +91,7 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                 set(() => ({
                     aiAgentNodeDetailsPanelOpen: false,
                     currentNode: undefined,
-                    focusedInput: null,
+                    pillTarget: null,
                     operationChangeInProgress: false,
                     workflowNodeDetailsPanelOpen: false,
                 })),

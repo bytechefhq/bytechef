@@ -15,6 +15,8 @@ export const ROUTES = {
     projects: '/automation/projects',
 } as const;
 
+export const PROPERTY_FORMULA_MODES_WORKFLOW_PATH = 'test/playwright/propertyFormulaModesWorkflow.json';
+
 export const PROPERTY_MENTIONS_WORKFLOW_PATH = 'test/playwright/propertyMentionsWorkflow.json';
 
 export const SAMPLE_WORKFLOW_PATH = 'test/playwright/sampleWorkflow.json';

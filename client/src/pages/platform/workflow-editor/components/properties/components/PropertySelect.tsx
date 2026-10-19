@@ -5,19 +5,21 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SelectOptionType} from '@/shared/types';
 import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {Select as SelectPrimitive} from 'radix-ui';
-import {ReactNode} from 'react';
+import {KeyboardEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from './PropertyFormulaSwitch';
 
 interface PropertySelectProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    dynamicSwitch?: ReactNode;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
     name?: string;
+    onTriggerKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
     onValueChange?: (value: string) => void;
     options: Array<SelectOptionType>;
     placeholder?: string;
@@ -30,10 +32,12 @@ const PropertySelect = ({
     defaultValue,
     deletePropertyButton,
     description,
+    dynamicSwitch,
     handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
     name,
+    onTriggerKeyDown,
     onValueChange,
     options,
     placeholder = 'Select...',
@@ -63,8 +67,10 @@ const PropertySelect = ({
                 </div>
 
                 <div className="flex items-center">
+                    {dynamicSwitch}
+
                     {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                        <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
+                        <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                     )}
 
                     {deletePropertyButton}
@@ -77,6 +83,7 @@ const PropertySelect = ({
                 <SelectTrigger
                     aria-label="Select"
                     className={twMerge('bg-background', leadingIcon && 'relative', 'pl-4')}
+                    onKeyDown={onTriggerKeyDown}
                 >
                     <>
                         {leadingIcon ? (

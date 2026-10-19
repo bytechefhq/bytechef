@@ -10,7 +10,6 @@ interface ControlledToolFieldStateI {
     displayValue: string;
     isExpressionMode: boolean;
     isFieldFromAi: boolean;
-    showControlledSwitch: boolean;
     showFromAi: boolean;
     strippedDisplayValue: string;
     strippedFromAiValue: string;
@@ -23,7 +22,6 @@ export default function getControlledToolFieldState({
     isToolsClusterElement,
     type,
 }: ControlledToolFieldStatePropsI): ControlledToolFieldStateI {
-    const showControlledSwitch = !!isToolsClusterElement && type !== 'STRING';
     const showFromAi = !!isToolsClusterElement && type === 'STRING';
 
     const valueIsFromAi = showFromAi && typeof fieldValue === 'string' && fieldValue.startsWith('=fromAi(');
@@ -44,7 +42,6 @@ export default function getControlledToolFieldState({
         displayValue,
         isExpressionMode,
         isFieldFromAi,
-        showControlledSwitch,
         showFromAi,
         strippedDisplayValue: isExpressionMode ? displayValue.substring(1) : displayValue,
         strippedFromAiValue: fromAiExpression.startsWith('=') ? fromAiExpression.substring(1) : fromAiExpression,

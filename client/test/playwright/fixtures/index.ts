@@ -5,6 +5,7 @@ export type {ProjectFixturesType} from './project';
 export {workflowTest} from './workflow';
 export type {WorkflowFixturesType} from './workflow';
 export {
+    importPropertyFormulaModesWorkflowTest,
     importPropertyMentionsWorkflowTest,
     importSelectableIndexWorkflowTest,
     importWorkflowTest,

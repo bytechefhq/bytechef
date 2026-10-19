@@ -16,7 +16,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CheckIcon, ChevronsUpDownIcon, CircleQuestionMarkIcon} from 'lucide-react';
-import {FocusEventHandler, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+import {FocusEventHandler, KeyboardEvent, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -26,7 +26,7 @@ import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import {resolveMainClusterRootName} from '../../../utils/resolveClusterRootId';
-import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from './PropertyFormulaSwitch';
 import PropertyInput from './property-input/PropertyInput';
 
 import type {
@@ -50,6 +50,7 @@ interface PropertyComboBoxProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    dynamicSwitch?: ReactNode;
     error?: boolean;
     errorMessage?: string;
     handleInputTypeSwitchButtonClick?: () => void;
@@ -59,6 +60,7 @@ interface PropertyComboBoxProps {
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
+    onTriggerKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
     onValueChange?: (value: string) => void;
     options: Array<Option>;
     optionsDataSource?: OptionsDataSource;
@@ -86,6 +88,7 @@ const PropertyComboBox = ({
     defaultValue,
     deletePropertyButton,
     description,
+    dynamicSwitch,
     error,
     errorMessage,
     handleInputTypeSwitchButtonClick,
@@ -95,6 +98,7 @@ const PropertyComboBox = ({
     lookupDependsOnValues,
     name,
     onBlur,
+    onTriggerKeyDown,
     onValueChange,
     options: initialOptions,
     optionsDataSource,
@@ -518,11 +522,10 @@ const PropertyComboBox = ({
                     </div>
 
                     <div className="flex items-center">
+                        {dynamicSwitch}
+
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                            <PropertyInputTypeSwitch
-                                handleClick={handleInputTypeSwitchButtonClick}
-                                mentionInput={false}
-                            />
+                            <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                         )}
 
                         {deletePropertyButton}
@@ -566,6 +569,7 @@ const PropertyComboBox = ({
                                     !connectionRequirementMet)
                             }
                             name={name}
+                            onKeyDown={onTriggerKeyDown}
                             role="combobox"
                             variant="outline"
                         >

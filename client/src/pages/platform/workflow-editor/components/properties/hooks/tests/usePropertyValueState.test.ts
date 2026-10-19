@@ -14,6 +14,7 @@ const hoisted = vi.hoisted(() => {
     const mockSaveProperty = vi.fn();
 
     const panelStoreState = {
+        clearPillTarget: vi.fn(),
         currentNode: {
             componentName: 'mailchimp',
             metadata: {ui: {}},
@@ -21,7 +22,7 @@ const hoisted = vi.hoisted(() => {
             operationName: 'addMemberToList',
             parameters: {} as Record<string, unknown>,
         } as Record<string, unknown>,
-        setFocusedInput: vi.fn(),
+        setPillTarget: vi.fn(),
         workflowNodeDetailsPanelOpen: true,
     };
 
@@ -390,8 +391,8 @@ describe('useProperty value state', () => {
         });
     });
 
-    describe('input type switching', () => {
-        it('should toggle mentionInput and reset the value states', async () => {
+    describe('formula switching', () => {
+        it('should move a select into the formula editor and back, resetting the value states', async () => {
             const {result} = await renderProperty({
                 controlType: 'SELECT',
                 expressionEnabled: true,
@@ -399,14 +400,24 @@ describe('useProperty value state', () => {
                 type: 'STRING',
             });
 
-            const initialMentionInput = result.current.mentionInput;
+            expect(result.current.mentionInput).toBe(false);
 
             act(() => {
-                result.current.handleInputTypeSwitchButtonClick();
+                result.current.handleFormulaSwitch();
             });
 
-            expect(result.current.mentionInput).toBe(!initialMentionInput);
+            expect(result.current.mentionInput).toBe(true);
+            expect(result.current.isFormulaMode).toBe(true);
             expect(result.current.mentionInputValue).toBe('');
+
+            act(() => {
+                result.current.handleFormulaSwitch();
+            });
+
+            expect(result.current.mentionInput).toBe(false);
+            expect(result.current.isFormulaMode).toBe(false);
+            expect(result.current.mentionInputValue).toBe('');
+            expect(result.current.selectValue).toBe('');
         });
     });
 

@@ -1,4 +1,3 @@
-import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {
@@ -53,6 +52,7 @@ import {useEvaluatorFunctionDefinitions} from './useEvaluatorFunctionDefinitions
 
 interface PropertyMentionsInputEditorProps {
     autoFocus?: boolean;
+    cancelPendingSaveRef?: MutableRefObject<(() => void) | null>;
     className?: string;
     componentDefinitions: ComponentDefinitionBasic[];
     controlType?: string;
@@ -60,16 +60,21 @@ interface PropertyMentionsInputEditorProps {
     disableAutoSave?: boolean;
     elementId?: string;
     expressionEnabled?: boolean;
+    focusRequest?: {initialInput?: string; token: number};
     handleFromAiClick?: (fromAi: boolean) => void;
     isFormulaMode?: boolean;
     isFromAi?: boolean;
     labelId?: string;
+    legacyMixed?: boolean;
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
+    onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
+    pillRequired?: boolean;
     placeholder?: string;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
+    singlePill?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     toolProperty?: boolean;
     type: string;
@@ -77,6 +82,23 @@ interface PropertyMentionsInputEditorProps {
     validateBeforeSave?: (value: string | number) => boolean;
     workflow: Workflow;
 }
+
+const isEditorContentMounted = (editor: Editor) =>
+    (editor as Editor & {isEditorContentInitialized?: boolean}).isEditorContentInitialized === true;
+
+const countMentionNodes = (editor: {
+    state: {doc: {descendants: (callback: (node: {type: {name: string}}) => void) => void}};
+}) => {
+    let mentionCount = 0;
+
+    editor.state.doc.descendants((node) => {
+        if (node.type.name === 'mention') {
+            mentionCount++;
+        }
+    });
+
+    return mentionCount;
+};
 
 const PropertyMention = Mention.extend({
     addNodeView() {
@@ -97,6 +119,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
     (
         {
             autoFocus,
+            cancelPendingSaveRef,
             className,
             componentDefinitions,
             controlType,
@@ -104,16 +127,21 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             disableAutoSave,
             elementId,
             expressionEnabled,
+            focusRequest,
             handleFromAiClick,
             isFormulaMode,
             isFromAi = false,
             labelId,
+            legacyMixed = false,
             onChange,
             onFocus,
+            onSinglePillAbandoned,
             onValueChange,
             path,
+            pillRequired = false,
             placeholder,
             setIsFormulaMode,
+            singlePill = false,
             taskDispatcherDefinitions,
             toolProperty,
             type,
@@ -127,7 +155,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value
         );
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-        const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
@@ -139,6 +166,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const isFormulaModeRef = useRef(isFormulaMode);
         const setIsFormulaModeRef = useRef(setIsFormulaMode);
         const restoreFocusAfterExitRef = useRef(false);
+        const appliedFocusTokenRef = useRef<number | undefined>(undefined);
+        const previousFormulaModeRef = useRef(isFormulaMode);
 
         editorValueRef.current = editorValue;
         isFormulaModeRef.current = isFormulaMode;
@@ -446,10 +475,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 if (onValueChange) {
                     onValueChange(value);
                 }
-
-                const propertyMentions = value.match(/property-mention/g);
-
-                setMentionOccurences(propertyMentions?.length || 0);
             },
             [editorValue, onChange, onValueChange, saveMentionInputValue]
         );
@@ -499,10 +524,18 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     return false;
                 }
 
-                const attributes = view.props.attributes as Record<string, string>;
-                const parameters = currentNode?.parameters || {};
+                if (expressionEnabled === false) {
+                    return true;
+                }
 
-                if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
+                if (singlePill) {
+                    editorRef.current
+                        ?.chain()
+                        .focus()
+                        .selectAll()
+                        .insertContent({attrs: {id: payload.mentionId}, type: 'mention'})
+                        .run();
+
                     return true;
                 }
 
@@ -524,7 +557,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 return true;
             },
-            [currentNode?.parameters, isFromAi]
+            [expressionEnabled, isFromAi, singlePill]
         );
 
         const editor = useEditor({
@@ -550,26 +583,50 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 },
                 handleClick: (view, pos) => moveCursorToEnd(view, pos),
                 handleDrop,
-                handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
-                    const isEditorEmpty = editor.state.doc.textContent.length === 0;
+                handleKeyPress: (editorView: EditorView, event: KeyboardEvent) => {
+                    const mentionCount = countMentionNodes(editorView);
 
-                    if ((event.key === '=' && isEditorEmpty) || isFormulaMode) {
+                    const isEditorEmpty = editorView.state.doc.textContent.length === 0 && mentionCount === 0;
+
+                    if ((event.key === '=' && isEditorEmpty && !singlePill) || isFormulaMode) {
                         return;
                     }
 
-                    if (DataPillSuggestionPluginKey.getState(editor.state)?.active) {
+                    if (DataPillSuggestionPluginKey.getState(editorView.state)?.active) {
                         return;
                     }
 
-                    if (type !== 'STRING' && (mentionOccurences || event.key !== '$')) {
+                    const restrictsToOnePill = singlePill || (type !== 'STRING' && !legacyMixed);
+
+                    if (restrictsToOnePill && (mentionCount || event.key !== '$')) {
                         event.preventDefault();
                     }
                 },
             },
             extensions,
             immediatelyRender: false,
-            onBlur: () => {
+            onBlur: ({editor: blurredEditor}) => {
                 isFocusedRef.current = false;
+
+                if (!isEditorContentMounted(blurredEditor)) {
+                    queueMicrotask(() => {
+                        if (!blurredEditor.isDestroyed && isEditorContentMounted(blurredEditor)) {
+                            blurredEditor.commands.focus();
+                        }
+                    });
+
+                    return;
+                }
+
+                if ((singlePill || pillRequired) && blurredEditor && countMentionNodes(blurredEditor) === 0) {
+                    unsavedSuggestionValueRef.current = undefined;
+
+                    if (onSinglePillAbandoned?.() !== true) {
+                        blurredEditor.commands.clearContent(false);
+                    }
+
+                    return;
+                }
 
                 if (unsavedSuggestionValueRef.current !== undefined) {
                     saveMentionInputValue(unsavedSuggestionValueRef.current);
@@ -648,6 +705,45 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, [autoFocus, editor]);
 
         useEffect(() => {
+            if (!editor) {
+                return;
+            }
+
+            editor.storage.MentionStorage.dataPills = dataPills;
+            editor.storage.MentionStorage.controlType = controlType;
+        }, [controlType, dataPills, editor]);
+
+        useEffect(() => {
+            if (!editor || !focusRequest || appliedFocusTokenRef.current === focusRequest.token) {
+                return;
+            }
+
+            appliedFocusTokenRef.current = focusRequest.token;
+
+            saveMentionInputValue.cancel();
+
+            const pendingValue = typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value;
+
+            const documentIsStale = pendingValue !== editorValueRef.current || (pendingValue !== '' && editor.isEmpty);
+
+            if (typeof pendingValue === 'string' && documentIsStale) {
+                editor.commands.setContent(getContent(pendingValue) ?? '', {
+                    emitUpdate: false,
+                    parseOptions: {preserveWhitespace: 'full'},
+                });
+            }
+
+            editor.view.dom.focus({preventScroll: true});
+
+            editor.commands.focus('end');
+
+            if (focusRequest.initialInput) {
+                editor.commands.insertContent(focusRequest.initialInput);
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [editor, focusRequest]);
+
+        useEffect(() => {
             if (!ref) {
                 return;
             }
@@ -666,16 +762,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }
             };
         }, [editor, ref]);
-
-        // MentionStorage: suggestion list + NodeView controlType (icon sizing); dataPills also drive NodeView via store
-        useEffect(() => {
-            if (!editor) {
-                return;
-            }
-
-            editor.storage.MentionStorage.dataPills = dataPills;
-            editor.storage.MentionStorage.controlType = controlType;
-        }, [controlType, dataPills, editor]);
 
         // Keep the function suggestion catalog in editor storage so the suggestion items callback can read it
         // without recreating the editor.
@@ -736,6 +822,28 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 editor.setEditable(!isFromAi);
             }
         }, [currentNode?.metadata?.ui?.fromAi, editor, isFromAi, path]);
+
+        useEffect(() => {
+            if (previousFormulaModeRef.current === isFormulaMode) {
+                return;
+            }
+
+            previousFormulaModeRef.current = isFormulaMode;
+
+            saveMentionInputValue.cancel();
+        }, [isFormulaMode, saveMentionInputValue]);
+
+        useEffect(() => {
+            if (!cancelPendingSaveRef) {
+                return;
+            }
+
+            cancelPendingSaveRef.current = saveMentionInputValue.cancel;
+
+            return () => {
+                cancelPendingSaveRef.current = null;
+            };
+        }, [cancelPendingSaveRef, saveMentionInputValue]);
 
         // Cleanup function to save mention input value on unmount
         useEffect(() => {

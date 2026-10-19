@@ -81,6 +81,19 @@ import {importPropertyMentionsWorkflowTest} from '../fixtures';
 // Requires: page and project (use with loginTest() and projectTest via mergeTests)
 ```
 
+### Property Formula Modes Workflow Fixture
+
+Imports `propertyFormulaModesWorkflow.json`. Its `var_1` node exposes `Flag`, `Number` and `String` data pills. Its
+`propertyTesting_1` node stores a legacy number value that mixes a pill with text (`numberMinNumPrecision`:
+`${var_1.Number} ms`) and an object holding one entry (`objectNoPredefinedProperties`):
+
+```typescript
+import {importPropertyFormulaModesWorkflowTest} from '../fixtures';
+
+// importPropertyFormulaModesWorkflowTest provides: workflow fixture
+// Requires: page and project (use with loginTest() and projectTest via mergeTests)
+```
+
 ## Usage Pattern
 
 The key pattern is to use `mergeTests` at the top of your test file to combine independent fixtures:

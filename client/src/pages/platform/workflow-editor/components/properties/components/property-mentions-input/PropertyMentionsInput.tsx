@@ -3,6 +3,7 @@ import {getRandomId} from '@/shared/util/random-utils';
 import {
     DragEvent,
     ForwardedRef,
+    MutableRefObject,
     ReactNode,
     Suspense,
     forwardRef,
@@ -20,7 +21,8 @@ import './PropertyMentionsInput.css';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import {createEditorPillTarget} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
@@ -40,27 +42,34 @@ const PropertyMentionsInputEditorSheet = lazy(
 
 interface PropertyMentionsInputProps {
     autoFocus?: boolean;
+    cancelPendingSaveRef?: MutableRefObject<(() => void) | null>;
     className?: string;
     controlType?: ControlType;
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
     disableAutoSave?: boolean;
+    dynamicSwitch?: ReactNode;
     error?: boolean;
     errorMessage?: string;
     expressionEnabled?: boolean;
+    focusRequest?: {initialInput?: string; token: number};
     handleFromAiClick?: (fromAi: boolean) => void;
     handleInputTypeSwitchButtonClick?: () => void;
     isFromAi?: boolean;
     isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
+    legacyMixed?: boolean;
+    onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
     path?: string;
+    pillRequired?: boolean;
     placeholder?: string;
     required?: boolean;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
     showInputTypeSwitchButton?: boolean;
+    singlePill?: boolean;
     toolProperty?: boolean;
     type?: string;
     validateBeforeSave?: (value: string | number) => boolean;
@@ -71,27 +80,34 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     (
         {
             autoFocus,
+            cancelPendingSaveRef,
             className,
             controlType,
             defaultValue,
             deletePropertyButton,
             description,
             disableAutoSave,
+            dynamicSwitch,
             error,
             errorMessage,
             expressionEnabled,
+            focusRequest,
             handleFromAiClick,
             handleInputTypeSwitchButtonClick,
             isFormulaMode,
             isFromAi,
             label,
             leadingIcon,
+            legacyMixed,
+            onSinglePillAbandoned,
             onValueChange,
             path,
+            pillRequired,
             placeholder,
             required = false,
             setIsFormulaMode,
             showInputTypeSwitchButton = false,
+            singlePill,
             toolProperty,
             type = 'STRING',
             validateBeforeSave,
@@ -100,8 +116,12 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         ref: ForwardedRef<Editor>
     ) => {
         const [isFocused, setIsFocused] = useState(false);
+
+        const acceptsPillRef = useRef(false);
         const isInitialLoadRef = useRef(true);
         const localEditorRef = useRef<Editor | null>(null);
+
+        acceptsPillRef.current = expressionEnabled !== false && !isFromAi;
 
         const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
             useShallow((state) => ({
@@ -112,18 +132,32 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             }))
         );
 
-        const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                focusedInput: state.focusedInput,
-                setFocusedInput: state.setFocusedInput,
-                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-            }))
-        );
+        const {clearPillTarget, pillTarget, setPillTarget, workflowNodeDetailsPanelOpen} =
+            useWorkflowNodeDetailsPanelStore(
+                useShallow((state) => ({
+                    clearPillTarget: state.clearPillTarget,
+                    pillTarget: state.pillTarget,
+                    setPillTarget: state.setPillTarget,
+                    workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+                }))
+            );
 
         const openDataPillPanel = useOpenDataPillPanel();
 
+        const registerPillTarget = useCallback(
+            (editor: Editor) =>
+                setPillTarget(
+                    createEditorPillTarget({
+                        acceptsPill: () => acceptsPillRef.current,
+                        editor,
+                        singlePill,
+                    })
+                ),
+            [setPillTarget, singlePill]
+        );
+
         const onFocus = (editor: Editor) => {
-            setFocusedInput(editor);
+            registerPillTarget(editor);
 
             if (workflowNodeDetailsPanelOpen && expressionEnabled !== false) {
                 openDataPillPanel();
@@ -147,7 +181,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         localEditorRef.current?.commands?.focus('end');
 
                         if (localEditorRef.current) {
-                            setFocusedInput(localEditorRef.current);
+                            registerPillTarget(localEditorRef.current);
                         }
 
                         return false;
@@ -156,7 +190,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 return true;
             },
-            [expressionEnabled, setFocusedInput, setIsFormulaMode]
+            [expressionEnabled, registerPillTarget, setIsFormulaMode]
         );
 
         const getPropertyMentionsInputEditorRef = useCallback(
@@ -193,14 +227,24 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         }, [ref]);
 
         useEffect(() => {
-            if (!focusedInput || !localEditorRef.current) {
+            if (!pillTarget || !localEditorRef.current) {
                 setIsFocused(false);
 
                 return;
             }
 
-            setIsFocused(focusedInput === localEditorRef.current);
-        }, [focusedInput]);
+            setIsFocused(pillTarget.owner === localEditorRef.current);
+        }, [pillTarget]);
+
+        useEffect(() => {
+            const editorAtMount = localEditorRef;
+
+            return () => {
+                if (editorAtMount.current) {
+                    clearPillTarget(editorAtMount.current);
+                }
+            };
+        }, [clearPillTarget]);
 
         // Check initial value for formula mode
         useEffect(() => {
@@ -216,8 +260,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         }, [value, defaultValue, expressionEnabled, setIsFormulaMode]);
 
         return (
-            <fieldset className={twMerge('w-full', label && 'space-y-1')}>
-                {(label || description || showInputTypeSwitchButton) && (
+            <fieldset className={twMerge('w-full', label && 'space-y-1')} data-pill-target="">
+                {(label || description || showInputTypeSwitchButton || dynamicSwitch) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
                             <div className="flex items-center">
@@ -264,8 +308,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                 </Suspense>
                             )}
 
+                            {dynamicSwitch}
+
                             {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                                <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput />
+                                <PropertyFormulaSwitch
+                                    formulaMode={!!isFormulaMode}
+                                    handleClick={handleInputTypeSwitchButtonClick}
+                                />
                             )}
 
                             {deletePropertyButton}
@@ -288,7 +337,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 >
                     {leadingIcon && (
                         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3">
-                            {isFormulaMode ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
+                            {isFromAi ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
 
@@ -304,6 +353,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     >
                         <PropertyMentionsInputEditor
                             autoFocus={autoFocus}
+                            cancelPendingSaveRef={cancelPendingSaveRef}
                             className={twMerge('px-2 py-2', leadingIcon && 'py-[7px]')}
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
@@ -311,17 +361,22 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             disableAutoSave={disableAutoSave}
                             elementId={elementId}
                             expressionEnabled={expressionEnabled}
+                            focusRequest={focusRequest}
                             handleFromAiClick={handleFromAiClick}
                             isFormulaMode={isFormulaMode}
                             isFromAi={isFromAi}
                             labelId={labelId}
+                            legacyMixed={legacyMixed}
                             onChange={(editorValue) => handleEditorValueChange(editorValue)}
                             onFocus={onFocus}
+                            onSinglePillAbandoned={onSinglePillAbandoned}
                             onValueChange={onValueChange}
                             path={path}
+                            pillRequired={pillRequired}
                             placeholder={placeholder}
                             ref={getPropertyMentionsInputEditorRef}
                             setIsFormulaMode={setIsFormulaMode}
+                            singlePill={singlePill}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             toolProperty={toolProperty}
                             type={type}
@@ -333,7 +388,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 </div>
 
                 {error && (
-                    <p className="mt-2 text-sm text-rose-600" role="alert">
+                    <p className="mt-2 text-sm text-content-destructive" role="alert">
                         {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                     </p>
                 )}

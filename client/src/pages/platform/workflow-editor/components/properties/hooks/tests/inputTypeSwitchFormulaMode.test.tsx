@@ -28,7 +28,7 @@ const uriProperty = {
 const renderUriProperty = (parameterValue?: string) =>
     renderHook(() => useProperty({parameterValue, path: 'parameters.uri', property: uriProperty}), {wrapper});
 
-describe('handleInputTypeSwitchButtonClick formula mode', () => {
+describe('handleFormulaSwitch formula mode', () => {
     beforeEach(() => {
         useWorkflowDataStore.setState({
             workflow: {id: 'wf-switch-test', nodeNames: []},
@@ -80,70 +80,48 @@ describe('handleInputTypeSwitchButtonClick formula mode', () => {
         expect(result.current.mentionInput).toBe(true);
     });
 
-    // The switch button is the only way out of the mentions editor in the uncontrolled path. Leaving formula
-    // mode latched on kept the f(x) icon on the plain input and dropped the field straight back into formula
-    // mode the next time it was switched over.
-    it('leaves formula mode when switching back to a constant value', () => {
+    it('turns formula mode on for a text value and stays in the editor', () => {
+        (saveProperty as unknown as Mock).mockReset();
+
+        const {result} = renderUriProperty('hello');
+
+        expect(result.current.isFormulaMode).toBe(false);
+        expect(result.current.mentionInput).toBe(true);
+
+        act(() => result.current.handleFormulaSwitch());
+
+        expect(result.current.isFormulaMode).toBe(true);
+        expect(result.current.mentionInput).toBe(true);
+        expect(result.current.propertyParameterValue).toBe("='hello'");
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: "='hello'"}));
+    });
+
+    it('turns a quoted formula literal back into text and stays in the editor', () => {
+        (saveProperty as unknown as Mock).mockReset();
+
+        const {result} = renderUriProperty("='hello'");
+
+        act(() => result.current.handleFormulaSwitch());
+
+        expect(result.current.isFormulaMode).toBe(false);
+        expect(result.current.mentionInput).toBe(true);
+        expect(result.current.propertyParameterValue).toBe('hello');
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: 'hello'}));
+    });
+
+    it('leaves formula mode and clears a formula that is not a literal', () => {
+        (saveProperty as unknown as Mock).mockReset();
+
         const {result} = renderUriProperty("=concat('a', 'b')");
 
         expect(result.current.isFormulaMode).toBe(true);
 
-        act(() => result.current.handleInputTypeSwitchButtonClick());
+        act(() => result.current.handleFormulaSwitch());
 
         expect(result.current.isFormulaMode).toBe(false);
-        expect(result.current.mentionInput).toBe(false);
-    });
-
-    it('does not carry formula mode back over when the editor is switched on again', () => {
-        const {result} = renderUriProperty("=concat('a', 'b')");
-
-        act(() => result.current.handleInputTypeSwitchButtonClick());
-
-        expect(result.current.mentionInput).toBe(false);
-
-        act(() => result.current.handleInputTypeSwitchButtonClick());
-
         expect(result.current.mentionInput).toBe(true);
-        expect(result.current.isFormulaMode).toBe(false);
-    });
-
-    it('stays in the editor once clearing the constant value succeeds', () => {
-        useWorkflowNodeDetailsPanelStore.setState({
-            currentNode: {
-                name: 'dataStorage_1',
-                parameters: {scope: 'CURRENT_EXECUTION'},
-                workflowNodeName: 'dataStorage_1',
-            },
-        } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
-
-        (saveProperty as unknown as Mock).mockReset();
-
-        const {result} = renderHook(
-            () =>
-                useProperty({
-                    parameterValue: 'CURRENT_EXECUTION',
-                    property: {
-                        controlType: 'SELECT',
-                        expressionEnabled: true,
-                        name: 'scope',
-                        options: [{label: 'Current Execution', value: 'CURRENT_EXECUTION'}],
-                        type: 'STRING',
-                    } as unknown as PropertyAllType,
-                }),
-            {wrapper}
-        );
-
-        expect(result.current.mentionInput).toBe(false);
-
-        act(() => result.current.handleInputTypeSwitchButtonClick());
-
-        expect(result.current.mentionInput).toBe(true);
-        expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({value: null}));
-
-        const {successCallback} = (saveProperty as unknown as Mock).mock.calls[0][0];
-
-        act(() => successCallback());
-
-        expect(result.current.mentionInput).toBe(true);
+        expect(result.current.mentionInputValue).toBe('');
+        expect(result.current.propertyParameterValue).toBe('');
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: null}));
     });
 });
