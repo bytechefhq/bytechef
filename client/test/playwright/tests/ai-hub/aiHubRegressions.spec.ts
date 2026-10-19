@@ -1114,16 +1114,16 @@ test.describe('AI Hub regressions', () => {
             let hubRunSettled: Promise<unknown> = Promise.resolve();
 
             await test.step('Stop the run after the failure', async () => {
-                await aiHubPage.send('Build a Slack workflow');
-
-                await expect(page.getByText('That did not work.')).toBeVisible();
-
                 const isHubRunRequest = (request: Request) => AI_HUB_CHAT_URL.test(request.url());
 
                 hubRunSettled = Promise.race([
                     page.waitForEvent('requestfailed', isHubRunRequest),
                     page.waitForEvent('requestfinished', isHubRunRequest),
                 ]).catch(() => undefined);
+
+                await aiHubPage.send('Build a Slack workflow');
+
+                await expect(page.getByText('That did not work.')).toBeVisible();
 
                 await aiHubPage.stopGeneratingButton.click();
 
