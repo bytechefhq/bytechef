@@ -43,6 +43,18 @@ interface RestProbeI {
     path: (workspace: RbacWorkspaceI, resources: ResourcesI) => string;
 }
 
+interface WorkflowExecutionTaskExecutionI {
+    id: string;
+    input?: Record<string, unknown> | null;
+    output?: unknown;
+}
+
+interface WorkflowExecutionJobI {
+    outputs?: Record<string, unknown> | null;
+    status: string;
+    taskExecutions: WorkflowExecutionTaskExecutionI[];
+}
+
 interface GateCaseI {
     allowed?: CallerType[];
     denied: CallerType[];
@@ -185,6 +197,16 @@ const GATE_CASES: GateCaseI[] = [
         module: 'Execution',
         name: 'read a run (EXECUTION_VIEW)',
         rest: {method: 'GET', path: (workspace, resources) => `${INTERNAL}/workflow-executions/${resources.jobId}`},
+    },
+    {
+        allowed: ['EDITOR'],
+        denied: ['VIEWER', 'OUTSIDER'],
+        graphQl: {
+            query: 'query JobFileLogs($jobId: ID!) { jobFileLogs(jobId: $jobId) { totalElements } }',
+            variables: (workspace, resources) => ({jobId: String(resources.jobId)}),
+        },
+        module: 'Execution',
+        name: 'read the logs of a run (EXECUTION_DETAILS_VIEW)',
     },
     {
         denied: ['VIEWER'],
@@ -605,6 +627,60 @@ test.describe('Server-side permission gates', () => {
             resources,
             false
         );
+    });
+
+    test('Execution: a VIEWER reads a run without its step data, an EDITOR with it (EXECUTION_DETAILS_VIEW)', async ({
+        adminApi,
+    }) => {
+        let completedJob: WorkflowExecutionJobI | undefined;
+
+        await expect
+            .poll(
+                async () => {
+                    const workflowExecution = await internalApi<{job: WorkflowExecutionJobI}>(
+                        adminApi,
+                        'GET',
+                        `/workflow-executions/${resources.jobId}`
+                    );
+
+                    completedJob = workflowExecution.job;
+
+                    return completedJob.status;
+                },
+                {timeout: 30_000}
+            )
+            .toBe('COMPLETED');
+
+        const taskExecutionId = completedJob!.taskExecutions[0].id;
+
+        const viewerWorkflowExecution = await internalApi<{job: WorkflowExecutionJobI}>(
+            callers.VIEWER!,
+            'GET',
+            `/workflow-executions/${resources.jobId}`
+        );
+
+        expect(viewerWorkflowExecution.job.status).toBe('COMPLETED');
+        expect(viewerWorkflowExecution.job.taskExecutions.map((taskExecution) => taskExecution.id)).toContain(
+            taskExecutionId
+        );
+        expect(viewerWorkflowExecution.job.outputs ?? null).toBeNull();
+
+        const viewerTaskExecution = await internalApi<WorkflowExecutionTaskExecutionI>(
+            callers.VIEWER!,
+            'GET',
+            `/workflow-executions/${resources.jobId}/task-executions/${taskExecutionId}`
+        );
+
+        expect(viewerTaskExecution.input ?? null).toBeNull();
+        expect(viewerTaskExecution.output ?? null).toBeNull();
+
+        const editorTaskExecution = await internalApi<WorkflowExecutionTaskExecutionI>(
+            callers.EDITOR!,
+            'GET',
+            `/workflow-executions/${resources.jobId}/task-executions/${taskExecutionId}`
+        );
+
+        expect(editorTaskExecution.output).toMatchObject({String: 'foo'});
     });
 
     for (const tenantAdminCase of TENANT_ADMIN_CASES) {
