@@ -9,9 +9,13 @@ package com.bytechef.ee.ai.hub.memory;
 
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.DefaultSessionService;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
@@ -25,6 +29,8 @@ import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 public class AiHubSessionMemory implements AutoCloseable {
 
     public static final String SESSION_USER_ID = "ai-hub";
+
+    public static final String USER_MESSAGE_ID_PARAM = "ai_hub_user_message_id";
 
     private static final Logger log = LoggerFactory.getLogger(AiHubSessionMemory.class);
 
@@ -45,7 +51,31 @@ public class AiHubSessionMemory implements AutoCloseable {
         return SessionMemoryAdvisor.builder(sessionService)
             .defaultUserId(SESSION_USER_ID)
             .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .requestEventIdGenerator(AiHubSessionMemory::requestEventId)
             .build();
+    }
+
+    static String requestEventId(ChatClientRequest request, Message message) {
+        if (message.getMessageType() == MessageType.USER
+            && request.context()
+                .get(USER_MESSAGE_ID_PARAM) instanceof String userMessageId
+            && isUuid(userMessageId)) {
+
+            return userMessageId;
+        }
+
+        return UUID.randomUUID()
+            .toString();
+    }
+
+    private static boolean isUuid(String value) {
+        try {
+            return UUID.fromString(value)
+                .toString()
+                .equals(value);
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
     }
 
     public AiHubTurnEndingToolResultAdvisor createTurnEndingToolResultAdvisor() {

@@ -25,6 +25,7 @@ import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.OptionalInt;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,12 +168,15 @@ public class AiHubChatGraphQlController {
     }
 
     @MutationMapping
-    public int truncateAiHubChatMessages(
-        @Argument long workspaceId, @Argument long id, @Argument int fromMessageIndex) {
+    public @Nullable Integer truncateAiHubChatMessages(
+        @Argument long workspaceId, @Argument long id, @Argument String messageId, @Argument boolean keepMessage) {
 
         AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
 
-        return chatService.truncateMessagesFrom(id, workspaceId, currentUserId(), fromMessageIndex);
+        OptionalInt deletedEventCount = chatService.truncateMessages(
+            id, workspaceId, currentUserId(), messageId, keepMessage);
+
+        return deletedEventCount.isPresent() ? deletedEventCount.getAsInt() : null;
     }
 
     @MutationMapping
