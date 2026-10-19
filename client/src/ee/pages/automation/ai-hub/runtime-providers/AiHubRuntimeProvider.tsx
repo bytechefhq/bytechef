@@ -18,7 +18,12 @@ import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalResolutionContext';
-import {RUN_ERROR_CODE_ACCESS_DENIED, toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
+import {
+    RUN_ERROR_CODE_ACCESS_DENIED,
+    RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
+    RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED,
+    toRunErrorData,
+} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useAiChatRetryableErrorStore';
 import {
@@ -101,31 +106,36 @@ const validateOpenWorkflowTabResult = (raw: unknown): OpenWorkflowTabResultType 
  * first {@code {}.
  */
 export function isTurnInFlightError(source: {message?: string; payload?: unknown} | null | undefined): boolean {
+    return readTurnErrorReason(source) === 'TURN_IN_FLIGHT';
+}
+
+function readTurnErrorReason(source: {message?: unknown; payload?: unknown} | null | undefined): string | undefined {
     if (!source) {
-        return false;
+        return undefined;
     }
 
-    const isTurnInFlightBody = (body: unknown) =>
-        body != null && typeof body === 'object' && (body as {error?: unknown}).error === 'TURN_IN_FLIGHT';
+    const readReason = (body: unknown) => {
+        const reason = body != null && typeof body === 'object' ? (body as {error?: unknown}).error : undefined;
 
-    if (isTurnInFlightBody(source.payload)) {
-        return true;
-    }
+        return typeof reason === 'string' ? reason : undefined;
+    };
 
-    if (typeof source.message !== 'string') {
-        return false;
+    const payloadReason = readReason(source.payload);
+
+    if (payloadReason !== undefined || typeof source.message !== 'string') {
+        return payloadReason;
     }
 
     const jsonStart = source.message.indexOf('{');
 
     if (jsonStart < 0) {
-        return false;
+        return undefined;
     }
 
     try {
-        return isTurnInFlightBody(JSON.parse(source.message.slice(jsonStart)));
+        return readReason(JSON.parse(source.message.slice(jsonStart)));
     } catch {
-        return false;
+        return undefined;
     }
 }
 
@@ -139,6 +149,20 @@ export function isForbiddenTurnError(source: {message?: unknown; status?: unknow
     }
 
     return source.status === 403 || (typeof source.message === 'string' && /^HTTP 403\b/.test(source.message));
+}
+
+const FORBIDDEN_TURN_RUN_ERROR_CODES: Record<string, string> = {
+    'AiHubChat is not accessible to the current user': RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
+    'Workspace is not accessible to the current user': RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED,
+};
+
+/** The run error code for a 403 turn refusal, chosen by the reason in the server's {@code {"error": ...}} body. */
+export function getForbiddenTurnRunErrorCode(
+    source: {message?: unknown; payload?: unknown; status?: unknown} | null | undefined
+): string {
+    const reason = readTurnErrorReason(source);
+
+    return (reason !== undefined && FORBIDDEN_TURN_RUN_ERROR_CODES[reason]) || RUN_ERROR_CODE_ACCESS_DENIED;
 }
 
 /** Whether a resolve mutation failed because the approval can no longer be decided, so the server answered CONFLICT. */
@@ -1080,7 +1104,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 if (useAiHubStore.getState().chatId === chatId) {
                     addMessage({
-                        content: [{data: toRunErrorData({code: RUN_ERROR_CODE_ACCESS_DENIED}), type: 'data-run-error'}],
+                        content: [
+                            {
+                                data: toRunErrorData({
+                                    code: getForbiddenTurnRunErrorCode(
+                                        error as {message?: unknown; payload?: unknown; status?: unknown}
+                                    ),
+                                }),
+                                type: 'data-run-error',
+                            },
+                        ],
                         role: 'assistant',
                     });
                 }
