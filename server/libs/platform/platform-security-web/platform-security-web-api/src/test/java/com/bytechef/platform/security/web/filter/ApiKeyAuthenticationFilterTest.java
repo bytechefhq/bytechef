@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,20 @@ class ApiKeyAuthenticationFilterTest {
         filter.doFilter(request, response, filterChain);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(filterChain.getRequest()).isNull();
+    }
+
+    @Test
+    void testDoFilterRespondsForbiddenWithServerDisabledBodyWhenTheServerIsDisabled() throws Exception {
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new McpServerDisabledException(McpServerDisabledException.MCP_SERVER_MESSAGE));
+
+        filter.doFilter(request, response, filterChain);
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
+        assertThat(response.getContentAsString()).contains("\"error\":\"server_disabled\"")
+            .contains(McpServerDisabledException.MCP_SERVER_MESSAGE);
+        assertThat(response.getHeader("WWW-Authenticate")).isNull();
         assertThat(filterChain.getRequest()).isNull();
     }
 

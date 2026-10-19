@@ -244,15 +244,18 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     }
 
     @Test
-    void testCanonicalEndpointRejectsJwtWhenTenantHasNoManagementServer() throws Exception {
+    void testCanonicalEndpointInitializesWithSelfIssuerJwtWhenTenantHasNoManagementServerProperty() {
         when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
             .thenReturn(Optional.empty());
 
         String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
 
-        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(CANONICAL_ENDPOINT_PATH, token)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+        }
     }
 
     @Test

@@ -85,6 +85,24 @@ class TenantAwareApiKeyAuthenticationFilterTest {
     }
 
     @Test
+    void testDisabledServerAnswersForbiddenWithServerDisabledBody() throws Exception {
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new McpServerDisabledException(McpServerDisabledException.MCP_SERVER_MESSAGE));
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+        MockFilterChain mockFilterChain = new MockFilterChain();
+
+        tenantAwareApiKeyAuthenticationFilter.doFilter(getMcpRequest(), mockHttpServletResponse, mockFilterChain);
+
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(403);
+        assertThat(mockHttpServletResponse.getContentType()).startsWith("application/json");
+        assertThat(mockHttpServletResponse.getContentAsString()).isEqualTo(
+            "{\"error\":\"server_disabled\",\"message\":\"" + McpServerDisabledException.MCP_SERVER_MESSAGE + "\"}");
+        assertThat(mockHttpServletResponse.getHeader("WWW-Authenticate")).isNull();
+        assertThat(mockFilterChain.getRequest()).isNull();
+    }
+
+    @Test
     void testRequestWithoutBearerTokenRunsInsidePathTenant() throws Exception {
         recordAuthenticationAndAuthenticateAnonymously();
 

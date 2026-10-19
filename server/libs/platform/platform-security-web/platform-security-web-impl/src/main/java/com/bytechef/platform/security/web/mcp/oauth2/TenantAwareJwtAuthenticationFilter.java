@@ -18,6 +18,7 @@ package com.bytechef.platform.security.web.mcp.oauth2;
 
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.user.domain.Authority;
@@ -153,10 +154,16 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!mcpServerSecretVerified) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+        String mcpServerDisabledMessage = null;
 
-            return;
+        if (!mcpServerSecretVerified) {
+            mcpServerDisabledMessage = getMcpServerDisabledMessage(request, urlTenantId);
+
+            if (mcpServerDisabledMessage == null) {
+                reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+
+                return;
+            }
         }
 
         if (staticIssuer.isEmpty()) {
@@ -169,6 +176,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), urlTenantId);
 
         if (mcpJwtIdentity == null) {
+            return;
+        }
+
+        if (mcpServerDisabledMessage != null) {
+            new McpServerDisabledException(mcpServerDisabledMessage).writeResponse(response);
+
             return;
         }
 
@@ -288,6 +301,25 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return claimTenantId;
+    }
+
+    @Nullable
+    private String getMcpServerDisabledMessage(HttpServletRequest request, String urlTenantId) {
+        try {
+            return TenantContext.callWithTenantId(
+                urlTenantId,
+                () -> mcpServerSecretVerifiers.stream()
+                    .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.getMcpServerDisabledMessage(request))
+                    .flatMap(Optional::stream)
+                    .findFirst()
+                    .orElse(null));
+        } catch (RuntimeException runtimeException) {
+            log.error(
+                "MCP server disabled check failed for {} in tenant {}", request.getServletPath(), urlTenantId,
+                runtimeException);
+
+            return null;
+        }
     }
 
     private boolean isMcpServerSecretVerified(HttpServletRequest request, String urlTenantId) {

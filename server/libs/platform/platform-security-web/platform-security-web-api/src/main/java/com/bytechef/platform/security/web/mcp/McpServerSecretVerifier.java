@@ -26,4 +26,8 @@ import java.util.Optional;
 public interface McpServerSecretVerifier {
 
     Optional<Boolean> verifyMcpServerSecret(HttpServletRequest request);
+
+    default Optional<String> getMcpServerDisabledMessage(HttpServletRequest request) {
+        return Optional.empty();
+    }
 }
