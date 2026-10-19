@@ -218,7 +218,7 @@ public class SpringAIAgent extends LocalAgent {
 
             this.emitEvent(runErrorEvent, subscriber);
         } finally {
-            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), input.state(), this, input));
         }
     }
 
@@ -391,7 +391,7 @@ public class SpringAIAgent extends LocalAgent {
         subscriber.onNewMessage(assistantMessage);
 
         this.emitEvent(runFinishedEvent(input.threadId(), input.runId()), subscriber);
-        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), input.state(), this, input));
     }
 
     /**
