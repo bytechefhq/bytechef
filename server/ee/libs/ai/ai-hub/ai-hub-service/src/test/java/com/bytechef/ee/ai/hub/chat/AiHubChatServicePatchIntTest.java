@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,17 +17,20 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.AiHubIntTestConfiguration;
+import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -153,7 +157,155 @@ public class AiHubChatServicePatchIntTest {
         assertThat(patchedChat.getStatus()).isEqualTo(AiHubChatStatus.ARCHIVED);
     }
 
-    private void runSecondWhileFirstHoldsTheRow(Runnable firstWrite, Runnable secondWrite) throws Exception {
+    @Test
+    public void testOverlappingDeleteAndArchiveKeepTheChatDeleted() throws Exception {
+        long chatId = saveChat();
+
+        Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(secondWriteFailure).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    public void testTitleGenerationRacingADeleteDoesNotWriteTheTitle() throws Exception {
+        long chatId = saveChat();
+
+        Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch("Generated title", null, null, null)));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(chat.getTitle()).isNull();
+        assertThat(chat.isAutoTitled()).isTrue();
+        assertThat(secondWriteFailure).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    public void testPreviewPatchOverlappingADeleteDoesNotWriteThePreview() throws Exception {
+        long chatId = saveChat();
+
+        Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", null, null)));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(chat.getLastPreview()).isNull();
+        assertThat(secondWriteFailure).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    public void testMessageCountPatchOverlappingADeleteDoesNotWriteTheCount() throws Exception {
+        long chatId = saveChat();
+
+        Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, 7, null)));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(chat.getMessageCount()).isZero();
+        assertThat(secondWriteFailure).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    public void testCombinedPatchOverlappingADeleteWritesNoField() throws Exception {
+        long chatId = saveChat();
+
+        Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID,
+                new AiHubChatPatch("Renamed", "Latest preview", 3, AiHubChatStatus.ARCHIVED)));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(chat.getTitle()).isNull();
+        assertThat(chat.getLastPreview()).isNull();
+        assertThat(chat.getMessageCount()).isZero();
+        assertThat(secondWriteFailure).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    public void testRenamingADeletedChatIsRejected() {
+        long chatId = saveChat();
+
+        transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)));
+
+        assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch("Renamed", null, null, null))))
+                    .isInstanceOf(ConflictException.class);
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getTitle()).isNull();
+    }
+
+    @Test
+    public void testPatchingADeletedChatToDeletedAgainSucceeds() {
+        long chatId = saveChat();
+
+        AiHubChatPatch deletePatch = new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED);
+
+        transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, deletePatch));
+
+        AiHubChat patchedChat = transactionTemplate.execute(
+            transactionStatus -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, deletePatch));
+
+        assertThat(patchedChat).isNotNull();
+        assertThat(patchedChat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+    }
+
+    @Test
+    public void testArchivingADeletedChatIsRejected() {
+        long chatId = saveChat();
+
+        transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)));
+
+        assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(
+                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED))))
+                    .isInstanceOf(ConflictException.class);
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+    }
+
+    private @Nullable Throwable runSecondWhileFirstHoldsTheRow(Runnable firstWrite, Runnable secondWrite)
+        throws Exception {
+
         CountDownLatch firstWrittenLatch = new CountDownLatch(1);
         CountDownLatch releaseFirstLatch = new CountDownLatch(1);
 
@@ -176,7 +328,14 @@ public class AiHubChatServicePatchIntTest {
         releaseFirstLatch.countDown();
 
         firstFuture.get(WAIT_TIMEOUT.toSeconds(), TimeUnit.SECONDS);
-        secondFuture.get(WAIT_TIMEOUT.toSeconds(), TimeUnit.SECONDS);
+
+        try {
+            secondFuture.get(WAIT_TIMEOUT.toSeconds(), TimeUnit.SECONDS);
+        } catch (ExecutionException executionException) {
+            return executionException.getCause();
+        }
+
+        return null;
     }
 
     private void awaitTransactionBlockedOnRowLock() throws InterruptedException {
