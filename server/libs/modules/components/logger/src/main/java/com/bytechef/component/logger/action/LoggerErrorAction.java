@@ -24,6 +24,7 @@ import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.logger.util.LoggerUtils;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +42,7 @@ public class LoggerErrorAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.error(text == null ? "" : String.valueOf(text)));
+        context.log(log -> log.error(LoggerUtils.toMessage(text)));
 
         return null;
     }
