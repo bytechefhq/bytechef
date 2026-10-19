@@ -56,9 +56,9 @@ public interface AiHubToolApprovalService {
 
     /**
      * Records {@code toolCallId}, the id of the model's tool call the approval holds, unless the approval already has
-     * one. An unknown approval id is ignored.
+     * one. An unknown approval id, or an approval of a thread other than {@code threadId}, is ignored.
      */
-    void recordToolCallId(long approvalId, String toolCallId);
+    void recordToolCallId(String threadId, long approvalId, String toolCallId);
 
     /**
      * Deletes every approval recorded for the chat. Called from the chat's own delete path, since the approval table

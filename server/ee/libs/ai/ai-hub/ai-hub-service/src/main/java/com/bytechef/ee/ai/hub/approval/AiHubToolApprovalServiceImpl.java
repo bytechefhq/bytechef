@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnAiHub
 @Transactional
 public class AiHubToolApprovalServiceImpl implements AiHubToolApprovalService {
+
+    private static final Logger log = LoggerFactory.getLogger(AiHubToolApprovalServiceImpl.class);
 
     private static final Duration DEFAULT_EXPIRY = Duration.ofHours(24);
 
@@ -101,10 +105,18 @@ public class AiHubToolApprovalServiceImpl implements AiHubToolApprovalService {
     }
 
     @Override
-    public void recordToolCallId(long approvalId, String toolCallId) {
+    public void recordToolCallId(String threadId, long approvalId, String toolCallId) {
         repository.findById(approvalId)
             .filter(approval -> approval.getToolCallId() == null)
             .ifPresent(approval -> {
+                if (!threadId.equals(approval.getThreadId())) {
+                    log.debug(
+                        "Ignoring tool call {} for approval {}, which belongs to another thread than {}", toolCallId,
+                        approvalId, threadId);
+
+                    return;
+                }
+
                 approval.setToolCallId(toolCallId);
 
                 repository.save(approval);

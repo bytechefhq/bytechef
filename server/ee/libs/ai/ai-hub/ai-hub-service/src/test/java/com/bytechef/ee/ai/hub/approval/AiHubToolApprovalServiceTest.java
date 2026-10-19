@@ -105,11 +105,24 @@ class AiHubToolApprovalServiceTest {
 
         when(repository.findById(5L)).thenReturn(Optional.of(approval));
 
-        service.recordToolCallId(5L, "call-1");
+        service.recordToolCallId("thread-1", 5L, "call-1");
 
         assertThat(approval.getToolCallId()).isEqualTo("call-1");
 
         verify(repository).save(approval);
+    }
+
+    @Test
+    void testRecordToolCallIdIgnoresAnApprovalOfAnotherThread() {
+        AiHubToolApproval approval = pendingApproval();
+
+        when(repository.findById(5L)).thenReturn(Optional.of(approval));
+
+        service.recordToolCallId("thread-other", 5L, "call-1");
+
+        assertThat(approval.getToolCallId()).isNull();
+
+        verify(repository, never()).save(any());
     }
 
     @Test
@@ -120,7 +133,7 @@ class AiHubToolApprovalServiceTest {
 
         when(repository.findById(5L)).thenReturn(Optional.of(approval));
 
-        service.recordToolCallId(5L, "call-2");
+        service.recordToolCallId("thread-1", 5L, "call-2");
 
         assertThat(approval.getToolCallId()).isEqualTo("call-1");
 
