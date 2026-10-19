@@ -1,6 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {
+    type ClusterElementCopilotParametersI,
+    Source,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {NodeDataType} from '@/shared/types';
 import {act, render, screen} from '@testing-library/react';
@@ -336,7 +340,9 @@ describe('ClusterFrameShell', () => {
 
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
         expect(useCopilotStore.getState().context.source).toBe(Source.CLUSTER_ELEMENT);
-        expect(useCopilotStore.getState().context.parameters.taskName).toBe('aiAgent_1');
+        expect((useCopilotStore.getState().context.parameters as ClusterElementCopilotParametersI).taskName).toBe(
+            'aiAgent_1'
+        );
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData?.workflowNodeName).toBe('aiAgent_1');
     });
 });
