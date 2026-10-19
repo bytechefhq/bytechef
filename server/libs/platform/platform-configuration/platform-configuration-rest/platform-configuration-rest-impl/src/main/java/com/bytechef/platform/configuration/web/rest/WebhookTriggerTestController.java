@@ -27,6 +27,8 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,17 +58,20 @@ public class WebhookTriggerTestController {
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
     private final TempFileStorage editorTempFileStorage;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerTestController(
         EditorTempFileStorage editorTempFileStorage, WebhookTriggerTestFacade webhookTriggerTestFacade,
-        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
+        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         this.editorTempFileStorage = editorTempFileStorage;
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 
     /**
@@ -86,6 +92,11 @@ public class WebhookTriggerTestController {
         @PathVariable String id, @PathVariable long environmentId, HttpServletRequest httpServletRequest) {
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId())) {
+            return ResponseEntity.status(HttpStatus.GONE)
+                .build();
+        }
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;

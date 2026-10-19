@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -33,15 +34,19 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressWarnings("unchecked")
 class WebhookTriggerTestControllerTest {
 
     private static final long ENVIRONMENT_ID = 0L;
@@ -50,6 +55,7 @@ class WebhookTriggerTestControllerTest {
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, -1L, "workflow-uuid", "trigger_1");
 
+    private TenantDeletionService tenantDeletionService;
     private WebhookTriggerTestController webhookTriggerTestController;
     private WebhookTriggerTestFacade webhookTriggerTestFacade;
     private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
@@ -62,8 +68,34 @@ class WebhookTriggerTestControllerTest {
         when(webhookTriggerTestFacade.getWebhookTriggerFlags(any())).thenReturn(VALIDATION_FLAGS);
         when(webhookTriggerTestFacade.isWorkflowEnabled(any())).thenReturn(true);
 
+        tenantDeletionService = mock(TenantDeletionService.class);
+
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider = mock(ObjectProvider.class);
+
+        when(tenantDeletionServiceProvider.getIfAvailable()).thenReturn(tenantDeletionService);
+
         webhookTriggerTestController = new WebhookTriggerTestController(
-            mock(EditorTempFileStorage.class), webhookTriggerTestFacade, workflowNodeTestOutputFacade);
+            mock(EditorTempFileStorage.class), webhookTriggerTestFacade, workflowNodeTestOutputFacade,
+            tenantDeletionServiceProvider);
+    }
+
+    @Test
+    void testInactiveTenantReturns410AndDoesNotExecute() {
+        WorkflowExecutionId inactiveWorkflowExecutionId = TenantContext.callWithTenantId(
+            "000001", () -> WorkflowExecutionId.of(PlatformType.AUTOMATION, -1L, "workflow-uuid", "trigger_1"));
+
+        when(tenantDeletionService.isInactive("000001")).thenReturn(true);
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(
+            "POST", "/webhooks/" + inactiveWorkflowExecutionId + "/test/environments/" + ENVIRONMENT_ID);
+
+        ResponseEntity<?> responseEntity = webhookTriggerTestController.executeWorkflow(
+            inactiveWorkflowExecutionId.toString(), ENVIRONMENT_ID, mockHttpServletRequest);
+
+        assertThat(responseEntity.getStatusCode()
+            .value()).isEqualTo(410);
+
+        verifyNoInteractions(webhookTriggerTestFacade, workflowNodeTestOutputFacade);
     }
 
     @Test
