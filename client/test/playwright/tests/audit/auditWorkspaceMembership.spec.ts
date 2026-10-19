@@ -4,8 +4,8 @@ import {workspaceRolesTest as test} from '../../fixtures/workspaceRoles';
 import {
     type AuditEventI,
     auditEventData,
-    auditEventRows,
     filterAuditEvents,
+    openAuditEventRowWithDataEntry,
     openAuditEventsPage,
     queryAuditEvents,
     selectAuditEventType,
@@ -90,20 +90,15 @@ async function expectRowOnAuditEventsPage(page: Page, eventType: string, workspa
     await openAuditEventsPage(page);
 
     await selectAuditEventType(page, eventType);
-    await filterAuditEvents(page, {dataSearch: String(workspace.id), principal: 'admin'});
+    await filterAuditEvents(page, {principal: 'admin'});
 
-    const firstRow = auditEventRows(page).first();
-
-    await expect(firstRow).toContainText(eventType);
-    await expect(firstRow).toContainText('admin');
-    await expect(firstRow).toContainText(outcome);
-
-    await firstRow.click();
+    await openAuditEventRowWithDataEntry(page, 'workspaceId', String(workspace.id));
 
     const dialog = page.getByRole('dialog');
 
-    await expect(dialog.getByText('workspaceId', {exact: true})).toBeVisible();
-    await expect(dialog.getByText(String(workspace.id), {exact: true}).first()).toBeVisible();
+    await expect(dialog).toContainText(eventType);
+    await expect(dialog).toContainText('admin');
+    await expect(dialog).toContainText(outcome);
 
     await page.keyboard.press('Escape');
 }
