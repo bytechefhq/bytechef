@@ -5,12 +5,17 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import McpComponentDialog from '../McpComponentDialog';
 
 const hoisted = vi.hoisted(() => ({
+    enabledFeatureFlags: ['ff-6383'],
     handleOpenChange: vi.fn(),
     handleSave: vi.fn(),
     state: {
         currentStep: 'components' as 'components' | 'tools',
         selectedTools: [] as unknown[],
     },
+}));
+
+vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
+    useFeatureFlagsStore: () => (featureFlag: string) => hoisted.enabledFeatureFlags.includes(featureFlag),
 }));
 
 vi.mock('../hooks/useMcpComponentDialog', () => ({
@@ -46,6 +51,7 @@ beforeEach(() => {
     windowResizeObserver();
     hoisted.state.currentStep = 'components';
     hoisted.state.selectedTools = [];
+    hoisted.enabledFeatureFlags = ['ff-6383'];
 });
 
 afterEach(() => {
@@ -96,6 +102,14 @@ describe('McpComponentDialog', () => {
             render(<McpComponentDialog mcpServerId="1" open />);
 
             expect(screen.getByLabelText('Required Authorities')).toHaveTextContent('Select authorities');
+        });
+
+        it('should hide the required authorities field while ff-6383 is off', () => {
+            hoisted.enabledFeatureFlags = [];
+
+            render(<McpComponentDialog mcpServerId="1" open />);
+
+            expect(screen.queryByText('Required Authorities')).not.toBeInTheDocument();
         });
 
         it('should offer Back when adding a new component', () => {
