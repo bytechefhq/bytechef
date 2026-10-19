@@ -125,6 +125,7 @@ class AiHubTurnToolDispatchTest {
         AiHubChatService chatService = mock(AiHubChatService.class);
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
         AiHubChatAccessPolicy accessPolicy = mock(AiHubChatAccessPolicy.class);
 
@@ -296,7 +297,7 @@ class AiHubTurnToolDispatchTest {
         chat.setThreadId(THREAD_ID);
         chat.setWorkspaceId(WORKSPACE_ID);
 
-        when(fixtures.chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(fixtures.chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
         when(fixtures.policy.decide(WORKSPACE_ID)).thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()));
         when(fixtures.approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
         when(fixtures.approvalService.createPending(any())).thenAnswer(invocation -> {

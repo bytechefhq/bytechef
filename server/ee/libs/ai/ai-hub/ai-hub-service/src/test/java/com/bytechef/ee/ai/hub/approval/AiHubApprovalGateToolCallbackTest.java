@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.approval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,10 +19,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
+import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.NonEmptyToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicyImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatServiceImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
+import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -125,7 +131,7 @@ class AiHubApprovalGateToolCallbackTest {
     void testGatedCallForADeletedChatIsRefused() {
         ToolCallback wrapped = gate(Set.of(), Set.of());
 
-        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.empty());
 
         String result = wrapped.call("{}", toolContext());
 
@@ -136,27 +142,44 @@ class AiHubApprovalGateToolCallbackTest {
     }
 
     @Test
-    void testGatedCallForAChatInDeletedStatusIsRefused() {
-        ToolCallback wrapped = gate(Set.of(), Set.of());
+    void testGatedCallForAChatInDeletedStatusOrBeingDeletedIsRefusedWithoutAnApproval() {
+        AiHubChatRepository chatRepository = mock(AiHubChatRepository.class);
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+
+        @SuppressWarnings("unchecked")
+        AiHubChatService activeChatService = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, mock(ObjectProvider.class), registry);
 
         AiHubChat chat = new AiHubChat(USER_ID);
 
         chat.setId(CHAT_ID);
         chat.setThreadId(THREAD_ID);
-        chat.setStatus(AiHubChatStatus.DELETED);
+        chat.setWorkspaceId(WORKSPACE_ID);
 
-        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(chatRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        AiHubToolApprovalPolicy policy = workspaceId -> new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of());
+        ToolCallback wrapped = new AiHubApprovalGateToolCallback(delegate, policy, approvalService, activeChatService);
+
+        registry.retireThread(THREAD_ID);
+
+        assertThat(wrapped.call("{}", toolContext())).contains("the tool was not executed");
+
+        registry.reinstateThread(THREAD_ID);
+
+        chat.setStatus(AiHubChatStatus.DELETED);
 
         assertThat(wrapped.call("{}", toolContext())).contains("the tool was not executed");
         verify(delegate, never()).call(anyString(), any());
         verify(approvalService, never()).createPending(any());
+        verify(approvalService, never()).findPending(anyLong());
     }
 
     @Test
     void testUngatedCallForADeletedChatPassesThrough() {
         ToolCallback wrapped = gate(Set.of(), Set.of("deleteProject"));
 
-        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.empty());
 
         assertThat(wrapped.call("{}", toolContext())).isEqualTo("{\"deleted\":true}");
     }
@@ -240,7 +263,7 @@ class AiHubApprovalGateToolCallbackTest {
         chat.setWorkspaceId(WORKSPACE_ID);
         chat.setThreadId(THREAD_ID);
 
-        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
         AiHubToolApprovalPolicy policy = workspaceId -> new AiHubToolApprovalPolicy.Decision(required, exempt);
 

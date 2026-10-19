@@ -12,7 +12,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
-import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,8 +33,8 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  * <p>
  * A call with no resolvable {@link AgentToolInvocationContext} (missing thread id, workspace id, or user id) passes
  * straight through to {@code delegate}. A gated call whose context is complete but whose {@link AiHubChat} no longer
- * exists, or is in {@code DELETED} status, is refused: the hub persists the chat before any run starts, so a missing
- * chat means it was deleted.
+ * exists, is in {@code DELETED} status or is being deleted (its thread is retired) is refused without recording an
+ * approval: the hub persists the chat before any run starts, so a missing chat means it was deleted.
  * </p>
  *
  * <p>
@@ -120,8 +119,7 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
             return delegate.call(toolInput, toolContext);
         }
 
-        Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId)
-            .filter(foundChat -> foundChat.getStatus() != AiHubChatStatus.DELETED);
+        Optional<AiHubChat> chatOptional = chatService.findActiveByThreadId(threadId);
 
         if (chatOptional.isEmpty()) {
             log.warn("Refusing gated tool={} for thread={}: the chat no longer exists", toolName, threadId);
