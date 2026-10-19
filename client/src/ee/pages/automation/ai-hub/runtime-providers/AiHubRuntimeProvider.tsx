@@ -289,9 +289,13 @@ export const terminateOrphanRunningToolCalls = (chatId: string | undefined): voi
 };
 
 /**
- * Builds an AG-UI subscriber that streams text into the assistant message, records every tool call in the per-tool-
- * call store, opens workflow tabs, and turns interactive tool results into data parts. Server text is not split at
- * tool calls; the whole turn's text lands in one assistant message.
+ * Builds an AG-UI subscriber that streams text into assistant messages, records every tool call in the per-tool-
+ * call store, opens workflow tabs, and turns interactive tool results into data parts. A text message that follows
+ * earlier text or a tool call opens a new assistant message, and each tool call attaches to the assistant message
+ * current at its start. A tool error, a failed workflow tab open or a malformed interactive payload raises the retry
+ * banner only when the run finishes without a later successful call of a tool with the same name; any such success counts as the recovery, whatever its arguments, since a model
+ * retrying a failed call usually changes them. A run that fails shows its run error bubble instead of the banner, and a
+ * user Stop shows neither.
  */
 export const buildAiHubSubscriber = ({
     addMessage,
@@ -305,6 +309,7 @@ export const buildAiHubSubscriber = ({
     turnAbortSignal,
 }: BuildSubscriberDepsI): AgentSubscriber => {
     const toolCallNamesById = new Map<string, string>();
+    const unrecoveredToolFailures = new Map<string, string>();
 
     let currentAssistantMessageIndex = assistantMessageIndex;
     let currentAssistantMessageHasOutput = false;
@@ -312,29 +317,38 @@ export const buildAiHubSubscriber = ({
 
     const isStaleChat = () => subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId;
 
-    const surfaceToolFailure = (toolName: string, reason: string, rawContent?: unknown) => {
-        if (rawContent !== undefined) {
-            console.warn(`[AiHub] ${toolName}: ${reason}`, rawContent);
-        }
+    const recordToolFailure = (toolName: string, reason: string) => {
+        unrecoveredToolFailures.delete(toolName);
+        unrecoveredToolFailures.set(toolName, reason);
+    };
 
-        aiChatRetryableErrorStore.getState().setError({
-            errorMessage: reason,
-            lastUserMessage: getLastUserMessage(),
-            toolName,
-        });
+    const surfaceUnrecoveredToolFailure = () => {
+        const lastUnrecoveredToolFailure = Array.from(unrecoveredToolFailures).pop();
+
+        unrecoveredToolFailures.clear();
+
+        if (lastUnrecoveredToolFailure && !isStaleChat()) {
+            aiChatRetryableErrorStore.getState().setError({
+                errorMessage: lastUnrecoveredToolFailure[1],
+                lastUserMessage: getLastUserMessage(),
+                toolName: lastUnrecoveredToolFailure[0],
+            });
+        }
     };
 
     const openWorkflowTab = (toolCallName: string, toolResultContent: string) => {
         const parsed = validateOpenWorkflowTabResult(parseJson<unknown>(toolResultContent, 'openWorkflowTab result'));
 
         if (parsed === null) {
-            surfaceToolFailure(toolCallName, 'unparseable result', toolResultContent);
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
 
             return;
         }
 
         if (!parsed.opened) {
-            surfaceToolFailure(toolCallName, parsed.error);
+            recordToolFailure(toolCallName, parsed.error);
 
             return;
         }
@@ -357,11 +371,7 @@ export const buildAiHubSubscriber = ({
         if (!dataPart.ok) {
             aiChatToolCallStore.getState().completeToolCall(toolCallId, {error: dataPart.errorMessage}, true);
 
-            aiChatRetryableErrorStore.getState().setError({
-                errorMessage: dataPart.errorMessage,
-                lastUserMessage: getLastUserMessage(),
-                toolName: dataPart.toolName,
-            });
+            recordToolFailure(dataPart.toolName, dataPart.errorMessage);
 
             return;
         }
@@ -403,6 +413,8 @@ export const buildAiHubSubscriber = ({
                 });
             }
 
+            unrecoveredToolFailures.clear();
+
             runLifecycle?.onSettle();
 
             terminateOrphanRunningToolCalls(subscriberChatId);
@@ -412,6 +424,8 @@ export const buildAiHubSubscriber = ({
             }
         },
         onRunFinishedEvent: () => {
+            surfaceUnrecoveredToolFailure();
+
             runLifecycle?.onSettle();
 
             terminateOrphanRunningToolCalls(subscriberChatId);
@@ -479,10 +493,12 @@ export const buildAiHubSubscriber = ({
                 );
 
             if (errorMessage !== null) {
-                surfaceToolFailure(toolCallName ?? 'unknown', errorMessage);
+                recordToolFailure(toolCallName ?? 'unknown', errorMessage);
 
                 return;
             }
+
+            unrecoveredToolFailures.delete(toolCallName ?? 'unknown');
 
             if (toolCallName !== undefined && WORKFLOW_MUTATING_TOOL_NAMES.has(toolCallName)) {
                 onWorkflowMutated?.(toolResultContent);
