@@ -2,13 +2,13 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
-import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {resolveRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/stores/useCopilotToolResultHandlerRegistry';
 import {findTurnRewindIndexes} from '@/shared/components/copilot/utils/findTurnRewindIndexes';
-import {AiProviderCatalogQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
+import {useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
@@ -28,43 +28,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
-};
-
-const isAvailableModel = (
-    providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'],
-    providerKey: string,
-    modelName: string
-): boolean => {
-    const provider = providerCatalog.find((candidate) => candidate?.key === providerKey);
-
-    if (provider == null || !provider.enabled) {
-        return false;
-    }
-
-    return provider.supportsModelById || provider.models.some((model) => model.name === modelName);
-};
-
-const resolvePersistedModel = (
-    workspaceId: number | null | undefined,
-    providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined
-): {model: string; provider: string} | null => {
-    if (workspaceId == null || providerCatalog == null) {
-        return null;
-    }
-
-    const lastUsedModel = readLastUsedModel(workspaceId);
-
-    if (lastUsedModel == null) {
-        return null;
-    }
-
-    if (!isAvailableModel(providerCatalog, lastUsedModel.provider, lastUsedModel.model)) {
-        writeLastUsedModel(workspaceId, null, null);
-
-        return null;
-    }
-
-    return lastUsedModel;
 };
 
 export function CopilotRuntimeProvider({
@@ -245,7 +208,7 @@ export function CopilotRuntimeProvider({
             const persistedModel =
                 selectedLlmProvider != null && selectedLlmModel != null
                     ? null
-                    : resolvePersistedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
+                    : resolveRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
 
             const userSelectedLlmProvider = selectedLlmProvider ?? persistedModel?.provider ?? null;
             const userSelectedLlmModel = selectedLlmModel ?? persistedModel?.model ?? null;

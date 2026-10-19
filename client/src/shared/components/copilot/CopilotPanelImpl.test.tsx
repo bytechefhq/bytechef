@@ -11,6 +11,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAiDefaultModelQuery: () => ({data: {aiDefaultModel: null}, isPending: false}),
+    useAiProviderCatalogQuery: () => ({data: undefined}),
 }));
 
 const wrapper = ({children}: {children: ReactNode}) => (
