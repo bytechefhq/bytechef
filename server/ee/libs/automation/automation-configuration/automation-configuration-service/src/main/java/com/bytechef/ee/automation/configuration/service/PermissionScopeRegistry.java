@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -47,9 +48,9 @@ public class PermissionScopeRegistry {
 
     private static final String PERMISSION_SCOPE_SUFFIX = "PermissionScope";
 
-    private final Set<String> allScopeNames;
+    private final Map<PermissionScopeSide, Set<String>> allScopeNamesBySide;
     private final List<BuiltInRoleDTO> builtInRoles;
-    private final Map<WorkspaceRole, Set<String>> roleScopeNames;
+    private final Map<PermissionScopeSide, Map<WorkspaceRole, Set<String>>> roleScopeNamesBySide;
     private final List<PermissionScopeGroupDTO> scopeGroups;
 
     @SuppressFBWarnings({
@@ -57,12 +58,18 @@ public class PermissionScopeRegistry {
     })
     public PermissionScopeRegistry(List<PermissionScopeProvider> permissionScopeProviders) {
         Map<String, WorkspaceRole> minimumRoleByScope = new HashMap<>();
+        Map<PermissionScopeSide, Map<String, List<PermissionScopeType>>> scopeTypesByGroupBySide =
+            new EnumMap<>(PermissionScopeSide.class);
+        Map<PermissionScopeSide, Set<String>> declaredScopeNamesBySide = new EnumMap<>(PermissionScopeSide.class);
 
-        // Sorted by module name, so the catalogue a role editor renders is stable across restarts. The scope set
-        // itself is assembled in a HashMap, whose iteration order is neither declaration order nor alphabetical.
-        Map<String, List<PermissionScopeType>> scopeTypesByGroup = new TreeMap<>();
+        for (PermissionScopeSide side : PermissionScopeSide.values()) {
+            scopeTypesByGroupBySide.put(side, new TreeMap<>());
+            declaredScopeNamesBySide.put(side, new LinkedHashSet<>());
+        }
 
         for (PermissionScopeProvider permissionScopeProvider : permissionScopeProviders) {
+            PermissionScopeSide side = permissionScopeProvider.side();
+
             for (ScopeDefinition scopeDefinition : permissionScopeProvider.scopeDefinitions()) {
                 PermissionScopeType permissionScopeType = scopeDefinition.scopeType();
 
@@ -76,7 +83,11 @@ public class PermissionScopeRegistry {
                             scopeDefinition.minimumRole());
                 }
 
-                if (existing == null) {
+                Set<String> declaredScopeNames = declaredScopeNamesBySide.get(side);
+
+                if (declaredScopeNames.add(permissionScopeType.name())) {
+                    Map<String, List<PermissionScopeType>> scopeTypesByGroup = scopeTypesByGroupBySide.get(side);
+
                     List<PermissionScopeType> groupScopeTypes = scopeTypesByGroup.computeIfAbsent(
                         getGroupName(permissionScopeType), groupName -> new ArrayList<>());
 
@@ -85,45 +96,56 @@ public class PermissionScopeRegistry {
             }
         }
 
-        List<PermissionScopeGroupDTO> permissionScopeGroups = new ArrayList<>();
+        Map<PermissionScopeSide, List<PermissionScopeGroupDTO>> scopeGroupsBySide =
+            new EnumMap<>(PermissionScopeSide.class);
+        Map<PermissionScopeSide, Set<String>> allScopeNamesBySide = new EnumMap<>(PermissionScopeSide.class);
+        Map<PermissionScopeSide, Map<WorkspaceRole, Set<String>>> roleScopeNamesBySide =
+            new EnumMap<>(PermissionScopeSide.class);
 
-        for (Map.Entry<String, List<PermissionScopeType>> entry : scopeTypesByGroup.entrySet()) {
-            List<PermissionScopeType> groupScopeTypes = entry.getValue();
+        for (PermissionScopeSide side : PermissionScopeSide.values()) {
+            List<PermissionScopeGroupDTO> permissionScopeGroups = new ArrayList<>();
 
-            // A provider declares its scopes as a Set, so the order they arrive in is not the order they were
-            // written. Ordinal restores the enum's own declaration order, which reads as an escalation.
-            groupScopeTypes.sort(Comparator.comparingInt(PermissionScopeRegistry::getOrdinal));
+            for (Map.Entry<String, List<PermissionScopeType>> entry : scopeTypesByGroupBySide.get(side)
+                .entrySet()) {
 
-            List<String> groupScopeNames = groupScopeTypes.stream()
-                .map(PermissionScopeType::name)
+                List<PermissionScopeType> groupScopeTypes = entry.getValue();
+
+                groupScopeTypes.sort(Comparator.comparingInt(PermissionScopeRegistry::getOrdinal));
+
+                List<String> groupScopeNames = groupScopeTypes.stream()
+                    .map(PermissionScopeType::name)
+                    .toList();
+
+                permissionScopeGroups.add(new PermissionScopeGroupDTO(entry.getKey(), groupScopeNames));
+            }
+
+            scopeGroupsBySide.put(side, Collections.unmodifiableList(permissionScopeGroups));
+
+            List<String> orderedScopeNames = permissionScopeGroups.stream()
+                .flatMap(permissionScopeGroup -> permissionScopeGroup.scopes()
+                    .stream())
                 .toList();
 
-            permissionScopeGroups.add(new PermissionScopeGroupDTO(entry.getKey(), groupScopeNames));
+            allScopeNamesBySide.put(side, Collections.unmodifiableSet(new LinkedHashSet<>(orderedScopeNames)));
+
+            EnumMap<WorkspaceRole, Set<String>> roleScopeNames = new EnumMap<>(WorkspaceRole.class);
+
+            for (WorkspaceRole role : WorkspaceRole.values()) {
+                Set<String> scopeNames = orderedScopeNames.stream()
+                    .filter(scopeName -> role.hasAtLeast(minimumRoleByScope.get(scopeName)))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                roleScopeNames.put(role, Collections.unmodifiableSet(scopeNames));
+            }
+
+            roleScopeNamesBySide.put(side, Collections.unmodifiableMap(roleScopeNames));
         }
 
-        this.scopeGroups = Collections.unmodifiableList(permissionScopeGroups);
+        this.scopeGroups = Collections.unmodifiableList(scopeGroupsBySide.get(PermissionScopeSide.AUTOMATION));
+        this.allScopeNamesBySide = Collections.unmodifiableMap(allScopeNamesBySide);
+        this.roleScopeNamesBySide = Collections.unmodifiableMap(roleScopeNamesBySide);
 
-        // One catalogue order -- module, then the enum's own -- for every view of a scope set, so a built-in role's
-        // permissions and the editor's checkboxes cannot disagree about sequence. Deriving it from the groups rather
-        // than from minimumRoleByScope also keeps it off that HashMap's iteration order, which is neither.
-        List<String> orderedScopeNames = permissionScopeGroups.stream()
-            .flatMap(permissionScopeGroup -> permissionScopeGroup.scopes()
-                .stream())
-            .toList();
-
-        this.allScopeNames = Collections.unmodifiableSet(new LinkedHashSet<>(orderedScopeNames));
-
-        EnumMap<WorkspaceRole, Set<String>> map = new EnumMap<>(WorkspaceRole.class);
-
-        for (WorkspaceRole role : WorkspaceRole.values()) {
-            Set<String> scopeNames = orderedScopeNames.stream()
-                .filter(scopeName -> role.hasAtLeast(minimumRoleByScope.get(scopeName)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-            map.put(role, Collections.unmodifiableSet(scopeNames));
-        }
-
-        this.roleScopeNames = Collections.unmodifiableMap(map);
+        Map<WorkspaceRole, Set<String>> map = roleScopeNamesBySide.get(PermissionScopeSide.AUTOMATION);
 
         // Least privileged first: the sets nest, so read downwards each tier shows what the one above adds.
         // WorkspaceRole declares itself in rank order, which is the opposite.
@@ -149,13 +171,23 @@ public class PermissionScopeRegistry {
      * Every registered scope name, across all providers. Used to validate custom-role scope assignments.
      */
     public Set<String> getAllScopeNames() {
-        return allScopeNames;
+        return getAllScopeNames(PermissionScopeSide.AUTOMATION);
+    }
+
+    public Set<String> getAllScopeNames(PermissionScopeSide side) {
+        return allScopeNamesBySide.get(side);
     }
 
     /**
      * The scope names granted to the given built-in role by rank.
      */
     public Set<String> getScopeNames(WorkspaceRole role) {
+        return getScopeNames(role, PermissionScopeSide.AUTOMATION);
+    }
+
+    public Set<String> getScopeNames(WorkspaceRole role, PermissionScopeSide side) {
+        Map<WorkspaceRole, Set<String>> roleScopeNames = roleScopeNamesBySide.get(side);
+
         return roleScopeNames.getOrDefault(role, Set.of());
     }
 
