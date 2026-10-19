@@ -39,15 +39,19 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -143,5 +147,76 @@ class WorkflowNodeTestOutputFacadeTest {
             eq(WORKFLOW_ID), eq("trigger_2"), any(WorkflowNodeType.class), any(), eq(ENVIRONMENT_ID));
         verify(webhookTriggerTestFacade).disableTrigger(
             WORKFLOW_ID, "trigger_2", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testSaveWorkflowNodeSampleOutputTruncatesLargeLists() {
+        Workflow workflow = new Workflow(WORKFLOW_ID, """
+            {
+                "tasks": [
+                    {"name": "oracle_1", "type": "oracle/v1/query", "parameters": {}}
+                ]
+            }
+            """, Format.JSON);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+
+        List<Map<String, Object>> rows = IntStream.range(0, 150)
+            .mapToObj(index -> Map.<String, Object>of("id", index, "tags", List.of(IntStream.range(0, 150)
+                .boxed()
+                .toArray())))
+            .toList();
+
+        workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
+            WORKFLOW_ID, "oracle_1", Map.of("rows", rows), ENVIRONMENT_ID);
+
+        ArgumentCaptor<OutputResponse> outputResponseArgumentCaptor = ArgumentCaptor.forClass(OutputResponse.class);
+
+        verify(workflowNodeTestOutputService).save(
+            eq(WORKFLOW_ID), eq("oracle_1"), any(WorkflowNodeType.class), outputResponseArgumentCaptor.capture(),
+            eq(ENVIRONMENT_ID));
+
+        OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
+
+        Map<String, Object> sampleOutput = (Map<String, Object>) outputResponse.sampleOutput();
+
+        List<Map<String, Object>> sampleRows = (List<Map<String, Object>>) sampleOutput.get("rows");
+
+        Assertions.assertThat(sampleRows)
+            .hasSize(WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS);
+        Assertions.assertThat((List<Object>) sampleRows.getFirst()
+            .get("tags"))
+            .hasSize(WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS);
+        Assertions.assertThat(sampleRows.getLast())
+            .containsEntry("id", WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS - 1);
+    }
+
+    @Test
+    void testSaveWorkflowNodeSampleOutputKeepsSmallOutput() {
+        Workflow workflow = new Workflow(WORKFLOW_ID, """
+            {
+                "tasks": [
+                    {"name": "oracle_1", "type": "oracle/v1/query", "parameters": {}}
+                ]
+            }
+            """, Format.JSON);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+
+        List<Map<String, Object>> rows = List.of(Map.of("id", 1), Map.of("id", 2));
+
+        workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(WORKFLOW_ID, "oracle_1", rows, ENVIRONMENT_ID);
+
+        ArgumentCaptor<OutputResponse> outputResponseArgumentCaptor = ArgumentCaptor.forClass(OutputResponse.class);
+
+        verify(workflowNodeTestOutputService).save(
+            eq(WORKFLOW_ID), eq("oracle_1"), any(WorkflowNodeType.class), outputResponseArgumentCaptor.capture(),
+            eq(ENVIRONMENT_ID));
+
+        OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
+
+        Assertions.assertThat(outputResponse.sampleOutput())
+            .isEqualTo(rows);
     }
 }

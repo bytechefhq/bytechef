@@ -56,11 +56,14 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -70,6 +73,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
+
+    static final int MAX_SAMPLE_OUTPUT_ITEMS = 100;
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -194,6 +199,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             });
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        sampleOutput = truncateSampleOutput(sampleOutput);
 
         Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
@@ -367,7 +374,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
 
         OutputResponse outputResponse = SchemaUtils.toOutput(
-            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            truncateSampleOutput(value), PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;
@@ -533,7 +540,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
 
         OutputResponse outputResponse = SchemaUtils.toOutput(
-            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            truncateSampleOutput(value), PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;
@@ -541,6 +548,31 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, outputResponse, environmentId);
+    }
+
+    private static Object truncateSampleOutput(Object value) {
+        if (value instanceof Map<?, ?> map) {
+            Map<Object, Object> truncatedMap = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                truncatedMap.put(entry.getKey(), truncateSampleOutput(entry.getValue()));
+            }
+
+            return truncatedMap;
+        }
+
+        if (value instanceof Collection<?> collection) {
+            return collection.stream()
+                .limit(MAX_SAMPLE_OUTPUT_ITEMS)
+                .map(WorkflowNodeTestOutputFacadeImpl::truncateSampleOutput)
+                .collect(Collectors.toCollection(ArrayList::new));
+        }
+
+        if (value instanceof Object[] array && array.length > MAX_SAMPLE_OUTPUT_ITEMS) {
+            return truncateSampleOutput(Arrays.asList(array));
+        }
+
+        return value;
     }
 
     @FunctionalInterface
