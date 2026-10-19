@@ -12,6 +12,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -21,9 +22,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
 /**
+ * Per-thread registry of AI Hub agent runs. Decouples the agent's reactive stream from any one HTTP {@code SseEmitter},
+ * so a client refresh mid-stream does not kill the agent: the run keeps publishing into its {@link Sinks.Many replay
+ * sink}, and a later attach sees both the buffered history and the live tail. It is also the one-turn-per-chat gate:
+ * {@link #tryStart} refuses a second run while one is in flight for the thread. A cancelled run stays in flight while
+ * its agent drains: until the agent reports that it stopped, or {@link #DRAIN_TIMEOUT} after the cancel, so a new turn
+ * or a truncation never overlaps a stopped run that is still writing to the session.
+ *
+ * <p>
+ * Backed by Caffeine directly: an entry holds a {@code Sinks.Many<BaseEvent>}, a stateful reactive primitive that
+ * cannot be serialized or shared across JVMs, so the registry is single-instance.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -39,6 +53,8 @@ public class InFlightAiHubRunRegistry {
     static final long ENTRY_TTL_MINUTES = 30L;
 
     static final long CANCELLED_RUN_ID_TTL_MINUTES = 2L;
+
+    static final Duration DRAIN_TIMEOUT = Duration.ofMinutes(2);
 
     private final Cache<String, InFlightRun> runs;
     private final Cache<String, Boolean> cancelledRunIds;
@@ -58,7 +74,7 @@ public class InFlightAiHubRunRegistry {
 
         InFlightRun run = runs.asMap()
             .compute(threadId, (key, existing) -> {
-                if (existing != null && !existing.isTerminated()) {
+                if (existing != null && existing.holdsThread(Instant.now())) {
                     return existing;
                 }
 
@@ -100,9 +116,15 @@ public class InFlightAiHubRunRegistry {
             return false;
         }
 
-        run.complete();
+        run.cancel();
 
         return true;
+    }
+
+    public Mono<Void> stopRequested(String threadId) {
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        return run == null ? Mono.never() : run.stopRequested();
     }
 
     public Optional<Flux<BaseEvent>> attach(String threadId) {
@@ -118,7 +140,7 @@ public class InFlightAiHubRunRegistry {
     public boolean isInFlight(String threadId) {
         InFlightRun run = runs.getIfPresent(threadId);
 
-        return run != null && !run.isTerminated();
+        return run != null && run.holdsThread(Instant.now());
     }
 
     private static Cache<String, InFlightRun> buildDefaultCache() {
@@ -143,6 +165,9 @@ public class InFlightAiHubRunRegistry {
         private final @Nullable String runId;
         private final Instant startedAt;
         private final Sinks.Many<BaseEvent> sink;
+        private final Sinks.Empty<Void> stopSink = Sinks.empty();
+        private volatile boolean agentStopped;
+        private volatile @Nullable Instant cancelledAt;
         private volatile boolean terminated;
 
         InFlightRun(String threadId, @Nullable String runId) {
@@ -178,16 +203,41 @@ public class InFlightAiHubRunRegistry {
             }
         }
 
-        void complete() {
+        boolean holdsThread(Instant now) {
+            if (agentStopped) {
+                return false;
+            }
+
+            Instant runCancelledAt = cancelledAt;
+
+            return runCancelledAt == null || now.isBefore(runCancelledAt.plus(DRAIN_TIMEOUT));
+        }
+
+        public void complete() {
+            agentStopped = true;
             terminated = true;
 
             completeSink();
         }
 
         void fail(Throwable error) {
+            agentStopped = true;
             terminated = true;
 
             sink.tryEmitError(error);
+        }
+
+        void cancel() {
+            cancelledAt = Instant.now();
+            terminated = true;
+
+            completeSink();
+
+            stopSink.tryEmitEmpty();
+        }
+
+        Mono<Void> stopRequested() {
+            return stopSink.asMono();
         }
 
         Flux<BaseEvent> asFlux() {

@@ -17,6 +17,7 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -178,8 +179,58 @@ class InFlightAiHubRunRegistryTest {
             })
             .assertNext(event -> assertThat(((TextMessageContentEvent) event).getDelta()).isEqualTo("partial"))
             .verifyComplete();
+    }
+
+    @Test
+    void testACancelledRunHoldsTheThreadUntilItsAgentStops() {
+        InFlightAiHubRunRegistry registry = newRegistry();
+
+        InFlightRun run = registry.tryStart("thread-1", "run-1")
+            .orElseThrow();
+
+        registry.cancel("thread-1");
+
+        assertThat(registry.isInFlight("thread-1")).isTrue();
+        assertThat(registry.tryStart("thread-1", "run-2")).isEmpty();
+
+        run.complete();
 
         assertThat(registry.isInFlight("thread-1")).isFalse();
+        assertThat(registry.tryStart("thread-1", "run-2")).isPresent();
+    }
+
+    @Test
+    void testACancelledRunWhoseAgentNeverStopsReleasesTheThreadAfterTheDrainTimeout() {
+        InFlightAiHubRunRegistry registry = newRegistry();
+
+        InFlightRun run = registry.tryStart("thread-1", "run-1")
+            .orElseThrow();
+
+        registry.cancel("thread-1");
+
+        assertThat(run.holdsThread(Instant.now()
+            .plus(InFlightAiHubRunRegistry.DRAIN_TIMEOUT)
+            .plusSeconds(1))).isFalse();
+    }
+
+    @Test
+    void testCancelSignalsTheStopOfTheRunsAgent() {
+        InFlightAiHubRunRegistry registry = newRegistry();
+
+        registry.tryStart("thread-1", "run-1");
+
+        StepVerifier.create(registry.stopRequested("thread-1"))
+            .then(() -> registry.cancel("thread-1"))
+            .verifyComplete();
+    }
+
+    @Test
+    void testStopIsNeverRequestedForAThreadWithNoRun() {
+        StepVerifier.create(newRegistry().stopRequested("ghost-thread"))
+            .expectSubscription()
+            .expectNoEvent(Duration.ofMillis(50))
+            .thenCancel()
+            .verify();
     }
 
     @Test
@@ -215,7 +266,7 @@ class InFlightAiHubRunRegistryTest {
         registry.tryStart("thread-1", "run-1");
 
         assertThat(registry.cancel("thread-1", "run-1")).isTrue();
-        assertThat(registry.isInFlight("thread-1")).isFalse();
+        assertThat(registry.isInFlight("thread-1")).isTrue();
     }
 
     @Test
@@ -240,6 +291,8 @@ class InFlightAiHubRunRegistryTest {
             .orElseThrow();
 
         registry.cancel("thread-1");
+
+        cancelledRun.complete();
 
         InFlightRun nextRun = registry.tryStart("thread-1", "run-2")
             .orElseThrow();

@@ -64,13 +64,20 @@ public interface AiHubChatService {
 
     /**
      * Drops everything after the visible message with id {@code messageId}, tool events included, and the message
-     * itself unless {@code keepMessage}. While a turn runs in the chat it refuses with a conflict before dropping
-     * anything.
+     * itself unless {@code keepMessage}, and supersedes every pending tool approval whose call it dropped. While a turn
+     * runs in the chat it refuses with a conflict before dropping anything.
      *
-     * @return the number of session events dropped, or empty when the chat holds no visible message with that id
+     * @return the number of session events dropped, or empty when the chat never held a message with that id; a message
+     *         an earlier edit or reload already dropped is refused with a conflict
      */
     OptionalInt truncateMessages(
         long chatId, long requesterWorkspaceId, long requesterUserId, String messageId, boolean keepMessage);
+
+    /**
+     * Whether the active session of {@code threadId} still holds a call of {@code toolName} with {@code arguments}; a
+     * call an edit or reload truncated away no longer counts. No access check: callers verify access themselves.
+     */
+    boolean containsActiveToolCall(String threadId, String toolName, String arguments);
 
     /**
      * Appends an assistant message to the chat's session. Blank content is ignored.
