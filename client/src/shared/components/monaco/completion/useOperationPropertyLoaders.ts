@@ -1,56 +1,82 @@
 import {
-    ComponentOperationDynamicPropertiesRequestOperationTypeEnum,
+    ComponentOperationPropertyRequestOperationTypeEnum,
     WorkflowNodeDynamicPropertiesApi,
+    WorkflowNodeOptionApi,
 } from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
-import type {DynamicPropertiesLoaderType} from './completionTypes';
+import type {OperationPropertyLoadersType, OperationPropertyRequestType} from './completionTypes';
 
-const DYNAMIC_PROPERTIES_STALE_TIME = 60000;
+const OPERATION_PROPERTY_STALE_TIME = 60000;
 
-export function useDynamicPropertiesLoader(
+function toRequestParameters(
+    {
+        clusterElementNode,
+        operationKind,
+        propertyName,
+        workflowNodeName,
+        ...operationRequest
+    }: OperationPropertyRequestType,
+    workflowId: string,
+    environmentId: number
+) {
+    return {
+        componentOperationPropertyRequest: {
+            ...operationRequest,
+            ...clusterElementNode,
+            operationType:
+                operationKind === 'trigger'
+                    ? ComponentOperationPropertyRequestOperationTypeEnum.Trigger
+                    : ComponentOperationPropertyRequestOperationTypeEnum.Action,
+        },
+        environmentId,
+        id: workflowId,
+        propertyName,
+        workflowNodeName,
+    };
+}
+
+export function useOperationPropertyLoaders(
     workflowId: string | undefined,
     environmentId: number | undefined
-): DynamicPropertiesLoaderType | undefined {
+): OperationPropertyLoadersType {
     const queryClient = useQueryClient();
 
     return useMemo(() => {
         if (!workflowId || environmentId === undefined) {
-            return undefined;
+            return {};
         }
 
-        return ({clusterElementNode, operationKind, propertyName, workflowNodeName, ...operationRequest}) => {
-            const componentOperationDynamicPropertiesRequest = {
-                ...operationRequest,
-                ...clusterElementNode,
-                operationType:
-                    operationKind === 'trigger'
-                        ? ComponentOperationDynamicPropertiesRequestOperationTypeEnum.Trigger
-                        : ComponentOperationDynamicPropertiesRequestOperationTypeEnum.Action,
-            };
+        return {
+            loadDynamicProperties: (request) => {
+                const requestParameters = toRequestParameters(request, workflowId, environmentId);
 
-            return queryClient.fetchQuery({
-                queryFn: () =>
-                    new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeComponentOperationDynamicProperties({
-                        componentOperationDynamicPropertiesRequest,
-                        environmentId,
-                        id: workflowId,
-                        propertyName,
-                        workflowNodeName,
-                    }),
-                queryKey: [
-                    ...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
-                    'completion',
-                    workflowId,
-                    workflowNodeName,
-                    propertyName,
-                    environmentId,
-                    componentOperationDynamicPropertiesRequest,
-                ],
-                staleTime: DYNAMIC_PROPERTIES_STALE_TIME,
-            });
+                return queryClient.fetchQuery({
+                    queryFn: () =>
+                        new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeComponentOperationDynamicProperties(
+                            requestParameters
+                        ),
+                    queryKey: [
+                        ...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
+                        'completion',
+                        requestParameters,
+                    ],
+                    staleTime: OPERATION_PROPERTY_STALE_TIME,
+                });
+            },
+            loadOptions: (request) => {
+                const requestParameters = toRequestParameters(request, workflowId, environmentId);
+
+                return queryClient.fetchQuery({
+                    queryFn: () =>
+                        new WorkflowNodeOptionApi().getWorkflowNodeComponentOperationOptions(requestParameters),
+                    queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, 'completion', requestParameters],
+                    staleTime: OPERATION_PROPERTY_STALE_TIME,
+                });
+            },
         };
     }, [environmentId, queryClient, workflowId]);
 }

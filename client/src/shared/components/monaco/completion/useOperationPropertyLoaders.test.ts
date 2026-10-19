@@ -3,22 +3,27 @@ import {renderHook} from '@testing-library/react';
 import {type ReactNode, createElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {useDynamicPropertiesLoader} from './useDynamicPropertiesLoader';
+import {useOperationPropertyLoaders} from './useOperationPropertyLoaders';
 
-import type {DynamicPropertiesRequestType} from './completionTypes';
+import type {OperationPropertyRequestType} from './completionTypes';
 
-const {getWorkflowNodeComponentOperationDynamicPropertiesMock} = vi.hoisted(() => ({
-    getWorkflowNodeComponentOperationDynamicPropertiesMock: vi.fn(),
-}));
+const {getWorkflowNodeComponentOperationDynamicPropertiesMock, getWorkflowNodeComponentOperationOptionsMock} =
+    vi.hoisted(() => ({
+        getWorkflowNodeComponentOperationDynamicPropertiesMock: vi.fn(),
+        getWorkflowNodeComponentOperationOptionsMock: vi.fn(),
+    }));
 
 vi.mock('@/shared/middleware/platform/configuration', () => ({
-    ComponentOperationDynamicPropertiesRequestOperationTypeEnum: {Action: 'ACTION', Trigger: 'TRIGGER'},
+    ComponentOperationPropertyRequestOperationTypeEnum: {Action: 'ACTION', Trigger: 'TRIGGER'},
     WorkflowNodeDynamicPropertiesApi: class {
         getWorkflowNodeComponentOperationDynamicProperties = getWorkflowNodeComponentOperationDynamicPropertiesMock;
     },
+    WorkflowNodeOptionApi: class {
+        getWorkflowNodeComponentOperationOptions = getWorkflowNodeComponentOperationOptionsMock;
+    },
 }));
 
-const request: DynamicPropertiesRequestType = {
+const request: OperationPropertyRequestType = {
     componentName: 'airtable',
     componentVersion: 1,
     connectionKey: 'at',
@@ -36,31 +41,32 @@ function wrapper({children}: {children: ReactNode}) {
     return createElement(QueryClientProvider, {client: queryClient}, children);
 }
 
-describe('useDynamicPropertiesLoader', () => {
+describe('useOperationPropertyLoaders', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
         queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
         getWorkflowNodeComponentOperationDynamicPropertiesMock.mockResolvedValue([{name: 'Email'}]);
+        getWorkflowNodeComponentOperationOptionsMock.mockResolvedValue([{label: 'Customers', value: 'tbl1'}]);
     });
 
-    it('has no loader without a workflow', () => {
-        const {result} = renderHook(() => useDynamicPropertiesLoader(undefined, 1), {wrapper});
+    it('has no loaders without a workflow', () => {
+        const {result} = renderHook(() => useOperationPropertyLoaders(undefined, 1), {wrapper});
 
-        expect(result.current).toBeUndefined();
+        expect(result.current).toEqual({});
     });
 
     it('requests the dynamic properties of the node once for the same values', async () => {
-        const {result} = renderHook(() => useDynamicPropertiesLoader('workflow1', 2), {wrapper});
+        const {result} = renderHook(() => useOperationPropertyLoaders('workflow1', 2), {wrapper});
 
-        expect(await result.current!(request)).toEqual([{name: 'Email'}]);
+        expect(await result.current.loadDynamicProperties!(request)).toEqual([{name: 'Email'}]);
 
-        await result.current!(request);
+        await result.current.loadDynamicProperties!(request);
 
         expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledTimes(1);
         expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledWith({
-            componentOperationDynamicPropertiesRequest: {
+            componentOperationPropertyRequest: {
                 componentName: 'airtable',
                 componentVersion: 1,
                 connectionKey: 'at',
@@ -76,34 +82,38 @@ describe('useDynamicPropertiesLoader', () => {
         });
     });
 
-    it('sends a trigger operation and the cluster element that declares the connection', async () => {
-        const {result} = renderHook(() => useDynamicPropertiesLoader('workflow1', 2), {wrapper});
+    it('requests options with a trigger operation and the cluster element that declares the connection', async () => {
+        const {result} = renderHook(() => useOperationPropertyLoaders('workflow1', 2), {wrapper});
 
-        await result.current!({
-            ...request,
-            clusterElementNode: {clusterElementType: 'tools', clusterElementWorkflowNodeName: 'script_1'},
-            operationKind: 'trigger',
-            workflowNodeName: 'aiAgent_1',
-        });
+        expect(
+            await result.current.loadOptions!({
+                ...request,
+                clusterElementNode: {clusterElementType: 'tools', clusterElementWorkflowNodeName: 'script_1'},
+                operationKind: 'trigger',
+                propertyName: 'tableId',
+                workflowNodeName: 'aiAgent_1',
+            })
+        ).toEqual([{label: 'Customers', value: 'tbl1'}]);
 
-        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledWith(
+        expect(getWorkflowNodeComponentOperationOptionsMock).toHaveBeenCalledWith(
             expect.objectContaining({
-                componentOperationDynamicPropertiesRequest: expect.objectContaining({
+                componentOperationPropertyRequest: expect.objectContaining({
                     clusterElementType: 'tools',
                     clusterElementWorkflowNodeName: 'script_1',
                     operationType: 'TRIGGER',
                 }),
+                propertyName: 'tableId',
                 workflowNodeName: 'aiAgent_1',
             })
         );
     });
 
     it('requests again when the written values change', async () => {
-        const {result} = renderHook(() => useDynamicPropertiesLoader('workflow1', 2), {wrapper});
+        const {result} = renderHook(() => useOperationPropertyLoaders('workflow1', 2), {wrapper});
 
-        await result.current!(request);
-        await result.current!({...request, parameters: {baseId: 'app2'}});
+        await result.current.loadOptions!(request);
+        await result.current.loadOptions!({...request, parameters: {baseId: 'app2'}});
 
-        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledTimes(2);
+        expect(getWorkflowNodeComponentOperationOptionsMock).toHaveBeenCalledTimes(2);
     });
 });
