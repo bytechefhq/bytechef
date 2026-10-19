@@ -41,7 +41,7 @@ public interface WorkflowNodeTestOutputService {
 
     WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse,
-        long environmentId);
+        boolean sampleOutputTruncated, long environmentId);
 
     void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

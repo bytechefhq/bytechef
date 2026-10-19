@@ -174,7 +174,7 @@ public class TestWorkflowExecutorTest {
         List<Map<String, Object>> sampleOutput = List.of(Map.of("x", 1), Map.of("y", 2));
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-            null, null, new OutputResponse(null, sampleOutput, null), null, false, null, "myTrigger");
+            null, null, new OutputResponse(null, sampleOutput, null), false, null, false, null, "myTrigger");
 
         when(workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "myTrigger", ENVIRONMENT_ID))
             .thenReturn(workflowNodeOutputDTO);

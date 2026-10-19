@@ -68,6 +68,10 @@ export interface WorkflowNodeOutput {
      */
     outputResponse?: OutputResponse;
     /**
+     * If lists in the sample output were cut to the configured maximum number of items
+     */
+    sampleOutputTruncated?: boolean;
+    /**
      * 
      */
     taskDispatcherDefinition?: TaskDispatcherDefinitionBasic;
@@ -110,6 +114,7 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
         'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
         'clusterElementDefinition': json['clusterElementDefinition'] == null ? undefined : ClusterElementDefinitionBasicFromJSON(json['clusterElementDefinition']),
         'outputResponse': json['outputResponse'] == null ? undefined : OutputResponseFromJSON(json['outputResponse']),
+        'sampleOutputTruncated': json['sampleOutputTruncated'] == null ? undefined : json['sampleOutputTruncated'],
         'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionBasicFromJSON(json['taskDispatcherDefinition']),
         'testOutputResponse': json['testOutputResponse'] == null ? undefined : json['testOutputResponse'],
         'triggerDefinition': json['triggerDefinition'] == null ? undefined : TriggerDefinitionBasicFromJSON(json['triggerDefinition']),
@@ -132,6 +137,7 @@ export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null,
         'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
         'clusterElementDefinition': ClusterElementDefinitionBasicToJSON(value['clusterElementDefinition']),
         'outputResponse': OutputResponseToJSON(value['outputResponse']),
+        'sampleOutputTruncated': value['sampleOutputTruncated'],
         'taskDispatcherDefinition': TaskDispatcherDefinitionBasicToJSON(value['taskDispatcherDefinition']),
         'testOutputResponse': value['testOutputResponse'],
         'triggerDefinition': TriggerDefinitionBasicToJSON(value['triggerDefinition']),
