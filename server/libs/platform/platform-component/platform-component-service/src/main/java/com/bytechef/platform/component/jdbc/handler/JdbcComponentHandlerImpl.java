@@ -40,6 +40,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABA
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.EXECUTE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.LAST_ITEM;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.MAX_ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_BY;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_DIRECTION;
@@ -143,7 +144,14 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 object(PARAMETERS)
                     .label("Parameters")
                     .description("The list of properties which should be used as query parameters.")
-                    .additionalProperties(bool(), dateTime(), number(), string()))
+                    .additionalProperties(bool(), dateTime(), number(), string()),
+                integer(MAX_ROWS)
+                    .label("Max Rows")
+                    .description(
+                        "The maximum number of rows the query may return. The action fails if the query returns more " +
+                            "rows.")
+                    .defaultValue(QueryJdbcOperation.DEFAULT_MAX_ROWS)
+                    .minValue(1))
             .output()
             .perform(this::performQuery),
         action("insert")

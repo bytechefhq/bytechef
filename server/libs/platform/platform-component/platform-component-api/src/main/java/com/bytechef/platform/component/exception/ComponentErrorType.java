@@ -31,6 +31,7 @@ public class ComponentErrorType extends AbstractErrorType {
     public static final ComponentErrorType INVALID_DATE_STRING = new ComponentErrorType(105);
     public static final ComponentErrorType INVALID_ORDER_DIRECTION = new ComponentErrorType(106);
     public static final ComponentErrorType UNSUPPORTED_PROPERTY_TYPE = new ComponentErrorType(107);
+    public static final ComponentErrorType QUERY_MAX_ROWS_EXCEEDED = new ComponentErrorType(108);
 
     private ComponentErrorType(int errorKey) {
         super(ComponentErrorType.class, errorKey);

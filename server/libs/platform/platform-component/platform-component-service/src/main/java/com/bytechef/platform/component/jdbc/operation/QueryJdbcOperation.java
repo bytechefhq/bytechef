@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import java.sql.ResultSet;
@@ -31,12 +33,15 @@ import javax.sql.DataSource;
  */
 public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object>>> {
 
+    public static final int DEFAULT_MAX_ROWS = 10000;
+
     @Override
     public List<Map<String, Object>> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
         String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
+        int maxRows = MapUtils.getInteger(inputParameters, JdbcConstants.MAX_ROWS, DEFAULT_MAX_ROWS);
 
-        return JdbcExecutor.query(
+        List<Map<String, Object>> rows = JdbcExecutor.query(
             queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
                 Map<String, Object> row = new HashMap<>();
 
@@ -51,6 +56,14 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
                 }
 
                 return row;
-            }, dataSource);
+            }, maxRows + 1, dataSource);
+
+        if (rows.size() > maxRows) {
+            throw new ConfigurationException(
+                "The query returned more than " + maxRows + " rows. Narrow the query or increase Max Rows.",
+                ComponentErrorType.QUERY_MAX_ROWS_EXCEEDED);
+        }
+
+        return rows;
     }
 }

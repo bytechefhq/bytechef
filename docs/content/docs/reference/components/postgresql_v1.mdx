@@ -50,6 +50,7 @@ Name: query
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
 | parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The list of properties which should be used as query parameters. | false |
+| maxRows | Max Rows | INTEGER | The maximum number of rows the query may return. The action fails if the query returns more rows. | false |
 
 #### Example JSON Structure
 ```json
@@ -58,7 +59,8 @@ Name: query
   "name" : "query",
   "parameters" : {
     "query" : "",
-    "parameters" : { }
+    "parameters" : { },
+    "maxRows" : 1
   },
   "type" : "postgresql/v1/query"
 }

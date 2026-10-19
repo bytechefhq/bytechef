@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.jdbc.operation;
 
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
@@ -71,5 +72,51 @@ public class QueryJdbcOperationIntTest {
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testQueryWithinMaxRows() throws SQLException {
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.MAX_ROWS, 4,
+            JdbcConstants.QUERY, "SELECT * FROM test");
+
+        List<Map<String, Object>> result = new QueryJdbcOperation().execute(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+
+        Assertions.assertEquals(4, result.size());
+    }
+
+    @Test
+    public void testQueryExceedingMaxRows() throws SQLException {
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.MAX_ROWS, 3,
+            JdbcConstants.QUERY, "SELECT * FROM test");
+
+        SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false);
+
+        ConfigurationException configurationException = Assertions.assertThrows(
+            ConfigurationException.class,
+            () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
+
+        Assertions.assertEquals(
+            "The query returned more than 3 rows. Narrow the query or increase Max Rows.",
+            configurationException.getMessage());
+    }
+
+    @Test
+    public void testQueryUsesDefaultMaxRows() throws SQLException {
+        jdbcTemplate.execute(
+            "INSERT INTO test SELECT 'gen' || i, 'name' || i FROM generate_series(1, " +
+                QueryJdbcOperation.DEFAULT_MAX_ROWS + ") AS i");
+
+        Map<String, ?> inputParameters = Map.of(JdbcConstants.QUERY, "SELECT * FROM test");
+
+        SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false);
+
+        Assertions.assertThrows(
+            ConfigurationException.class,
+            () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
     }
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -46,6 +47,19 @@ public class JdbcExecutor {
         NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(dataSource);
 
         return jdbcTemplate.query(sql, paramMap, rowMapper);
+    }
+
+    public static <T> List<T> query(
+        String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper, int maxRows, DataSource dataSource)
+        throws DataAccessException {
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.setMaxRows(maxRows);
+
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+
+        return namedParameterJdbcTemplate.query(sql, paramMap, rowMapper);
     }
 
     public static int update(String sql, Map<String, ?> paramMap, DataSource dataSource) throws DataAccessException {

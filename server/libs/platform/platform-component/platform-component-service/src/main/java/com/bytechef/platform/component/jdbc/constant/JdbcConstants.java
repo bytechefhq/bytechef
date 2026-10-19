@@ -28,6 +28,7 @@ public final class JdbcConstants {
     public static final String EXECUTE = "execute";
     public static final String HOST = "host";
     public static final String LAST_ITEM = "lastItem";
+    public static final String MAX_ROWS = "maxRows";
     public static final String NAME = "name";
     public static final String ORDER_BY = "orderBy";
     public static final String ORDER_DIRECTION = "orderDirection";
