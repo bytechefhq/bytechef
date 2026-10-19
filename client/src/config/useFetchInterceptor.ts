@@ -82,6 +82,10 @@ function isAuthenticationError(error: GraphQlErrorI): boolean {
     return error.extensions?.errorCode === AUTHENTICATION_REQUIRED_ERROR_CODE;
 }
 
+function isAiHubToolApprovalConflictError(error: GraphQlErrorI): boolean {
+    return error.extensions?.errorCode === 'CONFLICT' && error.path?.[0] === 'resolveAiHubToolApproval';
+}
+
 function resolveUrl(input: RequestInfo | URL): string {
     if (typeof input === 'string') {
         return input;
@@ -235,6 +239,10 @@ export default function useFetchInterceptor() {
                             }
 
                             if (errors.length && errors.every(isInlineTestOutputGraphQlError)) {
+                                return;
+                            }
+
+                            if (errors.length && errors.every(isAiHubToolApprovalConflictError)) {
                                 return;
                             }
 
