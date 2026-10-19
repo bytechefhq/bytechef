@@ -23,7 +23,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.agui.server.LocalAgent;
+import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
+import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
@@ -67,6 +71,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Unit tests for {@link AiHubChatServiceImpl}.
@@ -883,6 +888,66 @@ class AiHubChatServiceTest {
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
         }
+    }
+
+    @Test
+    void testDeletingAChatRemovesApprovalsTheGateLeftAfterTheCancel() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            verify(approvalService, times(1)).deleteByChat(1L);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(TransactionSynchronization::afterCommit);
+
+            verify(approvalService, times(2)).deleteByChat(1L);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+    }
+
+    @Test
+    void testDeletingAChatNeverStartsItsQueuedApprovalContinuation() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        lenient().when(chatRepository.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
+
+        LocalAgent askAgent = mock(LocalAgent.class);
+
+        when(askAgent.getAgentId()).thenReturn("ai_hub_ask");
+
+        AiHubContinuationStarter continuationStarter = new AiHubContinuationStarterImpl(
+            new AiHubChatStreamer(registry, new JsonMapper()), registry, List.of(askAgent), serviceWithRegistry);
+
+        InFlightAiHubRunRegistry.InFlightRun runningTurn = registry.tryStart(THREAD_ID, "run-running")
+            .orElseThrow();
+
+        AiHubToolApproval approval = new AiHubToolApproval();
+
+        approval.setMode("ASK");
+        approval.setRequestedByUserId(USER_ID);
+
+        assertThat(continuationStarter.startContinuation(approval, chat, WORKSPACE_ID, "[tool-approval #5]"))
+            .isEmpty();
+
+        serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+        runningTurn.complete();
+
+        verify(askAgent, never()).runAgent(any(), any());
+        assertThat(registry.isInFlight(THREAD_ID)).isFalse();
     }
 
     @Test

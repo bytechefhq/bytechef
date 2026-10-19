@@ -17,11 +17,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -72,15 +75,27 @@ public class InFlightAiHubRunRegistry {
 
     private final Cache<String, InFlightRun> runs;
     private final Cache<String, Boolean> cancelledRunIds;
+    private final Executor releaseActionExecutor;
 
     public InFlightAiHubRunRegistry() {
-        this(buildDefaultCache());
+        this(buildDefaultCache(), Runnable::run);
+    }
+
+    @Autowired
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public InFlightAiHubRunRegistry(@Qualifier("workerExecutor") Executor releaseActionExecutor) {
+        this(buildDefaultCache(), releaseActionExecutor);
+    }
+
+    InFlightAiHubRunRegistry(Cache<String, InFlightRun> runs) {
+        this(runs, Runnable::run);
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    InFlightAiHubRunRegistry(Cache<String, InFlightRun> runs) {
+    InFlightAiHubRunRegistry(Cache<String, InFlightRun> runs, Executor releaseActionExecutor) {
         this.runs = runs;
         this.cancelledRunIds = buildCancelledRunIdCache();
+        this.releaseActionExecutor = releaseActionExecutor;
     }
 
     /**
@@ -102,7 +117,7 @@ public class InFlightAiHubRunRegistry {
                     existing.completeSink();
                 }
 
-                InFlightRun newRun = new InFlightRun(threadId, runId);
+                InFlightRun newRun = new InFlightRun(threadId, runId, releaseActionExecutor);
 
                 if (runId != null && cancelledRunIds.asMap()
                     .remove(runId) != null) {
@@ -180,8 +195,9 @@ public class InFlightAiHubRunRegistry {
     }
 
     /**
-     * Runs {@code action} once no run holds {@code threadId}: at once when none does, otherwise on the thread that ends
-     * the holding run, right after it releases the thread.
+     * Runs {@code action} once no run holds {@code threadId}: at once when none does, otherwise on the release action
+     * executor right after the holding run releases the thread. An action queued on a run that never reports that it
+     * stopped never runs.
      */
     public void runWhenReleased(String threadId, Runnable action) {
         InFlightRun run = runs.getIfPresent(threadId);
@@ -191,6 +207,17 @@ public class InFlightAiHubRunRegistry {
         }
 
         action.run();
+    }
+
+    /**
+     * Drops the actions queued with {@link #runWhenReleased} on the run holding {@code threadId}, so they never run.
+     */
+    public void discardReleaseActions(String threadId) {
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        if (run != null) {
+            run.discardReleaseActions();
+        }
     }
 
     /**
@@ -227,11 +254,13 @@ public class InFlightAiHubRunRegistry {
         private final Sinks.Many<BaseEvent> sink;
         private final Sinks.Empty<Void> stopSink = Sinks.empty();
         private final List<Runnable> releaseActions = new ArrayList<>();
+        private final Executor releaseActionExecutor;
         private volatile boolean agentStopped;
         private volatile @Nullable Instant cancelledAt;
         private volatile boolean terminated;
 
-        InFlightRun(String threadId, @Nullable String runId) {
+        InFlightRun(String threadId, @Nullable String runId, Executor releaseActionExecutor) {
+            this.releaseActionExecutor = releaseActionExecutor;
             this.threadId = threadId;
             this.runId = runId;
             this.startedAt = Instant.now();
@@ -322,10 +351,24 @@ public class InFlightAiHubRunRegistry {
 
             for (Runnable action : actions) {
                 try {
-                    action.run();
+                    releaseActionExecutor.execute(() -> runReleaseAction(action));
                 } catch (RuntimeException exception) {
-                    log.warn("A deferred action for threadId={} failed", threadId, exception);
+                    log.warn("A deferred action for threadId={} could not be scheduled", threadId, exception);
                 }
+            }
+        }
+
+        private void runReleaseAction(Runnable action) {
+            try {
+                action.run();
+            } catch (RuntimeException exception) {
+                log.warn("A deferred action for threadId={} failed", threadId, exception);
+            }
+        }
+
+        void discardReleaseActions() {
+            synchronized (releaseActions) {
+                releaseActions.clear();
             }
         }
 
