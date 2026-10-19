@@ -14,6 +14,11 @@
 
 import * as runtime from '../runtime';
 import {
+    type ComponentOperationPropertyRequest,
+    ComponentOperationPropertyRequestFromJSON,
+    ComponentOperationPropertyRequestToJSON,
+} from '../models/ComponentOperationPropertyRequest';
+import {
     type Option,
     OptionFromJSON,
     OptionToJSON,
@@ -52,6 +57,14 @@ export interface GetClusterElementNodeOptionsRequest {
      * Optional search text used to filter option items
      */
     searchText?: string;
+}
+
+export interface GetWorkflowNodeComponentOperationOptionsRequest {
+    id: string;
+    workflowNodeName: string;
+    propertyName: string;
+    environmentId: number;
+    componentOperationPropertyRequest: ComponentOperationPropertyRequest;
 }
 
 export interface GetWorkflowNodeOptionsRequest {
@@ -181,6 +194,90 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
      */
     async getClusterElementNodeOptions(requestParameters: GetClusterElementNodeOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
         const response = await this.getClusterElementNodeOptionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getWorkflowNodeComponentOperationOptions without sending the request
+     */
+    async getWorkflowNodeComponentOperationOptionsRequestOpts(requestParameters: GetWorkflowNodeComponentOperationOptionsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowNodeComponentOperationOptions().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling getWorkflowNodeComponentOperationOptions().'
+            );
+        }
+
+        if (requestParameters['propertyName'] == null) {
+            throw new runtime.RequiredError(
+                'propertyName',
+                'Required parameter "propertyName" was null or undefined when calling getWorkflowNodeComponentOperationOptions().'
+            );
+        }
+
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling getWorkflowNodeComponentOperationOptions().'
+            );
+        }
+
+        if (requestParameters['componentOperationPropertyRequest'] == null) {
+            throw new runtime.RequiredError(
+                'componentOperationPropertyRequest',
+                'Required parameter "componentOperationPropertyRequest" was null or undefined when calling getWorkflowNodeComponentOperationOptions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/options/{propertyName}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{propertyName}', encodeURIComponent(String(requestParameters['propertyName'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ComponentOperationPropertyRequestToJSON(requestParameters['componentOperationPropertyRequest']),
+        };
+    }
+
+    /**
+     * Get options for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.
+     * Get options for a property of a component action or trigger using a connection declared on a workflow node
+     */
+    async getWorkflowNodeComponentOperationOptionsRaw(requestParameters: GetWorkflowNodeComponentOperationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Option>>> {
+        const requestOptions = await this.getWorkflowNodeComponentOperationOptionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionFromJSON));
+    }
+
+    /**
+     * Get options for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.
+     * Get options for a property of a component action or trigger using a connection declared on a workflow node
+     */
+    async getWorkflowNodeComponentOperationOptions(requestParameters: GetWorkflowNodeComponentOperationOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Option>> {
+        const response = await this.getWorkflowNodeComponentOperationOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
