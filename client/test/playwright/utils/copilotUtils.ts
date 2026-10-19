@@ -127,18 +127,29 @@ export async function navigateInApp(page: Page, path: string): Promise<void> {
     await page.waitForURL((url) => url.pathname === path);
 }
 
-const DEFAULT_WORKSPACE_ID = 1049;
+const WORKSPACE_REQUEST_PATH = /\/api\/automation\/internal\/workspaces\/(\d+)(\/|$)/;
 
-export async function readCurrentWorkspaceId(page: Page): Promise<number> {
-    return page.evaluate((defaultWorkspaceId) => {
-        const persistedWorkspaceStore = window.localStorage.getItem('bytechef.workspace');
+const readWorkspaceIdFromRequest = (request: Request) =>
+    new URL(request.url()).pathname.match(WORKSPACE_REQUEST_PATH)?.[1];
 
-        const currentWorkspaceId = persistedWorkspaceStore
-            ? JSON.parse(persistedWorkspaceStore)?.state?.currentWorkspaceId
-            : undefined;
+const readEnvironmentIdFromRequest = (request: Request) => {
+    const environmentId = new URL(request.url()).searchParams.get('environmentId');
 
-        return typeof currentWorkspaceId === 'number' ? currentWorkspaceId : defaultWorkspaceId;
-    }, DEFAULT_WORKSPACE_ID);
+    return environmentId !== null && /^\d+$/.test(environmentId) ? environmentId : undefined;
+};
+
+export async function waitForAppWorkspaceId(page: Page): Promise<number> {
+    const workspaceRequest = await page.waitForRequest((request) => readWorkspaceIdFromRequest(request) !== undefined);
+
+    return Number(readWorkspaceIdFromRequest(workspaceRequest));
+}
+
+export async function waitForAppEnvironmentId(page: Page): Promise<number> {
+    const environmentRequest = await page.waitForRequest(
+        (request) => readEnvironmentIdFromRequest(request) !== undefined
+    );
+
+    return Number(readEnvironmentIdFromRequest(environmentRequest));
 }
 
 export const lastUsedModelStorageKey = (workspaceId: number) => `bytechef.modelPicker.lastUsed.${workspaceId}`;

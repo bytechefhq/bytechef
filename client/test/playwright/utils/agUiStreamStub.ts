@@ -1,4 +1,4 @@
-import {type Page, type Route} from '@playwright/test';
+import {type Page, type Route, expect} from '@playwright/test';
 import {randomUUID} from 'node:crypto';
 
 export const COPILOT_WORKFLOW_EDITOR_CHAT_URL = /\/api\/platform\/internal\/ai\/chat\/workflow_editor(\?.*)?$/;
@@ -32,6 +32,7 @@ export type AgUiTurnType = AgUiEventType[];
 
 export interface AgUiStubI {
     requests: AgUiRequestI[];
+    waitForRequest: (requestIndex: number) => Promise<AgUiRequestI>;
 }
 
 const wireEvent = (type: string, fields: Record<string, unknown>): AgUiWireEventType => ({
@@ -126,7 +127,13 @@ export async function stubCopilotRun(page: Page, agentIdPattern: RegExp, turns: 
         });
     });
 
-    return {requests};
+    const waitForRequest = async (requestIndex: number) => {
+        await expect.poll(() => requests.length).toBeGreaterThan(requestIndex);
+
+        return requests[requestIndex];
+    };
+
+    return {requests, waitForRequest};
 }
 
 export function lastMessageOf(agUiRequest: AgUiRequestI): AgUiRequestMessageI | undefined {
