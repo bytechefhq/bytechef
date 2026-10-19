@@ -34,6 +34,7 @@ const catalog: ComponentCatalogType = {
                 version: 1,
             }) as unknown as ComponentDefinition
     ),
+    getDisplayConditions: vi.fn(async () => ({})),
     getOperationProperties: vi.fn(
         async () =>
             [
@@ -324,5 +325,80 @@ describe('action property completions', () => {
                 'actions: [{name: "a", perform: function (input, connection, context) {\ncontext.component.googleMaps.getAddress({'
             )
         ).toEqual([]);
+    });
+});
+
+describe('getScriptCompletions for runtime action properties', () => {
+    const properties = [
+        {name: 'baseId', type: 'STRING'},
+        {name: 'format', type: 'STRING'},
+        {displayCondition: "format == 'xml'", name: 'xmlRoot', type: 'STRING'},
+        {name: 'fields', propertiesDataSource: {propertiesLookupDependsOn: ['baseId']}, type: 'DYNAMIC_PROPERTIES'},
+    ] as unknown as Property[];
+
+    const runtimeCatalog: ComponentCatalogType = {
+        ...catalog,
+        components: [{name: 'airtable', title: 'Airtable', version: 1} as ComponentDefinitionBasic],
+        getOperationProperties: vi.fn(async () => properties),
+    };
+
+    const base = 'function perform(input, connection, context) {\n  context.component.airtable.createRecord(';
+
+    it('loads dynamic properties through the declared connection of the script node', async () => {
+        const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
+        const context: ScriptCompletionContextI = {
+            components: runtimeCatalog,
+            connections: [{componentName: 'airtable', componentVersion: 1, name: 'at'}],
+            input: {},
+            kind: 'script',
+            language: 'javascript',
+            loadDynamicProperties,
+            workflowNodeName: 'script_1',
+        };
+        const source = base + "{baseId: 'app1', fields: {";
+        const items = await getScriptCompletions({context, cursorOffset: source.length, source});
+
+        expect(items.map((item) => item.label)).toEqual(['Email']);
+        expect(loadDynamicProperties).toHaveBeenCalledWith({
+            actionName: 'createRecord',
+            componentName: 'airtable',
+            componentVersion: 1,
+            connectionKey: 'at',
+            lookupDependsOnPaths: ['baseId'],
+            parameters: {baseId: 'app1'},
+            propertyName: 'fields',
+            workflowNodeName: 'script_1',
+        });
+    });
+
+    it('hides a property whose display condition is false for the literal values written', async () => {
+        const context: ScriptCompletionContextI = {
+            components: runtimeCatalog,
+            connections: [],
+            input: {},
+            kind: 'script',
+            language: 'javascript',
+        };
+        const source = base + "{format: 'json', ";
+        const items = await getScriptCompletions({context, cursorOffset: source.length, source});
+
+        expect(items.map((item) => item.label)).toEqual(['baseId', 'fields']);
+    });
+
+    it('offers no dynamic properties without a connection declared for the component', async () => {
+        const loadDynamicProperties = vi.fn();
+        const context: ScriptCompletionContextI = {
+            components: runtimeCatalog,
+            connections: [],
+            input: {},
+            kind: 'script',
+            language: 'javascript',
+            loadDynamicProperties,
+            workflowNodeName: 'script_1',
+        };
+        const source = base + '{fields: {';
+
+        expect(await getScriptCompletions({context, cursorOffset: source.length, source})).toEqual([]);
+        expect(loadDynamicProperties).not.toHaveBeenCalled();
     });
 });
