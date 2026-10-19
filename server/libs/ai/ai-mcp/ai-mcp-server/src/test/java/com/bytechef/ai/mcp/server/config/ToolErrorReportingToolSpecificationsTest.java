@@ -22,16 +22,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
-import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.TaskDispatcherTools;
-import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorderImpl;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServerExchange;
@@ -91,9 +86,8 @@ class ToolErrorReportingToolSpecificationsTest {
         ToolCallback failingToolCallback = toolCallback("failingTool", "{\"error\":\"workspaceId is required\"}");
 
         ManagementMcpServerConfiguration managementMcpServerConfiguration = new ManagementMcpServerConfiguration(
-            mock(ComponentTools.class), mock(ProjectTools.class), mock(ProjectWorkflowLifecycleTools.class),
-            mock(TaskTools.class), mock(TaskDispatcherTools.class), mock(ScriptTools.class),
-            mock(ClusterElementTools.class), mock(WorkspaceTools.class), List.of(() -> List.of(failingToolCallback)),
+            mock(ProjectTools.class), mock(ProjectWorkflowLifecycleTools.class), mock(WorkspaceTools.class),
+            List.of(() -> List.of(failingToolCallback)),
             new ToolExecutionRecorderImpl(event -> {}, mock(ObjectProvider.class)), mock(WorkspaceFacade.class));
 
         McpServerFeatures.AsyncToolSpecification toolSpecification = managementMcpServerConfiguration

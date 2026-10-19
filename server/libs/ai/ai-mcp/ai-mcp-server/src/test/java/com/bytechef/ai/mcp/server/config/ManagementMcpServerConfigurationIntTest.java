@@ -21,15 +21,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
-import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.TaskDispatcherTools;
-import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
@@ -51,13 +46,8 @@ class ManagementMcpServerConfigurationIntTest {
         "listProjects", "searchProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
-        .withBean(ComponentTools.class, () -> mock(ComponentTools.class))
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
-        .withBean(TaskTools.class, () -> mock(TaskTools.class))
-        .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
-        .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
-        .withBean(ClusterElementTools.class, () -> mock(ClusterElementTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
         .withBean(ToolExecutionRecorder.class, () -> mock(ToolExecutionRecorder.class))
         .withBean(WorkspaceFacade.class, () -> mock(WorkspaceFacade.class))
@@ -131,7 +121,10 @@ class ManagementMcpServerConfigurationIntTest {
 
             assertThat(toolNames)
                 .contains("createProjectWorkflow", "deleteWorkflow", "saveWorkflowTestConnection")
-                .doesNotContain("updateWorkflow");
+                .doesNotContain(
+                    "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
+                    "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
+                    "updateWorkflowRootProperties");
         });
     }
 
