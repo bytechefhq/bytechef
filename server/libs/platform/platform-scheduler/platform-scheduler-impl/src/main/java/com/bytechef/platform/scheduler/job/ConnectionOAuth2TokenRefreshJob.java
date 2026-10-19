@@ -19,6 +19,8 @@ package com.bytechef.platform.scheduler.job;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.scheduler.util.QuartzConnectionRefreshUtils;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.quartz.Job;
@@ -28,6 +30,9 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,13 +42,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConnectionOAuth2TokenRefreshJob implements Job {
 
+    private static final Logger log = LoggerFactory.getLogger(ConnectionOAuth2TokenRefreshJob.class);
+
     private ConnectionFacade connectionFacade;
+    private ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
         Long connectionId = jobDataMap.getLong("connectionId");
         String tenantId = jobDataMap.getString("tenantId");
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, tenantId)) {
+            log.debug("Skipping connection refresh for inactive tenant {}", tenantId);
+
+            return;
+        }
 
         Integer expiresIn = TenantContext.callWithTenantId(
             tenantId, () -> connectionFacade.executeConnectionRefresh(connectionId));
@@ -72,5 +86,13 @@ public class ConnectionOAuth2TokenRefreshJob implements Job {
     @SuppressFBWarnings("EI")
     public void setConnectionFacade(ConnectionFacade connectionFacade) {
         this.connectionFacade = connectionFacade;
+    }
+
+    @Autowired
+    @SuppressFBWarnings("EI")
+    public void setTenantDeletionServiceProvider(
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
+
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 }

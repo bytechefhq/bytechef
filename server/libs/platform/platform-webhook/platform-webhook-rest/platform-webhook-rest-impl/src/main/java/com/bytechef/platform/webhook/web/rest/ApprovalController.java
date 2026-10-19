@@ -21,9 +21,12 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,11 +46,16 @@ public class ApprovalController {
 
     private final ObjectProvider<ApprovalTokens> approvalTokensProvider;
     private final JobFacade jobFacade;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @SuppressFBWarnings("EI")
-    public ApprovalController(ObjectProvider<ApprovalTokens> approvalTokensProvider, JobFacade jobFacade) {
+    public ApprovalController(
+        ObjectProvider<ApprovalTokens> approvalTokensProvider, JobFacade jobFacade,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
+
         this.approvalTokensProvider = approvalTokensProvider;
         this.jobFacade = jobFacade;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 
     /**
@@ -73,6 +81,11 @@ public class ApprovalController {
             approvalId = ApprovalId.parse(innerTokenOptional.get());
         } catch (IllegalArgumentException | IndexOutOfBoundsException exception) {
             return ResponseEntity.badRequest()
+                .build();
+        }
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, approvalId.getTenantId())) {
+            return ResponseEntity.status(HttpStatus.GONE)
                 .build();
         }
 

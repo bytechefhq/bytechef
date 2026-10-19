@@ -44,6 +44,8 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +55,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -70,6 +73,7 @@ public class TriggerCoordinator {
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
@@ -84,7 +88,8 @@ public class TriggerCoordinator {
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerCompletionHandler triggerCompletionHandler,
         TriggerDispatcher triggerDispatcher, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, TriggerScheduler triggerScheduler,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        TriggerStateService triggerStateService, WorkflowService workflowService,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
@@ -92,6 +97,7 @@ public class TriggerCoordinator {
         this.eventPublisher = eventPublisher;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
@@ -147,6 +153,10 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerListenerEvent.getWorkflowExecutionId();
 
+        if (isInactiveTenant(workflowExecutionId)) {
+            return;
+        }
+
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             try {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -187,6 +197,10 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
 
+        if (isInactiveTenant(workflowExecutionId)) {
+            return;
+        }
+
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             try {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -224,6 +238,10 @@ public class TriggerCoordinator {
 
         WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
 
+        if (isInactiveTenant(workflowExecutionId)) {
+            return;
+        }
+
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
             try {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -248,6 +266,16 @@ public class TriggerCoordinator {
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
             }
         });
+    }
+
+    private boolean isInactiveTenant(WorkflowExecutionId workflowExecutionId) {
+        boolean inactive = InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId());
+
+        if (inactive && log.isDebugEnabled()) {
+            log.debug("Dropping trigger event for inactive tenant: workflowExecutionId={}", workflowExecutionId);
+        }
+
+        return inactive;
     }
 
     private void dispatch(TriggerExecution triggerExecution) {

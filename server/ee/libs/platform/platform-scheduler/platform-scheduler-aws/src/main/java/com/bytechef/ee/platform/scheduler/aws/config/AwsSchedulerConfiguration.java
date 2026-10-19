@@ -33,6 +33,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.tenant.service.TenantDeletionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.listener.MessageListenerContainer;
@@ -112,8 +113,10 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
-    ConnectionRefreshListener connectionRefreshListener(ConnectionFacade connectionFacade) {
-        return new ConnectionRefreshListener(connectionFacade);
+    ConnectionRefreshListener connectionRefreshListener(
+        ConnectionFacade connectionFacade, ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
+
+        return new ConnectionRefreshListener(connectionFacade, tenantDeletionServiceProvider);
     }
 
     @Bean

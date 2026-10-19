@@ -39,6 +39,7 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorReg
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -65,6 +67,9 @@ class TriggerCoordinatorTest {
 
     @Mock
     private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+
+    @Mock
+    private ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @Mock
     private TriggerCompletionHandler triggerCompletionHandler;
@@ -97,7 +102,7 @@ class TriggerCoordinatorTest {
         triggerCoordinator = new TriggerCoordinator(
             List.of(), List.of(), evaluator, eventPublisher, jobPrincipalAccessorRegistry,
             triggerCompletionHandler, triggerDispatcher, triggerExecutionService,
-            triggerFileStorage, triggerScheduler, triggerStateService, workflowService);
+            triggerFileStorage, triggerScheduler, triggerStateService, workflowService, tenantDeletionServiceProvider);
     }
 
     @Test

@@ -35,6 +35,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -42,6 +43,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Ivica Cardic
  */
+@SuppressWarnings("unchecked")
 class WebhookTriggerControllerTest {
 
     private static final WebhookTriggerFlags ASYNC_EXECUTION_FLAGS =
@@ -62,7 +64,8 @@ class WebhookTriggerControllerTest {
         webhookWorkflowExecutor = mock(WebhookWorkflowExecutor.class);
 
         webhookTriggerController = new WebhookTriggerController(
-            mock(ApplicationProperties.class), mock(TempFileStorage.class), webhookWorkflowExecutor);
+            mock(ApplicationProperties.class), mock(TempFileStorage.class), webhookWorkflowExecutor,
+            mock(ObjectProvider.class));
     }
 
     @Test

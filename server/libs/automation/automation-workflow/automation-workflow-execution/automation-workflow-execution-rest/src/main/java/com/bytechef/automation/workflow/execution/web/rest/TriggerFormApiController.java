@@ -24,11 +24,14 @@ import com.bytechef.automation.workflow.execution.web.rest.model.TriggerFormMode
 import com.bytechef.commons.util.HtmlSanitizerUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,15 +49,17 @@ public class TriggerFormApiController implements TriggerFormApi {
 
     private final ConversionService conversionService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerFormApiController(
         ConversionService conversionService, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService) {
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider, WorkflowService workflowService) {
 
         this.conversionService = conversionService;
         this.projectWorkflowService = projectWorkflowService;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
         this.workflowService = workflowService;
     }
 
@@ -66,6 +71,10 @@ public class TriggerFormApiController implements TriggerFormApi {
             workflowExecutionId = WorkflowExecutionId.parse(id);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid id: " + id, e);
+        }
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId())) {
+            throw new ResponseStatusException(HttpStatus.GONE);
         }
 
         String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(

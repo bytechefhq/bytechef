@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.exception.InvalidWebhookSignatureException;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -61,12 +63,16 @@ class BillingWebhookFacadeImplTest {
     @Mock
     private StripeClient stripeClient;
 
+    @Mock
+    private ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
+
     private BillingWebhookFacadeImpl billingWebhookFacade;
 
     @BeforeEach
     void setUp() {
         billingWebhookFacade =
-            new BillingWebhookFacadeImpl(billingWebhookEventHandler, new ObjectMapper(), stripeClient);
+            new BillingWebhookFacadeImpl(
+                billingWebhookEventHandler, new ObjectMapper(), stripeClient, tenantDeletionServiceProvider);
 
         lenient().doAnswer(invocation -> Webhook.constructEvent(
             invocation.getArgument(0), invocation.getArgument(1), WEBHOOK_SECRET))

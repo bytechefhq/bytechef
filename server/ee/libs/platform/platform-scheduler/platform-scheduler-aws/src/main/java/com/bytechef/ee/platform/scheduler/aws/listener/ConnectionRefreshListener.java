@@ -14,8 +14,13 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedule
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @version ee
@@ -24,11 +29,17 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
  */
 public class ConnectionRefreshListener {
 
+    private static final Logger log = LoggerFactory.getLogger(ConnectionRefreshListener.class);
+
     private final ConnectionFacade connectionFacade;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @SuppressFBWarnings("EI")
-    public ConnectionRefreshListener(ConnectionFacade connectionFacade) {
+    public ConnectionRefreshListener(
+        ConnectionFacade connectionFacade, ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
+
         this.connectionFacade = connectionFacade;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 
     @SqsListener(
@@ -39,6 +50,12 @@ public class ConnectionRefreshListener {
         String[] split = message.split(SPLITTER);
         String tenantId = split[0];
         Long connectionId = Long.valueOf(split[1]);
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, tenantId)) {
+            log.debug("Skipping connection refresh for inactive tenant {}", tenantId);
+
+            return;
+        }
 
         TenantContext.runWithTenantId(tenantId, () -> connectionFacade.executeConnectionRefresh(connectionId));
     }

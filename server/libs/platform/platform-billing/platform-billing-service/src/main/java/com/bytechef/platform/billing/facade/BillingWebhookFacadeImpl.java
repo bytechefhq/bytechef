@@ -18,8 +18,13 @@ package com.bytechef.platform.billing.facade;
 
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import com.stripe.model.Event;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
@@ -32,18 +37,22 @@ import tools.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingWebhookFacadeImpl implements BillingWebhookFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(BillingWebhookFacadeImpl.class);
+
     private final BillingWebhookEventHandler billingWebhookEventHandler;
     private final ObjectMapper objectMapper;
     private final StripeClient stripeClient;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BillingWebhookFacadeImpl(
         BillingWebhookEventHandler billingWebhookEventHandler, ObjectMapper objectMapper,
-        StripeClient stripeClient) {
+        StripeClient stripeClient, ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         this.billingWebhookEventHandler = billingWebhookEventHandler;
         this.objectMapper = objectMapper;
         this.stripeClient = stripeClient;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 
     @Override
@@ -51,6 +60,12 @@ public class BillingWebhookFacadeImpl implements BillingWebhookFacade {
         Event event = stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
 
         String tenantId = extractTenantId(payload, event.getType());
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, tenantId)) {
+            log.debug("Dropping {} webhook event for inactive tenant {}", event.getType(), tenantId);
+
+            return;
+        }
 
         TenantContext.runWithTenantId(tenantId, () -> billingWebhookEventHandler.handle(event));
     }
