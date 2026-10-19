@@ -52,7 +52,7 @@ public abstract class LocalAgent implements Agent {
      */
     protected Function<LocalAgent, String> systemMessageProvider;
 
-    protected List<BaseMessage> messages;
+    protected final List<BaseMessage> messages;
 
     /**
      * Constructs a new LocalAgent with the specified configuration.
@@ -81,7 +81,7 @@ public abstract class LocalAgent implements Agent {
         this.systemMessage = systemMessage;
         this.systemMessageProvider = systemMessageProvider;
 
-        this.messages = messages;
+        this.messages = Objects.isNull(messages) ? List.of() : List.copyOf(messages);
     }
 
     /**
