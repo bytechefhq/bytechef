@@ -39,10 +39,10 @@ public class AgUiFunctionToolCallback implements ToolCallback {
 
         try {
             result = this.toolCallback.call(toolInput, toolContext);
-        } catch (RuntimeException exception) {
-            this.listener.onToolCallFailed(toolCallId, exception);
+        } catch (RuntimeException | Error throwable) {
+            this.listener.onToolCallFailed(toolCallId, throwable);
 
-            throw exception;
+            throw throwable;
         }
 
         this.listener.onToolCallFinished(toolCallId, result);
