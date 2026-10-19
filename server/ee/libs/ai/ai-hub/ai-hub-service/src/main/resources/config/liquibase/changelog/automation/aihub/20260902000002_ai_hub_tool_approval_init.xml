@@ -5,8 +5,7 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <!--
         One flagged AI Hub tool call waiting for (or already resolved by) a person's approval decision. No
-        foreign key to ai_hub_chat - the chat's delete path deletes approvals explicitly, matching how
-        ai_hub_chat_tool rows are cleaned.
+        foreign key to ai_hub_chat: the chat's delete path deletes approvals explicitly.
     -->
     <changeSet id="20260902000002" author="Ivica Cardic">
         <createTable tableName="ai_hub_tool_approval">

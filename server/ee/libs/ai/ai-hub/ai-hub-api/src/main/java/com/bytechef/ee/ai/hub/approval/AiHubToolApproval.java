@@ -17,6 +17,15 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
+ * One flagged AI Hub tool call waiting for (or already resolved by) a person's approval decision. {@link #toolKind}
+ * distinguishes a catalog tool from a component action; {@link #componentName}/{@link #componentVersion} are set only
+ * for the latter. {@link #arguments} carries the LLM-supplied JSON call arguments verbatim, so a resolved approval can
+ * re-drive the original tool invocation.
+ *
+ * <p>
+ * No foreign key to {@code ai_hub_chat}: the chat's delete path deletes approvals explicitly.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic
