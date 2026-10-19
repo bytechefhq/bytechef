@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiPlatformPermissionScopeProvider;
@@ -161,6 +162,61 @@ class PermissionScopeRegistryTest {
             .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    void testAScopeDeclaredOnBothSidesWithTheSameMinimumRoleBelongsToBoth() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.of(
+                automationProvider(new ScopeDefinition(TestPermissionScope.WORKFLOW_VIEW, WorkspaceRole.VIEWER)),
+                embeddedProvider(new ScopeDefinition(TestPermissionScope.WORKFLOW_VIEW, WorkspaceRole.VIEWER))));
+
+        assertThat(registry.getAllScopeNames(PermissionScopeSide.AUTOMATION)).contains("WORKFLOW_VIEW");
+        assertThat(registry.getAllScopeNames(PermissionScopeSide.EMBEDDED)).contains("WORKFLOW_VIEW");
+    }
+
+    @Test
+    void testAnEmbeddedOnlyScopeIsAbsentFromTheAutomationSide() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.of(
+                embeddedProvider(new ScopeDefinition(TestPermissionScope.INTEGRATION_CREATE, WorkspaceRole.EDITOR))));
+
+        assertThat(registry.getAllScopeNames()).doesNotContain("INTEGRATION_CREATE");
+        assertThat(registry.getScopeNames(WorkspaceRole.EDITOR)).doesNotContain("INTEGRATION_CREATE");
+        assertThat(registry.getScopeNames(WorkspaceRole.VIEWER, PermissionScopeSide.EMBEDDED))
+            .doesNotContain("INTEGRATION_CREATE");
+        assertThat(registry.getScopeNames(WorkspaceRole.EDITOR, PermissionScopeSide.EMBEDDED))
+            .contains("INTEGRATION_CREATE");
+    }
+
+    @Test
+    void testConflictingMinimumRolesAcrossSidesStillFailStartup() {
+        List<PermissionScopeProvider> permissionScopeProviders = List.of(
+            automationProvider(new ScopeDefinition(TestPermissionScope.MCP_DELETE, WorkspaceRole.ADMIN)),
+            embeddedProvider(new ScopeDefinition(TestPermissionScope.MCP_DELETE, WorkspaceRole.EDITOR)));
+
+        assertThatThrownBy(() -> new PermissionScopeRegistry(permissionScopeProviders))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("conflicting minimum roles");
+    }
+
+    private static PermissionScopeProvider automationProvider(ScopeDefinition... scopeDefinitions) {
+        return () -> Set.of(scopeDefinitions);
+    }
+
+    private static PermissionScopeProvider embeddedProvider(ScopeDefinition... scopeDefinitions) {
+        return new PermissionScopeProvider() {
+
+            @Override
+            public Set<ScopeDefinition> scopeDefinitions() {
+                return Set.of(scopeDefinitions);
+            }
+
+            @Override
+            public PermissionScopeSide side() {
+                return PermissionScopeSide.EMBEDDED;
+            }
+        };
+    }
+
     private static Set<String> union(Set<String> first, Set<String> second) {
         return Stream.concat(first.stream(), second.stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -175,7 +231,10 @@ class PermissionScopeRegistryTest {
         ALPHA_MANAGE,
         BETA_VIEW,
         BETA_DELETE,
-        X_SCOPE
+        X_SCOPE,
+        WORKFLOW_VIEW,
+        INTEGRATION_CREATE,
+        MCP_DELETE
     }
 
     @Nested
