@@ -1,5 +1,6 @@
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {getServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {act, renderHook} from '@testing-library/react';
@@ -149,9 +150,9 @@ describe('useSwitchChat', () => {
 
         expect(aiHubStore.getState().chatId).toBe('thread-target');
         expect(aiHubStore.getState().messages).toEqual([
-            {content: 'hi', role: 'user'},
-            {content: 'hello', role: 'assistant'},
-            {content: 'sys', role: 'system'},
+            {content: 'hi', metadata: {custom: {serverRowIndex: 0}}, role: 'user'},
+            {content: 'hello', metadata: {custom: {serverRowIndex: 1}}, role: 'assistant'},
+            {content: 'sys', metadata: {custom: {serverRowIndex: 2}}, role: 'system'},
         ]);
         expect(aiHubStore.getState().messagesLoading).toBe(false);
     });
@@ -202,6 +203,7 @@ describe('useSwitchChat', () => {
                     type: 'tool-call',
                 },
             ],
+            metadata: {custom: {serverRowIndex: 1}},
             role: 'assistant',
         });
     });
@@ -727,6 +729,29 @@ describe('useSwitchChat', () => {
         expect(mockGetToolApprovals).not.toHaveBeenCalled();
     });
 
+    it('marks each row with its server row index and leaves client-only rows unmarked', async () => {
+        mockGetChatMessages.mockResolvedValue([
+            buildMessage({
+                content: 'Bind a Slack connection',
+                role: 'USER',
+                toolEventsJson: JSON.stringify([
+                    {arguments: '{}', id: 'call-list', kind: 'call', name: 'listConnections'},
+                    {id: 'call-list', kind: 'result', name: 'listConnections', response: '[]'},
+                ]),
+            }),
+            buildMessage({content: 'Pick one:', role: 'ASSISTANT'}),
+            buildMessage({content: 'User picked: Slack Engineering (ID: 1051)', role: 'USER'}),
+            buildMessage({content: 'Bound.', role: 'ASSISTANT'}),
+        ]);
+
+        await switchTo(buildChat());
+
+        const {messages, nextServerRowIndex} = aiHubStore.getState();
+
+        expect(messages.map((message) => getServerRowIndex(message))).toEqual([0, undefined, 1, 2, 3]);
+        expect(nextServerRowIndex).toBe(4);
+    });
+
     it('returns true on success', async () => {
         mockGetChatMessages.mockResolvedValue([buildMessage({})]);
 
@@ -791,7 +816,9 @@ describe('useSwitchChat', () => {
 
             await switchTo(buildChat());
 
-            expect(aiHubStore.getState().messages).toEqual([{content: 'Opened.', role: 'assistant'}]);
+            expect(aiHubStore.getState().messages).toEqual([
+                {content: 'Opened.', metadata: {custom: {serverRowIndex: 0}}, role: 'assistant'},
+            ]);
         });
     });
 });
