@@ -42,7 +42,8 @@ The client records `WORKFLOW_REFERENCED` through `useRecordReferencedArtifacts` 
 lists (never a sweep of every `ToolCallback` bean). ASK is read only: `ReadProjectTools`,
 `ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`. BUILD adds `ProjectTools`,
 `ProjectWorkflowLifecycleTools`, deployment writes, write pickers, and `buildWorkflow` / `importWorkflow`.
-The controller needs workspace role VIEWER for ASK and EDITOR for BUILD.
+The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
+(`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
 
 Parity contract: the Copilot, the Hub and the management MCP server (`ManagementMcpServerConfiguration`) author
 workflow content only through the same `buildWorkflow` / `importWorkflow` specialist. No door holds raw
