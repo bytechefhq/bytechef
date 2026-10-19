@@ -1,4 +1,4 @@
-import {expect, mergeTests} from '@playwright/test';
+import {type Locator, expect, mergeTests} from '@playwright/test';
 
 import {loginTest, projectTest, workflowTest} from '../../fixtures';
 import {
@@ -25,6 +25,21 @@ const SELECT_SLACK_CONNECTION_RESULT = JSON.stringify({
     componentName: 'slack',
     kind: 'select-connection',
 });
+
+const readAncestorOpacity = (pickerLocator: Locator) =>
+    pickerLocator.evaluate((pickerElement) => {
+        let effectiveOpacity = 1;
+
+        for (
+            let ancestorElement = pickerElement.parentElement;
+            ancestorElement !== null;
+            ancestorElement = ancestorElement.parentElement
+        ) {
+            effectiveOpacity *= Number(window.getComputedStyle(ancestorElement).opacity);
+        }
+
+        return effectiveOpacity;
+    });
 
 const selectSlackConnectionTurn = () =>
     completedTurn(
@@ -73,7 +88,7 @@ test.describe('Copilot interactive pickers', () => {
         await test.step('Assert the pick is the next request last message', async () => {
             await expect.poll(() => copilotRun.requests.length).toBe(2);
 
-            expect(lastMessageOf(copilotRun.requests[1])).toMatchObject({
+            expect(lastMessageOf(await copilotRun.waitForRequest(1))).toMatchObject({
                 content: 'User picked: Slack Support (ID: 102)',
                 role: 'user',
             });
@@ -195,7 +210,7 @@ test.describe('Copilot interactive pickers', () => {
         await test.step('Assert the picked value is sent', async () => {
             await expect.poll(() => copilotRun.requests.length).toBe(2);
 
-            expect(lastMessageOf(copilotRun.requests[1])).toMatchObject({
+            expect(lastMessageOf(await copilotRun.waitForRequest(1))).toMatchObject({
                 content: 'User picked: #random (value: C0RANDOM)',
                 role: 'user',
             });
@@ -240,7 +255,7 @@ test.describe('Copilot interactive pickers', () => {
         await test.step('Assert the answer is sent once', async () => {
             await expect.poll(() => copilotRun.requests.length).toBe(2);
 
-            expect(lastMessageOf(copilotRun.requests[1])).toMatchObject({
+            expect(lastMessageOf(await copilotRun.waitForRequest(1))).toMatchObject({
                 content: 'User picked: Engineering',
                 role: 'user',
             });
@@ -265,6 +280,8 @@ test.describe('Copilot interactive pickers', () => {
             await copilotPanel.sendAndWaitForTurnEnd('Post new leads to Slack');
 
             await expect(connectionPicker).toBeEnabled();
+
+            await expect.poll(() => readAncestorOpacity(connectionPicker)).toBe(1);
         });
 
         await test.step('Send a newer message', async () => {
@@ -274,9 +291,7 @@ test.describe('Copilot interactive pickers', () => {
         await test.step('Assert the picker is dimmed and disabled', async () => {
             await expect(connectionPicker).toBeDisabled();
 
-            await expect(
-                copilotPanel.root.locator('.opacity-60').filter({has: page.getByRole('combobox')})
-            ).toBeVisible();
+            await expect.poll(() => readAncestorOpacity(connectionPicker)).toBeLessThan(1);
         });
     });
 
@@ -318,9 +333,11 @@ test.describe('Copilot interactive pickers', () => {
         });
 
         await test.step('Assert the Ask request and UI', async () => {
-            expect(copilotRun.requests[0].state).toMatchObject({mode: 'ASK', source: 'WORKFLOW_EDITOR'});
+            expect((await copilotRun.waitForRequest(0)).state).toMatchObject({mode: 'ASK', source: 'WORKFLOW_EDITOR'});
 
-            expect((copilotRun.requests[0].tools ?? []).map((tool) => tool.name)).not.toContain('selectConnection');
+            expect(((await copilotRun.waitForRequest(0)).tools ?? []).map((tool) => tool.name)).not.toContain(
+                'selectConnection'
+            );
 
             await expect(copilotPanel.root.getByRole('combobox')).toHaveCount(0);
         });
@@ -330,7 +347,7 @@ test.describe('Copilot interactive pickers', () => {
 
             await copilotPanel.sendAndWaitForTurnEnd('Build it');
 
-            expect(copilotRun.requests[1].state).toMatchObject({mode: 'BUILD'});
+            expect((await copilotRun.waitForRequest(1)).state).toMatchObject({mode: 'BUILD'});
 
             await expect(copilotPanel.root.getByRole('combobox')).toBeVisible();
         });
