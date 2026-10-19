@@ -25,7 +25,6 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -97,16 +96,6 @@ public class JdbcJobRepositoryIntTest {
         resultJob = jobOptional.get();
 
         Assertions.assertEquals(Job.Status.FAILED, resultJob.getStatus());
-    }
-
-    @Test
-    public void testFindAllIdsByStatus() {
-        Job stoppedJob = jobRepository.save(getJob(Job.Status.STOPPED));
-
-        jobRepository.save(getJob(Job.Status.STARTED));
-
-        Assertions.assertEquals(
-            List.of(stoppedJob.getId()), jobRepository.findAllIdsByStatus(Job.Status.STOPPED.ordinal()));
     }
 
     @Test

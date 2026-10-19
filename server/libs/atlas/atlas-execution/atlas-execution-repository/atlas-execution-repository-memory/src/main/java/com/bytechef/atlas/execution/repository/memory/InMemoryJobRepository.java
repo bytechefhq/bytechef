@@ -111,11 +111,6 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public List<Long> findAllIdsByStatus(int status) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<Job> findById(Long id) {
         return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)));
     }
