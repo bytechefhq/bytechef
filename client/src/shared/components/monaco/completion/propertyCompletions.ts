@@ -1,8 +1,25 @@
-import type {DynamicPropertiesProperty, Property} from '@/shared/middleware/platform/configuration';
+import type {
+    DynamicPropertiesProperty,
+    Option,
+    OptionsDataSource,
+    Property,
+} from '@/shared/middleware/platform/configuration';
 
 import type {CompletionItemDraftType} from './scriptCompletions';
 
 type NestedPropertyType = Property & {defaultValue?: unknown; items?: Property[]; properties?: Property[]};
+
+type OptionPropertyType = Property & {options?: Option[]; optionsDataSource?: OptionsDataSource};
+
+export type PropertyValueRequestType = Omit<PropertyCompletionRequestType, 'existingKeys' | 'loadDisplayConditions'> & {
+    loadOptions?: (
+        propertyName: string,
+        lookupDependsOnPaths: string[],
+        parameters: Record<string, unknown>
+    ) => Promise<Option[]>;
+    replaceLength: number;
+    toInsertText: (value: unknown) => string | undefined;
+};
 
 export type PropertyCompletionRequestType = {
     existingKeys: string[];
@@ -134,7 +151,7 @@ async function visibleProperties(
 }
 
 async function dynamicPropertiesOf(
-    request: PropertyCompletionRequestType,
+    request: Pick<PropertyCompletionRequestType, 'loadDynamicProperties'>,
     property: DynamicPropertiesProperty,
     values: Record<string, unknown>
 ): Promise<Property[]> {
@@ -163,21 +180,107 @@ export async function getPropertyCompletionItems(
         return buildPropertyItems(await visibleProperties(request, values), existingKeys);
     }
 
-    const [firstSegment, ...restOfPath] = propertyPath;
+    const nestedProperties = await containerProperties(request, propertyPath, values);
+
+    return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
+}
+
+async function containerProperties(
+    request: Pick<PropertyCompletionRequestType, 'loadDynamicProperties' | 'properties'>,
+    path: string[],
+    values: Record<string, unknown>
+): Promise<Property[] | undefined> {
+    const {properties} = request;
+    const [firstSegment, ...restOfPath] = path;
     const dynamicProperty = properties.find(
         (property) => property.name === firstSegment && property.type === 'DYNAMIC_PROPERTIES'
     );
 
     if (dynamicProperty) {
-        const nestedProperties = findNestedProperties(
+        return findNestedProperties(
             await dynamicPropertiesOf(request, dynamicProperty as DynamicPropertiesProperty, values),
             restOfPath
         );
-
-        return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
     }
 
-    const nestedProperties = findNestedProperties(properties, propertyPath);
+    return findNestedProperties(properties, path);
+}
 
-    return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
+async function optionsOf(
+    request: PropertyValueRequestType,
+    property: OptionPropertyType,
+    values: Record<string, unknown>,
+    topLevel: boolean
+): Promise<Option[]> {
+    if (property.options?.length) {
+        return property.options;
+    }
+
+    if (property.optionsDataSource && request.loadOptions && topLevel && property.name) {
+        try {
+            return await request.loadOptions(
+                property.name,
+                property.optionsDataSource.optionsLookupDependsOn ?? [],
+                values
+            );
+        } catch {
+            return [];
+        }
+    }
+
+    return property.type === 'BOOLEAN' ? [{value: true}, {value: false}] : [];
+}
+
+function isPrimitive(value: unknown): value is boolean | number | string {
+    return typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string';
+}
+
+export async function getPropertyValueItems(request: PropertyValueRequestType): Promise<CompletionItemDraftType[]> {
+    const {parameters, presentKeys, properties, propertyPath, replaceLength, toInsertText} = request;
+    const propertyName = propertyPath[propertyPath.length - 1];
+
+    if (propertyName === undefined) {
+        return [];
+    }
+
+    const topLevel = propertyPath.length === 1;
+    const values = withDefaults(properties, parameters, presentKeys);
+
+    if (topLevel) {
+        delete values[propertyName];
+    }
+
+    const container = await containerProperties(request, propertyPath.slice(0, -1), values);
+    const property = container?.find((candidate) => candidate.name === propertyName) as OptionPropertyType | undefined;
+
+    if (!property) {
+        return [];
+    }
+
+    const items: CompletionItemDraftType[] = [];
+
+    for (const option of await optionsOf(request, property, values, topLevel)) {
+        const insertText = isPrimitive(option.value) ? toInsertText(option.value) : undefined;
+
+        if (insertText === undefined) {
+            continue;
+        }
+
+        const valueText = String(option.value);
+        const label = option.label || valueText;
+
+        items.push({
+            ...(label !== valueText && {detail: valueText}),
+            documentation: option.description,
+            filterText: label === valueText ? valueText : `${valueText} ${label}`,
+            insertAsSnippet: false,
+            insertText,
+            kind: 'value',
+            label,
+            replaceLength,
+            sortText: String(items.length).padStart(3, '0'),
+        });
+    }
+
+    return items;
 }

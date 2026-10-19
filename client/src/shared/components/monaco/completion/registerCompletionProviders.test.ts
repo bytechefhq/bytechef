@@ -7,6 +7,7 @@ import type {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
 import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
+    Property,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 
@@ -221,6 +222,53 @@ describe('buildCompletionProvider', () => {
                 filterText: 'sendEmail',
                 insertText: 'sendEmail',
                 range: {endColumn: line.length + 1, startColumn: line.length + 1},
+            });
+        });
+    });
+
+    describe('replace range for an option value', () => {
+        const uri = 'inmemory://workflow-definition-values';
+
+        registerCompletionContext(uri, {
+            components: {
+                components: [],
+                getConnectionDefinition: vi.fn(),
+                getDefinition: vi.fn(),
+                getDisplayConditions: vi.fn(async () => ({})),
+                getOperationProperties: vi.fn(
+                    async () =>
+                        [
+                            {name: 'mimeType', options: [{value: 'application/json'}], type: 'STRING'},
+                        ] as unknown as Property[]
+                ),
+            },
+            format: 'json',
+            functions: [],
+            getNodeOutputs: vi.fn(async () => []),
+            kind: 'workflowDefinition',
+        });
+
+        it('replaces everything typed of the value, not only the trailing word', async () => {
+            const line =
+                '{"tasks": [{"name": "h", "type": "httpClient/v1/get", "parameters": {"mimeType": "application/js';
+            const source = `${line}"}}]}`;
+            const model = {
+                getLineContent: () => source,
+                getOffsetAt: () => line.length,
+                getValue: () => source,
+                uri: {toString: () => uri},
+            };
+
+            const result = await buildCompletionProvider(fakeMonaco).provideCompletionItems(
+                model as never,
+                {column: line.length + 1, lineNumber: 1} as never,
+                {} as never,
+                {} as never
+            );
+
+            expect(result?.suggestions[0]).toMatchObject({
+                insertText: 'application/json',
+                range: {endColumn: line.length + 1, startColumn: line.length + 1 - 'application/js'.length},
             });
         });
     });

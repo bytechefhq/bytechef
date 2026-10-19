@@ -451,3 +451,76 @@ describe('getScriptCompletions for runtime action properties', () => {
         expect(loadDynamicProperties).not.toHaveBeenCalled();
     });
 });
+
+describe('getScriptCompletions for action property values', () => {
+    const properties = [
+        {name: 'method', options: [{value: 'GET'}, {value: "it's"}], type: 'STRING'},
+        {name: 'followRedirect', type: 'BOOLEAN'},
+        {name: 'tableId', optionsDataSource: {optionsLookupDependsOn: []}, type: 'STRING'},
+    ] as unknown as Property[];
+
+    const valueCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(async () => properties),
+    };
+
+    const contextFor = (language: 'javascript' | 'python', extra: Partial<ScriptCompletionContextI> = {}) =>
+        ({
+            components: valueCatalog,
+            connections: [{componentName: 'airtable', componentVersion: 1, name: 'at'}],
+            input: {},
+            kind: 'script',
+            language,
+            ...extra,
+        }) as ScriptCompletionContextI;
+
+    it('inserts quoted string literals after a key', async () => {
+        const source = 'function perform(input, connection, context) {\n  context.component.airtable.list({method: G';
+        const items = await getScriptCompletions({
+            context: contextFor('javascript'),
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => [item.insertText, item.replaceLength])).toEqual([
+            ["'GET'", 1],
+            ["'it\\'s'", 1],
+        ]);
+    });
+
+    it('inserts raw text inside an open quote and Python booleans outside one', async () => {
+        const quoted = 'def perform(input, connection, context):\n    context.component.airtable.list({"method": "G';
+        const quotedItems = await getScriptCompletions({
+            context: contextFor('python'),
+            cursorOffset: quoted.length,
+            source: quoted,
+        });
+
+        expect(quotedItems.map((item) => item.insertText)).toEqual(['GET', "it's"]);
+
+        const flag =
+            'def perform(input, connection, context):\n    context.component.airtable.list({"followRedirect": ';
+        const flagItems = await getScriptCompletions({
+            context: contextFor('python'),
+            cursorOffset: flag.length,
+            source: flag,
+        });
+
+        expect(flagItems.map((item) => item.insertText)).toEqual(['True', 'False']);
+    });
+
+    it('loads options through the declared connection of the script node', async () => {
+        const loadOptions = vi.fn(async () => [{label: 'Customers', value: 'tbl1'}]);
+        const source = 'function perform(input, connection, context) {\n  context.component.airtable.list({tableId: ';
+        const items = await getScriptCompletions({
+            context: contextFor('javascript', {loadOptions, workflowNodeName: 'script_1'}),
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => [item.label, item.insertText])).toEqual([['Customers', "'tbl1'"]]);
+        expect(loadOptions).toHaveBeenCalledWith(
+            expect.objectContaining({connectionKey: 'at', propertyName: 'tableId', workflowNodeName: 'script_1'})
+        );
+    });
+});

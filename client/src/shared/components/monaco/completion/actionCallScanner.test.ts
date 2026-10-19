@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 
-import {findActionCallKeySlot} from './actionCallScanner';
+import {findActionCallKeySlot, findActionCallValueSlot} from './actionCallScanner';
 
 const at = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javascript') =>
     findActionCallKeySlot(source, source.length, language);
@@ -91,5 +91,48 @@ describe('findActionCallKeySlot', () => {
             rootKeys: ['flag', 'label'],
             rootValues: {flag: false},
         });
+    });
+});
+
+describe('findActionCallValueSlot', () => {
+    const valueAt = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javascript') =>
+        findActionCallValueSlot(source, source.length, language);
+
+    it('finds an unquoted value being typed after a key', () => {
+        expect(valueAt('context.component.a.b({uri: "x", method: PO')).toEqual({
+            calleeText: 'context.component.a.b',
+            prefix: 'PO',
+            propertyPath: ['method'],
+            rootKeys: ['uri', 'method'],
+            rootValues: {uri: 'x'},
+        });
+    });
+
+    it('finds a quoted value with its quote and raw prefix', () => {
+        expect(valueAt("context.component.a.b({method: 'app/js")).toMatchObject({
+            prefix: 'app/js',
+            propertyPath: ['method'],
+            quote: "'",
+        });
+    });
+
+    it('walks into nested objects and reads Python and Ruby keys', () => {
+        expect(valueAt('context.component.a.b({headers: {mode: ')).toMatchObject({
+            prefix: '',
+            propertyPath: ['headers', 'mode'],
+        });
+        expect(valueAt('context.component.a.b({"method": "G', 'python')).toMatchObject({
+            prefix: 'G',
+            propertyPath: ['method'],
+            quote: '"',
+        });
+        expect(valueAt('context.component.a.b({"method" => :', 'ruby')).toBeUndefined();
+        expect(valueAt('context.component.a.b({"method" => "G', 'ruby')).toMatchObject({propertyPath: ['method']});
+    });
+
+    it('returns undefined in a key position or after a value expression', () => {
+        expect(valueAt('context.component.a.b({meth')).toBeUndefined();
+        expect(valueAt('context.component.a.b({method: input.verb + ')).toBeUndefined();
+        expect(valueAt('context.component.a.b({method: f(')).toBeUndefined();
     });
 });
