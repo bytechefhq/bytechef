@@ -6,10 +6,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
+import {PROJECTS_DOCUMENTATION_URL, getAutomationJourneySteps} from '@/pages/automation/journey/automationJourneySteps';
+import {getAutomationJourney} from '@/pages/automation/journey/getAutomationJourney';
 import loadProject from '@/pages/automation/project/loadProject';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
@@ -41,6 +44,9 @@ export enum Type {
     Tag,
 }
 
+// A workspace without projects is always at the first step.
+const FIRST_RUN_JOURNEY = getAutomationJourney([], []);
+
 const Projects = () => {
     const [newlyCreatedProjectId, setNewlyCreatedProjectId] = useState<number | undefined>();
 
@@ -50,7 +56,7 @@ const Projects = () => {
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const {captureProjectImported} = useAnalytics();
+    const {captureEmptyStateAction, captureProjectImported} = useAnalytics();
 
     const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
 
@@ -71,8 +77,11 @@ const Projects = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
 
+    const currentCategoryId = categoryId ? parseInt(categoryId) : undefined;
+    const currentTagId = tagId ? parseInt(tagId) : undefined;
+
     const filterData = {
-        id: categoryId ? parseInt(categoryId) : tagId ? parseInt(tagId) : undefined,
+        id: currentCategoryId ?? currentTagId,
         type: tagId ? Type.Tag : Type.Category,
     };
 
@@ -100,24 +109,26 @@ const Projects = () => {
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useGetWorkspaceProjectsQuery({
-        categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+        categoryId: currentCategoryId,
         id: currentWorkspaceId!,
-        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
+        tagId: currentTagId,
     });
 
     const isRefetchingProjects =
         queryClient.isFetching({
             exact: true,
             queryKey: ProjectKeys.filteredProjects({
-                categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+                categoryId: currentCategoryId,
                 id: currentWorkspaceId!,
-                tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
+                tagId: currentTagId,
             }),
         }) > 0;
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
+
+    const isFirstRun = !isFiltered && projects?.length === 0;
 
     useEffect(() => {
         loadProject();
@@ -126,59 +137,63 @@ const Projects = () => {
     return (
         <LayoutContainer
             header={
-                projects &&
-                projects.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={
-                            <ButtonGroup>
-                                <ProjectDialog
-                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                    project={undefined}
-                                    triggerNode={
-                                        <Button
-                                            aria-label="Create Project"
-                                            onSelect={(event) => event.preventDefault()}
-                                        >
-                                            New Project
-                                        </Button>
-                                    }
-                                />
+                isFirstRun ? (
+                    <Header position="main" title="Projects" titleClassName="font-semibold" />
+                ) : (
+                    projects &&
+                    projects.length > 0 && (
+                        <Header
+                            centerTitle={true}
+                            position="main"
+                            right={
+                                <ButtonGroup>
+                                    <ProjectDialog
+                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                        project={undefined}
+                                        triggerNode={
+                                            <Button
+                                                aria-label="Create Project"
+                                                onSelect={(event) => event.preventDefault()}
+                                            >
+                                                New Project
+                                            </Button>
+                                        }
+                                    />
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button>
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button>
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                            icon={<LayoutTemplateIcon />}
-                                            label="From Template"
-                                            onClick={() => navigate(`templates`)}
-                                        />
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                icon={<LayoutTemplateIcon />}
+                                                label="From Template"
+                                                onClick={() => navigate(`templates`)}
+                                            />
 
-                                        <DropdownMenuItem
-                                            icon={<UploadIcon />}
-                                            label="Import Project"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        />
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
-                        }
-                        title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
-                    />
+                                            <DropdownMenuItem
+                                                icon={<UploadIcon />}
+                                                label="Import Project"
+                                                onClick={() => fileInputRef.current?.click()}
+                                            />
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            }
+                            title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
+                        />
+                    )
                 )
             }
             leftSidebarBody={
                 <CategoryTagLeftSidebarNav
                     categories={categories}
                     categoriesIsLoading={categoriesIsLoading}
-                    currentCategoryId={categoryId ? parseInt(categoryId) : undefined}
-                    currentTagId={tagId ? parseInt(tagId) : undefined}
+                    currentCategoryId={currentCategoryId}
+                    currentTagId={currentTagId}
                     tags={tags}
                     tagsClassName="mb-0"
                     tagsEmptyMessage="No defined tags."
@@ -186,6 +201,7 @@ const Projects = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
+            leftSidebarOpen={isFirstRun ? false : undefined}
             leftSidebarWidth="64"
         >
             <PageLoader
@@ -205,13 +221,25 @@ const Projects = () => {
                 ) : isFiltered ? (
                     <EmptyFilterResult entityName="projects" entityTitle="Projects" />
                 ) : (
-                    <EmptyList
-                        button={
+                    <EmptyState
+                        actions={
                             <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
                                 <ProjectDialog
                                     onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
                                     project={undefined}
-                                    triggerNode={<Button aria-label="Create Project" label="Create Project" />}
+                                    triggerNode={
+                                        <Button
+                                            aria-label="Create Project"
+                                            label="Create Project"
+                                            onClick={() =>
+                                                captureEmptyStateAction(
+                                                    'projects',
+                                                    'create_project',
+                                                    FIRST_RUN_JOURNEY.stage
+                                                )
+                                            }
+                                        />
+                                    }
                                 />
 
                                 <DropdownMenu onOpenChange={handleOpenChange}>
@@ -237,10 +265,16 @@ const Projects = () => {
                                 </DropdownMenu>
                             </ButtonGroup>
                         }
-                        icon={<FolderIcon className="size-24 text-gray-300" />}
-                        message="Get started by creating a new project."
-                        title="No Projects"
-                    />
+                        description="A project groups related workflows. Build and test a workflow inside it, then publish and deploy it so it runs on its own."
+                        docsLink={{href: PROJECTS_DOCUMENTATION_URL, label: 'How projects work'}}
+                        icon={<FolderIcon />}
+                        title="Create your first project"
+                    >
+                        <JourneySteps
+                            aria-label="Getting started"
+                            steps={getAutomationJourneySteps(FIRST_RUN_JOURNEY.stepStatuses)}
+                        />
+                    </EmptyState>
                 )}
             </PageLoader>
 
