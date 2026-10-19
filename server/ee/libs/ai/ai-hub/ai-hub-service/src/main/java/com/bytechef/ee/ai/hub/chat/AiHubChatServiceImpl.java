@@ -704,7 +704,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<AiHubChat> findActiveByThreadId(String threadId) {
+    public Optional<AiHubChat> findNotDeletedByThreadId(String threadId) {
         if (inFlightRunRegistry.isRetired(threadId)) {
             return Optional.empty();
         }

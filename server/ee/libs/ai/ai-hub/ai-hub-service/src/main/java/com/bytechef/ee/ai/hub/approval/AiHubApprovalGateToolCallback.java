@@ -119,7 +119,7 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
             return delegate.call(toolInput, toolContext);
         }
 
-        Optional<AiHubChat> chatOptional = chatService.findActiveByThreadId(threadId);
+        Optional<AiHubChat> chatOptional = chatService.findNotDeletedByThreadId(threadId);
 
         if (chatOptional.isEmpty()) {
             log.warn("Refusing gated tool={} for thread={}: the chat no longer exists", toolName, threadId);
