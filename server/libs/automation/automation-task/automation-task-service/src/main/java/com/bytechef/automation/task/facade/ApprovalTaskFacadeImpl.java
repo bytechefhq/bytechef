@@ -19,6 +19,7 @@ package com.bytechef.automation.task.facade;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.task.domain.ApprovalTask;
+import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -31,7 +32,6 @@ import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -40,15 +40,17 @@ import org.springframework.util.Assert;
 @Transactional
 public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
 
+    private final ApprovalTaskJobResolver approvalTaskJobResolver;
     private final ApprovalTaskService approvalTaskService;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentService projectDeploymentService;
 
     @SuppressFBWarnings("EI")
     public ApprovalTaskFacadeImpl(
-        ApprovalTaskService approvalTaskService, PrincipalJobService principalJobService,
-        ProjectDeploymentService projectDeploymentService) {
+        ApprovalTaskJobResolver approvalTaskJobResolver, ApprovalTaskService approvalTaskService,
+        PrincipalJobService principalJobService, ProjectDeploymentService projectDeploymentService) {
 
+        this.approvalTaskJobResolver = approvalTaskJobResolver;
         this.approvalTaskService = approvalTaskService;
         this.principalJobService = principalJobService;
         this.projectDeploymentService = projectDeploymentService;
@@ -101,9 +103,8 @@ public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
     }
 
     private Environment getEnvironment(String jobResumeIdString) {
-        Assert.notNull(jobResumeIdString, "'jobResumeId' must not be null");
-
-        JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
+        JobResumeId jobResumeId = approvalTaskJobResolver.fetchJobResumeId(jobResumeIdString)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid or expired job resume id"));
 
         long projectDeploymentId = principalJobService.getJobPrincipalId(
             jobResumeId.getJobId(), PlatformType.AUTOMATION);
