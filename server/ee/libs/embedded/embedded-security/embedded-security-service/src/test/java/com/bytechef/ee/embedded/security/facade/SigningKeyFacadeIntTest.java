@@ -29,6 +29,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +88,8 @@ class SigningKeyFacadeIntTest {
         when(userService.getCurrentUser()).thenAnswer(invocation -> user(
             SecurityUtils.fetchCurrentUserLogin()
                 .orElseThrow()));
+        when(userService.fetchUserByLogin(anyString()))
+            .thenAnswer(invocation -> Optional.of(user(invocation.getArgument(0))));
         when(userService.getUser(anyString())).thenAnswer(invocation -> user(invocation.getArgument(0)));
     }
 

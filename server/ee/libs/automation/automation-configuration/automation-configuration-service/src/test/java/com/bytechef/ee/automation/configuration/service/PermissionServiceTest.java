@@ -59,7 +59,6 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
@@ -149,8 +148,8 @@ class PermissionServiceTest {
         user.setId(USER_ID);
         user.setLogin(LOGIN);
 
-        lenient().when(userService.getUser(LOGIN))
-            .thenReturn(user);
+        lenient().when(userService.fetchUserByLogin(LOGIN))
+            .thenReturn(Optional.of(user));
     }
 
     @AfterEach
@@ -393,10 +392,11 @@ class PermissionServiceTest {
         // Defense-in-depth: an authenticated principal whose login resolves to no platform user (e.g. a non-platform
         // principal reaching a platform RBAC check) must fail closed — deny — rather than bubble UserNotFoundException
         // as a 500. Embedded flows that legitimately bypass automation RBAC are handled earlier via the skip flag.
-        when(userService.getUser(LOGIN)).thenThrow(new UserNotFoundException());
+        when(userService.fetchUserByLogin(LOGIN)).thenReturn(Optional.empty());
 
         assertThat(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_VIEW")).isFalse();
         verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong());
+        verify(userService, never()).getUser(LOGIN);
     }
 
     @Test
@@ -864,7 +864,7 @@ class PermissionServiceTest {
         securityUtilsMock.when(SecurityUtils::fetchCurrentUserLogin)
             .thenReturn(Optional.of(CONNECTED_USER_EXTERNAL_ID));
 
-        when(userService.getUser(CONNECTED_USER_EXTERNAL_ID)).thenThrow(new UserNotFoundException());
+        when(userService.fetchUserByLogin(CONNECTED_USER_EXTERNAL_ID)).thenReturn(Optional.empty());
     }
 
     private PermissionServiceImpl createConnectionService(long connectionWorkspaceId, Environment environment) {
