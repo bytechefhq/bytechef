@@ -6,6 +6,8 @@ import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mockProjectsState = vi.hoisted(() => ({
+    captureProjectImported: vi.fn(),
+    captureProjectWorkflowImported: vi.fn(),
     navigate: vi.fn(),
     projects: [] as unknown[],
 }));
@@ -30,6 +32,13 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
         analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
         application: {edition: 'CE'},
         featureFlags: {},
+    }),
+}));
+
+vi.mock('@/shared/hooks/useAnalytics', () => ({
+    useAnalytics: () => ({
+        captureProjectImported: mockProjectsState.captureProjectImported,
+        captureProjectWorkflowImported: mockProjectsState.captureProjectWorkflowImported,
     }),
 }));
 
@@ -115,6 +124,8 @@ let queryClient: QueryClient;
 beforeEach(() => {
     queryClient = createTestQueryClient();
     mockImportMutate.mockClear();
+    mockProjectsState.captureProjectImported.mockClear();
+    mockProjectsState.captureProjectWorkflowImported.mockClear();
     mockProjectsState.navigate.mockClear();
     mockProjectsState.projects = [];
 });
@@ -191,6 +202,19 @@ describe('Projects Import Functionality', () => {
                 file: mockFile,
                 workspaceId: 1,
             });
+        });
+    });
+
+    it('should capture analytics when the project import succeeds', async () => {
+        renderProjects();
+
+        const fileInput = document.querySelector('input[type="file"][accept=".zip"]') as HTMLInputElement;
+
+        fireEvent.change(fileInput, {target: {files: [new File(['test content'], 'test-project.zip')]}});
+
+        await waitFor(() => {
+            expect(mockProjectsState.captureProjectImported).toHaveBeenCalledTimes(1);
+            expect(mockProjectsState.captureProjectWorkflowImported).toHaveBeenCalledTimes(1);
         });
     });
 });
