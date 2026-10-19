@@ -36,6 +36,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
@@ -173,7 +174,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
-            securityContextRehydrator, approvalGate, overrideChatClientResolverProvider);
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
+            overrideChatClientResolverProvider);
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -185,7 +187,16 @@ public final class AiHubAgentFixtures {
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, artifactRecorder, securityContextRehydrator, approvalGate,
-            overrideChatClientResolverProvider);
+            inFlightRunRegistryProvider(), overrideChatClientResolverProvider);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider() {
+        ObjectProvider<InFlightAiHubRunRegistry> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(new InFlightAiHubRunRegistry());
+
+        return provider;
     }
 
     @SuppressWarnings("unchecked")

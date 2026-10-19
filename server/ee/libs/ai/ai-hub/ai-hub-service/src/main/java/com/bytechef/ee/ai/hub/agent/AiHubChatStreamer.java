@@ -70,11 +70,13 @@ public class AiHubChatStreamer {
     }
 
     /**
-     * Starts the agent for {@code run} without an emitter; a client follows it through {@link #attach}. A no-op when
-     * the run is already terminated.
+     * Starts the agent for {@code run} without an emitter; a client follows it through {@link #attach}. When the run is
+     * already terminated the agent is not started and the run releases its thread.
      */
     public void start(LocalAgent agent, AgUiParameters agUiParameters, InFlightRun run) {
         if (run.isTerminated()) {
+            run.complete();
+
             return;
         }
 

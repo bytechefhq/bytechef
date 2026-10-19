@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.chat;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
@@ -384,6 +385,12 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         }
 
         if (messageEventIndex < 0) {
+            if (containsEvent(sessionMemory.sessionService()
+                .getEvents(threadId, EventFilter.all()), messageId)) {
+
+                throw new ConflictException("The message was already removed from this chat; reload the chat");
+            }
+
             return OptionalInt.empty();
         }
 
@@ -406,10 +413,74 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             throw new ConflictException("The conversation changed while truncating; retry");
         }
 
+        supersedePendingApprovalsOfDroppedToolCalls(chat, activeEvents.subList(0, cutoffEventIndex));
+
         chat.setUpdatedAt(LocalDateTime.now(clock));
         chatRepository.save(chat);
 
         return OptionalInt.of(activeEvents.size() - cutoffEventIndex);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean containsActiveToolCall(String threadId, String toolName, String arguments) {
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
+
+        if (sessionMemory == null) {
+            return false;
+        }
+
+        return containsToolCall(
+            sessionMemory.sessionService()
+                .getEvents(threadId, EventFilter.active()),
+            toolName, arguments);
+    }
+
+    private void supersedePendingApprovalsOfDroppedToolCalls(AiHubChat chat, List<SessionEvent> keptEvents) {
+        for (AiHubToolApproval approval : approvalService.list(Objects.requireNonNull(chat.getId()))) {
+            if (approval.getStatus() == AiHubToolApproval.Status.PENDING
+                && !containsToolCall(keptEvents, approval.getToolName(), approval.getArguments())) {
+
+                approval.setStatus(AiHubToolApproval.Status.SUPERSEDED);
+
+                approvalService.save(approval);
+            }
+        }
+    }
+
+    private static boolean containsEvent(List<SessionEvent> events, String eventId) {
+        return events.stream()
+            .anyMatch(event -> eventId.equals(event.getId()));
+    }
+
+    private static boolean containsToolCall(List<SessionEvent> events, String toolName, String arguments) {
+        for (SessionEvent event : events) {
+            if (event.getMessage() instanceof AssistantMessage assistantMessage) {
+                for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
+                    if (toolName.equals(toolCall.name()) && sameArguments(arguments, toolCall.arguments())) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean sameArguments(String arguments, @Nullable String toolCallArguments) {
+        if (toolCallArguments == null) {
+            return false;
+        }
+
+        if (arguments.equals(toolCallArguments)) {
+            return true;
+        }
+
+        try {
+            return Objects.equals(JsonUtils.read(arguments), JsonUtils.read(toolCallArguments));
+        } catch (RuntimeException exception) {
+            return false;
+        }
     }
 
     @Override

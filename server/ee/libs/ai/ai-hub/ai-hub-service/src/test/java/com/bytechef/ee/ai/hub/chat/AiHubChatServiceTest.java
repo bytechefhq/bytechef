@@ -507,6 +507,27 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testTruncateMessagesAfterAStopIsRefusedUntilTheStoppedRunEnds() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        givenActiveEvents();
+
+        InFlightAiHubRunRegistry.InFlightRun run = registry.tryStart(THREAD_ID, "run-1")
+            .orElseThrow();
+
+        registry.cancel(THREAD_ID, "run-1");
+
+        assertThatThrownBy(() -> serviceWithRegistry.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-300", true))
+            .isInstanceOf(ConflictException.class);
+
+        run.complete();
+
+        assertThat(serviceWithRegistry.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-300", true)).hasValue(0);
+    }
+
+    @Test
     void testTruncateMessagesRefusesCrossUserAccess() {
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 

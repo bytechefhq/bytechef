@@ -9,15 +9,19 @@ package com.bytechef.ee.ai.hub.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.spring.ai.TurnEndingToolCallingManager;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
-import com.bytechef.ee.ai.hub.agent.ResentUserMessageAdvisor;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
+import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -81,6 +85,7 @@ class AiHubTurnEndingToolResultHistoryTest {
         "{\"kind\":\"tool-approval-request\",\"approvalId\":3,\"toolName\":\"deleteWorkflow\","
             + "\"arguments\":{\"workflowId\":\"wf-1\"},\"awaitingApproval\":true}";
 
+    private final AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
     private final ScriptedChatModel chatModel = new ScriptedChatModel();
 
     private AiHubChatServiceImpl chatService;
@@ -112,8 +117,8 @@ class AiHubTurnEndingToolResultHistoryTest {
         when(sessionMemoryProvider.getIfAvailable()).thenReturn(sessionMemory);
 
         chatService = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), mock(AiHubToolApprovalService.class),
-            sessionMemoryProvider, mock(InFlightAiHubRunRegistry.class));
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, sessionMemoryProvider,
+            mock(InFlightAiHubRunRegistry.class));
     }
 
     @Test
@@ -183,6 +188,43 @@ class AiHubTurnEndingToolResultHistoryTest {
         assertThat(messages).hasSize(1);
         assertThat(messages.getFirst()
             .toolEventsJson()).isNull();
+    }
+
+    @Test
+    void testTruncatingAwayAnApprovalRequestSupersedesItsPendingApproval() {
+        chatModel.reply(toolCallResponse("", "call-delete", "deleteWorkflow"));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", APPROVAL_REQUEST_RESULT));
+
+        AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
+
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, "deleteWorkflow", "{}")).isTrue();
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
+
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, "deleteWorkflow", "{}")).isFalse();
+        assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+
+        verify(approvalService).save(approval);
+    }
+
+    @Test
+    void testTruncatingAfterAnApprovalRequestKeepsItsPendingApproval() {
+        chatModel.reply(toolCallResponse("", "call-delete", "deleteWorkflow"));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", APPROVAL_REQUEST_RESULT));
+
+        chatModel.reply(textResponse("Waiting for your approval."));
+
+        runTurn("Is it done?", SECOND_USER_MESSAGE_ID);
+
+        AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, false);
+
+        assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.PENDING);
+
+        verify(approvalService, never()).save(any());
     }
 
     @Test
@@ -266,6 +308,113 @@ class AiHubTurnEndingToolResultHistoryTest {
     }
 
     @Test
+    void testReloadOfALaterMessageShowsTheModelEachMessageOnce() {
+        chatModel.reply(textResponse("Bound."));
+
+        runTurn("Bind a Slack connection", FIRST_USER_MESSAGE_ID);
+
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", SECOND_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, true);
+
+        chatModel.reply(textResponse("Renamed to Leads."));
+
+        runTurn("Now rename it", SECOND_USER_MESSAGE_ID);
+
+        assertThat(chatModel.prompts.getLast()
+            .getInstructions()).extracting(Message::getText)
+                .containsExactly("Bind a Slack connection", "Bound.", "Now rename it");
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).extracting(AiHubChatMessage::content)
+            .containsExactly("Bind a Slack connection", "Bound.", "Now rename it", "Renamed to Leads.");
+    }
+
+    @Test
+    void testARepeatUnderANewIdIsStoredAndShownToTheModel() {
+        chatModel.reply(textResponse("Bound."));
+
+        runTurn("Bind a Slack connection", FIRST_USER_MESSAGE_ID);
+
+        appendEvent(SECOND_USER_MESSAGE_ID, new UserMessage("Now rename it"));
+
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", EDITED_USER_MESSAGE_ID);
+
+        assertThat(chatModel.prompts.getLast()
+            .getInstructions()).extracting(Message::getText)
+                .containsExactly("Bind a Slack connection", "Bound.", "Now rename it", "Now rename it");
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).extracting(AiHubChatMessage::content)
+            .containsExactly("Bind a Slack connection", "Bound.", "Now rename it", "Now rename it", "Renamed.");
+        assertThat(messages.get(3)
+            .id()).isEqualTo(EDITED_USER_MESSAGE_ID);
+    }
+
+    @Test
+    void testAStaleTabReSendingATruncatedMessageStoresItAgainAheadOfItsReply() {
+        chatModel.reply(textResponse("Bound."));
+
+        runTurn("Bind a Slack connection", FIRST_USER_MESSAGE_ID);
+
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", SECOND_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, false);
+
+        chatModel.reply(textResponse("Renamed again."));
+
+        runTurn("Now rename it", SECOND_USER_MESSAGE_ID);
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).extracting(AiHubChatMessage::content)
+            .containsExactly("Bind a Slack connection", "Bound.", "Now rename it", "Renamed again.");
+        assertThat(messages.get(2)
+            .id()).isNotEqualTo(SECOND_USER_MESSAGE_ID);
+    }
+
+    @Test
+    void testTruncatingAtATruncatedMessageIsAConflict() {
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, false);
+
+        assertThatThrownBy(
+            () -> chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testAKeptResultBehindTheCutNeverResurfacesWhenTheReRunReusesItsToolCallId() {
+        chatModel.reply(toolCallResponse("Pick a Slack connection:", "call-select", "selectConnection"));
+
+        runTurn("Bind a connection", FIRST_USER_MESSAGE_ID, tool("selectConnection", SELECT_CONNECTION_RESULT));
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
+
+        chatModel.reply(toolCallResponse("Pick a Gmail connection:", "call-select", "selectConnection"));
+
+        runTurn(
+            "Bind a connection", FIRST_USER_MESSAGE_ID,
+            tool("selectConnection", SELECT_CONNECTION_RESULT.replace("slack", "gmail")));
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).extracting(AiHubChatMessage::content)
+            .containsExactly("Bind a connection", "Pick a Gmail connection:");
+        assertThat(messages.get(1)
+            .toolEventsJson()).contains("gmail")
+                .doesNotContain("slack");
+    }
+
+    @Test
     void testTruncatingAtAMessageTheChatDoesNotHoldDropsNothing() {
         chatModel.reply(textResponse("Renamed."));
 
@@ -308,7 +457,26 @@ class AiHubTurnEndingToolResultHistoryTest {
             .toolEventsJson()).doesNotContain("blank-result");
     }
 
+    private AiHubToolApproval pendingApproval(String toolName, String arguments) {
+        AiHubToolApproval approval = new AiHubToolApproval();
+
+        approval.setChatId(CHAT_ID);
+        approval.setThreadId(THREAD_ID);
+        approval.setToolName(toolName);
+        approval.setArguments(arguments);
+        approval.setStatus(AiHubToolApproval.Status.PENDING);
+
+        when(approvalService.list(CHAT_ID)).thenReturn(List.of(approval));
+
+        return approval;
+    }
+
     private void appendEvent(Message message) {
+        appendEvent(UUID.randomUUID()
+            .toString(), message);
+    }
+
+    private void appendEvent(String eventId, Message message) {
         if (sessionMemory.sessionService()
             .findById(THREAD_ID) == null) {
 
@@ -321,6 +489,7 @@ class AiHubTurnEndingToolResultHistoryTest {
 
         sessionMemory.sessionService()
             .appendEvent(SessionEvent.builder()
+                .id(eventId)
                 .sessionId(THREAD_ID)
                 .message(message)
                 .build());
@@ -374,7 +543,7 @@ class AiHubTurnEndingToolResultHistoryTest {
             .toolCallbacks(toolCallback)
             .advisors(
                 sessionMemory.createSessionMemoryAdvisor(), sessionMemory.createTurnEndingToolResultAdvisor(),
-                toolCallingAdvisor, new ResentUserMessageAdvisor())
+                toolCallingAdvisor, sessionMemory.createResentUserMessageAdvisor())
             .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, THREAD_ID)
                 .param(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, userMessageId))
             .stream()
