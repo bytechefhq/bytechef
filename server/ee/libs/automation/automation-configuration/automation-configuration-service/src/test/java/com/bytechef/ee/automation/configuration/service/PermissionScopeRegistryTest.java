@@ -28,6 +28,12 @@ import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScop
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkspacePermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.AppEventPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.ConnectedUserPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -196,6 +202,34 @@ class PermissionScopeRegistryTest {
         assertThatThrownBy(() -> new PermissionScopeRegistry(permissionScopeProviders))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("conflicting minimum roles");
+    }
+
+    @Test
+    void testTheEmbeddedCatalogueHoldsEveryEmbeddedScopeWithItsMinimumRole() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(
+                new IntegrationPermissionScopeProvider(), new IntegrationInstanceConfigurationPermissionScopeProvider(),
+                new ConnectedUserPermissionScopeProvider(), new AppEventPermissionScopeProvider(),
+                new EmbeddedPermissionScopeProvider(), new EmbeddedSharedPermissionScopeProvider(),
+                new WorkflowPermissionScopeProvider(), new ExecutionPermissionScopeProvider(),
+                new ConnectionPermissionScopeProvider(), new McpPermissionScopeProvider(),
+                new ApiKeyPermissionScopeProvider()));
+
+        assertThat(registry.getScopeNames(WorkspaceRole.VIEWER, PermissionScopeSide.EMBEDDED))
+            .containsExactlyInAnyOrder(
+                "WORKFLOW_VIEW", "EXECUTION_VIEW", "CONNECTION_VIEW", "MCP_VIEW",
+                "INTEGRATION_INSTANCE_CONFIGURATION_VIEW", "CONNECTED_USER_VIEW", "APP_EVENT_VIEW", "EMBEDDED_VIEW");
+        assertThat(registry.getScopeNames(WorkspaceRole.ADMIN, PermissionScopeSide.EMBEDDED))
+            .contains(
+                "INTEGRATION_SETTINGS", "INTEGRATION_DELETE", "EMBEDDED_MEMBER_MANAGE", "EMBEDDED_SETTINGS_MANAGE");
+
+        Set<String> editorScopeNames = registry.getScopeNames(WorkspaceRole.EDITOR, PermissionScopeSide.EMBEDDED);
+
+        assertThat(editorScopeNames)
+            .contains("API_KEY_VIEW", "API_KEY_CREATE", "API_KEY_DELETE", "EXECUTION_DETAILS_VIEW")
+            .doesNotContain("INTEGRATION_DELETE");
+        assertThat(registry.getAllScopeNames())
+            .doesNotContain("INTEGRATION_CREATE", "CONNECTED_USER_VIEW", "APP_EVENT_VIEW", "EMBEDDED_VIEW");
     }
 
     private static PermissionScopeProvider automationProvider(ScopeDefinition... scopeDefinitions) {
