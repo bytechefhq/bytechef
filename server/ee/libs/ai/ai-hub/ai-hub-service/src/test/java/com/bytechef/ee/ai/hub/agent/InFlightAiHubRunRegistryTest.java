@@ -34,6 +34,44 @@ import reactor.test.StepVerifier;
 class InFlightAiHubRunRegistryTest {
 
     @Test
+    void testReleaseActionsRunOnTheReleaseExecutorNotOnTheReleasingThread() {
+        List<Runnable> scheduledActions = new ArrayList<>();
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry(scheduledActions::add);
+        List<String> ranActions = new ArrayList<>();
+
+        InFlightRun run = registry.tryStart("thread-held", "run-1")
+            .orElseThrow();
+
+        registry.runWhenReleased("thread-held", () -> ranActions.add("held"));
+
+        run.complete();
+
+        assertThat(ranActions).isEmpty();
+        assertThat(scheduledActions).hasSize(1);
+
+        scheduledActions.getFirst()
+            .run();
+
+        assertThat(ranActions).containsExactly("held");
+    }
+
+    @Test
+    void testDiscardedReleaseActionsNeverRun() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        List<String> ranActions = new ArrayList<>();
+
+        InFlightRun run = registry.tryStart("thread-held", "run-1")
+            .orElseThrow();
+
+        registry.runWhenReleased("thread-held", () -> ranActions.add("held"));
+        registry.discardReleaseActions("thread-held");
+
+        run.complete();
+
+        assertThat(ranActions).isEmpty();
+    }
+
+    @Test
     void testRunWhenReleasedRunsAtOnceForAFreeThreadAndOtherwiseWhenTheHoldingRunEnds() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         List<String> ranActions = new ArrayList<>();
