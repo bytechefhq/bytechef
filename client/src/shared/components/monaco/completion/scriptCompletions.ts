@@ -1,5 +1,7 @@
+import {type ActionCallKeySlotType, findActionCallKeySlot} from './actionCallScanner';
 import {parseMemberPath} from './memberPath';
 import {findEnclosingFunctionName, findPerformScope} from './performScanner';
+import {buildPropertyItems, findNestedProperties} from './propertyCompletions';
 import {buildActionCallSnippet, buildFunctionSnippet} from './snippets';
 import {
     type EnclosingTaskType,
@@ -249,8 +251,55 @@ function bareRootItems(scope: PerformScopeType): CompletionItemDraftType[] {
         .map((name) => ({insertAsSnippet: false, insertText: name, kind: 'variable', label: name}));
 }
 
+async function actionPropertyItems(
+    request: ScriptCompletionRequestI,
+    keySlot: ActionCallKeySlotType
+): Promise<CompletionItemDraftType[] | undefined> {
+    const {context, cursorOffset, source} = request;
+
+    if (context.kind === 'customComponent') {
+        return undefined;
+    }
+
+    const calleePath = parseMemberPath(keySlot.calleeText);
+
+    if (!calleePath || calleePath.segments.length !== 3 || calleePath.segments[0] !== 'component') {
+        return undefined;
+    }
+
+    const scope = findPerformScope(source, cursorOffset, context.language, calleePath.root);
+
+    if (!scope || calleePath.root !== scope.contextName) {
+        return undefined;
+    }
+
+    const [, componentName, actionName] = calleePath.segments;
+    const declaredVersion = declaredConnections(request).find(
+        (connection) => connection.componentName === componentName
+    )?.componentVersion;
+
+    const properties = await context.components.getOperationProperties(
+        componentName,
+        declaredVersion,
+        actionName,
+        'action'
+    );
+    const nestedProperties = findNestedProperties(properties, keySlot.propertyPath);
+
+    return nestedProperties ? buildPropertyItems(nestedProperties, keySlot.existingKeys) : [];
+}
+
 export async function getScriptCompletions(request: ScriptCompletionRequestI): Promise<CompletionItemDraftType[]> {
     const {context, cursorOffset, source} = request;
+    const keySlot = findActionCallKeySlot(source, cursorOffset, context.language);
+
+    if (keySlot) {
+        const propertyItems = await actionPropertyItems(request, keySlot);
+
+        if (propertyItems) {
+            return propertyItems;
+        }
+    }
     const path = parseMemberPath(source.slice(0, cursorOffset));
 
     if (!path) {
