@@ -33,6 +33,7 @@ public class ExecutionPermissionScopeProvider implements PermissionScopeProvider
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
             new ScopeDefinition(ExecutionPermissionScope.EXECUTION_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(ExecutionPermissionScope.EXECUTION_DETAILS_VIEW, WorkspaceRole.EDITOR),
             new ScopeDefinition(ExecutionPermissionScope.EXECUTION_DELETE, WorkspaceRole.ADMIN));
     }
 }

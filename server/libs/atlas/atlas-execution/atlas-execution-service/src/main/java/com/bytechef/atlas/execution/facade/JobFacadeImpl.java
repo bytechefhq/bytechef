@@ -147,7 +147,7 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_DETAILS_VIEW')")
     public Job getJob(long id) {
         return jobService.getJob(id);
     }

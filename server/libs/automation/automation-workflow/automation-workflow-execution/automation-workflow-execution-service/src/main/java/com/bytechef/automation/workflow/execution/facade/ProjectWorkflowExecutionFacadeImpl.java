@@ -97,6 +97,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
+    private static final String EXECUTION_DETAILS_VIEW = "EXECUTION_DETAILS_VIEW";
+
     private final ComponentDefinitionService componentDefinitionService;
     private final ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider;
     private final ContextService contextService;
@@ -167,7 +169,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
 
-        return new WorkflowExecutionDTO(
+        WorkflowExecutionDTO workflowExecutionDTO = new WorkflowExecutionDTO(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
             projectDeploymentIdOptional
                 .map(projectDeploymentService::getProjectDeployment)
@@ -178,6 +180,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
                 job));
+
+        return permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)
+            ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
 
     @Override
@@ -194,7 +199,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 "Trigger execution " + triggerExecutionId + " does not belong to a deployed workflow");
         }
 
-        return workflowExecutionDTO;
+        return permissionService.hasResourceScope(triggerExecutionId, "TriggerExecution", EXECUTION_DETAILS_VIEW)
+            ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
 
     @Override
@@ -204,6 +210,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        if (!permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)) {
+            return toTaskExecutionDTO(taskExecution, null, false).withoutDetails();
+        }
 
         return toTaskExecutionDTO(taskExecution, null, true);
     }
@@ -485,16 +495,36 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     .map(WorkflowExecutionRowDTO::id)
                     .toList()));
 
+        Map<Long, Boolean> projectDeploymentDetailsVisibleMap = new HashMap<>();
+
         List<WorkflowExecutionDTO> workflowExecutionDTOs = rowsPage.getContent()
             .stream()
             .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
                 ? jobWorkflowExecutionDTOMap.get(row.id())
                 : triggerWorkflowExecutionDTOMap.get(row.id()))
             .filter(Objects::nonNull)
+            .map(workflowExecutionDTO -> isDetailsVisible(workflowExecutionDTO, projectDeploymentDetailsVisibleMap)
+                ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails())
             .toList();
 
         return new PageImpl<>(
             workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
+    }
+
+    private boolean isDetailsVisible(
+        WorkflowExecutionDTO workflowExecutionDTO, Map<Long, Boolean> projectDeploymentDetailsVisibleMap) {
+
+        ProjectDeployment projectDeployment = workflowExecutionDTO.projectDeployment();
+
+        if (projectDeployment == null || projectDeployment.getId() == null) {
+            return !workflowExecutionDTO.isTriggerOnly() &&
+                permissionService.hasResourceScope(workflowExecutionDTO.id(), "Job", EXECUTION_DETAILS_VIEW);
+        }
+
+        return projectDeploymentDetailsVisibleMap.computeIfAbsent(
+            projectDeployment.getId(),
+            projectDeploymentId -> permissionService.hasResourceScope(
+                projectDeploymentId, "ProjectDeployment", EXECUTION_DETAILS_VIEW));
     }
 
     private List<String> getProjectDeploymentWorkflowIds(List<ProjectDeployment> projectDeployments) {

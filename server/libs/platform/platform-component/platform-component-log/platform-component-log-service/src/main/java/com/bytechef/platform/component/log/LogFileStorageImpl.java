@@ -144,7 +144,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_DETAILS_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         awaitPendingWrites(jobId);
 
@@ -161,7 +161,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_DETAILS_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         awaitPendingWrites(jobId);
 

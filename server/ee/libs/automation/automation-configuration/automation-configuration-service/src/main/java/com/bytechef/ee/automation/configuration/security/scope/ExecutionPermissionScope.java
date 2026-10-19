@@ -19,5 +19,6 @@ import com.bytechef.automation.configuration.security.constant.PermissionScopeTy
 public enum ExecutionPermissionScope implements PermissionScopeType {
 
     EXECUTION_VIEW,
+    EXECUTION_DETAILS_VIEW,
     EXECUTION_DELETE
 }
