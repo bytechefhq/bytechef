@@ -21,14 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextConsumer;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Json;
 import com.bytechef.component.definition.Context.Log;
 import com.bytechef.component.definition.Parameters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,6 +42,7 @@ import org.junit.jupiter.api.Test;
 class LoggerActionsTest {
 
     private final List<String> messages = new ArrayList<>();
+    private final Json json = mock(Json.class);
     private final Log log = mock(Log.class);
     private final ActionContext actionContext = mock(ActionContext.class);
     private final Parameters inputParameters = mock(Parameters.class);
@@ -51,6 +57,12 @@ class LoggerActionsTest {
             return null;
         }).when(actionContext)
             .log(any());
+
+        when(actionContext.json(any())).thenAnswer(invocation -> {
+            ContextFunction<Json, ?> jsonFunction = invocation.getArgument(0);
+
+            return jsonFunction.apply(json);
+        });
 
         doAnswer(invocation -> messages.add(invocation.getArgument(0))).when(log)
             .debug(any(String.class));
@@ -108,33 +120,40 @@ class LoggerActionsTest {
     }
 
     @Test
-    void testPerformInfoLogsStringArrayElements() {
-        when(inputParameters.get(TEXT)).thenReturn(new String[] {
+    void testPerformInfoLogsTextWithoutJsonFormatting() {
+        when(inputParameters.get(TEXT)).thenReturn("Hello");
+
+        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
+
+        assertEquals(List.of("Hello"), messages);
+        verify(json, never()).write(any());
+    }
+
+    @Test
+    void testPerformInfoLogsArrayAsJson() {
+        String[] text = {
             "first", "second"
-        });
+        };
 
-        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
-
-        assertEquals(List.of("[first, second]"), messages);
+        assertLoggedAsJson(text, "[\"first\",\"second\"]");
     }
 
     @Test
-    void testPerformInfoLogsPrimitiveArrayElements() {
-        when(inputParameters.get(TEXT)).thenReturn(new int[] {
-            1, 2
-        });
-
-        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
-
-        assertEquals(List.of("[1, 2]"), messages);
+    void testPerformInfoLogsListAsJson() {
+        assertLoggedAsJson(List.of("first", "second"), "[\"first\",\"second\"]");
     }
 
     @Test
-    void testPerformInfoLogsListElements() {
-        when(inputParameters.get(TEXT)).thenReturn(List.of("first", "second"));
+    void testPerformInfoLogsMapAsJson() {
+        assertLoggedAsJson(Map.of("name", "first"), "{\"name\":\"first\"}");
+    }
+
+    private void assertLoggedAsJson(Object text, String jsonText) {
+        when(inputParameters.get(TEXT)).thenReturn(text);
+        when(json.write(text)).thenReturn(jsonText);
 
         LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
 
-        assertEquals(List.of("[first, second]"), messages);
+        assertEquals(List.of(jsonText), messages);
     }
 }

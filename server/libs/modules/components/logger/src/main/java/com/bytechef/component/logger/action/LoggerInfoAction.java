@@ -42,7 +42,9 @@ public class LoggerInfoAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.info(LoggerUtils.toMessage(text)));
+        String message = LoggerUtils.toMessage(text, context);
+
+        context.log(log -> log.info(message));
 
         return null;
     }

@@ -16,8 +16,7 @@
 
 package com.bytechef.component.logger.util;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import com.bytechef.component.definition.Context;
 
 /**
  * @author Ivica Cardic
@@ -27,27 +26,15 @@ public class LoggerUtils {
     private LoggerUtils() {
     }
 
-    public static String toMessage(Object text) {
+    public static String toMessage(Object text, Context context) {
         if (text == null) {
             return "";
         }
 
-        if (text instanceof Object[] objects) {
-            return Arrays.deepToString(objects);
+        if (text instanceof String string) {
+            return string;
         }
 
-        Class<?> textClass = text.getClass();
-
-        if (textClass.isArray()) {
-            Object[] objects = new Object[Array.getLength(text)];
-
-            for (int index = 0; index < objects.length; index++) {
-                objects[index] = Array.get(text, index);
-            }
-
-            return Arrays.toString(objects);
-        }
-
-        return String.valueOf(text);
+        return context.json(json -> json.write(text));
     }
 }
