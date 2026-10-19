@@ -34,12 +34,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -56,6 +61,151 @@ class CopilotChatFacadeTest {
     private final CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
         agUiService, List.of(localAgent("converter_build"), localAgent("workflow_editor_ask")),
         Optional.of(permissionService), Optional.of(projectWorkflowService), Optional.empty(), Optional.empty());
+
+    @BeforeEach
+    void beforeEach() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("someone@localhost.com", "", List.of()));
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testChatReplacesAClientSuppliedConversationScope() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotChatFacadeImpl facade = facadeWith(agent);
+
+        AgUiParameters parameters = parameters(
+            Map.<String, Object>of(
+                CopilotConstants.STATE_CONVERSATION_SCOPE, "app:tenant:victim@localhost.com",
+                CopilotConstants.STATE_SCOPED_PROJECT_ID, 9L, "mode", "ASK"));
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        facade.chat("workflow_editor", parameters);
+
+        State state = parameters.getState();
+
+        assertThat(state.getState())
+            .containsEntry(
+                CopilotConstants.STATE_CONVERSATION_SCOPE,
+                String.join(":", "app", TenantContext.getCurrentTenantId(), "login", "someone%40localhost.com"))
+            .doesNotContainKey(CopilotConstants.STATE_SCOPED_PROJECT_ID);
+    }
+
+    @Test
+    void testChatCannotForgeAnEmbeddedConversationScope() {
+        LocalAgent agent = localAgent("workflow_editor_embedded_ask");
+        CopilotChatFacadeImpl facade = facadeWith(agent);
+
+        AgUiParameters parameters = parameters(
+            Map.<String, Object>of(
+                CopilotConstants.STATE_CONVERSATION_SCOPE, "embedded:tenant:external-user:workflow-uuid", "mode",
+                "ASK"));
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        facade.chat("workflow_editor_embedded", parameters);
+
+        State state = parameters.getState();
+
+        assertThat(state.getState())
+            .containsEntry(
+                CopilotConstants.STATE_CONVERSATION_SCOPE,
+                String.join(":", "app", TenantContext.getCurrentTenantId(), "login", "someone%40localhost.com"));
+    }
+
+    @Test
+    void testChatScopesTheSameThreadToEachSignedInUser() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotChatFacadeImpl facade = facadeWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        AgUiParameters firstUserParameters = agUiParameters("ASK");
+        AgUiParameters secondUserParameters = agUiParameters("ASK");
+
+        SecurityUtils.runAs(
+            "first@localhost.com", List.of(), () -> facade.chat("workflow_editor", firstUserParameters));
+        SecurityUtils.runAs(
+            "second@localhost.com", List.of(), () -> facade.chat("workflow_editor", secondUserParameters));
+
+        State firstUserState = firstUserParameters.getState();
+        State secondUserState = secondUserParameters.getState();
+
+        assertThat(firstUserState.getState()
+            .get(CopilotConstants.STATE_CONVERSATION_SCOPE))
+                .isNotNull()
+                .isNotEqualTo(secondUserState.getState()
+                    .get(CopilotConstants.STATE_CONVERSATION_SCOPE));
+    }
+
+    @Test
+    void testChatKeepsAUserIdAndAnEqualLoginInDifferentScopes() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+
+        UserService userService = mock(UserService.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(7L);
+        when(userService.fetchUserByLogin("someone@localhost.com")).thenReturn(Optional.of(user));
+
+        CopilotChatFacadeImpl facadeWithUsers = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.empty(), Optional.empty(), Optional.of(userService),
+            Optional.empty());
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        AgUiParameters userIdParameters = agUiParameters("ASK");
+        AgUiParameters loginParameters = agUiParameters("ASK");
+
+        SecurityUtils.runAs(
+            "someone@localhost.com", List.of(), () -> facadeWithUsers.chat("workflow_editor", userIdParameters));
+        SecurityUtils.runAs("7", List.of(), () -> facadeWith(agent).chat("workflow_editor", loginParameters));
+
+        assertThat(conversationScope(userIdParameters)).isNotEqualTo(conversationScope(loginParameters));
+    }
+
+    @Test
+    void testChatEncodesAColonInTheLoginScope() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotChatFacadeImpl facade = facadeWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        AgUiParameters colonLoginParameters = agUiParameters("ASK");
+        AgUiParameters plainLoginParameters = agUiParameters("ASK");
+
+        SecurityUtils.runAs("7:x", List.of(), () -> facade.chat("workflow_editor", colonLoginParameters));
+        SecurityUtils.runAs("7", List.of(), () -> facade.chat("workflow_editor", plainLoginParameters));
+
+        String colonLoginScope = conversationScope(colonLoginParameters);
+
+        assertThat(colonLoginScope.split(":")).hasSize(4);
+        assertThat(colonLoginScope + ":" + "y").isNotEqualTo(conversationScope(plainLoginParameters) + ":" + "x:y");
+    }
+
+    @Test
+    void testChatRejectsARunWithoutAnAuthenticatedUser() {
+        SecurityContextHolder.clearContext();
+
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotChatFacadeImpl facade = facadeWith(agent);
+
+        AgUiParameters parameters = agUiParameters("ASK");
+
+        assertThatThrownBy(() -> facade.chat("workflow_editor", parameters))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(agUiService, never()).runAgent(any(), any());
+    }
 
     @Test
     void testChatDeniedWhenUserLacksWorkflowScope() {
@@ -316,7 +466,10 @@ class CopilotChatFacadeTest {
 
         assertThat(capturedState.getState())
             .containsEntry(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId())
-            .containsEntry(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 7L);
+            .containsEntry(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 7L)
+            .containsEntry(
+                CopilotConstants.STATE_CONVERSATION_SCOPE,
+                String.join(":", "app", TenantContext.getCurrentTenantId(), "user", "7"));
     }
 
     @Test
@@ -646,6 +799,13 @@ class CopilotChatFacadeTest {
         verify(permissionService).hasWorkspaceRole(5L, "EDITOR");
         verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
         verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    private static String conversationScope(AgUiParameters parameters) {
+        State state = parameters.getState();
+
+        return (String) state.getState()
+            .get(CopilotConstants.STATE_CONVERSATION_SCOPE);
     }
 
     private AgUiParameters agUiParameters(String mode) {
