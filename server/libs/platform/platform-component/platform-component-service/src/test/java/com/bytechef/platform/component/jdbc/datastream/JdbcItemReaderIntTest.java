@@ -26,7 +26,9 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.ExecutionContext;
 import com.bytechef.component.definition.datastream.FieldDefinition;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
+import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -43,6 +45,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -58,6 +61,9 @@ public class JdbcItemReaderIntTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private JdbcConnectionDetails jdbcConnectionDetails;
 
     private Parameters inputParameters;
     private ClusterElementContext clusterContext;
@@ -206,6 +212,35 @@ public class JdbcItemReaderIntTest {
         assertThat(row2.get("id")).isEqualTo(1);
 
         reader.close();
+    }
+
+    @Test
+    public void testReadStreamsRowsWithoutLoadingWholeResult() {
+        jdbcTemplate.execute(
+            "CREATE OR REPLACE VIEW test_reader_stream AS SELECT i AS id, 1 / (CASE WHEN i > " +
+                (2 * JdbcItemReader.FETCH_SIZE) + " THEN 0 ELSE 1 END) AS one FROM generate_series(1, " +
+                (3 * JdbcItemReader.FETCH_SIZE) + ") AS i");
+
+        JdbcItemReader reader = new JdbcItemReader(jdbcConnectionDetails.getJdbcUrl(), "org.postgresql.Driver");
+
+        reader.open(
+            ParametersFactory.create(Map.of(JdbcConstants.TABLE, "test_reader_stream")),
+            ParametersFactory.create(
+                Map.of(
+                    JdbcConstants.HOST, "", JdbcConstants.DATABASE, "",
+                    JdbcConstants.USERNAME, jdbcConnectionDetails.getUsername(),
+                    JdbcConstants.PASSWORD, jdbcConnectionDetails.getPassword())),
+            context, executionContext);
+
+        try {
+            for (int i = 1; i <= JdbcItemReader.FETCH_SIZE; i++) {
+                Map<String, Object> row = reader.read();
+
+                assertThat(row.get("id")).isEqualTo(i);
+            }
+        } finally {
+            reader.close();
+        }
     }
 
     /**
