@@ -5,7 +5,7 @@ All URIs are relative to */api/platform/internal*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**getClusterElementNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getclusterelementnodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
-| [**getWorkflowNodeComponentActionDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodecomponentactiondynamicproperties) | **POST** /workflows/{id}/workflow-nodes/{workflowNodeName}/component-actions/dynamic-properties/{propertyName} | Get dynamic properties for a property of a component action called from a script workflow node |
+| [**getWorkflowNodeComponentOperationDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodecomponentoperationdynamicproperties) | **POST** /workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/dynamic-properties/{propertyName} | Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node |
 | [**getWorkflowNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
 
 
@@ -95,13 +95,13 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
-## getWorkflowNodeComponentActionDynamicProperties
+## getWorkflowNodeComponentOperationDynamicProperties
 
-> Array&lt;Property&gt; getWorkflowNodeComponentActionDynamicProperties(id, workflowNodeName, propertyName, environmentId, componentActionDynamicPropertiesRequest)
+> Array&lt;Property&gt; getWorkflowNodeComponentOperationDynamicProperties(id, workflowNodeName, propertyName, environmentId, componentOperationDynamicPropertiesRequest)
 
-Get dynamic properties for a property of a component action called from a script workflow node
+Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node
 
-Get dynamic properties for a property of a component action called from a script workflow node.
+Get dynamic properties for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.
 
 ### Example
 
@@ -110,7 +110,7 @@ import {
   Configuration,
   WorkflowNodeDynamicPropertiesApi,
 } from '';
-import type { GetWorkflowNodeComponentActionDynamicPropertiesRequest } from '';
+import type { GetWorkflowNodeComponentOperationDynamicPropertiesRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -119,18 +119,18 @@ async function example() {
   const body = {
     // string | The workflow id
     id: id_example,
-    // string | The name of a workflow\'s script task (E.g. script_1)
+    // string | The name of a workflow\'s task or trigger (E.g. script_1)
     workflowNodeName: workflowNodeName_example,
     // string | The name of a property.
     propertyName: propertyName_example,
     // number | The id of an environment.
     environmentId: 789,
-    // ComponentActionDynamicPropertiesRequest
-    componentActionDynamicPropertiesRequest: ...,
-  } satisfies GetWorkflowNodeComponentActionDynamicPropertiesRequest;
+    // ComponentOperationDynamicPropertiesRequest
+    componentOperationDynamicPropertiesRequest: ...,
+  } satisfies GetWorkflowNodeComponentOperationDynamicPropertiesRequest;
 
   try {
-    const data = await api.getWorkflowNodeComponentActionDynamicProperties(body);
+    const data = await api.getWorkflowNodeComponentOperationDynamicProperties(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -147,10 +147,10 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `string` | The workflow id | [Defaults to `undefined`] |
-| **workflowNodeName** | `string` | The name of a workflow\&#39;s script task (E.g. script_1) | [Defaults to `undefined`] |
+| **workflowNodeName** | `string` | The name of a workflow\&#39;s task or trigger (E.g. script_1) | [Defaults to `undefined`] |
 | **propertyName** | `string` | The name of a property. | [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
-| **componentActionDynamicPropertiesRequest** | [ComponentActionDynamicPropertiesRequest](ComponentActionDynamicPropertiesRequest.md) |  | |
+| **componentOperationDynamicPropertiesRequest** | [ComponentOperationDynamicPropertiesRequest](ComponentOperationDynamicPropertiesRequest.md) |  | |
 
 ### Return type
 
