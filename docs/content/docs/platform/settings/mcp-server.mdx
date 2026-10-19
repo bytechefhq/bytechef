@@ -198,71 +198,12 @@ Tools that list, search or create things inside a workspace take a `workspaceId`
 
 | Tool | Description |
 |---|---|
-| `createProjectWorkflow` | Create a new, empty workflow (manual trigger, no tasks); author its content with `buildWorkflow` or `importWorkflow` |
+| `createProjectWorkflow` | Create a new, empty workflow (manual trigger, no tasks) for `importWorkflow` to fill; `buildWorkflow` creates its own |
 | `deleteWorkflow` | Delete a workflow |
 | `getWorkflow` | Get workflow details |
 | `listWorkflows` | List the workflows of a project |
 | `searchWorkflows` | Search workflows by keyword |
 | `saveWorkflowTestConnection` | Select or create the connection a workflow uses when it is tested, in the current environment |
-
-### Components & Actions
-
-| Tool | Description |
-|---|---|
-| `listComponents` | List all available components |
-| `getComponent` | Get component details |
-| `searchComponents` | Search components by keyword |
-| `listActions` | List the actions of all components |
-| `getAction` | Get action details |
-| `searchActions` | Search actions by keyword |
-| `getActionDefinition` | Get the full definition of an action |
-| `getOutputProperty` | Get output property details |
-| `getProperties` | Get all properties of a trigger, action, or cluster element |
-| `searchClusterElements` | Find components that support a given cluster element type |
-| `getClusterElement` | Get cluster element details |
-
-### Triggers
-
-| Tool | Description |
-|---|---|
-| `listTriggers` | List the triggers of all components |
-| `getTrigger` | Get trigger details |
-| `searchTriggers` | Search triggers by keyword |
-| `getTriggerDefinition` | Get the full definition of a trigger |
-
-### Tasks
-
-These tools address a *task* through a `type` argument - an action, a trigger, a task dispatcher, or, for some of them, a cluster element. `listTasks` and `searchTasks` cover actions, triggers and task dispatchers; `getTaskDefinition` does not accept cluster elements; `getTaskDispatcherBuildInstructions` takes no `type`.
-
-| Tool | Description |
-|---|---|
-| `listTasks` | List tasks in the project, optionally filtered by type |
-| `getTask` | Get details for one task of a given type |
-| `searchTasks` | Search across actions, triggers, and task dispatchers |
-| `validateTask` | Validate a task's structure and properties against its definition |
-| `getTaskDefinition` | Get a JSON template for configuring the task in a workflow |
-| `getTaskDispatcherBuildInstructions` | Get instructions for building with task dispatchers |
-| `getTaskProperties` | Get a task's properties, including nested ones |
-| `getTaskOutputProperty` | Get the structure of a task's output property |
-
-### Task dispatchers
-
-| Tool | Description |
-|---|---|
-| `listTaskDispatchers` | List all task dispatchers |
-| `getTaskDispatcher` | Get task dispatcher details |
-| `searchTaskDispatchers` | Search task dispatchers by keyword |
-| `getTaskDispatcherDefinition` | Get the full definition of a task dispatcher |
-| `getTaskDispatcherProperties` | Get a task dispatcher's properties |
-| `getTaskDispatcherOutput` | Get a task dispatcher's output property |
-
-### Editing a step in place
-
-| Tool | Description |
-|---|---|
-| `updateScriptComponentCode` | Replace the code of a script component task |
-| `updateClusterElementTask` | Update a cluster element attached to a task |
-| `updateWorkflowRootProperties` | Merge root-level properties - label, description, inputs, outputs - into a workflow definition |
 
 ### Workspace resources
 
@@ -279,10 +220,8 @@ Some capabilities are exposed as a single delegate tool that takes a natural-lan
 
 | Tool | Description |
 |---|---|
-| `buildWorkflow` | Designs, edits, debugs or explains a workflow |
+| `buildWorkflow` | Designs, edits, debugs or explains a workflow. Give it a `projectId` to create a new workflow or a `workflowId` to change one. It looks up components, actions, triggers, task dispatchers, cluster elements and script code itself, so the server has no separate tools for them |
 | `importWorkflow` | Converts a workflow definition from another tool (n8n, Make, Zapier, Workato, …) into an existing ByteChef workflow |
-| `configureClusterElement` | Designs, edits or explains cluster elements, such as an AI Agent's model, chat memory, RAG source, guardrails or tools |
-| `writeScript` | Writes, edits, debugs or explains the JavaScript, Python or Ruby code of a script task |
 | `authorSkill` | Lists, explains, creates or updates skills |
 | `debugWorkflowExecution` | Inspects or diagnoses a past workflow run and fixes the underlying workflow |
 | `configureMcpServer` | Writes the tool name, tool description and per-input `fromAi(...)` mapping of every workflow already attached to an MCP server; it never creates the server, attaches workflows or enables it |
