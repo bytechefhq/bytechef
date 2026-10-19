@@ -60,6 +60,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 import reactor.core.publisher.Flux;
 
 /**
@@ -122,7 +123,7 @@ class AiHubTurnEndingToolResultHistoryTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, sessionMemoryProvider,
-            mock(InFlightAiHubRunRegistry.class));
+            mock(InFlightAiHubRunRegistry.class), mock(PlatformTransactionManager.class));
     }
 
     @Test

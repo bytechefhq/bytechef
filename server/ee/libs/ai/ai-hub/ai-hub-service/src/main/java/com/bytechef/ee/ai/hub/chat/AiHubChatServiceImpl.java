@@ -46,7 +46,6 @@ import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.compaction.CompactionPlan;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -97,27 +96,15 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private final Clock clock;
     private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
-    private final @Nullable TransactionTemplate requiresNewTransactionTemplate;
+    private final TransactionTemplate requiresNewTransactionTemplate;
 
-    public AiHubChatServiceImpl(
-        AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
-        AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
-        InFlightAiHubRunRegistry inFlightRunRegistry) {
-
-        this(
-            chatRepository, accessPolicy, approvalService, aiHubSessionMemoryProvider, inFlightRunRegistry,
-            (PlatformTransactionManager) null);
-    }
-
-    @Autowired
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubChatServiceImpl(
         AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
         AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
-        InFlightAiHubRunRegistry inFlightRunRegistry, @Nullable PlatformTransactionManager transactionManager) {
+        InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager) {
 
-        this.requiresNewTransactionTemplate = transactionManager == null ? null : requiresNewTransactionTemplate(
-            transactionManager);
+        this.requiresNewTransactionTemplate = requiresNewTransactionTemplate(transactionManager);
         this.chatRepository = chatRepository;
         this.accessPolicy = accessPolicy;
         this.approvalService = approvalService;
@@ -677,16 +664,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     private void runInNewTransaction(Runnable cleanup, String description) {
-        TransactionTemplate transactionTemplate = requiresNewTransactionTemplate;
-
-        if (transactionTemplate == null) {
-            cleanup.run();
-
-            return;
-        }
-
         try {
-            transactionTemplate.executeWithoutResult(transactionStatus -> cleanup.run());
+            requiresNewTransactionTemplate.executeWithoutResult(transactionStatus -> cleanup.run());
         } catch (RuntimeException exception) {
             log.warn("Failed to {} after the chat delete committed", description, exception);
         }
