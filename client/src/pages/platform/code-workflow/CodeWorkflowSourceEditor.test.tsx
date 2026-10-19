@@ -1,4 +1,5 @@
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {
     getCompletionContext,
     unregisterCompletionContext,
@@ -39,6 +40,14 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     ),
 }));
 
+const {useOperationPropertyLoadersMock} = vi.hoisted(() => ({
+    useOperationPropertyLoadersMock: vi.fn((workflowId: string | undefined) => ({workflowId})),
+}));
+
+vi.mock('@/shared/components/monaco/completion/useOperationPropertyLoaders', () => ({
+    useOperationPropertyLoaders: useOperationPropertyLoadersMock,
+}));
+
 vi.mock('@/shared/components/monaco/completion/useComponentCatalog', () => ({
     useComponentCatalog: () => ({components: [], getConnectionDefinition: vi.fn(), getDefinition: vi.fn()}),
 }));
@@ -64,6 +73,26 @@ describe('CodeWorkflowSourceEditor', () => {
         fireEvent.click(await screen.findByRole('button', {name: 'Mount'}));
 
         expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'codeWorkflow', language: 'python'});
+    });
+
+    it('resolves lookups against the edited code workflow, not the workflow in the editor store', async () => {
+        useWorkflowDataStore.setState({workflow: {id: 'store-workflow', nodeNames: []}});
+
+        render(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={vi.fn()}
+                source=""
+                workflowId="code-workflow"
+            />
+        );
+
+        fireEvent.click(await screen.findByRole('button', {name: 'Mount'}));
+
+        expect(useOperationPropertyLoadersMock).toHaveBeenLastCalledWith('code-workflow', expect.anything());
+        expect(getCompletionContext('inmemory://test')).toMatchObject({workflowId: 'code-workflow'});
     });
 
     it('registers no completion context for a Java code workflow', async () => {

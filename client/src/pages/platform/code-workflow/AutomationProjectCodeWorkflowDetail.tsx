@@ -12,6 +12,7 @@ interface AutomationProjectCodeWorkflowDetailProps {
     language: string;
     onTestConfigurationClick?: () => void;
     testConfigurationDisabled?: boolean;
+    workflowId?: string;
 }
 
 const AutomationProjectCodeWorkflowDetail = ({
@@ -21,6 +22,7 @@ const AutomationProjectCodeWorkflowDetail = ({
     language,
     onTestConfigurationClick,
     testConfigurationDisabled,
+    workflowId,
 }: AutomationProjectCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
@@ -28,20 +30,16 @@ const AutomationProjectCodeWorkflowDetail = ({
         data: sourceData,
         error: sourceError,
         isLoading: sourceLoading,
-    } = useAutomationProjectCodeWorkflowSourceQuery(
-        {automationProjectId},
-        {enabled: !!automationProjectId}
-    );
+    } = useAutomationProjectCodeWorkflowSourceQuery({automationProjectId}, {enabled: !!automationProjectId});
 
-    const updateAutomationProjectCodeWorkflowSourceMutation =
-        useUpdateAutomationProjectCodeWorkflowSourceMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries({queryKey: ['automationProjectCodeWorkflowSource']});
-                queryClient.invalidateQueries({queryKey: ['automationProjects']});
+    const updateAutomationProjectCodeWorkflowSourceMutation = useUpdateAutomationProjectCodeWorkflowSourceMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['automationProjectCodeWorkflowSource']});
+            queryClient.invalidateQueries({queryKey: ['automationProjects']});
 
-                invalidateWorkflowQueries?.();
-            },
-        });
+            invalidateWorkflowQueries?.();
+        },
+    });
 
     return (
         <CodeWorkflowSourceEditor
@@ -60,6 +58,7 @@ const AutomationProjectCodeWorkflowDetail = ({
             onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.automationProjectCodeWorkflowSource.content}
             testConfigurationDisabled={testConfigurationDisabled}
+            workflowId={workflowId}
         />
     );
 };
