@@ -11,6 +11,7 @@ import {
     useAiHubRunStateStore,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {sanitizeAssistantMessages} from '@/ee/pages/automation/ai-hub/runtime-providers/stripLeakedToolMarkup';
+import {isParsedToolResultValue} from '@/ee/pages/automation/ai-hub/runtime-providers/toolResultValue';
 import {getServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
@@ -269,8 +270,9 @@ export function invalidateWorkflowQueries(queryClient: QueryClient, toolResultCo
 }
 
 /**
- * Parses a tool result as JSON. Objects and arrays that fail to parse are logged; any other text that is not a JSON
- * value (prose) is returned as not parsed without logging.
+ * Parses a tool result as JSON. Objects and arrays that fail to parse are logged. Any other text parses only when it is
+ * a JSON string; prose and a bare JSON number, boolean or null are returned as not parsed, without logging, so the
+ * card shows the text.
  */
 const parseToolResult = (content: string): {ok: true; value: unknown} | {ok: false} => {
     if (/^[[{]/.test(content.trimStart())) {
@@ -280,7 +282,9 @@ const parseToolResult = (content: string): {ok: true; value: unknown} | {ok: fal
     }
 
     try {
-        return {ok: true, value: JSON.parse(content)};
+        const parsed: unknown = JSON.parse(content);
+
+        return isParsedToolResultValue(parsed) ? {ok: true, value: parsed} : {ok: false};
     } catch {
         return {ok: false};
     }

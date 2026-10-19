@@ -2,6 +2,7 @@ import {isWorkflowArtifactKind, parseArtifactMetadata} from '@/ee/pages/automati
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
+import {isParsedToolResultValue} from '@/ee/pages/automation/ai-hub/runtime-providers/toolResultValue';
 import {withServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -123,7 +124,9 @@ function buildRestoredToolParts(
 
         if (resultEvent?.response) {
             try {
-                result = JSON.parse(resultEvent.response);
+                const parsedResult: unknown = JSON.parse(resultEvent.response);
+
+                result = isParsedToolResultValue(parsedResult) ? parsedResult : resultEvent.response;
             } catch {
                 result = resultEvent.response;
             }
