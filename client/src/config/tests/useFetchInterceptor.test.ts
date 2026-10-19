@@ -512,6 +512,90 @@ describe('useFetchInterceptor', () => {
             });
         });
 
+        it('does not toast a CONFLICT on resolving an AI Hub tool approval, which the approval card shows', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'CONFLICT'},
+                            message: 'Approval 4 is already APPROVED',
+                            path: ['resolveAiHubToolApproval'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts another error on resolving an AI Hub tool approval', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'NOT_FOUND'},
+                            message: 'Not found',
+                            path: ['resolveAiHubToolApproval'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Error',
+                expect.objectContaining({description: 'Not found'})
+            );
+        });
+
+        it('still toasts a CONFLICT from another GraphQL field', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'CONFLICT'},
+                            message: 'AiHubChat thread-1 already exists',
+                            path: ['createAiHubChat'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Error',
+                expect.objectContaining({description: 'AiHubChat thread-1 already exists'})
+            );
+        });
+
         it('does not show toast for GraphQL response without errors', async () => {
             renderHook(() => useFetchInterceptor());
 
