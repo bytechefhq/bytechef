@@ -81,12 +81,20 @@ public final class AwsScheduleUtils {
         String nextToken = null;
 
         do {
-            ListSchedulesResponse listSchedulesResponse = schedulerClient.listSchedules(
-                ListSchedulesRequest.builder()
-                    .groupName(groupName)
-                    .namePrefix(namePrefix)
-                    .nextToken(nextToken)
-                    .build());
+            ListSchedulesResponse listSchedulesResponse;
+
+            try {
+                listSchedulesResponse = schedulerClient.listSchedules(
+                    ListSchedulesRequest.builder()
+                        .groupName(groupName)
+                        .namePrefix(namePrefix)
+                        .nextToken(nextToken)
+                        .build());
+            } catch (ResourceNotFoundException e) {
+                log.debug("Schedule group does not exist: {}", groupName);
+
+                return List.of();
+            }
 
             for (ScheduleSummary scheduleSummary : listSchedulesResponse.schedules()) {
                 scheduleNames.add(scheduleSummary.name());
