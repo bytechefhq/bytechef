@@ -12,7 +12,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +46,16 @@ public class AiHubTurnEndingToolResultAdvisor implements CallAdvisor, StreamAdvi
 
     private static final String APPROVAL_REQUEST_KIND = "tool-approval-request";
 
-    private final BiConsumer<Long, String> approvalToolCallRecorder;
+    private final ApprovalToolCallRecorder approvalToolCallRecorder;
     private final SessionService sessionService;
 
     public AiHubTurnEndingToolResultAdvisor(SessionService sessionService) {
-        this(sessionService, (approvalId, toolCallId) -> {});
+        this(sessionService, (threadId, approvalId, toolCallId) -> {});
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubTurnEndingToolResultAdvisor(
-        SessionService sessionService, BiConsumer<Long, String> approvalToolCallRecorder) {
+        SessionService sessionService, ApprovalToolCallRecorder approvalToolCallRecorder) {
 
         this.approvalToolCallRecorder = approvalToolCallRecorder;
         this.sessionService = sessionService;
@@ -130,10 +129,10 @@ public class AiHubTurnEndingToolResultAdvisor implements CallAdvisor, StreamAdvi
             log.warn("Failed to store the turn-ending tool result for session {}", sessionId, exception);
         }
 
-        toolResponses.forEach(this::recordApprovalToolCall);
+        toolResponses.forEach(toolResponse -> recordApprovalToolCall(sessionId, toolResponse));
     }
 
-    private void recordApprovalToolCall(ToolResponse toolResponse) {
+    private void recordApprovalToolCall(String sessionId, ToolResponse toolResponse) {
         String responseData = toolResponse.responseData();
 
         if (responseData == null || !responseData.contains(APPROVAL_REQUEST_KIND)) {
@@ -145,11 +144,21 @@ public class AiHubTurnEndingToolResultAdvisor implements CallAdvisor, StreamAdvi
                 && APPROVAL_REQUEST_KIND.equals(response.get("kind"))
                 && response.get("approvalId") instanceof Number approvalId) {
 
-                approvalToolCallRecorder.accept(approvalId.longValue(), toolResponse.id());
+                approvalToolCallRecorder.record(sessionId, approvalId.longValue(), toolResponse.id());
             }
         } catch (RuntimeException exception) {
             log.warn("Failed to record the tool call of approval result {}", toolResponse.id(), exception);
         }
+    }
+
+    /**
+     * Records the tool call an approval request came from. {@code threadId} is the session the result was stored in, so
+     * a recorder can ignore an approval of another chat.
+     */
+    @FunctionalInterface
+    public interface ApprovalToolCallRecorder {
+
+        void record(String threadId, long approvalId, String toolCallId);
     }
 
     private static @Nullable ToolResponse toToolResponse(Generation generation) {
