@@ -99,8 +99,8 @@ Permissions are scoped to **workspaces**. There are no per-project roles and no 
 | Role | Rank |
 |---|---|
 | **Admin** | Most privileged. Holds every scope, including the destructive deletes and workspace administration. |
-| **Editor** | Everything Viewer has, plus creating, publishing and pushing projects; creating and editing workflows, deployments, data tables, knowledge bases, MCP servers and API collections; managing API keys; and deleting workflows. |
-| **Viewer** | Read-only. |
+| **Editor** | Everything Viewer has, plus creating, publishing and pushing projects; creating and editing workflows, deployments, data tables, knowledge bases, MCP servers and API collections; managing API keys; reading the inputs, outputs and logs of runs; and deleting workflows. |
+| **Viewer** | Read-only. Sees runs and their status, but not their inputs, outputs, errors or logs. |
 
 The roles are ranked rather than enumerated: a role is granted every permission scope whose declared minimum role it is at least as privileged as, so `VIEWER ⊆ EDITOR ⊆ ADMIN` holds by construction. Adding a scope means declaring its minimum role once, not editing three role definitions.
 
@@ -126,6 +126,7 @@ Scopes are contributed per module at startup rather than listed in a central enu
 | `DEPLOYMENT_CREATE`, `DEPLOYMENT_EDIT` | Editor |
 | `DEPLOYMENT_DELETE` | Admin |
 | `EXECUTION_VIEW` | Viewer |
+| `EXECUTION_DETAILS_VIEW` | Editor |
 | `EXECUTION_DELETE` | Admin |
 | `CONNECTION_VIEW` | Viewer |
 | `CONNECTION_CREATE`, `CONNECTION_EDIT`, `CONNECTION_DELETE` | Editor |
@@ -209,6 +210,12 @@ Hiding these controls is for convenience only. The server enforces the same rule
 
 ![The workflow editor opened by a Viewer - the View only badge next to the workflow name, with no Test button or add-node controls](users/view-only-editor.png)
 
+### Run details
+
+<EEBadge />
+
+A member who holds `EXECUTION_VIEW` but not `EXECUTION_DETAILS_VIEW`, such as a Viewer, sees the list of runs with their status, timing and steps. When they open a run, the **Input**, **Output** and **Logs** tabs say that the details are hidden. The server leaves the inputs, outputs, errors and trigger state out of every run it returns to them, and refuses to read the run's logs.
+
 ### Notable permission rules
 
 <EEBadge />
@@ -218,6 +225,7 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Action | Requires | Built-in role |
 |---|---|---|
 | Delete a deployment | `DEPLOYMENT_DELETE` | Admin |
+| Read a run's inputs, outputs, errors and logs | `EXECUTION_DETAILS_VIEW` in the run's environment | Editor |
 | Delete execution logs | `EXECUTION_DELETE` | Admin |
 | Delete an MCP server | `MCP_DELETE` | Admin |
 | Delete an API collection | `API_PLATFORM_DELETE` | Admin |
