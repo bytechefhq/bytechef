@@ -48,7 +48,9 @@ import com.bytechef.automation.configuration.security.WorkspaceOwnershipResolver
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
@@ -131,7 +133,8 @@ class PermissionServiceTest {
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -884,7 +887,8 @@ class PermissionServiceTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
             List.of(connectionEnvironmentResolver),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
     }
 
     private void givenWorkflowInWorkspace(long workspaceId) {
@@ -899,7 +903,8 @@ class PermissionServiceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolvers), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -1043,7 +1048,8 @@ class PermissionServiceTest {
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
@@ -1064,7 +1070,8 @@ class PermissionServiceTest {
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
             List.of(deploymentEnvironmentResolver(null)),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -1093,7 +1100,8 @@ class PermissionServiceTest {
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
         lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -1135,6 +1143,171 @@ class PermissionServiceTest {
     }
 
     @Nested
+    class EmbeddedScopes {
+
+        private static final String EMBEDDED_VIEW = "EMBEDDED_VIEW";
+
+        private CurrentUserResolver nestedCurrentUserResolver;
+        private ConnectedUserAccessDecider decider;
+        private EmbeddedScopeCacheService embeddedScopeCacheService;
+        private EmbeddedUserRepository embeddedUserRepository;
+        private PermissionScopeRegistry nestedPermissionScopeRegistry;
+        private PermissionServiceImpl embeddedPermissionService;
+
+        @BeforeEach
+        void setUp() {
+            nestedCurrentUserResolver = mock(CurrentUserResolver.class);
+            decider = mock(ConnectedUserAccessDecider.class);
+            embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+            embeddedUserRepository = mock(EmbeddedUserRepository.class);
+            nestedPermissionScopeRegistry = mock(PermissionScopeRegistry.class);
+
+            when(decider.decideWorkspace(anyLong(), anyString())).thenReturn(Decision.NOT_GOVERNED);
+            when(nestedCurrentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
+
+            StaticListableBeanFactory beanFactory = new StaticListableBeanFactory(
+                Map.of("connectedUserAccessDecider", decider));
+
+            embeddedPermissionService = new PermissionServiceImpl(
+                nestedCurrentUserResolver, nestedPermissionScopeRegistry, projectRepository,
+                workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
+                beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), embeddedScopeCacheService,
+                embeddedUserRepository);
+        }
+
+        @Test
+        void testTenantAdminHoldsEveryEmbeddedScope() {
+            securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+                .thenReturn(true);
+
+            when(nestedPermissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED))
+                .thenReturn(Set.of(EMBEDDED_VIEW, "INTEGRATION_CREATE"));
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope("INTEGRATION_CREATE")).isTrue();
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.PRODUCTION)).isTrue();
+            assertThat(embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW)).isTrue();
+            assertThat(embeddedPermissionService.isEmbeddedMember()).isTrue();
+            assertThat(embeddedPermissionService.getMyEmbeddedScopes(null))
+                .containsExactlyInAnyOrder(EMBEDDED_VIEW, "INTEGRATION_CREATE");
+
+            verifyNoInteractions(embeddedScopeCacheService, embeddedUserRepository);
+        }
+
+        @Test
+        void testMemberHoldsTheScopesTheCacheAnswers() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID)).thenReturn(Set.of(EMBEDDED_VIEW));
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW)).isTrue();
+            assertThat(embeddedPermissionService.hasEmbeddedScope("INTEGRATION_CREATE")).isFalse();
+        }
+
+        @Test
+        void testEnvironmentOverloadAsksTheCacheForThatEnvironment() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.STAGING))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.STAGING)).isTrue();
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.PRODUCTION)).isFalse();
+            assertThat(embeddedPermissionService.getMyEmbeddedScopes(Environment.STAGING))
+                .containsExactly(EMBEDDED_VIEW);
+        }
+
+        @Test
+        void testEveryEnvironmentRequiresAllThree() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.STAGING))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION))
+                .thenReturn(Set.of());
+
+            assertThat(embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW)).isFalse();
+
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+
+            assertThat(embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW)).isTrue();
+        }
+
+        @Test
+        void testNullEnvironmentRequiresEveryEnvironmentNotTheUnion() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID)).thenReturn(Set.of(EMBEDDED_VIEW));
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.STAGING)).thenReturn(Set.of());
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION)).thenReturn(Set.of());
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, null)).isFalse();
+
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.STAGING))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION))
+                .thenReturn(Set.of(EMBEDDED_VIEW));
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, null)).isTrue();
+        }
+
+        @Test
+        void testConnectedUserNeverHoldsAnEmbeddedScope() throws Throwable {
+            when(decider.decideWorkspace(anyLong(), anyString())).thenReturn(Decision.DENY);
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW)).isFalse();
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.PRODUCTION)).isFalse();
+            assertThat(embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW)).isFalse();
+            assertThat(embeddedPermissionService.isEmbeddedMember()).isFalse();
+            assertThat(embeddedPermissionService.getMyEmbeddedScopes(null)).isEmpty();
+
+            boolean grantedUnderSkip = AutomationAuthorizationContext.callSkippingChecks(
+                () -> embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW));
+
+            assertThat(grantedUnderSkip).isFalse();
+
+            verifyNoInteractions(embeddedScopeCacheService, embeddedUserRepository);
+        }
+
+        @Test
+        void testAutomationAuthorizationSkipGrantsEveryEmbeddedScope() throws Throwable {
+            boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+                () -> embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW) &&
+                    embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.PRODUCTION) &&
+                    embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW));
+
+            assertThat(granted).isTrue();
+
+            verifyNoInteractions(embeddedScopeCacheService);
+        }
+
+        @Test
+        void testAnonymousHoldsNothing() {
+            when(nestedCurrentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.empty());
+
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW)).isFalse();
+            assertThat(embeddedPermissionService.hasEmbeddedScope(EMBEDDED_VIEW, Environment.DEVELOPMENT)).isFalse();
+            assertThat(embeddedPermissionService.hasEmbeddedScopeInEveryEnvironment(EMBEDDED_VIEW)).isFalse();
+            assertThat(embeddedPermissionService.isEmbeddedMember()).isFalse();
+            assertThat(embeddedPermissionService.getMyEmbeddedScopes(null)).isEmpty();
+
+            verifyNoInteractions(embeddedScopeCacheService, embeddedUserRepository);
+        }
+
+        @Test
+        void testIsEmbeddedMemberAsksTheMembershipRepository() {
+            when(embeddedUserRepository.existsByUserId(USER_ID)).thenReturn(true);
+
+            assertThat(embeddedPermissionService.isEmbeddedMember()).isTrue();
+        }
+
+        @Test
+        void testEvictionDelegatesToTheCache() {
+            embeddedPermissionService.evictEmbeddedScopeCache(USER_ID);
+            embeddedPermissionService.evictAllEmbeddedScopeCache();
+
+            verify(embeddedScopeCacheService).evictEmbeddedScopeCache(USER_ID);
+            verify(embeddedScopeCacheService).evictAllEmbeddedScopeCache();
+        }
+    }
+
+    @Nested
     class ConnectedUser {
 
         private static final long USER_ID = 42L;
@@ -1163,7 +1336,8 @@ class PermissionServiceTest {
             permissionService = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, List.of(), List.of(),
-                beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
+                beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
         }
 
         @AfterEach
@@ -1234,7 +1408,8 @@ class PermissionServiceTest {
             PermissionServiceImpl permissionServiceWithoutDecider = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, List.of(), List.of(),
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
             assertThat(
                 AutomationAuthorizationContext
@@ -1393,7 +1568,8 @@ class PermissionServiceTest {
             PermissionServiceImpl permissionService = new PermissionServiceImpl(
                 currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
                 mock(WorkspaceUserRepository.class), List.of(), List.of(),
-                beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
+                beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
             AutomationMethodSecurityExpressionHandler expressionHandler =
                 new AutomationMethodSecurityExpressionHandler(permissionService);
@@ -1574,7 +1750,8 @@ class PermissionServiceTest {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, resourceOwnershipResolvers, List.of(),
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
         }
 
         private List<ResourceOwnershipResolver> ownershipResolvers() {
@@ -1665,7 +1842,8 @@ class PermissionServiceTest {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
         }
 
         private List<ResourceEnvironmentResolver> environmentResolvers() {
@@ -1799,7 +1977,8 @@ class PermissionServiceTest {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
         }
 
         private List<ResourceOwnershipResolver> ownershipResolvers() {
@@ -1877,7 +2056,8 @@ class PermissionServiceTest {
             return new PermissionServiceImpl(
                 currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
                 workspaceUserRepository, resourceOwnershipResolvers, List.of(),
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
         }
 
         private static List<ResourceOwnershipResolver> ownershipResolvers() {
@@ -2018,7 +2198,8 @@ class PermissionServiceTest {
                 mock(ProjectRepository.class),
                 mock(WorkspaceScopeCacheService.class), mock(WorkspaceUserRepository.class),
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
-                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
 
             PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
 

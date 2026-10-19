@@ -325,7 +325,7 @@ class PermissionServiceIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCacheService.class, EmbeddedScopeCacheService.class
     })
     static class RealPermissionServiceConfiguration {
 
