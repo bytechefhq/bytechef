@@ -11,8 +11,8 @@ import {
 } from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
-import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import useApiKeys from '@/shared/components/api-keys/hooks/useApiKeys';
+import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';

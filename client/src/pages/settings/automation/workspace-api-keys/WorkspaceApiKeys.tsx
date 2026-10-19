@@ -1,10 +1,10 @@
-import ApiKeysContent from '@/ee/shared/components/api-keys/ApiKeysContent';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ApiKeysContent from '@/shared/components/api-keys/ApiKeysContent';
 import {
     ApiKeysProvider,
     CreateApiKeyMutationProps,
     SimpleMutationProps,
-} from '@/ee/shared/components/api-keys/providers/apiKeysProvider';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+} from '@/shared/components/api-keys/providers/apiKeysProvider';
 import {
     ApiKey,
     useCreateWorkspaceApiKeyMutation,

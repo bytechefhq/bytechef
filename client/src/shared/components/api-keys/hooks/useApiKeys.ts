@@ -1,5 +1,5 @@
-import {useApiKeysProvider} from '@/ee/shared/components/api-keys/providers/apiKeysProvider';
-import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import {useApiKeysProvider} from '@/shared/components/api-keys/providers/apiKeysProvider';
+import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import {ApiKey} from '@/shared/middleware/graphql';
 import {useShallow} from 'zustand/react/shallow';
 

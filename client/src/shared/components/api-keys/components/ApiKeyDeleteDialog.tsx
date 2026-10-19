@@ -1,6 +1,6 @@
 import AlertDialog from '@/components/AlertDialog';
-import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
-import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import useApiKeys from '@/shared/components/api-keys/hooks/useApiKeys';
+import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import {useShallow} from 'zustand/react/shallow';
 
 const ApiKeyDeleteDialog = () => {
