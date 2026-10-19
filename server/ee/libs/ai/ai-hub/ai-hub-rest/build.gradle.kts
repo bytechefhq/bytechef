@@ -11,9 +11,11 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("com.jayway.jsonpath:json-path")
     testImplementation("jakarta.servlet:jakarta.servlet-api")
@@ -21,4 +23,5 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework:spring-test")
     testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }
