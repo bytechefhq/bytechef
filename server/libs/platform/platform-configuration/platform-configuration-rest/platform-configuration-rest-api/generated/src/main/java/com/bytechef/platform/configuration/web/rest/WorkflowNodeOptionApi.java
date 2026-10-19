@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationPropertyRequestModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:47:06.280758+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-node-option", description = "The Platform Workflow Node Option Internal API")
 public interface WorkflowNodeOptionApi {
@@ -83,6 +84,56 @@ public interface WorkflowNodeOptionApi {
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "lookupDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @RequestParam(value = "lookupDependsOnPaths", required = false) @Nullable List<String> lookupDependsOnPaths,
         @Parameter(name = "searchText", description = "Optional search text used to filter option items", in = ParameterIn.QUERY) @Valid @RequestParam(value = "searchText", required = false) @Nullable String searchText
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" }, { \"description\" : \"description\", \"label\" : \"label\", \"value\" : \"\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_WORKFLOW_NODE_COMPONENT_OPERATION_OPTIONS = "/workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/options/{propertyName}";
+    /**
+     * POST /workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/options/{propertyName} : Get options for a property of a component action or trigger using a connection declared on a workflow node
+     * Get options for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s task or trigger (E.g. script_1) (required)
+     * @param propertyName The name of a property. (required)
+     * @param environmentId The id of an environment. (required)
+     * @param componentOperationPropertyRequestModel  (required)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkflowNodeComponentOperationOptions",
+        summary = "Get options for a property of a component action or trigger using a connection declared on a workflow node",
+        description = "Get options for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.",
+        tags = { "workflow-node-option" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = WorkflowNodeOptionApi.PATH_GET_WORKFLOW_NODE_COMPONENT_OPERATION_OPTIONS,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<List<OptionModel>> getWorkflowNodeComponentOperationOptions(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's task or trigger (E.g. script_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "ComponentOperationPropertyRequestModel", description = "", required = true) @Valid @RequestBody ComponentOperationPropertyRequestModel componentOperationPropertyRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
