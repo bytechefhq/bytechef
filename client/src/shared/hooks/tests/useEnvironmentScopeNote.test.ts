@@ -46,6 +46,17 @@ describe('useEnvironmentScopeNote', () => {
         expect(result.current).toBeUndefined();
     });
 
+    it('counts only the environments the environment selector offers', () => {
+        hoisted.environments = [
+            {id: '1', name: 'STAGING'},
+            {id: '9', name: 'PRE_PROD'},
+        ];
+
+        const {result} = renderHook(() => useEnvironmentScopeNote('Deployments'));
+
+        expect(result.current).toBeUndefined();
+    });
+
     it('says nothing outside the enterprise edition, where environments are not selectable', () => {
         hoisted.edition = 'CE';
 

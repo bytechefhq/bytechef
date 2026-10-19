@@ -5,7 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {WorkflowExecutions} from './WorkflowExecutions';
 
-const hoisted = vi.hoisted(() => ({navigate: vi.fn()}));
+const hoisted = vi.hoisted(() => ({navigate: vi.fn(), totalElements: 0}));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
@@ -46,7 +46,12 @@ vi.mock('@/shared/queries/automation/projectWorkflows.queries', async (importOri
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/queries/automation/workflowExecutions.queries')>()),
     useGetWorkspaceProjectWorkflowExecutionsQuery: () => ({
-        data: {content: [], size: 20, totalElements: 0, totalPages: 0},
+        data: {
+            content: [],
+            size: 20,
+            totalElements: hoisted.totalElements,
+            totalPages: Math.ceil(hoisted.totalElements / 20),
+        },
         error: null,
         isFetching: false,
         isLoading: false,
@@ -67,6 +72,8 @@ const renderWorkflowExecutions = (initialEntries: string[] = ['/']) =>
 
 beforeEach(() => {
     vi.clearAllMocks();
+
+    hoisted.totalElements = 0;
 });
 
 describe('WorkflowExecutions empty states', () => {
@@ -90,5 +97,27 @@ describe('WorkflowExecutions empty states', () => {
             '/automation/executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
         );
         expect(screen.getByRole('heading', {level: 2, name: 'No workflow runs yet'})).toBeInTheDocument();
+    });
+
+    it('guides a first run on a page number with nothing to page through', () => {
+        renderWorkflowExecutions(['/?pageNumber=5']);
+
+        expect(screen.getByRole('heading', {level: 2, name: 'No workflow runs yet'})).toBeInTheDocument();
+        expect(screen.queryByText('No Matching Executions')).not.toBeInTheDocument();
+    });
+
+    it('offers the first page when the page number is past the last execution', async () => {
+        hoisted.totalElements = 40;
+
+        renderWorkflowExecutions(['/?pageNumber=5']);
+
+        expect(screen.getByText('No Executions on This Page')).toBeInTheDocument();
+        expect(screen.queryByRole('heading', {level: 2, name: 'No workflow runs yet'})).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Go to first page'}));
+
+        expect(hoisted.navigate).toHaveBeenCalledWith(
+            '/automation/executions?status=&startDate=&endDate=&projectId=&projectDeploymentId=&workflowId=&pageNumber='
+        );
     });
 });

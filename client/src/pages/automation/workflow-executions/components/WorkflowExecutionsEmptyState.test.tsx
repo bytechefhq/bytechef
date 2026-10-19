@@ -96,26 +96,43 @@ describe('WorkflowExecutionsEmptyState', () => {
         );
     });
 
-    it('asks to enable a deployment that exists but is off', () => {
+    it('asks to enable a workflow when the deployment is on but none of its workflows are', () => {
         hoisted.projectsResult = {data: [publishedProject], error: null, isLoading: false};
         hoisted.projectDeploymentsResult = {
-            data: [{enabled: false, id: 7, name: 'Order alerts', projectId: 4}],
+            data: [
+                {
+                    enabled: true,
+                    id: 7,
+                    name: 'Order alerts',
+                    projectDeploymentWorkflows: [{enabled: false, workflowId: 'w1'}],
+                    projectId: 4,
+                },
+            ],
             error: null,
             isLoading: false,
         };
 
         renderEmptyState();
 
-        expect(screen.getByRole('heading', {level: 2, name: 'Enable your deployment'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {level: 2, name: 'Enable a deployed workflow'})).toBeInTheDocument();
+        expect(screen.getByText(/A workflow runs when both it and its deployment are enabled/)).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Go to Deployments'})).toBeInTheDocument();
     });
 
-    it('waits for the first trigger once a deployment is enabled and lets the user refresh', async () => {
+    it('waits for the first trigger once a deployed workflow is enabled and lets the user refresh', async () => {
         const handleRefresh = vi.fn();
 
         hoisted.projectsResult = {data: [publishedProject], error: null, isLoading: false};
         hoisted.projectDeploymentsResult = {
-            data: [{enabled: true, id: 8, name: 'Order alerts', projectId: 4}],
+            data: [
+                {
+                    enabled: true,
+                    id: 8,
+                    name: 'Order alerts',
+                    projectDeploymentWorkflows: [{enabled: true, workflowId: 'w1'}],
+                    projectId: 4,
+                },
+            ],
             error: null,
             isLoading: false,
         };

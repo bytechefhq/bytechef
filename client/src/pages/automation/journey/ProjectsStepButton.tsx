@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {flushSync} from 'react-dom';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -13,7 +14,7 @@ interface ProjectsStepButtonProps {
 
 /*
  * Sends the user to where the project steps happen: straight into the editor of the one project they can publish,
- * otherwise to the project list. The list only exists in Development, so other environments switch first.
+ * otherwise to the project list. Both only exist in Development, so other environments switch first.
  */
 const ProjectsStepButton = ({nextProject, onClick, size = 'default'}: ProjectsStepButtonProps) => {
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -29,15 +30,29 @@ const ProjectsStepButton = ({nextProject, onClick, size = 'default'}: ProjectsSt
 
     const isDevelopment = currentEnvironmentId === DEVELOPMENT_ENVIRONMENT;
 
+    const environmentSuffix = isDevelopment ? '' : ' in Development';
+
+    const openInDevelopment = (path: string) => {
+        onClick?.();
+
+        // Commit the switch first: the page this button sits on may navigate when the environment changes (Executions
+        // rewrites its URL), and the navigation started last wins. Projects' route also redirects non-Development.
+        if (!isDevelopment) {
+            flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
+        }
+
+        navigate(path);
+    };
+
     if (nextProject && nextProjectWorkflowId !== undefined) {
         return (
             <Button
-                label={`Open ${nextProject.name}`}
-                onClick={() => {
-                    onClick?.();
-
-                    navigate(`/automation/projects/${nextProject.id}/project-workflows/${nextProjectWorkflowId}`);
-                }}
+                label={`Open ${nextProject.name}${environmentSuffix}`}
+                onClick={() =>
+                    openInDevelopment(
+                        `/automation/projects/${nextProject.id}/project-workflows/${nextProjectWorkflowId}`
+                    )
+                }
                 size={size}
             />
         );
@@ -45,16 +60,8 @@ const ProjectsStepButton = ({nextProject, onClick, size = 'default'}: ProjectsSt
 
     return (
         <Button
-            label={isDevelopment ? 'Go to Projects' : 'Go to Projects in Development'}
-            onClick={() => {
-                onClick?.();
-
-                if (!isDevelopment) {
-                    setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT);
-                }
-
-                navigate('/automation/projects');
-            }}
+            label={`Go to Projects${environmentSuffix}`}
+            onClick={() => openInDevelopment('/automation/projects')}
             size={size}
         />
     );

@@ -106,8 +106,7 @@ export const useWorkflowExecutions = () => {
         !!filterEndDate ||
         !!filterProjectId ||
         !!filterProjectDeploymentId ||
-        !!filterWorkflowId ||
-        !!filterPageNumber;
+        !!filterWorkflowId;
 
     const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
         WorkflowExecutionFromJSON(workflowExecution)

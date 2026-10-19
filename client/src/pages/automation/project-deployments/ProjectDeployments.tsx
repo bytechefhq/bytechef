@@ -150,7 +150,6 @@ const ProjectDeployments = () => {
                             isFirstRun && 'Deployments'
                         )
                     }
-                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -185,7 +184,7 @@ const ProjectDeployments = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Deployments" />}
-            leftSidebarOpen={isFirstRun ? false : undefined}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader
