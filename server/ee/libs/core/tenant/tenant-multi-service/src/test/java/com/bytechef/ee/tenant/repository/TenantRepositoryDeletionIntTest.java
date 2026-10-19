@@ -102,6 +102,12 @@ class TenantRepositoryDeletionIntTest {
     }
 
     @Test
+    void testSchemaExists() {
+        assertThat(tenantRepository.schemaExists("000001")).isTrue();
+        assertThat(tenantRepository.schemaExists("000999")).isFalse();
+    }
+
+    @Test
     void testFindTenantIdsByUserEmailSkipsPendingTenant() {
         assertThat(tenantRepository.findTenantIdsByUserEmail(PENDING_EMAIL)).isEmpty();
     }

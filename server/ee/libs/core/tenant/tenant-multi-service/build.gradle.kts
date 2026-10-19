@@ -4,6 +4,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-liquibase")
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

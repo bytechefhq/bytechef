@@ -247,6 +247,24 @@ public class TenantRepository {
         }
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
+    public boolean schemaExists(String tenantId) {
+        validateTenantId(tenantId);
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT 1 FROM information_schema.schemata WHERE schema_name = ?")) {
+
+            preparedStatement.setString(1, TenantUtils.getDatabaseSchema(tenantId));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     public String findTenantIdByUserActivationKey(String activationKey) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.activation_key) = UPPER(?)".formatted(
