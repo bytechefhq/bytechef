@@ -548,8 +548,16 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             List<?> polledRecords = pollOutput.records();
             int pollFunctionApplyCount = 1;
 
+            Object previousClosureParameters = closureParameterMap;
+
             while (!polledRecords.isEmpty() || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
                 int remainingCapacity = MAX_POLLING_TRIGGER_RECORDS - records.size();
+
+                if (!records.isEmpty() && polledRecords.size() > remainingCapacity) {
+                    closureParameters = previousClosureParameters;
+
+                    break;
+                }
 
                 records.addAll(polledRecords.subList(0, Math.min(remainingCapacity, polledRecords.size())));
 
@@ -557,6 +565,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
                     break;
                 }
+
+                previousClosureParameters = closureParameters;
 
                 pollOutput = pollFunctionApply(
                     pollFunction, inputParameters, connectionParameters,

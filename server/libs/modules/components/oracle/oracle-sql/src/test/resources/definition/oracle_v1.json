@@ -157,7 +157,7 @@
       "expressionEnabled": null,
       "hidden": null,
       "label": "Max Rows",
-      "maxValue": null,
+      "maxValue": 2147483646,
       "metadata": { },
       "minValue": 1,
       "name": "maxRows",
