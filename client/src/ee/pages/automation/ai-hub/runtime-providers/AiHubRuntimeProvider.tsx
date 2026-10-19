@@ -21,6 +21,7 @@ import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalRes
 import {
     RUN_ERROR_CODE_ACCESS_DENIED,
     RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
+    RUN_ERROR_CODE_CHAT_NOT_FOUND,
     RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED,
     toRunErrorData,
 } from '@/shared/components/ai-chat/messages/toRunErrorData';
@@ -107,6 +108,14 @@ const validateOpenWorkflowTabResult = (raw: unknown): OpenWorkflowTabResultType 
  */
 export function isTurnInFlightError(source: {message?: string; payload?: unknown} | null | undefined): boolean {
     return readTurnErrorReason(source) === 'TURN_IN_FLIGHT';
+}
+
+/**
+ * Recognizes the server's 404 {@code {"error":"CHAT_NOT_FOUND"}} response, which the hub returns for a turn on the
+ * thread of a deleted chat.
+ */
+export function isChatNotFoundTurnError(source: {message?: unknown; payload?: unknown} | null | undefined): boolean {
+    return readTurnErrorReason(source) === RUN_ERROR_CODE_CHAT_NOT_FOUND;
 }
 
 function readTurnErrorReason(source: {message?: unknown; payload?: unknown} | null | undefined): string | undefined {
@@ -1125,6 +1134,30 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                         ],
                         role: 'assistant',
                     });
+                }
+            } else if (isChatNotFoundTurnError(error as {message?: unknown; payload?: unknown})) {
+                turnForbidden = true;
+
+                console.warn('AI Hub turn refused because the chat no longer exists:', error);
+
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
+                }
+
+                if (useAiHubStore.getState().chatId === chatId) {
+                    addMessage({
+                        content: [
+                            {
+                                data: toRunErrorData({code: RUN_ERROR_CODE_CHAT_NOT_FOUND}),
+                                type: 'data-run-error',
+                            },
+                        ],
+                        role: 'assistant',
+                    });
+
+                    if (composerTextOnRollback !== undefined) {
+                        runtime.thread.composer.setText(composerTextOnRollback);
+                    }
                 }
             } else if (!isAbortError(error, turnController.signal)) {
                 const errorMessage = error instanceof Error ? error.message : String(error);

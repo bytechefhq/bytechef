@@ -27,6 +27,13 @@ describe('toRunErrorData', () => {
         });
     });
 
+    it('explains that the chat no longer exists', () => {
+        expect(toRunErrorData({code: 'CHAT_NOT_FOUND'})).toEqual({
+            code: 'CHAT_NOT_FOUND',
+            message: 'This chat no longer exists. Start a new chat to continue.',
+        });
+    });
+
     it('explains an access refusal without a known cause in words that fit any cause', () => {
         expect(toRunErrorData({code: 'ACCESS_DENIED'})).toEqual({
             code: 'ACCESS_DENIED',
