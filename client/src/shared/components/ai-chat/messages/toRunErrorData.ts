@@ -4,6 +4,8 @@ export const RUN_ERROR_CODE_ACCESS_DENIED = 'ACCESS_DENIED';
 
 export const RUN_ERROR_CODE_CHAT_ACCESS_DENIED = 'CHAT_ACCESS_DENIED';
 
+export const RUN_ERROR_CODE_CHAT_NOT_FOUND = 'CHAT_NOT_FOUND';
+
 export const RUN_ERROR_CODE_NO_AI_PROVIDER = 'NO_AI_PROVIDER';
 
 export const RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED = 'WORKSPACE_ACCESS_DENIED';
@@ -19,6 +21,7 @@ const RUN_ERROR_CODE_MESSAGES: Record<string, string> = {
     MODEL_SELECTION_INCOMPLETE: 'Your model selection is incomplete. Pick a model again.',
     [RUN_ERROR_CODE_ACCESS_DENIED]: "You don't have permission to do this.",
     [RUN_ERROR_CODE_CHAT_ACCESS_DENIED]: "You don't have access to this chat. Start a new chat to continue.",
+    [RUN_ERROR_CODE_CHAT_NOT_FOUND]: 'This chat no longer exists. Start a new chat to continue.',
     [RUN_ERROR_CODE_NO_AI_PROVIDER]:
         'No AI provider is set up for this environment. Enable one in Settings > AI > Providers. If you do not have permission, ask an administrator.',
     [RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED]:
