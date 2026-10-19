@@ -1,5 +1,6 @@
 import {TooltipIconButton} from '@/components/assistant-ui/tooltip-icon-button';
 import {AiHubMessageComponents} from '@/ee/pages/automation/ai-hub/messages/AiHubMessage';
+import AiHubRetryBanner from '@/ee/pages/automation/ai-hub/messages/AiHubRetryBanner';
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
 import {useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {ThreadPrimitive} from '@assistant-ui/react';
@@ -95,6 +96,8 @@ const AiHubThread: FC<AiHubThreadProps> = ({contentInsetRight = false, showSugge
                 <ThreadPrimitive.Messages components={AiHubMessageComponents} />
 
                 <ThreadPrimitive.If empty={false}>
+                    <AiHubRetryBanner />
+
                     <div className="min-h-4 grow" />
 
                     <ThreadScrollToBottom />

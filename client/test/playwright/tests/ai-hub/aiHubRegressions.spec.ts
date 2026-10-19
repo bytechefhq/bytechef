@@ -9,8 +9,10 @@ import {
     completedTurn,
     createAgUiGate,
     failedTurn,
+    lastMessageOf,
     newToolCallIds,
     rejectedRun,
+    runError,
     runFinished,
     runStarted,
     stubAgUiRun,
@@ -33,10 +35,8 @@ import {
     prepareAiHub,
     readAppEnvironmentId,
     readHubWorkflow,
-    readRaisedRetryableErrors,
     readRecordedToasts,
     recordToasts,
-    recordZustandDevtoolsStates,
     stubAiHubAttach,
     stubGraphQlOperationError,
     toolApprovalRequestResult,
@@ -931,19 +931,17 @@ test.describe('AI Hub regressions', () => {
         });
     });
 
-    test.describe('Retry state for tool failures', () => {
+    test.describe('Retry banner for tool failures', () => {
         test.beforeEach(async ({authenticatedPage: page}) => {
-            await recordZustandDevtoolsStates(page);
-
             await prepareAiHub(page);
         });
 
-        test('an unrecovered tool failure raises the retry state only when the run ends', async ({
+        test('an unrecovered tool failure shows the retry banner only when the run ends, and Retry resends', async ({
             authenticatedPage: page,
         }) => {
             const runEndGate = createAgUiGate();
 
-            await stubAgUiRun(page, AI_HUB_CHAT_URL, [
+            const hubRun = await stubAgUiRun(page, AI_HUB_CHAT_URL, [
                 [
                     runStarted(),
                     toolCall(
@@ -955,38 +953,45 @@ test.describe('AI Hub regressions', () => {
                     runEndGate,
                     runFinished(),
                 ],
+                completedTurn(textMessage('Built it this time.')),
             ]);
 
             const aiHubPage = new AiHubPage(page);
 
             await aiHubPage.goto();
 
-            await test.step('Assert nothing is raised while the run continues', async () => {
+            await test.step('Assert no banner while the run continues', async () => {
                 await aiHubPage.send('Build a Slack workflow');
 
                 await expect(page.getByText('That did not work.')).toBeVisible();
 
-                expect(await readRaisedRetryableErrors(page)).toEqual([]);
+                await expect(aiHubPage.retryBanner).toHaveCount(0);
             });
 
-            await test.step('Assert the failure is raised at the run end', async () => {
+            await test.step('Assert the banner shows the failure at the run end', async () => {
                 runEndGate.release();
 
                 await aiHubPage.waitForTurnEnd();
 
-                await expect
-                    .poll(() => readRaisedRetryableErrors(page))
-                    .toEqual([
-                        {
-                            errorMessage: 'Component slack/v9 does not exist',
-                            lastUserMessage: 'Build a Slack workflow',
-                            toolName: 'buildWorkflow',
-                        },
-                    ]);
+                await expect(aiHubPage.retryBanner).toHaveText(
+                    /buildWorkflow failed: Component slack\/v9 does not exist/
+                );
+            });
+
+            await test.step('Retry sends the last message again and clears the banner', async () => {
+                await aiHubPage.retryBanner.getByRole('button', {name: 'Retry'}).click();
+
+                const retriedRequest = await hubRun.waitForRequest(1);
+
+                expect(lastMessageOf(retriedRequest)).toMatchObject({content: 'Build a Slack workflow', role: 'user'});
+
+                await expect(page.getByText('Built it this time.')).toBeVisible();
+
+                await expect(aiHubPage.retryBanner).toHaveCount(0);
             });
         });
 
-        test('a tool failure the run recovers from raises nothing', async ({authenticatedPage: page}) => {
+        test('a tool failure the run recovers from shows no banner', async ({authenticatedPage: page}) => {
             await stubAgUiRun(page, AI_HUB_CHAT_URL, [
                 completedTurn(
                     toolCall(
@@ -1011,10 +1016,36 @@ test.describe('AI Hub regressions', () => {
 
             await expect(page.getByText('The workflow is ready.')).toBeVisible();
 
-            expect(await readRaisedRetryableErrors(page)).toEqual([]);
+            await expect(aiHubPage.retryBanner).toHaveCount(0);
         });
 
-        test('a tool failure followed by Stop raises nothing', async ({authenticatedPage: page}) => {
+        test('a tool failure followed by a run error shows the run error and no banner', async ({
+            authenticatedPage: page,
+        }) => {
+            await stubAgUiRun(page, AI_HUB_CHAT_URL, [
+                [
+                    runStarted(),
+                    toolCall(
+                        'buildWorkflow',
+                        {instructions: 'Post hello to Slack'},
+                        JSON.stringify({error: 'Component slack/v9 does not exist'})
+                    ),
+                    runError('The model provider is unavailable'),
+                ],
+            ]);
+
+            const aiHubPage = new AiHubPage(page);
+
+            await aiHubPage.goto();
+
+            await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
+
+            await expect(aiHubPage.runErrors).toContainText('The model provider is unavailable');
+
+            await expect(aiHubPage.retryBanner).toHaveCount(0);
+        });
+
+        test('a tool failure followed by Stop shows no banner', async ({authenticatedPage: page}) => {
             const runEndGate = createAgUiGate();
 
             await stubAgUiRun(page, AI_HUB_CHAT_URL, [
@@ -1057,10 +1088,10 @@ test.describe('AI Hub regressions', () => {
                 runEndGate.release();
             });
 
-            await test.step('Assert nothing was raised', async () => {
+            await test.step('Assert no banner was shown', async () => {
                 await expect(page.getByText('That did not work.')).toBeVisible();
 
-                expect(await readRaisedRetryableErrors(page)).toEqual([]);
+                await expect(aiHubPage.retryBanner).toHaveCount(0);
             });
         });
     });
