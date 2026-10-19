@@ -171,6 +171,12 @@ export function getMessageText(message: ThreadMessageLike): string {
         .join('\n');
 }
 
+export function getLastUserMessageText(messages: ThreadMessageLike[]): string {
+    const lastUserMessage = messages.findLast((message) => message.role === 'user');
+
+    return lastUserMessage ? getMessageText(lastUserMessage) : '';
+}
+
 export function findReloadedUserMessageIndex(messages: ThreadMessageLike[], parentId: string | null): number {
     const parentIndex = parentId == null ? -1 : messages.findIndex((message) => message.id === parentId);
 
@@ -666,8 +672,15 @@ export const runPostTurnTelemetry = ({
     }
 };
 
+/**
+ * Runs when the focused chat changes: drops the tool-call cards and the retry banner of the chat being left. It does
+ * not abort the in-flight run, so the turn completes server-side and is loaded on return; the subscriber's chat
+ * guards keep its late events out of the new chat.
+ */
 export const cleanupForChatChange = (previousChatId: string | undefined): void => {
     aiChatToolCallStore.getState().resetForChat(previousChatId);
+
+    aiChatRetryableErrorStore.getState().clearError();
 };
 
 export const projectMessagesWithToolCalls = (
@@ -797,7 +810,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 appendToLastAssistantMessage,
                 assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
                 chatId: threadId,
-                getLastUserMessage: () => '(resumed turn)',
+                getLastUserMessage: () => getLastUserMessageText(useAiHubStore.getState().messages),
                 onWorkflowMutated: handleWorkflowMutated,
                 runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(threadId, false)},
             });
@@ -1148,6 +1161,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         const runId = getRandomId();
+
+        aiChatRetryableErrorStore.getState().clearError();
 
         agent.setMessages([{content: userMessage.content, id: userMessage.id, role: 'user'}]);
 

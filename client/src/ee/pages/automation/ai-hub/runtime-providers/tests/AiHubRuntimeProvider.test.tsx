@@ -23,6 +23,7 @@ import {
     bootstrapAiHubTurnRunState,
     buildAiHubSubscriber,
     buildStateToSend,
+    getLastUserMessageText,
     getOptimisticTurnMarker,
     hasLivePropertyOptionPicker,
     invalidateWorkflowQueries,
@@ -186,6 +187,23 @@ describe('isForbiddenTurnError', () => {
         expect(isForbiddenTurnError({message: 'HTTP 409: {"error":"TURN_IN_FLIGHT"}', status: 409})).toBe(false);
         expect(isForbiddenTurnError({message: 'HTTP 4031 is not a status'})).toBe(false);
         expect(isForbiddenTurnError(null)).toBe(false);
+    });
+});
+
+describe('getLastUserMessageText', () => {
+    it('returns the text of the latest user message, skipping later assistant rows', () => {
+        expect(
+            getLastUserMessageText([
+                {content: 'First', role: 'user'},
+                {content: 'Reply', role: 'assistant'},
+                {content: [{text: 'Delete the Demo project', type: 'text'}], role: 'user'},
+                {content: 'Approve it?', role: 'assistant'},
+            ])
+        ).toBe('Delete the Demo project');
+    });
+
+    it('returns an empty string for a transcript without a user message', () => {
+        expect(getLastUserMessageText([{content: 'Hello', role: 'assistant'}])).toBe('');
     });
 });
 
