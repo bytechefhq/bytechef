@@ -16,6 +16,7 @@ import {DataMessagePartProps, ThreadMessageLike} from '@assistant-ui/react';
 import {QueryClient} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
+import {toast} from 'sonner';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
@@ -1233,8 +1234,10 @@ describe('runPostTurnTelemetry', () => {
         });
     });
 
-    it('marks the title generation failure on the chats store when it fails', async () => {
+    it('marks the title generation failure on the chats store, without a toast, when it fails', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+        const toastErrorSpy = vi.spyOn(toast, 'error');
 
         mockGenerateChatTitle.mockRejectedValue(new Error('model down'));
 
@@ -1243,6 +1246,8 @@ describe('runPostTurnTelemetry', () => {
         await vi.waitFor(() => {
             expect(aiHubChatsStore.getState().titleGenerationFailures[100]).toBe('model down');
         });
+
+        expect(toastErrorSpy).not.toHaveBeenCalled();
     });
 });
 
