@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.teardown;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -105,6 +106,35 @@ class BillingTenantTeardownContributorTest {
 
         assertThat(contributor.onDeletionRequested(TENANT_ID)).isEmpty();
 
+        verify(stripeClient, never()).cancelImmediately(anyString(), anyString());
+    }
+
+    @Test
+    void testSubscriptionWithoutStripeIdIsNoOp() {
+        BillingSubscription subscription = mock(BillingSubscription.class);
+
+        when(subscription.getSubscriptionId()).thenReturn(" ");
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
+        when(tenantDeletionServiceProvider.getIfAvailable()).thenReturn(tenantDeletionService);
+
+        assertThat(contributor.onDeletionRequested(TENANT_ID)).isEmpty();
+
+        verify(tenantDeletionService, never()).recordStripeIds(anyString(), any(), any());
+        verify(stripeClient, never()).cancelImmediately(anyString(), anyString());
+    }
+
+    @Test
+    void testCanceledSubscriptionIsNoOp() {
+        BillingSubscription subscription = mock(BillingSubscription.class);
+
+        when(subscription.getSubscriptionId()).thenReturn("sub_1");
+        when(subscription.getStatus()).thenReturn(BillingSubscription.Status.CANCELED);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
+        when(tenantDeletionServiceProvider.getIfAvailable()).thenReturn(tenantDeletionService);
+
+        assertThat(contributor.onDeletionRequested(TENANT_ID)).isEmpty();
+
+        verify(tenantDeletionService, never()).recordStripeIds(anyString(), any(), any());
         verify(stripeClient, never()).cancelImmediately(anyString(), anyString());
     }
 

@@ -70,6 +70,12 @@ class BillingTenantTeardownContributor implements TenantTeardownContributor {
 
         String subscriptionId = subscription.getSubscriptionId();
 
+        if (subscriptionId == null || subscriptionId.isBlank() ||
+            subscription.getStatus() == BillingSubscription.Status.CANCELED) {
+
+            return List.of();
+        }
+
         tenantDeletionService.recordStripeIds(tenantId, subscription.getCustomerId(), subscriptionId);
 
         try {
