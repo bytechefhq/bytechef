@@ -1,0 +1,9 @@
+extend type Query {
+    """
+    Returns the permission scope names the current user has in the given workspace. Workspace roles apply to every
+    environment, so `environment` does not change the answer.
+    """
+    myWorkspaceScopes(workspaceId: ID!, environment: EnvironmentEnum): [String!]!
+    "Returns the workspace role name for the current user in the given workspace"
+    myWorkspaceRole(workspaceId: ID!): String
+}
