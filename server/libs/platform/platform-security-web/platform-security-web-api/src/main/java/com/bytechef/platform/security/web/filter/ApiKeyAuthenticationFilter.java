@@ -17,6 +17,7 @@
 package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
@@ -135,6 +136,13 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         throws IOException, ServletException {
 
         securityContextHolderStrategy.clearContext();
+
+        if (failed instanceof McpServerDisabledException mcpServerDisabledException) {
+            mcpServerDisabledException.writeResponse(response);
+
+            return;
+        }
+
         failureHandler.onAuthenticationFailure(request, response, failed);
     }
 

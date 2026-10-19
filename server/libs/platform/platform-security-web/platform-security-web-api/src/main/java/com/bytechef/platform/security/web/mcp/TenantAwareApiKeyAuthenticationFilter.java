@@ -59,6 +59,7 @@ public class TenantAwareApiKeyAuthenticationFilter extends ApiKeyAuthenticationF
         this.mcpServerSecretPattern = mcpServerSecretPattern;
         this.tenantlessPath = tenantlessPath;
 
+        setFailureHandler(new McpServerDisabledAuthenticationFailureHandler(getFailureHandler()));
         setRequestMatcher(requestMatcher);
     }
 
