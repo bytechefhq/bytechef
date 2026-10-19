@@ -39,6 +39,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDIT
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABASE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.EXECUTE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.INITIALIZED;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.LAST_ITEM;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.MAX_ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
@@ -91,7 +92,9 @@ import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.platform.component.util.SqlUtils;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -105,6 +108,8 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  * @author Monika Kušter
  */
 public class JdbcComponentHandlerImpl implements ComponentHandler {
+
+    private static final int POLL_BATCH_SIZE = QueryJdbcOperation.DEFAULT_MAX_ROWS;
 
     private static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
@@ -429,10 +434,6 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        List<Map<String, Object>> allRows = closureParameters.getList(ALL_ROWS, new TypeReference<>() {}, List.of());
-        List<Map<String, Object>> allRowsUpdate = new ArrayList<>();
-        List<Map<String, Object>> newRows = new ArrayList<>();
-
         try (SingleConnectionDataSource dataSource = getDataSource(connectionParameters)) {
             String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
             String table = MapUtils.getRequiredString(inputParameters, TABLE);
@@ -444,58 +445,118 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     "Invalid order direction: " + orderDirection, ComponentErrorType.INVALID_ORDER_DIRECTION);
             }
 
-            Object lastItem = closureParameters.get(LAST_ITEM);
-            String queryStatement;
-
             String quotedSchema = SqlUtils.quoteIdentifier(schema);
             String quotedTable = SqlUtils.quoteIdentifier(table);
             String quotedOrderBy = SqlUtils.quoteIdentifier(orderBy);
 
+            List<Map<String, Object>> legacyAllRows = closureParameters.getList(
+                ALL_ROWS, new TypeReference<>() {}, List.of());
+
+            Object lastItem = closureParameters.get(LAST_ITEM);
+
+            if (!legacyAllRows.isEmpty()) {
+                Map<String, Object> newestLegacyRow = legacyAllRows.getFirst();
+
+                lastItem = newestLegacyRow.get(orderBy);
+            }
+
+            if (lastItem == null && !closureParameters.getBoolean(INITIALIZED, false)) {
+                List<Map<String, Object>> newestRows = JdbcExecutor.query(
+                    "SELECT * FROM %s.%s WHERE %s IS NOT NULL ORDER BY %s %s".formatted(
+                        quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy, orderDirection),
+                    Map.of(), JdbcComponentHandlerImpl::mapRow, 1, dataSource);
+
+                Object newestItem = null;
+
+                if (!newestRows.isEmpty()) {
+                    Map<String, Object> newestRow = newestRows.getFirst();
+
+                    newestItem = newestRow.get(orderBy);
+                }
+
+                return new PollOutput(List.of(), createClosureParameters(newestItem), false);
+            }
+
+            String newerThanOperator = orderDirection.equals("DESC") ? ">" : "<";
+            String oldestFirstDirection = orderDirection.equals("DESC") ? "ASC" : "DESC";
+
+            String queryStatement;
+            Map<String, Object> queryParams;
+
             if (lastItem == null) {
-                queryStatement = "SELECT * FROM %s.%s ORDER BY %s %s".formatted(
-                    quotedSchema, quotedTable, quotedOrderBy, orderDirection);
+                queryStatement = "SELECT * FROM %s.%s WHERE %s IS NOT NULL ORDER BY %s %s".formatted(
+                    quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy, oldestFirstDirection);
+                queryParams = Map.of();
             } else {
-                if (Objects.equals(orderDirection, "ASC")) {
-                    queryStatement = "SELECT * FROM %s.%s WHERE %s < :lastItem ORDER BY %s ASC".formatted(
-                        quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy);
-                } else {
-                    queryStatement = "SELECT * FROM %s.%s WHERE %s > :lastItem ORDER BY %s DESC".formatted(
-                        quotedSchema, quotedTable, quotedOrderBy, quotedOrderBy);
-                }
+                queryStatement = "SELECT * FROM %s.%s WHERE %s %s :lastItem ORDER BY %s %s".formatted(
+                    quotedSchema, quotedTable, quotedOrderBy, newerThanOperator, quotedOrderBy,
+                    oldestFirstDirection);
+                queryParams = Map.of(LAST_ITEM, lastItem);
             }
 
-            Map<String, Object> queryParams = lastItem != null ? Map.of("lastItem", lastItem) : Map.of();
+            List<Map<String, Object>> rows = JdbcExecutor.query(
+                queryStatement, queryParams, JdbcComponentHandlerImpl::mapRow, POLL_BATCH_SIZE + 1, dataSource);
 
-            List<Map<String, Object>> query = JdbcExecutor.query(
-                queryStatement, queryParams, (ResultSet rs, int rowNum) -> {
-                    Map<String, Object> row = new LinkedHashMap<>();
-                    ResultSetMetaData rsMetaData = rs.getMetaData();
+            boolean capped = rows.size() > POLL_BATCH_SIZE;
 
-                    int columnCount = rsMetaData.getColumnCount();
+            List<Map<String, Object>> newRows = capped ? getCompleteBatch(rows, orderBy) : rows;
 
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = rsMetaData.getColumnName(i);
-
-                        row.put(columnName, rs.getObject(i));
-                    }
-
-                    return row;
-                }, dataSource);
-
-            for (Map<String, Object> row : query) {
-                allRowsUpdate.add(row);
-
-                if (!allRows.contains(row)) {
-                    newRows.add(row);
-                }
+            if (newRows.isEmpty()) {
+                return new PollOutput(List.of(), createClosureParameters(lastItem), false);
             }
 
-            Map<String, Object> last = allRowsUpdate.getLast();
+            Map<String, Object> lastRow = newRows.getLast();
 
-            return new PollOutput(
-                lastItem == null ? List.of() : newRows, Map.of(ALL_ROWS, allRowsUpdate, LAST_ITEM, last.get(orderBy)),
-                false);
+            return new PollOutput(newRows, createClosureParameters(lastRow.get(orderBy)), capped);
         }
+    }
+
+    private static Map<String, Object> createClosureParameters(Object lastItem) {
+        Map<String, Object> closureParameters = new HashMap<>();
+
+        closureParameters.put(INITIALIZED, true);
+
+        if (lastItem != null) {
+            closureParameters.put(LAST_ITEM, lastItem);
+        }
+
+        return closureParameters;
+    }
+
+    private static List<Map<String, Object>> getCompleteBatch(List<Map<String, Object>> rows, String orderBy) {
+        Map<String, Object> firstExcludedRow = rows.get(POLL_BATCH_SIZE);
+
+        Object boundaryValue = firstExcludedRow.get(orderBy);
+
+        int endIndex = POLL_BATCH_SIZE;
+
+        while (endIndex > 0) {
+            Map<String, Object> row = rows.get(endIndex - 1);
+
+            if (!Objects.equals(row.get(orderBy), boundaryValue)) {
+                break;
+            }
+
+            endIndex--;
+        }
+
+        return rows.subList(0, endIndex == 0 ? POLL_BATCH_SIZE : endIndex);
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private static Map<String, Object> mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+        Map<String, Object> row = new LinkedHashMap<>();
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+
+        int columnCount = resultSetMetaData.getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            String columnName = resultSetMetaData.getColumnName(i);
+
+            row.put(columnName, resultSet.getObject(i));
+        }
+
+        return row;
     }
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {
