@@ -49,4 +49,21 @@ describe('PropertyField', () => {
 
         expect(copyToClipboard).toHaveBeenCalledWith('${script_1.data.items[0]}');
     });
+
+    it('should not show the first element as the value of an unnamed top-level array', () => {
+        const {queryByText} = render(
+            <TooltipProvider>
+                <PropertyField
+                    copiedValue={null}
+                    copyToClipboard={vi.fn()}
+                    label="textHelper_1"
+                    property={{items: [{type: 'STRING'}], type: 'ARRAY'}}
+                    sampleOutput={['first', 'second']}
+                    workflowNodeName="textHelper_1"
+                />
+            </TooltipProvider>
+        );
+
+        expect(queryByText('first')).not.toBeInTheDocument();
+    });
 });
