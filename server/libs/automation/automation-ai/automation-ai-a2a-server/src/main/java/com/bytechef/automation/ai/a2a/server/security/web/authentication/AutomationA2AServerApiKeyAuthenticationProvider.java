@@ -26,6 +26,7 @@ import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -69,10 +70,6 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
 
         A2aServer a2aServer = getA2aServer(mcpApiKeyCredentials.getMcpServerSecretKey());
 
-        if (!a2aServer.isEnabled()) {
-            throw new BadCredentialsException("A2A server is disabled");
-        }
-
         Environment requestedEnvironment = mcpApiKeyCredentials.getRequestedEnvironment();
 
         if (requestedEnvironment != null && requestedEnvironment != a2aServer.getEnvironment()) {
@@ -80,6 +77,8 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
         }
 
         if (!a2aServer.isAuthenticationRequired()) {
+            checkEnabled(a2aServer);
+
             return McpAnonymousAuthenticationToken.ofAutomationA2aServer(a2aServer.getId());
         }
 
@@ -113,6 +112,8 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
+        checkEnabled(a2aServer);
+
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
         return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
@@ -121,6 +122,12 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
     @Override
     public boolean supports(Class<?> authentication) {
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    private static void checkEnabled(A2aServer a2aServer) {
+        if (!a2aServer.isEnabled()) {
+            throw new McpServerDisabledException(McpServerDisabledException.A2A_SERVER_MESSAGE);
+        }
     }
 
     private A2aServer getA2aServer(@Nullable String a2aServerSecretKey) {
