@@ -28,6 +28,9 @@ import java.util.Set;
  */
 public interface FileStorageService {
 
+    default void deleteTenantFiles(String tenantId) {
+    }
+
     void deleteFile(String directory, FileEntry fileEntry);
 
     boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException;

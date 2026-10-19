@@ -19,6 +19,7 @@ package com.bytechef.file.storage.filesystem.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.teardown.FileStorageTenantTeardownContributor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,5 +35,12 @@ public class FilesystemFileStorageConfiguration {
             applicationProperties.getFileStorage()
                 .getFilesystem()
                 .getBasedir());
+    }
+
+    @Bean
+    FileStorageTenantTeardownContributor filesystemFileStorageTenantTeardownContributor(
+        FileStorageService filesystemFileStorageService) {
+
+        return new FileStorageTenantTeardownContributor(filesystemFileStorageService);
     }
 }

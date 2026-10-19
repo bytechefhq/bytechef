@@ -60,6 +60,18 @@ class AwsChatMemoryConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "aws")
+    AwsChatMemoryTenantTeardownContributor awsChatMemoryTenantTeardownContributor(
+        ApplicationProperties applicationProperties, S3Client awsChatMemoryS3Client) {
+
+        return new AwsChatMemoryTenantTeardownContributor(
+            awsChatMemoryS3Client, applicationProperties.getAi()
+                .getMemory()
+                .getAws()
+                .getBucketPrefix());
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "aws")
     ChatMemory awsChatMemory(ChatMemoryRepository awsChatMemoryRepository) {
         return MessageWindowChatMemory.builder()
             .chatMemoryRepository(awsChatMemoryRepository)

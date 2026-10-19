@@ -67,6 +67,13 @@ class RedisChatMemoryConfiguration {
     }
 
     @Bean
+    RedisChatMemoryTenantTeardownContributor redisChatMemoryTenantTeardownContributor(
+        RedisClient redisChatMemoryRedisClient) {
+
+        return new RedisChatMemoryTenantTeardownContributor(redisChatMemoryRedisClient);
+    }
+
+    @Bean
     ChatMemory redisChatMemory(ChatMemoryRepository redisChatMemoryRepository) {
         return MessageWindowChatMemory.builder()
             .chatMemoryRepository(redisChatMemoryRepository)

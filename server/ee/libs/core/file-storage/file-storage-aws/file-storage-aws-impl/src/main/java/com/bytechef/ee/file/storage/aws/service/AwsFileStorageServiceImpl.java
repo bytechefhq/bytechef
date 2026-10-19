@@ -12,6 +12,7 @@ import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.util.TenantIdUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +33,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
@@ -41,6 +47,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
  */
 public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
+    private static final int DELETE_BATCH_SIZE = 1000;
     private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
     private static final String URL_PREFIX = "s3://";
 
@@ -53,6 +60,44 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         this.s3Client = s3Client;
         this.s3Template = s3Template;
         this.bucketName = bucketName;
+    }
+
+    @Override
+    public void deleteTenantFiles(String tenantId) {
+        String prefix = TenantIdUtils.requireValid(tenantId) + "/";
+
+        String continuationToken = null;
+
+        do {
+            ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(
+                ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .prefix(prefix)
+                    .maxKeys(DELETE_BATCH_SIZE)
+                    .continuationToken(continuationToken)
+                    .build());
+
+            List<ObjectIdentifier> objectIdentifiers = listObjectsV2Response.contents()
+                .stream()
+                .map(s3Object -> ObjectIdentifier.builder()
+                    .key(s3Object.key())
+                    .build())
+                .toList();
+
+            if (!objectIdentifiers.isEmpty()) {
+                s3Client.deleteObjects(
+                    DeleteObjectsRequest.builder()
+                        .bucket(bucketName)
+                        .delete(Delete.builder()
+                            .objects(objectIdentifiers)
+                            .quiet(true)
+                            .build())
+                        .build());
+            }
+
+            continuationToken = Boolean.TRUE.equals(listObjectsV2Response.isTruncated())
+                ? listObjectsV2Response.nextContinuationToken() : null;
+        } while (continuationToken != null);
     }
 
     @Override
