@@ -44,6 +44,11 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     }
 
     @Override
+    public void cancelAllForTenant(String tenantId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void cancelOneTimeTask(long jobId) {
         throw new UnsupportedOperationException();
     }

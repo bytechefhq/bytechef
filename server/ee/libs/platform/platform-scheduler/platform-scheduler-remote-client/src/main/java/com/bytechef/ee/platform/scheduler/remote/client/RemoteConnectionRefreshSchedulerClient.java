@@ -32,6 +32,11 @@ public class RemoteConnectionRefreshSchedulerClient implements ConnectionRefresh
     }
 
     @Override
+    public void cancelAllForTenant(String tenantId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void cancelConnectionRefresh(Long connectionId, String tenantId) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder

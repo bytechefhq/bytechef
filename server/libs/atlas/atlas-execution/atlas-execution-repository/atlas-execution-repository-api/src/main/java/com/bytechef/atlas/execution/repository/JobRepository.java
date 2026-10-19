@@ -48,6 +48,8 @@ public interface JobRepository {
 
     List<Long> findAllIdsByParentJobId(Long parentJobId);
 
+    List<Long> findAllIdsByStatus(int status);
+
     List<Job> findAllByWorkflowId(String workflowId);
 
     Optional<Job> findById(Long id);

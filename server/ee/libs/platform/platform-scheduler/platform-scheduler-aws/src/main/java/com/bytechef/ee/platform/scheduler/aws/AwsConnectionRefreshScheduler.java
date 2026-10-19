@@ -12,10 +12,12 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefre
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants;
+import com.bytechef.ee.platform.scheduler.aws.util.AwsScheduleUtils;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
@@ -45,6 +47,17 @@ public class AwsConnectionRefreshScheduler implements ConnectionRefreshScheduler
 
         this.sqsArn = "arn:aws:sqs:" + aws.getRegion() + ":" + accountId;
         this.roleArn = "arn:aws:iam::" + accountId + ":role/schedule-role";
+    }
+
+    @Override
+    public void cancelAllForTenant(String tenantId) {
+        List<String> failures = AwsScheduleUtils.deleteSchedules(
+            schedulerClient, CONNECTION_REFRESH, CONNECTION_REFRESH + "_" + tenantId + "_", scheduleName -> true);
+
+        if (!failures.isEmpty()) {
+            throw new IllegalStateException(
+                "Unable to cancel connection refresh schedules %s of tenant %s".formatted(failures, tenantId));
+        }
     }
 
     @Override

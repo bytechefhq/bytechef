@@ -104,6 +104,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Long> getJobIds(Job.Status status) {
+        return jobRepository.findAllIdsByStatus(status.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Job> getJobs(List<Long> ids) {
         return jobRepository.findAllByIdIn(ids);
     }

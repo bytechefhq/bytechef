@@ -25,6 +25,12 @@ import java.util.Map;
  */
 public interface TriggerScheduler {
 
+    /**
+     * Cancels every schedule, polling and dynamic webhook refresh job that belongs to the tenant. One-time tasks are
+     * not covered; cancel them per job with {@link #cancelOneTimeTask(long)}.
+     */
+    void cancelAllForTenant(String tenantId);
+
     void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId);
 
     /**

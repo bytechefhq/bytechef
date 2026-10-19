@@ -44,6 +44,8 @@ public interface JobService {
 
     Job getJob(long id);
 
+    List<Long> getJobIds(Job.Status status);
+
     List<Job> getJobs(List<Long> ids);
 
     Page<Job> getJobsPage(int pageNumber);

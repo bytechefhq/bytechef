@@ -70,5 +70,9 @@ public interface JdbcJobRepository
         + "(SELECT te.id FROM task_execution te WHERE te.job_id=:parentJobId)")
     List<Long> findAllIdsByParentJobId(@Param("parentJobId") Long parentJobId);
 
+    @Override
+    @Query("SELECT id FROM job WHERE status = :status")
+    List<Long> findAllIdsByStatus(@Param("status") int status);
+
     Job save(Job job);
 }
