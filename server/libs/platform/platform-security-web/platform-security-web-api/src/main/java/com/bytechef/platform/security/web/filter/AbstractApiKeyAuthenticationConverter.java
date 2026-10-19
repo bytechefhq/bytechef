@@ -44,7 +44,13 @@ public abstract class AbstractApiKeyAuthenticationConverter implements Authentic
         String authToken = getAuthToken(request);
         Environment environment = getEnvironment(request);
 
-        TenantKey tenantKey = TenantKey.parse(authToken);
+        TenantKey tenantKey;
+
+        try {
+            tenantKey = TenantKey.parse(authToken);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new BadCredentialsException("Invalid API key", illegalArgumentException);
+        }
 
         return doConvert(environment.ordinal(), authToken, tenantKey.getTenantId());
     }
