@@ -17,11 +17,14 @@
 package com.bytechef.platform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,17 +40,24 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -67,6 +77,12 @@ class WorkflowNodeOptionFacadeIntTest {
 
     @Autowired
     private ClusterElementDefinitionService clusterElementDefinitionService;
+
+    @MockitoBean
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private JdbcWorkflowRepository jdbcWorkflowRepository;
@@ -321,6 +337,128 @@ class WorkflowNodeOptionFacadeIntTest {
         Map<String, ?> hubspotParameters = inputParameters.get("hubspot_1");
 
         assertThat(hubspotParameters.get("apiKey")).isEqualTo("secret");
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsResolvesDeclaredConnection() {
+        Workflow workflow = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "script_1",
+                            "type": "script/v1/javascript",
+                            "parameters": {}
+                        }
+                    ]
+                }
+                """);
+
+        Map<String, Object> parameters = Map.of("baseId", "app1");
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(componentConnectionFacade.getWorkflowNodeComponentConnections(workflow.getId(), "script_1"))
+            .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflow.getId(), "script_1", "at", 100L, false, ENVIRONMENT_ID);
+
+        Connection boundConnection = connectionOf("airtable");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
+        when(actionDefinitionFacade.executeOptions(
+            "airtable", 1, "createRecord", "tableId", parameters, List.of("baseId"), null, 100L))
+                .thenReturn(expectedOptions);
+
+        List<Option> options = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            workflow.getId(), "script_1", null, new ComponentOperation("airtable", 1, "createRecord", false),
+            "tableId", "at", parameters, List.of("baseId"), ENVIRONMENT_ID);
+
+        assertThat(options).isEqualTo(expectedOptions);
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsRunsTriggerOptionsForClusterElement() {
+        Workflow workflow = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "tools": {
+                                    "name": "script_1",
+                                    "type": "script/v1/javascript",
+                                    "parameters": {}
+                                }
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(componentConnectionFacade.getClusterElementComponentConnections(
+            workflow.getId(), "aiAgent_1", "tools", "script_1"))
+                .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflow.getId(), "aiAgent_1", "at", 100L, false, ENVIRONMENT_ID);
+
+        Connection boundConnection = connectionOf("airtable");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
+        when(triggerDefinitionFacade.executeOptions(
+            "airtable", 1, "newRecord", "tableId", Map.of(), List.of(), null, 100L))
+                .thenReturn(expectedOptions);
+
+        List<Option> options = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            workflow.getId(), "aiAgent_1", new ClusterElementNode("tools", "script_1"),
+            new ComponentOperation("airtable", 1, "newRecord", true), "tableId", null, Map.of(), List.of(),
+            ENVIRONMENT_ID);
+
+        assertThat(options).isEqualTo(expectedOptions);
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsReturnsEmptyWithoutTestConnection() {
+        Workflow workflow = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "script_1",
+                            "type": "script/v1/javascript",
+                            "parameters": {}
+                        }
+                    ]
+                }
+                """);
+
+        when(componentConnectionFacade.getWorkflowNodeComponentConnections(workflow.getId(), "script_1"))
+            .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+
+        List<Option> options = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            workflow.getId(), "script_1", null, new ComponentOperation("airtable", 1, "createRecord", false),
+            "tableId", "at", Map.of(), List.of(), ENVIRONMENT_ID);
+
+        assertThat(options).isEmpty();
+
+        verify(actionDefinitionFacade, never()).executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyList(), any(), any(Long.class));
+    }
+
+    private static Connection connectionOf(String componentName) {
+        Connection connection = mock(Connection.class);
+
+        when(connection.getComponentName()).thenReturn(componentName);
+
+        return connection;
     }
 
     private Workflow createWorkflow(String definition) {

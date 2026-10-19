@@ -17,6 +17,8 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.domain.BaseProperty;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +42,4 @@ public interface WorkflowNodeDynamicPropertiesFacade {
     List<? extends BaseProperty> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId);
-
-    record ClusterElementNode(String clusterElementTypeName, String clusterElementWorkflowNodeName) {
-    }
-
-    record ComponentOperation(String componentName, int componentVersion, String operationName, boolean trigger) {
-    }
 }
