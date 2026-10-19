@@ -1,5 +1,7 @@
 import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
 
+export const RUN_ERROR_CODE_ACCESS_DENIED = 'ACCESS_DENIED';
+
 export const RUN_ERROR_CODE_NO_AI_PROVIDER = 'NO_AI_PROVIDER';
 
 export interface RunErrorDataI {
@@ -10,6 +12,7 @@ export interface RunErrorDataI {
 const FALLBACK_MESSAGE = 'The agent run failed before completing this turn.';
 
 const RUN_ERROR_CODE_MESSAGES: Record<string, string> = {
+    ACCESS_DENIED: "You don't have permission to do this in this workspace. Ask a workspace administrator for access.",
     MODEL_SELECTION_INCOMPLETE: 'Your model selection is incomplete. Pick a model again.',
     [RUN_ERROR_CODE_NO_AI_PROVIDER]:
         'No AI provider is set up for this environment. Enable one in Settings > AI > Providers. If you do not have permission, ask an administrator.',

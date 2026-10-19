@@ -18,7 +18,7 @@ import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalResolutionContext';
-import {toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
+import {RUN_ERROR_CODE_ACCESS_DENIED, toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useAiChatRetryableErrorStore';
 import {
@@ -127,6 +127,18 @@ export function isTurnInFlightError(source: {message?: string; payload?: unknown
     } catch {
         return false;
     }
+}
+
+/**
+ * Recognizes the server's 403 on the turn endpoint, a real authorization refusal such as a workspace viewer sending a
+ * BUILD turn. The HttpAgent's rejection carries the status; its message starts with {@code HTTP 403}.
+ */
+export function isForbiddenTurnError(source: {message?: unknown; status?: unknown} | null | undefined): boolean {
+    if (!source) {
+        return false;
+    }
+
+    return source.status === 403 || (typeof source.message === 'string' && /^HTTP 403\b/.test(source.message));
 }
 
 /** Whether a resolve mutation failed because the approval can no longer be decided, so the server answered CONFLICT. */
@@ -1011,7 +1023,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         onFailure: (errorMessage: string) => void;
         optimisticTurnMarker: string;
         runId: string;
-    }): Promise<{turnInFlight: boolean}> => {
+    }): Promise<{turnForbidden: boolean; turnInFlight: boolean}> => {
         const turnController = startTurnController();
         const {handleTurnInFlight, wasHandled} = createTurnInFlightHandler(
             optimisticTurnMarker,
@@ -1041,11 +1053,28 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             turnAbortSignal: turnController.signal,
         });
 
+        let turnForbidden = false;
+
         try {
             await agent!.runAgent({abortController: turnController, runId}, subscriber);
         } catch (error) {
             if (isTurnInFlightError(error as {message?: string; payload?: unknown})) {
                 handleTurnInFlight();
+            } else if (isForbiddenTurnError(error as {message?: unknown; status?: unknown})) {
+                turnForbidden = true;
+
+                console.warn('AI Hub turn refused with 403:', error);
+
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
+                }
+
+                if (useAiHubStore.getState().chatId === chatId) {
+                    addMessage({
+                        content: [{data: toRunErrorData({code: RUN_ERROR_CODE_ACCESS_DENIED}), type: 'data-run-error'}],
+                        role: 'assistant',
+                    });
+                }
             } else if (!isAbortError(error, turnController.signal)) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -1068,7 +1097,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             }
         }
 
-        return {turnInFlight: wasHandled()};
+        return {turnForbidden, turnInFlight: wasHandled()};
     };
 
     const onNew = async (message: AppendMessage) => {
@@ -1154,7 +1183,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         aiHubComposerStore.getState().clear();
 
-        const {turnInFlight} = await runTurn({
+        const {turnForbidden, turnInFlight} = await runTurn({
             composerTextOnRollback: input,
             input,
             onFailure: (errorMessage) =>
@@ -1167,7 +1196,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const persistedChatId = aiHubChatsStore.getState().currentChatId;
 
-        if (!turnInFlight && persistedChatId != null) {
+        if (!turnInFlight && !turnForbidden && persistedChatId != null) {
             runPostTurnTelemetry({
                 chatId: persistedChatId,
                 input,

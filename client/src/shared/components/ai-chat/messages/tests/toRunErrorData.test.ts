@@ -12,6 +12,14 @@ describe('toRunErrorData', () => {
         });
     });
 
+    it('explains that the user lacks the permission for the turn', () => {
+        expect(toRunErrorData({code: 'ACCESS_DENIED'})).toEqual({
+            code: 'ACCESS_DENIED',
+            message:
+                "You don't have permission to do this in this workspace. Ask a workspace administrator for access.",
+        });
+    });
+
     it('asks the user to pick another model when the selected one is unavailable', () => {
         expect(
             toRunErrorData({

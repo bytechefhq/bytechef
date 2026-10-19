@@ -26,6 +26,7 @@ import {
     getOptimisticTurnMarker,
     hasLivePropertyOptionPicker,
     invalidateWorkflowQueries,
+    isForbiddenTurnError,
     isTurnInFlightError,
     projectMessagesWithToolCalls,
     removeOptimisticTurnMessages,
@@ -167,6 +168,24 @@ describe('isTurnInFlightError', () => {
         expect(isTurnInFlightError({message: 'HTTP 409: {not json'})).toBe(false);
         expect(isTurnInFlightError(null)).toBe(false);
         expect(isTurnInFlightError(undefined)).toBe(false);
+    });
+});
+
+describe('isForbiddenTurnError', () => {
+    it('recognises the HttpAgent rejection of a 403 by its status', () => {
+        expect(isForbiddenTurnError({message: 'HTTP 403: {}', status: 403})).toBe(true);
+    });
+
+    it('recognises a 403 from its message when the status is missing', () => {
+        expect(
+            isForbiddenTurnError({message: 'HTTP 403: {"error":"Workspace is not accessible to the current user"}'})
+        ).toBe(true);
+    });
+
+    it('does not match other failures', () => {
+        expect(isForbiddenTurnError({message: 'HTTP 409: {"error":"TURN_IN_FLIGHT"}', status: 409})).toBe(false);
+        expect(isForbiddenTurnError({message: 'HTTP 4031 is not a status'})).toBe(false);
+        expect(isForbiddenTurnError(null)).toBe(false);
     });
 });
 
