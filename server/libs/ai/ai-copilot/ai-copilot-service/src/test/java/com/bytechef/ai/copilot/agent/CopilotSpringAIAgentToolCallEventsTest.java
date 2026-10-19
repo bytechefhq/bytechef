@@ -158,6 +158,50 @@ class CopilotSpringAIAgentToolCallEventsTest {
             .contains("catalog down");
     }
 
+    @Test
+    void testScopedRunToolErrorResultHidesTheRawMessage() throws Exception {
+        ToolCallback failingToolCallback = toolCallback(() -> {
+            throw new IllegalStateException("jdbc:postgresql://db.internal:5432 password authentication failed");
+        });
+
+        List<BaseEvent> events = new CopyOnWriteArrayList<>();
+        CountDownLatch finalized = new CountDownLatch(1);
+
+        RunAgentInput input = newInput();
+
+        input.state()
+            .set(CopilotConstants.STATE_SCOPED_PROJECT_ID, 7L);
+
+        new StreamingCopilotAgent(newBuilder(new TextToolTextChatModel(), failingToolCallback))
+            .run(input, collector(events, finalized));
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+
+        ToolCallResultEvent resultEvent = firstOf(events, ToolCallResultEvent.class);
+
+        assertThat(resultEvent.getContent()).contains("\"error\"")
+            .contains("Reference: run")
+            .doesNotContain("db.internal")
+            .doesNotContain("password");
+    }
+
+    @Test
+    void testUnscopedRunToolErrorResultKeepsTheMessage() throws Exception {
+        ToolCallback failingToolCallback = toolCallback(() -> {
+            throw new IllegalStateException("Workflow w1 does not exist");
+        });
+
+        List<BaseEvent> events = new CopyOnWriteArrayList<>();
+        CountDownLatch finalized = new CountDownLatch(1);
+
+        new StreamingCopilotAgent(newBuilder(new TextToolTextChatModel(), failingToolCallback))
+            .run(newInput(), collector(events, finalized));
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+
+        assertThat(firstOf(events, ToolCallResultEvent.class).getContent()).contains("Workflow w1 does not exist");
+    }
+
     private static void awaitRelease(CountDownLatch releaseTool) {
         try {
             if (!releaseTool.await(10, TimeUnit.SECONDS)) {
