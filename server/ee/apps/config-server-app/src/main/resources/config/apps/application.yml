@@ -211,3 +211,6 @@ bytechef:
     repository:
       jdbc:
         enabled: true
+    test-output:
+      # Maximum number of items kept from each list in an output saved by Test Action in the workflow editor
+      max-sample-items: 100

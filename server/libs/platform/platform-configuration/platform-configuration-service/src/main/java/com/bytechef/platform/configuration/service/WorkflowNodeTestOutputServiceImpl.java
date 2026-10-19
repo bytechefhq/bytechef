@@ -149,13 +149,13 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     })
     public WorkflowNodeTestOutput save(
         @WorkflowCacheEvict.WorkflowIdParam String workflowId, String workflowNodeName,
-        WorkflowNodeType workflowNodeType, OutputResponse outputResponse,
+        WorkflowNodeType workflowNodeType, OutputResponse outputResponse, boolean sampleOutputTruncated,
         @WorkflowCacheEvict.EnvironmentIdParam long environmentId) {
 
         try {
             return save(
                 workflowId, workflowNodeName, workflowNodeType, outputResponse.outputSchema(),
-                outputResponse.sampleOutput(), environmentId);
+                outputResponse.sampleOutput(), sampleOutputTruncated, environmentId);
         } finally {
             clearWorkflowTestNodeOutputCache(workflowId, workflowNodeName, environmentId);
         }
@@ -168,7 +168,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     private WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, BaseProperty outputSchema,
-        Object sampleOutput, long environmentId) {
+        Object sampleOutput, boolean sampleOutputTruncated, long environmentId) {
 
         WorkflowNodeTestOutput workflowNodeTestOutput = workflowNodeTestOutputRepository
             .findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(workflowId, workflowNodeName, environmentId)
@@ -180,6 +180,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
         workflowNodeTestOutput.setTypeVersion(workflowNodeType.version());
         workflowNodeTestOutput.setOutputSchema(outputSchema);
         workflowNodeTestOutput.setSampleOutput(sampleOutput);
+        workflowNodeTestOutput.setSampleOutputTruncated(sampleOutputTruncated);
         workflowNodeTestOutput.setWorkflowId(workflowId);
         workflowNodeTestOutput.setWorkflowNodeName(workflowNodeName);
 

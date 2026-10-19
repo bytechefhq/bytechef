@@ -3288,6 +3288,10 @@ components:
           $ref: '#/components/schemas/ClusterElementDefinitionBasic'
         outputResponse:
           $ref: "#/components/schemas/OutputResponse"
+        sampleOutputTruncated:
+          description: "If lists in the sample output were cut to the configured maximum number of items"
+          type: "boolean"
+          default: false
         taskDispatcherDefinition:
           $ref: '#/components/schemas/TaskDispatcherDefinitionBasic'
         testOutputResponse:

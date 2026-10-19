@@ -36,6 +36,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
@@ -386,8 +387,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
-        OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName, environmentId)
+        Optional<WorkflowNodeTestOutput> workflowNodeTestOutputOptional = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName, environmentId);
+
+        boolean sampleOutputTruncated = workflowNodeTestOutputOptional
+            .map(WorkflowNodeTestOutput::isSampleOutputTruncated)
+            .orElse(false);
+
+        OutputResponse outputResponse = workflowNodeTestOutputOptional
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, clusterElement, environmentId))
             .orElse(null);
@@ -399,7 +406,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new ClusterElementOutputDTO(
-            clusterElementDefinition, outputResponse, testOutputResponse, clusterElementWorkflowNodeName);
+            clusterElementDefinition, outputResponse, sampleOutputTruncated,
+            testOutputResponse, clusterElementWorkflowNodeName);
     }
 
     private Optional<OutputResponse> getClusterElementDynamicOutputResponse(
@@ -451,8 +459,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
             ? Property.class : com.bytechef.platform.component.domain.Property.class;
 
-        OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName(), environmentId)
+        Optional<WorkflowNodeTestOutput> workflowNodeTestOutputOptional = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName(), environmentId);
+
+        boolean sampleOutputTruncated = workflowNodeTestOutputOptional
+            .map(WorkflowNodeTestOutput::isSampleOutputTruncated)
+            .orElse(false);
+
+        OutputResponse outputResponse = workflowNodeTestOutputOptional
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .orElse(null);
 
@@ -502,8 +516,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new WorkflowNodeOutputDTO(
-            actionDefinition, null, outputResponse, taskDispatcherDefinition, testoutputResponse, null,
-            variableOutputResponse, workflowTask.getName());
+            actionDefinition, null, outputResponse, sampleOutputTruncated,
+            taskDispatcherDefinition, testoutputResponse, null, variableOutputResponse, workflowTask.getName());
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
@@ -523,8 +537,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
             workflowNodeType.name(), workflowNodeType.version(), Objects.requireNonNull(workflowNodeType.operation()));
 
-        OutputResponse outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId)
+        Optional<WorkflowNodeTestOutput> workflowNodeTestOutputOptional = workflowNodeTestOutputService
+            .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId);
+
+        boolean sampleOutputTruncated = workflowNodeTestOutputOptional
+            .map(WorkflowNodeTestOutput::isSampleOutputTruncated)
+            .orElse(false);
+
+        OutputResponse outputResponse = workflowNodeTestOutputOptional
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> fetchWorkflowTriggerDynamicOutputResponse(
                 workflowId, workflowTrigger, environmentId, previousNode))
@@ -539,7 +559,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
         return new WorkflowNodeOutputDTO(
-            null, null, outputResponse, null, testoutputResponse, triggerDefinition, workflowTrigger.getName());
+            null, null, outputResponse, sampleOutputTruncated, null,
+            testoutputResponse, triggerDefinition, workflowTrigger.getName());
     }
 
     @SuppressWarnings("unchecked")

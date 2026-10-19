@@ -25,6 +25,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -56,11 +57,15 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -77,6 +82,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final int maxSampleItems;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -86,7 +92,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade,
+        ActionDefinitionFacade actionDefinitionFacade, ApplicationProperties applicationProperties,
         ClusterElementDefinitionService clusterElementDefinitionService,
         List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders, ConnectionService connectionService,
         Evaluator evaluator, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
@@ -100,6 +106,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.connectionService = connectionService;
         this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        ApplicationProperties.Workflow.TestOutput testOutput = workflow.getTestOutput();
+
+        this.maxSampleItems = testOutput.getMaxSampleItems();
+
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
@@ -195,12 +208,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
+        SampleOutput truncatedSampleOutput = truncateSampleOutput(sampleOutput);
+
         Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
-                sampleOutput, PropertyFactory.PROPERTY_FACTORY));
+                truncatedSampleOutput.value(), PropertyFactory.PROPERTY_FACTORY));
 
         return workflowNodeTestOutputService.save(
-            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput),
+            workflowId, workflowNodeName, workflowNodeType,
+            new OutputResponse(outputSchema, truncatedSampleOutput.value()), truncatedSampleOutput.truncated(),
             environmentId);
     }
 
@@ -366,8 +382,10 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             return null;
         }
 
+        SampleOutput sampleOutput = truncateSampleOutput(value);
+
         OutputResponse outputResponse = SchemaUtils.toOutput(
-            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            sampleOutput.value(), PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;
@@ -375,7 +393,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return workflowNodeTestOutputService.save(
             Validate.notNull(workflowId, "workflowId"), workflowNodeName, workflowNodeType, outputResponse,
-            environmentId);
+            sampleOutput.truncated(), environmentId);
     }
 
     @Nullable
@@ -532,15 +550,54 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             }
         }
 
+        SampleOutput sampleOutput = truncateSampleOutput(value);
+
         OutputResponse outputResponse = SchemaUtils.toOutput(
-            value, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            sampleOutput.value(), PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;
         }
 
         return workflowNodeTestOutputService.save(
-            workflowId, workflowNodeName, workflowNodeType, outputResponse, environmentId);
+            workflowId, workflowNodeName, workflowNodeType, outputResponse, sampleOutput.truncated(), environmentId);
+    }
+
+    private SampleOutput truncateSampleOutput(Object value) {
+        AtomicBoolean truncated = new AtomicBoolean();
+
+        Object sampleOutput = truncateSampleOutput(value, truncated);
+
+        return new SampleOutput(sampleOutput, truncated.get());
+    }
+
+    private Object truncateSampleOutput(Object value, AtomicBoolean truncated) {
+        if (value instanceof Map<?, ?> map) {
+            Map<Object, Object> truncatedMap = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                truncatedMap.put(entry.getKey(), truncateSampleOutput(entry.getValue(), truncated));
+            }
+
+            return truncatedMap;
+        }
+
+        if (value instanceof Collection<?> collection) {
+            if (collection.size() > maxSampleItems) {
+                truncated.set(true);
+            }
+
+            return collection.stream()
+                .limit(maxSampleItems)
+                .map(item -> truncateSampleOutput(item, truncated))
+                .collect(Collectors.toCollection(ArrayList::new));
+        }
+
+        if (value instanceof Object[] array && array.length > maxSampleItems) {
+            return truncateSampleOutput(Arrays.asList(array), truncated);
+        }
+
+        return value;
     }
 
     @FunctionalInterface
@@ -549,6 +606,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Object execute(
             WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
             Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId);
+    }
+
+    private record SampleOutput(Object value, boolean truncated) {
     }
 
     private record ClusterElementTestContext(

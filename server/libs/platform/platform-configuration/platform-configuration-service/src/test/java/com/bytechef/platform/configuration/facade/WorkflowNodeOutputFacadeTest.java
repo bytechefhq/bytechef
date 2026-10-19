@@ -693,6 +693,55 @@ class WorkflowNodeOutputFacadeTest {
         }
     }
 
+    @Test
+    void testGetClusterElementOutputReportsTruncatedSavedTestOutput() {
+        mockClusterElementWorkflow();
+
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(null, List.of(1, 2)));
+        when(workflowNodeTestOutput.isSampleOutputTruncated()).thenReturn(true);
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "hubspot_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        ClusterElementOutputDTO result = workflowNodeOutputFacade.getClusterElementOutput(
+            WORKFLOW_ID, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID);
+
+        assertNotNull(result);
+        assertTrue(result.sampleOutputTruncated());
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputReportsTruncatedSavedTestOutput() {
+        WorkflowTask workflowTask = new WorkflowTask(Map.of("name", "action_1", "type", "component/v1/action1"));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(workflowTask));
+
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(null, List.of(1, 2)));
+        when(workflowNodeTestOutput.isSampleOutputTruncated()).thenReturn(true);
+        when(actionDefinitionService.getActionDefinition("component", 1, "action1"))
+            .thenReturn(mock(ActionDefinition.class));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "action_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            WorkflowNodeOutputDTO result = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                WORKFLOW_ID, "action_1", ENVIRONMENT_ID);
+
+            assertNotNull(result);
+            assertTrue(result.sampleOutputTruncated());
+            assertTrue(result.testOutputResponse());
+        }
+    }
+
     private ClusterElementDefinition mockClusterElementWorkflow() {
         WorkflowTask workflowTask = new WorkflowTask(
             Map.of(

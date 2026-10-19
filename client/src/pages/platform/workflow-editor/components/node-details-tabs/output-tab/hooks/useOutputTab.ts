@@ -111,6 +111,7 @@ export default function useOutputTab({
     const {outputSchema: variableOutputSchema, sampleOutput: variableSampleOutput} =
         workflowNodeOutput?.variableOutputResponse || {};
     const testOutputResponse = !!workflowNodeOutput?.testOutputResponse;
+    const sampleOutputTruncated = !!workflowNodeOutput?.sampleOutputTruncated;
 
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery(
         {
@@ -390,6 +391,7 @@ export default function useOutputTab({
         outputSchema,
         placeholder,
         sampleOutput,
+        sampleOutputTruncated,
         saveClusterElementTestOutputMutationPending: saveClusterElementTestOutputMutation.isPending,
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
