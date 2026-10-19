@@ -48,7 +48,6 @@ public class WorkspaceUserErrorType extends AbstractErrorType {
      * workspace-wide rather than one environment at a time. Appended at the end because the keys are persisted.
      */
     public static final WorkspaceUserErrorType NO_ENVIRONMENT_ROLE = new WorkspaceUserErrorType(110);
-    public static final WorkspaceUserErrorType LAST_ENVIRONMENT_ROLE = new WorkspaceUserErrorType(111);
 
     private WorkspaceUserErrorType(int errorKey) {
         super(WorkspaceUser.class, errorKey);
