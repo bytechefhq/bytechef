@@ -122,8 +122,9 @@ Client: `useTruncateChatMessages`.
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
 the turn's POST still stops it.
 
-Deleting a chat discards the run's queued continuations and cancels the run the same way before the chat, its
-approvals and its session are removed; after the commit it deletes the chat's approvals again, so a PENDING row the
+Deleting a chat retires its thread (`InFlightAiHubRunRegistry.retireThread`: queued continuations are dropped, later
+ones and new runs are refused, the retirement expires with the run entries and a rolled-back delete lifts it) and
+cancels the run the same way before the chat, its approvals and its session are removed; after the commit it deletes the chat's approvals again, so a PENDING row the
 gate wrote during the delete does not outlive the chat.
 
 A turn or truncation against a held thread is refused: the turn POST answers 409 `{"error":"TURN_IN_FLIGHT"}`
