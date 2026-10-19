@@ -4,8 +4,11 @@ import {PostHog} from 'posthog-js';
 import {useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+export type EmptyStatePageType = 'connections' | 'deployments' | 'executions' | 'projects';
+
 export interface AnalyticsI {
     captureComponentUsed(name: string, actionName?: string, triggerName?: string): void;
+    captureEmptyStateAction(page: EmptyStatePageType, action: string, stage?: string): void;
     captureIntegrationCreated(): void;
     captureIntegrationInstanceConfigurationCreated(): void;
     captureIntegrationInstanceConfigurationEnabled(): void;
@@ -81,6 +84,8 @@ export const useAnalytics = (): AnalyticsI => {
     return {
         captureComponentUsed: (componentName: string, actionName?: string, triggerName?: string) =>
             captureEvent('component_used', {actionName, componentName, triggerName}),
+        captureEmptyStateAction: (page: EmptyStatePageType, action: string, stage?: string) =>
+            captureEvent('empty_state_action_clicked', {action, page, stage}),
         captureIntegrationCreated: () => captureEvent('integration_created'),
         captureIntegrationInstanceConfigurationCreated: () =>
             captureEvent('integration_instance_configuration_created'),
