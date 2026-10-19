@@ -18,6 +18,8 @@ package com.bytechef.platform.ai.provider.facade;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.CatalogModel;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
@@ -42,6 +44,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +60,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     private final AiProviderConnectionSource aiProviderConnectionSource;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ObjectProvider<ModelCatalog> modelCatalogProvider;
     private final OllamaModelClient ollamaModelClient;
     private final PropertyService propertyService;
     private final ApplicationProperties applicationProperties;
@@ -64,11 +68,13 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
         AiProviderConnectionSource aiProviderConnectionSource,
-        ComponentDefinitionService componentDefinitionService, OllamaModelClient ollamaModelClient,
+        ComponentDefinitionService componentDefinitionService, ObjectProvider<ModelCatalog> modelCatalogProvider,
+        OllamaModelClient ollamaModelClient,
         PropertyService propertyService, ApplicationProperties applicationProperties) {
 
         this.aiProviderConnectionSource = aiProviderConnectionSource;
         this.componentDefinitionService = componentDefinitionService;
+        this.modelCatalogProvider = modelCatalogProvider;
         this.ollamaModelClient = ollamaModelClient;
         this.propertyService = propertyService;
         this.applicationProperties = applicationProperties;
@@ -125,7 +131,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
                 List<AiProviderCatalogItemDTO.Model> models = enabled && provider == Provider.OLLAMA
                     ? readOllamaChatModels(fullComponentDefinition, environment)
-                    : labelModels(readChatModels(fullComponentDefinition));
+                    : labelModels(
+                        modelCatalogProvider.getIfAvailable(), provider, readChatModels(fullComponentDefinition));
 
                 return new AiProviderCatalogItemDTO(
                     provider.getKey(), provider.getLabel(), componentDefinition.getIcon(),
@@ -371,16 +378,51 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .orElse(List.of());
     }
 
-    private static List<AiProviderCatalogItemDTO.Model> labelModels(List<AiProviderCatalogItemDTO.Model> models) {
+    private static List<AiProviderCatalogItemDTO.Model> labelModels(
+        @Nullable ModelCatalog modelCatalog, Provider provider, List<AiProviderCatalogItemDTO.Model> models) {
+
+        String modelsDevProviderId = resolveModelsDevProviderId(provider);
+
         return models.stream()
-            .map(model -> new AiProviderCatalogItemDTO.Model(model.name(), resolveLabel(model)))
+            .map(model -> new AiProviderCatalogItemDTO.Model(
+                model.name(), resolveLabel(modelCatalog, modelsDevProviderId, model)))
             .toList();
     }
 
-    private static String resolveLabel(AiProviderCatalogItemDTO.Model model) {
+    private static String resolveLabel(
+        @Nullable ModelCatalog modelCatalog, @Nullable String modelsDevProviderId,
+        AiProviderCatalogItemDTO.Model model) {
+
+        if (modelCatalog != null && modelsDevProviderId != null) {
+            String displayName = modelCatalog.fetchModel(modelsDevProviderId, model.name())
+                .map(CatalogModel::name)
+                .orElse(null);
+
+            if (displayName != null && !displayName.isBlank()) {
+                return displayName;
+            }
+        }
+
         String label = model.label();
 
         return label != null && !label.isBlank() ? label : model.name();
+    }
+
+    private static @Nullable String resolveModelsDevProviderId(Provider provider) {
+        return switch (provider) {
+            case ANTHROPIC -> "anthropic";
+            case AZURE_OPEN_AI -> "azure";
+            case DEEPSEEK -> "deepseek";
+            case GROQ -> "groq";
+            case HUGGING_FACE -> null;
+            case MISTRAL -> "mistral";
+            case NVIDIA -> "nvidia";
+            case OLLAMA -> null;
+            case OPEN_AI -> "openai";
+            case PERPLEXITY -> "perplexity";
+            case STABILITY -> null;
+            case VERTEX_GEMINI -> "google-vertex";
+        };
     }
 
     private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
@@ -390,7 +432,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             resolveUrl(Provider.OLLAMA, environment), resolveApiKey(Provider.OLLAMA, environment));
 
         if (installedModels.isEmpty()) {
-            return labelModels(readChatModels(componentDefinition));
+            return labelModels(
+                modelCatalogProvider.getIfAvailable(), Provider.OLLAMA, readChatModels(componentDefinition));
         }
 
         return installedModels.stream()
