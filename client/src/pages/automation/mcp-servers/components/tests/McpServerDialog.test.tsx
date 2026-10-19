@@ -8,7 +8,12 @@ import McpServerDialog from '../McpServerDialog';
 
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    enabledFeatureFlags: ['ff-6383'],
     updateMutate: vi.fn(),
+}));
+
+vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
+    useFeatureFlagsStore: () => (featureFlag: string) => hoisted.enabledFeatureFlags.includes(featureFlag),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -57,6 +62,7 @@ describe('McpServerDialog', () => {
     beforeEach(() => {
         hoisted.createMutate.mockClear();
         hoisted.updateMutate.mockClear();
+        hoisted.enabledFeatureFlags = ['ff-6383'];
     });
 
     it('creates a server that requires authentication by default', async () => {
@@ -132,5 +138,13 @@ describe('McpServerDialog', () => {
 
         expect(getAuthenticationCheckbox()).not.toBeChecked();
         expect(getEnforceToolAuthorizationCheckbox()).toBeDisabled();
+    });
+
+    it('hides tool authorization while ff-6383 is off', () => {
+        hoisted.enabledFeatureFlags = [];
+
+        renderDialog(existingMcpServer);
+
+        expect(screen.queryByRole('checkbox', {name: 'Enforce tool authorization'})).not.toBeInTheDocument();
     });
 });
