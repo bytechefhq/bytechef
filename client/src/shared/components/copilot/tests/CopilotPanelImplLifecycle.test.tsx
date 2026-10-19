@@ -4,6 +4,7 @@ import {readLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedMod
 import CopilotPanel, {CopilotPanelContent} from '@/shared/components/copilot/CopilotPanelImpl';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_PROVIDERS_LINK_LABEL} from '@/shared/constants';
 import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -19,6 +20,20 @@ const hoisted = vi.hoisted(() => ({
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAiDefaultModelQuery: () => ({data: {aiDefaultModel: hoisted.defaultModel}, isPending: hoisted.isPending}),
+    useAiProviderCatalogQuery: () => ({
+        data: {
+            aiProviderCatalog: [
+                {
+                    enabled: true,
+                    icon: null,
+                    key: 'ai.provider.openAi',
+                    models: [],
+                    name: 'OpenAI',
+                    supportsModelById: true,
+                },
+            ],
+        },
+    }),
 }));
 
 vi.mock('@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider', () => ({
@@ -126,7 +141,7 @@ describe('CopilotPanelImpl', () => {
         expect(screen.getByText('No AI providers enabled')).toBeInTheDocument();
         expect(screen.queryByTestId('thread')).not.toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', {name: 'Go to AI Providers'}));
+        await user.click(screen.getByRole('button', {name: AI_PROVIDERS_LINK_LABEL}));
 
         expect(screen.getByText('AI providers settings')).toBeInTheDocument();
     });
