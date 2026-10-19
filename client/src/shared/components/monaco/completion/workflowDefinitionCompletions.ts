@@ -306,8 +306,8 @@ async function getParameterKeyCompletions(
     return target ? getPropertyCompletionItems({...target, existingKeys}) : [];
 }
 
-const YAML_PLAIN_STRING = /^[A-Za-z_/.@][\w ./@-]*$/;
-const YAML_RESERVED_PLAIN = /^(true|false|null|~|yes|no|on|off|-?\d+(\.\d+)?)$/i;
+const YAML_PLAIN_STRING = /^[A-Za-z_/.](?:[\w ./@-]*[\w./@-])?$/;
+const YAML_RESERVED_PLAIN = /^(true|false|null|~|yes|no|on|off|-?\d+(\.\d+)?|[-+]?\.(inf|nan))$/i;
 
 function documentValueText(value: unknown, format: 'json' | 'yaml', quote?: string): string | undefined {
     if (format === 'json' || quote === '"') {
