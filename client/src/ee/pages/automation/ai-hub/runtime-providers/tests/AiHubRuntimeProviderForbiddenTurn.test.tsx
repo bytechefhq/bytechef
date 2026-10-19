@@ -84,7 +84,7 @@ describe('AiHubRuntimeProvider when the server refuses the turn with 403', () =>
         expect(runErrorParts(aiHubStore.getState().messages)).toEqual([
             {
                 data: {
-                    code: 'ACCESS_DENIED',
+                    code: 'WORKSPACE_ACCESS_DENIED',
                     message:
                         "You don't have permission to do this in this workspace. Ask a workspace administrator for access.",
                 },
@@ -97,5 +97,38 @@ describe('AiHubRuntimeProvider when the server refuses the turn with 403', () =>
         expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
         expect(patchChat).not.toHaveBeenCalled();
         expect(generateAiHubChatTitle).not.toHaveBeenCalled();
+    });
+
+    it('tells the user to start a new chat when the server refuses the chat itself', async () => {
+        vi.mocked(globalThis.fetch).mockImplementation(
+            async () =>
+                new Response(JSON.stringify({error: 'AiHubChat is not accessible to the current user'}), {
+                    headers: {'Content-Type': 'application/json'},
+                    status: 403,
+                })
+        );
+
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <AiHubRuntimeProvider>child</AiHubRuntimeProvider>
+            </QueryClientProvider>
+        );
+
+        await act(async () => {
+            await getRuntimeOptions().onNew({
+                content: [{text: 'Build me a workflow', type: 'text'}],
+            } as unknown as AppendMessage);
+        });
+
+        expect(runErrorParts(aiHubStore.getState().messages)).toEqual([
+            {
+                data: {
+                    code: 'CHAT_ACCESS_DENIED',
+                    message: "You don't have access to this chat. Start a new chat to continue.",
+                },
+                type: 'data-run-error',
+            },
+        ]);
+        expect(toast.error).not.toHaveBeenCalled();
     });
 });
