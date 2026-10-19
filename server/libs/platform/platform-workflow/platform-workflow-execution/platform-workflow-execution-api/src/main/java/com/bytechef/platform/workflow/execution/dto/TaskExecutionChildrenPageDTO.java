@@ -44,6 +44,20 @@ public record TaskExecutionChildrenPageDTO(
             size, numberOfElements, totalElements, totalPages);
     }
 
+    public TaskExecutionChildrenPageDTO withoutDetails() {
+        return new TaskExecutionChildrenPageDTO(
+            children.stream()
+                .map(TaskExecutionDTO::withoutDetails)
+                .toList(),
+            icons,
+            iterations.stream()
+                .map(iteration -> iteration.stream()
+                    .map(TaskExecutionDTO::withoutDetails)
+                    .toList())
+                .toList(),
+            number, size, numberOfElements, totalElements, totalPages);
+    }
+
     private static Map<String, String> collectIcons(
         List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations) {
 
