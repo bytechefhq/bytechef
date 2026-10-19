@@ -16,12 +16,18 @@ import com.agui.core.type.EventType;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.lang.reflect.Proxy;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -32,6 +38,43 @@ import reactor.test.StepVerifier;
  * @author Ivica Cardic
  */
 class InFlightAiHubRunRegistryTest {
+
+    @Test
+    void testRetireThreadCancelsTheRunATryStartInstallsWhileTheRetireRaces() throws Exception {
+        CountDownLatch insideComputeLatch = new CountDownLatch(1);
+        CountDownLatch releaseComputeLatch = new CountDownLatch(1);
+
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry(
+            blockingFirstComputeCache(insideComputeLatch, releaseComputeLatch));
+
+        AtomicReference<Optional<InFlightRun>> startedRunReference = new AtomicReference<>();
+
+        Thread tryStartThread = new Thread(
+            () -> startedRunReference.set(registry.tryStart("thread-1", "run-1")), "try-start");
+        Thread retireThread = new Thread(() -> registry.retireThread("thread-1"), "retire");
+
+        tryStartThread.start();
+
+        assertThat(insideComputeLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+        retireThread.start();
+
+        assertThat(awaitBlocked(retireThread))
+            .as("the retire thread must block on the entry tryStart holds before the race is released")
+            .isTrue();
+
+        releaseComputeLatch.countDown();
+
+        tryStartThread.join(5_000);
+        retireThread.join(5_000);
+
+        Optional<InFlightRun> startedRun = startedRunReference.get();
+
+        assertThat(startedRun).isPresent();
+        assertThat(startedRun.get()
+            .isTerminated()).isTrue();
+        assertThat(registry.tryStart("thread-1", "run-2")).isEmpty();
+    }
 
     @Test
     void testReleaseActionsRunOnTheReleaseExecutorNotOnTheReleasingThread() {
@@ -56,6 +99,39 @@ class InFlightAiHubRunRegistryTest {
     }
 
     @Test
+    void testAReleaseActionQueuedAfterTheThreadRetiredIsRefused() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        List<String> ranActions = new ArrayList<>();
+
+        InFlightRun run = registry.tryStart("thread-held", "run-1")
+            .orElseThrow();
+
+        registry.retireThread("thread-held");
+        registry.runWhenReleased("thread-held", () -> ranActions.add("held"));
+
+        run.complete();
+
+        registry.runWhenReleased("thread-held", () -> ranActions.add("after-release"));
+        registry.runWhenReleased("thread-free", () -> ranActions.add("free"));
+
+        assertThat(ranActions).containsExactly("free");
+    }
+
+    @Test
+    void testTryStartOnARetiredThreadFailsUntilItIsReinstated() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+
+        registry.retireThread("thread-1");
+
+        assertThat(registry.tryStart("thread-1", "run-1")).isEmpty();
+        assertThat(registry.isInFlight("thread-1")).isFalse();
+
+        registry.reinstateThread("thread-1");
+
+        assertThat(registry.tryStart("thread-1", "run-2")).isPresent();
+    }
+
+    @Test
     void testDiscardedReleaseActionsNeverRun() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         List<String> ranActions = new ArrayList<>();
@@ -64,7 +140,7 @@ class InFlightAiHubRunRegistryTest {
             .orElseThrow();
 
         registry.runWhenReleased("thread-held", () -> ranActions.add("held"));
-        registry.discardReleaseActions("thread-held");
+        registry.retireThread("thread-held");
 
         run.complete();
 
@@ -387,5 +463,66 @@ class InFlightAiHubRunRegistryTest {
         event.setDelta(delta);
 
         return event;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Cache<String, InFlightRun> blockingFirstComputeCache(
+        CountDownLatch insideComputeLatch, CountDownLatch releaseComputeLatch) {
+
+        Cache<String, InFlightRun> cache = Caffeine.newBuilder()
+            .build();
+        ConcurrentMap<String, InFlightRun> map = cache.asMap();
+        AtomicBoolean blocked = new AtomicBoolean();
+
+        ConcurrentMap<String, InFlightRun> blockingMap = (ConcurrentMap<String, InFlightRun>) Proxy.newProxyInstance(
+            InFlightAiHubRunRegistryTest.class.getClassLoader(), new Class<?>[] {
+                ConcurrentMap.class
+            }, (proxy, method, arguments) -> {
+                if ("compute".equals(method.getName())) {
+                    BiFunction<String, InFlightRun, InFlightRun> remapping =
+                        (BiFunction<String, InFlightRun, InFlightRun>) arguments[1];
+
+                    return map.compute((String) arguments[0], (key, value) -> {
+                        InFlightRun result = remapping.apply(key, value);
+
+                        if (blocked.compareAndSet(false, true)) {
+                            insideComputeLatch.countDown();
+
+                            awaitLatch(releaseComputeLatch);
+                        }
+
+                        return result;
+                    });
+                }
+
+                return method.invoke(map, arguments);
+            });
+
+        return (Cache<String, InFlightRun>) Proxy.newProxyInstance(
+            InFlightAiHubRunRegistryTest.class.getClassLoader(), new Class<?>[] {
+                Cache.class
+            }, (proxy, method, arguments) -> "asMap".equals(method.getName())
+                ? blockingMap : method.invoke(cache, arguments));
+    }
+
+    private static void awaitLatch(CountDownLatch latch) {
+        try {
+            assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+        } catch (InterruptedException exception) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private static boolean awaitBlocked(Thread thread) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+
+        while (thread.getState() != Thread.State.BLOCKED && System.nanoTime() < deadline) {
+            Thread.sleep(5);
+        }
+
+        return thread.getState() == Thread.State.BLOCKED;
     }
 }

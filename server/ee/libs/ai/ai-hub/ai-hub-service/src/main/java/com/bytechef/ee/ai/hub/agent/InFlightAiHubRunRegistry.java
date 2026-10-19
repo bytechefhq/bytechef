@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,7 @@ public class InFlightAiHubRunRegistry {
 
     private final Cache<String, InFlightRun> runs;
     private final Cache<String, Boolean> cancelledRunIds;
+    private final Cache<String, Boolean> retiredThreadIds;
     private final Executor releaseActionExecutor;
 
     public InFlightAiHubRunRegistry() {
@@ -83,6 +86,7 @@ public class InFlightAiHubRunRegistry {
     InFlightAiHubRunRegistry(Cache<String, InFlightRun> runs, Executor releaseActionExecutor) {
         this.runs = runs;
         this.cancelledRunIds = buildCancelledRunIdCache();
+        this.retiredThreadIds = buildRetiredThreadIdCache();
         this.releaseActionExecutor = releaseActionExecutor;
     }
 
@@ -91,7 +95,7 @@ public class InFlightAiHubRunRegistry {
 
         InFlightRun run = runs.asMap()
             .compute(threadId, (key, existing) -> {
-                if (existing != null && existing.holdsThread(Instant.now())) {
+                if (isRetired(key) || existing != null && existing.holdsThread(Instant.now())) {
                     return existing;
                 }
 
@@ -157,19 +161,63 @@ public class InFlightAiHubRunRegistry {
     public void runWhenReleased(String threadId, Runnable action) {
         InFlightRun run = runs.getIfPresent(threadId);
 
-        if (run != null && run.deferUntilReleased(action)) {
+        DeferResult deferResult = run == null
+            ? DeferResult.NOT_HELD : run.deferUntilReleased(action, () -> isRetired(threadId));
+
+        if (deferResult == DeferResult.QUEUED) {
+            return;
+        }
+
+        if (deferResult == DeferResult.REFUSED || isRetired(threadId)) {
+            log.debug("Refused a deferred action for retired threadId={}", threadId);
+
             return;
         }
 
         action.run();
     }
 
-    public void discardReleaseActions(String threadId) {
-        InFlightRun run = runs.getIfPresent(threadId);
+    /**
+     * Retires {@code threadId} because its chat is being deleted, then cancels its live run. Drops the actions queued
+     * with {@link #runWhenReleased} on the run holding it, refuses any later one, and refuses {@link #tryStart} for it.
+     * The discard runs in a {@code compute} on the thread's entry, so it serializes with {@link #tryStart}: either that
+     * {@code tryStart} sees the retirement, or the run it installed is the one cancelled here. Returns {@code true}
+     * when a live run was cancelled. The retirement expires like the run entries; {@link #reinstateThread} lifts it
+     * when the delete rolls back.
+     */
+    public boolean retireThread(String threadId) {
+        retiredThreadIds.put(threadId, Boolean.TRUE);
 
-        if (run != null) {
-            run.discardReleaseActions();
+        AtomicReference<@Nullable InFlightRun> runReference = new AtomicReference<>();
+
+        runs.asMap()
+            .compute(threadId, (key, run) -> {
+                if (run != null) {
+                    run.discardReleaseActions();
+
+                    runReference.set(run);
+                }
+
+                return run;
+            });
+
+        InFlightRun run = runReference.get();
+
+        if (run == null || run.isTerminated()) {
+            return false;
         }
+
+        run.cancel();
+
+        return true;
+    }
+
+    public void reinstateThread(String threadId) {
+        retiredThreadIds.invalidate(threadId);
+    }
+
+    public boolean isRetired(String threadId) {
+        return retiredThreadIds.getIfPresent(threadId) != null;
     }
 
     public boolean isInFlight(String threadId) {
@@ -184,10 +232,21 @@ public class InFlightAiHubRunRegistry {
             .build();
     }
 
+    private static Cache<String, Boolean> buildRetiredThreadIdCache() {
+        return Caffeine.newBuilder()
+            .expireAfterWrite(ENTRY_TTL_MINUTES, TimeUnit.MINUTES)
+            .build();
+    }
+
     private static Cache<String, Boolean> buildCancelledRunIdCache() {
         return Caffeine.newBuilder()
             .expireAfterWrite(CANCELLED_RUN_ID_TTL_MINUTES, TimeUnit.MINUTES)
             .build();
+    }
+
+    enum DeferResult {
+
+        NOT_HELD, QUEUED, REFUSED
     }
 
     /**
@@ -269,15 +328,19 @@ public class InFlightAiHubRunRegistry {
             runReleaseActions();
         }
 
-        boolean deferUntilReleased(Runnable action) {
+        DeferResult deferUntilReleased(Runnable action, BooleanSupplier retired) {
             synchronized (releaseActions) {
+                if (retired.getAsBoolean()) {
+                    return DeferResult.REFUSED;
+                }
+
                 if (!holdsThread(Instant.now())) {
-                    return false;
+                    return DeferResult.NOT_HELD;
                 }
 
                 releaseActions.add(action);
 
-                return true;
+                return DeferResult.QUEUED;
             }
         }
 
