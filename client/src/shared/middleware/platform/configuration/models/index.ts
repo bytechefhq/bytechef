@@ -11,6 +11,7 @@ export * from './CheckWorkflowNodeTestOutputExists200Response';
 export * from './ClusterElementDefinition';
 export * from './ClusterElementDefinitionBasic';
 export * from './ClusterElementType';
+export * from './ComponentActionDynamicPropertiesRequest';
 export * from './ComponentCategory';
 export * from './ComponentConnection';
 export * from './ComponentDefinition';
