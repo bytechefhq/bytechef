@@ -344,21 +344,37 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         List<WorkspaceUser> memberRows = workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId);
 
+        WorkspaceUser lastEnvironmentWorkspaceUser = environmentWorkspaceUser.get();
+
         if (memberRows.size() <= 1) {
-            throw new ConfigurationException(
-                "The " + environment.name() + " role is the only role user " + userId + " holds in workspace "
-                    + workspaceId + ". Remove them from the workspace instead.",
-                WorkspaceUserErrorType.LAST_ENVIRONMENT_ROLE);
+            if (!permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, "WORKSPACE_MEMBER_MANAGE")) {
+                throw new AccessDeniedException(
+                    "Widening a member's last environment role to a workspace-wide role requires "
+                        + "WORKSPACE_MEMBER_MANAGE in every environment");
+            }
+
+            Long customRoleId = lastEnvironmentWorkspaceUser.getCustomRoleId();
+            WorkspaceRole workspaceRole = fetchBuiltInRole(lastEnvironmentWorkspaceUser);
+
+            validateGrantWithinCallerScopes(workspaceId, List.of(Environment.values()), workspaceRole, customRoleId);
+
+            WorkspaceUser workspaceWideWorkspaceUser = customRoleId == null
+                ? WorkspaceUser.forRole(userId, workspaceId, workspaceRole)
+                : WorkspaceUser.forCustomRole(userId, workspaceId, customRoleId);
+
+            workspaceUserRepository.delete(lastEnvironmentWorkspaceUser);
+
+            workspaceUserRepository.save(workspaceWideWorkspaceUser);
+        } else {
+            Set<Environment> lostAdminEnvironments = isAdmin(lastEnvironmentWorkspaceUser)
+                ? Set.of(environment)
+                : Set.of();
+
+            validateNotSelfDemotionFromEnvironments(workspaceId, userId, lostAdminEnvironments);
+            validateEnvironmentsKeepAnAdmin(workspaceId, lostAdminEnvironments);
+
+            workspaceUserRepository.delete(lastEnvironmentWorkspaceUser);
         }
-
-        Set<Environment> lostAdminEnvironments = isAdmin(environmentWorkspaceUser.get())
-            ? Set.of(environment)
-            : Set.of();
-
-        validateNotSelfDemotionFromEnvironments(workspaceId, userId, lostAdminEnvironments);
-        validateEnvironmentsKeepAnAdmin(workspaceId, lostAdminEnvironments);
-
-        workspaceUserRepository.delete(environmentWorkspaceUser.get());
 
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
     }

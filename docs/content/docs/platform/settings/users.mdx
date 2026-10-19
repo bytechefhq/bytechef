@@ -170,12 +170,12 @@ Switching between the two follows these rules:
 |---|---|
 | Give a workspace-wide member a role in one environment | The member switches to per-environment roles. Their workspace-wide role is removed, so they lose access to the other environments until they are granted roles there. |
 | Remove one environment role while others remain | The member is denied in that environment. Their other environment roles are unchanged. |
-| Remove the member's **last** environment role | Refused. Remove the member from the workspace instead. |
+| Remove the member's **last** environment role | The role becomes a workspace-wide role. The member keeps the same built-in or custom role, now in every environment. To take away their access entirely, remove them from the workspace instead. |
 
 The same page enforces who may make each change:
 - Adding, inviting or removing a member, and changing a workspace-wide role, need `WORKSPACE_MEMBER_MANAGE` in **every** environment.
 - Giving a member who still has a workspace-wide role their first environment role replaces that workspace-wide role, so it also needs the scope in every environment.
-- Once a member has per-environment roles, setting or removing one environment's role needs the scope only in **that** environment.
+- Once a member has per-environment roles, setting or removing one environment's role needs the scope only in **that** environment. Removing their last environment role grants that role in every environment, so it needs the scope in every environment.
 - An environment role can only be given to someone who is already a member of the workspace. Add them first.
 
 Per-environment roles are assigned on **Settings → Current Workspace → [Users](/platform/automation/settings/users)**.

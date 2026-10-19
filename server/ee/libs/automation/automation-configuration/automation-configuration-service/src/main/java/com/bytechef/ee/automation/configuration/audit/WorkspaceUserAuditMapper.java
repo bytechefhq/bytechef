@@ -132,7 +132,7 @@ public class WorkspaceUserAuditMapper implements AuditMapper {
             .orElse(null);
         List<WorkspaceUser> workspaceUsers = workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId);
 
-        return new EnvironmentRemoval(previousRole, workspaceUsers.size() <= 1);
+        return new EnvironmentRemoval(previousRole, previousRole != null && workspaceUsers.size() <= 1);
     }
 
     private Optional<WorkspaceUser> fetchEnvironmentOrWideRow(long userId, long workspaceId, Environment environment) {
