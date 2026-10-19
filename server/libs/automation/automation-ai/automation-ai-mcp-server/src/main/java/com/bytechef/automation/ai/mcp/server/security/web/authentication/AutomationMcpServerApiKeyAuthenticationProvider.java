@@ -27,6 +27,7 @@ import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -73,10 +74,6 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
         McpServer mcpServer = getMcpServer(mcpApiKeyCredentials.getMcpServerSecretKey());
 
-        if (!mcpServer.isEnabled()) {
-            throw new BadCredentialsException("MCP server is disabled");
-        }
-
         Environment requestedEnvironment = mcpApiKeyCredentials.getRequestedEnvironment();
 
         if (requestedEnvironment != null && requestedEnvironment != mcpServer.getEnvironment()) {
@@ -84,6 +81,8 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
         }
 
         if (!mcpServer.isAuthenticationRequired()) {
+            checkEnabled(mcpServer);
+
             return McpAnonymousAuthenticationToken.ofAutomationMcpServer(mcpServer.getId());
         }
 
@@ -111,6 +110,8 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
+        checkEnabled(mcpServer);
+
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
         return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
@@ -119,6 +120,12 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
     @Override
     public boolean supports(Class<?> authentication) {
         return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    private static void checkEnabled(McpServer mcpServer) {
+        if (!mcpServer.isEnabled()) {
+            throw new McpServerDisabledException(McpServerDisabledException.MCP_SERVER_MESSAGE);
+        }
     }
 
     private boolean isSameWorkspace(long apiKeyId, Long mcpServerId) {

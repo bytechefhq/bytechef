@@ -35,6 +35,7 @@ import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -185,21 +186,36 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticateWithDisabledMcpServerFails() {
+    void testAuthenticateWithDisabledMcpServerAndValidApiKeyReportsTheServerDisabled() {
         mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
 
-        McpServer mcpServer = mock(McpServer.class);
+        McpServer mcpServer = mcpServerService.getMcpServer("server-secret");
 
-        when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.isEnabled()).thenReturn(false);
-        when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
+
+        assertThatExceptionOfType(McpServerDisabledException.class)
+            .isThrownBy(() -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()))
+            .withMessage(McpServerDisabledException.MCP_SERVER_MESSAGE);
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithDisabledMcpServerAndInvalidApiKeyFailsAsInvalidCredentials() {
+        mockApiKey(PlatformType.EMBEDDED, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        McpServer mcpServer = mcpServerService.getMcpServer("server-secret");
+
+        when(mcpServer.isEnabled()).thenReturn(false);
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
     }
 
     @Test
-    void testAuthenticateWithDisabledMcpServerFailsEvenWhenAuthenticationIsNotRequired() {
+    void testAuthenticateWithDisabledMcpServerReportsTheServerDisabledWhenAuthenticationIsNotRequired() {
         McpServer mcpServer = mock(McpServer.class);
 
         when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
@@ -207,7 +223,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
         when(mcpServer.isEnabled()).thenReturn(false);
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
 
-        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+        assertThatExceptionOfType(McpServerDisabledException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
     }
 

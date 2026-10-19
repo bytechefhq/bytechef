@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.tenant.domain.TenantKey;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -90,6 +91,42 @@ class AutomationMcpServerSecretVerifierTest {
 
         assertThat(automationMcpServerSecretVerifier.verifyMcpServerSecret(request)).isEmpty();
         verifyNoInteractions(mcpServerService);
+    }
+
+    @Test
+    void testDisabledServerReportsItsDisabledMessage() {
+        mockMcpServer(false, MCP_SERVER_SECRET_KEY);
+
+        assertThat(
+            automationMcpServerSecretVerifier.getMcpServerDisabledMessage(automationRequest(MCP_SERVER_SECRET_KEY)))
+                .contains(McpServerDisabledException.MCP_SERVER_MESSAGE);
+    }
+
+    @Test
+    void testEnabledServerReportsNoDisabledMessage() {
+        mockMcpServer(true, MCP_SERVER_SECRET_KEY);
+
+        assertThat(
+            automationMcpServerSecretVerifier.getMcpServerDisabledMessage(automationRequest(MCP_SERVER_SECRET_KEY)))
+                .isEmpty();
+    }
+
+    @Test
+    void testDisabledServerOfAnotherSecretReportsNoDisabledMessage() {
+        mockMcpServer(false, String.valueOf(TenantKey.of("acme")));
+
+        assertThat(
+            automationMcpServerSecretVerifier.getMcpServerDisabledMessage(automationRequest(MCP_SERVER_SECRET_KEY)))
+                .isEmpty();
+    }
+
+    @Test
+    void testDisabledEmbeddedServerReportsNoDisabledMessage() {
+        mockMcpServer(false, MCP_SERVER_SECRET_KEY, PlatformType.EMBEDDED);
+
+        assertThat(
+            automationMcpServerSecretVerifier.getMcpServerDisabledMessage(automationRequest(MCP_SERVER_SECRET_KEY)))
+                .isEmpty();
     }
 
     private void mockMcpServer(boolean enabled, String secretKey) {
