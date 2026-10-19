@@ -42,6 +42,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -172,6 +173,55 @@ class AutomationMcpServerSecurityConfigurerIntTest {
                         .header("Authorization", "Bearer " + API_SECRET_KEY))
                 .andExpect(MockMvcResultMatchers.status()
                     .isOk());
+        }
+
+        @Test
+        void testDisabledServerAnswersAValidApiKeyWithServerDisabled() throws Exception {
+            mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+            mockMcpServer(Environment.PRODUCTION);
+            disableMcpServer();
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                        .header("Authorization", "Bearer " + API_SECRET_KEY))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isForbidden())
+                .andExpect(MockMvcResultMatchers.header()
+                    .doesNotExist("WWW-Authenticate"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                    .value("server_disabled"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                    .value(McpServerDisabledException.MCP_SERVER_MESSAGE));
+        }
+
+        @Test
+        void testDisabledServerStillRejectsARequestWithoutBearerToken() throws Exception {
+            mockMcpServer(Environment.PRODUCTION);
+            disableMcpServer();
+
+            mockMvc
+                .perform(MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                    .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY)))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testDisabledServerAnswersAnAnonymousRequestWithServerDisabledWhenAuthenticationIsNotRequired()
+            throws Exception {
+
+            mockMcpServer(Environment.PRODUCTION, PlatformType.AUTOMATION, false);
+            disableMcpServer();
+
+            mockMvc
+                .perform(MockMvcRequestBuilders.post("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY))
+                    .servletPath("/api/automation/%s/mcp".formatted(MCP_SERVER_SECRET_KEY)))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                    .value("server_disabled"));
         }
 
         @Test
@@ -430,6 +480,12 @@ class AutomationMcpServerSecurityConfigurerIntTest {
             when(mcpServer.isEnabled()).thenReturn(true);
             when(mcpServer.isAuthenticationRequired()).thenReturn(authenticationRequired);
             when(mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY)).thenReturn(mcpServer);
+        }
+
+        private void disableMcpServer() {
+            McpServer mcpServer = mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY);
+
+            when(mcpServer.isEnabled()).thenReturn(false);
         }
 
         private List<String> mockOtherTenantMcpServer(boolean authenticationRequired) {
