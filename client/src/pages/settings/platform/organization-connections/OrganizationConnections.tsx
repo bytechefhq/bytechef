@@ -18,6 +18,7 @@ import {
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult} from '@tanstack/react-query';
 import {Link2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -47,13 +48,14 @@ const OrganizationConnections = () => {
     const [connectionToDelete, setConnectionToDelete] = useState<OrganizationConnection | undefined>(undefined);
 
     const edition = useApplicationInfoStore((state) => state.application?.edition);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {
         data,
         error: connectionsError,
         isLoading: isConnectionsLoading,
         refetch,
-    } = useOrganizationConnectionsQuery({});
+    } = useOrganizationConnectionsQuery({environmentId: currentEnvironmentId});
 
     const connections = data?.organizationConnections ?? [];
 

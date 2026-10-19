@@ -1,4 +1,5 @@
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -9,6 +10,7 @@ const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
     createMutateAsync: vi.fn(),
     mutateAsyncResult: undefined as unknown,
+    organizationConnectionsQueryVariables: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -17,12 +19,16 @@ vi.mock('@/shared/middleware/graphql', () => ({
         mutateAsync: hoisted.createMutateAsync,
     }),
     useDeleteOrganizationConnectionMutation: () => ({mutate: vi.fn()}),
-    useOrganizationConnectionsQuery: () => ({
-        data: {organizationConnections: []},
-        error: null,
-        isLoading: false,
-        refetch: vi.fn(),
-    }),
+    useOrganizationConnectionsQuery: (variables: object) => {
+        hoisted.organizationConnectionsQueryVariables(variables);
+
+        return {
+            data: {organizationConnections: []},
+            error: null,
+            isLoading: false,
+            refetch: vi.fn(),
+        };
+    },
 }));
 
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
@@ -114,6 +120,17 @@ describe('OrganizationConnections', () => {
         hoisted.createMutate.mockReset();
         hoisted.createMutateAsync.mockReset();
         hoisted.mutateAsyncResult = undefined;
+        hoisted.organizationConnectionsQueryVariables.mockReset();
+
+        environmentStore.setState({currentEnvironmentId: 0});
+    });
+
+    it('lists the organization connections of the environment selected in the header', () => {
+        environmentStore.setState({currentEnvironmentId: 2});
+
+        render(<OrganizationConnections />);
+
+        expect(hoisted.organizationConnectionsQueryVariables).toHaveBeenLastCalledWith({environmentId: 2});
     });
 
     it('maps the dialog connection to the organization input when the dialog calls mutate', () => {
