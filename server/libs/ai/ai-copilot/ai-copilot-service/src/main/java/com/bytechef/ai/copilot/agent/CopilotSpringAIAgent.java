@@ -193,13 +193,12 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected ChatMemory chatMemoryForRun(RunAgentInput input, ChatMemory chatMemory) {
+        return new ConversationLockingChatMemory(chatMemory);
+    }
+
+    @Override
     protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
-        State state = input.state();
-
-        if (state == null || state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) == null) {
-            return;
-        }
-
         List<String> userTexts = input.messages()
             .stream()
             .filter(message -> message instanceof UserMessage)
