@@ -947,7 +947,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             aiHubChatsStore.getState().clearActivityState(currentChatId);
 
-            const {approval, continuationStarted} = result.resolveAiHubToolApproval;
+            const {approval, continuationStarted, runId} = result.resolveAiHubToolApproval;
 
             useAiHubStore.getState().markToolApprovalResolved(approvalId, {
                 executionError: approval.executionError,
@@ -955,6 +955,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             });
 
             if (continuationStarted) {
+                if (runId) {
+                    aiHubRunStateStore.getState().setChatRunId(currentChatId, runId);
+                }
+
                 addMessage({content: '', role: 'assistant'});
 
                 aiHubChatsStore.getState().setActivityState(currentChatId, 'running');
@@ -1436,6 +1440,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     const onCancel = async () => {
         turnControllerRef.current?.abort();
         turnControllerRef.current = null;
+
+        continuationDisposerRef.current?.();
+        continuationDisposerRef.current = null;
 
         aiChatToolCallStore.getState().failAllRunning({reason: 'Cancelled by user'}, 'aborted');
 
