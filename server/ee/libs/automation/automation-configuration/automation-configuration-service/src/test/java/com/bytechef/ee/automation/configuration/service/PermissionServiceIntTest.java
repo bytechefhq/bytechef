@@ -199,6 +199,29 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testDevelopmentViewerSeesRunsButNotTheirDetails() {
+        authenticate(DEVELOPMENT_VIEWER);
+
+        assertThat(permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_VIEW"))
+            .isTrue();
+        assertThat(
+            permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isFalse();
+    }
+
+    @Test
+    void testDevelopmentEditorSeesRunDetailsOnlyInDevelopment() {
+        authenticate(DEVELOPMENT_EDITOR);
+
+        assertThat(
+            permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isTrue();
+        assertThat(
+            permissionService.hasResourceScope(productionDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isFalse();
+    }
+
+    @Test
     void testMemberOfAnotherWorkspaceIsDeniedTheDeploymentById() {
         authenticate(OTHER_WORKSPACE_EDITOR);
 

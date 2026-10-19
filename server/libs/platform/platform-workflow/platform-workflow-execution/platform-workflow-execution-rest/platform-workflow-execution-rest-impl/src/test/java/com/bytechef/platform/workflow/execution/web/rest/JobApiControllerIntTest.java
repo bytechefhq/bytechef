@@ -204,7 +204,8 @@ public class JobApiControllerIntTest {
                     "getJob",
                     new GuardCase(
                         guardedApi -> guardedApi.getJob(JOB_ID),
-                        permissionService -> permissionService.hasResourceScope(JOB_ID, "Job", "EXECUTION_VIEW"))),
+                        permissionService -> permissionService.hasResourceScope(JOB_ID, "Job",
+                            "EXECUTION_DETAILS_VIEW"))),
                 Named.of(
                     "getJobsPage",
                     new GuardCase(guardedApi -> guardedApi.getJobsPage(0), PermissionService::isTenantAdmin)),
