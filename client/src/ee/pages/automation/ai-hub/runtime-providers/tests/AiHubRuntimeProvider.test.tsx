@@ -272,13 +272,17 @@ describe('buildAiHubSubscriber', () => {
             expect(state.activeTabId).toBe(firstTabId);
         });
 
-        it('surfaces a retryable error when the tool reports opened:false', () => {
+        it('surfaces a retryable error when the tool reports opened:false and the turn ends unrecovered', () => {
+            const subscriber = createSubscriber();
+
             deliverToolResult(
-                createSubscriber(),
+                subscriber,
                 'call-wf',
                 'openWorkflowTab',
                 JSON.stringify({error: 'Workflow not found', opened: false})
             );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
 
             expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
             expect(aiChatRetryableErrorStore.getState().currentError).toMatchObject({
@@ -287,13 +291,65 @@ describe('buildAiHubSubscriber', () => {
             });
         });
 
-        it('surfaces a retryable error for an unparseable result', () => {
+        it('raises the retry banner for an unparseable result only once the run finishes', () => {
             vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-            deliverToolResult(createSubscriber(), 'call-wf', 'openWorkflowTab', 'not-json');
+            const subscriber = createSubscriber();
+
+            deliverToolResult(subscriber, 'call-wf', 'openWorkflowTab', 'not-json');
 
             expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
             expect(aiChatRetryableErrorStore.getState().currentError?.errorMessage).toBe('unparseable result');
+        });
+
+        it('raises no retry banner for an opened:false result when the run then fails', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-wf',
+                'openWorkflowTab',
+                JSON.stringify({error: 'Workflow not found', opened: false})
+            );
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+
+            subscriber.onRunErrorEvent!(makeRunErrorParams('Provider overloaded'));
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+        });
+
+        it('raises the retry banner for a malformed picker payload only once the run finishes unrecovered', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(subscriber, 'call-pick', 'selectConnection', JSON.stringify({kind: 'select-connection'}));
+
+            expect(aiChatToolCallStore.getState().toolCalls['call-pick']!.status).toBe('error');
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toMatchObject({toolName: 'selectConnection'});
+        });
+
+        it('raises no retry banner for a malformed picker payload the model recovers from', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(subscriber, 'call-pick', 'selectConnection', JSON.stringify({kind: 'select-connection'}));
+            deliverToolResult(
+                subscriber,
+                'call-pick-retry',
+                'selectConnection',
+                JSON.stringify({componentName: 'slack', kind: 'select-connection'})
+            );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
         });
 
         it('ignores the same payload from a tool that is not openWorkflowTab', () => {
@@ -697,20 +753,105 @@ describe('buildAiHubSubscriber', () => {
             });
         });
 
-        it('error tool result populates the retryable-error store with toolName and lastUserMessage', () => {
+        it('raises the retry banner for a tool error still unrecovered when the turn ends', () => {
+            const subscriber = createSubscriber({
+                getLastUserMessage: vi.fn().mockReturnValue('Create a report for Q1'),
+            });
+
             deliverToolResult(
-                createSubscriber({getLastUserMessage: vi.fn().mockReturnValue('Create a report for Q1')}),
+                subscriber,
                 'call-err',
                 'createReport',
                 JSON.stringify({error: 'Report service unavailable'})
             );
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+            expect(aiChatToolCallStore.getState().toolCalls['call-err']!.status).toBe('error');
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
 
             expect(aiChatRetryableErrorStore.getState().currentError).toEqual({
                 errorMessage: 'Report service unavailable',
                 lastUserMessage: 'Create a report for Q1',
                 toolName: 'createReport',
             });
+        });
+
+        it('does not raise the retry banner for a tool error the model recovers from', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-err',
+                'createReport',
+                JSON.stringify({error: 'Report service unavailable'})
+            );
+            deliverToolResult(subscriber, 'call-retry', 'createReport', JSON.stringify({id: 7}));
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
             expect(aiChatToolCallStore.getState().toolCalls['call-err']!.status).toBe('error');
+            expect(aiChatToolCallStore.getState().toolCalls['call-retry']!.status).toBe('success');
+        });
+
+        it('shows only the run error bubble, not the retry banner, when the run fails after a tool error', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({
+                addMessage,
+                getLastUserMessage: vi.fn().mockReturnValue('Create a report for Q1'),
+            });
+
+            deliverToolResult(
+                subscriber,
+                'call-err',
+                'createReport',
+                JSON.stringify({error: 'Report service unavailable'})
+            );
+
+            subscriber.onRunErrorEvent!(makeRunErrorParams('Provider overloaded'));
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+            expect(addMessage).toHaveBeenCalledWith(
+                expect.objectContaining({content: [expect.objectContaining({type: 'data-run-error'})]})
+            );
+            expect(aiChatToolCallStore.getState().toolCalls['call-err']!.status).toBe('error');
+        });
+
+        it('raises neither the retry banner nor a bubble when the user stops a turn after a tool error', () => {
+            const addMessage = vi.fn();
+            const controller = new AbortController();
+            const subscriber = createSubscriber({addMessage, turnAbortSignal: controller.signal});
+
+            deliverToolResult(
+                subscriber,
+                'call-err',
+                'createReport',
+                JSON.stringify({error: 'Report service unavailable'})
+            );
+
+            controller.abort();
+
+            subscriber.onRunErrorEvent!(makeRunErrorParams('BodyStreamBuffer was aborted'));
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+            expect(addMessage).not.toHaveBeenCalled();
+        });
+
+        it('does not carry a tool error from a failed run into the banner of a later finish', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-err',
+                'createReport',
+                JSON.stringify({error: 'Report service unavailable'})
+            );
+
+            subscriber.onRunErrorEvent!(makeRunErrorParams('Provider overloaded'));
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
         });
     });
 
