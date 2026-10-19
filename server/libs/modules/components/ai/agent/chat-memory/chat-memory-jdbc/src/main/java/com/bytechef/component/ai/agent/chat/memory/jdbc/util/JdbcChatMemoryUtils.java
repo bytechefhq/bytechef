@@ -17,17 +17,16 @@
 package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
 import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChatMemoryConstants.ADDITIONAL_COLUMNS;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.ai.agent.DataSourceFunction.DATA_SOURCE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryConversationOptions;
 import com.bytechef.platform.component.definition.ai.agent.DataSourceFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -36,7 +35,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -47,7 +45,6 @@ import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryReposito
 import org.springframework.ai.chat.memory.repository.jdbc.MysqlChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.OracleChatMemoryRepositoryDialect;
 import org.springframework.ai.chat.memory.repository.jdbc.SqlServerChatMemoryRepositoryDialect;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -75,7 +72,7 @@ public class JdbcChatMemoryUtils {
             inputParameters.getMap(ADDITIONAL_COLUMNS, new TypeReference<>() {}, Map.of()));
     }
 
-    private static ChatMemoryRepository createChatMemoryRepository(
+    static ChatMemoryRepository createChatMemoryRepository(
         DataSource dataSource, JdbcChatMemoryTable chatMemoryTable, Map<String, Object> additionalColumns) {
 
         initializeSchema(dataSource, chatMemoryTable);
@@ -98,7 +95,8 @@ public class JdbcChatMemoryUtils {
 
         return new OrderedJdbcChatMemoryRepository(
             delegate, jdbcTemplate,
-            chatMemoryTable.rewriteSql(getSelectConversationIdsOrderedSql(dialect)));
+            chatMemoryTable.rewriteSql(getSelectConversationIdsOrderedSql(dialect)),
+            chatMemoryTable.rewriteSql(getSelectFirstMessagesSql(dialect)));
     }
 
     public static String getSelectConversationIdsOrderedSql(JdbcChatMemoryRepositoryDialect dialect) {
@@ -113,6 +111,29 @@ public class JdbcChatMemoryUtils {
         }
 
         return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(\"timestamp\") DESC";
+    }
+
+    public static String getSelectFirstMessagesSql(JdbcChatMemoryRepositoryDialect dialect) {
+        if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
+            return getSelectFirstMessagesSql("`timestamp`", "LIMIT ?");
+        } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
+            return getSelectFirstMessagesSql("\"TIMESTAMP\"", "FETCH FIRST ? ROWS ONLY");
+        } else if (dialect instanceof SqlServerChatMemoryRepositoryDialect) {
+            return getSelectFirstMessagesSql("[timestamp]", "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY");
+        } else if (dialect instanceof HsqldbChatMemoryRepositoryDialect) {
+            return getSelectFirstMessagesSql("timestamp", "LIMIT ?");
+        }
+
+        return getSelectFirstMessagesSql("\"timestamp\"", "LIMIT ?");
+    }
+
+    private static String getSelectFirstMessagesSql(String timestampColumn, String limitClause) {
+        return "SELECT m.conversation_id, m.content FROM SPRING_AI_CHAT_MEMORY m " +
+            "JOIN (SELECT conversation_id, MIN(sequence_id) AS first_sequence_id, MAX(" + timestampColumn +
+            ") AS last_timestamp FROM SPRING_AI_CHAT_MEMORY WHERE LOWER(conversation_id) LIKE ? ESCAPE '!' " +
+            "GROUP BY conversation_id ORDER BY MAX(" + timestampColumn + ") DESC, conversation_id " + limitClause +
+            ") c ON m.conversation_id = c.conversation_id AND m.sequence_id = c.first_sequence_id " +
+            "ORDER BY c.last_timestamp DESC, c.conversation_id";
     }
 
     private static void initializeSchema(DataSource dataSource, JdbcChatMemoryTable chatMemoryTable) {
@@ -201,18 +222,7 @@ public class JdbcChatMemoryUtils {
             ChatMemoryRepository chatMemoryRepository = createChatMemoryRepository(
                 dataSource, JdbcChatMemoryTable.of(inputParameters), Map.of());
 
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-            List<String> conversationIds = chatMemoryRepository.findConversationIds();
-
-            for (String conversationId : conversationIds) {
-                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-
-                Message message = messages.getFirst();
-
-                options.add(option(conversationId, conversationId, message.getText()));
-            }
-
-            return options;
+            return ChatMemoryConversationOptions.getOptions(chatMemoryRepository, searchText);
         };
     }
 
@@ -222,19 +232,7 @@ public class JdbcChatMemoryUtils {
             ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(
                 inputParameters, extensions, componentConnections, clusterElementDefinitionService);
 
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-
-            List<String> conversationIds = chatMemoryRepository.findConversationIds();
-
-            for (String conversationId : conversationIds) {
-                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-
-                Message message = messages.getFirst();
-
-                options.add(option(conversationId, conversationId, message.getText()));
-            }
-
-            return options;
+            return ChatMemoryConversationOptions.getOptions(chatMemoryRepository, null);
         };
     }
 }

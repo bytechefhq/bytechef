@@ -23,24 +23,20 @@ import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.Cas
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.PORT;
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.TABLE;
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.USERNAME;
-import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.commons.util.ClientCacheSettings;
 import com.bytechef.commons.util.ClientCacheUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryConversationOptions;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepositoryConfig;
-import org.springframework.ai.chat.messages.Message;
 
 /**
  * @author Ivica Cardic
@@ -133,19 +129,7 @@ public class CassandraChatMemoryUtils {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
 
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-
-            List<String> conversationIds = chatMemoryRepository.findConversationIds();
-
-            for (String conversationId : conversationIds) {
-                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-
-                Message message = messages.getFirst();
-
-                options.add(option(conversationId, conversationId, message.getText()));
-            }
-
-            return options;
+            return ChatMemoryConversationOptions.getOptions(chatMemoryRepository, searchText);
         };
     }
 }

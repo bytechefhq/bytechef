@@ -21,19 +21,15 @@ import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMe
 import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.KEY_PREFIX;
 import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.REGION;
 import static com.bytechef.component.ai.agent.chat.memory.aws.constant.AwsChatMemoryConstants.SECRET_ACCESS_KEY;
-import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.commons.util.ClientCacheSettings;
 import com.bytechef.commons.util.ClientCacheUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryConversationOptions;
 import com.github.benmanes.caffeine.cache.Cache;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.s3.S3ChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -56,8 +52,6 @@ public class AwsChatMemoryUtils {
 
     public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-
             try (S3Client s3Client = buildS3Client(connectionParameters)) {
                 ChatMemoryRepository chatMemoryRepository = S3ChatMemoryRepository.builder()
                     .s3Client(s3Client)
@@ -65,22 +59,8 @@ public class AwsChatMemoryUtils {
                     .keyPrefix(connectionParameters.getString(KEY_PREFIX, ""))
                     .build();
 
-                List<String> conversationIds = chatMemoryRepository.findConversationIds();
-
-                for (String conversationId : conversationIds) {
-                    List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-
-                    if (messages.isEmpty()) {
-                        options.add(option(conversationId, conversationId));
-                    } else {
-                        Message message = messages.getFirst();
-
-                        options.add(option(conversationId, conversationId, message.getText()));
-                    }
-                }
+                return ChatMemoryConversationOptions.getOptions(chatMemoryRepository, searchText);
             }
-
-            return options;
         };
     }
 
