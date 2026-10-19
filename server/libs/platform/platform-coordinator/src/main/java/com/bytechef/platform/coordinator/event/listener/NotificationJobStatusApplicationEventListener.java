@@ -35,6 +35,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Matija Petanjek
@@ -48,18 +49,21 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
     private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
+    private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI")
     public NotificationJobStatusApplicationEventListener(
         @Nullable JobExecutionCounter jobExecutionCounter, JobService jobService,
         NotificationHandlerRegistry notificationHandlerRegistry,
-        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
+        TaskExecutor taskExecutor) {
 
         this.jobExecutionCounter = jobExecutionCounter;
         this.jobService = jobService;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationService = notificationService;
         this.notificationSenderRegistry = notificationSenderRegistry;
+        this.taskExecutor = taskExecutor;
     }
 
     @SuppressWarnings({
@@ -91,13 +95,15 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
                 NotificationHandler notificationHandler = notificationHandlerRegistry.getNotificationHandler(
                     eventType, notification.getType());
 
-                try {
-                    notificationSender.send(notification, notificationHandler, notificationHandlerContext);
-                } catch (RuntimeException exception) {
-                    log.error(
-                        "Notification id={} of type {} could not be sent for job id={}", notification.getId(),
-                        notification.getType(), job.getId(), exception);
-                }
+                taskExecutor.execute(() -> {
+                    try {
+                        notificationSender.send(notification, notificationHandler, notificationHandlerContext);
+                    } catch (RuntimeException exception) {
+                        log.error(
+                            "Notification id={} of type {} could not be sent for job id={}", notification.getId(),
+                            notification.getType(), job.getId(), exception);
+                    }
+                });
             }
         }
     }
