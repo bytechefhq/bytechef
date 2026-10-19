@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import TagList from '@/shared/components/TagList';
+import useMcpServerListItemClick from '@/shared/components/mcp-server/hooks/useMcpServerListItemClick';
 import {
     A2aServer,
     Tag,
@@ -43,6 +44,8 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
 
     const queryClient = useQueryClient();
+
+    const {handleMcpServerListItemClick, toolsCollapsibleTriggerRef} = useMcpServerListItemClick();
 
     const {a2aProjects} = useA2aProjectList(a2aServer.id);
 
@@ -85,7 +88,11 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
 
     return (
         <Collapsible className="group mb-2 rounded border border-border/50">
-            <div className="flex w-full items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
+                onClick={handleMcpServerListItemClick}
+                role="presentation"
+            >
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center gap-2">
@@ -103,26 +110,31 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                         </div>
 
                         <div className="mt-2 flex min-h-7 items-center gap-4">
-                            <CollapsibleTrigger className="group flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                            <CollapsibleTrigger
+                                className="group flex items-center gap-1 text-xs font-semibold text-muted-foreground"
+                                ref={toolsCollapsibleTriggerRef}
+                            >
                                 {workflowCount === 1 ? '1 workflow skill' : `${workflowCount} workflow skills`}
 
                                 <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                             </CollapsibleTrigger>
 
-                            <TagList
-                                getRequest={(id, tagList) => ({
-                                    id: id!,
-                                    tags: tagList || [],
-                                })}
-                                id={Number.parseInt(a2aServer.id)}
-                                remainingTags={tags
-                                    ?.filter((tag) => !a2aServerTagIds?.includes(tag.id))
-                                    .map((tag) => ({id: Number.parseInt(tag.id), name: tag.name}))}
-                                tags={(a2aServer.tags ?? [])
-                                    .filter((tag) => tag != null)
-                                    .map((tag) => ({id: Number.parseInt(tag!.id), name: tag!.name}))}
-                                updateTagsMutation={updateA2aServerTagsMutation}
-                            />
+                            <div data-interactive>
+                                <TagList
+                                    getRequest={(id, tagList) => ({
+                                        id: id!,
+                                        tags: tagList || [],
+                                    })}
+                                    id={Number.parseInt(a2aServer.id)}
+                                    remainingTags={tags
+                                        ?.filter((tag) => !a2aServerTagIds?.includes(tag.id))
+                                        .map((tag) => ({id: Number.parseInt(tag.id), name: tag.name}))}
+                                    tags={(a2aServer.tags ?? [])
+                                        .filter((tag) => tag != null)
+                                        .map((tag) => ({id: Number.parseInt(tag!.id), name: tag!.name}))}
+                                    updateTagsMutation={updateA2aServerTagsMutation}
+                                />
+                            </div>
 
                             {a2aServer.description && (
                                 <span className="text-xs text-muted-foreground">{a2aServer.description}</span>
