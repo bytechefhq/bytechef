@@ -5,9 +5,10 @@ import {AlertTriangleIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 /**
- * Shows the tool failure the last run ended with and never recovered from, with a Retry that sends the user's last
- * message again and a Dismiss. The runtime provider raises it only at the end of a run; a run error or a Stop raises
- * nothing. Must render inside the runtime provider.
+ * Shows why the user's last message got no answer, with a Retry that sends it again and a Dismiss. The runtime provider
+ * raises it for a tool failure the run ended with and never recovered from, for a turn request that failed (such as an
+ * HTTP 500), and for a chat that could not be created; each of these is reported only here, not in a toast as well. A
+ * run error, which shows in the chat, or a Stop raises nothing. Must render inside the runtime provider.
  */
 const AiHubRetryBanner = () => {
     const {clearError, currentError} = useAiChatRetryableErrorStore(
