@@ -263,3 +263,64 @@ interactivity callbacks and the approval short-token endpoint. They read the ser
 
 When `PLAYWRIGHT_BASE_URL` is set and `BYTECHEF_SERVER_URL` is not, the approval utilities stop with an error instead
 of falling back to `localhost:9555`, so a run against one client never sends its server calls to another server.
+
+## Copilot Specs (#1570)
+
+The Copilot specs live in `tests/copilot/` and `tests/mcp/`. They come in two kinds.
+
+### Deterministic specs
+
+`copilotPickers.spec.ts`, `copilotDelegateQuestion.spec.ts` and `copilotRegressions.spec.ts` run against any local
+server, with no AI model configured. They never reach a model:
+
+- **`utils/agUiStreamStub.ts`** stubs the Copilot's AG-UI stream (`POST /api/platform/internal/ai/chat/<agentId>`,
+  `text/event-stream`). `stubCopilotRun(page, urlPattern, turns)` serves one scripted turn per request and records each
+  request body (`messages`, `state`, `tools`), so a spec can assert what the client sent back. Turns are built from
+  `runStarted`, `textMessage`, `toolCall`, `runFinished` and `runError` (or the `completedTurn` and `failedTurn`
+  shortcuts). The event wire format mirrors the server: a tool call emits `TOOL_CALL_START`, `TOOL_CALL_ARGS` and
+  `TOOL_CALL_END` before the tool runs and `TOOL_CALL_RESULT` after it, and `RUN_ERROR` may carry a `code`.
+- **`utils/copilotUtils.ts`** turns the Copilot on by patching `/actuator/info`, stubs the `aiDefaultModel` and
+  `aiProviderCatalog` GraphQL operations, hides the React Query devtools button (it covers the composer's send
+  button), and navigates inside the app with `navigateInApp` when a spec must not reload the page.
+- **`pages/copilotPanel.ts`** is the panel page object (composer, Build switch, messages, edit and refresh actions).
+
+### Live specs
+
+`copilotLive.spec.ts` and `tests/mcp/managementMcpLive.spec.ts` are tagged `@live` and skip unless
+`PLAYWRIGHT_LIVE=1`. They need a server started with `bytechef.ai.copilot.enabled=true` and a configured AI model.
+The MCP specs talk JSON-RPC to `/api/management/{secretKey}/mcp` through `utils/mcpClient.ts`.
+
+| Variable                      | Purpose                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `PLAYWRIGHT_BASE_URL`         | Client URL (default `http://127.0.0.1:5173`)                                             |
+| `PLAYWRIGHT_LIVE`             | `1` runs the `@live` specs                                                               |
+| `PLAYWRIGHT_MCP_SECRET_KEY`   | The management MCP secret key (the `{secretKey}` path segment)                           |
+| `PLAYWRIGHT_MCP_BEARER_TOKEN` | Optional API key sent as `Authorization: Bearer` to the management MCP                   |
+| `PLAYWRIGHT_MCP_ENVIRONMENT`  | `X-ENVIRONMENT` header for the management MCP (default `DEVELOPMENT`)                    |
+| `PLAYWRIGHT_COPILOT_DISABLED` | `1` when the server runs with the Copilot disabled; runs the MCP "Copilot disabled" spec |
+
+```bash
+cd client
+
+# Deterministic
+npx playwright test tests/copilot/copilotPickers.spec.ts tests/copilot/copilotDelegateQuestion.spec.ts \
+  tests/copilot/copilotRegressions.spec.ts
+
+# Live, once, without retries
+PLAYWRIGHT_LIVE=1 PLAYWRIGHT_MCP_SECRET_KEY=<secret> npx playwright test tests/copilot/copilotLive.spec.ts \
+  tests/mcp/managementMcpLive.spec.ts --workers=1 --retries=0
+```
+
+### Scenario coverage
+
+| #1570 scenario                                                                                                                | Spec                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 1. Interactive pickers (select connection, create connection, property option, ask question, dimming, negative ids, Ask mode) | `copilotPickers.spec.ts`; live Slack build in `copilotLive.spec.ts`                     |
+| 2. Ask mode keeps the picker tools out                                                                                        | `copilotPickers.spec.ts` (ASK mode test)                                                |
+| 3. Management MCP tool surface and buildWorkflow                                                                              | `managementMcpLive.spec.ts`                                                             |
+| 4. Delegated specialist question                                                                                              | `copilotDelegateQuestion.spec.ts`; MCP numbered question in `managementMcpLive.spec.ts` |
+| 5. importWorkflow and the Copilot-disabled MCP                                                                                | `managementMcpLive.spec.ts`                                                             |
+
+`copilotRegressions.spec.ts` pins bugs that unit tests missed: the editor's connection issue clearing after a
+Copilot binding (C-H6), the Build/Ask mode following the conversation (F6), editing and reloading messages, the
+model picker's remembered model, coded run errors (E1) and the no-AI-provider empty state.
