@@ -24,6 +24,8 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
@@ -85,6 +87,7 @@ public class AiHubConfiguration {
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -97,7 +100,7 @@ public class AiHubConfiguration {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, toolCallbacks, aiHubSessionMemory, chatModel,
-            securityContextRehydrator, approvalGate, overrideChatClientResolverProvider);
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider);
     }
 
     @Bean
@@ -108,7 +111,7 @@ public class AiHubConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatArtifactRecorder aiHubChatArtifactRecorder, SecurityContextRehydrator securityContextRehydrator,
-        AiHubApprovalGate approvalGate,
+        AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -127,7 +130,8 @@ public class AiHubConfiguration {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, toolCallbacks, aiHubSessionMemory,
-            chatModel, securityContextRehydrator, approvalGate, overrideChatClientResolverProvider);
+            chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
+            overrideChatClientResolverProvider);
     }
 
     @Bean
@@ -182,6 +186,7 @@ public class AiHubConfiguration {
         AiHubAgentType agentType, Mode mode, Resource systemPromptResource, List<ToolCallback> toolCallbacks,
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -195,6 +200,9 @@ public class AiHubConfiguration {
             .securityContextRehydrator(securityContextRehydrator)
             .approvalGate(approvalGate);
 
+        inFlightRunRegistryProvider
+            .ifAvailable(inFlightRunRegistry -> builder.advisor(new RunStopAdvisor(inFlightRunRegistry)));
+        builder.advisor(aiHubSessionMemory.createResentUserMessageAdvisor());
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor());
 
