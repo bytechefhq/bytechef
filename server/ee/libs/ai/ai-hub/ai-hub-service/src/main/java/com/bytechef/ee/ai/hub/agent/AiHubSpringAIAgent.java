@@ -97,8 +97,6 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
-    private final @Nullable SecurityContextRehydrator securityContextRehydrator;
-    private final @Nullable AiHubApprovalGate approvalGate;
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
     private final List<ToolCallback> toolCallbacks;
@@ -107,8 +105,6 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         super(builder);
 
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
-        this.securityContextRehydrator = builder.securityContextRehydrator;
-        this.approvalGate = builder.approvalGate;
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
         this.toolCallbacks = List.copyOf(builder.wrappedToolCallbacks);
@@ -358,14 +354,6 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     /**
-     * Applies the AI Hub wrappers in the canonical order: context rehydration (tenant + SecurityContext) OUTERMOST,
-     * then the approval gate, then the empty-return guard.
-     */
-    ToolCallback wrapToolCallback(ToolCallback callback) {
-        return AiHubToolCallbackWrappers.wrap(callback, securityContextRehydrator, approvalGate);
-    }
-
-    /**
      * Workspace and user come from the controller-verified keys, never from raw request fields: the controller checks
      * workspace membership and chat ownership before this runs and rewrites the verified values into reserved keys.
      */
@@ -474,6 +462,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     public static class Builder extends SpringAIAgent.Builder {
 
+        private static final String TOOL_OBJECTS_UNSUPPORTED_MESSAGE =
+            "AI Hub tools must be ToolCallbacks so they pass the approval gate; use toolCallbacks(...)";
+
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable AiHubApprovalGate approvalGate;
@@ -538,16 +529,12 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         @Override
         public Builder tools(List<Object> tools) {
-            super.tools(tools);
-
-            return this;
+            throw new UnsupportedOperationException(TOOL_OBJECTS_UNSUPPORTED_MESSAGE);
         }
 
         @Override
         public Builder tool(Object tool) {
-            super.tool(tool);
-
-            return this;
+            throw new UnsupportedOperationException(TOOL_OBJECTS_UNSUPPORTED_MESSAGE);
         }
 
         @Override
