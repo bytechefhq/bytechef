@@ -107,6 +107,7 @@ class AiHubToolApprovalFacadeTest {
         when(chatService.getManageable(CHAT_ID, WORKSPACE_ID, STRANGER_ID))
             .thenThrow(new NotFoundException("AiHubChat not found"));
         when(approvalService.save(any(AiHubToolApproval.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(chatService.containsActiveToolCall(anyString(), anyString(), anyString())).thenReturn(true);
         when(continuationStarter.startContinuation(any(), any(), anyLong(), anyString()))
             .thenReturn(Optional.of(RUN_ID));
 
@@ -173,6 +174,27 @@ class AiHubToolApprovalFacadeTest {
         assertThatThrownBy(() -> facade.resolve(8L, 99L, true, null)).isInstanceOf(NotFoundException.class);
 
         verify(gatedDelegate, never()).call(anyString(), any());
+    }
+
+    @Test
+    void testApprovalWhoseToolCallWasTruncatedIsSupersededAndNeverExecutes() {
+        AiHubToolApproval approval = pendingApproval(TOOL_NAME, "BUILD");
+
+        when(chatService.containsActiveToolCall(THREAD_ID, TOOL_NAME, approval.getArguments())).thenReturn(false);
+
+        assertThatThrownBy(() -> facade.resolve(WORKSPACE_ID, 99L, true, null))
+            .isInstanceOf(ConflictException.class)
+            .hasMessageContaining("no longer");
+
+        ArgumentCaptor<AiHubToolApproval> savedCaptor = ArgumentCaptor.forClass(AiHubToolApproval.class);
+
+        verify(approvalService).save(savedCaptor.capture());
+
+        assertThat(savedCaptor.getValue()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+
+        verify(gatedDelegate, never()).call(anyString(), any());
+        verify(continuationStarter, never()).startContinuation(any(), any(), anyLong(), anyString());
     }
 
     @Test
