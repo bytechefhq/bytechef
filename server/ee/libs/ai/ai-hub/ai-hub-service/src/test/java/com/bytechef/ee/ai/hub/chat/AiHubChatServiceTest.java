@@ -67,6 +67,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import reactor.core.publisher.Mono;
@@ -125,7 +127,7 @@ class AiHubChatServiceTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry);
+            inFlightRunRegistry, mock(PlatformTransactionManager.class));
     }
 
     @AfterEach
@@ -568,7 +570,8 @@ class AiHubChatServiceTest {
     void testDeleteStopsTheChatsInFlightRunBeforeRemovingItsApprovals() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -732,7 +735,8 @@ class AiHubChatServiceTest {
     void testTruncateMessagesAfterAStopIsRefusedUntilTheStoppedRunEnds() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         givenActiveEvents();
 
@@ -916,7 +920,8 @@ class AiHubChatServiceTest {
     void testDeletingAChatNeverStartsItsQueuedApprovalContinuation() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -954,7 +959,8 @@ class AiHubChatServiceTest {
     void testARolledBackDeleteLeavesTheChatsThreadUsable() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -982,7 +988,8 @@ class AiHubChatServiceTest {
     void testADeleteThatFailsAfterRetiringStillLiftsTheRetirementOnRollback() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1013,7 +1020,8 @@ class AiHubChatServiceTest {
     void testACommittedDeleteKeepsTheChatsThreadRetired() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1035,6 +1043,41 @@ class AiHubChatServiceTest {
         }
 
         assertThat(registry.tryStart(THREAD_ID, "run-after-commit")).isEmpty();
+    }
+
+    @Test
+    void testAfterCommitCleanupsRunInRequiresNewTransactions() {
+        PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+        AiHubChatServiceImpl serviceWithTransactionManager = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
+            inFlightRunRegistry, transactionManager);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithTransactionManager.delete(1L, WORKSPACE_ID, USER_ID);
+
+            verify(transactionManager, never()).getTransaction(any());
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(TransactionSynchronization::afterCommit);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        ArgumentCaptor<TransactionDefinition> definitionCaptor = ArgumentCaptor.forClass(TransactionDefinition.class);
+
+        verify(transactionManager, times(2)).getTransaction(definitionCaptor.capture());
+
+        assertThat(definitionCaptor.getAllValues())
+            .extracting(TransactionDefinition::getPropagationBehavior)
+            .containsOnly(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        verify(sessionService).delete(THREAD_ID);
+        verify(approvalService, times(2)).deleteByChat(1L);
     }
 
     @Test

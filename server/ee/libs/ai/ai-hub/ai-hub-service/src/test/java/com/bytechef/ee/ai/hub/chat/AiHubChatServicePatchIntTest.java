@@ -96,7 +96,7 @@ public class AiHubChatServicePatchIntTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), mock(AiHubToolApprovalService.class),
-            sessionMemoryProvider, mock(InFlightAiHubRunRegistry.class));
+            sessionMemoryProvider, mock(InFlightAiHubRunRegistry.class), transactionManager);
         executorService = Executors.newFixedThreadPool(2);
         jdbcTemplate = new JdbcTemplate(dataSource);
         transactionTemplate = new TransactionTemplate(transactionManager);
