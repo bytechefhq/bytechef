@@ -30,6 +30,7 @@ import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -117,6 +118,20 @@ class AiHubChatGraphQlControllerTest {
             .thenThrow(new NotFoundException("gone"));
 
         assertThat(controller.generateAiHubChatTitle(7L, 42L)).isSameAs(existing);
+    }
+
+    @Test
+    void testTruncateReturnsTheDroppedEventCount() {
+        when(chatService.truncateMessages(42L, 7L, 10L, "event-5", true)).thenReturn(OptionalInt.of(3));
+
+        assertThat(controller.truncateAiHubChatMessages(7L, 42L, "event-5", true)).isEqualTo(3);
+    }
+
+    @Test
+    void testTruncateReturnsNullForAMessageTheChatDoesNotHold() {
+        when(chatService.truncateMessages(42L, 7L, 10L, "event-5", false)).thenReturn(OptionalInt.empty());
+
+        assertThat(controller.truncateAiHubChatMessages(7L, 42L, "event-5", false)).isNull();
     }
 
     @Test

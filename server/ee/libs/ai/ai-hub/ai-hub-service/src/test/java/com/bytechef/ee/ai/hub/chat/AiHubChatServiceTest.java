@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -262,6 +264,8 @@ class AiHubChatServiceTest {
 
         assertThat(messages).hasSize(1);
         assertThat(messages.get(0)
+            .id()).isEqualTo("event-" + now.toEpochMilli());
+        assertThat(messages.get(0)
             .role()).isEqualTo("USER");
         assertThat(messages.get(0)
             .content()).isEqualTo("Hello");
@@ -430,10 +434,90 @@ class AiHubChatServiceTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testTruncateMessagesFromDeletesAtAndAfterIndex() {
-        AiHubChat chat =
-            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+    void testTruncateMessagesDropsTheMessageAndEverythingAfterIt() {
+        List<SessionEvent> events = givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+        when(chatRepository.save(any(AiHubChat.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-200", false);
+
+        assertThat(deleted).hasValue(2);
+        assertThat(archivedEventIds()).containsExactlyInAnyOrder(events.get(1)
+            .getId(),
+            events.get(2)
+                .getId());
+    }
+
+    @Test
+    void testTruncateMessagesKeepingTheMessageDropsOnlyWhatFollowsIt() {
+        List<SessionEvent> events = givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+        when(chatRepository.save(any(AiHubChat.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
+
+        assertThat(deleted).hasValue(2);
+        assertThat(archivedEventIds()).containsExactlyInAnyOrder(events.get(1)
+            .getId(),
+            events.get(2)
+                .getId());
+    }
+
+    @Test
+    void testTruncateMessagesKeepingTheLastMessageDropsNothing() {
+        givenActiveEvents();
+
+        OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-300", true);
+
+        assertThat(deleted).hasValue(0);
+
+        verify(sessionRepository, never()).applyCompaction(any(), any(), anyLong());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testTruncateMessagesIsEmptyForAMessageTheChatDoesNotHold() {
+        givenActiveEvents();
+
+        OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-unknown", false);
+
+        assertThat(deleted).isEmpty();
+
+        verify(sessionRepository, never()).applyCompaction(any(), any(), anyLong());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testTruncateMessagesRefusesWhileATurnRunsBeforeDroppingAnything() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(inFlightRunRegistry.isInFlight(THREAD_ID)).thenReturn(true);
+
+        assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-200", false))
+            .isInstanceOf(ConflictException.class)
+            .hasMessageContaining("A turn is already running");
+
+        verify(sessionService, never()).getEvents(anyString(), any());
+        verify(sessionRepository, never()).applyCompaction(any(), any(), anyLong());
+    }
+
+    @Test
+    void testTruncateMessagesRefusesCrossUserAccess() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, OTHER_USER_ID, "event-100", false))
+            .isInstanceOf(NotFoundException.class);
+    }
+
+    private List<SessionEvent> givenActiveEvents() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
 
@@ -443,71 +527,20 @@ class AiHubChatServiceTest {
             sessionEvent(MessageType.USER, "three", Instant.ofEpochMilli(300)));
 
         when(sessionService.getEvents(THREAD_ID, EventFilter.active())).thenReturn(events);
-        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
 
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
+        return events;
+    }
 
-        int deleted = chatService.truncateMessagesFrom(1L, WORKSPACE_ID, USER_ID, 1);
-
-        assertThat(deleted).isEqualTo(2);
-
+    private Set<String> archivedEventIds() {
         ArgumentCaptor<CompactionPlan> planCaptor = ArgumentCaptor.forClass(CompactionPlan.class);
 
         verify(sessionRepository).applyCompaction(eq(THREAD_ID), planCaptor.capture(), eq(0L));
 
         assertThat(planCaptor.getValue()
-            .archiveIds()).containsExactlyInAnyOrder(events.get(1)
-                .getId(),
-                events.get(2)
-                    .getId());
-        assertThat(planCaptor.getValue()
             .inserts()).isEmpty();
-    }
 
-    @Test
-    @SuppressWarnings("unchecked")
-    void testTruncateMessagesFromIsNoOpForIndexPastEnd() {
-        AiHubChat chat =
-            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
-
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-
-        List<SessionEvent> events = List.of(
-            sessionEvent(MessageType.USER, "one", Instant.ofEpochMilli(100)),
-            sessionEvent(MessageType.ASSISTANT, "two", Instant.ofEpochMilli(200)));
-
-        when(sessionService.getEvents(THREAD_ID, EventFilter.active())).thenReturn(events);
-
-        int deleted = chatService.truncateMessagesFrom(1L, WORKSPACE_ID, USER_ID, 5);
-
-        assertThat(deleted).isZero();
-
-        verify(sessionRepository, never()).applyCompaction(any(), any(), anyLong());
-        verify(chatRepository, never()).save(any());
-    }
-
-    @Test
-    void testTruncateMessagesFromRefusesNegativeIndex() {
-        AiHubChat chat =
-            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
-
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-
-        assertThatThrownBy(() -> chatService.truncateMessagesFrom(1L, WORKSPACE_ID, USER_ID, -1))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("non-negative");
-    }
-
-    @Test
-    void testTruncateMessagesFromRefusesCrossUserAccess() {
-        AiHubChat chat =
-            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
-
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-
-        assertThatThrownBy(() -> chatService.truncateMessagesFrom(1L, WORKSPACE_ID, OTHER_USER_ID, 0))
-            .isInstanceOf(NotFoundException.class);
+        return planCaptor.getValue()
+            .archiveIds();
     }
 
     /**
