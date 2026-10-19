@@ -72,7 +72,7 @@ class WorkflowNodeOutputApiControllerTest {
     private WorkflowNodeOutputDTO getClusterElementOutputDTO(boolean testOutputResponse) {
         ClusterElementOutputDTO clusterElementOutputDTO = new ClusterElementOutputDTO(
             mock(ClusterElementDefinition.class), mock(BaseProperty.class), null, Map.of("id", "contact-42"),
-            testOutputResponse, "hubspot_1");
+            false, testOutputResponse, "hubspot_1");
 
         when(workflowNodeOutputFacade.getClusterElementOutput(
             WORKFLOW_ID, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID)).thenReturn(clusterElementOutputDTO);

@@ -167,4 +167,36 @@ describe('OutputTab', () => {
             expect(screen.getByRole('alert')).toHaveTextContent('The tool ran successfully but returned no data.');
         });
     });
+
+    describe('a truncated test output', () => {
+        it('passes the truncation notice to the output schema display', () => {
+            hoisted.outputTabState.outputSchema = outputSchema;
+            hoisted.outputTabState.sampleOutputTruncated = true;
+
+            renderOutputTab({outputDefined: true});
+
+            expect(screen.getByTestId('output-schema-display')).toHaveTextContent(
+                'Long lists in this test output were cut to their first items. Workflow runs use the full output.'
+            );
+        });
+
+        it('shows the truncation notice together with the no data notice', () => {
+            hoisted.outputTabState.outputSchema = outputSchema;
+            hoisted.outputTabState.sampleOutputTruncated = true;
+            hoisted.outputTabState.testReturnedNoOutput = true;
+
+            renderOutputTab({outputDefined: true});
+
+            expect(screen.getAllByRole('alert')).toHaveLength(2);
+        });
+
+        it('shows no truncation notice when the output was saved whole', () => {
+            hoisted.outputTabState.outputSchema = outputSchema;
+            hoisted.outputTabState.sampleOutputTruncated = false;
+
+            renderOutputTab({outputDefined: true});
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        });
+    });
 });

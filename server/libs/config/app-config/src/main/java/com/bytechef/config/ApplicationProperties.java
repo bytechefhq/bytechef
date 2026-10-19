@@ -4741,6 +4741,11 @@ public class ApplicationProperties {
          */
         private Repository repository = new Repository();
 
+        /**
+         * Test output configuration for outputs saved by Test Action in the workflow editor
+         */
+        private TestOutput testOutput = new TestOutput();
+
         public OutputStorage getOutputStorage() {
             return outputStorage;
         }
@@ -4749,12 +4754,39 @@ public class ApplicationProperties {
             return repository;
         }
 
+        public TestOutput getTestOutput() {
+            return testOutput;
+        }
+
         public void setOutputStorage(OutputStorage outputStorage) {
             this.outputStorage = outputStorage;
         }
 
         public void setRepository(Repository repository) {
             this.repository = repository;
+        }
+
+        public void setTestOutput(TestOutput testOutput) {
+            this.testOutput = testOutput;
+        }
+
+        /**
+         * Configuration for test outputs saved by Test Action in the workflow editor.
+         */
+        public static class TestOutput {
+
+            /**
+             * Maximum number of items kept from each list in a saved test output
+             */
+            private int maxSampleItems = 100;
+
+            public int getMaxSampleItems() {
+                return maxSampleItems;
+            }
+
+            public void setMaxSampleItems(int maxSampleItems) {
+                this.maxSampleItems = maxSampleItems;
+            }
         }
 
         /**

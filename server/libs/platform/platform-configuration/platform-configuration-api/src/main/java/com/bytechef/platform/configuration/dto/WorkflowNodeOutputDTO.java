@@ -28,18 +28,20 @@ import org.jspecify.annotations.Nullable;
  */
 public record WorkflowNodeOutputDTO(
     @Nullable ActionDefinition actionDefinition, @Nullable ClusterElementDefinition clusterElementDefinition,
-    @Nullable OutputResponse outputResponse, @Nullable TaskDispatcherDefinition taskDispatcherDefinition,
-    boolean testOutputResponse, @Nullable TriggerDefinition triggerDefinition,
-    @Nullable OutputResponse variableOutputResponse, String workflowNodeName) {
+    @Nullable OutputResponse outputResponse, boolean sampleOutputTruncated,
+    @Nullable TaskDispatcherDefinition taskDispatcherDefinition, boolean testOutputResponse,
+    @Nullable TriggerDefinition triggerDefinition, @Nullable OutputResponse variableOutputResponse,
+    String workflowNodeName) {
 
     public WorkflowNodeOutputDTO(
         @Nullable ActionDefinition actionDefinition, @Nullable ClusterElementDefinition clusterElementDefinition,
-        @Nullable OutputResponse outputResponse, @Nullable TaskDispatcherDefinition taskDispatcherDefinition,
-        boolean testOutputResponse, @Nullable TriggerDefinition triggerDefinition, String workflowNodeName) {
+        @Nullable OutputResponse outputResponse, boolean sampleOutputTruncated,
+        @Nullable TaskDispatcherDefinition taskDispatcherDefinition, boolean testOutputResponse,
+        @Nullable TriggerDefinition triggerDefinition, String workflowNodeName) {
 
         this(
-            actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition,
-            testOutputResponse, triggerDefinition, null, workflowNodeName);
+            actionDefinition, clusterElementDefinition, outputResponse, sampleOutputTruncated,
+            taskDispatcherDefinition, testOutputResponse, triggerDefinition, null, workflowNodeName);
     }
 
     public Object getSampleOutput() {
