@@ -27,6 +27,7 @@ import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
@@ -123,7 +124,8 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
-                INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
+                INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
+                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback, workspaceFacade)));
 
         requireBuildWorkflow(toolCallbacks);
