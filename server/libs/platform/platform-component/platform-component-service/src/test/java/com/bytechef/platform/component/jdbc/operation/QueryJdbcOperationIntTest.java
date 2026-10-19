@@ -68,10 +68,14 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "id2"),
             JdbcConstants.QUERY, "SELECT count(*) FROM test where id=:id");
 
-        List<Map<String, Object>> result = new QueryJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false)) {
 
-        Assertions.assertEquals(1, result.size());
+            List<Map<String, Object>> result = new QueryJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            Assertions.assertEquals(1, result.size());
+        }
     }
 
     @Test
@@ -80,10 +84,14 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.MAX_ROWS, 4,
             JdbcConstants.QUERY, "SELECT * FROM test");
 
-        List<Map<String, Object>> result = new QueryJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false)) {
 
-        Assertions.assertEquals(4, result.size());
+            List<Map<String, Object>> result = new QueryJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            Assertions.assertEquals(4, result.size());
+        }
     }
 
     @Test
@@ -92,16 +100,17 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.MAX_ROWS, 3,
             JdbcConstants.QUERY, "SELECT * FROM test");
 
-        SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
-            dataSource.getConnection(), false);
+        try (SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false)) {
 
-        ConfigurationException configurationException = Assertions.assertThrows(
-            ConfigurationException.class,
-            () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
+            ConfigurationException configurationException = Assertions.assertThrows(
+                ConfigurationException.class,
+                () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
 
-        Assertions.assertEquals(
-            "The query returned more than 3 rows. Narrow the query or increase Max Rows.",
-            configurationException.getMessage());
+            Assertions.assertEquals(
+                "The query returned more than 3 rows. Narrow the query or increase Max Rows.",
+                configurationException.getMessage());
+        }
     }
 
     @Test
@@ -112,11 +121,32 @@ public class QueryJdbcOperationIntTest {
 
         Map<String, ?> inputParameters = Map.of(JdbcConstants.QUERY, "SELECT * FROM test");
 
-        SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
-            dataSource.getConnection(), false);
+        try (SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false)) {
 
-        Assertions.assertThrows(
-            ConfigurationException.class,
-            () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
+            Assertions.assertThrows(
+                ConfigurationException.class,
+                () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
+        }
+    }
+
+    @Test
+    public void testQueryStopsReadingRowsAfterMaxRowsPlusOne() throws SQLException {
+        jdbcTemplate.execute(
+            "CREATE OR REPLACE FUNCTION query_test_fail_after(value INTEGER, threshold INTEGER) RETURNS INTEGER " +
+                "AS $$ BEGIN IF value > threshold THEN RAISE EXCEPTION 'row % read', value; END IF; " +
+                "RETURN value; END $$ LANGUAGE plpgsql;");
+
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.MAX_ROWS, 3,
+            JdbcConstants.QUERY, "SELECT query_test_fail_after(i, 4) AS id FROM generate_series(1, 100) AS i");
+
+        try (SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource(
+            dataSource.getConnection(), false)) {
+
+            Assertions.assertThrows(
+                ConfigurationException.class,
+                () -> new QueryJdbcOperation().execute(inputParameters, singleConnectionDataSource));
+        }
     }
 }
