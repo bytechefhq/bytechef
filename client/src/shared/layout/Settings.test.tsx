@@ -50,7 +50,6 @@ describe('Settings', () => {
             {href: '/automation/settings/workspaces', title: 'Workspaces'},
             {title: 'Current Workspace'},
             {href: 'git-configuration', title: 'Git Configuration'},
-            {href: 'workspace-api-keys', title: 'API Keys'},
             {title: 'Organization'},
             {href: 'users', title: 'Users'},
         ]);
@@ -58,6 +57,18 @@ describe('Settings', () => {
         expect(screen.queryByText('Current Workspace')).not.toBeInTheDocument();
         expect(screen.getByText('Organization')).toBeInTheDocument();
         expect(screen.getByText('Users')).toBeInTheDocument();
+    });
+
+    it('shows the workspace API Keys page without any feature flag', () => {
+        renderSettings([
+            {title: 'Current Workspace'},
+            {href: 'git-configuration', title: 'Git Configuration'},
+            {href: 'workspace-api-keys', title: 'API Keys'},
+        ]);
+
+        expect(screen.getByText('Current Workspace')).toBeInTheDocument();
+        expect(screen.getByText('API Keys')).toBeInTheDocument();
+        expect(screen.queryByText('Git Configuration')).not.toBeInTheDocument();
     });
 
     it('keeps a section heading when an item below it is visible', () => {

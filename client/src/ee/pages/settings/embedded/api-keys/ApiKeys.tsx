@@ -1,9 +1,9 @@
-import ApiKeysContent from '@/ee/shared/components/api-keys/ApiKeysContent';
+import ApiKeysContent from '@/shared/components/api-keys/ApiKeysContent';
 import {
     ApiKeysProvider,
     CreateApiKeyMutationProps,
     SimpleMutationProps,
-} from '@/ee/shared/components/api-keys/providers/apiKeysProvider';
+} from '@/shared/components/api-keys/providers/apiKeysProvider';
 import {
     ApiKey,
     CreateApiKeyMutation,
