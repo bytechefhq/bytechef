@@ -36,9 +36,16 @@ import com.bytechef.automation.task.facade.ApprovalTaskFacadeImpl;
 import com.bytechef.automation.task.security.ApprovalTaskJobResolver;
 import com.bytechef.automation.task.service.ApprovalTaskService;
 import com.bytechef.automation.task.web.graphql.ApprovalTaskGraphQlController.ApprovalTaskInput;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
+import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
@@ -93,6 +100,9 @@ class ApprovalTaskGraphQlControllerIntTest {
 
     @Autowired
     private ApprovalTaskFacade approvalTaskFacade;
+
+    @Autowired
+    private ApprovalTokens approvalTokens;
 
     @Autowired
     private ApprovalTaskGraphQlController approvalTaskGraphQlController;
@@ -170,6 +180,55 @@ class ApprovalTaskGraphQlControllerIntTest {
         verify(permissionService).isTenantAdmin();
         verify(permissionService).hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT");
         verifyNoMoreInteractions(permissionService);
+    }
+
+    @ParameterizedTest(name = "granted={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testCreateApprovalTaskForASignedApprovalTokenRequiresDeploymentEditOnItsJob(boolean granted) {
+        when(permissionService.hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT")).thenReturn(granted);
+        when(principalJobService.getJobPrincipalId(JOB_ID, PlatformType.AUTOMATION))
+            .thenThrow(new IllegalStateException(BODY_REACHED));
+
+        ApprovalTask approvalTask = ApprovalTask.builder()
+            .name("Approve the invoice")
+            .jobResumeId(signedApprovalToken(approvalTokens))
+            .build();
+
+        assertInvocationOutcome(() -> approvalTaskFacade.createApprovalTask(approvalTask), granted);
+
+        verify(permissionService).isTenantAdmin();
+        verify(permissionService).hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT");
+        verifyNoMoreInteractions(permissionService);
+    }
+
+    @ParameterizedTest(name = "tenantAdmin={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testCreateApprovalTaskForAnApprovalTokenSignedWithAnotherSecretGrantsNoJobScope(boolean tenantAdmin) {
+        when(permissionService.isTenantAdmin()).thenReturn(tenantAdmin);
+
+        ApprovalTask approvalTask = ApprovalTask.builder()
+            .name("Approve the invoice")
+            .jobResumeId(signedApprovalToken(newApprovalTokens("approval-token-secret-key-0002!!")))
+            .build();
+
+        if (tenantAdmin) {
+            assertThatThrownBy(() -> approvalTaskFacade.createApprovalTask(approvalTask))
+                .isInstanceOf(IllegalArgumentException.class);
+        } else {
+            assertThatThrownBy(() -> approvalTaskFacade.createApprovalTask(approvalTask))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(-1L, "Job", "DEPLOYMENT_EDIT");
+        }
+
+        verify(permissionService).isTenantAdmin();
+        verifyNoMoreInteractions(permissionService);
+        verify(principalJobService, never()).getJobPrincipalId(anyLong(), any());
+        verify(approvalTaskService, never()).create(any(ApprovalTask.class));
     }
 
     @ParameterizedTest(name = "granted={0}")
@@ -317,12 +376,31 @@ class ApprovalTaskGraphQlControllerIntTest {
             .build();
     }
 
+    private static ApprovalTokens newApprovalTokens(String secret) {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        return new ApprovalTokensImpl(
+            Clock.systemUTC(), encoder.encodeToString(secret.getBytes(StandardCharsets.UTF_8)), List.of(),
+            Duration.ofDays(1), Duration.ofSeconds(60), false);
+    }
+
+    private static String signedApprovalToken(ApprovalTokens approvalTokens) {
+        JobResumeId jobResumeId = JobResumeId.of("public", JOB_ID);
+
+        return approvalTokens.toSignedToken(jobResumeId.toString(), Duration.ofDays(1));
+    }
+
     private static ApprovalTaskInput approvalTaskInput(Long id) {
         return new ApprovalTaskInput(id, "Approve the invoice", null, null, null, null, null, null);
     }
 
     @EnableMethodSecurity
     static class MethodSecurityConfiguration {
+
+        @Bean
+        ApprovalTokens approvalTokens() {
+            return newApprovalTokens("approval-token-secret-key-0001!!");
+        }
 
         @Bean
         static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
