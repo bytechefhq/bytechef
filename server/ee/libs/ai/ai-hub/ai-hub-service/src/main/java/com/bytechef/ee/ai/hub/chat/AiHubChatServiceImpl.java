@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import org.jspecify.annotations.Nullable;
@@ -55,7 +56,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * <p>
  * Message contents are stored and owned by Spring AI's session store, keyed by {@code AiHubChat.threadId} as the
  * session id. This service reaches them through {@code AiHubSessionMemory}: reads via {@code SessionService}, and the
- * few write paths ({@code appendAssistantMessage}, {@code truncateMessagesFrom}, delete cleanup) via
+ * few write paths ({@code appendAssistantMessage}, {@code truncateMessages}, delete cleanup) via
  * {@code SessionRepository}. The agent's own turns are written by the session memory advisor, not here.
  *
  * @version ee
@@ -77,6 +78,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
      * never needs more than the most recent slice.
      */
     private static final int MESSAGE_LIMIT = 500;
+
+    private static final String TURN_IN_FLIGHT_MESSAGE = "A turn is already running in this chat.";
 
     private final AiHubChatRepository chatRepository;
     private final AiHubChatAccessPolicy accessPolicy;
@@ -209,6 +212,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             List<Map<String, String>> toolEvents = toolEventsPerRow.get(i);
 
             messages.add(new AiHubChatMessage(
+                event.getId(),
                 event.getMessageType()
                     .name(),
                 event.getMessage()
@@ -344,53 +348,54 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     @Override
-    public int truncateMessagesFrom(
-        long chatId, long requesterWorkspaceId, long requesterUserId, int fromMessageIndex) {
+    public OptionalInt truncateMessages(
+        long chatId, long requesterWorkspaceId, long requesterUserId, String messageId, boolean keepMessage) {
 
         AiHubChat chat = loadParticipable(chatId, requesterWorkspaceId, requesterUserId);
 
-        if (fromMessageIndex < 0) {
-            throw new IllegalArgumentException("fromMessageIndex must be non-negative; got " + fromMessageIndex);
+        String threadId = chat.getThreadId();
+
+        if (inFlightRunRegistry.isInFlight(threadId)) {
+            throw new ConflictException(TURN_IN_FLIGHT_MESSAGE);
         }
 
         AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
 
         if (sessionMemory == null) {
-            return 0;
+            return OptionalInt.empty();
         }
-
-        String threadId = chat.getThreadId();
 
         long eventVersion = sessionMemory.sessionRepository()
             .getEventVersion(threadId);
 
-        List<SessionEvent> allEvents = sessionMemory.sessionService()
+        List<SessionEvent> activeEvents = sessionMemory.sessionService()
             .getEvents(threadId, EventFilter.active());
 
-        int visibleCount = 0;
-        int cutoffEventIndex = -1;
+        int messageEventIndex = -1;
 
-        for (int i = 0; i < allEvents.size(); i++) {
-            if (isVisibleConversationEvent(allEvents.get(i))) {
-                if (visibleCount == fromMessageIndex) {
-                    cutoffEventIndex = i;
+        for (int index = 0; index < activeEvents.size(); index++) {
+            SessionEvent event = activeEvents.get(index);
 
-                    break;
-                }
+            if (messageId.equals(event.getId()) && isVisibleConversationEvent(event)) {
+                messageEventIndex = index;
 
-                visibleCount++;
+                break;
             }
         }
 
-        if (cutoffEventIndex < 0) {
-            return 0;
+        if (messageEventIndex < 0) {
+            return OptionalInt.empty();
         }
 
-        int deleted = allEvents.size() - cutoffEventIndex;
+        int cutoffEventIndex = keepMessage ? messageEventIndex + 1 : messageEventIndex;
+
+        if (cutoffEventIndex >= activeEvents.size()) {
+            return OptionalInt.of(0);
+        }
 
         Set<String> truncatedEventIds = new HashSet<>();
 
-        for (SessionEvent event : allEvents.subList(cutoffEventIndex, allEvents.size())) {
+        for (SessionEvent event : activeEvents.subList(cutoffEventIndex, activeEvents.size())) {
             truncatedEventIds.add(event.getId());
         }
 
@@ -404,7 +409,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         chat.setUpdatedAt(LocalDateTime.now(clock));
         chatRepository.save(chat);
 
-        return deleted;
+        return OptionalInt.of(activeEvents.size() - cutoffEventIndex);
     }
 
     @Override

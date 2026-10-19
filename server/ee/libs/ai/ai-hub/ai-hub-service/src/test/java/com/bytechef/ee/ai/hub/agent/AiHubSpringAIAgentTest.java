@@ -17,6 +17,7 @@ import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -101,11 +102,33 @@ class AiHubSpringAIAgentTest {
     }
 
     @Test
-    void testAdvisorParamsCarryOnlyTheConversationId() throws AGUIException {
-        AiHubSpringAIAgent agent = newAgent();
+    void testAdvisorParamsCarryOnlyTheConversationIdWithoutAUserMessage() throws AGUIException {
+        RunAgentInput input = new RunAgentInput(
+            "thread", "run", verifiedState(), List.of(), List.of(), List.of(), null);
 
-        assertThat(agent.advisorParams(newInput(verifiedState())))
+        assertThat(newAgent().advisorParams(input))
             .containsExactly(Map.entry(ChatMemory.CONVERSATION_ID, "thread"));
+    }
+
+    @Test
+    void testAdvisorParamsCarryTheIdOfTheLastUserMessage() throws AGUIException {
+        UserMessage earlierUserMessage = new UserMessage();
+
+        earlierUserMessage.setId("earlier-message");
+        earlierUserMessage.setContent("Bind a Slack connection");
+
+        UserMessage userMessage = new UserMessage();
+
+        userMessage.setId("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed");
+        userMessage.setContent("Now rename it");
+
+        RunAgentInput input = new RunAgentInput(
+            "thread", "run", verifiedState(), List.<BaseMessage>of(earlierUserMessage, userMessage), List.of(),
+            List.of(), null);
+
+        assertThat(newAgent().advisorParams(input)).containsOnly(
+            Map.entry(ChatMemory.CONVERSATION_ID, "thread"),
+            Map.entry(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed"));
     }
 
     @Test

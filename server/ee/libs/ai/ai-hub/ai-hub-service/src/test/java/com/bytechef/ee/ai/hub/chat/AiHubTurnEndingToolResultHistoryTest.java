@@ -8,11 +8,13 @@
 package com.bytechef.ee.ai.hub.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.agui.spring.ai.TurnEndingToolCallingManager;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.ResentUserMessageAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
@@ -22,7 +24,10 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,6 +69,10 @@ class AiHubTurnEndingToolResultHistoryTest {
     private static final String THREAD_ID = "thread-turn-ending";
     private static final long USER_ID = 10L;
     private static final long WORKSPACE_ID = 1L;
+
+    private static final String FIRST_USER_MESSAGE_ID = "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed";
+    private static final String SECOND_USER_MESSAGE_ID = "6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b";
+    private static final String EDITED_USER_MESSAGE_ID = "9f8b2c4e-5d6a-4b3c-8e1f-0a2b3c4d5e6f";
 
     private static final String SELECT_CONNECTION_RESULT =
         "{\"kind\":\"select-connection\",\"componentName\":\"slack\",\"awaitingAnswer\":true}";
@@ -163,13 +172,108 @@ class AiHubTurnEndingToolResultHistoryTest {
 
         runTurn("Bind a Slack connection", tool("selectConnection", SELECT_CONNECTION_RESULT));
 
-        chatService.truncateMessagesFrom(CHAT_ID, WORKSPACE_ID, USER_ID, 1);
+        String pickerRowId = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)
+            .get(1)
+            .id();
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, pickerRowId, false);
 
         List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
 
         assertThat(messages).hasSize(1);
         assertThat(messages.getFirst()
             .toolEventsJson()).isNull();
+    }
+
+    @Test
+    void testUserRowIsStoredUnderItsAgUiMessageId() {
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).extracting(AiHubChatMessage::id)
+            .first()
+            .isEqualTo(FIRST_USER_MESSAGE_ID);
+    }
+
+    @Test
+    void testReloadKeepsTheUserRowAndDoesNotStoreItAgain() {
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
+
+        chatModel.reply(textResponse("Renamed to Leads."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).extracting(AiHubChatMessage::content)
+            .containsExactly("Now rename it", "Renamed to Leads.");
+        assertThat(chatModel.prompts.getLast()
+            .getInstructions()).extracting(Message::getText)
+                .containsExactly("Now rename it");
+    }
+
+    @Test
+    void testReloadAfterAFailedReRunKeepsTheUserRow() {
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
+
+        chatModel.fail(new IllegalStateException("The selected model is unavailable"));
+
+        assertThatThrownBy(() -> runTurn("Now rename it", FIRST_USER_MESSAGE_ID))
+            .hasStackTraceContaining("The selected model is unavailable");
+
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).extracting(AiHubChatMessage::content)
+            .containsExactly("Now rename it");
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
+
+        chatModel.reply(textResponse("Renamed to Leads."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).extracting(AiHubChatMessage::content)
+            .containsExactly("Now rename it", "Renamed to Leads.");
+    }
+
+    @Test
+    void testEditDropsTheEditedRowAndStoresTheNewTextUnderItsNewId() {
+        chatModel.reply(textResponse("Bound."));
+
+        runTurn("Bind a Slack connection", FIRST_USER_MESSAGE_ID);
+
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", SECOND_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, false);
+
+        chatModel.reply(textResponse("Renamed to Leads."));
+
+        runTurn("Now rename it to Leads", EDITED_USER_MESSAGE_ID);
+
+        List<AiHubChatMessage> messages = chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID);
+
+        assertThat(messages).extracting(AiHubChatMessage::content)
+            .containsExactly("Bind a Slack connection", "Bound.", "Now rename it to Leads", "Renamed to Leads.");
+        assertThat(messages.get(2)
+            .id()).isEqualTo(EDITED_USER_MESSAGE_ID);
+    }
+
+    @Test
+    void testTruncatingAtAMessageTheChatDoesNotHoldDropsNothing() {
+        chatModel.reply(textResponse("Renamed."));
+
+        runTurn("Now rename it", FIRST_USER_MESSAGE_ID);
+
+        assertThat(chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, true))
+            .isEmpty();
+        assertThat(chatService.loadMessages(CHAT_ID, WORKSPACE_ID, USER_ID)).hasSize(2);
     }
 
     @Test
@@ -242,7 +346,16 @@ class AiHubTurnEndingToolResultHistoryTest {
             .build();
     }
 
+    private void runTurn(String userText, String userMessageId) {
+        runTurn(userText, userMessageId, tool("listConnections", "[]"));
+    }
+
     private void runTurn(String userText, ToolCallback toolCallback) {
+        runTurn(userText, UUID.randomUUID()
+            .toString(), toolCallback);
+    }
+
+    private void runTurn(String userText, String userMessageId, ToolCallback toolCallback) {
         ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
             .toolCallingManager(new TurnEndingToolCallingManager(
                 ToolCallingManager.builder()
@@ -261,11 +374,16 @@ class AiHubTurnEndingToolResultHistoryTest {
             .toolCallbacks(toolCallback)
             .advisors(
                 sessionMemory.createSessionMemoryAdvisor(), sessionMemory.createTurnEndingToolResultAdvisor(),
-                toolCallingAdvisor)
-            .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, THREAD_ID))
+                toolCallingAdvisor, new ResentUserMessageAdvisor())
+            .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, THREAD_ID)
+                .param(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, userMessageId))
             .stream()
             .chatResponse()
             .blockLast();
+    }
+
+    private static ChatResponse textResponse(String text) {
+        return new ChatResponse(List.of(new Generation(new AssistantMessage(text))));
     }
 
     private static ChatResponse toolCallResponse(String text, String toolCallId, String toolName) {
@@ -299,9 +417,15 @@ class AiHubTurnEndingToolResultHistoryTest {
     private static final class ScriptedChatModel implements ChatModel {
 
         private final List<Prompt> prompts = new ArrayList<>();
-        private ChatResponse nextResponse;
+        private @Nullable RuntimeException nextFailure;
+        private @Nullable ChatResponse nextResponse;
+
+        void fail(RuntimeException failure) {
+            nextFailure = failure;
+        }
 
         void reply(ChatResponse chatResponse) {
+            nextFailure = null;
             nextResponse = chatResponse;
         }
 
@@ -309,7 +433,11 @@ class AiHubTurnEndingToolResultHistoryTest {
         public ChatResponse call(Prompt prompt) {
             prompts.add(prompt);
 
-            return nextResponse;
+            if (nextFailure != null) {
+                throw nextFailure;
+            }
+
+            return Objects.requireNonNull(nextResponse);
         }
 
         @Override

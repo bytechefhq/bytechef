@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -62,11 +63,14 @@ public interface AiHubChatService {
     void delete(long chatId, long requesterWorkspaceId, long requesterUserId);
 
     /**
-     * Drops the visible message at {@code fromMessageIndex} and everything after it, tool events included.
+     * Drops everything after the visible message with id {@code messageId}, tool events included, and the message
+     * itself unless {@code keepMessage}. While a turn runs in the chat it refuses with a conflict before dropping
+     * anything.
      *
-     * @return the number of session events dropped; zero when the index is past the end of the transcript
+     * @return the number of session events dropped, or empty when the chat holds no visible message with that id
      */
-    int truncateMessagesFrom(long chatId, long requesterWorkspaceId, long requesterUserId, int fromMessageIndex);
+    OptionalInt truncateMessages(
+        long chatId, long requesterWorkspaceId, long requesterUserId, String messageId, boolean keepMessage);
 
     /**
      * Appends an assistant message to the chat's session. Blank content is ignored.
@@ -140,12 +144,14 @@ public interface AiHubChatService {
     }
 
     /**
-     * One visible transcript row.
+     * One visible transcript row. {@code id} is the id of its session event; a user row sent through the hub keeps the
+     * AG-UI message id it was sent with.
      */
-    record AiHubChatMessage(String role, String content, Instant timestamp, @Nullable String toolEventsJson) {
+    record AiHubChatMessage(
+        String id, String role, String content, Instant timestamp, @Nullable String toolEventsJson) {
 
-        public AiHubChatMessage(String role, String content, Instant timestamp) {
-            this(role, content, timestamp, null);
+        public AiHubChatMessage(String id, String role, String content, Instant timestamp) {
+            this(id, role, content, timestamp, null);
         }
     }
 }
