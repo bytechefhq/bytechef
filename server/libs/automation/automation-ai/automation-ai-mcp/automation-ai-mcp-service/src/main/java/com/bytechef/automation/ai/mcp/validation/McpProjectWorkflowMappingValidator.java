@@ -28,7 +28,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -106,9 +106,7 @@ public class McpProjectWorkflowMappingValidator implements McpServerEnablementVa
 
         Map<String, ?> parameters = mcpProjectWorkflow.getParameters();
 
-        String toolName = MapUtils.getString(parameters, ToolConstants.TOOL_NAME);
-
-        if (toolName == null || toolName.isBlank()) {
+        if (AbstractToolFacade.getWorkflowToolName(parameters, workflow.getLabel()) == null) {
             return workflowLabel(workflow);
         }
 
