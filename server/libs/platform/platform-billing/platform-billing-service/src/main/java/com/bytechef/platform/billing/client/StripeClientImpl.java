@@ -114,6 +114,20 @@ public class StripeClientImpl implements StripeClient {
     }
 
     @Override
+    public void cancelImmediately(String stripeSubscriptionId, String tenantId) {
+        try {
+            Subscription subscription = Subscription.retrieve(stripeSubscriptionId);
+
+            releaseScheduleIfPresent(subscription);
+
+            subscription.cancel();
+        } catch (StripeException stripeException) {
+            throw new PaymentClientException(
+                "Failed to cancel subscription " + stripeSubscriptionId + " immediately", stripeException);
+        }
+    }
+
+    @Override
     public void reactivateSubscription(String stripeSubscriptionId, String tenantId) {
         try {
             Subscription subscription = Subscription.retrieve(stripeSubscriptionId);
