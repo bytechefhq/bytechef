@@ -332,7 +332,11 @@ describe('settings route authorities', () => {
 
         const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
 
-        const routes = findRoutesByPath(embeddedRoutes, path);
+        const embeddedPageRoutes = embeddedRoutes.flatMap((route) =>
+            (route.children ?? []).filter((child) => child.path !== 'settings')
+        );
+
+        const routes = findRoutesByPath(embeddedPageRoutes, path);
 
         expect(routes).toHaveLength(1);
         expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([
