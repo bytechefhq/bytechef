@@ -41,6 +41,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
@@ -287,6 +288,33 @@ class AiHubApiControllerTest {
     }
 
     @Test
+    void testTurnOnARetiredThreadIsNotFoundAndCreatesNoChat() {
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+
+        inFlightRunRegistry.retireThread(THREAD_ID);
+
+        assertStatus(() -> controller.chat(agUiParameters("ASK", "run-1")), HttpStatus.NOT_FOUND);
+
+        verify(chatService, never()).create(anyLong(), anyLong(), anyInt(), anyString());
+        verify(toolApprovalService, never()).supersedePending(anyLong());
+        verify(askAgent, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testTurnOnAChatInDeletedStatusIsForbidden() {
+        AiHubChat chat = chat(OWNER_USER_ID, WORKSPACE_ID);
+
+        chat.setStatus(AiHubChatStatus.DELETED);
+
+        stubExistingChat(chat);
+
+        assertStatus(() -> controller.chat(agUiParameters("ASK", "run-1")), HttpStatus.FORBIDDEN);
+
+        verify(askAgent, never()).runAgent(any(), any());
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
     void testTurnOnAChatOfAnotherWorkspaceIsForbidden() {
         AiHubChat chat = chat(OWNER_USER_ID, OTHER_WORKSPACE_ID);
 
@@ -499,6 +527,22 @@ class AiHubApiControllerTest {
 
         verify(userService, never()).getCurrentUser();
         verify(chatService, never()).findByThreadIdViewable(any(), anyLong());
+    }
+
+    @Test
+    void testTurnOnARetiredThreadOverHttpIs404WithTheChatNotFoundCode() throws Exception {
+        inFlightRunRegistry.retireThread(THREAD_ID);
+
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"ASK\",\"workspaceId\":" + WORKSPACE_ID + "}")))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("CHAT_NOT_FOUND"));
+
+        verify(chatService, never()).create(anyLong(), anyLong(), anyInt(), anyString());
     }
 
     @Test

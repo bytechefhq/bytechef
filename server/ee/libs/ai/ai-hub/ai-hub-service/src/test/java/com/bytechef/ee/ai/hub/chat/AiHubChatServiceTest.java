@@ -419,7 +419,7 @@ class AiHubChatServiceTest {
     }
 
     @Test
-    void testPatchOfAnAlreadyDeletedChatThrowsConflictBeforeWriting() {
+    void testPatchOfAChatInDeletedStatusIsNotFoundBeforeWriting() {
         AiHubChat chat =
             buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
 
@@ -428,9 +428,54 @@ class AiHubChatServiceTest {
         assertThatThrownBy(
             () -> chatService.patch(
                 1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)))
-                    .isInstanceOf(ConflictException.class);
+                    .isInstanceOf(NotFoundException.class);
 
         verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testAChatInDeletedStatusCannotBeReadOrWritten() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(() -> chatService.getViewable(1L, WORKSPACE_ID, USER_ID))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.loadMessages(1L, WORKSPACE_ID, USER_ID))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.appendAssistantMessage(1L, WORKSPACE_ID, USER_ID, "Hello"))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-1", true))
+            .isInstanceOf(NotFoundException.class);
+        assertThat(chatService.findByThreadIdViewable(THREAD_ID, USER_ID)).isEmpty();
+
+        verify(chatRepository, never()).updateUpdatedAtUnlessDeleted(anyLong(), anyInt(), any());
+    }
+
+    @Test
+    void testAChatInDeletedStatusCanStillBeHardDeleted() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testListWithoutAStatusExcludesDeletedChatsAndListingDeletedReturnsNothing() {
+        List<AiHubChat> chats = List.of(buildChat(1L, USER_ID, "t-1", AiHubChatStatus.ACTIVE));
+
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            eq(WORKSPACE_ID), eq(USER_ID), eq(0), eq(DELETED_ORDINAL), anyInt()))
+                .thenReturn(chats);
+
+        assertThat(chatService.list(WORKSPACE_ID, USER_ID, 0, null)).isEqualTo(chats);
+        assertThat(chatService.list(WORKSPACE_ID, USER_ID, 0, AiHubChatStatus.DELETED)).isEmpty();
     }
 
     @Test
@@ -451,20 +496,14 @@ class AiHubChatServiceTest {
     }
 
     @Test
-    void testPatchStatusToDeletedOfAnAlreadyDeletedChatSucceeds() {
-        AiHubChat chat =
-            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+    void testPatchStatusToDeletedIsRejectedBeforeAnyLookup() {
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)))
+                    .isInstanceOf(IllegalArgumentException.class);
 
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(chatRepository.updateStatusUnlessDeleted(
-            eq(1L), eq(AiHubChatStatus.DELETED.ordinal()), eq(AiHubChatStatus.DELETED.ordinal()),
-            any(LocalDateTime.class)))
-                .thenReturn(0);
-
-        AiHubChat patchedChat = chatService.patch(
-            1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED));
-
-        assertThat(patchedChat).isSameAs(chat);
+        verify(chatRepository, never()).findById(anyLong());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -622,7 +661,7 @@ class AiHubChatServiceTest {
 
         assertThat(deleted).hasValue(2);
 
-        verify(chatRepository).updateUpdatedAt(eq(1L), any(LocalDateTime.class));
+        verify(chatRepository).updateUpdatedAtUnlessDeleted(eq(1L), eq(DELETED_ORDINAL), any(LocalDateTime.class));
         verify(chatRepository, never()).save(any());
         assertThat(archivedEventIds()).containsExactlyInAnyOrder(events.get(1)
             .getId(),
@@ -869,7 +908,7 @@ class AiHubChatServiceTest {
         chatService.appendAssistantMessage(1L, WORKSPACE_ID, USER_ID, "hello");
 
         verify(sessionRepository).appendEvent(any(SessionEvent.class));
-        verify(chatRepository).updateUpdatedAt(eq(1L), any(LocalDateTime.class));
+        verify(chatRepository).updateUpdatedAtUnlessDeleted(eq(1L), eq(DELETED_ORDINAL), any(LocalDateTime.class));
         verify(chatRepository, never()).save(any());
     }
 
