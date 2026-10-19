@@ -12,6 +12,8 @@ describe('findActionCallKeySlot', () => {
             existingKeys: [],
             prefix: 'ur',
             propertyPath: [],
+            rootKeys: [],
+            rootValues: {},
         });
     });
 
@@ -33,6 +35,8 @@ describe('findActionCallKeySlot', () => {
             existingKeys: ['latitude'],
             prefix: 'lon',
             propertyPath: [],
+            rootKeys: ['latitude'],
+            rootValues: {latitude: 1},
         });
     });
 
@@ -57,6 +61,35 @@ describe('findActionCallKeySlot', () => {
     it('skips braces inside strings and comments', () => {
         expect(at('context.component.a.b({\n  // } not a close\n  text: "}", ')).toMatchObject({
             existingKeys: ['text'],
+        });
+    });
+
+    it('collects literal values of the first argument, including from a nested key slot', () => {
+        expect(
+            at('context.component.a.b({method: "POST", count: -2, flag: true, empty: null, body: {ke')
+        ).toMatchObject({
+            propertyPath: ['body'],
+            rootKeys: ['method', 'count', 'flag', 'empty', 'body'],
+            rootValues: {count: -2, empty: null, flag: true, method: 'POST'},
+        });
+    });
+
+    it('leaves out values that are not plain literals', () => {
+        expect(at('context.component.a.b({uri: input.uri, path: `/${id}`, size: 1 + 2, name: "x" + y, ')).toMatchObject(
+            {
+                rootKeys: ['uri', 'path', 'size', 'name'],
+                rootValues: {},
+            }
+        );
+    });
+
+    it('reads Python and Ruby literal keywords', () => {
+        expect(at("context.component.a.b({'flag': True, 'none': None, ", 'python')).toMatchObject({
+            rootValues: {flag: true, none: null},
+        });
+        expect(at('context.component.a.b({flag: false, label: "a#{b}", ', 'ruby')).toMatchObject({
+            rootKeys: ['flag', 'label'],
+            rootValues: {flag: false},
         });
     });
 });

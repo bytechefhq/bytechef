@@ -30,6 +30,7 @@ const catalog: ComponentCatalogType = {
                 version: 1,
             }) as unknown as ComponentDefinition
     ),
+    getDisplayConditions: vi.fn(async () => ({})),
     getOperationProperties: vi.fn(
         async (_componentName: string, _componentVersion: number | undefined, _operationName: string, kind: string) =>
             (kind === 'trigger'
@@ -266,5 +267,57 @@ describe('parameter key completions', () => {
                 source,
             })
         ).toEqual([]);
+    });
+});
+
+describe('parameter key completions with runtime properties', () => {
+    const properties = [
+        {name: 'baseId', type: 'STRING'},
+        {name: 'format', type: 'STRING'},
+        {displayCondition: "format == 'xml'", name: 'xmlRoot', type: 'STRING'},
+        {name: 'fields', propertiesDataSource: {propertiesLookupDependsOn: ['baseId']}, type: 'DYNAMIC_PROPERTIES'},
+    ] as unknown as Property[];
+
+    const runtimeCatalog: ComponentCatalogType = {
+        ...catalog,
+        getDisplayConditions: vi.fn(async () => ({})),
+        getOperationProperties: vi.fn(async () => properties),
+    };
+
+    it('loads dynamic properties with the task name and the values written in the document', async () => {
+        const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
+        const source =
+            '{"tasks": [{"name": "airtable_1", "type": "airtable/v1/createRecord", "parameters": {"baseId": "app1", "fields": {""}}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: runtimeCatalog, format: 'json', loadDynamicProperties},
+            cursorOffset: source.indexOf('{""}') + 2,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['Email']);
+        expect(loadDynamicProperties).toHaveBeenCalledWith({
+            actionName: 'createRecord',
+            componentName: 'airtable',
+            componentVersion: 1,
+            lookupDependsOnPaths: ['baseId'],
+            parameters: {baseId: 'app1'},
+            propertyName: 'fields',
+            workflowNodeName: 'airtable_1',
+        });
+    });
+
+    it('hides a property whose display condition is false for the values in the document', async () => {
+        const source =
+            'tasks:\n  - name: airtable_1\n    type: airtable/v1/createRecord\n    parameters:\n      format: json\n      ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: runtimeCatalog, format: 'yaml'},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['baseId', 'fields']);
+        expect(runtimeCatalog.getDisplayConditions).toHaveBeenCalledWith('airtable', 1, 'createRecord', 'action', {
+            format: 'json',
+        });
     });
 });

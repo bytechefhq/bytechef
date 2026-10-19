@@ -1,8 +1,12 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
 import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
+import {useDynamicPropertiesLoader} from '@/shared/components/monaco/completion/useDynamicPropertiesLoader';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Suspense, lazy, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -12,9 +16,15 @@ const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'
 
 interface PropertyCodeEditorDialogEditorProps {
     language: string;
+    workflowId?: string;
+    workflowNodeName?: string;
 }
 
-const PropertyCodeEditorDialogEditor = ({language}: PropertyCodeEditorDialogEditorProps) => {
+const PropertyCodeEditorDialogEditor = ({
+    language,
+    workflowId,
+    workflowNodeName,
+}: PropertyCodeEditorDialogEditorProps) => {
     const [model, setModel] = useState<editor.ITextModel>();
 
     const {componentConnections, editorValue, inputParameters, scriptInput, setEditorValue} =
@@ -27,8 +37,16 @@ const PropertyCodeEditorDialogEditor = ({language}: PropertyCodeEditorDialogEdit
                 setEditorValue: state.setEditorValue,
             }))
         );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const clusterElementType = useWorkflowNodeDetailsPanelStore((state) => state.currentNode?.clusterElementType);
+    const rootClusterElementNodeName = useWorkflowEditorStore(
+        (state) => state.rootClusterElementNodeData?.workflowNodeName
+    );
 
     const components = useComponentCatalog();
+    const loadDynamicProperties = useDynamicPropertiesLoader(workflowId, currentEnvironmentId);
+
+    const isClusterElement = !!clusterElementType && !!rootClusterElementNodeName;
 
     const completionContext = useMemo<CompletionContextType | undefined>(() => {
         const scriptLanguage = language.toLowerCase();
@@ -43,8 +61,18 @@ const PropertyCodeEditorDialogEditor = ({language}: PropertyCodeEditorDialogEdit
             input: inputParameters ?? scriptInput,
             kind: 'script',
             language: scriptLanguage as ScriptLanguageType,
+            ...(!isClusterElement && {loadDynamicProperties, workflowNodeName}),
         };
-    }, [componentConnections, components, inputParameters, language, scriptInput]);
+    }, [
+        componentConnections,
+        components,
+        inputParameters,
+        isClusterElement,
+        language,
+        loadDynamicProperties,
+        scriptInput,
+        workflowNodeName,
+    ]);
 
     useCompletionContext(model, completionContext);
 

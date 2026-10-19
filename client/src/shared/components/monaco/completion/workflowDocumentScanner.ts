@@ -8,6 +8,9 @@ export type WorkflowDocumentPositionType = {
     earlierNodeNames: string[];
     inString: boolean;
     keySlot?: KeySlotType;
+    keysOf: (containerPath: string[]) => string[];
+    literalValuesOf: (containerPath: string[]) => Record<string, unknown>;
+    nameOf: (nodePath: string[]) => string | undefined;
     path: string[];
     stringValueBeforeCursor?: string;
     typeOf: (nodePath: string[]) => string | undefined;
@@ -905,6 +908,28 @@ function collectConnections(scalars: ScalarType[], taskIndex: number): Connectio
     return connections;
 }
 
+function isChildPath(path: string[], containerPath: string[]): boolean {
+    return path.length === containerPath.length + 1 && containerPath.every((segment, index) => path[index] === segment);
+}
+
+function coerceJsonLiteral(value: string): unknown {
+    if (value === 'true' || value === 'false') {
+        return value === 'true';
+    }
+
+    if (value === 'null') {
+        return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : value;
+}
+
+function coercePlainScalar(value: string, quoted: boolean): unknown {
+    return !quoted && /^(true|false|null|-?\d+(\.\d+)?)$/.test(value) ? coerceJsonLiteral(value) : value;
+}
+
 export function scanWorkflowDocument(
     source: string,
     cursorOffset: number,
@@ -942,11 +967,45 @@ export function scanWorkflowDocument(
             .map((node) => node.name),
     ];
 
+    const scannedKeySlot = hit ? undefined : document.keySlotAt(cursor);
+    const isOwnKey = (path: string[]): boolean =>
+        scannedKeySlot?.name !== undefined &&
+        isChildPath(path, scannedKeySlot.containerPath) &&
+        path[path.length - 1] === scannedKeySlot.name;
+
     const result: WorkflowDocumentPositionType = {
         earlierNodeNames,
         enclosingTaskConnections: [],
         enclosingTaskInputKeys: [],
         inString: !!hit,
+        keysOf: (containerPath) => [
+            ...new Set(
+                document.keys
+                    .filter((keyPath) => isChildPath(keyPath, containerPath) && !isOwnKey(keyPath))
+                    .map((keyPath) => keyPath[keyPath.length - 1])
+            ),
+        ],
+        literalValuesOf: (containerPath) => {
+            const values: Record<string, unknown> = {};
+
+            for (const scalar of document.scalars) {
+                if (
+                    isChildPath(scalar.path, containerPath) &&
+                    !isOwnKey(scalar.path) &&
+                    scalar.value !== '' &&
+                    !scalar.value.includes('${')
+                ) {
+                    const quoted = format === 'json' || /['"]/.test(source[scalar.start - 1]);
+
+                    values[scalar.path[scalar.path.length - 1]] = scalar.isString
+                        ? coercePlainScalar(scalar.value, quoted)
+                        : coerceJsonLiteral(scalar.value);
+                }
+            }
+
+            return values;
+        },
+        nameOf: (nodePath) => scalarByPath.get([...nodePath, 'name'].join('\u0000'))?.value || undefined,
         path,
         typeOf: (nodePath) => scalarByPath.get([...nodePath, 'type'].join('\u0000'))?.value || undefined,
     };
@@ -954,10 +1013,8 @@ export function scanWorkflowDocument(
     if (hit) {
         result.stringValueBeforeCursor = hit.before(cursor);
     } else {
-        const keySlot = document.keySlotAt(cursor);
-
-        if (keySlot) {
-            const {containerPath, name, prefix} = keySlot;
+        if (scannedKeySlot) {
+            const {containerPath, name, prefix} = scannedKeySlot;
             const existingKeys: string[] = [];
             let skippedOwnKey = false;
 

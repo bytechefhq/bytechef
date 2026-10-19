@@ -22,6 +22,13 @@ export type ComponentCatalogType = {
         componentVersion?: number
     ): Promise<ConnectionDefinition | undefined>;
     getDefinition(componentName: string, componentVersion?: number): Promise<ComponentDefinition | undefined>;
+    getDisplayConditions(
+        componentName: string,
+        componentVersion: number | undefined,
+        operationName: string,
+        operationKind: OperationKindType,
+        parameters: Record<string, unknown>
+    ): Promise<Record<string, boolean>>;
     getOperationProperties(
         componentName: string,
         componentVersion: number | undefined,
@@ -32,12 +39,27 @@ export type ComponentCatalogType = {
 
 export type OperationKindType = 'action' | 'trigger';
 
+export type DynamicPropertiesRequestType = {
+    actionName: string;
+    componentName: string;
+    componentVersion: number;
+    connectionKey?: string;
+    lookupDependsOnPaths: string[];
+    parameters: Record<string, unknown>;
+    propertyName: string;
+    workflowNodeName: string;
+};
+
+export type DynamicPropertiesLoaderType = (request: DynamicPropertiesRequestType) => Promise<Property[]>;
+
 export interface ScriptCompletionContextI {
     components: ComponentCatalogType;
     connections: ConnectionDeclarationType[];
     input: Record<string, unknown>;
     kind: 'script';
     language: ScriptLanguageType;
+    loadDynamicProperties?: DynamicPropertiesLoaderType;
+    workflowNodeName?: string;
 }
 
 export interface CustomComponentCompletionContextI {
@@ -57,6 +79,7 @@ export interface WorkflowDefinitionCompletionContextI {
     functions: EvaluatorFunctionDefinition[];
     getNodeOutputs: () => Promise<WorkflowNodeOutput[]>;
     kind: 'workflowDefinition';
+    loadDynamicProperties?: DynamicPropertiesLoaderType;
 }
 
 export type CompletionContextType =

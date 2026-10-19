@@ -1,7 +1,7 @@
 import {filterFunctionDefinitions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/functionSuggestionUtils';
 import getOutputSchemaFromWorkflowNodeOutput from '@/pages/platform/workflow-editor/utils/getOutputSchemaFromWorkflowNodeOutput';
 
-import {buildPropertyItems, findNestedProperties} from './propertyCompletions';
+import {getPropertyCompletionItems} from './propertyCompletions';
 import {type CompletionItemDraftType, getScriptCompletions} from './scriptCompletions';
 import {buildFunctionSnippet} from './snippets';
 import {scanWorkflowDocument} from './workflowDocumentScanner';
@@ -200,18 +200,48 @@ async function getParameterKeyCompletions(
         return [];
     }
 
-    const [, componentName, componentVersion, operationName] = typeMatch;
+    const [, componentName, version, operationName] = typeMatch;
+    const componentVersion = Number(version);
     const operationKind = section === 'triggers' && parametersIndex === 2 ? 'trigger' : 'action';
+    const parametersPath = containerPath.slice(0, parametersIndex + 1);
+    const workflowNodeName = position.nameOf(nodePath);
+    const {loadDynamicProperties} = context;
 
     const properties = await context.components.getOperationProperties(
         componentName,
-        Number(componentVersion),
+        componentVersion,
         operationName,
         operationKind
     );
-    const nestedProperties = findNestedProperties(properties, containerPath.slice(parametersIndex + 1));
 
-    return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
+    return getPropertyCompletionItems({
+        existingKeys,
+        loadDisplayConditions: (parameters) =>
+            context.components.getDisplayConditions(
+                componentName,
+                componentVersion,
+                operationName,
+                operationKind,
+                parameters
+            ),
+        loadDynamicProperties:
+            loadDynamicProperties && workflowNodeName && operationKind === 'action'
+                ? (propertyName, lookupDependsOnPaths, parameters) =>
+                      loadDynamicProperties({
+                          actionName: operationName,
+                          componentName,
+                          componentVersion,
+                          lookupDependsOnPaths,
+                          parameters,
+                          propertyName,
+                          workflowNodeName,
+                      })
+                : undefined,
+        parameters: position.literalValuesOf(parametersPath),
+        presentKeys: position.keysOf(parametersPath),
+        properties,
+        propertyPath: containerPath.slice(parametersIndex + 1),
+    });
 }
 
 export async function getWorkflowDefinitionCompletions(
