@@ -145,6 +145,12 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         return tenantRepository.findTenantIds();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getTenantIdsIncludingPendingDeletion() {
+        return tenantRepository.findTenantIdsIncludingPendingDeletion();
+    }
+
     @Transactional(readOnly = true)
     public List<Tenant> getTenants() {
         return tenantRepository.findTenants();

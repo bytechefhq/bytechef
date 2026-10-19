@@ -66,6 +66,11 @@ public class SingleTenantService implements TenantService {
     }
 
     @Override
+    public List<String> getTenantIdsIncludingPendingDeletion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isMultiTenantEnabled() {
         return false;
     }

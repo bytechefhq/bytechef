@@ -78,7 +78,7 @@ class MultiTenantPgVectorLoaderIntTest {
     void testAfterPropertiesSetInstallsExtensionInPublicWhenTenantSchemaMissing() {
         TenantService tenantService = mock(TenantService.class);
 
-        when(tenantService.getTenantIds()).thenReturn(List.of(TENANT_ID));
+        when(tenantService.getTenantIdsIncludingPendingDeletion()).thenReturn(List.of(TENANT_ID));
 
         PgVectorStoreProperties properties = new PgVectorStoreProperties();
 

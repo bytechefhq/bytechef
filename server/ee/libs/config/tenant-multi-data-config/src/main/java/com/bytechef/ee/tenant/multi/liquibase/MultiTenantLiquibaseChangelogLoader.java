@@ -33,7 +33,7 @@ public class MultiTenantLiquibaseChangelogLoader implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        List<String> tenantIds = tenantService.getTenantIds();
+        List<String> tenantIds = tenantService.getTenantIdsIncludingPendingDeletion();
 
         log.info("Loading changelog for {} tenants", tenantIds.size());
 
