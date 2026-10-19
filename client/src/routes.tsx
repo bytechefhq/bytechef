@@ -106,7 +106,7 @@ const IntegrationInstanceConfigurations = lazy(
 const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
-const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
+const WorkspaceApiKeys = lazy(() => import('@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
@@ -182,12 +182,10 @@ const currentWorkspaceSettingsRoutes = {
         },
         {
             element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <WorkspaceApiKeys />
-                        </LazyLoadWrapper>
-                    </EEVersion>
+                <PrivateRoute>
+                    <LazyLoadWrapper>
+                        <WorkspaceApiKeys />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'workspace-api-keys',

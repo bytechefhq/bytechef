@@ -1,4 +1,3 @@
-import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -28,8 +27,6 @@ interface SettingsProps {
 }
 
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
-    const currentType = usePlatformTypeStore((state) => state.currentType);
-
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
@@ -46,16 +43,6 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'git-configuration') {
             return isFeatureFlagEnabled('ff-1039');
-        }
-
-        if (navItem.href === 'workspace-api-keys') {
-            return (
-                (currentType === PlatformType.AUTOMATION &&
-                    (isFeatureFlagEnabled('ff-1025') ||
-                        isFeatureFlagEnabled('ff-1039') ||
-                        isFeatureFlagEnabled('ff-4814'))) ||
-                currentType === PlatformType.EMBEDDED
-            );
         }
 
         if (navItem.href === 'mcp-server') {

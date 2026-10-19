@@ -1,4 +1,4 @@
-import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -9,7 +9,7 @@ const hoisted = vi.hoisted(() => ({
     isDeletePending: false,
 }));
 
-vi.mock('@/ee/shared/components/api-keys/hooks/useApiKeys', () => ({
+vi.mock('@/shared/components/api-keys/hooks/useApiKeys', () => ({
     default: () => ({
         handleDelete: hoisted.handleDeleteMock,
         isDeletePending: hoisted.isDeletePending,
