@@ -296,28 +296,38 @@ class AutomationA2AServerSecurityConfigurerIntTest {
     }
 
     @Test
-    void testDisabledA2aServerIsRejected() throws Exception {
+    void testDisabledA2aServerAnswersAValidApiKeyWithServerDisabled() throws Exception {
         ApiKey apiKey = seedApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
 
         stubA2aServer(A2A_SERVER_SECRET_KEY, Environment.PRODUCTION, false, true);
 
         HttpResponse<String> httpResponse = postJsonRpc(A2A_SERVER_SECRET_KEY, apiKey.getSecretKey());
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertServerDisabled(httpResponse);
 
-        verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
-        verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
+        verifyNoInteractions(a2aAgentExecutor, a2aProtocolHandler);
     }
 
     @Test
-    void testDisabledA2aServerRejectsAnonymousRequest() throws Exception {
+    void testDisabledA2aServerStillRejectsAnInvalidApiKey() throws Exception {
+        stubA2aServer(A2A_SERVER_SECRET_KEY, Environment.PRODUCTION, false, true);
+
+        HttpResponse<String> httpResponse = postJsonRpc(A2A_SERVER_SECRET_KEY, String.valueOf(TenantKey.of()));
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(httpResponse.body()).doesNotContain("server_disabled");
+
+        verifyNoInteractions(a2aAgentExecutor, a2aProtocolHandler);
+    }
+
+    @Test
+    void testDisabledA2aServerAnswersAnAnonymousRequestWithServerDisabled() throws Exception {
         stubA2aServer(A2A_SERVER_SECRET_KEY, Environment.PRODUCTION, false, false);
 
         HttpResponse<String> httpResponse = getAgentCard(A2A_SERVER_SECRET_KEY, null);
 
-        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertServerDisabled(httpResponse);
 
-        verify(a2aServerService).fetchA2aServer(A2A_SERVER_SECRET_KEY);
         verifyNoInteractions(apiKeyService, a2aAgentExecutor, a2aProtocolHandler);
     }
 
@@ -489,5 +499,17 @@ class AutomationA2AServerSecurityConfigurerIntTest {
 
             return Optional.of(a2aServer);
         });
+    }
+
+    private static void assertServerDisabled(HttpResponse<String> httpResponse) {
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
+        assertThat(httpResponse.headers()
+            .firstValue("Content-Type")).hasValueSatisfying(
+                contentType -> assertThat(contentType)
+                    .startsWith("application/json"));
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")).isEmpty();
+        assertThat(httpResponse.body()).contains("\"error\":\"server_disabled\"")
+            .contains("This A2A server is disabled");
     }
 }
