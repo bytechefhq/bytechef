@@ -4,15 +4,19 @@ import {AiHubChatI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {mockArchivedChatsDataRef, mockChatsDataRef, unarchiveMutateMock} = vi.hoisted(() => ({
+const {mockArchivedChatsDataRef, mockChatsDataRef, modelPickerPropsRef, unarchiveMutateMock} = vi.hoisted(() => ({
     mockArchivedChatsDataRef: {current: [] as AiHubChatI[]},
     mockChatsDataRef: {current: [] as AiHubChatI[]},
+    modelPickerPropsRef: {
+        current: undefined as {selectedModel: string | null; selectedProvider: string | null} | undefined,
+    },
     unarchiveMutateMock: vi.fn(),
 }));
 
@@ -33,7 +37,11 @@ vi.mock('@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard', () => ({
 }));
 
 vi.mock('@/shared/components/ai/model-picker/ModelPicker', () => ({
-    default: () => <div data-testid="model-picker" />,
+    default: (props: {selectedModel: string | null; selectedProvider: string | null}) => {
+        modelPickerPropsRef.current = props;
+
+        return <div data-testid="model-picker" />;
+    },
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
@@ -47,6 +55,20 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAiDefaultModelQuery: () => ({data: undefined}),
+    useAiProviderCatalogQuery: () => ({
+        data: {
+            aiProviderCatalog: [
+                {
+                    enabled: true,
+                    icon: null,
+                    key: 'ai.provider.anthropic',
+                    models: [{label: 'Claude Sonnet 4.6', name: 'claude-sonnet-4-6'}],
+                    name: 'Anthropic',
+                    supportsModelById: false,
+                },
+            ],
+        },
+    }),
     useCancelAiHubRunMutation: () => ({mutate: vi.fn()}),
 }));
 
@@ -109,6 +131,32 @@ describe('AiHubPanel', () => {
         expect(screen.getByTestId('ai-hub-thread')).toBeInTheDocument();
         expect(screen.getByTestId('ai-hub-composer')).toBeInTheDocument();
         expect(container.querySelector('.size-full')).not.toBeNull();
+    });
+
+    it('shows the default instead of a remembered model the catalog no longer offers', () => {
+        localStorage.clear();
+
+        writeLastUsedModel(1, 'ai.provider.anthropic', 'claude-nonexistent-9');
+
+        aiHubChatsStore.getState().setCurrentChatId(41);
+
+        renderPanel();
+
+        expect(modelPickerPropsRef.current).toMatchObject({selectedModel: null, selectedProvider: null});
+
+        localStorage.clear();
+    });
+
+    it("shows the chat's explicit pick as is", () => {
+        aiHubChatsStore.getState().setCurrentChatId(41);
+        aiHubChatsStore.getState().setChatLlmSelection(41, 'ai.provider.openAi', 'gpt-5');
+
+        renderPanel();
+
+        expect(modelPickerPropsRef.current).toMatchObject({
+            selectedModel: 'gpt-5',
+            selectedProvider: 'ai.provider.openAi',
+        });
     });
 
     it("renders the chat's title and its model picker", () => {
