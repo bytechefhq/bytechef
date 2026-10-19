@@ -555,7 +555,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getOwnedConnectionIds(
+        Set<Long> connectionIds = connectedUserConnectionMembership.getConnectionIds(
             connectedUserProject.getConnectedUserId(), environment);
 
         List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
@@ -563,7 +563,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .map(WorkflowTestConfiguration::getConnections)
             .orElse(List.of())
             .stream()
-            .filter(workflowTestConfigurationConnection -> ownedConnectionIds.contains(
+            .filter(workflowTestConfigurationConnection -> connectionIds.contains(
                 workflowTestConfigurationConnection.getConnectionId()))
             .filter(workflowTestConfigurationConnection -> {
                 Connection connection = connectionService.getConnection(
@@ -696,11 +696,12 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 "Workflow with workflowUuid: %s not exist".formatted(workflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
 
-        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getOwnedConnectionIds(
+        Set<Long> connectionIds = connectedUserConnectionMembership.getConnectionIds(
             connectedUserProject.getConnectedUserId(), environment);
 
-        if (!ownedConnectionIds.contains(connectionId)) {
-            throw new AccessDeniedException("Connection %s is not owned by the connected user".formatted(connectionId));
+        if (!connectionIds.contains(connectionId)) {
+            throw new AccessDeniedException(
+                "Connection %s is neither owned by nor shared with the connected user".formatted(connectionId));
         }
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(

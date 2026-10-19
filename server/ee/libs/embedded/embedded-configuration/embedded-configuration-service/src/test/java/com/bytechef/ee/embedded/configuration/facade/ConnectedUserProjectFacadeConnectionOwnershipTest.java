@@ -45,8 +45,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * A connected user may bind and deploy only the connections they own: binding refuses a foreign connection, and
- * publishing drops any foreign connection left in the workflow's test configuration.
+ * A connected user may bind and deploy only the connections they own or an admin shared with every connected user:
+ * binding refuses a foreign connection, and publishing drops any foreign connection left in the workflow's test
+ * configuration.
  *
  * @version ee
  *
@@ -60,6 +61,7 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
     private static final long FOREIGN_CONNECTION_ID = 99L;
     private static final long OWNED_CONNECTION_ID = 11L;
     private static final long PROJECT_ID = 3L;
+    private static final long SHARED_CONNECTION_ID = 12L;
     private static final String WORKFLOW_ID = "workflow-id";
     private static final String WORKFLOW_UUID = "workflow-uuid";
 
@@ -102,7 +104,7 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
     }
 
     @Test
-    void testBindRefusesAConnectionTheConnectedUserDoesNotOwn() {
+    void testBindRefusesAConnectionTheConnectedUserNeitherOwnsNorIsSharedWith() {
         givenConnectedUserWorkflow();
 
         assertThatThrownBy(
@@ -126,7 +128,18 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
     }
 
     @Test
-    void testPublishDeploysOnlyConnectionsTheConnectedUserOwns() {
+    void testBindSavesAConnectionAnAdminSharedWithEveryConnectedUser() {
+        givenConnectedUserWorkflow();
+
+        connectedUserProjectFacade.updateWorkflowConfigurationConnection(
+            EXTERNAL_USER_ID, WORKFLOW_UUID, "slack_1", "slack", SHARED_CONNECTION_ID, Environment.PRODUCTION);
+
+        verify(workflowTestConfigurationFacade).saveWorkflowTestConfigurationConnection(
+            WORKFLOW_ID, "slack_1", "slack", SHARED_CONNECTION_ID, Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testPublishDeploysOnlyConnectionsTheConnectedUserOwnsOrIsSharedWith() {
         givenConnectedUserWorkflow();
 
         ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
@@ -139,7 +152,8 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
         workflowTestConfiguration.setConnections(
             List.of(
                 new WorkflowTestConfigurationConnection(OWNED_CONNECTION_ID, "slack", "slack_1"),
-                new WorkflowTestConfigurationConnection(FOREIGN_CONNECTION_ID, "slack", "slack_2")));
+                new WorkflowTestConfigurationConnection(FOREIGN_CONNECTION_ID, "slack", "slack_2"),
+                new WorkflowTestConfigurationConnection(SHARED_CONNECTION_ID, "slack", "slack_3")));
 
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
             WORKFLOW_ID, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(workflowTestConfiguration));
@@ -149,6 +163,7 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
         connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
 
         when(connectionService.getConnection(OWNED_CONNECTION_ID)).thenReturn(connection);
+        when(connectionService.getConnection(SHARED_CONNECTION_ID)).thenReturn(connection);
         when(projectFacade.publishProject(PROJECT_ID, "v2", false)).thenReturn(3);
 
         connectedUserProjectFacade.publishProjectWorkflow(EXTERNAL_USER_ID, WORKFLOW_UUID, "v2", null);
@@ -162,7 +177,7 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
 
         assertThat(connectionsCaptor.getValue())
             .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
-            .containsExactly(OWNED_CONNECTION_ID);
+            .containsExactlyInAnyOrder(OWNED_CONNECTION_ID, SHARED_CONNECTION_ID);
 
         verify(connectionService, never()).getConnection(FOREIGN_CONNECTION_ID);
     }
@@ -173,7 +188,7 @@ class ConnectedUserProjectFacadeConnectionOwnershipTest {
                 .thenReturn(new ConnectedUserProject(CONNECTED_USER_ID, 1L, PROJECT_ID, 0));
         when(projectWorkflowService.fetchLastProjectWorkflowId(PROJECT_ID, WORKFLOW_UUID))
             .thenReturn(Optional.of(WORKFLOW_ID));
-        when(connectedUserConnectionMembership.getOwnedConnectionIds(CONNECTED_USER_ID, Environment.PRODUCTION))
-            .thenReturn(Set.of(OWNED_CONNECTION_ID));
+        when(connectedUserConnectionMembership.getConnectionIds(CONNECTED_USER_ID, Environment.PRODUCTION))
+            .thenReturn(Set.of(OWNED_CONNECTION_ID, SHARED_CONNECTION_ID));
     }
 }
