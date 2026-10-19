@@ -33,6 +33,8 @@ public class UserErrorType extends AbstractErrorType {
     public static final UserErrorType INVALID_EMAIL = new UserErrorType(106);
     public static final UserErrorType ORGANIZATION_DELETION_CONFIRMATION = new UserErrorType(107);
     public static final UserErrorType ORGANIZATION_DELETION_NOT_AVAILABLE = new UserErrorType(108);
+    public static final UserErrorType LAST_ADMIN_DELETION = new UserErrorType(109);
+    public static final UserErrorType SELF_DELETION = new UserErrorType(110);
 
     private UserErrorType(int errorKey) {
         super(User.class, errorKey);

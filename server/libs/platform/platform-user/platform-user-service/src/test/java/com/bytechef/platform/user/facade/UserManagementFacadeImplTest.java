@@ -28,14 +28,19 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
+import com.bytechef.platform.user.exception.LastAdminDeletionException;
+import com.bytechef.platform.user.exception.SelfDeletionException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Unit test for the {@link UserManagementFacadeImpl} invite orchestration that previously lived in
@@ -50,6 +55,11 @@ class UserManagementFacadeImplTest {
     private TenantService tenantService;
     private UserService userService;
     private UserManagementFacadeImpl userManagementFacade;
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @BeforeEach
     void setUp() {
@@ -120,6 +130,58 @@ class UserManagementFacadeImplTest {
             .isInstanceOf(EmailAlreadyUsedException.class);
 
         verify(userService, never()).registerUser(any(), anyString());
+    }
+
+    @Test
+    void testDeleteUserRejectsSelf() {
+        authenticateAs("admin");
+
+        assertThatThrownBy(() -> userManagementFacade.deleteUser("admin"))
+            .isInstanceOf(SelfDeletionException.class);
+
+        verify(userService, never()).delete(anyString());
+    }
+
+    @Test
+    void testDeleteUserRejectsLastAdmin() {
+        authenticateAs("other");
+
+        when(userService.getUsersByAuthorityName("ROLE_ADMIN"))
+            .thenReturn(List.of(createUser("admin", "a@example.com")));
+
+        assertThatThrownBy(() -> userManagementFacade.deleteUser("admin"))
+            .isInstanceOf(LastAdminDeletionException.class);
+
+        verify(userService, never()).delete(anyString());
+    }
+
+    @Test
+    void testDeleteUserAllowsAdminWhenAnotherAdminExists() {
+        authenticateAs("admin");
+
+        when(userService.getUsersByAuthorityName("ROLE_ADMIN"))
+            .thenReturn(List.of(createUser("admin", "a@example.com"), createUser("second", "s@example.com")));
+
+        userManagementFacade.deleteUser("second");
+
+        verify(userService).delete("second");
+    }
+
+    @Test
+    void testDeleteUserAllowsNonAdmin() {
+        authenticateAs("admin");
+
+        when(userService.getUsersByAuthorityName("ROLE_ADMIN"))
+            .thenReturn(List.of(createUser("admin", "a@example.com")));
+
+        userManagementFacade.deleteUser("member");
+
+        verify(userService).delete("member");
+    }
+
+    private void authenticateAs(String login) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken(login, "n/a", List.of()));
     }
 
     private Authority createAuthority(String name) {

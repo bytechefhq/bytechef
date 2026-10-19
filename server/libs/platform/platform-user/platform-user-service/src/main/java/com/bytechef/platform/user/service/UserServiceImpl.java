@@ -43,6 +43,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -601,6 +602,18 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<User> getAllActiveUsers(Pageable pageable) {
         return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable);
+    }
+
+    @Override
+    public List<User> getUsersByAuthorityName(String authorityName) {
+        return authorityRepository.findByName(authorityName)
+            .map(authority -> userRepository.findAll()
+                .stream()
+                .filter(User::isActivated)
+                .filter(user -> user.getAuthorityIds()
+                    .contains(authority.getId()))
+                .toList())
+            .orElse(List.of());
     }
 
     @Override
