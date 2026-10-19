@@ -23,6 +23,21 @@ import {Link2Icon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Navigate} from 'react-router-dom';
 
+const toCreateOrganizationConnectionVariables = (connection: ConnectionI) => ({
+    input: {
+        authorizationType: (connection.authorizationType || undefined) as AuthorizationType | undefined,
+        componentName: connection.componentName ?? '',
+        connectionVersion: connection.connectionVersion ?? 1,
+        environmentId: Number(connection.environmentId ?? 0),
+        name: connection.name ?? '',
+        parameters: (connection.parameters ?? {}) as Record<string, unknown>,
+        tags: (connection.tags ?? []).map((tag) => ({
+            id: tag.id == null ? undefined : String(tag.id),
+            name: tag.name,
+        })),
+    },
+});
+
 const OrganizationConnections = () => {
     // All hooks must run unconditionally (rules of hooks). The EE gate is applied right before the
     // render-tree decision below; the gate is defense-in-depth on top of the server-side guard in
@@ -68,21 +83,12 @@ const OrganizationConnections = () => {
 
         return {
             ...mutation,
-            mutate: (connection: ConnectionI) =>
-                mutation.mutate({
-                    input: {
-                        authorizationType: (connection.authorizationType || undefined) as AuthorizationType | undefined,
-                        componentName: connection.componentName ?? '',
-                        connectionVersion: connection.connectionVersion ?? 1,
-                        environmentId: Number(connection.environmentId ?? 0),
-                        name: connection.name ?? '',
-                        parameters: (connection.parameters ?? {}) as Record<string, unknown>,
-                        tags: (connection.tags ?? []).map((tag) => ({
-                            id: tag.id == null ? undefined : String(tag.id),
-                            name: tag.name,
-                        })),
-                    },
-                }),
+            mutate: (connection: ConnectionI) => mutation.mutate(toCreateOrganizationConnectionVariables(connection)),
+            mutateAsync: async (connection: ConnectionI) => {
+                const result = await mutation.mutateAsync(toCreateOrganizationConnectionVariables(connection));
+
+                return Number(result.createOrganizationConnection);
+            },
         } as unknown as UseMutationResult<number, Error, ConnectionI, unknown>;
     };
 
