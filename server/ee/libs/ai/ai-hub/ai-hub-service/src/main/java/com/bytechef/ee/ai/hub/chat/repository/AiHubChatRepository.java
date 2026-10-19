@@ -63,10 +63,8 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
     Optional<AiHubChat> findByThreadId(String threadId);
 
     /**
-     * Batch counterpart of {@link #findByThreadId}, for the {@code /status} poll. That endpoint is handed every thread
-     * id the sidebar knows about on a 20-second interval, and resolving them one at a time made the poll's cost N
-     * round-trips per tick where the {@code /in-flight} endpoint it replaced cost none. Rows the caller may not view
-     * are filtered afterwards, in the service, by the same access policy the single-row lookup applies —
+     * Batch counterpart of {@link #findByThreadId}: resolves many thread ids in one query. Rows the caller may not view
+     * are filtered afterwards, in the service, by the same access policy the single-row lookup applies.
      * {@code thread_id} carries a global UNIQUE constraint, so this returns at most one row per id.
      */
     List<AiHubChat> findAllByThreadIdIn(Collection<String> threadIds);
