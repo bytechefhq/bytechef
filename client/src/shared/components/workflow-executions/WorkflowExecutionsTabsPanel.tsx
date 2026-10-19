@@ -14,6 +14,7 @@ import {useCallback, useMemo, useState} from 'react';
 
 interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
+    detailsHidden?: boolean;
     dialogOpen: boolean;
     isEditorEnvironment?: boolean;
     job?: Job;
@@ -28,8 +29,17 @@ interface WorkflowExecutionsTabsPanelProps {
     triggerExecution?: TriggerExecution;
 }
 
+const WorkflowExecutionDetailsHiddenMessage = () => (
+    <div className="flex items-center justify-center p-4">
+        <span className="text-sm text-muted-foreground">
+            You do not have permission to see the inputs, outputs and logs of this run.
+        </span>
+    </div>
+);
+
 const WorkflowExecutionsTabsPanel = ({
     activeTab,
+    detailsHidden = false,
     dialogOpen,
     isEditorEnvironment = false,
     job,
@@ -189,7 +199,7 @@ const WorkflowExecutionsTabsPanel = ({
 
                 {activeTab === 'logs' && <div className="ml-6 min-w-0 flex-1" ref={setLogsToolbarContainer} />}
 
-                {hasDialogContent && (
+                {hasDialogContent && !detailsHidden && (
                     <div className="flex items-center gap-x-2">
                         <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
                             <DialogTrigger asChild>
@@ -234,7 +244,9 @@ const WorkflowExecutionsTabsPanel = ({
             <ScrollArea className="min-h-0 flex-1">
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
-                        {selectedItemDataLoading ? (
+                        {detailsHidden ? (
+                            <WorkflowExecutionDetailsHiddenMessage />
+                        ) : selectedItemDataLoading ? (
                             <div className="flex items-center justify-center p-4">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
@@ -248,7 +260,9 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="p-3" value="output">
-                        {selectedItemDataLoading ? (
+                        {detailsHidden ? (
+                            <WorkflowExecutionDetailsHiddenMessage />
+                        ) : selectedItemDataLoading ? (
                             <div className="flex items-center justify-center p-4">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
@@ -272,16 +286,20 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="h-full p-3" value="logs">
-                        {(job?.id || triggerExecution?.id) && (
-                            <WorkflowExecutionLogsContent
-                                isEditorEnvironment={isEditorEnvironment}
-                                jobId={job?.id}
-                                taskExecutionId={
-                                    selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
-                                }
-                                toolbarContainer={logsToolbarContainer}
-                                triggerExecutionId={isTriggerExecution ? triggerExecution?.id : undefined}
-                            />
+                        {detailsHidden ? (
+                            <WorkflowExecutionDetailsHiddenMessage />
+                        ) : (
+                            (job?.id || triggerExecution?.id) && (
+                                <WorkflowExecutionLogsContent
+                                    isEditorEnvironment={isEditorEnvironment}
+                                    jobId={job?.id}
+                                    taskExecutionId={
+                                        selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
+                                    }
+                                    toolbarContainer={logsToolbarContainer}
+                                    triggerExecutionId={isTriggerExecution ? triggerExecution?.id : undefined}
+                                />
+                            )
                         )}
                     </TabsContent>
                 </div>

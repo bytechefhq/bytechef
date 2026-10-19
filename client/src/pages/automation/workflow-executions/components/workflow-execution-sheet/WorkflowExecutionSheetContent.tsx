@@ -1,6 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
     TruncatedLabel,
@@ -12,6 +13,7 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
@@ -61,12 +63,16 @@ const WorkflowExecutionSheetContent = ({
     triggerExecution,
     workflowExecutionId,
 }: WorkflowExecutionSheetContentProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canViewExecutionDetails = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
             {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
-            isTaskSelected,
+            isTaskSelected && canViewExecutionDetails,
             false
         );
 
@@ -173,6 +179,7 @@ const WorkflowExecutionSheetContent = ({
                     <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={74} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
+                            detailsHidden={!canViewExecutionDetails}
                             dialogOpen={dialogOpen}
                             job={job}
                             onSeeExecutionsClick={handleSeeExecutions}
