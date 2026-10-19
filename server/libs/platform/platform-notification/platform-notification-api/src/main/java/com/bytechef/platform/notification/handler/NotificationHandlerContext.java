@@ -31,6 +31,7 @@ public class NotificationHandlerContext {
             notificationHandlerContext.eventType = eventType;
             notificationHandlerContext.jobId = jobId;
             notificationHandlerContext.jobName = jobName;
+            notificationHandlerContext.suppressedCount = suppressedCount;
 
             return notificationHandlerContext;
         }
@@ -53,9 +54,16 @@ public class NotificationHandlerContext {
             return this;
         }
 
+        public Builder suppressedCount(long suppressedCount) {
+            this.suppressedCount = suppressedCount;
+
+            return this;
+        }
+
         private NotificationEvent.Type eventType;
         private Long jobId;
         private String jobName;
+        private long suppressedCount;
     }
 
     public NotificationEvent.Type getEventType() {
@@ -70,6 +78,10 @@ public class NotificationHandlerContext {
         return jobName;
     }
 
+    public long getSuppressedCount() {
+        return suppressedCount;
+    }
+
     private NotificationHandlerContext() {
 
     }
@@ -77,5 +89,6 @@ public class NotificationHandlerContext {
     private NotificationEvent.Type eventType;
     private Long jobId;
     private String jobName;
+    private long suppressedCount;
 
 }

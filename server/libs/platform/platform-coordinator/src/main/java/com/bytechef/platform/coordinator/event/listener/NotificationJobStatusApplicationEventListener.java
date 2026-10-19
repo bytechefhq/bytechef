@@ -22,6 +22,7 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.coordinator.notification.NotificationThrottle;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.handler.NotificationHandler;
@@ -32,30 +33,38 @@ import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.OptionalLong;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Matija Petanjek
  */
 public class NotificationJobStatusApplicationEventListener implements ApplicationEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(NotificationJobStatusApplicationEventListener.class);
+
     private final @Nullable JobExecutionCounter jobExecutionCounter;
     private final JobService jobService;
     private final NotificationHandlerRegistry notificationHandlerRegistry;
     private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
+    private final NotificationThrottle notificationThrottle;
 
     @SuppressFBWarnings("EI")
     public NotificationJobStatusApplicationEventListener(
         @Nullable JobExecutionCounter jobExecutionCounter, JobService jobService,
         NotificationHandlerRegistry notificationHandlerRegistry,
-        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService,
+        NotificationThrottle notificationThrottle) {
 
         this.jobExecutionCounter = jobExecutionCounter;
         this.jobService = jobService;
         this.notificationHandlerRegistry = notificationHandlerRegistry;
         this.notificationService = notificationService;
         this.notificationSenderRegistry = notificationSenderRegistry;
+        this.notificationThrottle = notificationThrottle;
     }
 
     @SuppressWarnings({
@@ -75,12 +84,22 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
             NotificationEvent.Type eventType =
                 NotificationEvent.Type.of(NotificationEvent.Source.JOB, status.toString());
 
-            NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
-                eventType, job);
-
             List<Notification> notifications = notificationService.getNotifications(eventType);
 
             for (Notification notification : notifications) {
+                OptionalLong suppressedCount = getSuppressedCount(notification, job, eventType);
+
+                if (suppressedCount.isEmpty()) {
+                    log.debug(
+                        "Suppressed {} notification id={} for workflow id={}, job id={}", eventType,
+                        notification.getId(), job.getWorkflowId(), job.getId());
+
+                    continue;
+                }
+
+                NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
+                    eventType, job, suppressedCount.getAsLong());
+
                 NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
                     notification.getType());
 
@@ -92,11 +111,22 @@ public class NotificationJobStatusApplicationEventListener implements Applicatio
         }
     }
 
-    private NotificationHandlerContext getNotificationHandlerContext(NotificationEvent.Type eventType, Job job) {
+    private OptionalLong getSuppressedCount(Notification notification, Job job, NotificationEvent.Type eventType) {
+        if (eventType != NotificationEvent.Type.JOB_FAILED) {
+            return OptionalLong.of(0);
+        }
+
+        return notificationThrottle.tryAcquire(notification.getId(), job.getWorkflowId(), eventType);
+    }
+
+    private NotificationHandlerContext getNotificationHandlerContext(
+        NotificationEvent.Type eventType, Job job, long suppressedCount) {
+
         return new NotificationHandlerContext.Builder()
             .eventType(eventType)
             .jobId(job.getId())
             .jobName(job.getLabel())
+            .suppressedCount(suppressedCount)
             .build();
     }
 

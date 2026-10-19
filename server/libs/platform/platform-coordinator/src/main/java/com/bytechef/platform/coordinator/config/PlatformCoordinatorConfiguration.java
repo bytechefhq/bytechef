@@ -19,12 +19,14 @@ package com.bytechef.platform.coordinator.config;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.coordinator.notification.NotificationThrottle;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
@@ -76,11 +78,13 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
-        Optional<JobExecutionCounter> jobExecutionCounter) {
+        ApplicationProperties applicationProperties, Optional<JobExecutionCounter> jobExecutionCounter) {
+
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
 
         return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService);
+            notificationService, new NotificationThrottle(mail.getFailureNotificationThrottleWindow()));
     }
 
     @Bean
