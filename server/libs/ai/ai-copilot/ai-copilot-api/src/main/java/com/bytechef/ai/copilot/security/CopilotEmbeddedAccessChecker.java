@@ -16,10 +16,14 @@
 
 package com.bytechef.ai.copilot.security;
 
+import org.springframework.security.core.Authentication;
+
 /**
  * @author Ivica Cardic
  */
 public interface CopilotEmbeddedAccessChecker {
 
     void checkIntegrationWorkflowAccess(String workflowId);
+
+    boolean isConnectedUser(Authentication authentication);
 }

@@ -9,8 +9,10 @@ package com.bytechef.ee.embedded.configuration.copilot;
 
 import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,5 +34,10 @@ public class EmbeddedCopilotAccessChecker implements CopilotEmbeddedAccessChecke
     @Override
     public void checkIntegrationWorkflowAccess(String workflowId) {
         integrationWorkflowFacade.getIntegrationWorkflow(workflowId);
+    }
+
+    @Override
+    public boolean isConnectedUser(Authentication authentication) {
+        return authentication instanceof ConnectedUserAuthentication;
     }
 }

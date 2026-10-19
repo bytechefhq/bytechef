@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -84,6 +86,13 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
 
     @Override
     public SseEmitter chat(String agentId, AgUiParameters agUiParameters) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (copilotEmbeddedAccessChecker != null &&
+            copilotEmbeddedAccessChecker.isConnectedUser(securityContext.getAuthentication())) {
+            throw new AccessDeniedException("Connected users cannot use the Copilot");
+        }
+
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
 

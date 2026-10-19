@@ -202,6 +202,42 @@ class CopilotChatFacadeTest {
     }
 
     @Test
+    void testChatRejectsAConnectedUser() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            "someone@localhost.com", null, List.of());
+
+        securityContext.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        UserService userService = mock(UserService.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(7L);
+        when(userService.fetchUserByLogin("someone@localhost.com")).thenReturn(Optional.of(user));
+
+        LocalAgent agent = localAgent("workflow_editor_ask");
+
+        CopilotEmbeddedAccessChecker copilotEmbeddedAccessChecker = mock(CopilotEmbeddedAccessChecker.class);
+
+        when(copilotEmbeddedAccessChecker.isConnectedUser(authentication)).thenReturn(true);
+
+        CopilotChatFacadeImpl facadeWithUsers = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.empty(), Optional.empty(), Optional.of(userService),
+            Optional.of(copilotEmbeddedAccessChecker));
+
+        AgUiParameters parameters = agUiParameters("ASK");
+
+        assertThatThrownBy(() -> facadeWithUsers.chat("workflow_editor", parameters))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(agUiService, never()).runAgent(any(), any());
+        verify(userService, never()).fetchUserByLogin(any());
+    }
+
+    @Test
     void testChatRejectsARunWithoutAnAuthenticatedUser() {
         SecurityContextHolder.clearContext();
 

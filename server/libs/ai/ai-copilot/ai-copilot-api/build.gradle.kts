@@ -12,6 +12,7 @@ dependencies {
     implementation("org.springframework:spring-webmvc")
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
     implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
+    implementation("org.springframework.security:spring-security-core")
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
