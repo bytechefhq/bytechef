@@ -170,4 +170,34 @@ describe('AccountProfileDeleteOrganization', () => {
         expect(hoisted.logoutMock).not.toHaveBeenCalled();
         expect(hoisted.clearAuthenticationMock).not.toHaveBeenCalled();
     });
+
+    it('clears the confirmation and password when the dialog is cancelled', async () => {
+        render(<AccountProfileDeleteOrganization />);
+
+        await openDialog();
+
+        await userEvent.type(screen.getByLabelText(/to confirm/), 'admin@localhost.com');
+        await userEvent.type(screen.getByLabelText('Password'), 'secret');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+        await openDialog();
+
+        expect(screen.getByLabelText(/to confirm/)).toHaveValue('');
+        expect(screen.getByLabelText('Password')).toHaveValue('');
+    });
+
+    it('still asks for the password when the linked accounts cannot be loaded', async () => {
+        fetchMock.mockImplementationOnce(() => Promise.reject(new Error('network down')));
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/account/linked-accounts'));
+
+        await openDialog();
+
+        expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    });
 });
