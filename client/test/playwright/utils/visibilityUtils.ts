@@ -1,15 +1,23 @@
 import {APIRequestContext, APIResponse, expect, request} from '@playwright/test';
 
 import getRandomString from './getRandomString';
-import {type BuiltInRoleType, type CustomRoleI, RBAC_BASE_URL, type RbacWorkspaceI, type RoleUserI} from './rbacUtils';
+import {
+    type BuiltInRoleType,
+    type CustomRoleI,
+    RBAC_BASE_URL,
+    type RbacWorkspaceI,
+    type RoleUserI,
+    createAccount as createRbacAccount,
+    fetchUserId,
+} from './rbacUtils';
+
+export {fetchUserId};
 
 export const INTERNAL = '/api/automation/internal';
 
+const SERVER_URL = process.env.PLAYWRIGHT_SERVER_URL || 'http://localhost:9555';
+
 export const HTTP_CLIENT_WORKFLOW_NODE = 'httpClient_1';
-
-const MAILPIT_URL = process.env.PLAYWRIGHT_MAILPIT_URL || 'http://localhost:8025';
-
-const ROLE_USER_PASSWORD = 'Playwright-Role-1';
 
 export type VisibilityType = 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE';
 
@@ -83,40 +91,6 @@ export async function internalApi<T>(
     return (text ? JSON.parse(text) : undefined) as T;
 }
 
-async function readClaimKey(email: string): Promise<string> {
-    const mailpitContext = await request.newContext({baseURL: MAILPIT_URL});
-
-    try {
-        let claimKey = '';
-
-        await expect(async () => {
-            const searchResponse = await mailpitContext.get('/api/v1/search', {
-                params: {limit: '1', query: `to:"${email}"`},
-            });
-
-            const search = await searchResponse.json();
-
-            const messageId = search.messages?.[0]?.ID;
-
-            expect(messageId, `no claim mail for ${email} yet`).toBeTruthy();
-
-            const messageResponse = await mailpitContext.get(`/api/v1/message/${messageId}`);
-
-            const message = await messageResponse.json();
-
-            const match = `${message.HTML} ${message.Text}`.match(/password-reset\/finish\?key=([A-Za-z0-9]+)/);
-
-            expect(match, `no claim link in the mail to ${email}`).toBeTruthy();
-
-            claimKey = match![1];
-        }).toPass({timeout: 30000});
-
-        return claimKey;
-    } finally {
-        await mailpitContext.dispose();
-    }
-}
-
 export async function createUserApiContext(email: string, password: string): Promise<APIRequestContext> {
     const apiContext = await request.newContext({baseURL: RBAC_BASE_URL});
 
@@ -176,54 +150,11 @@ export function expectNoGraphQlErrors(response: GraphQlResponseI<unknown>): void
     expect(response.errors, JSON.stringify(response.errors)).toBeUndefined();
 }
 
-async function claimAccount(email: string): Promise<void> {
-    const claimKey = await readClaimKey(email);
-
-    const anonymousContext = await request.newContext({baseURL: RBAC_BASE_URL});
-
-    try {
-        const xsrfToken = await getXsrfToken(anonymousContext);
-
-        const response = await anonymousContext.post('/api/account/reset-password/finish', {
-            data: {key: claimKey, newPassword: ROLE_USER_PASSWORD},
-            headers: {'X-XSRF-TOKEN': xsrfToken},
-        });
-
-        expect(response.ok(), `claiming ${email} failed: ${response.status()}`).toBeTruthy();
-    } finally {
-        await anonymousContext.dispose();
-    }
-}
-
-export async function fetchUserId(apiContext: APIRequestContext, login: string): Promise<string> {
-    const data = await graphql<{user: {id: string} | null}>(
-        apiContext,
-        'query User($login: String!) { user(login: $login) { id } }',
-        {login}
-    );
-
-    expect(data.user, `no user with login ${login}`).toBeTruthy();
-
-    return data.user!.id;
-}
-
 export async function createAccount(
     adminApi: APIRequestContext,
     authority: 'ROLE_ADMIN' | 'ROLE_USER' = 'ROLE_USER'
 ): Promise<RoleUserI> {
-    const login = `vis_account_${getRandomString()}`;
-
-    const email = `${login}@localhost.com`;
-
-    await graphql(
-        adminApi,
-        'mutation InviteUser($email: String!, $role: String!) { inviteUser(email: $email, role: $role) }',
-        {email, role: authority}
-    );
-
-    await claimAccount(email);
-
-    return {email, login, password: ROLE_USER_PASSWORD, role: authority, userId: await fetchUserId(adminApi, login)};
+    return createRbacAccount(adminApi, RBAC_BASE_URL, authority);
 }
 
 export async function createWorkspaceMember(
@@ -575,7 +506,7 @@ export function httpClientWorkflowDefinition(triggerType = 'manual/v1/manual'): 
             {
                 label: 'HTTP Client',
                 name: HTTP_CLIENT_WORKFLOW_NODE,
-                parameters: {uri: 'http://localhost:9555/actuator/health'},
+                parameters: {uri: `${SERVER_URL}/actuator/health`},
                 type: 'httpClient/v1/get',
             },
         ],
