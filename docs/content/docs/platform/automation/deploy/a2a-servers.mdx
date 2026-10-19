@@ -138,7 +138,7 @@ The secret key in the URL identifies the server and the tenant that owns it. On 
 In both modes a request may name an environment in the `X-ENVIRONMENT` header, but it must be the server's own;
 another one is rejected with `401`.
 
-A disabled server, or an unknown secret key, answers every request with `401`.
+An unknown secret key is answered with `401`. A disabled server answers a request with a valid API key - or any request, when it does not require authentication - with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`; a request without a valid API key still gets `401`.
 
 ---
 
