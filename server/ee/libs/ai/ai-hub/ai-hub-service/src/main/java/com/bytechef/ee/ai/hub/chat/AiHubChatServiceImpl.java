@@ -611,6 +611,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     public void delete(long chatId, long requesterWorkspaceId, long requesterUserId) {
         AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
 
+        inFlightRunRegistry.cancel(chat.getThreadId());
+
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
