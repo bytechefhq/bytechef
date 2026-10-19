@@ -1027,6 +1027,7 @@ export function scanWorkflowDocument(
                     containerPath.some((segment, index) => scalar.path[index] !== segment) ||
                     isOwnKey(scalar.path) ||
                     scalar.value === '' ||
+                    scalar.value.startsWith('=') ||
                     scalar.value.includes('${')
                 ) {
                     continue;
