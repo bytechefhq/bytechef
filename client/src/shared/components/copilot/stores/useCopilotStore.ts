@@ -199,7 +199,7 @@ export const useCopilotStore = create<CopilotStateI>()(
             set((state) => {
                 return {
                     ...state,
-                    messages: [...state.messages, message],
+                    messages: [...state.messages, message.id ? message : {...message, id: generateRandomId()}],
                 };
             }),
         appendToLastAssistantMessage: (text: string) =>
@@ -223,7 +223,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                 }
 
                 // No assistant message for the current turn yet; create one.
-                messages.push({role: 'assistant', content: text} as ThreadMessageLike);
+                messages.push({role: 'assistant', content: text, id: generateRandomId()} as ThreadMessageLike);
 
                 return {...state, messages};
             }),
