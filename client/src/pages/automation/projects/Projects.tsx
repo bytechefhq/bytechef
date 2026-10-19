@@ -77,8 +77,8 @@ const Projects = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
 
-    const currentCategoryId = categoryId ? parseInt(categoryId) : undefined;
-    const currentTagId = tagId ? parseInt(tagId) : undefined;
+    const currentCategoryId = categoryId ? Number.parseInt(categoryId) : undefined;
+    const currentTagId = tagId ? Number.parseInt(tagId) : undefined;
 
     const filterData = {
         id: currentCategoryId ?? currentTagId,
