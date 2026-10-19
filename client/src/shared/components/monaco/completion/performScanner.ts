@@ -190,10 +190,10 @@ function skipString(source: string, index: number, end: number): number {
     return position;
 }
 
-function braceBodyContains(source: string, bodyStart: number, cursorOffset: number, language: ScriptLanguageType) {
-    let depth = 1;
+function collectOpenBraceBodyStarts(source: string, cursorOffset: number, language: ScriptLanguageType): Set<number> {
+    const openBodyStarts: number[] = [];
 
-    for (let index = bodyStart; index < cursorOffset; index++) {
+    for (let index = 0; index < cursorOffset; index++) {
         const character = source.charAt(index);
 
         if (character === '"' || character === "'" || (character === '`' && language === 'javascript')) {
@@ -211,17 +211,13 @@ function braceBodyContains(source: string, bodyStart: number, cursorOffset: numb
         }
 
         if (character === '{') {
-            depth++;
+            openBodyStarts.push(index + 1);
         } else if (character === '}') {
-            depth--;
-
-            if (depth === 0) {
-                return false;
-            }
+            openBodyStarts.pop();
         }
     }
 
-    return true;
+    return new Set(openBodyStarts);
 }
 
 function expressionBodyContains(source: string, bodyStart: number, cursorOffset: number): boolean {
@@ -338,14 +334,19 @@ function rubyBodyContains(source: string, bodyStart: number, cursorOffset: numbe
     return true;
 }
 
-function headContainsCursor(source: string, head: FunctionHeadI, cursorOffset: number, language: ScriptLanguageType) {
+function headContainsCursor(
+    source: string,
+    head: FunctionHeadI,
+    cursorOffset: number,
+    openBraceBodyStarts: () => Set<number>
+) {
     if (head.bodyStart > cursorOffset) {
         return false;
     }
 
     switch (head.bodyKind) {
         case 'braces':
-            return braceBodyContains(source, head.bodyStart, cursorOffset, language);
+            return openBraceBodyStarts().has(head.bodyStart);
         case 'expression':
             return expressionBodyContains(source, head.bodyStart, cursorOffset);
         case 'indentation':
@@ -370,10 +371,18 @@ function collectHeads(source: string, language: ScriptLanguageType): FunctionHea
 }
 
 function findContainingHeads(source: string, cursorOffset: number, language: ScriptLanguageType): FunctionHeadI[] {
+    let openBraceBodyStarts: Set<number> | undefined;
+
+    const getOpenBraceBodyStarts = () => {
+        openBraceBodyStarts ??= collectOpenBraceBodyStarts(source, cursorOffset, language);
+
+        return openBraceBodyStarts;
+    };
+
     return collectHeads(source, language)
         .filter((head) => head.start < cursorOffset)
         .sort((first, second) => second.start - first.start || second.bodyStart - first.bodyStart)
-        .filter((head) => headContainsCursor(source, head, cursorOffset, language));
+        .filter((head) => headContainsCursor(source, head, cursorOffset, getOpenBraceBodyStarts));
 }
 
 function findEnclosingHead(
