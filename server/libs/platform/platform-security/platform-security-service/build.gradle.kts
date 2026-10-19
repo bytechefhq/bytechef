@@ -10,9 +10,15 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation(project(":server:libs:config:jdbc-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

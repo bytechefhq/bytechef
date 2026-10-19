@@ -108,6 +108,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(long id) {
+        return apiKeyRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApiKey getApiKey(long id) {
         return apiKeyRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Api key not found for id: " + id));
