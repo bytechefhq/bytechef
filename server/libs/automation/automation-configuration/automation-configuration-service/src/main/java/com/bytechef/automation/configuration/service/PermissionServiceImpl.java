@@ -33,6 +33,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -217,5 +218,38 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void evictAllWorkspaceScopeCache() {
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope) {
+        return false;
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope, Environment environment) {
+        return false;
+    }
+
+    @Override
+    public boolean hasEmbeddedScopeInEveryEnvironment(String scope) {
+        return false;
+    }
+
+    @Override
+    public boolean isEmbeddedMember() {
+        return false;
+    }
+
+    @Override
+    public Set<String> getMyEmbeddedScopes(@Nullable Environment environment) {
+        return Set.of();
+    }
+
+    @Override
+    public void evictEmbeddedScopeCache(long userId) {
+    }
+
+    @Override
+    public void evictAllEmbeddedScopeCache() {
     }
 }

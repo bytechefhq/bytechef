@@ -247,6 +247,40 @@ class AutomationMethodSecurityExpressionRootTest {
     }
 
     @Test
+    void testHasEmbeddedScopeDelegatesToThePermissionService() {
+        when(permissionService.hasEmbeddedScope(SCOPE)).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(SCOPE, Environment.PRODUCTION)).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScope(SCOPE)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, Environment.PRODUCTION)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, Environment.STAGING)).isFalse();
+        assertThat(root.hasEmbeddedScopeInEveryEnvironment(SCOPE)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, (long) Environment.PRODUCTION.ordinal())).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, (long) Environment.STAGING.ordinal())).isFalse();
+    }
+
+    @Test
+    void testHasEmbeddedScopeInEnvironmentIdWithNullRequiresEveryEnvironment() {
+        when(permissionService.hasEmbeddedScope(SCOPE, Environment.DEVELOPMENT)).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(SCOPE, Environment.STAGING)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, null)).isFalse();
+
+        when(permissionService.hasEmbeddedScope(SCOPE, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, null)).isTrue();
+    }
+
+    @Test
+    void testHasEmbeddedScopeInEnvironmentIdDeniesAnOrdinalOutsideTheEnum() {
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, 99L)).isFalse();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, -1L)).isFalse();
+
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
+    }
+
+    @Test
     void testHasWorkspaceScopeInEveryEnvironmentPassesArgumentsAndResultThrough() {
         when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).thenReturn(true);
 

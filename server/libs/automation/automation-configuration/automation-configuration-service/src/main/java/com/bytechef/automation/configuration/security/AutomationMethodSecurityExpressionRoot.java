@@ -180,6 +180,46 @@ public final class AutomationMethodSecurityExpressionRoot
         return permissionService.hasWorkspaceScope(workspaceId, scope, environments[(int) (long) environmentId]);
     }
 
+    public boolean hasEmbeddedScope(String scope) {
+        return permissionService.hasEmbeddedScope(scope);
+    }
+
+    public boolean hasEmbeddedScopeInEnvironment(String scope, Environment environment) {
+        if (isAuthorizationSkipped()) {
+            return true;
+        }
+
+        return permissionService.hasEmbeddedScope(scope, environment);
+    }
+
+    public boolean hasEmbeddedScopeInEnvironmentId(String scope, @Nullable Long environmentId) {
+        if (isAuthorizationSkipped()) {
+            return true;
+        }
+
+        Environment[] environments = Environment.values();
+
+        if (environmentId == null) {
+            for (Environment environment : environments) {
+                if (!permissionService.hasEmbeddedScope(scope, environment)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (environmentId < 0 || environmentId >= environments.length) {
+            return isSkippedAndGranted(() -> permissionService.hasEmbeddedScope(scope));
+        }
+
+        return permissionService.hasEmbeddedScope(scope, environments[(int) (long) environmentId]);
+    }
+
+    public boolean hasEmbeddedScopeInEveryEnvironment(String scope) {
+        return permissionService.hasEmbeddedScopeInEveryEnvironment(scope);
+    }
+
     /**
      * Requires {@code scope} for the resource in the environment the operation acts on, for a resource that spans
      * environments and an operation that picks one — the case {@code hasPermission(#id, 'Type', 'SCOPE')} cannot
