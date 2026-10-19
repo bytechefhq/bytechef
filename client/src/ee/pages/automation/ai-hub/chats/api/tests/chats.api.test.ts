@@ -95,15 +95,23 @@ describe('chats.api', () => {
         });
     });
 
-    it('getChatMessages maps the timestamp and tool events', async () => {
+    it('getChatMessages maps the row id, timestamp and tool events', async () => {
         mockGraphQlResponse({
-            aiHubChatMessages: [{content: 'hi', role: 'USER', timestamp: '1716000000000', toolEventsJson: null}],
+            aiHubChatMessages: [
+                {content: 'hi', id: 'event-1', role: 'USER', timestamp: '1716000000000', toolEventsJson: null},
+            ],
         });
 
         const messages = await getChatMessages({chatId: 101, workspaceId: 7});
 
         expect(messages).toEqual([
-            {content: 'hi', role: 'USER', timestamp: new Date(1716000000000).toISOString(), toolEventsJson: null},
+            {
+                content: 'hi',
+                id: 'event-1',
+                role: 'USER',
+                timestamp: new Date(1716000000000).toISOString(),
+                toolEventsJson: null,
+            },
         ]);
     });
 

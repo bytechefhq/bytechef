@@ -16,14 +16,14 @@ describe('aiHubStore.appendToLastAssistantMessage', () => {
         const {messages} = aiHubStore.getState();
 
         expect(messages).toHaveLength(2);
-        expect(messages[1]).toEqual({content: 'Streaming reply', role: 'assistant'});
+        expect(messages[1]).toEqual({content: 'Streaming reply', id: expect.any(String), role: 'assistant'});
     });
 
     it('extends the trailing string assistant of the current turn', () => {
         aiHubStore.setState({
             messages: [
-                {content: 'continue', role: 'user'},
-                {content: 'Strea', role: 'assistant'},
+                {content: 'continue', id: 'user-1', role: 'user'},
+                {content: 'Strea', id: 'assistant-1', role: 'assistant'},
             ],
         });
 
@@ -32,7 +32,7 @@ describe('aiHubStore.appendToLastAssistantMessage', () => {
         const {messages} = aiHubStore.getState();
 
         expect(messages).toHaveLength(2);
-        expect(messages[1]).toEqual({content: 'Streaming reply', role: 'assistant'});
+        expect(messages[1]).toEqual({content: 'Streaming reply', id: 'assistant-1', role: 'assistant'});
     });
 
     it('does NOT overwrite a prior-turn assistant when the trailing message is an artifact-link card', () => {
@@ -52,7 +52,7 @@ describe('aiHubStore.appendToLastAssistantMessage', () => {
         expect(messages[0]).toEqual(priorAssistant);
         expect(messages[1]).toEqual(userMessage);
         expect(messages[2]).toEqual(artifactCard);
-        expect(messages[3]).toEqual({content: 'Resumed reply', role: 'assistant'});
+        expect(messages[3]).toEqual({content: 'Resumed reply', id: expect.any(String), role: 'assistant'});
     });
 });
 
@@ -78,18 +78,28 @@ describe('aiHubStore', () => {
         expect(aiHubStore.getState().chatId).not.toBe(previousChatId);
     });
 
-    it('editUserMessage replaces the user message and truncates everything after it', () => {
+    it('addMessage gives a message without an id a fresh one and keeps a given id', () => {
+        aiHubStore.getState().addMessage({content: 'hi', role: 'user'});
+        aiHubStore.getState().addMessage({content: 'hello', id: 'assistant-1', role: 'assistant'});
+
+        const [userMessage, assistantMessage] = aiHubStore.getState().messages;
+
+        expect(userMessage.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+        expect(assistantMessage.id).toBe('assistant-1');
+    });
+
+    it('editUserMessage replaces the user message under its new id and truncates everything after it', () => {
         aiHubStore.setState({
             messages: [
-                {content: 'first', role: 'user'},
-                {content: 'reply', role: 'assistant'},
-                {content: 'second', role: 'user'},
+                {content: 'first', id: 'user-1', role: 'user'},
+                {content: 'reply', id: 'assistant-1', role: 'assistant'},
+                {content: 'second', id: 'user-2', role: 'user'},
             ],
         });
 
-        aiHubStore.getState().editUserMessage(0, 'edited');
+        aiHubStore.getState().editUserMessage(0, 'edited', 'user-1-edited');
 
-        expect(aiHubStore.getState().messages).toEqual([{content: 'edited', role: 'user'}]);
+        expect(aiHubStore.getState().messages).toEqual([{content: 'edited', id: 'user-1-edited', role: 'user'}]);
     });
 
     it('editUserMessage ignores an index that does not point at a user message', () => {
@@ -100,18 +110,21 @@ describe('aiHubStore', () => {
 
         aiHubStore.setState({messages});
 
-        aiHubStore.getState().editUserMessage(1, 'edited');
-        aiHubStore.getState().editUserMessage(5, 'edited');
+        aiHubStore.getState().editUserMessage(1, 'edited', 'edited-id');
+        aiHubStore.getState().editUserMessage(5, 'edited', 'edited-id');
 
         expect(aiHubStore.getState().messages).toBe(messages);
     });
 
-    it('resetMessages clears messages and the loading flag', () => {
+    it('resetMessages clears messages and the loading flag and starts a new transcript', () => {
         aiHubStore.setState({messages: [{content: 'hi', role: 'user'}], messagesLoading: true});
+
+        const transcriptGeneration = aiHubStore.getState().transcriptGeneration;
 
         aiHubStore.getState().resetMessages();
 
         expect(aiHubStore.getState().messages).toEqual([]);
         expect(aiHubStore.getState().messagesLoading).toBe(false);
+        expect(aiHubStore.getState().transcriptGeneration).toBe(transcriptGeneration + 1);
     });
 });
