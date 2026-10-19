@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261019130000-1" author="Ivica Cardic" contextFilter="mono and !multitenant and dev" dbms="postgresql">
+        <sql>
+            SELECT setval(pg_get_serial_sequence('workspace_user', 'id'), (SELECT COALESCE(MAX(id), 1) FROM workspace_user))
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261019130000-2" author="Ivica Cardic" contextFilter="mono and !multitenant and dev" dbms="h2">
+        <sql>
+            ALTER TABLE workspace_user ALTER COLUMN id RESTART WITH (SELECT COALESCE(MAX(id), 0) + 1 FROM workspace_user)
+        </sql>
+    </changeSet>
+</databaseChangeLog>
