@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -117,6 +118,48 @@ class SpringAIAgentRunIsolationTest {
         assertThat(initialMessages).containsExactly(initialMessage);
     }
 
+    @Test
+    void shouldPassTheRunStateToTheFinalizedSubscriber() throws AGUIException, InterruptedException {
+        var agent = newAgent();
+        var runState = new State();
+
+        assertThat(finalizedState(agent, runState)).isSameAs(runState);
+    }
+
+    @Test
+    void shouldPassTheRunStateToTheFinalizedSubscriberOfAFailedRun() throws AGUIException, InterruptedException {
+        var agent = new SpringAIAgent(SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new FailingChatModel())
+            .systemMessage("system")
+            .state(new State()));
+        var runState = new State();
+
+        assertThat(finalizedState(agent, runState)).isSameAs(runState);
+    }
+
+    private static State finalizedState(SpringAIAgent agent, State runState) throws InterruptedException {
+        var input = new RunAgentInput(
+            "thread", "run", runState, List.of(userMessage("message-1", "question")), List.of(), new ArrayList<>(),
+            null);
+
+        var finalizedState = new AtomicReference<State>();
+        var finalized = new CountDownLatch(1);
+
+        agent.run(input, new AgentSubscriber() {
+            @Override
+            public void onRunFinalized(AgentSubscriberParams params) {
+                finalizedState.set(params.state());
+
+                finalized.countDown();
+            }
+        });
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+
+        return finalizedState.get();
+    }
+
     private static SpringAIAgent newAgent() throws AGUIException {
         return new SpringAIAgent(SpringAIAgent.builder()
             .agentId("test")
@@ -160,6 +203,25 @@ class SpringAIAgentRunIsolationTest {
         assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
 
         return String.join("", deltas);
+    }
+
+    private static class FailingChatModel implements ChatModel {
+
+        @Override
+        public ChatResponse call(Prompt prompt) {
+            throw new UnsupportedOperationException("The chat model must be streamed");
+        }
+
+        @Override
+        public Flux<ChatResponse> stream(Prompt prompt) {
+            return Flux.error(new IllegalStateException("model failed"));
+        }
+
+        @Override
+        public ChatOptions getOptions() {
+            return ToolCallingChatOptions.builder()
+                .build();
+        }
     }
 
     private static class EchoLatestUserMessageChatModel implements ChatModel {
