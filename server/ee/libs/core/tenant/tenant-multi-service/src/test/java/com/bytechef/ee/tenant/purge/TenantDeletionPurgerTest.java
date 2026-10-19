@@ -75,6 +75,60 @@ class TenantDeletionPurgerTest {
     }
 
     @Test
+    void testPurgeRerunsDeletionRequestedBeforeBeforeDrop() {
+        when(tenantDeletionService.getDueForPurge(NOW)).thenReturn(List.of(deletion("000001")));
+
+        purger(contributor).purgeDueTenants();
+
+        InOrder inOrder = inOrder(contributor, tenantService);
+
+        inOrder.verify(contributor)
+            .onDeletionRequested("000001");
+        inOrder.verify(contributor)
+            .beforeSchemaDrop("000001");
+        inOrder.verify(tenantService)
+            .deleteTenant("000001");
+    }
+
+    @Test
+    void testDeletionRequestedRunsInTenantContext() {
+        List<String> tenantIds = new ArrayList<>();
+
+        TenantTeardownContributor recordingContributor = new TenantTeardownContributor() {
+
+            @Override
+            public List<String> onDeletionRequested(String tenantId) {
+                tenantIds.add(TenantContext.getCurrentTenantId());
+
+                return List.of("webhook still registered");
+            }
+        };
+
+        when(tenantDeletionService.getDueForPurge(NOW)).thenReturn(List.of(deletion("000001")));
+
+        purger(recordingContributor).purgeDueTenants();
+
+        assertThat(tenantIds).containsExactly("000001");
+        verify(tenantService).deleteTenant("000001");
+        verify(tenantDeletionService).markPurged("000001");
+    }
+
+    @Test
+    void testDeletionRequestedFailureDoesNotStopDrop() {
+        TenantTeardownContributor failingContributor = mock(TenantTeardownContributor.class);
+
+        when(failingContributor.onDeletionRequested("000001")).thenThrow(new IllegalStateException("boom"));
+        when(tenantDeletionService.getDueForPurge(NOW)).thenReturn(List.of(deletion("000001")));
+
+        purger(failingContributor, contributor).purgeDueTenants();
+
+        verify(contributor).onDeletionRequested("000001");
+        verify(failingContributor).beforeSchemaDrop("000001");
+        verify(tenantService).deleteTenant("000001");
+        verify(tenantDeletionService).markPurged("000001");
+    }
+
+    @Test
     void testBeforeDropRunsInTenantContextAndAfterDropInDefaultContext() {
         List<String> tenantIds = new ArrayList<>();
 
@@ -118,6 +172,7 @@ class TenantDeletionPurgerTest {
 
         purger(contributor).purgeDueTenants();
 
+        verify(contributor, never()).onDeletionRequested(anyString());
         verify(contributor, never()).beforeSchemaDrop(anyString());
         verify(tenantService, never()).deleteTenant(anyString());
         verify(contributor).afterSchemaDrop("000001");

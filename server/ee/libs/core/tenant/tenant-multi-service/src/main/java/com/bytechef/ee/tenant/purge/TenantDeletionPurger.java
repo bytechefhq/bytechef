@@ -84,6 +84,8 @@ public class TenantDeletionPurger {
 
         if (tenantRepository.schemaExists(tenantId)) {
             TenantContext.runWithTenantId(tenantId, () -> SecurityUtils.runAsSystem(() -> {
+                rerunDeletionRequested(tenantId);
+
                 for (TenantTeardownContributor tenantTeardownContributor : tenantTeardownContributors) {
                     tenantTeardownContributor.beforeSchemaDrop(tenantId);
                 }
@@ -96,6 +98,24 @@ public class TenantDeletionPurger {
 
         if (runAfterSchemaDrop(tenantId)) {
             tenantDeletionService.markPurged(tenantId);
+        }
+    }
+
+    private void rerunDeletionRequested(String tenantId) {
+        for (TenantTeardownContributor tenantTeardownContributor : tenantTeardownContributors) {
+            try {
+                List<String> failures = tenantTeardownContributor.onDeletionRequested(tenantId);
+
+                if (failures != null && !failures.isEmpty()) {
+                    log.warn(
+                        "Deletion-requested teardown {} reported failures for tenant {} during purge: {}",
+                        tenantTeardownContributor.getClass(), tenantId, failures);
+                }
+            } catch (RuntimeException runtimeException) {
+                log.warn(
+                    "Deletion-requested teardown {} failed for tenant {} during purge",
+                    tenantTeardownContributor.getClass(), tenantId, runtimeException);
+            }
         }
     }
 
