@@ -76,6 +76,23 @@ class AiHubChatStreamerTest {
     }
 
     @Test
+    void testARunStoppedBeforeItsAgentStartedReleasesTheThread() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatStreamer streamer = new AiHubChatStreamer(registry, new JsonMapper());
+        LocalAgent agent = mock(LocalAgent.class);
+
+        InFlightRun run = registry.tryStart("thread-1", "run-1")
+            .orElseThrow();
+
+        registry.cancel("thread-1", "run-1");
+
+        streamer.stream(agent, buildAgUiParameters(), run);
+
+        verify(agent, never()).runAgent(any(), any());
+        assertThat(registry.isInFlight("thread-1")).isFalse();
+    }
+
+    @Test
     void testFinishedAgentRunReleasesTheThread() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatStreamer streamer = new AiHubChatStreamer(registry, new JsonMapper());

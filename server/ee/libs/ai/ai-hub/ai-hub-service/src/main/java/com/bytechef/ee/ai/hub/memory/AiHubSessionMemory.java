@@ -9,14 +9,19 @@ package com.bytechef.ee.ai.hub.memory;
 
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
@@ -51,21 +56,62 @@ public class AiHubSessionMemory implements AutoCloseable {
         return SessionMemoryAdvisor.builder(sessionService)
             .defaultUserId(SESSION_USER_ID)
             .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
-            .requestEventIdGenerator(AiHubSessionMemory::requestEventId)
+            .requestEventIdGenerator(this::requestEventId)
             .build();
     }
 
-    static String requestEventId(ChatClientRequest request, Message message) {
-        if (message.getMessageType() == MessageType.USER
-            && request.context()
-                .get(USER_MESSAGE_ID_PARAM) instanceof String userMessageId
-            && isUuid(userMessageId)) {
+    public ResentUserMessageAdvisor createResentUserMessageAdvisor() {
+        return new ResentUserMessageAdvisor(this, ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER - 1);
+    }
 
-            return userMessageId;
+    String requestEventId(ChatClientRequest request, Message message) {
+        String userMessageId = userMessageId(request);
+
+        if (message.getMessageType() == MessageType.USER && userMessageId != null) {
+            Optional<SessionEvent> storedEvent = findStoredEvent(request, userMessageId);
+
+            if (storedEvent.isEmpty() || isStoredCopy(storedEvent.get(), message)) {
+                return userMessageId;
+            }
         }
 
         return UUID.randomUUID()
             .toString();
+    }
+
+    boolean isResentUserMessage(ChatClientRequest request, Message message) {
+        String userMessageId = userMessageId(request);
+
+        if (message.getMessageType() != MessageType.USER || userMessageId == null) {
+            return false;
+        }
+
+        return findStoredEvent(request, userMessageId).filter(storedEvent -> isStoredCopy(storedEvent, message))
+            .isPresent();
+    }
+
+    private Optional<SessionEvent> findStoredEvent(ChatClientRequest request, String eventId) {
+        if (!(request.context()
+            .get(ChatMemory.CONVERSATION_ID) instanceof String sessionId)) {
+
+            return Optional.empty();
+        }
+
+        return sessionService.getEvents(sessionId, EventFilter.all())
+            .stream()
+            .filter(event -> eventId.equals(event.getId()))
+            .findFirst();
+    }
+
+    private static boolean isStoredCopy(SessionEvent storedEvent, Message message) {
+        return !storedEvent.isArchived() && storedEvent.getMessageType() == MessageType.USER
+            && Objects.equals(storedEvent.getMessage()
+                .getText(), message.getText());
+    }
+
+    private static @Nullable String userMessageId(ChatClientRequest request) {
+        return request.context()
+            .get(USER_MESSAGE_ID_PARAM) instanceof String userMessageId && isUuid(userMessageId) ? userMessageId : null;
     }
 
     private static boolean isUuid(String value) {

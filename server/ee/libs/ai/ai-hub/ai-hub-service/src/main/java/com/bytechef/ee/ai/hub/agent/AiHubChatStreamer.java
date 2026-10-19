@@ -57,6 +57,8 @@ public class AiHubChatStreamer {
 
     public void start(LocalAgent agent, AgUiParameters agUiParameters, InFlightRun run) {
         if (run.isTerminated()) {
+            run.complete();
+
             return;
         }
 
