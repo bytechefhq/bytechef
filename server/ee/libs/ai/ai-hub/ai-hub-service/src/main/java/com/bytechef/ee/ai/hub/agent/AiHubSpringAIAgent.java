@@ -27,6 +27,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -173,6 +174,12 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         return environmentId.intValue();
     }
 
+    /**
+     * Publishes the thread id as {@link ChatMemory#CONVERSATION_ID}, the key the session memory advisor resolves its
+     * session from, and the AG-UI id of the run's user message as {@link AiHubSessionMemory#USER_MESSAGE_ID_PARAM}, the
+     * id the advisor stores that message under. The parent agent only sets the conversation id on its own chat-memory
+     * branch, which the hub does not take.
+     */
     @Override
     protected Map<String, Object> advisorParams(RunAgentInput input) {
         Map<String, Object> advisorParams = new HashMap<>();
@@ -181,6 +188,12 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         if (threadId != null && !threadId.isBlank()) {
             advisorParams.put(ChatMemory.CONVERSATION_ID, threadId);
+        }
+
+        String userMessageId = lastUserMessageId(input.messages());
+
+        if (userMessageId != null && !userMessageId.isBlank()) {
+            advisorParams.put(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, userMessageId);
         }
 
         return advisorParams;
@@ -402,6 +415,18 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     }
 
     private static @Nullable String lastUserPrompt(@Nullable List<BaseMessage> messages) {
+        UserMessage userMessage = lastUserMessage(messages);
+
+        return userMessage == null ? null : userMessage.getContent();
+    }
+
+    private static @Nullable String lastUserMessageId(@Nullable List<BaseMessage> messages) {
+        UserMessage userMessage = lastUserMessage(messages);
+
+        return userMessage == null ? null : userMessage.getId();
+    }
+
+    private static @Nullable UserMessage lastUserMessage(@Nullable List<BaseMessage> messages) {
         if (messages == null || messages.isEmpty()) {
             return null;
         }
@@ -410,7 +435,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             BaseMessage message = messages.get(index);
 
             if (message instanceof UserMessage userMessage && Role.user.equals(userMessage.getRole())) {
-                return userMessage.getContent();
+                return userMessage;
             }
         }
 
@@ -545,6 +570,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
         @Override
         public AiHubSpringAIAgent build() throws AGUIException {
+            super.advisor(new ResentUserMessageAdvisor());
             super.advisor(new NonEmptyMessagesAdvisor());
             super.advisor(new SimpleLoggerAdvisor(Integer.MAX_VALUE));
 
