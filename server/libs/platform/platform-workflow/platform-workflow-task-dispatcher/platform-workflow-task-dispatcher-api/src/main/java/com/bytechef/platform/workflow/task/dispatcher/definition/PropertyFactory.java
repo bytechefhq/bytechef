@@ -26,6 +26,7 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherD
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,21 +121,28 @@ public record PropertyFactory() implements SchemaPropertyFactory {
     }
 
     private ModifiableArrayProperty getArrayProperty(String name, Object value) {
-        ModifiableArrayProperty arrayProperty;
+        ModifiableArrayProperty arrayProperty = TaskDispatcherDsl.array(name);
+
         Class<?> valueClass = value.getClass();
+        Object firstItem = null;
 
         if (valueClass.isArray()) {
-            arrayProperty = TaskDispatcherDsl.array(name);
+            if (Array.getLength(value) > 0) {
+                firstItem = Array.get(value, 0);
+            }
         } else {
-            arrayProperty = TaskDispatcherDsl.array(name);
-
             List<?> list = (List<?>) value;
 
             if (!list.isEmpty()) {
-                arrayProperty.items(
-                    (ModifiableProperty<?>) SchemaUtils.getOutputSchema(
-                        null, list.getFirst(), PROPERTY_FACTORY));
+                firstItem = list.getFirst();
             }
+        }
+
+        if (firstItem != null) {
+            ModifiableProperty<?> itemProperty =
+                (ModifiableProperty<?>) SchemaUtils.getOutputSchema(null, firstItem, PROPERTY_FACTORY);
+
+            arrayProperty.items(itemProperty);
         }
 
         return arrayProperty;

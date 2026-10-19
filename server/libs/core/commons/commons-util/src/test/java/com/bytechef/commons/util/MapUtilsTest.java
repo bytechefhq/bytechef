@@ -24,9 +24,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -99,5 +101,26 @@ public class MapUtilsTest {
             .toInstant(ZoneOffset.UTC);
 
         assertEquals(expected, instant);
+    }
+
+    @Test
+    public void testGetListFromStringArray() {
+        Map<String, Object> map = Map.of("items", new String[] {
+            "first", "second"
+        });
+
+        assertEquals(List.of("first", "second"), MapUtils.getList(map, "items"));
+        assertEquals(List.of("first", "second"), MapUtils.getList(map, "items", String.class));
+        assertEquals(List.of("first", "second"), MapUtils.getList(map, "items", new TypeReference<String>() {}));
+    }
+
+    @Test
+    public void testGetListFromPrimitiveArray() {
+        Map<String, Object> map = Map.of("items", new int[] {
+            1, 2
+        });
+
+        assertEquals(List.of(1, 2), MapUtils.getList(map, "items"));
+        assertEquals(List.of(1L, 2L), MapUtils.getList(map, "items", Long.class));
     }
 }
