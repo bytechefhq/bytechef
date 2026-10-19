@@ -7,12 +7,11 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
+import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BrainCircuitIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-
-const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 /**
  * The home view: a centered composer that starts a chat. It renders inside the page-level runtime provider, so the
@@ -63,7 +62,7 @@ const AiHubHomePanel = () => {
                             </p>
                         </div>
 
-                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>Go to AI Providers</Button>
+                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
                     </div>
                 ) : (
                     <div className="flex w-full max-w-2xl flex-col gap-6">
