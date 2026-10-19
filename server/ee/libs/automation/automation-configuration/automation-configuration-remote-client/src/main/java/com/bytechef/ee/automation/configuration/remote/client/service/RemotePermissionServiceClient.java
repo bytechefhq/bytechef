@@ -141,4 +141,39 @@ public class RemotePermissionServiceClient implements PermissionService {
     public void evictAllWorkspaceScopeCache() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasEmbeddedScopeInEveryEnvironment(String scope) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isEmbeddedMember() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<String> getMyEmbeddedScopes(@Nullable Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void evictEmbeddedScopeCache(long userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void evictAllEmbeddedScopeCache() {
+        throw new UnsupportedOperationException();
+    }
 }
