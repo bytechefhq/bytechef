@@ -6,6 +6,7 @@ import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
     ConnectionDefinition,
+    Property,
 } from '@/shared/middleware/platform/configuration';
 
 import type {
@@ -32,6 +33,14 @@ const catalog: ComponentCatalogType = {
                 name,
                 version: 1,
             }) as unknown as ComponentDefinition
+    ),
+    getOperationProperties: vi.fn(
+        async () =>
+            [
+                {name: 'latitude', required: true, type: 'NUMBER'},
+                {name: 'longitude', required: true, type: 'NUMBER'},
+                {name: 'options', properties: [{name: 'language', type: 'STRING'}], type: 'OBJECT'},
+            ] as unknown as Property[]
     ),
 };
 

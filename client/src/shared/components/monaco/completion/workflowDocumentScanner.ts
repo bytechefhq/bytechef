@@ -7,8 +7,22 @@ export type WorkflowDocumentPositionType = {
     enclosingTaskType?: string;
     earlierNodeNames: string[];
     inString: boolean;
+    keySlot?: KeySlotType;
     path: string[];
     stringValueBeforeCursor?: string;
+    typeOf: (nodePath: string[]) => string | undefined;
+};
+
+export type KeySlotType = {
+    containerPath: string[];
+    existingKeys: string[];
+    prefix: string;
+};
+
+type ScannedKeySlotType = {
+    containerPath: string[];
+    name?: string;
+    prefix: string;
 };
 
 type ScalarType = {
@@ -27,6 +41,7 @@ type CommentType = {
 
 type ScannedDocumentType = {
     comments: CommentType[];
+    keySlotAt: (cursorOffset: number) => ScannedKeySlotType | undefined;
     keys: string[][];
     pathAt: (cursorOffset: number) => string[];
     scalars: ScalarType[];
@@ -103,6 +118,7 @@ function unescapeJson(raw: string): string {
 function scanJson(source: string): ScannedDocumentType {
     const comments: CommentType[] = [];
     const containers: {end: number; path: string[]; start: number}[] = [];
+    const keyStrings: {containerPath: string[]; end: number; name: string; start: number}[] = [];
     const keys: string[][] = [];
     const scalars: ScalarType[] = [];
 
@@ -253,9 +269,11 @@ function scanJson(source: string): ScannedDocumentType {
             }
 
             if (character === '"') {
-                const keyPath = [...path, readString().value];
+                const {contentEnd, contentStart, value: keyName} = readString();
+                const keyPath = [...path, keyName];
 
                 keys.push(keyPath);
+                keyStrings.push({containerPath: path, end: contentEnd, name: keyName, start: contentStart});
 
                 skipWhitespace();
 
@@ -325,6 +343,21 @@ function scanJson(source: string): ScannedDocumentType {
 
     return {
         comments,
+        keySlotAt: (cursorOffset) => {
+            const keyString = keyStrings.find(
+                (candidate) => cursorOffset >= candidate.start && cursorOffset <= candidate.end
+            );
+
+            if (!keyString) {
+                return undefined;
+            }
+
+            return {
+                containerPath: keyString.containerPath,
+                name: keyString.name,
+                prefix: unescapeJson(source.slice(keyString.start, cursorOffset)),
+            };
+        },
         keys,
         pathAt: (cursorOffset) => {
             let deepest: {path: string[]; start: number} | undefined;
@@ -748,44 +781,62 @@ function scanYaml(source: string, cursorOffset: number): ScannedDocumentType {
         lineIndex = nextLineIndex;
     }
 
+    function pathAt(offset: number): string[] {
+        const cursorLineIndex = lines.findIndex(
+            (line) => offset >= line.start && offset <= line.start + line.text.length
+        );
+
+        if (cursorLineIndex === -1) {
+            return [];
+        }
+
+        const ownSnapshot = snapshots.get(cursorLineIndex);
+
+        if (ownSnapshot) {
+            return ownSnapshot[ownSnapshot.length - 1].path;
+        }
+
+        let snapshot: YamlSnapshotEntryType[] | undefined;
+
+        for (let previous = cursorLineIndex - 1; previous >= 0 && !snapshot; previous--) {
+            snapshot = snapshots.get(previous);
+        }
+
+        if (!snapshot) {
+            return [];
+        }
+
+        const column = offset - lines[cursorLineIndex].start;
+        const contexts = snapshot.filter((context) => context.indent <= column);
+        const top = contexts[contexts.length - 1];
+
+        if (!top) {
+            return [];
+        }
+
+        return top.pending && column > top.indent ? top.pending : top.path;
+    }
+
     return {
         comments,
-        keys,
-        pathAt: (offset) => {
-            const cursorLineIndex = lines.findIndex(
-                (line) => offset >= line.start && offset <= line.start + line.text.length
-            );
+        keySlotAt: (offset) => {
+            const cursorLine = lines.find((line) => offset >= line.start && offset <= line.start + line.text.length);
 
-            if (cursorLineIndex === -1) {
-                return [];
+            if (!cursorLine) {
+                return undefined;
             }
 
-            const ownSnapshot = snapshots.get(cursorLineIndex);
+            const column = offset - cursorLine.start;
+            const match = /^\s*([A-Za-z_][\w-]*)?$/.exec(cursorLine.text.slice(0, column));
 
-            if (ownSnapshot) {
-                return ownSnapshot[ownSnapshot.length - 1].path;
+            if (!match || cursorLine.text.slice(column).trim() !== '') {
+                return undefined;
             }
 
-            let snapshot: YamlSnapshotEntryType[] | undefined;
-
-            for (let previous = cursorLineIndex - 1; previous >= 0 && !snapshot; previous--) {
-                snapshot = snapshots.get(previous);
-            }
-
-            if (!snapshot) {
-                return [];
-            }
-
-            const column = offset - lines[cursorLineIndex].start;
-            const contexts = snapshot.filter((context) => context.indent <= column);
-            const top = contexts[contexts.length - 1];
-
-            if (!top) {
-                return [];
-            }
-
-            return top.pending && column > top.indent ? top.pending : top.path;
+            return {containerPath: pathAt(offset), prefix: match[1] ?? ''};
         },
+        keys,
+        pathAt,
         scalars,
     };
 }
@@ -897,10 +948,42 @@ export function scanWorkflowDocument(
         enclosingTaskInputKeys: [],
         inString: !!hit,
         path,
+        typeOf: (nodePath) => scalarByPath.get([...nodePath, 'type'].join('\u0000'))?.value || undefined,
     };
 
     if (hit) {
         result.stringValueBeforeCursor = hit.before(cursor);
+    } else {
+        const keySlot = document.keySlotAt(cursor);
+
+        if (keySlot) {
+            const {containerPath, name, prefix} = keySlot;
+            const existingKeys: string[] = [];
+            let skippedOwnKey = false;
+
+            for (const keyPath of document.keys) {
+                if (
+                    keyPath.length !== containerPath.length + 1 ||
+                    containerPath.some((segment, index) => keyPath[index] !== segment)
+                ) {
+                    continue;
+                }
+
+                const keyName = keyPath[keyPath.length - 1];
+
+                if (!skippedOwnKey && name !== undefined && keyName === name) {
+                    skippedOwnKey = true;
+
+                    continue;
+                }
+
+                if (!existingKeys.includes(keyName)) {
+                    existingKeys.push(keyName);
+                }
+            }
+
+            result.keySlot = {containerPath, existingKeys, prefix};
+        }
     }
 
     if (enclosingTaskIndex !== undefined) {

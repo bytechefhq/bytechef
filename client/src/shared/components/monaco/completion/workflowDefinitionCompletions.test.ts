@@ -7,6 +7,7 @@ import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
     ConnectionDefinition,
+    Property,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 
@@ -28,6 +29,15 @@ const catalog: ComponentCatalogType = {
                 name,
                 version: 1,
             }) as unknown as ComponentDefinition
+    ),
+    getOperationProperties: vi.fn(
+        async (_componentName: string, _componentVersion: number | undefined, _operationName: string, kind: string) =>
+            (kind === 'trigger'
+                ? [{name: 'channel', required: true, type: 'STRING'}]
+                : [
+                      {name: 'uri', required: true, type: 'STRING'},
+                      {name: 'headers', properties: [{name: 'accept', type: 'STRING'}], type: 'OBJECT'},
+                  ]) as unknown as Property[]
     ),
 };
 
@@ -180,5 +190,81 @@ describe('getWorkflowDefinitionCompletions', () => {
         expect(await getWorkflowDefinitionCompletions({context, cursorOffset: 1, source: '{ "tasks": [] }'})).toEqual(
             []
         );
+    });
+});
+
+describe('parameter key completions', () => {
+    const jsonContext = {...context, format: 'json' as const};
+    const yamlContext = {...context, format: 'yaml' as const};
+
+    it('offers the action properties not yet present in a JSON parameters key', async () => {
+        const source = '{"tasks": [{"name": "h", "type": "httpClient/v1/get", "parameters": {"uri": "x", "": 1}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: jsonContext,
+            cursorOffset: source.indexOf('"": 1') + 1,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['headers']);
+        expect(catalog.getOperationProperties).toHaveBeenCalledWith('httpClient', 1, 'get', 'action');
+    });
+
+    it('offers nested object properties', async () => {
+        const source = '{"tasks": [{"type": "httpClient/v1/get", "parameters": {"headers": {""}}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: jsonContext,
+            cursorOffset: source.indexOf('{""}') + 2,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['accept']);
+    });
+
+    it('offers trigger properties in a YAML trigger', async () => {
+        const source = 'triggers:\n  - name: t\n    type: slack/v1/newMessage\n    parameters:\n      ch';
+        const items = await getWorkflowDefinitionCompletions({
+            context: yamlContext,
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['channel']);
+        expect(catalog.getOperationProperties).toHaveBeenCalledWith('slack', 1, 'newMessage', 'trigger');
+    });
+
+    it('treats a task nested in a dispatcher as an action', async () => {
+        const source =
+            'tasks:\n  - type: loop/v1\n    parameters:\n      iteratee:\n        - type: httpClient/v1/get\n          parameters:\n            ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: yamlContext,
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['uri', 'headers']);
+    });
+
+    it('offers nothing when the node has no type yet', async () => {
+        const source = '{"tasks": [{"name": "h", "parameters": {""}}]}';
+
+        expect(
+            await getWorkflowDefinitionCompletions({
+                context: jsonContext,
+                cursorOffset: source.indexOf('{""}') + 2,
+                source,
+            })
+        ).toEqual([]);
+    });
+
+    it('offers nothing for a key outside parameters', async () => {
+        const source = '{"tasks": [{"type": "httpClient/v1/get", "": 1}]}';
+
+        expect(
+            await getWorkflowDefinitionCompletions({
+                context: jsonContext,
+                cursorOffset: source.indexOf('"": 1') + 1,
+                source,
+            })
+        ).toEqual([]);
     });
 });

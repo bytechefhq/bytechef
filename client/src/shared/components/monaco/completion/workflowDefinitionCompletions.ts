@@ -1,6 +1,7 @@
 import {filterFunctionDefinitions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/functionSuggestionUtils';
 import getOutputSchemaFromWorkflowNodeOutput from '@/pages/platform/workflow-editor/utils/getOutputSchemaFromWorkflowNodeOutput';
 
+import {buildPropertyItems, findNestedProperties} from './propertyCompletions';
 import {type CompletionItemDraftType, getScriptCompletions} from './scriptCompletions';
 import {buildFunctionSnippet} from './snippets';
 import {scanWorkflowDocument} from './workflowDocumentScanner';
@@ -25,6 +26,7 @@ const SCRIPT_LANGUAGES: Record<string, ScriptLanguageType> = {javascript: 'javas
 const TYPE_WITH_VERSION_PATTERN = /^(\w+)\/v(\d+)\//;
 const NODE_REFERENCE_PATTERN = /\$\{([\w.-]*)$/;
 const TRAILING_WORD_PATTERN = /[A-Za-z]\w*$/;
+const OPERATION_TYPE_PATTERN = /^(\w+)\/v(\d+)\/(\w+)$/;
 
 function isArrayElementType(path: string[]): boolean {
     return (path[0] === 'tasks' || path[0] === 'triggers') && /^\d+$/.test(path[path.length - 2] ?? '');
@@ -175,11 +177,52 @@ async function getExpressionCompletions(
     return items;
 }
 
+async function getParameterKeyCompletions(
+    context: WorkflowDefinitionCompletionContextI,
+    position: WorkflowDocumentPositionType
+): Promise<CompletionItemDraftType[]> {
+    const {containerPath, existingKeys} = position.keySlot!;
+    const section = containerPath[0];
+    const parametersIndex = containerPath.lastIndexOf('parameters');
+
+    if (
+        (section !== 'tasks' && section !== 'triggers') ||
+        parametersIndex < 2 ||
+        !/^\d+$/.test(containerPath[parametersIndex - 1])
+    ) {
+        return [];
+    }
+
+    const nodePath = containerPath.slice(0, parametersIndex);
+    const typeMatch = OPERATION_TYPE_PATTERN.exec(position.typeOf(nodePath) ?? '');
+
+    if (!typeMatch) {
+        return [];
+    }
+
+    const [, componentName, componentVersion, operationName] = typeMatch;
+    const operationKind = section === 'triggers' && parametersIndex === 2 ? 'trigger' : 'action';
+
+    const properties = await context.components.getOperationProperties(
+        componentName,
+        Number(componentVersion),
+        operationName,
+        operationKind
+    );
+    const nestedProperties = findNestedProperties(properties, containerPath.slice(parametersIndex + 1));
+
+    return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
+}
+
 export async function getWorkflowDefinitionCompletions(
     request: WorkflowDefinitionCompletionRequestI
 ): Promise<CompletionItemDraftType[]> {
     const {context, cursorOffset, source} = request;
     const position = scanWorkflowDocument(source, cursorOffset, context.format);
+
+    if (position?.keySlot) {
+        return getParameterKeyCompletions(context, position);
+    }
 
     if (!position?.inString) {
         return [];
