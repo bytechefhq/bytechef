@@ -405,43 +405,6 @@ export async function stubGraphQlOperationError(
     return {calls};
 }
 
-interface RetryableErrorI {
-    errorMessage: string;
-    lastUserMessage: string;
-    toolName: string;
-}
-
-export async function recordZustandDevtoolsStates(page: Page): Promise<void> {
-    await page.addInitScript(() => {
-        const recordedStates: unknown[] = [];
-
-        Object.assign(window, {
-            __REDUX_DEVTOOLS_EXTENSION__: {
-                connect: () => ({
-                    error: () => undefined,
-                    init: (state: unknown) => recordedStates.push(JSON.parse(JSON.stringify(state ?? null))),
-                    send: (_action: unknown, state: unknown) =>
-                        recordedStates.push(JSON.parse(JSON.stringify(state ?? null))),
-                    subscribe: () => () => undefined,
-                    unsubscribe: () => undefined,
-                }),
-            },
-            __playwrightZustandStates: recordedStates,
-        });
-    });
-}
-
-export async function readRaisedRetryableErrors(page: Page): Promise<RetryableErrorI[]> {
-    return page.evaluate(() =>
-        (
-            (window as unknown as {__playwrightZustandStates: Array<Record<string, unknown> | null>})
-                .__playwrightZustandStates ?? []
-        )
-            .filter((state) => state != null && 'currentError' in state && state.currentError != null)
-            .map((state) => state!.currentError as RetryableErrorI)
-    );
-}
-
 export interface RecordedToastI {
     text: string;
     type: string;

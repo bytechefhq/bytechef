@@ -19,6 +19,7 @@ export class AiHubPage {
     readonly newChatLink: Locator;
     readonly page: Page;
     readonly resourcePanel: Locator;
+    readonly retryBanner: Locator;
     readonly runErrors: Locator;
     readonly runningToolCallRows: Locator;
     readonly saveEditedMessageButton: Locator;
@@ -43,6 +44,7 @@ export class AiHubPage {
             .locator('div')
             .filter({has: page.getByRole('button', {name: 'Close resource panel'})})
             .last();
+        this.retryBanner = page.getByTestId('ai-hub-retry-banner');
         this.runErrors = page.getByTestId('ai-hub-run-error');
         this.runningToolCallRows = this.assistantMessages.getByRole('status');
         this.saveEditedMessageButton = page.getByRole('button', {name: 'Save and resend'});
