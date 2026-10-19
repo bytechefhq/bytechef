@@ -59,6 +59,9 @@
     <!-- spring batch -->
     <includeAll path="${batch_changelog_path}" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
 
+    <!-- tenant deletion -->
+    <includeAll path="classpath:config/liquibase/changelog/tenant/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or tenant" />
+
     <!-- quartz -->
     <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
 </databaseChangeLog>
