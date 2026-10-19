@@ -5,7 +5,7 @@ openapi:
 
 spring:
   liquibase:
-    contexts: user
+    contexts: user,tenant
 
 bytechef:
   mail:
