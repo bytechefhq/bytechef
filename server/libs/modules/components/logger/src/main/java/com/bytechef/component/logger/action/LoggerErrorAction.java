@@ -42,7 +42,9 @@ public class LoggerErrorAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.error(LoggerUtils.toMessage(text)));
+        String message = LoggerUtils.toMessage(text, context);
+
+        context.log(log -> log.error(message));
 
         return null;
     }

@@ -42,7 +42,9 @@ public class LoggerWarnAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.warn(LoggerUtils.toMessage(text)));
+        String message = LoggerUtils.toMessage(text, context);
+
+        context.log(log -> log.warn(message));
 
         return null;
     }

@@ -42,7 +42,9 @@ public class LoggerDebugAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.debug(LoggerUtils.toMessage(text)));
+        String message = LoggerUtils.toMessage(text, context);
+
+        context.log(log -> log.debug(message));
 
         return null;
     }
