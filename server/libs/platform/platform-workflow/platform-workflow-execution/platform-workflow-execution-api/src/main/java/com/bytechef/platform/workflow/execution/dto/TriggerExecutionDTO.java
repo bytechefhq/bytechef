@@ -50,4 +50,11 @@ public record TriggerExecutionDTO(
             triggerExecution.getWorkflowExecutionId(), title, triggerExecution.getType(),
             triggerExecution.getWorkflowTrigger());
     }
+
+    public TriggerExecutionDTO withoutDetails() {
+        return new TriggerExecutionDTO(
+            batch, createdBy, createdDate, endDate, null, executionTime, icon, id, null, lastModifiedBy,
+            lastModifiedDate, maxRetries, null, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis,
+            startDate, null, status, workflowExecutionId, title, type, workflowTrigger);
+    }
 }

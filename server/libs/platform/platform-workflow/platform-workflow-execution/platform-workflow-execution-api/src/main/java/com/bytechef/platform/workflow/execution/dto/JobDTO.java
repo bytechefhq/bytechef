@@ -55,4 +55,14 @@ public record JobDTO(
             Map.of(), job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(), job.getStatus(), List.of(),
             job.getVersion(), List.of(), job.getWorkflowId());
     }
+
+    public JobDTO withoutDetails() {
+        return new JobDTO(
+            createdBy, createdDate, currentTask, endDate, null, id, Map.of(), label, lastModifiedBy, lastModifiedDate,
+            metadata, null, parentTaskExecutionId, priority, startDate, status,
+            taskExecutions == null ? null : taskExecutions.stream()
+                .map(TaskExecutionDTO::withoutDetails)
+                .toList(),
+            version, webhooks, workflowId);
+    }
 }

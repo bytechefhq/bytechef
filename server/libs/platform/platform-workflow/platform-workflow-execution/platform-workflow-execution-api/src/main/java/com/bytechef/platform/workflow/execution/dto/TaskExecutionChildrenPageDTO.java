@@ -70,4 +70,18 @@ public record TaskExecutionChildrenPageDTO(
             .map(TaskExecutionChildrenPageDTO::withoutIcons)
             .toList();
     }
+
+    public TaskExecutionChildrenPageDTO withoutDetails() {
+        return new TaskExecutionChildrenPageDTO(
+            children.stream()
+                .map(TaskExecutionDTO::withoutDetails)
+                .toList(),
+            icons,
+            iterations.stream()
+                .map(iteration -> iteration.stream()
+                    .map(TaskExecutionDTO::withoutDetails)
+                    .toList())
+                .toList(),
+            number, size, numberOfElements, totalElements, totalPages);
+    }
 }

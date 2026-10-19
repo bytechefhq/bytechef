@@ -71,19 +71,19 @@ public class TriggerLogFileStorageImpl implements TriggerLogFileStorage {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_DETAILS_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         return logFileStorage.readLogEntries(jobId, taskExecutionId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_DETAILS_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId, String clusterElementCallId) {
         return logFileStorage.readLogEntries(jobId, taskExecutionId, clusterElementCallId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_DETAILS_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return logFileStorage.readLogEntriesByJobId(jobId);
     }
