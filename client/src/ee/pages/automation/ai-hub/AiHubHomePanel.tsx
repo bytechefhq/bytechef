@@ -5,8 +5,9 @@ import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatCo
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
-import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
-import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
+import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BrainCircuitIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
@@ -29,10 +30,17 @@ const AiHubHomePanel = () => {
     const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
         environment: String(currentEnvironmentId),
     });
+    const {data: providerCatalogData} = useAiProviderCatalogQuery(
+        {environment: String(currentEnvironmentId)},
+        {enabled: currentEnvironmentId >= 0}
+    );
 
     const hasEnabledProvider = defaultModelData?.aiDefaultModel != null;
 
-    const lastUsedModel = currentWorkspaceId != null ? readLastUsedModel(currentWorkspaceId) : null;
+    const shownLlmSelection =
+        draftLlmSelection?.provider != null && draftLlmSelection.model != null
+            ? draftLlmSelection
+            : findAvailableRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
 
     return (
         <div className="relative flex size-full flex-col bg-background">
@@ -78,10 +86,8 @@ const AiHubHomePanel = () => {
                                             writeLastUsedModel(currentWorkspaceId, provider, model);
                                             setDraftLlmSelection(provider, model);
                                         }}
-                                        selectedModel={draftLlmSelection?.model ?? lastUsedModel?.model ?? null}
-                                        selectedProvider={
-                                            draftLlmSelection?.provider ?? lastUsedModel?.provider ?? null
-                                        }
+                                        selectedModel={shownLlmSelection?.model ?? null}
+                                        selectedProvider={shownLlmSelection?.provider ?? null}
                                     />
                                 ) : null
                             }
