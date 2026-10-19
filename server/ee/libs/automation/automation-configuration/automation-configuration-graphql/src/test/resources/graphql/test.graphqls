@@ -1,0 +1,9 @@
+type Query {
+    _placeholder: Boolean
+}
+
+enum EnvironmentEnum {
+    DEVELOPMENT
+    STAGING
+    PRODUCTION
+}
