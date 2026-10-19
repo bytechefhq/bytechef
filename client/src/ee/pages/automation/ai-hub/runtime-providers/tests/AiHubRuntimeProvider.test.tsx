@@ -23,6 +23,7 @@ import {
     bootstrapAiHubTurnRunState,
     buildAiHubSubscriber,
     buildStateToSend,
+    getForbiddenTurnRunErrorCode,
     getLastUserMessageText,
     getOptimisticTurnMarker,
     hasLivePropertyOptionPicker,
@@ -169,6 +170,30 @@ describe('isTurnInFlightError', () => {
         expect(isTurnInFlightError({message: 'HTTP 409: {not json'})).toBe(false);
         expect(isTurnInFlightError(null)).toBe(false);
         expect(isTurnInFlightError(undefined)).toBe(false);
+    });
+});
+
+describe('getForbiddenTurnRunErrorCode', () => {
+    it('maps the workspace role refusal from the parsed payload', () => {
+        expect(
+            getForbiddenTurnRunErrorCode({
+                payload: {error: 'Workspace is not accessible to the current user'},
+                status: 403,
+            })
+        ).toBe('WORKSPACE_ACCESS_DENIED');
+    });
+
+    it('maps the chat refusal from the message when there is no payload', () => {
+        expect(
+            getForbiddenTurnRunErrorCode({
+                message: 'HTTP 403: {"error":"AiHubChat is not accessible to the current user"}',
+            })
+        ).toBe('CHAT_ACCESS_DENIED');
+    });
+
+    it('falls back to the neutral code for any other refusal', () => {
+        expect(getForbiddenTurnRunErrorCode({payload: {error: 'Access denied'}, status: 403})).toBe('ACCESS_DENIED');
+        expect(getForbiddenTurnRunErrorCode({message: 'HTTP 403: ', status: 403})).toBe('ACCESS_DENIED');
     });
 });
 
