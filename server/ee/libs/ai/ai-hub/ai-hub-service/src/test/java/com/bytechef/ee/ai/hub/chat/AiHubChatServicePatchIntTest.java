@@ -18,6 +18,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.AiHubIntTestConfiguration;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
+import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Duration;
@@ -162,8 +163,7 @@ public class AiHubChatServicePatchIntTest {
         long chatId = saveChat();
 
         Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
-            () -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> markDeleted(chatId),
             () -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)));
 
@@ -179,8 +179,7 @@ public class AiHubChatServicePatchIntTest {
         long chatId = saveChat();
 
         Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
-            () -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> markDeleted(chatId),
             () -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch("Generated title", null, null, null)));
 
@@ -198,8 +197,7 @@ public class AiHubChatServicePatchIntTest {
         long chatId = saveChat();
 
         Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
-            () -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> markDeleted(chatId),
             () -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", null, null)));
 
@@ -216,8 +214,7 @@ public class AiHubChatServicePatchIntTest {
         long chatId = saveChat();
 
         Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
-            () -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> markDeleted(chatId),
             () -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, 7, null)));
 
         AiHubChat chat = chatRepository.findById(chatId)
@@ -233,8 +230,7 @@ public class AiHubChatServicePatchIntTest {
         long chatId = saveChat();
 
         Throwable secondWriteFailure = runSecondWhileFirstHoldsTheRow(
-            () -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)),
+            () -> markDeleted(chatId),
             () -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID,
                 new AiHubChatPatch("Renamed", "Latest preview", 3, AiHubChatStatus.ARCHIVED)));
@@ -253,14 +249,12 @@ public class AiHubChatServicePatchIntTest {
     public void testRenamingADeletedChatIsRejected() {
         long chatId = saveChat();
 
-        transactionTemplate.executeWithoutResult(
-            transactionStatus -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)));
+        transactionTemplate.executeWithoutResult(transactionStatus -> markDeleted(chatId));
 
         assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(
             transactionStatus -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch("Renamed", null, null, null))))
-                    .isInstanceOf(ConflictException.class);
+                    .isInstanceOf(NotFoundException.class);
 
         AiHubChat chat = chatRepository.findById(chatId)
             .orElseThrow();
@@ -269,38 +263,64 @@ public class AiHubChatServicePatchIntTest {
     }
 
     @Test
-    public void testPatchingADeletedChatToDeletedAgainSucceeds() {
+    public void testPatchingAChatToDeletedIsRejected() {
         long chatId = saveChat();
 
         AiHubChatPatch deletePatch = new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED);
 
-        transactionTemplate.executeWithoutResult(
-            transactionStatus -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, deletePatch));
+        assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(
+            transactionStatus -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, deletePatch)))
+                .isInstanceOf(IllegalArgumentException.class);
 
-        AiHubChat patchedChat = transactionTemplate.execute(
-            transactionStatus -> chatService.patch(chatId, WORKSPACE_ID, USER_ID, deletePatch));
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
 
-        assertThat(patchedChat).isNotNull();
-        assertThat(patchedChat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+    }
+
+    @Test
+    public void testUpdatedAtOfADeletedChatIsNotTouched() {
+        long chatId = saveChat();
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> markDeleted(chatId));
+
+        AiHubChat deletedChat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        LocalDateTime tomorrow = LocalDateTime.now()
+            .plusDays(1);
+
+        Integer updatedRowCount = transactionTemplate.execute(
+            transactionStatus -> chatRepository.updateUpdatedAtUnlessDeleted(
+                chatId, AiHubChatStatus.DELETED.ordinal(), tomorrow));
+
+        AiHubChat chat = chatRepository.findById(chatId)
+            .orElseThrow();
+
+        assertThat(updatedRowCount).isZero();
+        assertThat(chat.getUpdatedAt()).isEqualTo(deletedChat.getUpdatedAt());
     }
 
     @Test
     public void testArchivingADeletedChatIsRejected() {
         long chatId = saveChat();
 
-        transactionTemplate.executeWithoutResult(
-            transactionStatus -> chatService.patch(
-                chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)));
+        transactionTemplate.executeWithoutResult(transactionStatus -> markDeleted(chatId));
 
         assertThatThrownBy(() -> transactionTemplate.executeWithoutResult(
             transactionStatus -> chatService.patch(
                 chatId, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED))))
-                    .isInstanceOf(ConflictException.class);
+                    .isInstanceOf(NotFoundException.class);
 
         AiHubChat chat = chatRepository.findById(chatId)
             .orElseThrow();
 
         assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+    }
+
+    private void markDeleted(long chatId) {
+        chatRepository.updateStatusUnlessDeleted(
+            chatId, AiHubChatStatus.DELETED.ordinal(), AiHubChatStatus.DELETED.ordinal(), LocalDateTime.now());
     }
 
     private @Nullable Throwable runSecondWhileFirstHoldsTheRow(Runnable firstWrite, Runnable secondWrite)

@@ -160,9 +160,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     @Override
     @Transactional(readOnly = true)
     public List<AiHubChat> list(long workspaceId, long userId, int environment, @Nullable AiHubChatStatus status) {
+        if (status == AiHubChatStatus.DELETED) {
+            return List.of();
+        }
+
         if (status == null) {
-            return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(
-                workspaceId, userId, environment, LIST_LIMIT);
+            return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+                workspaceId, userId, environment, DELETED_STATUS_ORDINAL, LIST_LIMIT);
         }
 
         return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
@@ -331,13 +335,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
      */
     @Override
     public AiHubChat patch(long chatId, long requesterWorkspaceId, long requesterUserId, AiHubChatPatch chatPatch) {
-        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
-
         AiHubChatStatus status = chatPatch.status();
 
-        if (chat.getStatus() == AiHubChatStatus.DELETED && status != AiHubChatStatus.DELETED) {
-            throw new ConflictException(CHAT_DELETED_MESSAGE);
+        if (status == AiHubChatStatus.DELETED) {
+            throw new IllegalArgumentException("A chat is deleted with deleteAiHubChat, not by setting its status");
         }
+
+        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
 
         LocalDateTime updatedAt = LocalDateTime.now(clock);
 
@@ -374,12 +378,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         if (status != null) {
             chat.setStatus(status);
 
-            int updatedRowCount = chatRepository.updateStatusUnlessDeleted(
-                chatId, status.ordinal(), DELETED_STATUS_ORDINAL, updatedAt);
-
-            if (status != AiHubChatStatus.DELETED) {
-                requireUpdated(updatedRowCount);
-            }
+            requireUpdated(
+                chatRepository.updateStatusUnlessDeleted(chatId, status.ordinal(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
         return chatRepository.findById(chatId)
@@ -455,7 +455,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             chat, activeEvents.subList(0, cutoffEventIndex), activeEvents.get(messageEventIndex)
                 .getTimestamp());
 
-        chatRepository.updateUpdatedAt(chatId, LocalDateTime.now(clock));
+        chatRepository.updateUpdatedAtUnlessDeleted(chatId, DELETED_STATUS_ORDINAL, LocalDateTime.now(clock));
 
         return OptionalInt.of(activeEvents.size() - cutoffEventIndex);
     }
@@ -589,7 +589,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
                     .message(new AssistantMessage(content))
                     .build());
 
-        chatRepository.updateUpdatedAt(chatId, LocalDateTime.now(clock));
+        chatRepository.updateUpdatedAtUnlessDeleted(chatId, DELETED_STATUS_ORDINAL, LocalDateTime.now(clock));
     }
 
     @Override
@@ -609,7 +609,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     public void delete(long chatId, long requesterWorkspaceId, long requesterUserId) {
-        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
+        AiHubChat chat = load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage, true);
 
         inFlightRunRegistry.cancel(chat.getThreadId());
 
@@ -663,7 +663,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     @Transactional(readOnly = true)
     public Optional<AiHubChat> findByThreadIdViewable(String threadId, long requesterUserId) {
         return chatRepository.findByThreadId(threadId)
-            .filter(chat -> accessPolicy.canView(chat, requesterUserId));
+            .filter(chat -> !isDeleted(chat) && accessPolicy.canView(chat, requesterUserId));
     }
 
     @Override
@@ -676,7 +676,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         Map<String, AiHubChat> chatByThreadId = new LinkedHashMap<>();
 
         for (AiHubChat chat : chatRepository.findAllByThreadIdIn(threadIds)) {
-            if (accessPolicy.canView(chat, requesterUserId)) {
+            if (!isDeleted(chat) && accessPolicy.canView(chat, requesterUserId)) {
                 chatByThreadId.put(chat.getThreadId(), chat);
             }
         }
@@ -702,6 +702,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return loadManageable(chatId, requesterWorkspaceId, requesterUserId);
     }
 
+    private static boolean isDeleted(AiHubChat chat) {
+        return chat.getStatus() == AiHubChatStatus.DELETED;
+    }
+
     private static boolean workspaceOwnsChat(long workspaceId, AiHubChat chat) {
         return Objects.equals(chat.getWorkspaceId(), workspaceId);
     }
@@ -724,16 +728,24 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage);
     }
 
-    /**
-     * Loads {@code chatId}, verifies it lives in {@code requesterWorkspaceId}, and verifies {@code allowed} accepts the
-     * requester. "Does not exist", "exists in another workspace" and "not permitted for this requester" all return 404
-     * with an opaque message so an authenticated attacker cannot enumerate chat ids across the install; the WARN log
-     * keeps the audit trail.
-     */
     private AiHubChat load(
         long chatId, long requesterWorkspaceId, long requesterUserId, BiPredicate<AiHubChat, Long> allowed) {
 
+        return load(chatId, requesterWorkspaceId, requesterUserId, allowed, false);
+    }
+
+    /**
+     * Loads {@code chatId}, verifies it lives in {@code requesterWorkspaceId}, and verifies {@code allowed} accepts the
+     * requester. "Does not exist", "is in {@code DELETED} status" (unless {@code includeDeleted}), "exists in another
+     * workspace" and "not permitted for this requester" all return 404 with an opaque message so an authenticated
+     * attacker cannot enumerate chat ids across the install; the WARN log keeps the audit trail.
+     */
+    private AiHubChat load(
+        long chatId, long requesterWorkspaceId, long requesterUserId, BiPredicate<AiHubChat, Long> allowed,
+        boolean includeDeleted) {
+
         AiHubChat chat = chatRepository.findById(chatId)
+            .filter(foundChat -> includeDeleted || !isDeleted(foundChat))
             .orElseThrow(() -> new NotFoundException("AiHubChat not found"));
 
         if (!workspaceOwnsChat(requesterWorkspaceId, chat) || !allowed.test(chat, requesterUserId)) {
