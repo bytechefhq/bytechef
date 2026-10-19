@@ -33,7 +33,7 @@ Individual users are not self-service: a tenant admin removes a particular user 
 - Leaving anything that can act on the tenant's behalf after the request: a provider webhook still registered, a
   Quartz/db-scheduler/EventBridge job still firing, an OAuth2 refresh still running.
 - A dropped tenant whose stale callers silently read and write the **public** schema. Every tenant datasource
-  appends `public` to `search_path` (`BaseDataSource.getSearchPath`), and the public schema carries the full table
+  appends `public` to `search_path` (`BaseDataSource.setSearchPath`), and the public schema carries the full table
   set, so an orphaned webhook or scheduled job does not fail: it corrupts public data. Teardown must be complete
   *before* the drop, and the drop must not be the only line of defence (see "Pending tenants are inert").
 - A new sign-up inheriting a deleted tenant's id, and with it every key, prefix, bucket and URL built from that id.
@@ -63,7 +63,7 @@ connections and deployment rows all live there.
 
 1. Record the request in a new public-schema table (below) with status `PENDING_DELETION`.
 2. Disable every enabled automation project deployment through `ProjectDeploymentFacade.enableProjectDeployment(id,
-   false)`. That is the path a manual disable takes: per trigger it calls `TriggerLifecycleFacade.executeTriggerDisable`,
+   false)`. There is no finder for enabled deployments, so the request lists the tenant's project deployments and filters on the flag; `ProjectDeploymentService.disableAllProjectDeployments()` only flips the flag and must not be used for teardown. That is the path a manual disable takes: per trigger it calls `TriggerLifecycleFacade.executeTriggerDisable`,
    which unregisters dynamic/hybrid webhooks at the provider (using the connection and the stored
    `WebhookEnableOutput`), cancels polling and schedule jobs, and deletes trigger state. Agents, agent channels, MCP
    servers, A2A and API collections all sit on project deployments, so this covers them.
@@ -76,7 +76,7 @@ connections and deployment rows all live there.
    `TriggerScheduler.cancelOneTimeTask` (my call: this closes the hole without changing the key shape, which is
    listed under "Found along the way").
 6. Sweep the scheduler store for anything left under the tenant (see "Scheduler sweep").
-7. Snapshot the Stripe customer and subscription ids onto the deletion row, then cancel the subscription
+7. Snapshot the Stripe customer and subscription ids onto the deletion row (read from `billing_subscription`, a tenant-schema table), then cancel the subscription
    immediately. `StripeClient` only has `cancelAtPeriodEnd` today; add an immediate cancel. The customer is **not**
    deleted, at request or at purge: its invoices stay in Stripe for accounting.
 8. Delete every persistent token, then log the requester out. Other sessions are not enumerable (container
@@ -126,7 +126,7 @@ A platform-coordinator sweep picks up rows whose grace period has elapsed:
    tenant.
 7. Mark the row `PURGED`. Keep it forever as the tombstone.
 
-Each step is idempotent and the row records the last completed step, so a crashed purge resumes on the next sweep.
+Purge steps are idempotent and rerun until the row is marked purged, so a crashed purge resumes on the next sweep.
 
 ### Support cancellation
 
@@ -147,7 +147,7 @@ A new table in the **public** schema (it must survive the tenant's schema), e.g.
 | `requested_date` | |
 | `purge_after` | `requested_date` + grace period |
 | `stripe_customer_id`, `stripe_subscription_id` | snapshotted at request time so a retried cancel still has them |
-| `last_completed_step` | purge resume point |
+| `purge_claimed_date` | TIMESTAMP; set when a coordinator claims the purge, a claim older than 1 hour is reclaimable |
 | `teardown_failures` | JSON list of deployments/instances whose trigger disable threw |
 
 Liquibase context: the public-schema contexts the scheduler tables use, not `multitenant`.
@@ -165,15 +165,14 @@ base64 of `tenantId:…`; a 6-character tenant id is exactly two base64 groups, 
 tenant.
 
 - **Quartz** (public schema, forced by `MultiTenantDriverDelegate`): groups `ScheduleTrigger`, `PollingTrigger`,
-  `DynamicWebhookTriggerRefresh` by that prefix; one-time tasks `tenantId:jobId`; connection refresh
+  `DynamicWebhookTriggerRefresh` by that prefix; one-time tasks by bare job id, `JobKey(String.valueOf(jobId), "OneTimeTask")`; connection refresh
   `tenantId + connectionId`.
 - **db-scheduler** (`scheduled_tasks`): the same instance-id shapes. Not on master yet; covered once it lands.
-- **AWS EventBridge**: `ListSchedules(NamePrefix=<group> + base64prefix)` per group, `OneTimeTask_resume_<tenantId>_`,
-  and the connection-refresh names.
+- **AWS EventBridge**: `ListSchedules(NamePrefix=<group> + base64prefix)` per group, `OneTimeTask_resume_<jobId>` (no tenant in the name, so these come from step 5's enumeration), and connection refresh `ConnectionRefresh_<tenantId>_<connectionId>`.
 
 Add a `cancelAllForTenant(tenantId)` to the `TriggerScheduler` SPI with one implementation per scheduler. OAuth2
 refresh jobs live on a separate SPI, `ConnectionRefreshScheduler` (Quartz and AWS implementations, keys
-`tenantId + connectionId`), which gets the same method.
+`tenantId + connectionId`), which gets the same method. `OneTimeSchedulerJob` and `DynamicWebhookTriggerRefreshJob` run with no tenant context.
 
 ## UI
 
