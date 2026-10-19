@@ -102,6 +102,53 @@ class TenantDeletionRepositoryIntTest {
     }
 
     @Test
+    void testMarkPendingDeletionAfterCancelResetsRow() {
+        Instant firstPurgeAfter = Instant.now()
+            .truncatedTo(ChronoUnit.SECONDS);
+        Instant secondPurgeAfter = firstPurgeAfter.plus(Duration.ofDays(30));
+
+        tenantDeletionRepository.markPendingDeletion(TENANT_ID, "admin@x", firstPurgeAfter);
+        tenantDeletionRepository.recordStripeIds(TENANT_ID, "cus_1", "sub_1");
+        tenantDeletionRepository.recordTeardownFailures(TENANT_ID, List.of("a"));
+        tenantDeletionRepository.claimForPurge(TENANT_ID, firstPurgeAfter);
+
+        new JdbcTemplate(dataSource).update(
+            "UPDATE public.tenant_deletion SET status = ? WHERE tenant_id = ?", Status.CANCELLED.ordinal(),
+            TENANT_ID);
+
+        assertThat(tenantDeletionRepository.markPendingDeletion(TENANT_ID, "other@x", secondPurgeAfter)).isTrue();
+
+        TenantDeletion tenantDeletion = tenantDeletionRepository.fetchTenantDeletion(TENANT_ID)
+            .orElseThrow();
+
+        assertThat(tenantDeletion.status()).isEqualTo(Status.PENDING_DELETION);
+        assertThat(tenantDeletion.requestedBy()).isEqualTo("other@x");
+        assertThat(tenantDeletion.purgeAfter()).isEqualTo(secondPurgeAfter);
+        assertThat(tenantDeletion.stripeCustomerId()).isNull();
+        assertThat(tenantDeletion.stripeSubscriptionId()).isNull();
+        assertThat(tenantDeletion.purgeClaimedDate()).isNull();
+        assertThat(tenantDeletion.teardownFailures()).isEmpty();
+    }
+
+    @Test
+    void testMarkPendingDeletionOnPurgedRowReturnsFalse() {
+        Instant purgeAfter = Instant.now()
+            .truncatedTo(ChronoUnit.SECONDS);
+
+        tenantDeletionRepository.markPendingDeletion(TENANT_ID, "admin@x", purgeAfter);
+        tenantDeletionRepository.markPurged(TENANT_ID);
+
+        assertThat(tenantDeletionRepository.markPendingDeletion(TENANT_ID, "other@x", purgeAfter.plusSeconds(60)))
+            .isFalse();
+
+        TenantDeletion tenantDeletion = tenantDeletionRepository.fetchTenantDeletion(TENANT_ID)
+            .orElseThrow();
+
+        assertThat(tenantDeletion.status()).isEqualTo(Status.PURGED);
+        assertThat(tenantDeletion.purgeAfter()).isEqualTo(purgeAfter);
+    }
+
+    @Test
     void testRecordStripeIdsRoundTrip() {
         tenantDeletionRepository.markPendingDeletion(TENANT_ID, "admin@x", Instant.now());
         tenantDeletionRepository.recordStripeIds(TENANT_ID, "cus_1", "sub_1");

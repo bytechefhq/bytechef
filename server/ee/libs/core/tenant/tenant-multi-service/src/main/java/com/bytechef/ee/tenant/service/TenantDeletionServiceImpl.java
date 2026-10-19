@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,13 +36,14 @@ import org.springframework.stereotype.Service;
 @ConditionalOnMultiTenant
 class TenantDeletionServiceImpl implements TenantDeletionService {
 
+    private static final Logger log = LoggerFactory.getLogger(TenantDeletionServiceImpl.class);
+
     private static final long REFRESH_INTERVAL_MILLIS = 30_000L;
 
+    private final ReentrantLock refreshLock = new ReentrantLock();
     private final TenantDeletionRepository tenantDeletionRepository;
 
-    private volatile Set<String> inactiveTenantIds = Set.of();
-    private volatile long loadedAtMillis;
-    private volatile boolean loaded;
+    private volatile Snapshot snapshot = new Snapshot(Set.of(), 0L, false);
 
     TenantDeletionServiceImpl(TenantDeletionRepository tenantDeletionRepository) {
         this.tenantDeletionRepository = tenantDeletionRepository;
@@ -62,11 +66,24 @@ class TenantDeletionServiceImpl implements TenantDeletionService {
 
     @Override
     public boolean isInactive(String tenantId) {
-        if (!loaded || System.currentTimeMillis() - loadedAtMillis > REFRESH_INTERVAL_MILLIS) {
-            reload(null);
+        Snapshot currentSnapshot = snapshot;
+
+        if (isStale(currentSnapshot)) {
+            refreshLock.lock();
+
+            try {
+                if (isStale(snapshot)) {
+                    reload(null);
+                }
+
+                currentSnapshot = snapshot;
+            } finally {
+                refreshLock.unlock();
+            }
         }
 
-        return inactiveTenantIds.contains(tenantId);
+        return currentSnapshot.inactiveTenantIds()
+            .contains(tenantId);
     }
 
     @Override
@@ -74,7 +91,7 @@ class TenantDeletionServiceImpl implements TenantDeletionService {
         boolean marked = tenantDeletionRepository.markPendingDeletion(tenantId, requestedBy, purgeAfter);
 
         if (marked) {
-            reload(tenantId);
+            reloadLocked(tenantId);
         }
 
         return marked;
@@ -84,7 +101,7 @@ class TenantDeletionServiceImpl implements TenantDeletionService {
     public void markPurged(String tenantId) {
         tenantDeletionRepository.markPurged(tenantId);
 
-        reload(tenantId);
+        reloadLocked(tenantId);
     }
 
     @Override
@@ -97,15 +114,45 @@ class TenantDeletionServiceImpl implements TenantDeletionService {
         tenantDeletionRepository.recordTeardownFailures(tenantId, failures);
     }
 
+    private boolean isStale(Snapshot currentSnapshot) {
+        return !currentSnapshot.loaded() ||
+            System.currentTimeMillis() - currentSnapshot.loadedAtMillis() > REFRESH_INTERVAL_MILLIS;
+    }
+
+    private void reloadLocked(String locallyInactiveTenantId) {
+        refreshLock.lock();
+
+        try {
+            reload(locallyInactiveTenantId);
+        } finally {
+            refreshLock.unlock();
+        }
+    }
+
     private void reload(String locallyInactiveTenantId) {
-        Set<String> tenantIds = new HashSet<>(tenantDeletionRepository.findInactiveTenantIds());
+        Set<String> tenantIds = new HashSet<>();
+        Snapshot previousSnapshot = snapshot;
+        long loadedAtMillis = previousSnapshot.loadedAtMillis();
+        boolean loaded = previousSnapshot.loaded();
+
+        try {
+            tenantIds.addAll(tenantDeletionRepository.findInactiveTenantIds());
+
+            loadedAtMillis = System.currentTimeMillis();
+            loaded = true;
+        } catch (RuntimeException runtimeException) {
+            log.warn("Failed to refresh the inactive tenant ids, keeping the last known set", runtimeException);
+
+            tenantIds.addAll(previousSnapshot.inactiveTenantIds());
+        }
 
         if (locallyInactiveTenantId != null) {
             tenantIds.add(locallyInactiveTenantId);
         }
 
-        inactiveTenantIds = Set.copyOf(tenantIds);
-        loadedAtMillis = System.currentTimeMillis();
-        loaded = true;
+        snapshot = new Snapshot(Set.copyOf(tenantIds), loadedAtMillis, loaded);
+    }
+
+    private record Snapshot(Set<String> inactiveTenantIds, long loadedAtMillis, boolean loaded) {
     }
 }
