@@ -386,26 +386,36 @@ describe('buildAiHubSubscriber', () => {
             consoleWarnSpy.mockRestore();
         });
 
-        it.each([
-            ['"done"', 'done'],
-            ['42', 42],
-            ['-1.5', -1.5],
-            ['true', true],
-            ['false', false],
-            ['null', null],
-        ])('parses the JSON scalar tool result %s', (content, expected) => {
+        it('parses a JSON string tool result to its text', () => {
             const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            deliverToolResult(createSubscriber(), 'call-scalar', 'getValue', content);
+            deliverToolResult(createSubscriber(), 'call-scalar', 'getValue', '"done"');
 
             expect(aiChatToolCallStore.getState().toolCalls['call-scalar']).toMatchObject({
-                result: expected,
+                result: 'done',
                 status: 'success',
             });
             expect(consoleWarnSpy).not.toHaveBeenCalled();
 
             consoleWarnSpy.mockRestore();
         });
+
+        it.each(['42', '-1.5', 'true', 'false', 'null'])(
+            'keeps the bare JSON literal tool result %s as text, silently',
+            (content) => {
+                const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+                deliverToolResult(createSubscriber(), 'call-scalar', 'getValue', content);
+
+                expect(aiChatToolCallStore.getState().toolCalls['call-scalar']).toMatchObject({
+                    result: content,
+                    status: 'success',
+                });
+                expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+                consoleWarnSpy.mockRestore();
+            }
+        );
 
         it('keeps prose that starts like a JSON literal as text, silently', () => {
             const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
