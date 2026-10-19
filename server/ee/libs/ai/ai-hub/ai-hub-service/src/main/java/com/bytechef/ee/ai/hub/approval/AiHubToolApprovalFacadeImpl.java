@@ -177,7 +177,9 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     }
 
     private void supersedeIfToolCallDropped(AiHubToolApproval approval, AiHubChat chat) {
-        if (chatService.containsActiveToolCall(chat.getThreadId(), approval.getToolName(), approval.getArguments())) {
+        if (chatService.containsActiveToolCall(
+            chat.getThreadId(), approval.getToolCallId(), approval.getToolName(), approval.getArguments())) {
+
             return;
         }
 

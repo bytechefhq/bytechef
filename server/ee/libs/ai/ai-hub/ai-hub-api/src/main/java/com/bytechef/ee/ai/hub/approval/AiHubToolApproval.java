@@ -96,6 +96,9 @@ public final class AiHubToolApproval {
     @Column
     private @Nullable String comment;
 
+    @Column("tool_call_id")
+    private @Nullable String toolCallId;
+
     @Column("expires_at")
     private Instant expiresAt;
 
@@ -266,6 +269,18 @@ public final class AiHubToolApproval {
 
     public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    /**
+     * The id of the model's tool call this approval holds, recorded once the call's turn-ending result is stored;
+     * {@code null} for an approval created before the id was recorded.
+     */
+    public @Nullable String getToolCallId() {
+        return toolCallId;
+    }
+
+    public void setToolCallId(@Nullable String toolCallId) {
+        this.toolCallId = toolCallId;
     }
 
     public @Nullable String getExecutionError() {

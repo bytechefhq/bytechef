@@ -234,7 +234,7 @@ public class AiHubConfiguration {
             .ifAvailable(inFlightRunRegistry -> builder.advisor(new RunStopAdvisor(inFlightRunRegistry)));
         builder.advisor(aiHubSessionMemory.createResentUserMessageAdvisor());
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
-        builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor());
+        builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
 
