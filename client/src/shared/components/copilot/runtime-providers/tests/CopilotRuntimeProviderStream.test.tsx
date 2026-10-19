@@ -85,7 +85,7 @@ describe('CopilotRuntimeProvider with the captured build stream', () => {
         const assistantMessages = renderedMessages.filter((message) => message.role === 'assistant');
         const assistantPartTypes = assistantMessages.flatMap(partTypesOf);
 
-        expect(renderedMessages[0]).toEqual({content: 'Build this workflow', role: 'user'});
+        expect(renderedMessages[0]).toEqual({content: 'Build this workflow', id: expect.any(String), role: 'user'});
         expect(assistantPartTypes).toContain('text');
         expect(assistantPartTypes).toContain('data-ask-user-question');
         expect(
