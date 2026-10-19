@@ -330,15 +330,29 @@ export type AiHubChat = {
   id: Scalars['ID']['output'];
   /** Whether the current caller is this chat's owner. */
   isOwner: Scalars['Boolean']['output'];
+  /**
+   * Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
+   * binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+   * AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
+   * server-side.
+   */
+  kind: AiHubChatKind;
   lastPreview?: Maybe<Scalars['String']['output']>;
   messageCount: Scalars['Int']['output'];
   /** The chat owner's user id, resolved off the row's userId column. */
   ownerUserId: Scalars['Long']['output'];
+  /**
+   * Parent project-deployment id for the workflow execution. Used by the sidebar to group workflow chats by project.
+   * Non-null when {@code kind = WORKFLOW_CHAT}.
+   */
+  projectDeploymentId?: Maybe<Scalars['Long']['output']>;
   status: AiHubChatStatus;
   threadId: Scalars['String']['output'];
   title?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['Long']['output']>;
   userId: Scalars['Long']['output'];
+  /** Composite WorkflowExecutionId string the chat is bound to. Non-null when {@code kind = WORKFLOW_CHAT}. */
+  workflowExecutionId?: Maybe<Scalars['String']['output']>;
   workspaceId: Scalars['Long']['output'];
 };
 
@@ -398,6 +412,11 @@ export enum AiHubChatArtifactStatus {
   Irreversible = 'IRREVERSIBLE'
 }
 
+export enum AiHubChatKind {
+  Standard = 'STANDARD',
+  WorkflowChat = 'WORKFLOW_CHAT'
+}
+
 /**
  * Single chat message in a chat. {@code role} is one of {@code user}/{@code assistant}/{@code system};
  * {@code timestamp} is the message's epoch-milli arrival time.
@@ -405,6 +424,11 @@ export enum AiHubChatArtifactStatus {
 export type AiHubChatMessage = {
   __typename?: 'AiHubChatMessage';
   content: Scalars['String']['output'];
+  /**
+   * The id of the session event behind this row. A user row sent through the AI Hub keeps the AG-UI message id it
+   * was sent with, so the client addresses both loaded and live rows by the same id.
+   */
+  id: Scalars['String']['output'];
   role: Scalars['String']['output'];
   timestamp: Scalars['Long']['output'];
   /**
@@ -852,7 +876,9 @@ export type ChatWorkflow = {
   projectDeploymentId: Scalars['ID']['output'];
   projectId: Scalars['ID']['output'];
   projectName: Scalars['String']['output'];
+  projectWorkflowId: Scalars['ID']['output'];
   workflowExecutionId: Scalars['String']['output'];
+  workflowId: Scalars['ID']['output'];
   workflowLabel: Scalars['String']['output'];
 };
 
@@ -1957,6 +1983,8 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   /** Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn. */
   appendAiHubChatAssistantMessage: Scalars['Boolean']['output'];
+  /** Archives the caller's active workflow chats in the environment. Returns the number archived. */
+  bulkArchiveWorkflowChatAiHubChats: Scalars['Int']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   /**
    * Cancels the in-flight agent run of a chat. Returns {@code true} when a live run was cancelled and
@@ -1965,6 +1993,8 @@ export type Mutation = {
    */
   cancelAiHubRun: Scalars['Boolean']['output'];
   cancelGenerationJob: Scalars['Boolean']['output'];
+  /** Stops the in-flight turn of a workflow chat. Returns true when a live turn was cancelled. */
+  cancelWorkflowChatTurn: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
@@ -1999,6 +2029,12 @@ export type Mutation = {
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpTool?: Maybe<McpTool>;
+  /**
+   * Creates a workflow chat bound to a workflow execution id and its project deployment. Always inserts a new chat. The
+   * caller needs the workspace VIEWER role and the WORKFLOW_VIEW scope, and the workflow must be one the workspace may
+   * chat with; otherwise the call is refused as forbidden.
+   */
+  createWorkflowChatAiHubChat: AiHubChat;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
@@ -2120,10 +2156,12 @@ export type Mutation = {
   testWebSearchProvider: WebSearchProviderTestResult;
   testWorkflowNodeScript: ScriptTestExecution;
   /**
-   * Truncates the chat history, deleting the message at {@code fromMessageIndex} and every message after it.
-   * Returns the number of session events deleted; zero when the index is past the end.
+   * Truncates the chat history at the message with id {@code messageId}: every message after it is deleted, and the
+   * message itself too unless {@code keepMessage} is true. Returns the number of session events deleted, or null
+   * when the chat holds no message with that id. Fails with CONFLICT while a turn is running in the chat, before
+   * anything is deleted.
    */
-  truncateAiHubChatMessages: Scalars['Int']['output'];
+  truncateAiHubChatMessages?: Maybe<Scalars['Int']['output']>;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2203,6 +2241,12 @@ export type MutationAppendAiHubChatAssistantMessageArgs = {
 };
 
 
+export type MutationBulkArchiveWorkflowChatAiHubChatsArgs = {
+  environment: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationCancelAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2217,6 +2261,12 @@ export type MutationCancelAiHubRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCancelWorkflowChatTurnArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2413,6 +2463,15 @@ export type MutationCreateMcpProjectWorkflowArgs = {
 
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
+};
+
+
+export type MutationCreateWorkflowChatAiHubChatArgs = {
+  environment: Scalars['Int']['input'];
+  projectDeploymentId: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+  workflowExecutionId: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2949,8 +3008,9 @@ export type MutationTestWorkflowNodeScriptArgs = {
 
 
 export type MutationTruncateAiHubChatMessagesArgs = {
-  fromMessageIndex: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
+  keepMessage: Scalars['Boolean']['input'];
+  messageId: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
