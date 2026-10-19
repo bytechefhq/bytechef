@@ -35,8 +35,8 @@ public class AiHubApprovalGate {
         this.chatService = chatService;
     }
 
-    public void recordToolCallId(long approvalId, String toolCallId) {
-        approvalService.recordToolCallId(approvalId, toolCallId);
+    public void recordToolCallId(String threadId, long approvalId, String toolCallId) {
+        approvalService.recordToolCallId(threadId, approvalId, toolCallId);
     }
 
     public ToolCallback wrap(ToolCallback callback) {
