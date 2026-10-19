@@ -132,6 +132,42 @@ describe('A2aServerListItem', () => {
         expect(screen.getByRole('button', {name: 'Add Workflows'})).toBeInTheDocument();
     });
 
+    it('expands when the row itself is clicked, like an MCP server row', async () => {
+        const user = userEvent.setup();
+
+        renderListItem();
+
+        expect(screen.queryByRole('tab', {name: 'Connect'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByText(/Modified at|No modifications/));
+
+        expect(await screen.findByRole('tab', {name: 'Connect'})).toBeInTheDocument();
+    });
+
+    it('leaves the row a pointer shortcut and lets a keyboard user expand the server from its toggle', async () => {
+        const user = userEvent.setup();
+
+        const {container} = renderListItem();
+
+        expect(container.querySelector('[role="presentation"]')).toHaveTextContent(/Modified at|No modifications/);
+
+        screen.getByRole('button', {name: /2 workflow skills/}).focus();
+
+        await user.keyboard('{Enter}');
+
+        expect(await screen.findByRole('tab', {name: 'Connect'})).toBeInTheDocument();
+    });
+
+    it('does not expand when a tag is clicked', async () => {
+        const user = userEvent.setup();
+
+        renderListItem();
+
+        await user.click(screen.getByText('sales'));
+
+        expect(screen.queryByRole('tab', {name: 'Connect'})).not.toBeInTheDocument();
+    });
+
     it('shows the agent card and endpoint URLs in the Connect tab', async () => {
         const user = userEvent.setup();
 
