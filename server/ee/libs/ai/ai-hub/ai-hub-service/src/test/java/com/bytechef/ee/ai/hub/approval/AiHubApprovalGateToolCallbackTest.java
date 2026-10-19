@@ -121,8 +121,22 @@ class AiHubApprovalGateToolCallbackTest {
     }
 
     @Test
-    void testUnknownThreadPassesThrough() {
+    void testGatedCallForADeletedChatIsRefused() {
         ToolCallback wrapped = gate(Set.of(), Set.of());
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+
+        String result = wrapped.call("{}", toolContext());
+
+        assertThat(result).contains("\"error\"")
+            .contains("the tool was not executed");
+        verify(delegate, never()).call(anyString(), any());
+        verify(approvalService, never()).createPending(any());
+    }
+
+    @Test
+    void testUngatedCallForADeletedChatPassesThrough() {
+        ToolCallback wrapped = gate(Set.of(), Set.of("deleteProject"));
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
 
