@@ -153,9 +153,8 @@ class WorkspaceConnectionFacadeIntTest {
             user(TENANT_ADMIN_USER_ID, TENANT_ADMIN_LOGIN))) {
 
             when(userService.getUser(user.getLogin())).thenReturn(user);
+            when(userService.fetchUserByLogin(user.getLogin())).thenReturn(Optional.of(user));
         }
-
-        when(userService.fetchUserByLogin(OWNER_LOGIN)).thenReturn(Optional.of(user(OWNER_USER_ID, OWNER_LOGIN)));
 
         Connection connection = new Connection();
 
@@ -213,12 +212,12 @@ class WorkspaceConnectionFacadeIntTest {
 
     @ParameterizedTest
     @MethodSource("gatedMethods")
-    void testGateDeniesTheOwnerWhenTheUserLookupIsUnsupported(String methodName) {
+    void testGateRefusesTheOwnerWhenTheUserLookupIsUnsupported(String methodName) {
         when(userService.fetchUserByLogin(OWNER_LOGIN)).thenThrow(new UnsupportedOperationException());
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
-        assertThatThrownBy(() -> invokeGatedMethod(methodName)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> invokeGatedMethod(methodName)).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @ParameterizedTest
