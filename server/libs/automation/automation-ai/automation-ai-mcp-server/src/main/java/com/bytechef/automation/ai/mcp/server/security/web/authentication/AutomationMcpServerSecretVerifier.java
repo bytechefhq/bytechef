@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import java.security.MessageDigest;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -50,21 +52,47 @@ public class AutomationMcpServerSecretVerifier implements McpServerSecretVerifie
             return Optional.empty();
         }
 
-        String mcpServerSecretKey = matcher.group(1);
+        McpServer mcpServer = fetchSecretMatchingMcpServer(matcher.group(1));
 
+        return Optional.of(mcpServer != null && mcpServer.isEnabled());
+    }
+
+    @Override
+    public Optional<String> getMcpServerDisabledMessage(HttpServletRequest request) {
+        Matcher matcher = SECRET_KEY_PATH_PATTERN.matcher(request.getServletPath());
+
+        if (!matcher.matches()) {
+            return Optional.empty();
+        }
+
+        McpServer mcpServer = fetchSecretMatchingMcpServer(matcher.group(1));
+
+        if (mcpServer == null || mcpServer.isEnabled()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(McpServerDisabledException.MCP_SERVER_MESSAGE);
+    }
+
+    @Nullable
+    private McpServer fetchSecretMatchingMcpServer(String mcpServerSecretKey) {
         McpServer mcpServer;
 
         try {
             mcpServer = mcpServerService.getMcpServer(mcpServerSecretKey);
         } catch (RuntimeException runtimeException) {
-            return Optional.of(false);
+            return null;
         }
 
         String secretKey = mcpServer.getSecretKey();
 
-        return Optional.of(
-            mcpServer.isEnabled() && mcpServer.getType() == PlatformType.AUTOMATION && secretKey != null &&
-                MessageDigest.isEqual(
-                    secretKey.getBytes(StandardCharsets.UTF_8), mcpServerSecretKey.getBytes(StandardCharsets.UTF_8)));
+        if (mcpServer.getType() != PlatformType.AUTOMATION || secretKey == null ||
+            !MessageDigest.isEqual(
+                secretKey.getBytes(StandardCharsets.UTF_8), mcpServerSecretKey.getBytes(StandardCharsets.UTF_8))) {
+
+            return null;
+        }
+
+        return mcpServer;
     }
 }
