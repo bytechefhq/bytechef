@@ -1375,13 +1375,13 @@ paths:
                     type: "array"
                     items:
                       type: "string"
-  /workflows/{id}/workflow-nodes/{workflowNodeName}/component-actions/dynamic-properties/{propertyName}:
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/dynamic-properties/{propertyName}:
     post:
-      description: "Get dynamic properties for a property of a component action called from a script workflow node."
-      summary: "Get dynamic properties for a property of a component action called from a script workflow node"
+      description: "Get dynamic properties for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements."
+      summary: "Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node"
       tags:
         - "workflow-node-dynamic-properties"
-      operationId: "getWorkflowNodeComponentActionDynamicProperties"
+      operationId: "getWorkflowNodeComponentOperationDynamicProperties"
       parameters:
         - name: "id"
           description: "The workflow id"
@@ -1390,7 +1390,7 @@ paths:
           schema:
             type: "string"
         - name: "workflowNodeName"
-          description: "The name of a workflow's script task (E.g. script_1)"
+          description: "The name of a workflow's task or trigger (E.g. script_1)"
           in: "path"
           required: true
           schema:
@@ -1412,7 +1412,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ComponentActionDynamicPropertiesRequest"
+              $ref: "#/components/schemas/ComponentOperationDynamicPropertiesRequest"
         required: true
       responses:
         "200":
@@ -2241,15 +2241,19 @@ components:
         multipleElements:
           description: "If multiple elements can be added."
           type: "boolean"
-    ComponentActionDynamicPropertiesRequest:
+    ComponentOperationDynamicPropertiesRequest:
       type: "object"
       required:
-        - "actionName"
         - "componentName"
         - "componentVersion"
+        - "operationName"
+        - "operationType"
       properties:
-        actionName:
-          description: "The name of a component action."
+        clusterElementType:
+          description: "The type of a cluster element of the workflow node that declares the connection."
+          type: "string"
+        clusterElementWorkflowNodeName:
+          description: "The name of a cluster element of the workflow node that declares the connection."
           type: "string"
         componentName:
           description: "The name of a component."
@@ -2265,8 +2269,17 @@ components:
           type: "array"
           items:
             type: "string"
+        operationName:
+          description: "The name of a component action or trigger."
+          type: "string"
+        operationType:
+          description: "The type of a component operation."
+          type: "string"
+          enum:
+            - "ACTION"
+            - "TRIGGER"
         parameters:
-          description: "The known parameter values of the action call."
+          description: "The known parameter values of the operation."
           type: "object"
           additionalProperties: true
     ComponentDefinition:
