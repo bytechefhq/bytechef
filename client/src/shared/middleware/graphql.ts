@@ -630,6 +630,14 @@ export type McpProjectsByServerIdQueryVariables = Exact<{
 
 export type McpProjectsByServerIdQuery = { mcpProjectsByServerId: Array<{ id: string, projectDeploymentId: string, mcpServerId: string, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectVersion: number | null, project: { id: string, name: string, category: { id: string | null, name: string | null } | null, tags: Array<{ id: string, name: string } | null> | null } | null, mcpProjectWorkflows: Array<{ id: string, enabled: boolean, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectDeploymentWorkflow: { id: string, enabled: boolean, inputs: any, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
+export type MyWorkspaceScopesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment?: Types.EnvironmentEnum | null | undefined;
+}>;
+
+
+export type MyWorkspaceScopesQuery = { myWorkspaceScopes: Array<string> };
+
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
   query?: string | null | undefined;
   category?: string | null | undefined;
@@ -4524,6 +4532,28 @@ export const useMcpProjectsByServerIdQuery = <
       {
     queryKey: ['mcpProjectsByServerId', variables],
     queryFn: fetcher<McpProjectsByServerIdQuery, McpProjectsByServerIdQueryVariables>(McpProjectsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const MyWorkspaceScopesDocument = new TypedDocumentString(`
+    query MyWorkspaceScopes($workspaceId: ID!, $environment: EnvironmentEnum) {
+  myWorkspaceScopes(workspaceId: $workspaceId, environment: $environment)
+}
+    `);
+
+export const useMyWorkspaceScopesQuery = <
+      TData = MyWorkspaceScopesQuery,
+      TError = unknown
+    >(
+      variables: MyWorkspaceScopesQueryVariables,
+      options?: Omit<UseQueryOptions<MyWorkspaceScopesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<MyWorkspaceScopesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<MyWorkspaceScopesQuery, TError, TData>(
+      {
+    queryKey: ['MyWorkspaceScopes', variables],
+    queryFn: fetcher<MyWorkspaceScopesQuery, MyWorkspaceScopesQueryVariables>(MyWorkspaceScopesDocument, variables),
     ...options
   }
     )};
