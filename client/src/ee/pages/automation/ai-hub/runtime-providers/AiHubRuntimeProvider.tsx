@@ -1121,7 +1121,6 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 const errorMessage = error instanceof Error ? error.message : String(error);
 
                 console.error('AI Hub agent run failed:', error);
-                toast.error(`AI Hub failed: ${errorMessage}`);
 
                 aiChatToolCallStore.getState().failAllRunning({error: errorMessage});
 
@@ -1161,8 +1160,6 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             const errorMessage = 'AI Hub is not ready: missing chat id.';
 
             toast.error(errorMessage);
-
-            aiChatRetryableErrorStore.getState().setError({errorMessage, lastUserMessage: input, toolName: 'aiHub'});
 
             return;
         }
@@ -1209,7 +1206,6 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 useAiHubStore.getState().resetMessages();
 
                 console.error('Failed to auto-create chat on first message:', error);
-                toast.error(`Failed to start chat: ${errorMessage}`);
 
                 aiChatRetryableErrorStore
                     .getState()
@@ -1269,7 +1265,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         await runTurn({
             input: userMessage.content,
-            onFailure: () => undefined,
+            onFailure: (errorMessage) => toast.error(`AI Hub failed: ${errorMessage}`),
             optimisticTurnMarker: getRandomId(),
             runId,
         });
