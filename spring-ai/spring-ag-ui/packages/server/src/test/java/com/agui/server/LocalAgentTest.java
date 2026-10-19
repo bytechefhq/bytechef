@@ -12,9 +12,13 @@ import com.agui.core.state.State;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -207,16 +211,42 @@ class LocalAgentTest {
 
 
     @Test
-    public void shouldSetState() throws AGUIException {
-        var agent = new TestAgent(null, null, null, "Message");
+    public void shouldKeepTheAgentStateFinal() throws NoSuchFieldException {
+        assertThat(Modifier.isFinal(LocalAgent.class.getDeclaredField("state").getModifiers())).isTrue();
+    }
 
-        var state = new State();
+    @Test
+    public void shouldPassTheRunStateToAFailedRunsSubscriber() throws Exception {
+        var builderState = new State();
+        var runState = new State();
 
-        assertThat(agent.state).isNull();
+        runState.set("owner", "this run");
 
-        agent.setState(state);
+        var agent = new TestAgent(null, builderState, null, "System") {
+            @Override
+            protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+                throw new IllegalStateException("run failed");
+            }
+        };
 
-        assertThat(agent.state).isEqualTo(state);
+        var failedRunState = new AtomicReference<State>();
+
+        var future = agent.runAgent(
+            RunAgentParameters.builder()
+                .messages(List.of())
+                .state(runState)
+                .threadId("thread-1")
+                .build(),
+            new AgentSubscriber() {
+                @Override
+                public void onRunFailed(AgentSubscriberParams params, Throwable error) {
+                    failedRunState.set(params.state());
+                }
+            });
+
+        assertThatExceptionOfType(ExecutionException.class)
+            .isThrownBy(() -> future.get(10, TimeUnit.SECONDS));
+        assertThat(failedRunState.get()).isSameAs(runState);
     }
 
     public static class TestAgent extends LocalAgent {

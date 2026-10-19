@@ -39,7 +39,7 @@ public abstract class LocalAgent implements Agent {
     /**
      * Current state of the agent, containing persistent data and configuration.
      */
-    protected State state;
+    protected final State state;
 
     /**
      * Static system message content used when no system message provider is specified.
@@ -94,15 +94,6 @@ public abstract class LocalAgent implements Agent {
     }
 
     /**
-     * Updates the current state of the agent.
-     *
-     * @param state the new state to set for this agent
-     */
-    public void setState(final State state) {
-        this.state = state;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * Returns the messages of the agent
@@ -150,7 +141,7 @@ public abstract class LocalAgent implements Agent {
 
                 try {
                     subscriber.onRunFailed(
-                        new AgentSubscriberParams(input.messages(), this.state, this, input), cause);
+                        new AgentSubscriberParams(input.messages(), input.state(), this, input), cause);
                 } catch (RuntimeException runFailedException) {
                     cause.addSuppressed(runFailedException);
                 }
