@@ -33,7 +33,9 @@ const PropertyField = ({
 
     let sampleValue;
 
-    if (typeof sampleOutput === 'object') {
+    if (property.type === 'ARRAY' && !property.name && !parentPath) {
+        sampleValue = sampleOutput;
+    } else if (typeof sampleOutput === 'object') {
         sampleValue = getNestedObject(sampleOutput, selector);
     } else {
         sampleValue = sampleOutput;
