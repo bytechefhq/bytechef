@@ -38,7 +38,7 @@ import {
     useAiProviderCatalogQuery,
     useResolveAiHubToolApprovalMutation,
 } from '@/shared/middleware/graphql';
-import {GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
+import {GraphQLHttpError, GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -154,6 +154,10 @@ export function getForbiddenTurnRunErrorCode(
     const reason = readTurnErrorReason(source);
 
     return (reason !== undefined && FORBIDDEN_TURN_RUN_ERROR_CODES[reason]) || RUN_ERROR_CODE_ACCESS_DENIED;
+}
+
+function isChatThreadConflictError(error: unknown): boolean {
+    return error instanceof GraphQLResponseError && error.errorCode === 'CONFLICT';
 }
 
 export function isToolApprovalConflictError(error: unknown): error is GraphQLResponseError {
@@ -1144,9 +1148,15 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 console.error('Failed to auto-create chat on first message:', error);
 
-                aiChatRetryableErrorStore
-                    .getState()
-                    .setError({errorMessage, lastUserMessage: input, toolName: 'aiHub'});
+                if (isChatThreadConflictError(error)) {
+                    useAiHubStore.getState().generateChatId();
+                }
+
+                if (!(error instanceof GraphQLResponseError) && !(error instanceof GraphQLHttpError)) {
+                    toast.error(`Failed to start chat: ${errorMessage}`);
+                }
+
+                runtime.thread.composer.setText(input);
             },
         });
 
