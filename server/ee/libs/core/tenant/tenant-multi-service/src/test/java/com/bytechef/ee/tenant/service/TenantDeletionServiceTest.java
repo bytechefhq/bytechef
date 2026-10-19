@@ -67,6 +67,17 @@ class TenantDeletionServiceTest {
     }
 
     @Test
+    void testIsInactiveIsFalseForNullTenant() {
+        TenantDeletionRepository tenantDeletionRepository = mock(TenantDeletionRepository.class);
+
+        when(tenantDeletionRepository.findInactiveTenantIds()).thenReturn(Set.of("000002"));
+
+        TenantDeletionServiceImpl tenantDeletionService = new TenantDeletionServiceImpl(tenantDeletionRepository);
+
+        assertThat(tenantDeletionService.isInactive(null)).isFalse();
+    }
+
+    @Test
     void testRefreshFailureKeepsLastGoodSet() {
         TenantDeletionRepository tenantDeletionRepository = mock(TenantDeletionRepository.class);
 

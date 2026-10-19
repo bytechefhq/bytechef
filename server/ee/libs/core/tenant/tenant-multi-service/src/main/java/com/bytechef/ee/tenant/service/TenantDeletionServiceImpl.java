@@ -66,6 +66,10 @@ class TenantDeletionServiceImpl implements TenantDeletionService {
 
     @Override
     public boolean isInactive(String tenantId) {
+        if (tenantId == null) {
+            return false;
+        }
+
         Snapshot currentSnapshot = snapshot;
 
         if (isStale(currentSnapshot)) {
