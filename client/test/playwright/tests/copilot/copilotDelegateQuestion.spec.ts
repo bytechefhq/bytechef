@@ -54,6 +54,8 @@ test.describe('Copilot delegated specialist question', () => {
             await copilotPanel.sendAndWaitForTurnEnd('Send a weekly report');
 
             await expect(copilotPanel.root.getByText('How often should the report run?')).toBeVisible();
+
+            await expect(copilotPanel.root.getByRole('button', {name: 'Other…'})).toBeVisible();
         });
 
         await test.step('Answer the delegated question', async () => {
@@ -65,12 +67,12 @@ test.describe('Copilot delegated specialist question', () => {
         await test.step('Assert one User picked message was sent', async () => {
             expect(copilotRun.requests).toHaveLength(2);
 
-            expect(lastMessageOf(copilotRun.requests[1])).toMatchObject({
+            expect(lastMessageOf(await copilotRun.waitForRequest(1))).toMatchObject({
                 content: 'User picked: Every Monday',
                 role: 'user',
             });
 
-            const userPickedMessages = copilotRun.requests[1].messages.filter(
+            const userPickedMessages = (await copilotRun.waitForRequest(1)).messages.filter(
                 (message) => message.role === 'user' && message.content?.startsWith('User picked:')
             );
 

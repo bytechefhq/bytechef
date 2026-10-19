@@ -22,8 +22,8 @@ import {
     navigateInApp,
     openWorkflowEditorCopilot,
     prepareCopilot,
-    readCurrentWorkspaceId,
     stubGraphQlOperation,
+    waitForAppWorkspaceId,
 } from '../../utils/copilotUtils';
 import {type TestWorkflowI, createWorkflow} from '../../utils/projectUtils';
 
@@ -287,7 +287,7 @@ test.describe('Copilot regressions', () => {
             await test.step('Assert the edit replaced the message and dropped what followed', async () => {
                 expect(copilotRun.requests).toHaveLength(4);
 
-                expect(toMessageSummaries(copilotRun.requests[3])).toEqual([
+                expect(toMessageSummaries(await copilotRun.waitForRequest(3))).toEqual([
                     {content: 'First message', role: 'user'},
                     {content: 'Reply to the first message.', role: 'assistant'},
                     {content: 'Second message, edited', role: 'user'},
@@ -328,7 +328,7 @@ test.describe('Copilot regressions', () => {
             await test.step('Assert the re-run carried the user message without the old reply', async () => {
                 expect(copilotRun.requests).toHaveLength(3);
 
-                expect(toMessageSummaries(copilotRun.requests[2])).toEqual([
+                expect(toMessageSummaries(await copilotRun.waitForRequest(2))).toEqual([
                     {content: 'First message', role: 'user'},
                     {content: 'Reply to the first message.', role: 'assistant'},
                     {content: 'Second message', role: 'user'},
@@ -382,9 +382,11 @@ test.describe('Copilot regressions', () => {
         ) => {
             const workflowPage = new WorkflowPage(page);
 
+            const appWorkspaceId = waitForAppWorkspaceId(page);
+
             await workflowPage.goToWorkflowEditor(workflow.projectId, workflow.workflowId);
 
-            const workspaceId = await readCurrentWorkspaceId(page);
+            const workspaceId = await appWorkspaceId;
 
             await page.evaluate(
                 ({storageKey, storedModel}) => window.localStorage.setItem(storageKey, JSON.stringify(storedModel)),
@@ -422,9 +424,9 @@ test.describe('Copilot regressions', () => {
             await test.step('Assert the request carries no model and the stale entry is forgotten', async () => {
                 await copilotPanel.sendAndWaitForTurnEnd('Hello');
 
-                expect(copilotRun.requests[0].state).not.toHaveProperty('userSelectedLlmModel');
+                expect((await copilotRun.waitForRequest(0)).state).not.toHaveProperty('userSelectedLlmModel');
 
-                expect(copilotRun.requests[0].state).not.toHaveProperty('userSelectedLlmProvider');
+                expect((await copilotRun.waitForRequest(0)).state).not.toHaveProperty('userSelectedLlmProvider');
 
                 const storedModel = await page.evaluate(
                     (storageKey) => window.localStorage.getItem(storageKey),
@@ -452,7 +454,7 @@ test.describe('Copilot regressions', () => {
             await test.step('Assert the request carries the remembered model', async () => {
                 await copilotPanel.sendAndWaitForTurnEnd('Hello');
 
-                expect(copilotRun.requests[0].state).toMatchObject({
+                expect((await copilotRun.waitForRequest(0)).state).toMatchObject({
                     userSelectedLlmModel: ALTERNATE_MODEL.name,
                     userSelectedLlmProvider: OPENAI_PROVIDER_KEY,
                     workspaceId: String(workspaceId),
