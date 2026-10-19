@@ -35,7 +35,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -52,7 +53,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Covers the last-admin guard, the self-demotion and self-promotion guards, the limit on granting more than the caller
- * holds, which row each workspace-wide operation reads now that a member may hold several, and cache eviction in
+ * holds, and which row each workspace-wide operation reads now that a member may hold several in
  * {@link WorkspaceUserServiceImpl}. {@code @PreAuthorize} enforcement is verified separately in
  * {@link WorkspaceUserServiceIntTest}.
  *
@@ -68,7 +69,7 @@ class WorkspaceUserServiceTest {
     private CustomRoleRepository customRoleRepository;
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionService permissionService;
-    private UserInvitationService userInvitationService;
+    private UserInvitationFacade userInvitationFacade;
     private UserService userService;
     private WorkspaceService workspaceService;
     private WorkspaceUserRepository workspaceUserRepository;
@@ -79,7 +80,7 @@ class WorkspaceUserServiceTest {
         customRoleRepository = mock(CustomRoleRepository.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         permissionService = mock(PermissionService.class);
-        userInvitationService = mock(UserInvitationService.class);
+        userInvitationFacade = mock(UserInvitationFacade.class);
         userService = mock(UserService.class);
         workspaceService = mock(WorkspaceService.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
@@ -97,7 +98,7 @@ class WorkspaceUserServiceTest {
             .thenReturn(true);
 
         workspaceUserService = new WorkspaceUserServiceImpl(
-            customRoleRepository, permissionScopeRegistry, permissionService, userInvitationService, userService,
+            customRoleRepository, permissionScopeRegistry, permissionService, userInvitationFacade, userService,
             workspaceService, workspaceUserRepository);
     }
 
@@ -112,8 +113,6 @@ class WorkspaceUserServiceTest {
         assertThat(result.getUserId()).isEqualTo(USER_ID);
         assertThat(result.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
         assertThat(result.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
-
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -140,7 +139,6 @@ class WorkspaceUserServiceTest {
             .hasMessageContaining("already a member");
 
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
-        verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -157,8 +155,6 @@ class WorkspaceUserServiceTest {
 
         // The XOR invariant holds on creation too, not just on a later conversion.
         assertThat(result.getWorkspaceRole()).isNull();
-
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -181,7 +177,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(customRoleRepository.findById(900L))
             .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
@@ -237,7 +233,6 @@ class WorkspaceUserServiceTest {
         assertThat(result).isTrue();
 
         verify(workspaceUserRepository, times(1)).deleteByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -266,7 +261,6 @@ class WorkspaceUserServiceTest {
         workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
         assertThat(workspaceUser.getWorkspaceRole()).isEqualTo(WorkspaceRole.VIEWER.ordinal());
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -388,7 +382,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
         when(workspaceUserRepository.save(any(WorkspaceUser.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -402,7 +396,6 @@ class WorkspaceUserServiceTest {
         // The land-nowhere defect, from the workspace side: an invite that provisioned an account without writing
         // membership is exactly what this must never do again.
         verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -419,7 +412,7 @@ class WorkspaceUserServiceTest {
 
         // Reusing rather than rejecting: a workspace admin should not have to know whether a colleague already signed
         // up. The provisioning call is skipped entirely, because one address has at most one account.
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
     }
 
@@ -437,7 +430,7 @@ class WorkspaceUserServiceTest {
 
         // Without this the existing account holder is added silently and discovers the workspace by chance. They
         // must not get the claim link -- they already have a password.
-        verify(userInvitationService).notifyAddedToWorkspace(existingUser, "Engineering");
+        verify(userInvitationFacade).notifyAddedToWorkspace(existingUser, "Engineering");
     }
 
     @Test
@@ -445,7 +438,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
         when(workspaceUserRepository.save(any(WorkspaceUser.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -453,7 +446,7 @@ class WorkspaceUserServiceTest {
         workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "newcomer@example.com", WorkspaceRole.EDITOR);
 
         // A new account already learned about this through the claim link; a second mail would be noise.
-        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+        verify(userInvitationFacade, never()).notifyAddedToWorkspace(any(), any());
     }
 
     @Test
@@ -469,7 +462,7 @@ class WorkspaceUserServiceTest {
                     .isInstanceOf(ConfigurationException.class);
 
         // Announcing access nobody has would be worse than announcing nothing.
-        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+        verify(userInvitationFacade, never()).notifyAddedToWorkspace(any(), any());
     }
 
     @Test
@@ -499,7 +492,7 @@ class WorkspaceUserServiceTest {
         // Provisioning first and validating afterwards mailed a claim link and then rolled the account, and its
         // activation_key, out from under it. Nothing is even looked up here.
         verify(userService, never()).fetchUserByEmail(any());
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
     }
 
     @Test
@@ -509,7 +502,7 @@ class WorkspaceUserServiceTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("Exactly one");
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
     }
 
     @Test
@@ -526,7 +519,7 @@ class WorkspaceUserServiceTest {
                 .isEqualTo(WorkspaceErrorType.WORKSPACE_NOT_FOUND.getErrorKey());
 
         verify(userService, never()).fetchUserByEmail(any());
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -539,7 +532,7 @@ class WorkspaceUserServiceTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("does not exist");
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -597,8 +590,6 @@ class WorkspaceUserServiceTest {
 
         // The XOR invariant: a member holds a built-in role or a custom one, never both.
         assertThat(result.getWorkspaceRole()).isNull();
-
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -712,7 +703,7 @@ class WorkspaceUserServiceTest {
             () -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "alt@example.com", WorkspaceRole.ADMIN))
                 .isInstanceOf(AccessDeniedException.class);
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -867,7 +858,6 @@ class WorkspaceUserServiceTest {
         assertThat(result).isTrue();
 
         verify(workspaceUserRepository, times(1)).deleteByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
-        verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -923,7 +913,7 @@ class WorkspaceUserServiceTest {
 
         workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER);
 
-        verify(userInvitationService).notifyAddedToWorkspace(existingUser, "Engineering");
+        verify(userInvitationFacade).notifyAddedToWorkspace(existingUser, "Engineering");
         verify(workspaceService, never()).getWorkspace(WORKSPACE_ID);
     }
 
@@ -1022,6 +1012,46 @@ class WorkspaceUserServiceTest {
                 USER_ID, WORKSPACE_ID, Environment.PRODUCTION, null, 900L))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("onto a custom role");
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
+    }
+
+    @Test
+    void testSetEnvironmentRoleInOneEnvironmentKeepsTheSoleAdminRowOfAnotherEnvironment() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(false);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(
+            List.of(
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.DEVELOPMENT),
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+        when(workspaceUserRepository.save(any(WorkspaceUser.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkspaceUser result = workspaceUserService.setEnvironmentRole(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT, WorkspaceRole.EDITOR, null);
+
+        assertThat(result.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
+
+        verify(workspaceUserRepository, never()).countAdminsForEnvironment(anyLong(), anyInt(), anyInt());
+    }
+
+    @Test
+    void testSetEnvironmentRoleRefusesDemotingTheSoleAdminOfThatEnvironment() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(true);
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.isCurrentUser(USER_ID)).thenReturn(false);
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(
+            List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+        when(workspaceUserRepository.countAdminsForEnvironment(
+            WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal(), Environment.PRODUCTION.ordinal()))
+                .thenReturn(1L);
+
+        assertThatThrownBy(
+            () -> workspaceUserService.setEnvironmentRole(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION, WorkspaceRole.EDITOR, null))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("without an admin");
 
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
@@ -1436,7 +1466,6 @@ class WorkspaceUserServiceTest {
                         .isEqualTo(WorkspaceUserErrorType.NOT_MEMBER.getErrorKey());
 
             verify(workspaceUserRepository, never()).save(any());
-            verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
         }
 
         @Test
@@ -1453,20 +1482,6 @@ class WorkspaceUserServiceTest {
                 USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT, WorkspaceRole.EDITOR, null);
 
             verify(workspaceUserRepository).delete(implicitWorkspaceUser);
-        }
-
-        @Test
-        void testGrantingAnEnvironmentRoleEvictsTheScopeCache() {
-            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
-                .thenReturn(Optional.empty());
-            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
-                USER_ID, WORKSPACE_ID, Environment.STAGING.ordinal())).thenReturn(Optional.empty());
-            when(workspaceUserRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-            workspaceUserService.setEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.STAGING, WorkspaceRole.VIEWER,
-                null);
-
-            verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
         }
 
         @Test
@@ -1500,7 +1515,7 @@ class WorkspaceUserServiceTest {
         }
 
         @Test
-        void testRefusesToRemoveTheOnlyEnvironmentRole() {
+        void testRemovingTheLastEnvironmentRowKeepsItsRoleInEveryEnvironment() {
             WorkspaceUser onlyWorkspaceUser =
                 WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
 
@@ -1509,15 +1524,86 @@ class WorkspaceUserServiceTest {
             when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
                 .thenReturn(List.of(onlyWorkspaceUser));
 
+            workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT);
+
+            ArgumentCaptor<WorkspaceUser> workspaceUserArgumentCaptor = ArgumentCaptor.forClass(WorkspaceUser.class);
+
+            verify(workspaceUserRepository).delete(onlyWorkspaceUser);
+            verify(workspaceUserRepository).save(workspaceUserArgumentCaptor.capture());
+
+            WorkspaceUser workspaceWideWorkspaceUser = workspaceUserArgumentCaptor.getValue();
+
+            assertThat(workspaceWideWorkspaceUser.getEnvironment()).isNull();
+            assertThat(workspaceWideWorkspaceUser.getWorkspaceRole()).isEqualTo(WorkspaceRole.EDITOR.ordinal());
+            assertThat(workspaceWideWorkspaceUser.getCustomRoleId()).isNull();
+        }
+
+        @Test
+        void testRemovingTheLastCustomRoleEnvironmentRowKeepsTheCustomRoleInEveryEnvironment() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 7L, Environment.PRODUCTION);
+
+            when(customRoleRepository.findById(7L))
+                .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+
+            workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+            ArgumentCaptor<WorkspaceUser> workspaceUserArgumentCaptor = ArgumentCaptor.forClass(WorkspaceUser.class);
+
+            verify(workspaceUserRepository).delete(onlyWorkspaceUser);
+            verify(workspaceUserRepository).save(workspaceUserArgumentCaptor.capture());
+
+            WorkspaceUser workspaceWideWorkspaceUser = workspaceUserArgumentCaptor.getValue();
+
+            assertThat(workspaceWideWorkspaceUser.getEnvironment()).isNull();
+            assertThat(workspaceWideWorkspaceUser.getCustomRoleId()).isEqualTo(7L);
+            assertThat(workspaceWideWorkspaceUser.getWorkspaceRole()).isNull();
+        }
+
+        @Test
+        void testRefusesToWidenTheLastEnvironmentRowWithoutMemberManagementInEveryEnvironment() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
+
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+            when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "WORKSPACE_MEMBER_MANAGE"))
+                .thenReturn(false);
+
             assertThatThrownBy(
                 () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
-                    .isInstanceOf(ConfigurationException.class)
-                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                    .isEqualTo(WorkspaceUserErrorType.LAST_ENVIRONMENT_ROLE.getErrorKey());
+                    .isInstanceOf(AccessDeniedException.class);
 
             verify(workspaceUserRepository, never()).delete(any());
             verify(workspaceUserRepository, never()).save(any());
-            verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+        }
+
+        @Test
+        void testRefusesToWidenTheLastEnvironmentRowBeyondTheCallersScopes() {
+            WorkspaceUser onlyWorkspaceUser =
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT);
+
+            when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).thenReturn(Set.of("WORKFLOW_EDIT"));
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
+                .thenReturn(false);
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+                USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal())).thenReturn(Optional.of(onlyWorkspaceUser));
+            when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+                .thenReturn(List.of(onlyWorkspaceUser));
+
+            assertThatThrownBy(
+                () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+                    .isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("PRODUCTION");
+
+            verify(workspaceUserRepository, never()).delete(any());
+            verify(workspaceUserRepository, never()).save(any());
         }
 
         @Test
@@ -1552,7 +1638,6 @@ class WorkspaceUserServiceTest {
                     .isEqualTo(WorkspaceUserErrorType.NO_ENVIRONMENT_ROLE.getErrorKey());
 
             verify(workspaceUserRepository, never()).delete(any());
-            verify(permissionService, never()).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
         }
 
         @Test

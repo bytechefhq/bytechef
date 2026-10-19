@@ -149,8 +149,9 @@ public interface WorkspaceUserService {
      * Revokes a member's role in one environment.
      *
      * <p>
-     * Refuses to revoke a member's only environment role; removing them from the workspace is
-     * {@link #removeWorkspaceUser(long, long)}.
+     * Revoking a member's only environment role turns it into a workspace-wide role with the same built-in or custom
+     * role, so they keep that role in every environment. That widening requires WORKSPACE_MEMBER_MANAGE in every
+     * environment. Removing them from the workspace is {@link #removeWorkspaceUser(long, long)}.
      *
      * <p>
      * Refuses rather than succeeding quietly when there is nothing to revoke, so a caller acting on a stale members
@@ -161,10 +162,9 @@ public interface WorkspaceUserService {
      * @param workspaceId the workspace the membership belongs to
      * @param environment the environment to revoke the role in
      * @throws com.bytechef.exception.ConfigurationException if the member holds no role specific to this environment,
-     *                                                       if they are not a member at all, if it is the only role
-     *                                                       they hold, if the removal would leave the environment
-     *                                                       without an admin, or if it would withdraw the caller's own
-     *                                                       ADMIN role from it
+     *                                                       if they are not a member at all, if the removal would leave
+     *                                                       the environment without an admin, or if it would withdraw
+     *                                                       the caller's own ADMIN role from it
      */
     void removeEnvironmentRole(long userId, long workspaceId, Environment environment);
 
@@ -201,8 +201,7 @@ public interface WorkspaceUserService {
      *
      * <p>
      * Authorization: the {@code WORKSPACE_MEMBER_MANAGE} scope in every environment of the workspace. Refuses to remove
-     * the workspace's last admin, which would lock the workspace out. Evicts the impacted {@code (userId, workspaceId)}
-     * scope cache entry so later permission checks re-resolve. Every row the member holds goes, implicit and
+     * the workspace's last admin, which would lock the workspace out. Every row the member holds goes, implicit and
      * per-environment alike; removing only some would leave them resolving to a role while the members view shows them
      * gone.
      *

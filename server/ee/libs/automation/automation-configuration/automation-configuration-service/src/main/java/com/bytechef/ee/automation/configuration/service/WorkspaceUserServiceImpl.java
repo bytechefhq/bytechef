@@ -24,7 +24,7 @@ import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.EnumSet;
@@ -54,7 +54,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     private final CustomRoleRepository customRoleRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final PermissionService permissionService;
-    private final UserInvitationService userInvitationService;
+    private final UserInvitationFacade userInvitationFacade;
     private final WorkspaceService workspaceService;
     private final UserService userService;
     private final WorkspaceUserRepository workspaceUserRepository;
@@ -62,13 +62,13 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     @SuppressFBWarnings("EI")
     public WorkspaceUserServiceImpl(
         CustomRoleRepository customRoleRepository, PermissionScopeRegistry permissionScopeRegistry,
-        PermissionService permissionService, UserInvitationService userInvitationService, UserService userService,
+        PermissionService permissionService, UserInvitationFacade userInvitationFacade, UserService userService,
         WorkspaceService workspaceService, WorkspaceUserRepository workspaceUserRepository) {
 
         this.customRoleRepository = customRoleRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.permissionService = permissionService;
-        this.userInvitationService = userInvitationService;
+        this.userInvitationFacade = userInvitationFacade;
         this.userService = userService;
         this.workspaceService = workspaceService;
         this.workspaceUserRepository = workspaceUserRepository;
@@ -90,14 +90,14 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         Optional<User> existingUser = userService.fetchUserByEmail(email);
 
-        User user = existingUser.orElseGet(() -> userInvitationService.inviteUser(email, AuthorityConstants.USER));
+        User user = existingUser.orElseGet(() -> userInvitationFacade.inviteUser(email, AuthorityConstants.USER));
 
         WorkspaceUser workspaceUser = addWorkspaceUser(user.getId(), workspaceId, workspaceRole, customRoleId);
 
         if (existingUser.isPresent()) {
             String workspaceName = workspaceService.getWorkspaceName(workspaceId);
 
-            userInvitationService.notifyAddedToWorkspace(user, workspaceName);
+            userInvitationFacade.notifyAddedToWorkspace(user, workspaceName);
         }
 
         return workspaceUser;
@@ -123,11 +123,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         workspaceUser.assignCustomRole(customRoleId);
 
-        WorkspaceUser savedWorkspaceUser = workspaceUserRepository.save(workspaceUser);
-
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        return savedWorkspaceUser;
+        return workspaceUserRepository.save(workspaceUser);
     }
 
     /**
@@ -253,14 +249,10 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
                 WorkspaceUserErrorType.ALREADY_MEMBER);
         }
 
-        WorkspaceUser savedWorkspaceUser = workspaceUserRepository.save(
+        return workspaceUserRepository.save(
             hasCustomRole
                 ? WorkspaceUser.forCustomRole(userId, workspaceId, customRoleId)
                 : WorkspaceUser.forRole(userId, workspaceId, workspaceRole));
-
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        return savedWorkspaceUser;
     }
 
     @Override
@@ -324,8 +316,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
                     : WorkspaceUser.forRole(userId, workspaceId, workspaceRole, environment));
         }
 
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
         return savedWorkspaceUser;
     }
 
@@ -344,23 +334,37 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         List<WorkspaceUser> memberRows = workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId);
 
+        WorkspaceUser lastEnvironmentWorkspaceUser = environmentWorkspaceUser.get();
+
         if (memberRows.size() <= 1) {
-            throw new ConfigurationException(
-                "The " + environment.name() + " role is the only role user " + userId + " holds in workspace "
-                    + workspaceId + ". Remove them from the workspace instead.",
-                WorkspaceUserErrorType.LAST_ENVIRONMENT_ROLE);
+            if (!permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, "WORKSPACE_MEMBER_MANAGE")) {
+                throw new AccessDeniedException(
+                    "Widening a member's last environment role to a workspace-wide role requires "
+                        + "WORKSPACE_MEMBER_MANAGE in every environment");
+            }
+
+            Long customRoleId = lastEnvironmentWorkspaceUser.getCustomRoleId();
+            WorkspaceRole workspaceRole = fetchBuiltInRole(lastEnvironmentWorkspaceUser);
+
+            validateGrantWithinCallerScopes(workspaceId, List.of(Environment.values()), workspaceRole, customRoleId);
+
+            WorkspaceUser workspaceWideWorkspaceUser = customRoleId == null
+                ? WorkspaceUser.forRole(userId, workspaceId, workspaceRole)
+                : WorkspaceUser.forCustomRole(userId, workspaceId, customRoleId);
+
+            workspaceUserRepository.delete(lastEnvironmentWorkspaceUser);
+
+            workspaceUserRepository.save(workspaceWideWorkspaceUser);
+        } else {
+            Set<Environment> lostAdminEnvironments = isAdmin(lastEnvironmentWorkspaceUser)
+                ? Set.of(environment)
+                : Set.of();
+
+            validateNotSelfDemotionFromEnvironments(workspaceId, userId, lostAdminEnvironments);
+            validateEnvironmentsKeepAnAdmin(workspaceId, lostAdminEnvironments);
+
+            workspaceUserRepository.delete(lastEnvironmentWorkspaceUser);
         }
-
-        Set<Environment> lostAdminEnvironments = isAdmin(environmentWorkspaceUser.get())
-            ? Set.of(environment)
-            : Set.of();
-
-        validateNotSelfDemotionFromEnvironments(workspaceId, userId, lostAdminEnvironments);
-        validateEnvironmentsKeepAnAdmin(workspaceId, lostAdminEnvironments);
-
-        workspaceUserRepository.delete(environmentWorkspaceUser.get());
-
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
     }
 
     @Override
@@ -422,11 +426,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         workspaceUser.setWorkspaceRole(workspaceRole.ordinal());
 
-        WorkspaceUser savedWorkspaceUser = workspaceUserRepository.save(workspaceUser);
-
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        return savedWorkspaceUser;
+        return workspaceUserRepository.save(workspaceUser);
     }
 
     private void validateNotSelfDemotion(
