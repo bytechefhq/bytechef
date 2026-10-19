@@ -24,6 +24,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
@@ -34,6 +35,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -679,6 +681,45 @@ class TenantAwareJwtAuthenticationFilterTest {
     }
 
     @Test
+    void testDisabledServerAnswersAValidTokenWithServerDisabled() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = disabledServerFilter(mcpResourceServerProperties());
+
+        String path = automationPath("acme");
+
+        authenticate(jwtWithTenant("acme", "mcp:automation", endpointUrl(path)), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getContentType()).startsWith("application/json");
+        assertThat(response.getContentAsString()).contains("\"error\":\"server_disabled\"")
+            .contains(McpServerDisabledException.MCP_SERVER_MESSAGE);
+        assertThat(response.getHeader("WWW-Authenticate")).isNull();
+        assertThat(chainInvoked).isFalse();
+    }
+
+    @Test
+    void testDisabledServerStillRejectsATokenForAnotherEndpoint() throws Exception {
+        TenantAwareJwtAuthenticationFilter filter = disabledServerFilter(mcpResourceServerProperties());
+
+        String path = automationPath("acme");
+
+        authenticate(
+            jwtWithTenant("acme", "mcp:automation", endpointUrl(automationPath("other"))), "SCOPE_mcp:automation");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
+
+        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getContentAsString()).doesNotContain("server_disabled");
+    }
+
+    @Test
     void testTenantlessAutomationPathIsRejected() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER);
 
@@ -705,6 +746,31 @@ class TenantAwareJwtAuthenticationFilterTest {
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
             authorityService, MCP_ENDPOINTS,
             List.of(mcpServerSecretVerifier), selfIssuedTokenRevocationChecker, null);
+    }
+
+    private TenantAwareJwtAuthenticationFilter disabledServerFilter(
+        McpResourceServerProperties mcpResourceServerProperties) {
+
+        return new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
+            authorityService, MCP_ENDPOINTS,
+            List.of(disabledServerVerifier(McpServerDisabledException.MCP_SERVER_MESSAGE)), null,
+            null);
+    }
+
+    private static McpServerSecretVerifier disabledServerVerifier(String disabledMessage) {
+        return new McpServerSecretVerifier() {
+
+            @Override
+            public Optional<Boolean> verifyMcpServerSecret(HttpServletRequest request) {
+                return Optional.of(false);
+            }
+
+            @Override
+            public Optional<String> getMcpServerDisabledMessage(HttpServletRequest request) {
+                return Optional.of(disabledMessage);
+            }
+        };
     }
 
     private TenantAwareJwtAuthenticationFilter publicUrlFilter() {
