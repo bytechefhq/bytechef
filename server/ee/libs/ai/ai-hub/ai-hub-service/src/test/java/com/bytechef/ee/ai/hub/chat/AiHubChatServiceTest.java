@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -64,6 +65,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 /**
  * Unit tests for {@link AiHubChatServiceImpl}.
@@ -515,6 +518,36 @@ class AiHubChatServiceTest {
         chatService.delete(1L, WORKSPACE_ID, USER_ID);
 
         verify(approvalService).deleteByChat(1L);
+    }
+
+    @Test
+    void testDeleteStopsTheChatsInFlightRunBeforeRemovingItsApprovals() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        InFlightAiHubRunRegistry.InFlightRun run = registry.tryStart(THREAD_ID, "run-1")
+            .orElseThrow();
+
+        Mono<Void> stopRequested = registry.stopRequested(THREAD_ID);
+
+        doAnswer(invocation -> {
+            assertThat(run.isTerminated()).isTrue();
+
+            return null;
+        }).when(approvalService)
+            .deleteByChat(1L);
+
+        serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+        StepVerifier.create(stopRequested)
+            .verifyComplete();
+        verify(approvalService).deleteByChat(1L);
+        verify(chatRepository).delete(chat);
     }
 
     @Test
