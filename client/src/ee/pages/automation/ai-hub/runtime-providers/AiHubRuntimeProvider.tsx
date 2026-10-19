@@ -186,6 +186,13 @@ export function getMessageText(message: ThreadMessageLike): string {
         .join('\n');
 }
 
+/** The text of the latest user message in {@code messages}, or an empty string when there is none. */
+export function getLastUserMessageText(messages: ThreadMessageLike[]): string {
+    const lastUserMessage = messages.findLast((message) => message.role === 'user');
+
+    return lastUserMessage ? getMessageText(lastUserMessage) : '';
+}
+
 /**
  * The index of the user message a reload regenerates the reply to: the nearest user message at or before the reloaded
  * reply's parent, walking back over tool-only and data rows. -1 when there is none.
@@ -722,12 +729,14 @@ export const runPostTurnTelemetry = ({
 };
 
 /**
- * Runs when the focused chat changes: drops the tool-call cards of the chat being left. It does not abort the
- * in-flight run, so the turn completes server-side and is loaded on return; the subscriber's chat guards keep its
- * late events out of the new chat.
+ * Runs when the focused chat changes: drops the tool-call cards and the retry banner of the chat being left. It does
+ * not abort the in-flight run, so the turn completes server-side and is loaded on return; the subscriber's chat
+ * guards keep its late events out of the new chat.
  */
 export const cleanupForChatChange = (previousChatId: string | undefined): void => {
     aiChatToolCallStore.getState().resetForChat(previousChatId);
+
+    aiChatRetryableErrorStore.getState().clearError();
 };
 
 /**
@@ -862,7 +871,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 appendToLastAssistantMessage,
                 assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
                 chatId: threadId,
-                getLastUserMessage: () => '(resumed turn)',
+                getLastUserMessage: () => getLastUserMessageText(useAiHubStore.getState().messages),
                 onWorkflowMutated: handleWorkflowMutated,
                 runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(threadId, false)},
             });
@@ -1218,6 +1227,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         }
 
         const runId = getRandomId();
+
+        aiChatRetryableErrorStore.getState().clearError();
 
         agent.setMessages([{content: userMessage.content, id: userMessage.id, role: 'user'}]);
 
