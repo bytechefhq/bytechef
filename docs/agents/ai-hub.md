@@ -83,7 +83,8 @@ Rules (`AiHubToolApprovalPolicy.Decision.isGated`):
 
 A gated call creates a `PENDING` `AiHubToolApproval` and returns a `tool-approval-request` envelope instead of
 running; a second gated call while one is pending gets a `deferred` result; a persistence failure returns a refusal
-and the tool does not run. Approvals expire (`isExpired`).
+and the tool does not run. A gated call whose chat no longer exists (deleted mid-run) is refused. Approvals expire
+(`isExpired`).
 
 Binding: `AiHubTurnEndingToolResultAdvisor` calls `AiHubApprovalGate.recordToolCallId`, so the approval holds the
 model's tool call id. `AiHubToolApprovalFacadeImpl.resolve` re-checks `AiHubChatService.containsActiveToolCall`
@@ -112,6 +113,8 @@ Client: `useTruncateChatMessages`.
 (draining guard, `holdsThread`) until its agent reports it stopped or `DRAIN_TIMEOUT` (2 minutes) passes, so a new
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
 the turn's POST still stops it.
+
+Deleting a chat cancels its run the same way before the chat, its approvals and its session are removed.
 
 A turn or truncation against a held thread is refused: the turn POST answers 409 `{"error":"TURN_IN_FLIGHT"}`
 (`TurnInFlightException`), truncation throws `ConflictException`. The client turns the 409 into a toast
