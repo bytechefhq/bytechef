@@ -290,17 +290,27 @@ server, with no AI model configured. They never reach a model:
 `PLAYWRIGHT_LIVE=1`. They need a server started with `bytechef.ai.copilot.enabled=true` and a configured AI model.
 The MCP specs talk JSON-RPC to `/api/management/{secretKey}/mcp` through `utils/mcpClient.ts`.
 
-| Variable                      | Purpose                                                                                  |
-| ----------------------------- | ---------------------------------------------------------------------------------------- |
-| `PLAYWRIGHT_BASE_URL`         | Client URL (default `http://127.0.0.1:5173`)                                             |
-| `PLAYWRIGHT_LIVE`             | `1` runs the `@live` specs                                                               |
-| `PLAYWRIGHT_MCP_SECRET_KEY`   | The management MCP secret key (the `{secretKey}` path segment)                           |
-| `PLAYWRIGHT_MCP_BEARER_TOKEN` | Optional API key sent as `Authorization: Bearer` to the management MCP                   |
-| `PLAYWRIGHT_MCP_ENVIRONMENT`  | `X-ENVIRONMENT` header for the management MCP (default `DEVELOPMENT`)                    |
-| `PLAYWRIGHT_COPILOT_DISABLED` | `1` when the server runs with the Copilot disabled; runs the MCP "Copilot disabled" spec |
+| Variable                      | Purpose                                                                                                                                                                            |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PLAYWRIGHT_BASE_URL`         | Client URL (default `http://127.0.0.1:5173`). When set, Playwright does not start `npm run dev` and runs against the client already serving that URL                               |
+| `PLAYWRIGHT_LIVE`             | `1` runs the `@live` specs                                                                                                                                                         |
+| `PLAYWRIGHT_MCP_SECRET_KEY`   | The management MCP secret key (the `{secretKey}` path segment)                                                                                                                     |
+| `PLAYWRIGHT_MCP_BEARER_TOKEN` | Optional API key sent as `Authorization: Bearer` to the management MCP                                                                                                             |
+| `PLAYWRIGHT_MCP_ENVIRONMENT`  | `X-ENVIRONMENT` header for the management MCP (default `DEVELOPMENT`)                                                                                                              |
+| `PLAYWRIGHT_COPILOT_DISABLED` | `1` when the server runs with `bytechef.ai.copilot.enabled=false`; runs the MCP spec that checks the management tools still answer and `buildWorkflow`/`importWorkflow` are absent |
+
+Without `PLAYWRIGHT_BASE_URL`, `playwright.config.ts` starts (or reuses) the Vite dev server on port 5173. To run
+against a client and server that are already running elsewhere, set `PLAYWRIGHT_BASE_URL` to the client URL; the
+`webServer` step is then skipped.
+
+The management MCP secret key is part of the request path (`/api/management/{secretKey}/mcp`), so Playwright traces,
+HTML reports and request error messages from live runs contain it. Do not share live-run artifacts.
 
 ```bash
 cd client
+
+# Against an already running client
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:5176 npx playwright test tests/copilot
 
 # Deterministic
 npx playwright test tests/copilot/copilotPickers.spec.ts tests/copilot/copilotDelegateQuestion.spec.ts \
