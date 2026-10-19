@@ -493,6 +493,7 @@ export async function deleteConnectionThroughApi(page: Page, connectionId: numbe
 export interface ProjectSummaryI {
     id: number;
     lastProjectVersion?: number;
+    lastPublishedDate?: string | number | null;
     lastStatus?: string;
     name: string;
 }
