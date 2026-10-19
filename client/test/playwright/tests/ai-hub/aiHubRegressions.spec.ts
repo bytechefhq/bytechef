@@ -1121,6 +1121,8 @@ test.describe('AI Hub regressions', () => {
 
             const {attachRequests} = await stubAiHubAttach(page, []);
 
+            await recordToasts(page);
+
             const aiHubPage = new AiHubPage(page);
 
             await aiHubPage.goto();
@@ -1149,6 +1151,8 @@ test.describe('AI Hub regressions', () => {
                 await expect(aiHubPage.composerInput).toHaveAttribute('placeholder', SEND_A_MESSAGE_PLACEHOLDER);
 
                 expect(attachRequests).toEqual([]);
+
+                expect(await readRecordedToasts(page)).toEqual([]);
             });
         });
     });
