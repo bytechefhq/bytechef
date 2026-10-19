@@ -43,8 +43,7 @@ import org.springframework.context.annotation.Configuration;
 public class ToolCallbackContributorConfiguration {
 
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
-        "buildWorkflow", "importWorkflow", "configureClusterElement", "writeScript", "authorSkill",
-        "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
 
     private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
 

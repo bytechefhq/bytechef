@@ -17,14 +17,9 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
-import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
-import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.TaskDispatcherTools;
-import com.bytechef.platform.ai.tool.TaskTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -57,13 +52,13 @@ public class ManagementMcpServerConfiguration {
     private static final String INSTRUCTIONS =
         """
             ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD — call them \
-            directly; intelligent tools (buildWorkflow, importWorkflow, configureClusterElement, \
-            writeScript, authorSkill, debugWorkflowExecution, configureMcpServer) run an inner AI agent and \
-            may take minutes — call them for judgment work, not for CRUD.
-            To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
-            the workflowId and a plain-language instruction. createProjectWorkflow creates an EMPTY workflow \
-            (manual trigger, no tasks) from a name and description; no tool writes a whole workflow definition \
-            directly - buildWorkflow and importWorkflow are the only ways to author content. To import an \
+            directly; intelligent tools (buildWorkflow, importWorkflow, authorSkill, debugWorkflowExecution, \
+            configureMcpServer) run an inner AI agent and may take minutes — call them for judgment work, not \
+            for CRUD.
+            To build a workflow: createProject (if needed) → buildWorkflow with a plain-language instruction \
+            and the projectId for a new workflow or the workflowId for an existing one. buildWorkflow and \
+            importWorkflow are the only ways to author workflow content: they look up components, actions, \
+            triggers and task dispatchers themselves, so there are no separate tools for those. To import an \
             external workflow (n8n, Make, \
             Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
             workflowId and the source definition — it has no project/workflow-creation tools of its own. \
@@ -90,31 +85,18 @@ public class ManagementMcpServerConfiguration {
             DEVELOPMENT). Call listWorkspaces first to find the workspace id. Tools that take a project or \
             workflow id act on that object directly.""";
 
-    private final ComponentTools componentTools;
     private final ProjectTools projectTools;
     private final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools;
-    private final TaskTools taskTools;
-    private final TaskDispatcherTools taskDispatcherTools;
-    private final ScriptTools scriptTools;
-    private final ClusterElementTools clusterElementTools;
     private final WorkspaceTools workspaceTools;
     private final List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, ProjectTools projectTools,
-        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
-        TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools, WorkspaceTools workspaceTools,
-        List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors) {
+        ProjectTools projectTools, ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        WorkspaceTools workspaceTools, List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors) {
 
-        this.componentTools = componentTools;
         this.projectTools = projectTools;
         this.projectWorkflowLifecycleTools = projectWorkflowLifecycleTools;
-        this.taskTools = taskTools;
-        this.taskDispatcherTools = taskDispatcherTools;
-        this.scriptTools = scriptTools;
-        this.clusterElementTools = clusterElementTools;
         this.workspaceTools = workspaceTools;
         this.mcpServerToolCallbackContributors = mcpServerToolCallbackContributors;
     }
@@ -159,9 +141,7 @@ public class ManagementMcpServerConfiguration {
     }
 
     ToolCallbackProvider toolCallbackProvider() {
-        List<Object> tools = List.of(
-            projectTools, projectWorkflowLifecycleTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
-            clusterElementTools, workspaceTools);
+        List<Object> tools = List.of(projectTools, projectWorkflowLifecycleTools, workspaceTools);
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(List.of(ToolCallbacks.from(tools.toArray())));
 
