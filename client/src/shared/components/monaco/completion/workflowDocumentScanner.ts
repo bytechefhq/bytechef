@@ -1,6 +1,7 @@
 import {ConnectionDeclarationType} from './completionTypes';
 
 export type WorkflowDocumentPositionType = {
+    bareValue?: BareValueType;
     enclosingTaskConnections: ConnectionDeclarationType[];
     enclosingTaskIndex?: number;
     enclosingTaskInputKeys: string[];
@@ -16,6 +17,11 @@ export type WorkflowDocumentPositionType = {
     stringStart?: number;
     stringValueBeforeCursor?: string;
     typeOf: (nodePath: string[]) => string | undefined;
+};
+
+export type BareValueType = {
+    path: string[];
+    start: number;
 };
 
 export type KeySlotType = {
@@ -910,6 +916,31 @@ function collectConnections(scalars: ScalarType[], taskIndex: number): Connectio
     return connections;
 }
 
+const JSON_BARE_VALUE = /"((?:[^"\\]|\\.)*)"\s*:\s*([\w.+-]*)$/;
+
+function setPathValue(target: Record<string, unknown>, path: string[], value: unknown): void {
+    let container: Record<string, unknown> | unknown[] = target;
+
+    path.forEach((segment, index) => {
+        const key = isIndex(segment) ? Number(segment) : segment;
+        const containerRecord = container as Record<string | number, unknown>;
+
+        if (index === path.length - 1) {
+            containerRecord[key] = value;
+
+            return;
+        }
+
+        const existing = containerRecord[key];
+
+        if (typeof existing !== 'object' || existing === null) {
+            containerRecord[key] = isIndex(path[index + 1]) ? [] : {};
+        }
+
+        container = containerRecord[key] as Record<string, unknown> | unknown[];
+    });
+}
+
 function isChildPath(path: string[], containerPath: string[]): boolean {
     return path.length === containerPath.length + 1 && containerPath.every((segment, index) => path[index] === segment);
 }
@@ -992,17 +1023,22 @@ export function scanWorkflowDocument(
 
             for (const scalar of document.scalars) {
                 if (
-                    isChildPath(scalar.path, containerPath) &&
-                    !isOwnKey(scalar.path) &&
-                    scalar.value !== '' &&
-                    !scalar.value.includes('${')
+                    scalar.path.length <= containerPath.length ||
+                    containerPath.some((segment, index) => scalar.path[index] !== segment) ||
+                    isOwnKey(scalar.path) ||
+                    scalar.value === '' ||
+                    scalar.value.includes('${')
                 ) {
-                    const quoted = format === 'json' || /['"]/.test(source[scalar.start - 1]);
-
-                    values[scalar.path[scalar.path.length - 1]] = scalar.isString
-                        ? coercePlainScalar(scalar.value, quoted)
-                        : coerceJsonLiteral(scalar.value);
+                    continue;
                 }
+
+                const quoted = format === 'json' || /['"]/.test(source[scalar.start - 1]);
+
+                setPathValue(
+                    values,
+                    scalar.path.slice(containerPath.length),
+                    scalar.isString ? coercePlainScalar(scalar.value, quoted) : coerceJsonLiteral(scalar.value)
+                );
             }
 
             return values;
@@ -1022,6 +1058,16 @@ export function scanWorkflowDocument(
             result.stringQuote = quote;
         }
     } else {
+        const bareValueMatch =
+            format === 'json' && !scannedKeySlot ? JSON_BARE_VALUE.exec(source.slice(0, cursor)) : null;
+
+        if (bareValueMatch) {
+            result.bareValue = {
+                path: [...path, unescapeJson(bareValueMatch[1])],
+                start: cursor - bareValueMatch[2].length,
+            };
+        }
+
         if (scannedKeySlot) {
             const {containerPath, name, prefix} = scannedKeySlot;
             const existingKeys: string[] = [];
