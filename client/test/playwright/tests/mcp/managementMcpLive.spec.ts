@@ -61,6 +61,10 @@ const QUESTION_MARKER = 'needs a decision before continuing';
 test.describe('@live Management MCP', () => {
     test.skip(!process.env.PLAYWRIGHT_LIVE, 'Set PLAYWRIGHT_LIVE=1 to run against a live server and model');
     test.skip(!MCP_SECRET_KEY, 'Set PLAYWRIGHT_MCP_SECRET_KEY to the management MCP secret key');
+    test.skip(
+        !!process.env.PLAYWRIGHT_COPILOT_DISABLED,
+        'These need buildWorkflow and importWorkflow, which the Copilot provides'
+    );
 
     test.describe.configure({timeout: 600000});
 
