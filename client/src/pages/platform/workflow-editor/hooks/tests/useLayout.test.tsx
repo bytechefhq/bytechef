@@ -1,3 +1,4 @@
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook, waitFor} from '@testing-library/react';
 import {Node} from '@xyflow/react';
 import {ReactNode} from 'react';
@@ -32,7 +33,9 @@ const STICKY_NOTE_DEFINITION = JSON.stringify({
 const renderLayout = (readOnly: boolean) =>
     renderHook(() => useLayout({canvasWidth: 800, componentDefinitions: [], taskDispatcherDefinitions: []}), {
         wrapper: ({children}: {children: ReactNode}) => (
-            <WorkflowEditorReadOnlyProvider readOnly={readOnly}>{children}</WorkflowEditorReadOnlyProvider>
+            <QueryClientProvider client={new QueryClient()}>
+                <WorkflowEditorReadOnlyProvider readOnly={readOnly}>{children}</WorkflowEditorReadOnlyProvider>
+            </QueryClientProvider>
         ),
     });
 
