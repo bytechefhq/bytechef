@@ -35,6 +35,10 @@ public class AiHubApprovalGate {
         this.chatService = chatService;
     }
 
+    public void recordToolCallId(long approvalId, String toolCallId) {
+        approvalService.recordToolCallId(approvalId, toolCallId);
+    }
+
     public ToolCallback wrap(ToolCallback callback) {
         if (callback instanceof AiHubApprovalGateToolCallback) {
             return callback;

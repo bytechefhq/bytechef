@@ -28,6 +28,7 @@
             <column name="tool_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="tool_call_id" type="VARCHAR(255)"/>
             <column name="component_name" type="VARCHAR(255)"/>
             <column name="component_version" type="INT"/>
             <column name="connection_id" type="BIGINT"/>
