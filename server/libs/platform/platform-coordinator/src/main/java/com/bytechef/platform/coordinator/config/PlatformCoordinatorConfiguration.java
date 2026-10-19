@@ -30,17 +30,14 @@ import com.bytechef.platform.coordinator.notification.NotificationThrottle;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,8 +47,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnCoordinator
 public class PlatformCoordinatorConfiguration {
-
-    private static final Duration MINIMUM_NOTIFICATION_THROTTLE_TTL = Duration.ofMinutes(10);
 
     private final JobService jobService;
     private final NotificationHandlerRegistry notificationHandlerRegistry;
@@ -87,7 +82,7 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
-        ApplicationProperties applicationProperties, ObjectProvider<CacheManager> cacheManagerProvider,
+        ApplicationProperties applicationProperties, CacheManager cacheManager,
         Optional<JobExecutionCounter> jobExecutionCounter) {
 
         ApplicationProperties.Mail mail = applicationProperties.getMail();
@@ -95,7 +90,7 @@ public class PlatformCoordinatorConfiguration {
         return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
             notificationService,
-            getNotificationThrottle(cacheManagerProvider, mail.getFailureNotificationThrottleWindow()));
+            getNotificationThrottle(cacheManager, mail.getFailureNotificationThrottleWindow()));
     }
 
     @Bean
@@ -105,35 +100,13 @@ public class PlatformCoordinatorConfiguration {
         return new SseStreamApplicationEventListener(messageBroker, taskExecutionService);
     }
 
-    private static NotificationThrottle getNotificationThrottle(
-        ObjectProvider<CacheManager> cacheManagerProvider, Duration window) {
-
-        CacheManager cacheManager = cacheManagerProvider.getIfAvailable();
-
-        Duration claimTtl = window.isZero() || window.isNegative() ? MINIMUM_NOTIFICATION_THROTTLE_TTL : window;
-        Duration suppressedCountTtl = window.multipliedBy(2);
-
-        if (suppressedCountTtl.compareTo(MINIMUM_NOTIFICATION_THROTTLE_TTL) < 0) {
-            suppressedCountTtl = MINIMUM_NOTIFICATION_THROTTLE_TTL;
-        }
-
+    private static NotificationThrottle getNotificationThrottle(CacheManager cacheManager, Duration window) {
         return new NotificationThrottle(
-            getCache(cacheManager, NotificationThrottle.CLAIM_CACHE_NAME, claimTtl),
-            getCache(cacheManager, NotificationThrottle.SUPPRESSED_COUNT_CACHE_NAME, suppressedCountTtl), window);
+            getCache(cacheManager, NotificationThrottle.CLAIM_CACHE_NAME),
+            getCache(cacheManager, NotificationThrottle.SUPPRESSED_COUNT_CACHE_NAME), window);
     }
 
-    private static Cache getCache(@Nullable CacheManager cacheManager, String name, Duration ttl) {
-        Cache cache = cacheManager == null ? null : cacheManager.getCache(name);
-
-        if (cache != null) {
-            return cache;
-        }
-
-        return new CaffeineCache(
-            name,
-            Caffeine.newBuilder()
-                .maximumSize(10_000)
-                .expireAfterWrite(ttl)
-                .build());
+    private static Cache getCache(CacheManager cacheManager, String name) {
+        return Objects.requireNonNull(cacheManager.getCache(name), name);
     }
 }
