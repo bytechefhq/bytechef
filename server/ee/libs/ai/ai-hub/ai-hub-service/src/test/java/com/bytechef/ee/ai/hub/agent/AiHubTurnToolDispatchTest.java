@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -27,6 +28,8 @@ import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.copilot.agent.CopilotChatClientResolver;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
@@ -48,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -280,6 +284,41 @@ class AiHubTurnToolDispatchTest {
         assertThat(fixtures.sessionMemory.sessionService()
             .getEvents(THREAD_ID, EventFilter.all())).extracting(SessionEvent::getMessageType)
                 .containsExactly(MessageType.USER);
+    }
+
+    @Test
+    void testATurnEndingOnAnApprovalRequestRecordsTheApprovalsToolCallForItsOwnThread() {
+        activateDefaultProvider();
+
+        AiHubChat chat = new AiHubChat(USER_ID);
+
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setWorkspaceId(WORKSPACE_ID);
+
+        when(fixtures.chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(fixtures.policy.decide(WORKSPACE_ID)).thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()));
+        when(fixtures.approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(fixtures.approvalService.createPending(any())).thenAnswer(invocation -> {
+            AiHubToolApproval approval = invocation.getArgument(0);
+
+            approval.setId(99L);
+
+            return approval;
+        });
+
+        AssistantMessage toolCallMessage = AssistantMessage.builder()
+            .content("")
+            .toolCalls(List.of(new AssistantMessage.ToolCall("call-delete", "function", "deleteProject",
+                "{\"projectId\":42}")))
+            .build();
+
+        providerChatModel.streamOverride = Flux.just(new ChatResponse(List.of(new Generation(toolCallMessage))));
+
+        runTurn("BUILD", null);
+
+        verify(fixtures.approvalService).recordToolCallId(THREAD_ID, 99L, "call-delete");
+        verify(fixtures.projectFacade, never()).deleteProject(anyLong());
     }
 
     private static ChatResponse textChunk(String text) {
