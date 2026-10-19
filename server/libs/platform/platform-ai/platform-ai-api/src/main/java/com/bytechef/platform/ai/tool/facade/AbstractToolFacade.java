@@ -215,7 +215,7 @@ public abstract class AbstractToolFacade {
         return sb.toString();
     }
 
-    protected static @Nullable String getWorkflowToolName(@Nullable Map<String, ?> parameters, @Nullable String label) {
+    public static @Nullable String getWorkflowToolName(@Nullable Map<String, ?> parameters, @Nullable String label) {
         if (parameters != null) {
             Object toolName = parameters.get(ToolConstants.TOOL_NAME);
 

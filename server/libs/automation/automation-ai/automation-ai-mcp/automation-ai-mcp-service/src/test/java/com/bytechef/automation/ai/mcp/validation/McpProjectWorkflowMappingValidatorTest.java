@@ -39,6 +39,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
@@ -112,6 +113,46 @@ class McpProjectWorkflowMappingValidatorTest {
     }
 
     @Test
+    void testValidateEnablementFallsBackToWorkflowLabelForToolName() {
+        McpProjectWorkflow defaultNamedMcpProjectWorkflow = mcpProjectWorkflow(
+            21L, Map.of("city", "fromAi('city', 'STRING', {required: true})"));
+
+        stubMcpServerProjects(defaultNamedMcpProjectWorkflow);
+
+        stubEnabledDeployment(21L, "wf1", "workflow1");
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
+            MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
+
+            stubNewWorkflowCallTrigger(
+                workflowTriggerMockedStatic, workflowNodeTypeMockedStatic, REQUIRED_INPUT_SCHEMA);
+
+            assertThatCode(() -> validator.validateEnablement(MCP_SERVER_ID)).doesNotThrowAnyException();
+        }
+    }
+
+    @Test
+    void testValidateEnablementThrowsWhenToolNameCannotBeDerived() {
+        McpProjectWorkflow unnamedMcpProjectWorkflow = mcpProjectWorkflow(
+            21L, Map.of("city", "fromAi('city', 'STRING', {required: true})"));
+
+        stubMcpServerProjects(unnamedMcpProjectWorkflow);
+
+        stubEnabledDeployment(21L, "wf1", null);
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerMockedStatic = mockStatic(WorkflowTrigger.class);
+            MockedStatic<WorkflowNodeType> workflowNodeTypeMockedStatic = mockStatic(WorkflowNodeType.class)) {
+
+            stubNewWorkflowCallTrigger(
+                workflowTriggerMockedStatic, workflowNodeTypeMockedStatic, REQUIRED_INPUT_SCHEMA);
+
+            assertThatThrownBy(() -> validator.validateEnablement(MCP_SERVER_ID))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("wf1");
+        }
+    }
+
+    @Test
     void testValidateEnablementThrowsWhenRequiredInputUnmapped() {
         McpProjectWorkflow partiallyMappedMcpProjectWorkflow = mcpProjectWorkflow(
             21L, Map.of("toolName", "mapped_tool"));
@@ -169,7 +210,9 @@ class McpProjectWorkflowMappingValidatorTest {
         return mcpProjectWorkflow;
     }
 
-    private void stubEnabledDeployment(long projectDeploymentWorkflowId, String workflowId, String workflowLabel) {
+    private void stubEnabledDeployment(
+        long projectDeploymentWorkflowId, String workflowId, @Nullable String workflowLabel) {
+
         ProjectDeploymentWorkflow projectDeploymentWorkflow = mock(ProjectDeploymentWorkflow.class);
 
         when(projectDeploymentWorkflow.isEnabled()).thenReturn(true);
@@ -180,6 +223,7 @@ class McpProjectWorkflowMappingValidatorTest {
 
         Workflow workflow = mock(Workflow.class);
 
+        when(workflow.getId()).thenReturn(workflowId);
         when(workflow.getLabel()).thenReturn(workflowLabel);
 
         when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
