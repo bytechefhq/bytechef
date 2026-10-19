@@ -50,7 +50,7 @@ const WorkflowExecutionsEmptyState = ({onRefresh}: WorkflowExecutionsEmptyStateP
     const goToDeployments = (action: string) => {
         captureAction(action);
 
-        navigate('/automation/deployments');
+        void navigate('/automation/deployments');
     };
 
     const sharedProps = {
