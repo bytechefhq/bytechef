@@ -5,15 +5,15 @@ import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorCanvas from '../useWorkflowEditorCanvas';
 
 const hoisted = vi.hoisted(() => ({
-    fitViewMock: vi.fn(),
-    nodesInitialized: {current: false},
     useInitialViewportMock: vi.fn(),
+    useNodesInitializedMock: vi.fn(),
+    useReactFlowMock: vi.fn(),
 }));
 
 vi.mock('@xyflow/react', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@xyflow/react')>()),
-    useNodesInitialized: () => hoisted.nodesInitialized.current,
-    useReactFlow: () => ({fitView: hoisted.fitViewMock}),
+    useNodesInitialized: hoisted.useNodesInitializedMock,
+    useReactFlow: hoisted.useReactFlowMock,
 }));
 
 vi.mock('../useInitialViewport', () => ({default: hoisted.useInitialViewportMock}));
@@ -44,42 +44,13 @@ const renderCanvasHook = (fitViewOnWorkflowChange?: boolean) =>
 
 describe('useWorkflowEditorCanvas fit view on workflow change', () => {
     beforeEach(() => {
-        hoisted.fitViewMock.mockClear();
         hoisted.useInitialViewportMock.mockClear();
-        hoisted.nodesInitialized.current = false;
+        hoisted.useNodesInitializedMock.mockClear();
+        hoisted.useReactFlowMock.mockClear();
 
         useWorkflowDataStore.setState({
             workflow: {id: 'workflow-1', nodeNames: [], version: 1, workflowUuid: 'workflow-uuid-1'},
         });
-    });
-
-    it('fits the view once after the nodes are initialised', () => {
-        const {rerender} = renderCanvasHook(true);
-
-        expect(hoisted.fitViewMock).not.toHaveBeenCalled();
-
-        hoisted.nodesInitialized.current = true;
-
-        rerender();
-        rerender();
-
-        expect(hoisted.fitViewMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('fits the view again when the workflow changes', () => {
-        hoisted.nodesInitialized.current = true;
-
-        const {rerender} = renderCanvasHook(true);
-
-        expect(hoisted.fitViewMock).toHaveBeenCalledTimes(1);
-
-        useWorkflowDataStore.setState({
-            workflow: {id: 'workflow-2', nodeNames: [], version: 1, workflowUuid: 'workflow-uuid-2'},
-        });
-
-        rerender();
-
-        expect(hoisted.fitViewMock).toHaveBeenCalledTimes(2);
     });
 
     it('disables the initial viewport while fitting the view on workflow change', () => {
@@ -88,23 +59,17 @@ describe('useWorkflowEditorCanvas fit view on workflow change', () => {
         expect(hoisted.useInitialViewportMock).toHaveBeenLastCalledWith(expect.objectContaining({enabled: false}));
     });
 
-    it('never fits the view when fitViewOnWorkflowChange is off', () => {
-        hoisted.nodesInitialized.current = true;
+    it('keeps the initial viewport enabled by default', () => {
+        renderCanvasHook();
 
-        const {rerender} = renderCanvasHook(false);
-
-        rerender();
-
-        expect(hoisted.fitViewMock).not.toHaveBeenCalled();
         expect(hoisted.useInitialViewportMock).toHaveBeenLastCalledWith(expect.objectContaining({enabled: true}));
     });
 
-    it('keeps the initial viewport enabled by default', () => {
-        hoisted.nodesInitialized.current = true;
+    it('never subscribes to React Flow state, so editors without the fit view do not re-render on it', () => {
+        renderCanvasHook(true);
+        renderCanvasHook(false);
 
-        renderCanvasHook();
-
-        expect(hoisted.fitViewMock).not.toHaveBeenCalled();
-        expect(hoisted.useInitialViewportMock).toHaveBeenLastCalledWith(expect.objectContaining({enabled: true}));
+        expect(hoisted.useNodesInitializedMock).not.toHaveBeenCalled();
+        expect(hoisted.useReactFlowMock).not.toHaveBeenCalled();
     });
 });
