@@ -54,6 +54,33 @@ import {
 } from '../../utils/copilotUtils';
 import {type TestWorkflowI} from '../../utils/projectUtils';
 
+const recordRetryBannerAppearances = (page: Page) =>
+    page.addInitScript(() => {
+        const bannerAppearances: string[] = [];
+        const seenBanners = new WeakSet<Element>();
+
+        Object.assign(window, {__aiHubRetryBannerAppearances: bannerAppearances});
+
+        const recordNewBanners = () => {
+            document.querySelectorAll('[data-testid="ai-hub-retry-banner"]').forEach((bannerElement) => {
+                if (seenBanners.has(bannerElement)) {
+                    return;
+                }
+
+                seenBanners.add(bannerElement);
+
+                bannerAppearances.push(bannerElement.textContent ?? '');
+            });
+        };
+
+        new MutationObserver(recordNewBanners).observe(document, {childList: true, subtree: true});
+    });
+
+const readRetryBannerAppearances = (page: Page) =>
+    page.evaluate(
+        () => (window as unknown as {__aiHubRetryBannerAppearances?: string[]}).__aiHubRetryBannerAppearances ?? []
+    );
+
 export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflowTest);
 
 const TEST_CONFIGURATION_URL = /\/api\/platform\/internal\/workflow-test-configurations\/[^/?]+(\?.*)?$/;
@@ -1010,6 +1037,8 @@ test.describe('AI Hub regressions', () => {
 
             const aiHubPage = new AiHubPage(page);
 
+            await recordRetryBannerAppearances(page);
+
             await aiHubPage.goto();
 
             await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
@@ -1017,6 +1046,8 @@ test.describe('AI Hub regressions', () => {
             await expect(page.getByText('The workflow is ready.')).toBeVisible();
 
             await expect(aiHubPage.retryBanner).toHaveCount(0);
+
+            expect(await readRetryBannerAppearances(page)).toEqual([]);
         });
 
         test('a tool failure followed by a run error shows the run error and no banner', async ({
@@ -1036,6 +1067,8 @@ test.describe('AI Hub regressions', () => {
 
             const aiHubPage = new AiHubPage(page);
 
+            await recordRetryBannerAppearances(page);
+
             await aiHubPage.goto();
 
             await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
@@ -1043,6 +1076,8 @@ test.describe('AI Hub regressions', () => {
             await expect(aiHubPage.runErrors).toContainText('The model provider is unavailable');
 
             await expect(aiHubPage.retryBanner).toHaveCount(0);
+
+            expect(await readRetryBannerAppearances(page)).toEqual([]);
         });
 
         test('a tool failure followed by Stop shows no banner', async ({authenticatedPage: page}) => {
@@ -1072,6 +1107,8 @@ test.describe('AI Hub regressions', () => {
 
             const aiHubPage = new AiHubPage(page);
 
+            await recordRetryBannerAppearances(page);
+
             await aiHubPage.goto();
 
             await test.step('Stop the run after the failure', async () => {
@@ -1092,6 +1129,8 @@ test.describe('AI Hub regressions', () => {
                 await expect(page.getByText('That did not work.')).toBeVisible();
 
                 await expect(aiHubPage.retryBanner).toHaveCount(0);
+
+                expect(await readRetryBannerAppearances(page)).toEqual([]);
             });
         });
     });
