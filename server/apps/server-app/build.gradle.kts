@@ -114,6 +114,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-jdbc"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-configuration:ai-mcp-server-configuration-graphql"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
