@@ -28,6 +28,14 @@ const getCurrentStepIndex = (stage: AutomationJourneyStageType) => {
     return AUTOMATION_JOURNEY_STEP_IDS.indexOf(stage === 'enable' ? 'deploy' : stage);
 };
 
+const getStepStatus = (stepIndex: number, currentStepIndex: number): JourneyStepStatusType => {
+    if (stepIndex < currentStepIndex) {
+        return 'complete';
+    }
+
+    return stepIndex === currentStepIndex ? 'current' : 'upcoming';
+};
+
 const hasWorkflows = (project: Project) => (project.projectWorkflowIds?.length ?? 0) > 0;
 
 // Triggers fire only for a workflow that is enabled inside an enabled deployment.
@@ -74,10 +82,7 @@ export const getAutomationJourney = (
     const currentStepIndex = getCurrentStepIndex(stage);
 
     const stepStatuses = Object.fromEntries(
-        AUTOMATION_JOURNEY_STEP_IDS.map((stepId, index) => [
-            stepId,
-            index < currentStepIndex ? 'complete' : index === currentStepIndex ? 'current' : 'upcoming',
-        ])
+        AUTOMATION_JOURNEY_STEP_IDS.map((stepId, index) => [stepId, getStepStatus(index, currentStepIndex)])
     ) as Record<AutomationJourneyStepIdType, JourneyStepStatusType>;
 
     const publishableProjects = stage === 'publish' ? projects.filter(hasWorkflows) : [];

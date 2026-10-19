@@ -123,18 +123,22 @@ export const WorkflowExecutions = () => {
 
     const isFirstRun = !hasActiveFilters && !isPastLastPage && workflowExecutions?.length === 0;
 
-    const emptyState = isPastLastPage ? (
-        <EmptyList
-            button={<Button label="Go to first page" onClick={() => handlePaginationClick(0)} variant="outline" />}
-            icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
-            message="This page is past the last execution."
-            title="No Executions on This Page"
-        />
-    ) : hasActiveFilters ? (
-        <EmptyFilterResult entityName="executions" entityTitle="Executions" onClear={handleClearFilters} />
-    ) : (
-        <WorkflowExecutionsEmptyState onRefresh={() => refetchWorkflowExecutions()} />
-    );
+    let emptyState = <WorkflowExecutionsEmptyState onRefresh={() => refetchWorkflowExecutions()} />;
+
+    if (isPastLastPage) {
+        emptyState = (
+            <EmptyList
+                button={<Button label="Go to first page" onClick={() => handlePaginationClick(0)} variant="outline" />}
+                icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
+                message="This page is past the last execution."
+                title="No Executions on This Page"
+            />
+        );
+    } else if (hasActiveFilters) {
+        emptyState = (
+            <EmptyFilterResult entityName="executions" entityTitle="Executions" onClear={handleClearFilters} />
+        );
+    }
 
     return (
         <LayoutContainer

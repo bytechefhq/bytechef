@@ -41,7 +41,7 @@ const ProjectsStepButton = ({nextProject, onClick, size = 'default'}: ProjectsSt
             flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
         }
 
-        navigate(path);
+        void navigate(path);
     };
 
     if (nextProject && nextProjectWorkflowId !== undefined) {
