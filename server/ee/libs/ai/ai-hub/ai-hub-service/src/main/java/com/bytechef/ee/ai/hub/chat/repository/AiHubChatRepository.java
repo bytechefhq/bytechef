@@ -8,9 +8,11 @@
 package com.bytechef.ee.ai.hub.chat.repository;
 
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -67,4 +69,44 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
      * {@code thread_id} carries a global UNIQUE constraint, so this returns at most one row per id.
      */
     List<AiHubChat> findAllByThreadIdIn(Collection<String> threadIds);
+
+    /** Sets the title and clears {@code auto_titled}, touching no other column. */
+    @Modifying
+    @Query("""
+        UPDATE ai_hub_chat SET title = :title, auto_titled = false, updated_at = :updatedAt
+        WHERE id = :id
+        """)
+    void updateTitle(long id, String title, LocalDateTime updatedAt);
+
+    /** Sets the last preview, touching no other column. */
+    @Modifying
+    @Query("""
+        UPDATE ai_hub_chat SET last_preview = :lastPreview, updated_at = :updatedAt
+        WHERE id = :id
+        """)
+    void updateLastPreview(long id, String lastPreview, LocalDateTime updatedAt);
+
+    /** Sets the message count, touching no other column. */
+    @Modifying
+    @Query("""
+        UPDATE ai_hub_chat SET message_count = :messageCount, updated_at = :updatedAt
+        WHERE id = :id
+        """)
+    void updateMessageCount(long id, int messageCount, LocalDateTime updatedAt);
+
+    /** Sets {@code updated_at}, touching no other column. */
+    @Modifying
+    @Query("""
+        UPDATE ai_hub_chat SET updated_at = :updatedAt
+        WHERE id = :id
+        """)
+    void updateUpdatedAt(long id, LocalDateTime updatedAt);
+
+    /** Sets the status ordinal, touching no other column. */
+    @Modifying
+    @Query("""
+        UPDATE ai_hub_chat SET status = :status, updated_at = :updatedAt
+        WHERE id = :id
+        """)
+    void updateStatus(long id, int status, LocalDateTime updatedAt);
 }
