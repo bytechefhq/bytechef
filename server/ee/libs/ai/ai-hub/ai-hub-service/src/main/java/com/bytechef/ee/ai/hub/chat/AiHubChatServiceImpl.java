@@ -21,6 +21,7 @@ import com.bytechef.ee.ai.hub.util.EnumOrdinals;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -395,7 +396,9 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             throw new ConflictException("The conversation changed while truncating; retry");
         }
 
-        supersedePendingApprovalsOfDroppedToolCalls(chat, activeEvents.subList(0, cutoffEventIndex));
+        supersedePendingApprovalsOfDroppedToolCalls(
+            chat, activeEvents.subList(0, cutoffEventIndex), activeEvents.get(messageEventIndex)
+                .getTimestamp());
 
         chat.setUpdatedAt(LocalDateTime.now(clock));
         chatRepository.save(chat);
@@ -420,12 +423,30 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             toolCallId, toolName, arguments);
     }
 
-    private void supersedePendingApprovalsOfDroppedToolCalls(AiHubChat chat, List<SessionEvent> keptEvents) {
+    private void supersedePendingApprovalsOfDroppedToolCalls(
+        AiHubChat chat, List<SessionEvent> keptEvents, Instant droppedTurnStart) {
+
         for (AiHubToolApproval approval : approvalService.list(Objects.requireNonNull(chat.getId()))) {
             if (approval.getStatus() == AiHubToolApproval.Status.PENDING
-                && !containsToolCall(
-                    keptEvents, approval.getToolCallId(), approval.getToolName(), approval.getArguments())) {
+                && (isIdlessApprovalCreatedSince(approval, droppedTurnStart) || !containsToolCall(
+                    keptEvents, approval.getToolCallId(), approval.getToolName(), approval.getArguments()))) {
 
+                approval.setStatus(AiHubToolApproval.Status.SUPERSEDED);
+
+                approvalService.save(approval);
+            }
+        }
+    }
+
+    private static boolean isIdlessApprovalCreatedSince(AiHubToolApproval approval, Instant since) {
+        Instant createdDate = approval.getCreatedDate();
+
+        return approval.getToolCallId() == null && createdDate != null && !createdDate.isBefore(since);
+    }
+
+    private void supersedePendingApprovalsWithoutToolCall(AiHubChat chat) {
+        for (AiHubToolApproval approval : approvalService.list(Objects.requireNonNull(chat.getId()))) {
+            if (approval.getStatus() == AiHubToolApproval.Status.PENDING && approval.getToolCallId() == null) {
                 approval.setStatus(AiHubToolApproval.Status.SUPERSEDED);
 
                 approvalService.save(approval);
@@ -513,13 +534,18 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean cancelAiHubRun(
         long chatId, long requesterWorkspaceId, long requesterUserId, @Nullable String runId) {
 
         AiHubChat chat = loadParticipable(chatId, requesterWorkspaceId, requesterUserId);
 
-        return inFlightRunRegistry.cancel(chat.getThreadId(), runId);
+        boolean cancelled = inFlightRunRegistry.cancel(chat.getThreadId(), runId);
+
+        if (cancelled) {
+            supersedePendingApprovalsWithoutToolCall(chat);
+        }
+
+        return cancelled;
     }
 
     @Override

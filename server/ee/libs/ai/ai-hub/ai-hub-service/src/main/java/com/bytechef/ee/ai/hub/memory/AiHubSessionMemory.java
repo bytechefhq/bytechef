@@ -12,7 +12,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +129,7 @@ public class AiHubSessionMemory implements AutoCloseable {
     }
 
     public AiHubTurnEndingToolResultAdvisor createTurnEndingToolResultAdvisor(
-        BiConsumer<Long, String> approvalToolCallRecorder) {
+        AiHubTurnEndingToolResultAdvisor.ApprovalToolCallRecorder approvalToolCallRecorder) {
 
         return new AiHubTurnEndingToolResultAdvisor(sessionService, approvalToolCallRecorder);
     }

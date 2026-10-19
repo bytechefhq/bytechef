@@ -91,9 +91,10 @@ public interface AiHubChatService {
 
     /**
      * Stops the chat's in-flight agent run, for a requester who may participate in the chat. Returns {@code true} when
-     * a live run was cancelled. {@code runId} is the AG-UI run id of the turn being stopped, or {@code null}; when
-     * present it is tombstoned, so a Stop that reaches the server before the turn's POST registers the run still stops
-     * it.
+     * a live run was cancelled; its pending approvals whose tool call was never recorded are then superseded, since the
+     * stopped run cannot have stored their request. {@code runId} is the AG-UI run id of the turn being stopped, or
+     * {@code null}; when present it is tombstoned, so a Stop that reaches the server before the turn's POST registers
+     * the run still stops it.
      */
     boolean cancelAiHubRun(long chatId, long requesterWorkspaceId, long requesterUserId, @Nullable String runId);
 
