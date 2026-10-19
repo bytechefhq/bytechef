@@ -14,6 +14,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -178,6 +180,20 @@ public class InFlightAiHubRunRegistry {
     }
 
     /**
+     * Runs {@code action} once no run holds {@code threadId}: at once when none does, otherwise on the thread that ends
+     * the holding run, right after it releases the thread.
+     */
+    public void runWhenReleased(String threadId, Runnable action) {
+        InFlightRun run = runs.getIfPresent(threadId);
+
+        if (run != null && run.deferUntilReleased(action)) {
+            return;
+        }
+
+        action.run();
+    }
+
+    /**
      * Returns {@code true} while a run holds {@code threadId}: it is live, or it was cancelled and its agent is still
      * draining.
      */
@@ -210,6 +226,7 @@ public class InFlightAiHubRunRegistry {
         private final Instant startedAt;
         private final Sinks.Many<BaseEvent> sink;
         private final Sinks.Empty<Void> stopSink = Sinks.empty();
+        private final List<Runnable> releaseActions = new ArrayList<>();
         private volatile boolean agentStopped;
         private volatile @Nullable Instant cancelledAt;
         private volatile boolean terminated;
@@ -269,6 +286,8 @@ public class InFlightAiHubRunRegistry {
             terminated = true;
 
             completeSink();
+
+            runReleaseActions();
         }
 
         void fail(Throwable error) {
@@ -276,6 +295,38 @@ public class InFlightAiHubRunRegistry {
             terminated = true;
 
             sink.tryEmitError(error);
+
+            runReleaseActions();
+        }
+
+        boolean deferUntilReleased(Runnable action) {
+            synchronized (releaseActions) {
+                if (!holdsThread(Instant.now())) {
+                    return false;
+                }
+
+                releaseActions.add(action);
+
+                return true;
+            }
+        }
+
+        private void runReleaseActions() {
+            List<Runnable> actions;
+
+            synchronized (releaseActions) {
+                actions = List.copyOf(releaseActions);
+
+                releaseActions.clear();
+            }
+
+            for (Runnable action : actions) {
+                try {
+                    action.run();
+                } catch (RuntimeException exception) {
+                    log.warn("A deferred action for threadId={} failed", threadId, exception);
+                }
+            }
         }
 
         void cancel() {

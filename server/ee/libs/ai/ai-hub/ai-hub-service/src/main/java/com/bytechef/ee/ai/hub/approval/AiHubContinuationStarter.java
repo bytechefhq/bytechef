@@ -30,8 +30,8 @@ public interface AiHubContinuationStarter {
     /**
      * Posts {@code message} as a user message on {@code chat}'s thread and runs the agent of the approval's mode.
      * {@code approval} supplies the mode, environment, LLM selection and requester; {@code workspaceId} is the chat's
-     * workspace. Returns the started run's id, or empty when no continuation was started (a run is already in flight
-     * for the thread, or no agent is registered for the mode).
+     * workspace. Returns the started run's id, or empty when no continuation started now: no agent is registered for
+     * the mode, or a run is in flight for the thread, in which case the continuation starts once that run ends.
      */
     Optional<String> startContinuation(AiHubToolApproval approval, AiHubChat chat, long workspaceId, String message);
 }

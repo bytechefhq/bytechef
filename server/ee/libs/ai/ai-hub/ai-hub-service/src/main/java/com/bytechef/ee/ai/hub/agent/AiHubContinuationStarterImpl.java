@@ -15,6 +15,7 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
 import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
@@ -26,12 +27,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
  * Starts the continuation turn that reports a resolved tool approval back into its chat. The run goes through the same
  * {@link InFlightAiHubRunRegistry#tryStart} gate as a user's turn, so it never overlaps one; the client follows it
- * through the attach endpoint.
+ * through the attach endpoint. When a run holds the thread, the continuation is deferred until that run ends
+ * ({@link InFlightAiHubRunRegistry#runWhenReleased}) and then starts on the worker executor in the same tenant and
+ * security context. It is dropped when the chat is deleted, when the holding run never reports that it stopped, or on
+ * restart (the queue is in memory).
  *
  * <p>
  * The run state's {@code AUTHENTICATED_USER_ID} is the approval's requester, not the resolver: the continuation is
@@ -47,14 +56,19 @@ import org.springframework.stereotype.Component;
 @ConditionalOnAiHub
 public class AiHubContinuationStarterImpl implements AiHubContinuationStarter {
 
+    private static final Logger log = LoggerFactory.getLogger(AiHubContinuationStarterImpl.class);
+
+    private final AiHubChatService chatService;
     private final AiHubChatStreamer chatStreamer;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
     private final Map<String, LocalAgent> localAgentMap;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubContinuationStarterImpl(
-        AiHubChatStreamer chatStreamer, InFlightAiHubRunRegistry inFlightRunRegistry, List<LocalAgent> localAgents) {
+        AiHubChatStreamer chatStreamer, InFlightAiHubRunRegistry inFlightRunRegistry, List<LocalAgent> localAgents,
+        AiHubChatService chatService) {
 
+        this.chatService = chatService;
         this.chatStreamer = chatStreamer;
         this.inFlightRunRegistry = inFlightRunRegistry;
         this.localAgentMap = localAgents.stream()
@@ -81,6 +95,8 @@ public class AiHubContinuationStarterImpl implements AiHubContinuationStarter {
         Optional<InFlightRun> runOptional = inFlightRunRegistry.tryStart(threadId, runId);
 
         if (runOptional.isEmpty()) {
+            deferContinuation(approval, chat, workspaceId, message);
+
             return Optional.empty();
         }
 
@@ -124,6 +140,37 @@ public class AiHubContinuationStarterImpl implements AiHubContinuationStarter {
         }
 
         return Optional.of(runId);
+    }
+
+    private void deferContinuation(AiHubToolApproval approval, AiHubChat chat, long workspaceId, String message) {
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        SecurityContext currentSecurityContext = SecurityContextHolder.getContext();
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(currentSecurityContext.getAuthentication());
+
+        Runnable deferredContinuation = () -> TenantContext.runWithTenantId(
+            tenantId, () -> startDeferredContinuation(approval, chat, workspaceId, message));
+
+        inFlightRunRegistry.runWhenReleased(
+            chat.getThreadId(), new DelegatingSecurityContextRunnable(deferredContinuation, securityContext));
+    }
+
+    private void startDeferredContinuation(
+        AiHubToolApproval approval, AiHubChat chat, long workspaceId, String message) {
+
+        Optional<AiHubChat> chatOptional = chatService.findByThreadId(chat.getThreadId());
+
+        if (chatOptional.isEmpty()) {
+            log.info(
+                "Dropping the deferred continuation of approval id={}: chat thread={} no longer exists",
+                approval.getId(), chat.getThreadId());
+
+            return;
+        }
+
+        startContinuation(approval, chatOptional.get(), workspaceId, message);
     }
 
     private static String agentId(Mode mode) {
