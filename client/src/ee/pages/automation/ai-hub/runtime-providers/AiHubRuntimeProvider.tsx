@@ -760,8 +760,6 @@ export const runPostTurnTelemetry = ({
                 console.error('Failed to generate chat title:', error);
 
                 aiHubChatsStore.getState().markTitleGenerationFailed(chatId, errorMessage);
-
-                toast.error(`Failed to generate chat title: ${errorMessage}`);
             });
     }
 };

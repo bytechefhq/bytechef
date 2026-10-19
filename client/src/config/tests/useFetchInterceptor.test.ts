@@ -859,6 +859,30 @@ describe('useFetchInterceptor', () => {
                 expect.objectContaining({description: 'Tool failed\nWorkflow not found'})
             );
         });
+
+        it('skips the toast for a failed AI Hub chat title, which the chats sidebar marks', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {
+                        errors: [
+                            {
+                                extensions: {errorCode: 'TITLE_GENERATION_FAILED'},
+                                message: 'Chat title generation is temporarily unavailable.',
+                                path: ['generateAiHubChatTitle'],
+                            },
+                        ],
+                    },
+                    status: 200,
+                    url: 'http://localhost/graphql',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
     });
 
     describe('csrf-aware fetch wrapper', () => {
