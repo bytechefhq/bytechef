@@ -10,10 +10,14 @@ package com.bytechef.ee.ai.hub.chat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalServiceImpl;
+import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRepository;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.AiHubIntTestConfiguration;
@@ -36,12 +40,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.session.SessionRepository;
+import org.springframework.ai.session.SessionService;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -67,6 +73,9 @@ public class AiHubChatServicePatchIntTest {
 
     @Autowired
     private AiHubChatRepository chatRepository;
+
+    @Autowired
+    private ObjectProvider<AiHubToolApprovalRepository> approvalRepositoryProvider;
 
     @Autowired
     private DataSource dataSource;
@@ -316,6 +325,57 @@ public class AiHubChatServicePatchIntTest {
             .orElseThrow();
 
         assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.DELETED);
+    }
+
+    @Test
+    public void testCommittedDeleteRemovesApprovalsCommittedDuringTheDeleteAndPurgesTheSession() {
+        long chatId = saveChat();
+
+        AiHubToolApprovalRepository approvalRepository = approvalRepositoryProvider.getObject();
+        AiHubSessionMemory sessionMemory = mock(AiHubSessionMemory.class);
+        SessionService sessionService = mock(SessionService.class);
+
+        when(sessionMemory.sessionService()).thenReturn(sessionService);
+        when(sessionMemoryProvider.getIfAvailable()).thenReturn(sessionMemory);
+
+        AiHubChatServiceImpl deletingChatService = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), new AiHubToolApprovalServiceImpl(approvalRepository),
+            sessionMemoryProvider, new InFlightAiHubRunRegistry(), transactionManager);
+
+        approvalRepository.save(buildApproval(chatId));
+
+        TransactionTemplate requiresNewTransactionTemplate = new TransactionTemplate(transactionManager);
+
+        requiresNewTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> {
+            deletingChatService.delete(chatId, WORKSPACE_ID, USER_ID);
+
+            requiresNewTransactionTemplate.executeWithoutResult(
+                lateTransactionStatus -> approvalRepository.save(buildApproval(chatId)));
+        });
+
+        assertThat(chatRepository.findById(chatId)).isEmpty();
+        assertThat(approvalRepository.findAllByChatIdOrderByCreatedDateDesc(chatId)).isEmpty();
+        verify(sessionService).delete("thread-patch");
+    }
+
+    private static AiHubToolApproval buildApproval(long chatId) {
+        AiHubToolApproval approval = new AiHubToolApproval();
+
+        approval.setChatId(chatId);
+        approval.setThreadId("thread-patch");
+        approval.setRequestedByUserId(USER_ID);
+        approval.setToolKind(AiHubToolApproval.ToolKind.CATALOG);
+        approval.setToolName("deleteProject");
+        approval.setArguments("{}");
+        approval.setStatus(AiHubToolApproval.Status.PENDING);
+        approval.setMode("BUILD");
+        approval.setEnvironment(0);
+        approval.setExpiresAt(Instant.now()
+            .plusSeconds(600));
+
+        return approval;
     }
 
     private void markDeleted(long chatId) {
