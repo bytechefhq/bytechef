@@ -10,7 +10,9 @@ Modules: `server/ee/libs/ai/ai-hub/{ai-hub-api,ai-hub-service,ai-hub-rest,ai-hub
 
 ## Gate
 
-Everything is `@ConditionalOnAiHub`, which is `bytechef.ai.hub.enabled` AND `bytechef.ai.copilot.enabled`. The
+Every hub bean is `@ConditionalOnAiHub`, which is `bytechef.ai.hub.enabled` AND `bytechef.ai.copilot.enabled`. The
+one exception is the `AiHubJdbcRepositoryConfiguration` auto-configuration, which only enables the hub's Spring Data
+JDBC repositories. The
 `buildWorkflow` and `importWorkflow` delegates come from the Copilot's sub-agents, so `AiHubConfiguration`
 (`requireBuildWorkflow`) fails startup if BUILD has no `buildWorkflow`. Turn dispatch is also
 `@ConditionalOnEEVersion` and `@ConditionalOnCoordinator`.
