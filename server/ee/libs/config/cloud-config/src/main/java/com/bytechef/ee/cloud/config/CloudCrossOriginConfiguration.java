@@ -42,6 +42,7 @@ public class CloudCrossOriginConfiguration {
             List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "X-XSRF-TOKEN"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedOrigins(List.of("https://app.bytechef.io"));
+        configuration.setExposedHeaders(List.of("X-CSRF-Rejected"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
