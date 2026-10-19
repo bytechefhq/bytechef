@@ -54,6 +54,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -117,6 +122,86 @@ class CopilotSpringAIAgentTest {
         @Test
         void testConversationIdFallsBackToTheThreadIdWithoutAScope() throws AGUIException {
             assertThat(newConverterAgent(null).conversationId(newInput(new State()))).isEqualTo("thread");
+        }
+    }
+
+    @Nested
+    class PrepareChatMemoryTest {
+
+        private static final String CONVERSATION_ID = "conversation";
+
+        private ChatMemory chatMemory;
+
+        @BeforeEach
+        void beforeEach() {
+            chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                .maxMessages(100)
+                .build();
+
+            chatMemory.add(
+                CONVERSATION_ID,
+                List.of(
+                    new org.springframework.ai.chat.messages.UserMessage("Post a standup reminder"),
+                    new AssistantMessage("Which channel?"),
+                    new org.springframework.ai.chat.messages.UserMessage("Use #general"),
+                    new AssistantMessage("Done, posting to #general.")));
+        }
+
+        @Test
+        void testRewindsTheMemoryOfAnUnscopedRunToTheEditedTurn() throws AGUIException {
+            newPlainAgent().prepareChatMemory(
+                newInput(new State(), "Post a standup reminder", "Use #random"), chatMemory, CONVERSATION_ID);
+
+            assertThat(chatMemory.get(CONVERSATION_ID))
+                .extracting(Message::getText)
+                .containsExactly("Post a standup reminder", "Which channel?");
+        }
+
+        @Test
+        void testRewindsTheMemoryOfAnUnscopedRunForARegeneratedReply() throws AGUIException {
+            newPlainAgent().prepareChatMemory(
+                newInput(new State(), "Post a standup reminder", "Use #general"), chatMemory, CONVERSATION_ID);
+
+            assertThat(chatMemory.get(CONVERSATION_ID))
+                .extracting(Message::getText)
+                .containsExactly("Post a standup reminder", "Which channel?");
+        }
+
+        @Test
+        void testRunsUseAConversationLockingChatMemory() throws AGUIException {
+            assertThat(newPlainAgent().chatMemoryForRun(newInput(new State()), chatMemory))
+                .isInstanceOf(ConversationLockingChatMemory.class);
+        }
+
+        @Test
+        void testResetsTheMemoryWhenTheFirstMessageIsEdited() throws AGUIException {
+            newPlainAgent().prepareChatMemory(
+                newInput(new State(), "Post a standup reminder at 9am"), chatMemory, CONVERSATION_ID);
+
+            assertThat(chatMemory.get(CONVERSATION_ID)).isEmpty();
+        }
+
+        @Test
+        void testKeepsTheMemoryWhenALongerHistoryDoesNotMatch() throws AGUIException {
+            newPlainAgent().prepareChatMemory(
+                newInput(new State(), "Something the server never saw", "Use #random"), chatMemory,
+                CONVERSATION_ID);
+
+            assertThat(chatMemory.get(CONVERSATION_ID)).hasSize(4);
+        }
+
+        @Test
+        void testKeepsTheMemoryOfAnUnscopedRunThatContinuesTheConversation() throws AGUIException {
+            newPlainAgent().prepareChatMemory(
+                newInput(new State(), "Post a standup reminder", "Use #general", "Make it 10am"), chatMemory,
+                CONVERSATION_ID);
+
+            assertThat(chatMemory.get(CONVERSATION_ID)).hasSize(4);
+        }
+
+        private static CopilotSpringAIAgent newPlainAgent() throws AGUIException {
+            return new PlainAgent(newBuilder(mock(ChatModel.class)), null);
         }
     }
 
@@ -527,6 +612,21 @@ class CopilotSpringAIAgentTest {
         List<BaseMessage> messages = new ArrayList<>();
 
         messages.add(userMessage);
+
+        return new RunAgentInput("thread", "run", state, messages, List.of(), List.of(), null);
+    }
+
+    private static RunAgentInput newInput(State state, String... userTexts) {
+        List<BaseMessage> messages = new ArrayList<>();
+
+        for (int index = 0; index < userTexts.length; index++) {
+            UserMessage userMessage = new UserMessage();
+
+            userMessage.setId("message-" + index);
+            userMessage.setContent(userTexts[index]);
+
+            messages.add(userMessage);
+        }
 
         return new RunAgentInput("thread", "run", state, messages, List.of(), List.of(), null);
     }
