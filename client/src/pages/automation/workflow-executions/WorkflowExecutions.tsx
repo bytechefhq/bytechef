@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
-import EmptyList from '@/components/EmptyList';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
@@ -17,10 +17,11 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {GetWorkflowExecutionsPageJobStatusEnum} from '@/shared/middleware/automation/workflow/execution';
-import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
+import {RefreshCwIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import WorkflowExecutionsEmptyState from './components/WorkflowExecutionsEmptyState';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 import WorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
@@ -62,7 +63,6 @@ const ProjectLabel = ({project}: {project: Project}) => (
 
 export const WorkflowExecutions = () => {
     const {
-        emptyListMessage,
         filterEndDate,
         filterPageNumber,
         filterProjectDeploymentId,
@@ -70,6 +70,7 @@ export const WorkflowExecutions = () => {
         filterStartDate,
         filterStatus,
         filterWorkflowId,
+        handleClearFilters,
         handleEndDateChange,
         handlePaginationClick,
         handleProjectChange,
@@ -77,6 +78,7 @@ export const WorkflowExecutions = () => {
         handleStartDateChange,
         handleStatusChange,
         handleWorkflowChange,
+        hasActiveFilters,
         projectDeployments,
         projects,
         refetchWorkflowExecutions,
@@ -113,6 +115,14 @@ export const WorkflowExecutions = () => {
             projects,
             workflows,
         ]
+    );
+
+    const isFirstRun = !hasActiveFilters && workflowExecutions?.length === 0;
+
+    const emptyState = hasActiveFilters ? (
+        <EmptyFilterResult entityName="executions" entityTitle="Executions" onClear={handleClearFilters} />
+    ) : (
+        <WorkflowExecutionsEmptyState onRefresh={() => refetchWorkflowExecutions()} />
     );
 
     return (
@@ -162,9 +172,10 @@ export const WorkflowExecutions = () => {
                         workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 ? (
                             <FilterTitle filters={activeFilters} />
                         ) : (
-                            ''
+                            isFirstRun && 'Workflow Executions'
                         )
                     }
+                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -249,17 +260,14 @@ export const WorkflowExecutions = () => {
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
+            leftSidebarOpen={isFirstRun ? false : undefined}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
                     <WorkflowExecutionsTable workflowExecutions={workflowExecutions} />
                 ) : (
-                    <EmptyList
-                        icon={<ActivityIcon className="size-24 text-gray-300" />}
-                        message={emptyListMessage}
-                        title="No Executed Workflows"
-                    />
+                    emptyState
                 )}
             </PageLoader>
 

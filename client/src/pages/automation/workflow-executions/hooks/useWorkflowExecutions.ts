@@ -100,16 +100,14 @@ export const useWorkflowExecutions = () => {
         filterProjectId != null && workflowsProjectVersion != null
     );
 
-    const emptyListMessage =
-        !filterStatus &&
-        !filterStartDate &&
-        !filterEndDate &&
-        !filterProjectId &&
-        !filterProjectDeploymentId &&
-        !filterWorkflowId &&
-        !filterPageNumber
-            ? "You don't have any executed workflows yet."
-            : 'There is no executed workflows for the current criteria.';
+    const hasActiveFilters =
+        !!filterStatus ||
+        !!filterStartDate ||
+        !!filterEndDate ||
+        !!filterProjectId ||
+        !!filterProjectDeploymentId ||
+        !!filterWorkflowId ||
+        !!filterPageNumber;
 
     const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) =>
         WorkflowExecutionFromJSON(workflowExecution)
@@ -128,6 +126,18 @@ export const useWorkflowExecutions = () => {
             `/automation/executions?status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectDeploymentId=${projectDeploymentId ? projectDeploymentId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
+
+    const handleClearFilters = () => {
+        setFilterEndDate(undefined);
+        setFilterPageNumber(undefined);
+        setFilterProjectDeploymentId(undefined);
+        setFilterProjectId(undefined);
+        setFilterStartDate(undefined);
+        setFilterStatus(undefined);
+        setFilterWorkflowId(undefined);
+
+        filter();
+    };
 
     const handleEndDateChange = (date?: Date) => {
         const normalizedDate = date
@@ -275,7 +285,6 @@ export const useWorkflowExecutions = () => {
 
     return {
         currentEnvironmentId,
-        emptyListMessage,
         filterEndDate,
         filterPageNumber,
         filterProjectDeploymentId,
@@ -283,6 +292,7 @@ export const useWorkflowExecutions = () => {
         filterStartDate,
         filterStatus,
         filterWorkflowId,
+        handleClearFilters,
         handleEndDateChange,
         handlePaginationClick,
         handleProjectChange,
@@ -290,6 +300,7 @@ export const useWorkflowExecutions = () => {
         handleStartDateChange,
         handleStatusChange,
         handleWorkflowChange,
+        hasActiveFilters,
         projectDeployments,
         projects,
         refetchWorkflowExecutions,
