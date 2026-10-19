@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -58,6 +59,24 @@ public class JdbcExecutor {
         return jdbcTemplate.query(sql, paramMap, resultSetExtractor);
     }
 
+    public static <T> List<T> query(
+        String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper, int maxRows, DataSource dataSource)
+        throws DataAccessException {
+
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = getJdbcTemplate(dataSource, maxRows);
+
+        return namedParameterJdbcTemplate.query(sql, paramMap, rowMapper);
+    }
+
+    public static <T> T query(
+        String sql, Map<String, ?> paramMap, ResultSetExtractor<T> resultSetExtractor, int maxRows,
+        DataSource dataSource) throws DataAccessException {
+
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = getJdbcTemplate(dataSource, maxRows);
+
+        return namedParameterJdbcTemplate.query(sql, paramMap, resultSetExtractor);
+    }
+
     public static int update(String sql, Map<String, ?> paramMap, DataSource dataSource) throws DataAccessException {
         NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(dataSource);
 
@@ -66,5 +85,13 @@ public class JdbcExecutor {
 
     private static NamedParameterJdbcTemplate getJdbcTemplate(DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    private static NamedParameterJdbcTemplate getJdbcTemplate(DataSource dataSource, int maxRows) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.setMaxRows(maxRows);
+
+        return new NamedParameterJdbcTemplate(jdbcTemplate);
     }
 }
