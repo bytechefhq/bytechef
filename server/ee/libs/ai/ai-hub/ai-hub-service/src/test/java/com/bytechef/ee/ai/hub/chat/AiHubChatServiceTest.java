@@ -951,6 +951,93 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testARolledBackDeleteLeavesTheChatsThreadUsable() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+            assertThat(registry.tryStart(THREAD_ID, "run-during-delete")).isEmpty();
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.tryStart(THREAD_ID, "run-after-rollback")).isPresent();
+        verify(sessionService, never()).delete(any());
+    }
+
+    @Test
+    void testADeleteThatFailsAfterRetiringStillLiftsTheRetirementOnRollback() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        doThrow(new IllegalStateException("database down")).when(approvalService)
+            .deleteByChat(1L);
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            assertThatThrownBy(() -> serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID))
+                .isInstanceOf(IllegalStateException.class);
+
+            assertThat(registry.isRetired(THREAD_ID)).isTrue();
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.isRetired(THREAD_ID)).isFalse();
+        assertThat(registry.tryStart(THREAD_ID, "run-after-rollback")).isPresent();
+    }
+
+    @Test
+    void testACommittedDeleteKeepsTheChatsThreadRetired() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+            for (TransactionSynchronization synchronization : TransactionSynchronizationManager
+                .getSynchronizations()) {
+
+                synchronization.afterCommit();
+                synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+            }
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.tryStart(THREAD_ID, "run-after-commit")).isEmpty();
+    }
+
+    @Test
     void testDeleteSucceedsWhenTheSessionPurgeFails() {
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
