@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
@@ -133,7 +134,8 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new A2aPermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
+                new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
+                new DeploymentPermissionScopeProvider(),
                 new McpPermissionScopeProvider(),
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
 
@@ -165,6 +167,14 @@ class PermissionScopeRegistryTest {
                 "MCP_VIEW", "MCP_CREATE", "MCP_EDIT");
             assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
                 "MCP_CREATE", "MCP_EDIT");
+        }
+
+        @Test
+        void testApiKeyScopesAreGrantedFromEditorOnly() {
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).contains(
+                "API_KEY_VIEW", "API_KEY_CREATE", "API_KEY_DELETE");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
+                "API_KEY_VIEW", "API_KEY_CREATE", "API_KEY_DELETE");
         }
 
         @Test

@@ -18,14 +18,15 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +51,9 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')")
     public String create(long workspaceId, ApiKey apiKey) {
-        apiKey = apiKeyFacade.create(apiKey, PlatformType.AUTOMATION);
+        apiKey = apiKeyFacade.createAutomationApiKey(apiKey);
 
         workspaceApiKeyService.create(apiKey.getId(), workspaceId);
 
@@ -59,27 +61,29 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiKeyId, 'ApiKey', 'API_KEY_DELETE')")
     public void delete(long apiKeyId) {
+        apiKeyFacade.getApiKey(apiKeyId);
+
         workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
         apiKeyService.delete(apiKeyId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_VIEW')")
     public List<ApiKey> getApiKeys(long workspaceId, long environmentId) {
-        List<Long> apiKeyIds = CollectionUtils.map(
-            workspaceApiKeyService.getWorkspaceApiKeys(workspaceId), WorkspaceApiKey::getApiKeyId);
+        Set<Long> workspaceApiKeyIds = workspaceApiKeyService.getWorkspaceApiKeys(workspaceId)
+            .stream()
+            .map(WorkspaceApiKey::getApiKeyId)
+            .collect(Collectors.toSet());
 
-        if (apiKeyIds.isEmpty()) {
+        if (workspaceApiKeyIds.isEmpty()) {
             return List.of();
         }
 
-        return apiKeyIds.stream()
-            .map(apiKeyService::getApiKey)
-            .filter(apiKey -> {
-                Environment environment = apiKey.getEnvironment();
-
-                return environment.ordinal() == environmentId;
-            })
+        return apiKeyFacade.getApiKeys(environmentId, PlatformType.AUTOMATION)
+            .stream()
+            .filter(apiKey -> workspaceApiKeyIds.contains(apiKey.getId()))
             .toList();
     }
 }
