@@ -359,6 +359,49 @@ public class TriggerDefinitionServiceTest {
     }
 
     @Test
+    public void testExecutePollingTriggerKeepsPreviousCursorWhenLaterBatchExceedsRemainingCapacity() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        AtomicInteger pollCount = new AtomicInteger();
+
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> {
+                int page = pollCount.incrementAndGet();
+
+                List<Object> batch = new ArrayList<>();
+
+                for (int i = 0; i < (page == 1 ? 9_999 : 100); i++) {
+                    batch.add("record-" + page + "-" + i);
+                }
+
+                return new PollOutput(batch, Map.of("cursor", page), false);
+            };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        TriggerOutput output = triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), Map.of("cursor", 0), null,
+            null, null, PlatformType.AUTOMATION, false);
+
+        List<?> records = (List<?>) output.value();
+
+        assertEquals(9_999, records.size(), "A batch that does not fit must be dropped as a whole");
+        assertEquals(
+            Map.of("cursor", 1), output.state(),
+            "The cursor must stay at the last batch that was kept so the dropped batch is polled again");
+        assertEquals(2, pollCount.get());
+    }
+
+    @Test
     public void testExecutePollingTriggerLogsWarningWhenCapTrips() {
         TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
 
