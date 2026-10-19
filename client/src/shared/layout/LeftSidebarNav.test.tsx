@@ -67,4 +67,13 @@ describe('LeftSidebarNav', () => {
         expect(navItemClasses).toContain('h-9');
         expect(placeholderRows()[0]).toHaveClass('h-9');
     });
+
+    it('stacks its title above its rows at every width, so the small-screen drawer matches the docked rail', () => {
+        renderNav();
+
+        const group = screen.getByRole('link').parentElement;
+
+        expect(group).toHaveClass('flex-col');
+        expect(group).not.toHaveClass('lg:flex-col', 'space-x-2');
+    });
 });
