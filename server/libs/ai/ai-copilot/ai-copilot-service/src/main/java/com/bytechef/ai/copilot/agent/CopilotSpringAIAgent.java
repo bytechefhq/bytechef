@@ -214,10 +214,19 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
-    protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
-        State state = input.state();
+    protected String toolErrorMessage(RunAgentInput input, Throwable throwable) {
+        if (!isScopedRun(input)) {
+            return super.toolErrorMessage(input, throwable);
+        }
 
-        if (state != null && state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) != null) {
+        String description = CopilotRunFailures.describe(throwable);
+
+        return (description == null ? "The tool call failed." : description) + " Reference: " + input.runId();
+    }
+
+    @Override
+    protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
+        if (isScopedRun(input)) {
             String description = CopilotRunFailures.describe(throwable);
 
             if (description != null) {
@@ -237,6 +246,12 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         CopilotRunErrorCode copilotRunErrorCode = CopilotRunErrorCode.of(throwable);
 
         return copilotRunErrorCode == null ? null : copilotRunErrorCode.name();
+    }
+
+    private static boolean isScopedRun(RunAgentInput input) {
+        State state = input.state();
+
+        return state != null && state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID) != null;
     }
 
     private @Nullable Integer getEnvironmentId(RunAgentInput input) {
