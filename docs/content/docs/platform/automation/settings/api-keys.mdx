@@ -1,18 +1,14 @@
 ---
 title: API Keys
-description: Keys for the automation public API, bound to a workspace and environment.
-ee: true
-comingSoon: true
+description: Keys for the automation public API, MCP servers and A2A servers, bound to a workspace and environment.
 ---
 
-<EEBadge />
-
-A **workspace API key** is scoped to a workspace *and* an environment, and authenticates calls to the [automation public API](/platform/automation/deploy/api-platform), where workflows are published as REST endpoints.
+A **workspace API key** is scoped to a workspace *and* an environment, and authenticates calls to the [automation public API](/platform/automation/deploy/api-platform), where workflows are published as REST endpoints, and to [MCP servers](/platform/automation/deploy/mcp-servers) and [A2A servers](/platform/automation/deploy/a2a-servers) that require authentication.
 
 Because these keys are scoped to both, the key you present must match the workspace *and* the environment of the API you are calling.
 
 <Callout title="Availability">
-    Workspace API keys are Enterprise Edition. In automation the page is behind any of `ff-1025`, `ff-1039`, or `ff-4814`; in the embedded product it is behind `ff-520`. When no required flag is on, the page is hidden from the Settings sidebar.
+    Workspace API keys are available in the Community and Enterprise Editions. The page is listed under **Current Workspace** in the Settings sidebar.
 </Callout>
 
 For account-scoped keys used for administration and the management MCP server, see [Admin API Keys](/platform/settings/admin-api-keys). Both pages share the same layout, dialogs, and actions.
@@ -34,6 +30,16 @@ For account-scoped keys used for administration and the management MCP server, s
 Each row ends with an **edit** (pencil) and a **delete** (trash) icon.
 
 {/* TODO screenshot: Settings → API Keys page - header with the New API Key button, and the keys table below */}
+
+## Who can manage keys
+
+A key authenticates as the user who created it, so it is a personal credential:
+
+- **Workspace editors and admins** create keys in their workspace and see, rename and delete their own keys. They do not see other members' keys.
+- **Workspace viewers** cannot create keys.
+- **Tenant administrators** see and manage every key in the workspace.
+
+On the Community Edition every user is an administrator.
 
 ## Workspace and environment binding
 
