@@ -1,11 +1,12 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import Projects from '@/pages/automation/projects/Projects';
-import {fireEvent, render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {fireEvent, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mockProjectsState = vi.hoisted(() => ({
+    captureEmptyStateAction: vi.fn(),
     captureProjectImported: vi.fn(),
     navigate: vi.fn(),
     projects: [] as unknown[],
@@ -36,6 +37,7 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({
+        captureEmptyStateAction: mockProjectsState.captureEmptyStateAction,
         captureProjectImported: mockProjectsState.captureProjectImported,
     }),
 }));
@@ -122,6 +124,7 @@ let queryClient: QueryClient;
 beforeEach(() => {
     queryClient = createTestQueryClient();
     mockImportMutate.mockClear();
+    mockProjectsState.captureEmptyStateAction.mockClear();
     mockProjectsState.captureProjectImported.mockClear();
     mockProjectsState.navigate.mockClear();
     mockProjectsState.projects = [];
@@ -216,11 +219,44 @@ describe('Projects Import Functionality', () => {
 });
 
 describe('Projects empty states', () => {
-    it('offers to create a project when the workspace has none', () => {
+    it('explains what a project is and links to the docs', () => {
         renderProjects();
 
-        expect(screen.getByText('No Projects')).toBeInTheDocument();
-        expect(screen.getByText('Get started by creating a new project.')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {level: 2, name: 'Create your first project'})).toBeInTheDocument();
+        expect(screen.getByText(/A project groups related workflows\./)).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'How projects work'})).toHaveAttribute(
+            'href',
+            'https://docs.bytechef.io/platform/automation/build/workflows/projects'
+        );
+    });
+
+    it('shows creating a project as the current step of getting started', () => {
+        renderProjects();
+
+        const steps = within(screen.getByRole('list', {name: 'Getting started'})).getAllByRole('listitem');
+
+        expect(steps).toHaveLength(4);
+        expect(steps[0]).toHaveTextContent('Create a project');
+        expect(steps[0]).toHaveAttribute('aria-current', 'step');
+    });
+
+    it('records a click on Create Project', async () => {
+        renderProjects();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create Project'}));
+
+        expect(mockProjectsState.captureEmptyStateAction).toHaveBeenCalledWith(
+            'projects',
+            'create_project',
+            'createProject'
+        );
+    });
+
+    it('hides the category and tag sidebar until there is something to filter', () => {
+        renderProjects();
+
+        expect(screen.queryByText('No defined tags.')).not.toBeInTheDocument();
+        expect(screen.getByText('Projects')).toBeInTheDocument();
     });
 
     // The filtered list and the unfiltered one were the same array, so a filter that matched nothing rendered
@@ -229,7 +265,8 @@ describe('Projects empty states', () => {
         renderProjects(['/?tagId=1']);
 
         expect(screen.getByText('No Matching Projects')).toBeInTheDocument();
-        expect(screen.queryByText('Get started by creating a new project.')).not.toBeInTheDocument();
+        expect(screen.queryByText('Create your first project')).not.toBeInTheDocument();
+        expect(screen.getByText('No defined tags.')).toBeInTheDocument();
     });
 });
 
