@@ -15,6 +15,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import java.util.List;
 import java.util.OptionalLong;
@@ -43,7 +44,8 @@ class PermissionServiceResourceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolvers), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            Mockito.mock(EmbeddedScopeCacheService.class), Mockito.mock(EmbeddedUserRepository.class));
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

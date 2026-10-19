@@ -17,8 +17,11 @@
 package com.bytechef.automation.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -242,6 +245,52 @@ class AutomationMethodSecurityExpressionRootTest {
 
             return null;
         });
+
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
+    }
+
+    @Test
+    void testHasEmbeddedScopeDelegatesToThePermissionService() {
+        when(permissionService.hasEmbeddedScope(SCOPE)).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(SCOPE, Environment.PRODUCTION)).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScope(SCOPE)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, Environment.PRODUCTION)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, Environment.STAGING)).isFalse();
+        assertThat(root.hasEmbeddedScopeInEveryEnvironment(SCOPE)).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, (long) Environment.PRODUCTION.ordinal())).isTrue();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, (long) Environment.STAGING.ordinal())).isFalse();
+    }
+
+    @Test
+    void testHasEmbeddedScopeInEnvironmentIdWithNullRequiresEveryEnvironment() {
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(false);
+
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, null)).isFalse();
+
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, null)).isTrue();
+    }
+
+    @Test
+    void testHasEmbeddedScopeInEnvironmentWithNullRequiresEveryEnvironment() {
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(false);
+
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, null)).isFalse();
+
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(SCOPE)).thenReturn(true);
+
+        assertThat(root.hasEmbeddedScopeInEnvironment(SCOPE, null)).isTrue();
+
+        verify(permissionService, never()).hasEmbeddedScope(anyString(), any());
+    }
+
+    @Test
+    void testHasEmbeddedScopeInEnvironmentIdDeniesAnOrdinalOutsideTheEnum() {
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, 99L)).isFalse();
+        assertThat(root.hasEmbeddedScopeInEnvironmentId(SCOPE, -1L)).isFalse();
 
         verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
