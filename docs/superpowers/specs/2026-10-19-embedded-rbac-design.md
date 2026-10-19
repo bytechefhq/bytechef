@@ -103,8 +103,14 @@ Connection edit and delete keep the 1051/4750 rule: the scope **and** ownership 
 owned by connected users are not "owned" by members; a member with `CONNECTION_EDIT` manages them only through the
 existing admin connection facade, and its current behaviour for tenant admins becomes the behaviour for that scope.
 
-Every scope must gate something (`PermissionScopeGateCoverageTest`) and every `hasPermission` resource type must have a
-resolver (`ResourceTokenResolverCoverageTest`); both tests already scan `server/ee/libs/embedded`.
+The existing coverage tests pin the catalogue and the gates and already scan `server/ee/libs/embedded`:
+`PermissionScopeTypeTest` (every gate scope is in the catalogue; every catalogue scope is enforced or pinned as
+unenforced), `ResourceOwnershipResolverTest` (every `hasPermission` resource type has a resolver) and
+`AutomationMethodSecurityConfigurationTest` (every write endpoint is gated or listed). Embedded scopes, resolvers and
+gates must satisfy them; their allowlists are not to be widened for embedded.
+
+Webhook trigger testing from the integration workflow editor (`WebhookTriggerTestAdminFacadeImpl`) is a workflow write:
+`WORKFLOW_EDIT` in Development.
 
 ## Resources and environments
 
@@ -118,9 +124,12 @@ resolver (`ResourceTokenResolverCoverageTest`); both tests already scan `server/
 | Embedded job, trigger execution | Yes (via the instance configuration) | its environment |
 | App event | No | environment-unaware |
 
-Note: `PermissionServiceImpl.hasWorkflowScopeIfProjectWorkflow` (and siblings) deny non-tenant-admins for any workflow
-that is not a project workflow. Integration workflows go through these shared workflow facades, so they need an
-embedded branch (resolve workflow → integration → embedded check) or they stay admin-only.
+Required: `PermissionServiceImpl.hasWorkflowScope`, `hasWorkflowScopeIfProjectWorkflow` and their environment
+overloads deny non-tenant-admins for any workflow that is not a project workflow, and 21 `@PreAuthorize` gates in
+`server/libs/platform` (node parameters, test runs, node tests, scripts, test configuration) use them. Integration
+workflows go through those shared facades, so these methods get an embedded branch (workflow → integration → embedded
+check in the given environment). Without it the integration workflow editor stays admin-only no matter what the
+embedded facades gate.
 
 ## Enforcement
 
@@ -135,6 +144,14 @@ embedded branch (resolve workflow → integration → embedded check) or they st
   instead of falling through to "deny unless tenant admin".
 - `IntegrationWorkflowExecutionFacadeImpl` redacts run details without `EXECUTION_DETAILS_VIEW`, using the
   `withoutDetails()` helpers added on 1051.
+- The shared `ApiKeyFacadeImpl` enforces ownership in plain Java, not SpEL: `create(apiKey, type)` is tenant-admin
+  only for non-automation keys, `getApiKeys` filters to the caller's own keys, and `revokeAll(userId)` revokes every
+  key of a departing user. Decision 9 needs an embedded branch there: `PlatformType.EMBEDDED` keys are created with
+  `API_KEY_CREATE`, listed and deleted by scope in their environment without an owner filter, and skipped by
+  `revokeAll`. Automation and personal keys keep today's rules.
+- Decision 8 is a behaviour change for automation: members of the default workspace lose list and by-id access to
+  Automation Hub projects and connected users' projects. `automation_workflow_project` (one row per Hub project) and
+  the connected-user project link are the existing markers; no new column is needed to tell them apart.
 - The connected-user decision keeps precedence: it is evaluated first, exactly as `decideForConnectedUser` does now.
 - Lists filter to what the caller can see in the selected environment; by-id reads check the same scope, so a list
   never hides what a by-id read would return.
@@ -192,5 +209,8 @@ embedded branch (resolve workflow → integration → embedded check) or they st
   suggestion is a side discriminator resolved from the resource being checked.
 - How `ResourceOwner` represents "embedded" (a new variant rather than a sentinel workspace id).
 - Whether the embedded role type is `WorkspaceRole` reused or its own enum with the same ranking.
+- The SpEL built-ins (`hasEmbeddedScope`, `hasEmbeddedScopeInEnvironment`, `hasEmbeddedScopeInEveryEnvironment` or
+  equivalents) and how `hasPermission(#id, '<Type>', '<SCOPE>')` picks the embedded side for a shared type such as
+  `Job`, `Connection` or `McpServer`.
 - Exact method-by-method gate mapping, list filtering, the GraphQL shape of the membership and scope queries, and the
   order of work, provided each step leaves the stack green.
