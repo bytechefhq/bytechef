@@ -1,0 +1,4 @@
+extend type Query {
+    myWorkspaceScopes(workspaceId: ID!, environment: EnvironmentEnum): [String!]!
+    myWorkspaceRole(workspaceId: ID!): String
+}
