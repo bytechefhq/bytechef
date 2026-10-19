@@ -171,7 +171,8 @@ const A2aServerDialog = ({
                                                 </FormControl>
 
                                                 <FormDescription>
-                                                    Require an API key in addition to the server secret in the URL.
+                                                    Require a workspace API key, sent as an Authorization: Bearer
+                                                    header, in addition to the server secret in the URL.
                                                 </FormDescription>
                                             </div>
 

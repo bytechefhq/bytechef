@@ -70,9 +70,18 @@ const A2aServerConnect = ({a2aServer}: A2aServerConnectProps) => {
             />
 
             {a2aServer.authenticationRequired ? (
-                <p className="text-sm text-muted-foreground">
-                    Requests require an API key created under Settings, sent as an Authorization: Bearer header.
-                </p>
+                <div className="space-y-2">
+                    <A2aServerConnectUrl
+                        description="Every request, including the agent card request, must send a workspace API key from this server's workspace and environment. Create one under Settings → API Keys and replace YOUR_API_KEY with it."
+                        label="Authorization header"
+                        url="Authorization: Bearer YOUR_API_KEY"
+                    />
+
+                    <p className="text-sm text-muted-foreground">
+                        A client that also sends an X-ENVIRONMENT header must name this server&apos;s environment, or
+                        the request is rejected.
+                    </p>
+                </div>
             ) : (
                 <p className="text-sm text-muted-foreground">
                     This server does not require authentication, so the URLs can be used as is.
