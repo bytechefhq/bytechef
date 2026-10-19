@@ -240,12 +240,16 @@ export async function createActiveUser(email: string, scimToken: string): Promis
     return String(body!.id);
 }
 
-export async function inviteAndClaimUser(apiContext: APIRequestContext, email: string): Promise<void> {
+export async function inviteUser(apiContext: APIRequestContext, email: string): Promise<void> {
     await graphql(
         apiContext,
         'mutation InviteUser($email: String!, $role: String!) { inviteUser(email: $email, role: $role) }',
         {email, role: 'ROLE_USER'}
     );
+}
+
+export async function inviteAndClaimUser(apiContext: APIRequestContext, email: string): Promise<void> {
+    await inviteUser(apiContext, email);
 
     const mailpitContext = await request.newContext({baseURL: MAILPIT_URL});
     let claimKey = '';
@@ -262,7 +266,7 @@ export async function inviteAndClaimUser(apiContext: APIRequestContext, email: s
 
             const message = await (await mailpitContext.get(`/api/v1/message/${messageId}`)).json();
 
-            const match = `${message.HTML} ${message.Text}`.match(/password-reset\/finish\?key=([A-Za-z0-9]+)/);
+            const match = `${message.HTML} ${message.Text}`.match(/accept-invitation\?key=([A-Za-z0-9]+)/);
 
             expect(match, `no claim link in the mail to ${email}`).toBeTruthy();
 
@@ -275,7 +279,7 @@ export async function inviteAndClaimUser(apiContext: APIRequestContext, email: s
     const anonymousContext = await request.newContext({baseURL: AUTHENTICATION_BASE_URL});
 
     try {
-        const response = await anonymousContext.post('/api/account/reset-password/finish', {
+        const response = await anonymousContext.post('/api/account/accept-invitation', {
             data: {key: claimKey, newPassword: INVITED_USER_PASSWORD},
             headers: {'X-XSRF-TOKEN': await getXsrfToken(anonymousContext)},
         });
