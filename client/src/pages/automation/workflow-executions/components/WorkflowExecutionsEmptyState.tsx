@@ -63,9 +63,9 @@ const WorkflowExecutionsEmptyState = ({onRefresh}: WorkflowExecutionsEmptyStateP
             <EmptyState
                 {...sharedProps}
                 actions={<Button label="Go to Deployments" onClick={() => goToDeployments('go_to_deployments')} />}
-                description="You have a deployment, but none of its workflows are enabled. Enabled workflows start when their trigger fires."
+                description="You have a deployment, but none of its workflows can run yet. A workflow runs when both it and its deployment are enabled, starting each time its trigger fires."
                 icon={<PowerIcon />}
-                title="Enable your deployment"
+                title="Enable a deployed workflow"
             />
         );
     }
@@ -94,7 +94,7 @@ const WorkflowExecutionsEmptyState = ({onRefresh}: WorkflowExecutionsEmptyStateP
                         />
                     </>
                 }
-                description="Your deployment is enabled. Runs appear here when a trigger fires, for example on a schedule or an incoming webhook. Test runs from the workflow editor aren't listed here."
+                description="A deployed workflow is enabled. Runs appear here when a trigger fires, for example on a schedule or an incoming webhook. Test runs from the workflow editor aren't listed here."
                 icon={<ClockIcon />}
                 title="Waiting for the first run"
             />

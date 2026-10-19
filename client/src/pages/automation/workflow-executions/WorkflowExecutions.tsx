@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
+import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
@@ -17,7 +18,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {GetWorkflowExecutionsPageJobStatusEnum} from '@/shared/middleware/automation/workflow/execution';
-import {RefreshCwIcon} from 'lucide-react';
+import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -117,9 +118,19 @@ export const WorkflowExecutions = () => {
         ]
     );
 
-    const isFirstRun = !hasActiveFilters && workflowExecutions?.length === 0;
+    // An empty page of a non-empty result, e.g. a bookmarked page number after older executions were purged.
+    const isPastLastPage = !!workflowExecutionPage?.totalElements;
 
-    const emptyState = hasActiveFilters ? (
+    const isFirstRun = !hasActiveFilters && !isPastLastPage && workflowExecutions?.length === 0;
+
+    const emptyState = isPastLastPage ? (
+        <EmptyList
+            button={<Button label="Go to first page" onClick={() => handlePaginationClick(0)} variant="outline" />}
+            icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
+            message="This page is past the last execution."
+            title="No Executions on This Page"
+        />
+    ) : hasActiveFilters ? (
         <EmptyFilterResult entityName="executions" entityTitle="Executions" onClear={handleClearFilters} />
     ) : (
         <WorkflowExecutionsEmptyState onRefresh={() => refetchWorkflowExecutions()} />
@@ -175,7 +186,6 @@ export const WorkflowExecutions = () => {
                             isFirstRun && 'Workflow Executions'
                         )
                     }
-                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -260,7 +270,7 @@ export const WorkflowExecutions = () => {
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
-            leftSidebarOpen={isFirstRun ? false : undefined}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>

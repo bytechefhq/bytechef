@@ -121,7 +121,6 @@ export const Connections = () => {
                             isFirstRun && 'Connections'
                         )
                     }
-                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -136,7 +135,7 @@ export const Connections = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
-            leftSidebarOpen={isFirstRun ? false : undefined}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[connectionsError, tagsError, unfilteredConnectionsError]} loading={isAnyLoading}>

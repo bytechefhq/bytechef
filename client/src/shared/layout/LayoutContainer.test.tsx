@@ -69,6 +69,50 @@ describe('LayoutContainer', () => {
         expect(screen.queryByRole('button', {name: 'Toggle sidebar'})).not.toBeInTheDocument();
     });
 
+    // A page learns it is empty only after loading, so the sidebar shown meanwhile must go at once, not slide out.
+    it('drops a hidden left sidebar at once and offers no toggle', () => {
+        const renderEmptyPage = (leftSidebarHidden: boolean) => (
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarHidden={leftSidebarHidden}
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        const {rerender} = render(renderEmptyPage(false));
+
+        expect(screen.getByText('Categories')).toBeInTheDocument();
+
+        rerender(renderEmptyPage(true));
+
+        expect(screen.queryByText('Categories')).not.toBeInTheDocument();
+        expect(screen.getByText('Content').closest('.size-full.overflow-auto > div')).not.toHaveClass(
+            'transition-[padding]'
+        );
+        expect(screen.queryByRole('button', {name: 'Toggle sidebar'})).not.toBeInTheDocument();
+    });
+
+    // With the sidebar hidden, the main header carries the page title the sidebar header would have shown.
+    it('styles the main header title like the sidebar header while the sidebar is hidden', () => {
+        render(
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarHidden
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('Projects')).toHaveClass('font-semibold');
+    });
+
     it('lets a nested sidebar-less container use the outer container toggle', () => {
         render(
             <TooltipProvider>
@@ -95,6 +139,25 @@ describe('LayoutContainer', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Toggle sidebar'}));
 
         expect(within(screen.getByRole('dialog')).getByText('Categories')).toBeInTheDocument();
+    });
+
+    it('offers no drawer on a small screen while the sidebar is hidden', () => {
+        setViewportWidth(800);
+
+        render(
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarHidden
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        expect(screen.queryByRole('button', {name: 'Toggle sidebar'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('does not open a drawer when toggled on a large screen', () => {

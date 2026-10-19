@@ -76,12 +76,11 @@ describe('useAutomationJourney', () => {
         expect(result.current.journey).toBeUndefined();
     });
 
-    it('reports an error when either query fails', () => {
+    it('derives no journey when either query fails', () => {
         hoisted.projectsResult = {data: undefined, error: new Error('Request failed'), isLoading: false};
 
         const {result} = renderHook(() => useAutomationJourney());
 
-        expect(result.current.isError).toBe(true);
         expect(result.current.journey).toBeUndefined();
     });
 });

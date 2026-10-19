@@ -3,6 +3,8 @@ import {createContext, useContext} from 'react';
 interface LeftSidebarToggleContextI {
     /** False on pages that render no left sidebar — the header must not offer to toggle one. */
     hasLeftSidebar: boolean;
+    /** True while the page hides its sidebar for having nothing to filter; the main header then carries the title. */
+    leftSidebarHidden: boolean;
     leftSidebarOpen: boolean;
     toggleLeftSidebar: () => void;
 }
@@ -24,6 +26,7 @@ interface LeftSidebarToggleContextI {
  */
 const LeftSidebarToggleContext = createContext<LeftSidebarToggleContextI>({
     hasLeftSidebar: false,
+    leftSidebarHidden: false,
     leftSidebarOpen: true,
     toggleLeftSidebar: () => {},
 });

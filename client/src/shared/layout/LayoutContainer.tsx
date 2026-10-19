@@ -12,6 +12,7 @@ interface SidebarContentLayoutProps {
     leftSidebarBody?: ReactNode;
     leftSidebarClass?: string;
     leftSidebarHeader?: ReactNode;
+    leftSidebarHidden?: boolean;
     leftSidebarOpen?: boolean;
     leftSidebarWidth?: '56' | '64' | '72' | '96' | '112';
     rightSidebarBody?: ReactNode;
@@ -46,6 +47,7 @@ const LayoutContainer = ({
     leftSidebarBody,
     leftSidebarClass,
     leftSidebarHeader,
+    leftSidebarHidden = false,
     leftSidebarOpen,
     leftSidebarWidth = '64',
     rightSidebarBody,
@@ -68,18 +70,30 @@ const LayoutContainer = ({
     const isMobile = useIsMobile();
 
     const isLeftSidebarControlled = leftSidebarOpen !== undefined;
-    const leftSidebarIsOpen = isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen;
+
+    // Hidden is for a page with nothing in it to filter (an empty list's first run). Unlike closed, it skips the
+    // slide-out: the page only learns it is empty once loaded, and animating then would jolt the layout.
+    const leftSidebarIsOpen =
+        !leftSidebarHidden && (isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen);
 
     const [leftAsideMounted, setLeftAsideMounted] = useState(leftSidebarIsOpen);
 
     const ownLeftSidebarToggle = useMemo(
         () => ({
-            hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled,
+            hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled && !leftSidebarHidden,
+            leftSidebarHidden,
             leftSidebarOpen: isMobile ? mobileLeftSidebarOpen : leftSidebarIsOpen,
             toggleLeftSidebar: () =>
                 isMobile ? setMobileLeftSidebarOpen((open) => !open) : setUncontrolledLeftSidebarOpen((open) => !open),
         }),
-        [isLeftSidebarControlled, isMobile, leftSidebarBody, leftSidebarIsOpen, mobileLeftSidebarOpen]
+        [
+            isLeftSidebarControlled,
+            isMobile,
+            leftSidebarBody,
+            leftSidebarHidden,
+            leftSidebarIsOpen,
+            mobileLeftSidebarOpen,
+        ]
     );
 
     // A LayoutContainer with no sidebar of its own must not shadow an outer one's toggle: every Settings page
@@ -110,7 +124,7 @@ const LayoutContainer = ({
     return (
         <LeftSidebarToggleContext.Provider value={leftSidebarToggle}>
             <div className={twMerge('size-full overflow-auto', className)}>
-                {leftAsideMounted && (
+                {leftAsideMounted && !leftSidebarHidden && (
                     <aside
                         className={twMerge(
                             'hidden border-r border-r-border/50 bg-muted/50 lg:flex lg:flex-col',
@@ -141,7 +155,8 @@ const LayoutContainer = ({
 
                 <div
                     className={twMerge(
-                        'size-full transition-[padding] duration-300 ease-in-out',
+                        'size-full',
+                        !leftSidebarHidden && 'transition-[padding] duration-300 ease-in-out',
                         topHeader && 'flex flex-col',
                         leftSidebarIsOpen && leftSidebarWidths[leftSidebarWidth][1]
                     )}
