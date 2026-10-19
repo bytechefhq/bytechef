@@ -7,7 +7,6 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mockProjectsState = vi.hoisted(() => ({
     captureProjectImported: vi.fn(),
-    captureProjectWorkflowImported: vi.fn(),
     navigate: vi.fn(),
     projects: [] as unknown[],
 }));
@@ -38,7 +37,6 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({
         captureProjectImported: mockProjectsState.captureProjectImported,
-        captureProjectWorkflowImported: mockProjectsState.captureProjectWorkflowImported,
     }),
 }));
 
@@ -125,7 +123,6 @@ beforeEach(() => {
     queryClient = createTestQueryClient();
     mockImportMutate.mockClear();
     mockProjectsState.captureProjectImported.mockClear();
-    mockProjectsState.captureProjectWorkflowImported.mockClear();
     mockProjectsState.navigate.mockClear();
     mockProjectsState.projects = [];
 });
@@ -214,7 +211,6 @@ describe('Projects Import Functionality', () => {
 
         await waitFor(() => {
             expect(mockProjectsState.captureProjectImported).toHaveBeenCalledTimes(1);
-            expect(mockProjectsState.captureProjectWorkflowImported).toHaveBeenCalledTimes(1);
         });
     });
 });
