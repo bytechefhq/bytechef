@@ -1,6 +1,6 @@
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import {render, screen} from '@testing-library/react';
-import {expect, it} from 'vitest';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {expect, it, vi} from 'vitest';
 
 // The point of the component: a filtered list that comes back empty used to render the first-run empty state,
 // which told the reader the workspace was empty and offered to create the thing they already had.
@@ -17,4 +17,14 @@ it("carries the caller's casing into the title and the message separately", () =
 
     expect(screen.getByText('No Matching API Collections')).toBeInTheDocument();
     expect(screen.getByText('No API collections match the current filter.')).toBeInTheDocument();
+});
+
+it('offers to clear the filter when the page can clear it', async () => {
+    const handleClear = vi.fn();
+
+    render(<EmptyFilterResult entityName="executions" entityTitle="Executions" onClear={handleClear} />);
+
+    await userEvent.click(screen.getByRole('button', {name: 'Clear filters'}));
+
+    expect(handleClear).toHaveBeenCalledTimes(1);
 });
