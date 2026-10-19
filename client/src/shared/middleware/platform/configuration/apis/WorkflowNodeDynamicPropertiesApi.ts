@@ -14,10 +14,10 @@
 
 import * as runtime from '../runtime';
 import {
-    type ComponentOperationDynamicPropertiesRequest,
-    ComponentOperationDynamicPropertiesRequestFromJSON,
-    ComponentOperationDynamicPropertiesRequestToJSON,
-} from '../models/ComponentOperationDynamicPropertiesRequest';
+    type ComponentOperationPropertyRequest,
+    ComponentOperationPropertyRequestFromJSON,
+    ComponentOperationPropertyRequestToJSON,
+} from '../models/ComponentOperationPropertyRequest';
 import {
     type Property,
     PropertyFromJSON,
@@ -56,11 +56,26 @@ export interface GetClusterElementNodeDynamicPropertiesRequest {
 }
 
 export interface GetWorkflowNodeComponentOperationDynamicPropertiesRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's task or trigger (E.g. script_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a property.
+     */
     propertyName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
-    componentOperationDynamicPropertiesRequest: ComponentOperationDynamicPropertiesRequest;
+    /**
+     * 
+     */
+    componentOperationPropertyRequest: ComponentOperationPropertyRequest;
 }
 
 export interface GetWorkflowNodeDynamicPropertiesRequest {
@@ -217,10 +232,10 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['componentOperationDynamicPropertiesRequest'] == null) {
+        if (requestParameters['componentOperationPropertyRequest'] == null) {
             throw new runtime.RequiredError(
-                'componentOperationDynamicPropertiesRequest',
-                'Required parameter "componentOperationDynamicPropertiesRequest" was null or undefined when calling getWorkflowNodeComponentOperationDynamicProperties().'
+                'componentOperationPropertyRequest',
+                'Required parameter "componentOperationPropertyRequest" was null or undefined when calling getWorkflowNodeComponentOperationDynamicProperties().'
             );
         }
 
@@ -245,7 +260,7 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ComponentOperationDynamicPropertiesRequestToJSON(requestParameters['componentOperationDynamicPropertiesRequest']),
+            body: ComponentOperationPropertyRequestToJSON(requestParameters['componentOperationPropertyRequest']),
         };
     }
 

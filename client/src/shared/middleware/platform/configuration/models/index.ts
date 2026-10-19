@@ -16,7 +16,7 @@ export * from './ComponentConnection';
 export * from './ComponentDefinition';
 export * from './ComponentDefinitionBasic';
 export * from './ComponentInputReference';
-export * from './ComponentOperationDynamicPropertiesRequest';
+export * from './ComponentOperationPropertyRequest';
 export * from './ConnectionDefinition';
 export * from './ConnectionDefinitionBasic';
 export * from './ConnectionDefinitionHelp';
