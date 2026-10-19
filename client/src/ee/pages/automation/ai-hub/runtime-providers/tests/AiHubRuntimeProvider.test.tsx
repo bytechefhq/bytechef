@@ -223,6 +223,29 @@ describe('buildAiHubSubscriber', () => {
             ...overrides,
         });
 
+    it('attaches a tool call to its assistant message after the loaded history was prepended', () => {
+        aiHubStore.setState({
+            messages: [
+                {content: 'sent while loading', id: 'user-new', role: 'user'},
+                {content: '', id: 'assistant-new', role: 'assistant'},
+            ],
+        });
+
+        const subscriber = createSubscriber({assistantMessageIndex: 1});
+
+        aiHubStore.setState((state) => ({
+            messages: [
+                {content: 'earlier question', id: 'history-1', role: 'user'},
+                {content: 'earlier answer', id: 'history-2', role: 'assistant'},
+                ...state.messages,
+            ],
+        }));
+
+        subscriber.onToolCallStartEvent!(makeToolCallStartParams({toolCallId: 'call-1', toolCallName: 'listProjects'}));
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-1']?.messageIndex).toBe(3);
+    });
+
     describe('openWorkflowTab', () => {
         const openWorkflowTabResult = JSON.stringify({
             name: 'Leads Sync',

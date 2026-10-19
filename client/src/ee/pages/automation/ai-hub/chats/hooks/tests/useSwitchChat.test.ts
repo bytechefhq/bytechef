@@ -1,6 +1,5 @@
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
-import {getServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {act, renderHook} from '@testing-library/react';
@@ -70,8 +69,11 @@ const buildChat = (overrides: Partial<AiHubChatI> = {}): AiHubChatI => ({
     ...overrides,
 });
 
+let builtMessageCount = 0;
+
 const buildMessage = (overrides: Partial<AiHubChatMessageI>): AiHubChatMessageI => ({
     content: 'hi',
+    id: `event-${++builtMessageCount}`,
     role: 'user',
     timestamp: '2026-04-01T00:00:00Z',
     toolEventsJson: null,
@@ -140,19 +142,19 @@ describe('useSwitchChat', () => {
 
     it('maps user/assistant/system roles and filters tool', async () => {
         mockGetChatMessages.mockResolvedValue([
-            buildMessage({content: 'hi', role: 'user'}),
-            buildMessage({content: 'hello', role: 'assistant'}),
-            buildMessage({content: 'sys', role: 'system'}),
-            buildMessage({content: 'tool-payload', role: 'tool'}),
+            buildMessage({content: 'hi', id: 'event-user', role: 'user'}),
+            buildMessage({content: 'hello', id: 'event-assistant', role: 'assistant'}),
+            buildMessage({content: 'sys', id: 'event-system', role: 'system'}),
+            buildMessage({content: 'tool-payload', id: 'event-tool', role: 'tool'}),
         ]);
 
         await switchTo(buildChat());
 
         expect(aiHubStore.getState().chatId).toBe('thread-target');
         expect(aiHubStore.getState().messages).toEqual([
-            {content: 'hi', metadata: {custom: {serverRowIndex: 0}}, role: 'user'},
-            {content: 'hello', metadata: {custom: {serverRowIndex: 1}}, role: 'assistant'},
-            {content: 'sys', metadata: {custom: {serverRowIndex: 2}}, role: 'system'},
+            {content: 'hi', id: 'event-user', role: 'user'},
+            {content: 'hello', id: 'event-assistant', role: 'assistant'},
+            {content: 'sys', id: 'event-system', role: 'system'},
         ]);
         expect(aiHubStore.getState().messagesLoading).toBe(false);
     });
@@ -181,6 +183,7 @@ describe('useSwitchChat', () => {
             buildMessage({content: 'build it', role: 'user'}),
             buildMessage({
                 content: 'Done.',
+                id: 'event-done',
                 role: 'assistant',
                 toolEventsJson: JSON.stringify([
                     {arguments: '{"projectId":5}', id: 'call-1', kind: 'call', name: 'listWorkflows'},
@@ -203,7 +206,7 @@ describe('useSwitchChat', () => {
                     type: 'tool-call',
                 },
             ],
-            metadata: {custom: {serverRowIndex: 1}},
+            id: 'event-done',
             role: 'assistant',
         });
     });
@@ -754,27 +757,60 @@ describe('useSwitchChat', () => {
         expect(mockGetToolApprovals).not.toHaveBeenCalled();
     });
 
-    it('marks each row with its server row index and leaves client-only rows unmarked', async () => {
+    it('keys each row by its server id and each synthetic message by a stable id of its own', async () => {
         mockGetChatMessages.mockResolvedValue([
             buildMessage({
                 content: 'Bind a Slack connection',
+                id: 'event-bind',
                 role: 'USER',
                 toolEventsJson: JSON.stringify([
                     {arguments: '{}', id: 'call-list', kind: 'call', name: 'listConnections'},
                     {id: 'call-list', kind: 'result', name: 'listConnections', response: '[]'},
                 ]),
             }),
-            buildMessage({content: 'Pick one:', role: 'ASSISTANT'}),
-            buildMessage({content: 'User picked: Slack Engineering (ID: 1051)', role: 'USER'}),
-            buildMessage({content: 'Bound.', role: 'ASSISTANT'}),
+            buildMessage({content: 'Pick one:', id: 'event-pick', role: 'ASSISTANT'}),
+            buildMessage({content: '[tool-approval #4] approved', id: 'event-continuation', role: 'USER'}),
+            buildMessage({content: 'Bound.', id: 'event-bound', role: 'ASSISTANT'}),
         ]);
+        mockGetToolApprovals.mockResolvedValue([
+            {
+                arguments: '{}',
+                componentName: 'slack',
+                decidedByUserId: 1,
+                executionError: null,
+                expiresAt: null,
+                id: 4,
+                status: 'APPROVED',
+                toolName: 'bindConnection',
+            },
+        ]);
+        mockGetChatArtifacts.mockResolvedValue([buildArtifact()]);
 
         await switchTo(buildChat());
 
-        const {messages, nextServerRowIndex} = aiHubStore.getState();
+        expect(aiHubStore.getState().messages.map((message) => message.id)).toEqual([
+            'event-bind',
+            'event-bind-tools',
+            'event-pick',
+            'tool-approval-4',
+            'event-bound',
+            'artifact-links',
+        ]);
+    });
 
-        expect(messages.map((message) => getServerRowIndex(message))).toEqual([0, undefined, 1, 2, 3]);
-        expect(nextServerRowIndex).toBe(4);
+    it('starts a new transcript as soon as the switch begins', async () => {
+        const transcriptGeneration = aiHubStore.getState().transcriptGeneration;
+        const observedGenerations: number[] = [];
+
+        mockGetChatMessages.mockImplementation(async () => {
+            observedGenerations.push(aiHubStore.getState().transcriptGeneration);
+
+            return [];
+        });
+
+        await switchTo(buildChat());
+
+        expect(observedGenerations).toEqual([transcriptGeneration + 1]);
     });
 
     it('returns true on success', async () => {
@@ -832,6 +868,7 @@ describe('useSwitchChat', () => {
             mockGetChatMessages.mockResolvedValue([
                 buildMessage({
                     content: 'Opened.',
+                    id: 'event-opened',
                     role: 'assistant',
                     toolEventsJson: JSON.stringify([
                         {arguments: '{}', id: 'call-1', kind: 'call', name: 'openWorkflowTab'},
@@ -842,7 +879,7 @@ describe('useSwitchChat', () => {
             await switchTo(buildChat());
 
             expect(aiHubStore.getState().messages).toEqual([
-                {content: 'Opened.', metadata: {custom: {serverRowIndex: 0}}, role: 'assistant'},
+                {content: 'Opened.', id: 'event-opened', role: 'assistant'},
             ]);
         });
     });
