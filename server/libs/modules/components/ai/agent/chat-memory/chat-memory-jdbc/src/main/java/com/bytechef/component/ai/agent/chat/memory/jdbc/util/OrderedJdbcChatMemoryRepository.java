@@ -16,37 +16,53 @@
 
 package com.bytechef.component.ai.agent.chat.memory.jdbc.util;
 
+import com.bytechef.platform.component.definition.ai.agent.ConversationFirstMessageReader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Wraps a {@link ChatMemoryRepository} and replaces {@link #findConversationIds()} with a query that orders results by
- * the most recent message timestamp (DESC) so callers always see the most active conversations first.
+ * the most recent message timestamp (DESC) so callers always see the most active conversations first. Also reads the
+ * first message of the most recently active conversations in a single query.
  *
  * @author ByteChef
  */
-public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
+public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository, ConversationFirstMessageReader {
 
     private final ChatMemoryRepository delegate;
     private final JdbcTemplate jdbcTemplate;
     private final String findConversationIdsOrderedSql;
+    private final String findFirstMessagesSql;
 
     @SuppressFBWarnings("EI2")
     public OrderedJdbcChatMemoryRepository(
-        ChatMemoryRepository delegate, JdbcTemplate jdbcTemplate, String findConversationIdsOrderedSql) {
+        ChatMemoryRepository delegate, JdbcTemplate jdbcTemplate, String findConversationIdsOrderedSql,
+        String findFirstMessagesSql) {
 
         this.delegate = delegate;
         this.jdbcTemplate = jdbcTemplate;
         this.findConversationIdsOrderedSql = findConversationIdsOrderedSql;
+        this.findFirstMessagesSql = findFirstMessagesSql;
     }
 
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<String> findConversationIds() {
         return jdbcTemplate.queryForList(findConversationIdsOrderedSql, String.class);
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<ConversationFirstMessage> findFirstMessages(@Nullable String searchText, int limit) {
+        return jdbcTemplate.query(
+            findFirstMessagesSql,
+            (resultSet, rowNumber) -> new ConversationFirstMessage(resultSet.getString(1), resultSet.getString(2)),
+            toContainsPattern(searchText), limit);
     }
 
     @Override
@@ -62,5 +78,18 @@ public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
     @Override
     public void deleteByConversationId(String conversationId) {
         delegate.deleteByConversationId(conversationId);
+    }
+
+    private static String toContainsPattern(@Nullable String searchText) {
+        if (searchText == null || searchText.isBlank()) {
+            return "%";
+        }
+
+        String escapedSearchText = searchText.toLowerCase(Locale.ROOT)
+            .replace("!", "!!")
+            .replace("%", "!%")
+            .replace("_", "!_");
+
+        return "%" + escapedSearchText + "%";
     }
 }
