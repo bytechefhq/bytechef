@@ -21,8 +21,9 @@ import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
-import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
-import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
+import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
     ArchiveIcon,
@@ -64,6 +65,10 @@ const AiHubPanel = () => {
     );
 
     const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
+    const {data: providerCatalogData} = useAiProviderCatalogQuery(
+        {environment: String(currentEnvironmentId)},
+        {enabled: currentEnvironmentId >= 0}
+    );
 
     const {data: activeChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
     const {data: archivedChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ARCHIVED');
@@ -76,7 +81,10 @@ const AiHubPanel = () => {
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 
-    const lastUsedModel = currentWorkspaceId != null ? readLastUsedModel(currentWorkspaceId) : null;
+    const shownLlmSelection =
+        chatLlmSelection?.provider != null && chatLlmSelection.model != null
+            ? chatLlmSelection
+            : findAvailableRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
 
     return (
         <div className="relative flex size-full min-h-[50vh] flex-col overflow-x-hidden">
@@ -184,8 +192,8 @@ const AiHubPanel = () => {
                                         writeLastUsedModel(currentWorkspaceId, provider, model);
                                         setChatLlmSelection(currentChatId, provider, model);
                                     }}
-                                    selectedModel={chatLlmSelection?.model ?? lastUsedModel?.model ?? null}
-                                    selectedProvider={chatLlmSelection?.provider ?? lastUsedModel?.provider ?? null}
+                                    selectedModel={shownLlmSelection?.model ?? null}
+                                    selectedProvider={shownLlmSelection?.provider ?? null}
                                 />
                             ) : null
                         }

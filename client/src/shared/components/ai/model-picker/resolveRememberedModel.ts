@@ -15,11 +15,8 @@ const isAvailableModel = (
     return provider.supportsModelById || provider.models.some((model) => model.name === modelName);
 };
 
-/**
- * The workspace's remembered model when the provider catalog still offers it. A remembered model the catalog no longer
- * offers is forgotten and null is returned, as is null while the catalog has not loaded.
- */
-export const resolveRememberedModel = (
+/** The workspace's remembered model when the provider catalog offers it, or null; null while the catalog is unloaded. */
+export const findAvailableRememberedModel = (
     workspaceId: number | null | undefined,
     providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined
 ): {model: string; provider: string} | null => {
@@ -29,15 +26,25 @@ export const resolveRememberedModel = (
 
     const lastUsedModel = readLastUsedModel(workspaceId);
 
-    if (lastUsedModel == null) {
-        return null;
-    }
-
-    if (!isAvailableModel(providerCatalog, lastUsedModel.provider, lastUsedModel.model)) {
-        writeLastUsedModel(workspaceId, null, null);
-
+    if (lastUsedModel == null || !isAvailableModel(providerCatalog, lastUsedModel.provider, lastUsedModel.model)) {
         return null;
     }
 
     return lastUsedModel;
+};
+
+/**
+ * {@link findAvailableRememberedModel}, also forgetting a remembered model the loaded catalog no longer offers.
+ */
+export const resolveRememberedModel = (
+    workspaceId: number | null | undefined,
+    providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined
+): {model: string; provider: string} | null => {
+    const availableRememberedModel = findAvailableRememberedModel(workspaceId, providerCatalog);
+
+    if (availableRememberedModel == null && workspaceId != null && providerCatalog != null) {
+        writeLastUsedModel(workspaceId, null, null);
+    }
+
+    return availableRememberedModel;
 };
