@@ -225,13 +225,14 @@ async function getParameterKeyCompletions(
                 parameters
             ),
         loadDynamicProperties:
-            loadDynamicProperties && workflowNodeName && operationKind === 'action'
+            loadDynamicProperties && workflowNodeName
                 ? (propertyName, lookupDependsOnPaths, parameters) =>
                       loadDynamicProperties({
-                          actionName: operationName,
                           componentName,
                           componentVersion,
                           lookupDependsOnPaths,
+                          operationKind,
+                          operationName,
                           parameters,
                           propertyName,
                           workflowNodeName,

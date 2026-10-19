@@ -296,14 +296,36 @@ describe('parameter key completions with runtime properties', () => {
 
         expect(items.map((item) => item.label)).toEqual(['Email']);
         expect(loadDynamicProperties).toHaveBeenCalledWith({
-            actionName: 'createRecord',
             componentName: 'airtable',
             componentVersion: 1,
             lookupDependsOnPaths: ['baseId'],
+            operationKind: 'action',
+            operationName: 'createRecord',
             parameters: {baseId: 'app1'},
             propertyName: 'fields',
             workflowNodeName: 'airtable_1',
         });
+    });
+
+    it('loads trigger dynamic properties for a trigger', async () => {
+        const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
+        const source =
+            'triggers:\n  - name: newRecord_1\n    type: airtable/v1/newRecord\n    parameters:\n      baseId: app1\n      fields:\n        ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: runtimeCatalog, format: 'yaml', loadDynamicProperties},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['Email']);
+        expect(loadDynamicProperties).toHaveBeenCalledWith(
+            expect.objectContaining({
+                operationKind: 'trigger',
+                operationName: 'newRecord',
+                parameters: {baseId: 'app1'},
+                workflowNodeName: 'newRecord_1',
+            })
+        );
     });
 
     it('hides a property whose display condition is false for the values in the document', async () => {
