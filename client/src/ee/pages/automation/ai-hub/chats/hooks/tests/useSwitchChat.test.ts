@@ -208,6 +208,31 @@ describe('useSwitchChat', () => {
         });
     });
 
+    it.each([
+        ['"done"', 'done'],
+        ['42', '42'],
+        ['true', 'true'],
+        ['null', 'null'],
+    ])('restores the scalar tool result %s as text', async (response, expected) => {
+        mockGetChatMessages.mockResolvedValue([
+            buildMessage({content: 'count them', role: 'user'}),
+            buildMessage({
+                content: 'Counted.',
+                role: 'assistant',
+                toolEventsJson: JSON.stringify([
+                    {arguments: '{}', id: 'call-1', kind: 'call', name: 'countWorkflows'},
+                    {id: 'call-1', kind: 'result', name: 'countWorkflows', response},
+                ]),
+            }),
+        ]);
+
+        await switchTo(buildChat());
+
+        const content = aiHubStore.getState().messages[1].content as unknown as Array<{result?: unknown; type: string}>;
+
+        expect(content.find((part) => part.type === 'tool-call')?.result).toBe(expected);
+    });
+
     it('stitches a settled approval status onto its restored approval card', async () => {
         mockGetChatMessages.mockResolvedValue([
             buildMessage({
