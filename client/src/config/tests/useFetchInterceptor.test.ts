@@ -798,13 +798,11 @@ describe('useFetchInterceptor', () => {
         });
 
         it('does not replay or log out on a 403 without the csrf rejection header', async () => {
-            const innerFetch = vi
-                .fn()
-                .mockResolvedValueOnce({
-                    headers: new Headers(),
-                    status: 403,
-                    url: 'http://localhost/internal/api/test',
-                });
+            const innerFetch = vi.fn().mockResolvedValueOnce({
+                headers: new Headers(),
+                status: 403,
+                url: 'http://localhost/internal/api/test',
+            });
 
             window.fetch = innerFetch as unknown as typeof window.fetch;
 
