@@ -9,14 +9,19 @@ package com.bytechef.ee.ai.hub.memory;
 
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
@@ -52,8 +57,8 @@ public class AiHubSessionMemory implements AutoCloseable {
 
     /**
      * Advisor param carrying the AG-UI message id of the user message a run sends. The session memory advisor stores
-     * that message under this id, so the client can name the stored row, and a run that sends a message the session
-     * already holds, as a reload does, does not store it again.
+     * that message under this id, so the client can name the stored row, and a run that sends again a message the
+     * session still holds, as a reload does, does not store it again.
      */
     public static final String USER_MESSAGE_ID_PARAM = "ai_hub_user_message_id";
 
@@ -81,27 +86,78 @@ public class AiHubSessionMemory implements AutoCloseable {
         return SessionMemoryAdvisor.builder(sessionService)
             .defaultUserId(SESSION_USER_ID)
             .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
-            .requestEventIdGenerator(AiHubSessionMemory::requestEventId)
+            .requestEventIdGenerator(this::requestEventId)
             .build();
     }
 
     /**
-     * The id the session memory advisor stores a request message under: for the user message, the AG-UI message id the
-     * run carries in {@link #USER_MESSAGE_ID_PARAM} when it is a UUID; otherwise, and for every tool response, a random
-     * UUID. Accepting only a UUID keeps a client-chosen id as unlikely to collide with another session's event as the
-     * random ids the store assigns otherwise.
+     * Builds the advisor that keeps a re-sent user message out of the prompt, since the session memory advisor already
+     * puts the stored copy in it. Ordered right before the session memory advisor.
      */
-    static String requestEventId(ChatClientRequest request, Message message) {
-        if (message.getMessageType() == MessageType.USER
-            && request.context()
-                .get(USER_MESSAGE_ID_PARAM) instanceof String userMessageId
-            && isUuid(userMessageId)) {
+    public ResentUserMessageAdvisor createResentUserMessageAdvisor() {
+        return new ResentUserMessageAdvisor(this, ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER - 1);
+    }
 
-            return userMessageId;
+    /**
+     * The id the session memory advisor stores a request message under. For the user message it is the AG-UI message id
+     * the run carries in {@link #USER_MESSAGE_ID_PARAM}, when that id is a UUID and the session holds no event with it,
+     * or holds this very message under it (a re-send, which the store then skips). Otherwise, and for every tool
+     * response, it is a random UUID, so a message whose id was truncated away or names a different message is stored as
+     * a new row. Accepting only a UUID keeps a client-chosen id as unlikely to collide with another session's event as
+     * the random ids the store assigns otherwise.
+     */
+    String requestEventId(ChatClientRequest request, Message message) {
+        String userMessageId = userMessageId(request);
+
+        if (message.getMessageType() == MessageType.USER && userMessageId != null) {
+            Optional<SessionEvent> storedEvent = findStoredEvent(request, userMessageId);
+
+            if (storedEvent.isEmpty() || isStoredCopy(storedEvent.get(), message)) {
+                return userMessageId;
+            }
         }
 
         return UUID.randomUUID()
             .toString();
+    }
+
+    /**
+     * Whether {@code message} is the run's user message sent again while the session still holds it, active and with
+     * the same text, under the run's AG-UI message id.
+     */
+    boolean isResentUserMessage(ChatClientRequest request, Message message) {
+        String userMessageId = userMessageId(request);
+
+        if (message.getMessageType() != MessageType.USER || userMessageId == null) {
+            return false;
+        }
+
+        return findStoredEvent(request, userMessageId).filter(storedEvent -> isStoredCopy(storedEvent, message))
+            .isPresent();
+    }
+
+    private Optional<SessionEvent> findStoredEvent(ChatClientRequest request, String eventId) {
+        if (!(request.context()
+            .get(ChatMemory.CONVERSATION_ID) instanceof String sessionId)) {
+
+            return Optional.empty();
+        }
+
+        return sessionService.getEvents(sessionId, EventFilter.all())
+            .stream()
+            .filter(event -> eventId.equals(event.getId()))
+            .findFirst();
+    }
+
+    private static boolean isStoredCopy(SessionEvent storedEvent, Message message) {
+        return !storedEvent.isArchived() && storedEvent.getMessageType() == MessageType.USER
+            && Objects.equals(storedEvent.getMessage()
+                .getText(), message.getText());
+    }
+
+    private static @Nullable String userMessageId(ChatClientRequest request) {
+        return request.context()
+            .get(USER_MESSAGE_ID_PARAM) instanceof String userMessageId && isUuid(userMessageId) ? userMessageId : null;
     }
 
     private static boolean isUuid(String value) {

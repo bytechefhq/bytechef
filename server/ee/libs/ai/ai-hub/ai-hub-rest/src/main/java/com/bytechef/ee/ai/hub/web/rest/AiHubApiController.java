@@ -135,7 +135,7 @@ public class AiHubApiController {
 
             return chatStreamer.stream(localAgent, agUiParameters, run);
         } catch (RuntimeException exception) {
-            inFlightRunRegistry.cancel(threadId);
+            run.complete();
 
             throw exception;
         }

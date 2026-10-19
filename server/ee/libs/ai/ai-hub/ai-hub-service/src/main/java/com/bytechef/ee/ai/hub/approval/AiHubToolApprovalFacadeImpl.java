@@ -149,6 +149,8 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
             throw new ConflictException("Approval " + approvalId + " is already " + approval.getStatus());
         }
 
+        supersedeIfToolCallDropped(approval, chat);
+
         expireIfPastDeadline(approval);
 
         AiHubToolApproval decided = persistDecision(approval, currentUserId, approved, comment);
@@ -172,6 +174,19 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         } catch (NotFoundException exception) {
             throw new NotFoundException("AiHubToolApproval", approval.getId());
         }
+    }
+
+    private void supersedeIfToolCallDropped(AiHubToolApproval approval, AiHubChat chat) {
+        if (chatService.containsActiveToolCall(chat.getThreadId(), approval.getToolName(), approval.getArguments())) {
+            return;
+        }
+
+        approval.setStatus(AiHubToolApproval.Status.SUPERSEDED);
+
+        approvalService.save(approval);
+
+        throw new ConflictException(
+            "Approval " + approval.getId() + " no longer matches a tool call in this chat; it was edited or reloaded");
     }
 
     private void expireIfPastDeadline(AiHubToolApproval approval) {

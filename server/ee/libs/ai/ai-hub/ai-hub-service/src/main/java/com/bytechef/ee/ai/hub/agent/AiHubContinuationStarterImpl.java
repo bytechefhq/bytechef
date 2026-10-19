@@ -117,7 +117,8 @@ public class AiHubContinuationStarterImpl implements AiHubContinuationStarter {
         try {
             chatStreamer.start(localAgent, agUiParameters, runOptional.get());
         } catch (RuntimeException exception) {
-            inFlightRunRegistry.cancel(threadId);
+            runOptional.get()
+                .complete();
 
             throw exception;
         }

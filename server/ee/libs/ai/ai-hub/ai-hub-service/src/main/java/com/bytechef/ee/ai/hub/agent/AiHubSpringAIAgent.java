@@ -612,7 +612,6 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
          */
         @Override
         public AiHubSpringAIAgent build() throws AGUIException {
-            super.advisor(new ResentUserMessageAdvisor());
             super.advisor(new NonEmptyMessagesAdvisor());
             super.advisor(new SimpleLoggerAdvisor(Integer.MAX_VALUE));
 
