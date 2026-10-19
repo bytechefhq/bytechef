@@ -274,6 +274,7 @@ export const buildAiHubSubscriber = ({
     turnAbortSignal,
 }: BuildSubscriberDepsI): AgentSubscriber => {
     const toolCallNamesById = new Map<string, string>();
+    const unrecoveredToolFailures = new Map<string, string>();
 
     let currentAssistantMessageIndex = assistantMessageIndex;
     let currentAssistantMessageHasOutput = false;
@@ -281,29 +282,38 @@ export const buildAiHubSubscriber = ({
 
     const isStaleChat = () => subscriberChatId != null && useAiHubStore.getState().chatId !== subscriberChatId;
 
-    const surfaceToolFailure = (toolName: string, reason: string, rawContent?: unknown) => {
-        if (rawContent !== undefined) {
-            console.warn(`[AiHub] ${toolName}: ${reason}`, rawContent);
-        }
+    const recordToolFailure = (toolName: string, reason: string) => {
+        unrecoveredToolFailures.delete(toolName);
+        unrecoveredToolFailures.set(toolName, reason);
+    };
 
-        aiChatRetryableErrorStore.getState().setError({
-            errorMessage: reason,
-            lastUserMessage: getLastUserMessage(),
-            toolName,
-        });
+    const surfaceUnrecoveredToolFailure = () => {
+        const lastUnrecoveredToolFailure = Array.from(unrecoveredToolFailures).pop();
+
+        unrecoveredToolFailures.clear();
+
+        if (lastUnrecoveredToolFailure && !isStaleChat()) {
+            aiChatRetryableErrorStore.getState().setError({
+                errorMessage: lastUnrecoveredToolFailure[1],
+                lastUserMessage: getLastUserMessage(),
+                toolName: lastUnrecoveredToolFailure[0],
+            });
+        }
     };
 
     const openWorkflowTab = (toolCallName: string, toolResultContent: string) => {
         const parsed = validateOpenWorkflowTabResult(parseJson<unknown>(toolResultContent, 'openWorkflowTab result'));
 
         if (parsed === null) {
-            surfaceToolFailure(toolCallName, 'unparseable result', toolResultContent);
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
 
             return;
         }
 
         if (!parsed.opened) {
-            surfaceToolFailure(toolCallName, parsed.error);
+            recordToolFailure(toolCallName, parsed.error);
 
             return;
         }
@@ -326,11 +336,7 @@ export const buildAiHubSubscriber = ({
         if (!dataPart.ok) {
             aiChatToolCallStore.getState().completeToolCall(toolCallId, {error: dataPart.errorMessage}, true);
 
-            aiChatRetryableErrorStore.getState().setError({
-                errorMessage: dataPart.errorMessage,
-                lastUserMessage: getLastUserMessage(),
-                toolName: dataPart.toolName,
-            });
+            recordToolFailure(dataPart.toolName, dataPart.errorMessage);
 
             return;
         }
@@ -372,6 +378,8 @@ export const buildAiHubSubscriber = ({
                 });
             }
 
+            unrecoveredToolFailures.clear();
+
             runLifecycle?.onSettle();
 
             terminateOrphanRunningToolCalls(subscriberChatId);
@@ -381,6 +389,8 @@ export const buildAiHubSubscriber = ({
             }
         },
         onRunFinishedEvent: () => {
+            surfaceUnrecoveredToolFailure();
+
             runLifecycle?.onSettle();
 
             terminateOrphanRunningToolCalls(subscriberChatId);
@@ -448,10 +458,12 @@ export const buildAiHubSubscriber = ({
                 );
 
             if (errorMessage !== null) {
-                surfaceToolFailure(toolCallName ?? 'unknown', errorMessage);
+                recordToolFailure(toolCallName ?? 'unknown', errorMessage);
 
                 return;
             }
+
+            unrecoveredToolFailures.delete(toolCallName ?? 'unknown');
 
             if (toolCallName !== undefined && WORKFLOW_MUTATING_TOOL_NAMES.has(toolCallName)) {
                 onWorkflowMutated?.(toolResultContent);
