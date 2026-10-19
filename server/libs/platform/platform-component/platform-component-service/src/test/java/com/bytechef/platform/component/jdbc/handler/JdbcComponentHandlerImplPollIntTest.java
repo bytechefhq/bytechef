@@ -18,10 +18,12 @@ package com.bytechef.platform.component.jdbc.handler;
 
 import static com.bytechef.platform.component.definition.JdbcComponentDsl.jdbcComponent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
@@ -54,6 +56,7 @@ public class JdbcComponentHandlerImplPollIntTest {
 
     @BeforeEach
     public void beforeEach() {
+        jdbcTemplate.execute("DROP VIEW IF EXISTS poll_test_limited;");
         jdbcTemplate.execute("DROP TABLE IF EXISTS poll_test;");
         jdbcTemplate.execute("CREATE TABLE poll_test (id INTEGER PRIMARY KEY, seq INTEGER);");
 
@@ -145,6 +148,20 @@ public class JdbcComponentHandlerImplPollIntTest {
     }
 
     @Test
+    public void testPollFailsWhenMoreRowsThanBatchSizeShareOneOrderValue() {
+        jdbcTemplate.execute("INSERT INTO poll_test VALUES (0, 0)");
+
+        PollOutput firstPollOutput = poll("seq", "DESC", Map.of());
+
+        jdbcTemplate.execute(
+            "INSERT INTO poll_test SELECT i, 1 FROM generate_series(1, " + (BATCH_SIZE + 1) + ") AS i");
+
+        assertThatThrownBy(() -> poll("seq", "DESC", firstPollOutput.closureParameters()))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("share the seq value 1");
+    }
+
+    @Test
     public void testPollOnEmptyTableEmitsRowsInsertedLater() {
         PollOutput firstPollOutput = poll("id", "DESC", Map.of());
 
@@ -171,15 +188,52 @@ public class JdbcComponentHandlerImplPollIntTest {
         assertThat(pollOutput.closureParameters()).doesNotContainKey(JdbcConstants.ALL_ROWS);
     }
 
+    @Test
+    public void testPollStopsReadingRowsAfterBatchSizePlusOne() {
+        jdbcTemplate.execute(
+            "CREATE OR REPLACE FUNCTION poll_test_fail_after(value INTEGER, threshold INTEGER) RETURNS INTEGER " +
+                "AS $$ BEGIN IF value > threshold THEN RAISE EXCEPTION 'row % read', value; END IF; " +
+                "RETURN value; END $$ LANGUAGE plpgsql STABLE;");
+        jdbcTemplate.execute(
+            "CREATE OR REPLACE VIEW poll_test_limited AS SELECT id, poll_test_fail_after(id, " + (BATCH_SIZE + 1) +
+                ") AS seq FROM poll_test;");
+
+        String jdbcUrl = jdbcConnectionDetails.getJdbcUrl();
+
+        JdbcComponentHandlerImpl indexOrderJdbcComponentHandler = new JdbcComponentHandlerImpl(
+            jdbcComponent("postgresql")
+                .urlTemplate(jdbcUrl + (jdbcUrl.contains("?") ? "&" : "?") + "options=-c%20enable_sort%3Doff")
+                .jdbcDriverClassName("org.postgresql.Driver"));
+
+        insertRows(0, 0);
+
+        PollOutput firstPollOutput = poll(indexOrderJdbcComponentHandler, "poll_test_limited", "id", "DESC", Map.of());
+
+        insertRows(1, BATCH_SIZE + 5);
+
+        PollOutput secondPollOutput = poll(
+            indexOrderJdbcComponentHandler, "poll_test_limited", "id", "DESC", firstPollOutput.closureParameters());
+
+        assertThat(secondPollOutput.records()).hasSize(BATCH_SIZE);
+        assertThat(secondPollOutput.pollImmediately()).isTrue();
+    }
+
     private void insertRows(int from, int to) {
         jdbcTemplate.update("INSERT INTO poll_test SELECT i, i FROM generate_series(?, ?) AS i", from, to);
     }
 
     private PollOutput poll(String orderBy, String orderDirection, Map<String, ?> closureParameters) {
-        return jdbcComponentHandler.poll(
+        return poll(jdbcComponentHandler, "poll_test", orderBy, orderDirection, closureParameters);
+    }
+
+    private PollOutput poll(
+        JdbcComponentHandlerImpl handler, String table, String orderBy, String orderDirection,
+        Map<String, ?> closureParameters) {
+
+        return handler.poll(
             ParametersFactory.create(
                 Map.of(
-                    JdbcConstants.SCHEMA, "public", JdbcConstants.TABLE, "poll_test", JdbcConstants.ORDER_BY, orderBy,
+                    JdbcConstants.SCHEMA, "public", JdbcConstants.TABLE, table, JdbcConstants.ORDER_BY, orderBy,
                     JdbcConstants.ORDER_DIRECTION, orderDirection)),
             ParametersFactory.create(
                 Map.of(
