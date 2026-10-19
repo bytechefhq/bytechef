@@ -86,8 +86,8 @@ Rules (`AiHubToolApprovalPolicy.Decision.isGated`):
 
 A gated call creates a `PENDING` `AiHubToolApproval` and returns a `tool-approval-request` envelope instead of
 running; a second gated call while one is pending gets a `deferred` result; a persistence failure returns a refusal
-and the tool does not run. A gated call whose chat no longer exists (deleted mid-run) is refused. Approvals expire
-(`isExpired`).
+and the tool does not run. A gated call whose chat no longer exists, is in `DELETED` status or is being deleted
+(retired thread) is refused without recording an approval. Approvals expire (`isExpired`).
 
 Binding: `AiHubTurnEndingToolResultAdvisor` calls `AiHubApprovalGate.recordToolCallId`, so the approval holds the
 model's tool call id. `AiHubToolApprovalFacadeImpl.resolve` re-checks `AiHubChatService.containsActiveToolCall`
@@ -122,10 +122,12 @@ Client: `useTruncateChatMessages`.
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
 the turn's POST still stops it.
 
-Deleting a chat retires its thread (`InFlightAiHubRunRegistry.retireThread`: queued continuations are dropped, later
-ones and new runs are refused, the retirement expires with the run entries and a rolled-back delete lifts it) and
-cancels the run the same way before the chat, its approvals and its session are removed; after the commit it deletes the chat's approvals again, so a PENDING row the
-gate wrote during the delete does not outlive the chat.
+Deleting a chat registers its rollback hook, then retires its thread (`InFlightAiHubRunRegistry.retireThread`):
+queued continuations are dropped, later ones, new runs and turns (404) are refused, and the live run is cancelled
+the same way. The retirement expires with the run entries; a delete that rolls back lifts it. The chat, its
+approvals and its session are then removed. After the commit the approvals are deleted again in a new transaction,
+which removes a PENDING row the gate committed during the delete; a row the gate commits after that cleanup can
+still remain (it never executes).
 
 A turn or truncation against a held thread is refused: the turn POST answers 409 `{"error":"TURN_IN_FLIGHT"}`
 (`TurnInFlightException`), truncation throws `ConflictException`. The client turns the 409 into a toast
