@@ -106,7 +106,7 @@ describe('AiHubHomePanel', () => {
         expect(screen.getByRole('button', {name: 'Hide chats'})).toBeInTheDocument();
     });
 
-    it('points to the AI provider settings when no provider is enabled', async () => {
+    it('offers the same Open AI Providers action as the Copilot when no provider is enabled', async () => {
         defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
 
         const user = userEvent.setup();
@@ -116,7 +116,7 @@ describe('AiHubHomePanel', () => {
         expect(screen.getByText('No AI providers enabled')).toBeInTheDocument();
         expect(screen.queryByTestId('ai-hub-composer')).toBeNull();
 
-        await user.click(screen.getByRole('button', {name: 'Go to AI Providers'}));
+        await user.click(screen.getByRole('button', {name: 'Open AI Providers'}));
 
         expect(navigateMock).toHaveBeenCalledWith('/automation/settings/ai-providers');
     });
