@@ -52,12 +52,12 @@ export function buildCompletionProvider(monaco: MonacoType): languages.Completio
                 const linePrefix = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
                 const identifierLength = IDENTIFIER_BEFORE_CURSOR.exec(linePrefix)?.[0].length ?? 0;
 
-                const range = {
+                const rangeOf = (replaceLength: number) => ({
                     endColumn: position.column,
                     endLineNumber: position.lineNumber,
-                    startColumn: position.column - identifierLength,
+                    startColumn: position.column - Math.min(replaceLength, linePrefix.length),
                     startLineNumber: position.lineNumber,
-                };
+                });
 
                 return {
                     suggestions: drafts.map((draft) => ({
@@ -71,7 +71,7 @@ export function buildCompletionProvider(monaco: MonacoType): languages.Completio
                             : undefined,
                         kind: toCompletionItemKind(monaco, draft.kind),
                         label: draft.label,
-                        range,
+                        range: rangeOf(draft.replaceLength ?? identifierLength),
                         sortText: `0${draft.sortText ?? draft.label}`,
                     })),
                 };

@@ -16,7 +16,7 @@ import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {CompletionContextType} from '@/shared/components/monaco/completion/completionTypes';
 import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
-import {useDynamicPropertiesLoader} from '@/shared/components/monaco/completion/useDynamicPropertiesLoader';
+import {useOperationPropertyLoaders} from '@/shared/components/monaco/completion/useOperationPropertyLoaders';
 import {useWorkflowNodeOutputsForCompletion} from '@/shared/components/monaco/completion/useWorkflowNodeOutputsForCompletion';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -101,7 +101,7 @@ const WorkflowCodeEditorSheet = ({
     const components = useComponentCatalog();
     const functions = useEvaluatorFunctionDefinitions();
     const getNodeOutputs = useWorkflowNodeOutputsForCompletion(workflow.id, currentEnvironmentId);
-    const loadDynamicProperties = useDynamicPropertiesLoader(workflow.id, currentEnvironmentId);
+    const operationPropertyLoaders = useOperationPropertyLoaders(workflow.id, currentEnvironmentId);
 
     const completionContext = useMemo<CompletionContextType>(
         () => ({
@@ -110,9 +110,9 @@ const WorkflowCodeEditorSheet = ({
             functions,
             getNodeOutputs,
             kind: 'workflowDefinition',
-            loadDynamicProperties,
+            ...operationPropertyLoaders,
         }),
-        [components, functions, getNodeOutputs, loadDynamicProperties, workflow.format]
+        [components, functions, getNodeOutputs, operationPropertyLoaders, workflow.format]
     );
 
     useCompletionContext(model, completionContext);

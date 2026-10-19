@@ -343,3 +343,98 @@ describe('parameter key completions with runtime properties', () => {
         });
     });
 });
+
+describe('parameter value completions', () => {
+    const properties = [
+        {name: 'baseId', type: 'STRING'},
+        {name: 'note', options: [{label: 'Quoted', value: 'say "hi"'}, {value: 'yes'}], type: 'STRING'},
+        {name: 'count', options: [{value: 1}, {value: 2}], type: 'INTEGER'},
+        {name: 'tableId', optionsDataSource: {optionsLookupDependsOn: ['baseId']}, type: 'STRING'},
+    ] as unknown as Property[];
+
+    const valueCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(async () => properties),
+    };
+
+    it('escapes values inside a JSON string and replaces what was typed', async () => {
+        const source = '{"tasks": [{"name": "a_1", "type": "airtable/v1/createRecord", "parameters": {"note": "sa"}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: valueCatalog, format: 'json'},
+            cursorOffset: source.indexOf('"sa"') + 3,
+            source,
+        });
+
+        expect(items.map((item) => [item.label, item.insertText, item.replaceLength])).toEqual([
+            ['Quoted', 'say \\"hi\\"', 2],
+            ['yes', 'yes', 2],
+        ]);
+    });
+
+    it('offers no number options inside a JSON string', async () => {
+        const source = '{"tasks": [{"type": "airtable/v1/createRecord", "parameters": {"count": ""}}]}';
+
+        expect(
+            await getWorkflowDefinitionCompletions({
+                context: {...context, components: valueCatalog, format: 'json'},
+                cursorOffset: source.indexOf('""') + 1,
+                source,
+            })
+        ).toEqual([]);
+    });
+
+    it('writes plain YAML values, quoting strings YAML would read as something else', async () => {
+        const source = 'tasks:\n  - type: airtable/v1/createRecord\n    parameters:\n      note: y';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: valueCatalog, format: 'yaml'},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['"say \\"hi\\""', '"yes"']);
+
+        const countSource = 'tasks:\n  - type: airtable/v1/createRecord\n    parameters:\n      count: ';
+        const countItems = await getWorkflowDefinitionCompletions({
+            context: {...context, components: valueCatalog, format: 'yaml'},
+            cursorOffset: countSource.length,
+            source: countSource,
+        });
+
+        expect(countItems.map((item) => item.insertText)).toEqual(['1', '2']);
+    });
+
+    it('loads options from the connection for a saved node', async () => {
+        const loadOptions = vi.fn(async () => [{label: 'Customers', value: 'tbl1'}]);
+        const source =
+            'tasks:\n  - name: a_1\n    type: airtable/v1/createRecord\n    parameters:\n      baseId: app1\n      tableId: ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: valueCatalog, format: 'yaml', loadOptions},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => [item.label, item.insertText])).toEqual([['Customers', 'tbl1']]);
+        expect(loadOptions).toHaveBeenCalledWith({
+            componentName: 'airtable',
+            componentVersion: 1,
+            lookupDependsOnPaths: ['baseId'],
+            operationKind: 'action',
+            operationName: 'createRecord',
+            parameters: {baseId: 'app1'},
+            propertyName: 'tableId',
+            workflowNodeName: 'a_1',
+        });
+    });
+
+    it('keeps offering expressions once a value starts one', async () => {
+        const source =
+            '{"triggers": [{"name": "trigger_1"}], "tasks": [{"type": "airtable/v1/createRecord", "parameters": {"note": "${"}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: valueCatalog, format: 'json'},
+            cursorOffset: source.indexOf('${') + 2,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toContain('trigger_1');
+    });
+});
