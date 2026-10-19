@@ -36,6 +36,11 @@ Single chat message in a chat. {@code role} is one of {@code user}/{@code assist
 {@code timestamp} is the message's epoch-milli arrival time.
 """
 type AiHubChatMessage {
+    """
+    The id of the session event behind this row. A user row sent through the AI Hub keeps the AG-UI message id it
+    was sent with, so the client addresses both loaded and live rows by the same id.
+    """
+    id: String!
     role: String!
     content: String!
     timestamp: Long!
@@ -102,10 +107,12 @@ extend type Mutation {
     deleteAiHubChat(workspaceId: ID!, id: ID!): Boolean!
 
     """
-    Truncates the chat history, deleting the message at {@code fromMessageIndex} and every message after it.
-    Returns the number of session events deleted; zero when the index is past the end.
+    Truncates the chat history at the message with id {@code messageId}: every message after it is deleted, and the
+    message itself too unless {@code keepMessage} is true. Returns the number of session events deleted, or null
+    when the chat holds no message with that id. Fails with CONFLICT while a turn is running in the chat, before
+    anything is deleted.
     """
-    truncateAiHubChatMessages(workspaceId: ID!, id: ID!, fromMessageIndex: Int!): Int!
+    truncateAiHubChatMessages(workspaceId: ID!, id: ID!, messageId: String!, keepMessage: Boolean!): Int
 
     "Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn."
     appendAiHubChatAssistantMessage(workspaceId: ID!, id: ID!, content: String!): Boolean!

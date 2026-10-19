@@ -47,8 +47,8 @@ class TitleGenerationServiceTest {
         stubChatModel("  Create Workflow Automation  ");
 
         List<AiHubChatMessage> messages = List.of(
-            new AiHubChatMessage("USER", "How do I create a workflow?", Instant.now()),
-            new AiHubChatMessage("ASSISTANT", "You can create a workflow by...", Instant.now()));
+            new AiHubChatMessage("event-1", "USER", "How do I create a workflow?", Instant.now()),
+            new AiHubChatMessage("event-2", "ASSISTANT", "You can create a workflow by...", Instant.now()));
 
         String title = titleGenerationService.generateTitle(messages);
 
@@ -60,7 +60,7 @@ class TitleGenerationServiceTest {
         stubChatModel("   ");
 
         List<AiHubChatMessage> messages = List.of(
-            new AiHubChatMessage("USER", "Hello", Instant.now()));
+            new AiHubChatMessage("event-1", "USER", "Hello", Instant.now()));
 
         String title = titleGenerationService.generateTitle(messages);
 
@@ -76,8 +76,8 @@ class TitleGenerationServiceTest {
         stubChatModel(longResponse);
 
         List<AiHubChatMessage> messages = List.of(
-            new AiHubChatMessage("USER", "Tell me something", Instant.now()),
-            new AiHubChatMessage("ASSISTANT", "Sure, here is something", Instant.now()));
+            new AiHubChatMessage("event-1", "USER", "Tell me something", Instant.now()),
+            new AiHubChatMessage("event-2", "ASSISTANT", "Sure, here is something", Instant.now()));
 
         String title = titleGenerationService.generateTitle(messages);
 
@@ -100,7 +100,7 @@ class TitleGenerationServiceTest {
         when(chatModel.call(any(Prompt.class))).thenThrow(upstream);
 
         List<AiHubChatMessage> messages = List.of(
-            new AiHubChatMessage("USER", "Hello", Instant.now()));
+            new AiHubChatMessage("event-1", "USER", "Hello", Instant.now()));
 
         assertThatThrownBy(() -> titleGenerationService.generateTitle(messages))
             .isInstanceOf(TitleGenerationFailedException.class)
