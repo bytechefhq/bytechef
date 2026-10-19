@@ -21,6 +21,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.tenant.domain.TenantKey;
 import io.jsonwebtoken.Jwts;
 import java.security.KeyPair;
@@ -172,6 +173,63 @@ class EmbeddedMcpServerSecurityConfigurerIntTest {
                         .session(createUiSession()))
                 .andExpect(MockMvcResultMatchers.status()
                     .isOk());
+        }
+
+        @Test
+        void testDisabledServerAnswersAValidJwtWithServerDisabled() throws Exception {
+            mockMcpServer(true);
+            mockConnectedUser();
+            disableMcpServer();
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post(MCP_SERVER_PATH)
+                        .servletPath(MCP_SERVER_PATH)
+                        .header("Authorization", "Bearer " + signJwt()))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isForbidden())
+                .andExpect(MockMvcResultMatchers.header()
+                    .doesNotExist("WWW-Authenticate"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                    .value("server_disabled"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                    .value(McpServerDisabledException.MCP_SERVER_MESSAGE));
+        }
+
+        @Test
+        void testDisabledServerStillRejectsARequestWithoutBearerToken() throws Exception {
+            mockMcpServer(true);
+            disableMcpServer();
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post(MCP_SERVER_PATH)
+                        .servletPath(MCP_SERVER_PATH))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isUnauthorized());
+        }
+
+        @Test
+        void testDisabledServerAnswersAnAnonymousRequestWithServerDisabledWhenAuthenticationIsNotRequired()
+            throws Exception {
+
+            mockMcpServer(false);
+            disableMcpServer();
+
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders.post(MCP_SERVER_PATH)
+                        .servletPath(MCP_SERVER_PATH))
+                .andExpect(MockMvcResultMatchers.status()
+                    .isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error")
+                    .value("server_disabled"));
+        }
+
+        private void disableMcpServer() {
+            McpServer mcpServer = mcpServerService.getMcpServer(MCP_SERVER_SECRET_KEY);
+
+            when(mcpServer.isEnabled()).thenReturn(false);
         }
 
         private static MockHttpSession createUiSession() {
