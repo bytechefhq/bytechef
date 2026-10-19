@@ -156,6 +156,10 @@ export function getForbiddenTurnRunErrorCode(
     return (reason !== undefined && FORBIDDEN_TURN_RUN_ERROR_CODES[reason]) || RUN_ERROR_CODE_ACCESS_DENIED;
 }
 
+function isChatThreadConflictError(error: unknown): boolean {
+    return error instanceof GraphQlResponseError && error.errorCode === 'CONFLICT';
+}
+
 export function isToolApprovalConflictError(error: unknown): error is GraphQlResponseError {
     return error instanceof GraphQlResponseError && error.errorCode === 'CONFLICT';
 }
@@ -1144,9 +1148,15 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 console.error('Failed to auto-create chat on first message:', error);
 
-                aiChatRetryableErrorStore
-                    .getState()
-                    .setError({errorMessage, lastUserMessage: input, toolName: 'aiHub'});
+                if (isChatThreadConflictError(error)) {
+                    useAiHubStore.getState().generateChatId();
+                }
+
+                if (!(error instanceof GraphQlResponseError)) {
+                    toast.error(`Failed to start chat: ${errorMessage}`);
+                }
+
+                runtime.thread.composer.setText(input);
             },
         });
 
