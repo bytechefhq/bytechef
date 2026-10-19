@@ -34,6 +34,27 @@ import reactor.test.StepVerifier;
 class InFlightAiHubRunRegistryTest {
 
     @Test
+    void testRunWhenReleasedRunsAtOnceForAFreeThreadAndOtherwiseWhenTheHoldingRunEnds() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        List<String> ranActions = new ArrayList<>();
+
+        registry.runWhenReleased("thread-free", () -> ranActions.add("free"));
+
+        assertThat(ranActions).containsExactly("free");
+
+        InFlightRun run = registry.tryStart("thread-held", "run-1")
+            .orElseThrow();
+
+        registry.runWhenReleased("thread-held", () -> ranActions.add("held"));
+
+        assertThat(ranActions).containsExactly("free");
+
+        run.complete();
+
+        assertThat(ranActions).containsExactly("free", "held");
+    }
+
+    @Test
     void testAttachAfterFirstEventReplaysHistoryThenReceivesLiveTail() {
         InFlightAiHubRunRegistry registry = newRegistry();
 

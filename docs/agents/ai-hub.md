@@ -90,7 +90,12 @@ and the tool does not run. A gated call whose chat no longer exists (deleted mid
 Binding: `AiHubTurnEndingToolResultAdvisor` calls `AiHubApprovalGate.recordToolCallId`, so the approval holds the
 model's tool call id. `AiHubToolApprovalFacadeImpl.resolve` re-checks `AiHubChatService.containsActiveToolCall`
 against that id; a dropped call marks the approval `SUPERSEDED` and answers 409. Approving runs the pinned callback
-(`AiHubPinnedToolCallbacks`) and starts a continuation run (`AiHubContinuationStarterImpl`).
+(`AiHubPinnedToolCallbacks`) and starts a continuation run (`AiHubContinuationStarterImpl`). When another run holds the
+thread, the continuation is queued on that run and starts on the worker executor once the run ends
+(`InFlightAiHubRunRegistry.runWhenReleased`). The client is not attached to it (`continuationStarted` is false), so
+its output shows on the next attach or reload. Stopping the holding run therefore starts the queued continuation.
+The queue is in memory and best effort: a queued continuation is lost on restart and when the holding run never
+reports that it stopped (a stall past the drain timeout or the entry TTL), and deleting the chat discards it.
 
 Superseding: a new turn (`AiHubApiController.chat`), a truncation (edit or reload) and Stop
 (`cancelAiHubRun`, for approvals with no recorded call id) each supersede pending approvals.
@@ -115,7 +120,9 @@ Client: `useTruncateChatMessages`.
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
 the turn's POST still stops it.
 
-Deleting a chat cancels its run the same way before the chat, its approvals and its session are removed.
+Deleting a chat discards the run's queued continuations and cancels the run the same way before the chat, its
+approvals and its session are removed; after the commit it deletes the chat's approvals again, so a PENDING row the
+gate wrote during the delete does not outlive the chat.
 
 A turn or truncation against a held thread is refused: the turn POST answers 409 `{"error":"TURN_IN_FLIGHT"}`
 (`TurnInFlightException`), truncation throws `ConflictException`. The client turns the 409 into a toast
