@@ -33,7 +33,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnec
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentInputReferenceModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOperationDynamicPropertiesRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOperationPropertyRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionHelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java

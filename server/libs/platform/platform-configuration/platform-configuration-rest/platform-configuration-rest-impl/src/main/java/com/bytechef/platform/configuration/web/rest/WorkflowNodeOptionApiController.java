@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOptionFacade;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationPropertyRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -54,6 +55,24 @@ public class WorkflowNodeOptionApiController implements WorkflowNodeOptionApi {
                 workflowNodeOptionFacade.getClusterElementNodeOptions(
                     workflowId, workflowNodeName, clusterElementTypeName.toUpperCase(), clusterElementName,
                     propertyName, lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, searchText,
+                    environmentId),
+                option -> conversionService.convert(option, OptionModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<OptionModel>> getWorkflowNodeComponentOperationOptions(
+        String workflowId, String workflowNodeName, String propertyName, Long environmentId,
+        ComponentOperationPropertyRequestModel componentOperationPropertyRequestModel) {
+
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+                    workflowId, workflowNodeName,
+                    ComponentOperationPropertyRequests.toClusterElementNode(componentOperationPropertyRequestModel),
+                    ComponentOperationPropertyRequests.toComponentOperation(componentOperationPropertyRequestModel),
+                    propertyName, componentOperationPropertyRequestModel.getConnectionKey(),
+                    ComponentOperationPropertyRequests.parameters(componentOperationPropertyRequestModel),
+                    ComponentOperationPropertyRequests.lookupDependsOnPaths(componentOperationPropertyRequestModel),
                     environmentId),
                 option -> conversionService.convert(option, OptionModel.class)));
     }
