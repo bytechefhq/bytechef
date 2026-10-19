@@ -22,14 +22,18 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.workflow.execution.JobSuspends;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Arik Cohen
@@ -42,12 +46,17 @@ public class JobApiController implements JobApi {
 
     private final ConversionService conversionService;
     private final JobFacade jobFacade;
+    private final JobResumeFacade jobResumeFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI2")
-    public JobApiController(ConversionService conversionService, JobFacade jobFacade, JobService jobService) {
+    public JobApiController(
+        ConversionService conversionService, JobFacade jobFacade, JobResumeFacade jobResumeFacade,
+        JobService jobService) {
+
         this.conversionService = conversionService;
         this.jobFacade = jobFacade;
+        this.jobResumeFacade = jobResumeFacade;
         this.jobService = jobService;
     }
 
@@ -72,6 +81,13 @@ public class JobApiController implements JobApi {
 
     @Override
     public ResponseEntity<Void> restartJob(Long id) {
+        if (JobSuspends.isAwaitingApproval(jobService.getJob(id))) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Job %s is waiting on an approval; resolve the approval or stop the job instead of restarting it"
+                    .formatted(id));
+        }
+
         jobFacade.resumeJob(id);
 
         return ResponseEntity.noContent()
@@ -80,7 +96,9 @@ public class JobApiController implements JobApi {
 
     @Override
     public ResponseEntity<Void> stopJob(Long id) {
-        jobFacade.stopJob(id);
+        if (!jobResumeFacade.cancelApproval(id)) {
+            jobFacade.stopJob(id);
+        }
 
         return ResponseEntity.noContent()
             .build();

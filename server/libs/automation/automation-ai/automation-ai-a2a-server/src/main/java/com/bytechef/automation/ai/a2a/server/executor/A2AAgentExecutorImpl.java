@@ -45,6 +45,7 @@ import com.bytechef.platform.ai.a2a.A2AAgentRun;
 import com.bytechef.platform.ai.a2a.A2AInvalidParamsException;
 import com.bytechef.platform.ai.a2a.A2ATaskReference;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
@@ -56,6 +57,7 @@ import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -393,10 +395,22 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         return ApprovalFormUrls
             .buildFormUrl(
                 publicUrl, jobResumeId == null ? null : jobResumeId.toString(),
-                approvalTokensObjectProvider.getIfAvailable())
+                approvalTokensObjectProvider.getIfAvailable(), resolveApprovalExpiresAt(job))
             .map(formUrl -> "Approval required — the workflow run is paused waiting for a human decision. " +
                 "Resolve it at: " + formUrl)
             .orElse("Approval required — the workflow run is paused waiting for a human decision.");
+    }
+
+    private @Nullable Instant resolveApprovalExpiresAt(Job job) {
+        Object taskExecutionResumeId = job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (taskExecutionResumeId == null) {
+            return null;
+        }
+
+        return taskExecutionService.fetchTaskExecution(ConvertUtils.convertValue(taskExecutionResumeId, Long.class))
+            .map(taskExecution -> SuspendUtils.extractSuspendExpiresAt(taskExecution.getMetadata()))
+            .orElse(null);
     }
 
     private String readOutputText(Job job) {

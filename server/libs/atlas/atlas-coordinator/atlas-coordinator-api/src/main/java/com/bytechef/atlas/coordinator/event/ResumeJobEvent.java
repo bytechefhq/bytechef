@@ -51,7 +51,13 @@ public class ResumeJobEvent extends AbstractEvent {
     }
 
     public static ResumeJobEvent ofStartedJob(long jobId) {
-        ResumeJobEvent resumeJobEvent = new ResumeJobEvent(jobId);
+        return ofStartedJob(jobId, null, null);
+    }
+
+    public static ResumeJobEvent ofStartedJob(
+        long jobId, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
+
+        ResumeJobEvent resumeJobEvent = new ResumeJobEvent(jobId, taskExecutionId, data);
 
         resumeJobEvent.started = true;
 

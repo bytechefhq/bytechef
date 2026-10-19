@@ -63,11 +63,35 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
             new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Job.class);
     }
 
+    @Override
+    public long createPrincipalLinkedJob(
+        long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+
+        return loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(PRINCIPAL_JOB_FACADE + "/create-principal-linked-job")
+                .build(),
+            new CreatePrincipalLinkedJobRequest(referenceJobId, jobParametersDTO, platformType), Long.class);
+    }
+
+    @Override
+    public long createPrincipalLinkedJob(
+        JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType platformType) {
+
+        throw new UnsupportedOperationException();
+    }
+
     @SuppressFBWarnings("EI")
     public record CreateChildJobRequest(long parentJobId, JobParametersDTO jobParameters, PlatformType platformType) {
     }
 
     @SuppressFBWarnings("EI")
     public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, PlatformType type) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record CreatePrincipalLinkedJobRequest(
+        long referenceJobId, JobParametersDTO jobParameters, PlatformType platformType) {
     }
 }

@@ -78,7 +78,12 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
-        throw new UnsupportedOperationException();
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host("connection-app")
+                .path("/remote/connection-service/get-connections/{componentName}/{version}/{type}")
+                .build(componentName, version, type),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override

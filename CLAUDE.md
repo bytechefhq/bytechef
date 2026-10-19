@@ -353,6 +353,29 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
+### HITL approvals
+
+Two separate primitives: **Approval** (a decision with a boolean `approved`; a comment is valid on BOTH outcomes) and
+**AskUserQuestion** (clarification for the LLM). Typing in chat NEVER resolves an approval. The step
+(`approval/v1/requestApproval`, also usable as an agent tool) delivers best-effort over 15 `APPROVAL_CHANNELS` elements:
+chat, Slack, Discord, Telegram, Mattermost, Rocket.Chat, Gmail, Outlook 365, SMTP email, WhatsApp via Meta/Twilio/Infobip,
+SMS via Twilio/Infobip, and approval task. The step fails only when every configured channel fails. Besides the chat
+card, five resolve in place through a signed interactivity callback: Slack, Discord, Telegram, WhatsApp (Meta) and
+Mattermost.
+
+The resume contract:
+- An approval resumes only with a signed token and a boolean `approved`, whatever
+  `bytechef.approval.signed-token.required` is set to.
+- A GET of an approval resume link, or a HEAD of any resume link, answers 405.
+- Restarting a run that waits on an approval answers 409, and stop cancels the approval.
+
+An expired approval FAILS the run, through the resume check, the suspend timer or the sweep, and its links answer
+410. A synchronous run cannot pause: a workflow with a step that could pause it is rejected before it starts.
+Expiry, reminders and escalation each run a 15-minute platform-coordinator sweep, acting only on approval suspends
+(`JobSuspends`).
+
+Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-approvals.md`.
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
@@ -426,6 +449,12 @@ public class ExampleComponentHandler implements ComponentHandler {
 ### Agent Component Handlers
 - `@AutoService(ComponentHandler.class)` — ServiceLoader discovery, no Spring DI available
 - `@Component("name_v1_ComponentHandler")` — Spring discovery, supports constructor injection (used by guardrails, RAG, chat-memory, and agent utils when Spring beans are needed)
+
+### Lazy Component Loading & Build-time Index
+- `ComponentDefinitionRegistry` loads NO ServiceLoader components at Spring startup — all registry beans are `lazyInit`, and the registry constructor only captures suppliers
+- server-app's `generateComponentIndex` Gradle task writes `META-INF/bytechef/component-index.json` at build time; the components-list view is served from index stubs (zero handlers loaded), single components load on demand via recorded provider class names
+- **When an index is present it is authoritative**: a ServiceLoader component missing from the index is invisible (both in the list and per-name resolution). Apps that assemble their classpath differently (EE apps) must either run the generator or ship without an index — absent/corrupt index falls back transparently to full loading on first registry access
+- With an index, a by-name read loads only that component, while the no-arg `getComponentDefinitions()` and the first task/trigger handler resolution each trigger their own one-time full load (the registry loads from the index's providers; the task and trigger handler providers share a separate `ServiceLoader` sweep); stubs never reach detail/execution paths
 
 ### GraphQL Development Workflow
 - Add schema path to `client/codegen.ts` `schema` array

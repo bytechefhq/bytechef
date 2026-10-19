@@ -26,6 +26,10 @@ public final class ApprovalConstants {
 
     public static final String APPROVAL = "approval";
     public static final String DEFAULT_VALUE = "defaultValue";
+    public static final String EXPIRES_IN = "expiresIn";
+    public static final String EXPIRES_IN_UNIT = "expiresInUnit";
+    public static final String EXPIRES_IN_UNIT_DAYS = "DAYS";
+    public static final String EXPIRES_IN_UNIT_HOURS = "HOURS";
     public static final String FIELD_DESCRIPTION = "fieldDescription";
     public static final String FIELD_LABEL = "fieldLabel";
     public static final String FIELD_NAME = "fieldName";

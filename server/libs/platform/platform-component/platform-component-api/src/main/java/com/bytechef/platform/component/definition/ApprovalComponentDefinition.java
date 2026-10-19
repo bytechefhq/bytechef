@@ -20,14 +20,22 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApprovalComponentDefinition extends ClusterRootComponentDefinition {
 
+    String REQUEST_APPROVAL = "requestApproval";
+
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(APPROVAL_CHANNELS);
+    }
+
+    @Override
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of(REQUEST_APPROVAL, List.of(APPROVAL_CHANNELS.name()));
     }
 }

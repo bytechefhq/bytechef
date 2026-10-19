@@ -77,6 +77,7 @@ export const JobBasicStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
+    Cancelled: 'CANCELLED',
     Failed: 'FAILED',
     Completed: 'COMPLETED',
 } as const;

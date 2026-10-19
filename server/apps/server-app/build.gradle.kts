@@ -417,3 +417,25 @@ val buildComponentJars by tasks.registering {
         println("📝 Now set useComponentJars=true in gradle.properties and refresh Gradle in IntelliJ")
     }
 }
+
+val generateComponentIndex by tasks.registering(JavaExec::class) {
+    group = "build"
+    description = "Generate the component index consumed by ComponentDefinitionRegistry"
+
+    val outputDir = layout.buildDirectory.dir("generated/component-index")
+    val outputFile = outputDir.map { it.file("META-INF/bytechef/component-index.json") }
+
+    classpath = files(configurations.runtimeClasspath.get())
+    mainClass.set("com.bytechef.platform.component.index.ComponentIndexGenerator")
+
+    argumentProviders.add(CommandLineArgumentProvider { listOf(outputFile.get().asFile.absolutePath) })
+
+    inputs.files(
+        configurations.runtimeClasspath.get()
+            .filter { it.path.contains("components") || it.path.contains("platform-component-service") })
+    outputs.dir(outputDir)
+}
+
+tasks.named<ProcessResources>("processResources") {
+    from(generateComponentIndex)
+}

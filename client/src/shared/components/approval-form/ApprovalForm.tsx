@@ -1,8 +1,10 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {renderFormField} from '@/shared/components/form/renderFormField';
 import useApprovalForm from '@/shared/hooks/useApprovalForm';
-import {useEffect, useRef} from 'react';
+import {useEffect, useId, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 interface ApprovalFormPropsI {
@@ -10,6 +12,8 @@ interface ApprovalFormPropsI {
     onSubmitted?: (approved: boolean) => void;
     setDocumentTitle?: boolean;
     showHeader?: boolean;
+
+    submitHandler?: (data: Record<string, unknown>, approved: boolean) => Promise<void>;
 }
 
 export default function ApprovalForm({
@@ -17,23 +21,26 @@ export default function ApprovalForm({
     onSubmitted,
     setDocumentTitle = false,
     showHeader = true,
+    submitHandler,
 }: ApprovalFormPropsI) {
+    const [comment, setComment] = useState('');
+
+    const commentFieldId = useId();
+
     const {approved, definition, error, form, handleSubmit, loading, submitError, submitted, submitting, uiDefinition} =
-        useApprovalForm(id, {onSubmitted});
+        useApprovalForm(id, {onSubmitted, submitOverride: submitHandler});
 
     const [searchParams] = useSearchParams();
     const approvedParam = searchParams.get('approved');
-    const autoApproved = approvedParam === 'true' ? true : approvedParam === 'false' ? false : null;
-    const autoSubmittedRef = useRef(false);
+    const presetApproved = approvedParam === 'true' ? true : approvedParam === 'false' ? false : null;
 
-    useEffect(() => {
-        if (autoApproved !== null && !autoSubmittedRef.current) {
-            autoSubmittedRef.current = true;
+    const hasCommentField = !!uiDefinition?.inputs?.some((formInput) => formInput.fieldName === 'comment');
 
-            void handleSubmit({}, autoApproved);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [autoApproved]);
+    const withComment = (values: Record<string, unknown>) => {
+        const trimmedComment = comment.trim();
+
+        return trimmedComment && !hasCommentField ? {...values, comment: trimmedComment} : values;
+    };
 
     useEffect(() => {
         if (!setDocumentTitle) {
@@ -49,36 +56,12 @@ export default function ApprovalForm({
         };
     }, [setDocumentTitle, uiDefinition?.title]);
 
-    if (submitError) {
+    if (loading) {
         return (
-            <div className="p-6">
-                <span className="text-sm text-destructive">{submitError}</span>
+            <div className="p-6 text-center text-sm text-muted-foreground" role="status">
+                Loading form...
             </div>
         );
-    }
-
-    if (autoApproved !== null) {
-        if (submitted) {
-            const resolvedApproved = approved ?? autoApproved;
-
-            return (
-                <div className="p-6 text-center">
-                    <h2 className="text-lg font-semibold tracking-tight">
-                        {resolvedApproved ? 'Approved' : 'Discarded'}
-                    </h2>
-
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        {resolvedApproved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
-                    </p>
-                </div>
-            );
-        }
-
-        return <div className="p-6 text-center text-sm text-muted-foreground">Submitting...</div>;
-    }
-
-    if (loading) {
-        return <div className="p-6 text-center text-sm text-muted-foreground">Loading form...</div>;
     }
 
     if (error || !uiDefinition || !definition) {
@@ -96,12 +79,57 @@ export default function ApprovalForm({
 
     if (submitted) {
         return (
-            <div className="p-6 text-center">
+            <div className="p-6 text-center" role="status">
                 <h2 className="text-lg font-semibold tracking-tight">{approved ? 'Approved' : 'Discarded'}</h2>
 
                 <p className="mt-2 text-sm text-muted-foreground">
                     {approved ? 'Your approval has been submitted.' : 'The request has been discarded.'}
                 </p>
+            </div>
+        );
+    }
+
+    if (presetApproved !== null && !uiDefinition.inputs?.length) {
+        return (
+            <div className="mx-auto max-w-md p-6 text-center">
+                <h2 className="text-lg font-semibold tracking-tight">{uiDefinition.title || 'Approval requested'}</h2>
+
+                {uiDefinition.description && (
+                    <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">{uiDefinition.description}</p>
+                )}
+
+                <p className="mt-4 text-sm text-muted-foreground">
+                    {presetApproved ? 'Confirm to approve this request.' : 'Confirm to discard this request.'}
+                </p>
+
+                {!hasCommentField && (
+                    <div className="mt-4 space-y-2 text-left">
+                        <Label htmlFor={commentFieldId}>Comment (optional)</Label>
+
+                        <Textarea
+                            id={commentFieldId}
+                            onChange={(event) => setComment(event.target.value)}
+                            placeholder="Add a note for the requester — included whether you approve or discard."
+                            value={comment}
+                        />
+                    </div>
+                )}
+
+                {submitError && (
+                    <p className="mt-4 text-sm text-destructive" role="alert">
+                        {submitError}
+                    </p>
+                )}
+
+                <Button
+                    className="mt-6"
+                    disabled={submitting}
+                    onClick={() => handleSubmit(withComment({}), presetApproved)}
+                    type="button"
+                    variant={presetApproved ? 'default' : 'outline'}
+                >
+                    {submitting ? 'Submitting...' : presetApproved ? 'Confirm approval' : 'Confirm discard'}
+                </Button>
             </div>
         );
     }
@@ -137,10 +165,29 @@ export default function ApprovalForm({
                         <span className="text-sm text-muted-foreground">No inputs defined.</span>
                     )}
 
+                    {!hasCommentField && (
+                        <div className="space-y-2">
+                            <Label htmlFor={commentFieldId}>Comment (optional)</Label>
+
+                            <Textarea
+                                id={commentFieldId}
+                                onChange={(event) => setComment(event.target.value)}
+                                placeholder="Add a note for the requester — included whether you approve or discard."
+                                value={comment}
+                            />
+                        </div>
+                    )}
+
+                    {submitError && (
+                        <p className="text-sm text-destructive" role="alert">
+                            {submitError}
+                        </p>
+                    )}
+
                     <div className="mt-4 flex gap-3">
                         <Button
                             disabled={submitting}
-                            onClick={form.handleSubmit((values) => handleSubmit(values, true))}
+                            onClick={form.handleSubmit((values) => handleSubmit(withComment(values), true))}
                             type="button"
                         >
                             {submitting ? 'Submitting...' : 'Approve'}
@@ -148,7 +195,7 @@ export default function ApprovalForm({
 
                         <Button
                             disabled={submitting}
-                            onClick={() => handleSubmit(form.getValues(), false)}
+                            onClick={() => handleSubmit(withComment(form.getValues()), false)}
                             type="button"
                             variant="outline"
                         >

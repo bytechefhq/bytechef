@@ -80,6 +80,8 @@ public class JobModel {
     
     STOPPED("STOPPED"),
     
+    CANCELLED("CANCELLED"),
+    
     FAILED("FAILED"),
     
     COMPLETED("COMPLETED");

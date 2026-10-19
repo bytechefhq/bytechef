@@ -29,6 +29,8 @@ public interface NotificationService {
 
     void delete(long notificationId);
 
+    Notification getNotification(long notificationId);
+
     List<Notification> getNotifications();
 
     List<Notification> getNotifications(NotificationEvent.Type eventType);

@@ -17,3 +17,15 @@ export async function ensureAuthenticated(page: Page): Promise<void> {
 
     await login(page, TEST_USER.email, TEST_USER.password);
 }
+
+/**
+ * Waits out a long stretch (an approval expiry or a sweep period) and then starts a fresh session, so the API calls
+ * after the wait carry a valid session and XSRF token.
+ */
+export async function waitAndStaySignedIn(page: Page, milliseconds: number): Promise<void> {
+    await page.waitForTimeout(Math.max(milliseconds, 0));
+
+    await page.context().clearCookies();
+
+    await login(page, TEST_USER.email, TEST_USER.password);
+}

@@ -1,5 +1,7 @@
 import {defineConfig, devices} from '@playwright/test';
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
+
 export default defineConfig({
     // Every property test logs in, creates a project, imports a workflow and then waits for the
     // workflow editor to mount its canvas and node definitions. Fixture setup counts against the test
@@ -23,7 +25,7 @@ export default defineConfig({
     timeout: 90000,
     use: {
         actionTimeout: 30000,
-        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
+        baseURL,
         navigationTimeout: 30000,
         screenshot: 'only-on-failure',
         trace: 'on-first-retry',
@@ -35,7 +37,7 @@ export default defineConfig({
         stderr: 'pipe',
         stdout: 'ignore',
         timeout: 120 * 1000,
-        url: 'http://127.0.0.1:5173',
+        url: baseURL,
     },
     // Prevent over-subscription of test workers due to workflow editor; the default (~50% of cores)
     workers: process.env.CI ? 1 : 3,

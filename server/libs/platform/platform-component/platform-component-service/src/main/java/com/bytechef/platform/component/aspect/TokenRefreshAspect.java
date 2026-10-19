@@ -97,7 +97,7 @@ public class TokenRefreshAspect {
                     "@WithTokenRefresh.ComponentNameParam of type String: " + method.toGenericString());
         }
 
-        ComponentConnection componentConnection = findConnectionArgument(parameters, args);
+        ComponentConnection componentConnection = findConnectionArgument(parameters, args, componentName);
 
         if (componentConnection == null || componentConnection.authorizationType() == null) {
             throw exception;
@@ -122,7 +122,7 @@ public class TokenRefreshAspect {
         ComponentConnection refreshedConnection = tokenRefreshHandler.refreshCredentials(
             componentConnection, context);
 
-        Object[] updatedArgs = updateArgsWithRefreshedConnection(args, parameters, refreshedConnection);
+        Object[] updatedArgs = updateArgsWithRefreshedConnection(args, parameters, componentName, refreshedConnection);
 
         if (log.isDebugEnabled()) {
             log.debug("Retrying method {} with refreshed credentials", method.getName());
@@ -136,7 +136,9 @@ public class TokenRefreshAspect {
     }
 
     @SuppressWarnings("unchecked")
-    private @Nullable ComponentConnection findConnectionArgument(Parameter[] parameters, Object[] args) {
+    private @Nullable ComponentConnection findConnectionArgument(
+        Parameter[] parameters, Object[] args, String componentName) {
+
         int index = findAnnotatedParameterIndex(parameters, WithTokenRefresh.ConnectionParam.class);
 
         if (index < 0) {
@@ -156,13 +158,11 @@ public class TokenRefreshAspect {
         if (value instanceof Map<?, ?> map) {
             Map<String, ComponentConnection> connectionMap = (Map<String, ComponentConnection>) map;
 
-            if (connectionMap.isEmpty()) {
-                return null;
-            }
-
             return connectionMap.values()
-                .iterator()
-                .next();
+                .stream()
+                .filter(connection -> componentName.equals(connection.componentName()))
+                .findFirst()
+                .orElse(null);
         }
 
         return null;
@@ -206,7 +206,7 @@ public class TokenRefreshAspect {
 
     @SuppressWarnings("unchecked")
     private Object[] updateArgsWithRefreshedConnection(
-        Object[] args, Parameter[] parameters, ComponentConnection refreshedConnection) {
+        Object[] args, Parameter[] parameters, String componentName, ComponentConnection refreshedConnection) {
 
         Object[] updatedArgs = args.clone();
         int index = findAnnotatedParameterIndex(parameters, WithTokenRefresh.ConnectionParam.class);
@@ -220,19 +220,19 @@ public class TokenRefreshAspect {
         if (currentValue instanceof ComponentConnection) {
             updatedArgs[index] = refreshedConnection;
         } else if (currentValue instanceof Map<?, ?> map) {
-            Map<String, ComponentConnection> connectionMap = (Map<String, ComponentConnection>) map;
+            Map<String, ComponentConnection> updatedMap = new HashMap<>((Map<String, ComponentConnection>) map);
 
-            if (!connectionMap.isEmpty()) {
-                String firstKey = connectionMap.keySet()
-                    .iterator()
-                    .next();
+            for (Map.Entry<String, ComponentConnection> entry : updatedMap.entrySet()) {
+                ComponentConnection connection = entry.getValue();
 
-                Map<String, ComponentConnection> updatedMap = new HashMap<>(connectionMap);
+                if (componentName.equals(connection.componentName())) {
+                    entry.setValue(refreshedConnection);
 
-                updatedMap.put(firstKey, refreshedConnection);
-
-                updatedArgs[index] = updatedMap;
+                    break;
+                }
             }
+
+            updatedArgs[index] = updatedMap;
         }
 
         return updatedArgs;

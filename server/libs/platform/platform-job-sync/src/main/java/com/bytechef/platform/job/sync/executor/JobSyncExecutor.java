@@ -71,6 +71,7 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
@@ -81,15 +82,14 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
@@ -98,14 +98,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
+ * Runs jobs in-process and waits for them. Every job it creates is marked with
+ * {@link MetadataConstants#SYNC_EXECUTION}, which tells steps that the run can't suspend.
+ *
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(JobSyncExecutor.class);
 
+    private static final int MAX_FAIL_UNFINISHED_JOB_ATTEMPTS = 3;
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
 
@@ -494,7 +499,7 @@ public class JobSyncExecutor {
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskExecutionService, taskFileStorage, workflowService);
 
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
 
         return awaitJob(jobId, checkForError, taskExecutionCompleteCallback, timeout);
     }
@@ -506,7 +511,7 @@ public class JobSyncExecutor {
      * @return the unique identifier of the created job
      */
     public long startJob(JobParametersDTO jobParametersDTO) {
-        return jobFacade.createJob(jobParametersDTO);
+        return jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
     }
 
     /**
@@ -521,7 +526,7 @@ public class JobSyncExecutor {
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskExecutionService, taskFileStorage, workflowService);
 
-        return jobFacade.createJob(jobParametersDTO);
+        return jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
     }
 
     /**
@@ -532,6 +537,16 @@ public class JobSyncExecutor {
      */
     public void stopJob(long jobId) {
         coordinatorEventPublisher.publishEvent(new StopJobEvent(jobId));
+    }
+
+    private static JobParametersDTO withSyncExecutionMetadata(JobParametersDTO jobParametersDTO) {
+        Map<String, Object> metadata = new HashMap<>(jobParametersDTO.getMetadata());
+
+        metadata.put(MetadataConstants.SYNC_EXECUTION, true);
+
+        return new JobParametersDTO(
+            jobParametersDTO.getWorkflowId(), jobParametersDTO.getParentTaskExecutionId(), jobParametersDTO.getInputs(),
+            jobParametersDTO.getLabel(), jobParametersDTO.getPriority(), jobParametersDTO.getWebhooks(), metadata);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
@@ -545,7 +560,7 @@ public class JobSyncExecutor {
     }
 
     private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError) {
-        long jobId = jobFacade.createJob(jobParametersDTO);
+        long jobId = jobFacade.createJob(withSyncExecutionMetadata(jobParametersDTO));
 
         waitForJobCompletion(jobId, null);
 
@@ -568,7 +583,8 @@ public class JobSyncExecutor {
 
             Job.Status status = jobStatusEvent.getStatus();
 
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
+            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED
+                || status == Job.Status.CANCELLED) {
                 CountDownLatch latch = jobCompletionLatches.get(getKey(jobId));
 
                 if (latch != null) {
@@ -580,7 +596,8 @@ public class JobSyncExecutor {
 
             notifyJobStatusListeners(jobId, jobStatusEvent);
 
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
+            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED
+                || status == Job.Status.CANCELLED) {
                 invalidateListeners(jobId);
             }
         } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent) {
@@ -860,63 +877,63 @@ public class JobSyncExecutor {
     }
 
     private void waitForJobCompletion(long jobId, @Nullable Duration timeout) {
-        Job job = jobService.getJob(jobId);
-
-        if (job.getStatus() == Job.Status.COMPLETED || job.getStatus() == Job.Status.FAILED ||
-            job.getStatus() == Job.Status.STOPPED) {
-
-            return;
-        }
-
         CountDownLatch latch = jobCompletionLatches.computeIfAbsent(getKey(jobId), id -> new CountDownLatch(1));
 
         try {
-            Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
-
-            if (lastTaskExecutionOptional.isPresent()) {
-                TaskExecution taskExecution = lastTaskExecutionOptional.get();
-
-                TaskExecution.Status status = taskExecution.getStatus();
-
-                if (status.isTerminated()) {
-                    jobCompletionLatches.remove(getKey(jobId));
-
-                    return;
-                }
+            if (isTerminal(jobService.getJob(jobId))) {
+                return;
             }
-        } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
-        }
 
-        try {
             long timeoutMillis = getTimeoutMillis(timeout);
 
             if (timeoutMillis == NO_TIMEOUT) {
                 latch.await();
-            } else {
-                if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                    throw new TimeoutException(
-                        "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
-                }
+            } else if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                failUnfinishedJob(jobId,
+                    "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
             }
-        } catch (InterruptedException | TimeoutException exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage());
-            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
 
-            job.setError(
-                new ExecutionError(
-                    Objects.requireNonNullElse(
-                        exception.getMessage(), "Interrupted while waiting for job %d".formatted(jobId)),
-                    List.of()));
-            job.setStatus(Job.Status.FAILED);
-
-            jobService.update(job);
+            failUnfinishedJob(jobId, "Interrupted while waiting for job %d".formatted(jobId));
         } finally {
             jobCompletionLatches.remove(getKey(jobId));
         }
+    }
+
+    private void failUnfinishedJob(long jobId, String errorMessage) {
+        if (log.isTraceEnabled()) {
+            log.trace(errorMessage);
+        }
+
+        for (int attempt = 1;; attempt++) {
+            Job job = jobService.getJob(jobId);
+
+            if (isTerminal(job)) {
+                return;
+            }
+
+            job.setError(new ExecutionError(errorMessage, List.of()));
+            job.setStatus(Job.Status.FAILED);
+
+            try {
+                jobService.update(job);
+
+                return;
+            } catch (OptimisticLockingFailureException optimisticLockingFailureException) {
+                if (attempt == MAX_FAIL_UNFINISHED_JOB_ATTEMPTS) {
+                    throw optimisticLockingFailureException;
+                }
+            }
+        }
+    }
+
+    private static boolean isTerminal(Job job) {
+        Job.Status status = job.getStatus();
+
+        return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED ||
+            status == Job.Status.CANCELLED;
     }
 
     @FunctionalInterface

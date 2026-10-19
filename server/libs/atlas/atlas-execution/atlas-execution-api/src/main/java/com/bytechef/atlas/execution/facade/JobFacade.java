@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import java.util.Map;
+import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,6 +28,13 @@ public interface JobFacade {
 
     long createJob(JobParametersDTO jobParametersDTO);
 
+    /**
+     * Creates and starts a job like {@link #createJob(JobParametersDTO)}, passing the new job's id to
+     * {@code jobCreatedCallback} inside the transaction that inserts the job, so rows linked to the job are committed
+     * before the job starts.
+     */
+    long createJob(JobParametersDTO jobParametersDTO, LongConsumer jobCreatedCallback);
+
     void deleteJob(long id);
 
     @Deprecated
@@ -35,6 +43,15 @@ public interface JobFacade {
     void resumeJob(long id);
 
     void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data);
+
+    /**
+     * Continues a job the caller has already moved from STOPPED to STARTED.
+     *
+     * @param id              the job id
+     * @param taskExecutionId the suspended task execution id, or null
+     * @param data            the resume data, or null
+     */
+    void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data);
 
     void stopJob(long id);
 }

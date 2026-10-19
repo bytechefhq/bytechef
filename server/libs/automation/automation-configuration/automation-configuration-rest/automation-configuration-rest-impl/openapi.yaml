@@ -1424,6 +1424,7 @@ components:
             - "COMPLETED"
             - "FAILED"
             - "STOPPED"
+            - "CANCELLED"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"

@@ -23,4 +23,9 @@ class RuntimeJobChildJobPrincipalFactory implements ChildJobPrincipalFactory {
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
+        throw new UnsupportedOperationException();
+    }
 }

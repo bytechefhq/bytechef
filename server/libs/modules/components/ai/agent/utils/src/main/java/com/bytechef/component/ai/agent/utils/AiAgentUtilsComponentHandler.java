@@ -36,6 +36,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchT
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsListDirectoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsShellTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSubagentTool;
@@ -78,6 +79,8 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
         AiAgentUtilsAutoMemoryTool agentUtilsAutoMemoryTool = new AiAgentUtilsAutoMemoryTool(
             aiAutoMemoryService, projectDeploymentService, projectService);
+        AiAgentUtilsSmartWebFetchTool agentUtilsSmartWebFetchTool = new AiAgentUtilsSmartWebFetchTool(
+            clusterElementDefinitionService);
         AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(
             aiAgentToolFacade, clusterElementDefinitionService);
 
@@ -87,7 +90,8 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsListDirectoryTool.CLUSTER_ELEMENT_DEFINITION,
+            agentUtilsSmartWebFetchTool.clusterElementDefinition,
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             agentUtilsAutoMemoryTool.clusterElementDefinition,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,

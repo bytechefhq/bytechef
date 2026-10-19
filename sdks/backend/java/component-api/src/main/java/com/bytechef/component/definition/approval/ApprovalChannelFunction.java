@@ -29,6 +29,8 @@ public interface ApprovalChannelFunction {
     ClusterElementType APPROVAL_CHANNELS =
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
+    String EXPIRES_AT = "expiresAt";
+
     /**
      * Key under which the calling approval action publishes the form description.
      */
@@ -45,6 +47,18 @@ public interface ApprovalChannelFunction {
      * of one-click Approve/Discard actions (when the list is empty).
      */
     String INPUTS = "inputs";
+
+    String PUBLIC_URL = "publicUrl";
+
+    String RESUME_ID = "resumeId";
+
+    String RESUME_URL = "resumeUrl";
+
+    /**
+     * Key under which the platform publishes a short id standing for the resume id, for channels whose button payloads
+     * cannot hold the full token. Absent when the platform could not mint one.
+     */
+    String SHORT_RESUME_ID = "shortResumeId";
 
     Object apply(
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)

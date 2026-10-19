@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.execution.token;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
@@ -23,6 +25,11 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public final class ApprovalFormUrls {
+
+    /**
+     * How long a signed approval token stays valid after the approval expires.
+     */
+    public static final Duration APPROVAL_TOKEN_TTL_MARGIN = Duration.ofHours(1);
 
     private ApprovalFormUrls() {
     }
@@ -35,7 +42,31 @@ public final class ApprovalFormUrls {
         }
 
         return buildResumeToken(jobResumeId, approvalTokens)
-            .map(token -> publicUrl + "/resume/" + token);
+            .map(token -> toFormUrl(publicUrl, token));
+    }
+
+    /**
+     * Builds the form URL with a token that expires together with the approval, plus
+     * {@link #APPROVAL_TOKEN_TTL_MARGIN}; without an expiry the token gets the default time-to-live.
+     */
+    public static Optional<String> buildFormUrl(
+        @Nullable String publicUrl, @Nullable String jobResumeId, @Nullable ApprovalTokens approvalTokens,
+        @Nullable Instant expiresAt) {
+
+        if (publicUrl == null || publicUrl.isBlank()) {
+            return Optional.empty();
+        }
+
+        return buildResumeToken(jobResumeId, approvalTokens, expiresAt)
+            .map(token -> toFormUrl(publicUrl, token));
+    }
+
+    public static String toFormUrl(String publicUrl, String resumeToken) {
+        return publicUrl + "/resume/" + resumeToken;
+    }
+
+    public static String toResumeUrl(String publicUrl, String resumeToken) {
+        return publicUrl + "/job/resume/" + resumeToken;
     }
 
     public static Optional<String> buildResumeToken(
@@ -50,5 +81,31 @@ public final class ApprovalFormUrls {
                 ? jobResumeId
                 : approvalTokens.toSignedTokenIfConfigured(jobResumeId)
                     .orElse(jobResumeId));
+    }
+
+    public static Optional<String> buildResumeToken(
+        @Nullable String jobResumeId, @Nullable ApprovalTokens approvalTokens, @Nullable Instant expiresAt) {
+
+        if (expiresAt == null) {
+            return buildResumeToken(jobResumeId, approvalTokens);
+        }
+
+        if (jobResumeId == null || jobResumeId.isBlank()) {
+            return Optional.empty();
+        }
+
+        if (approvalTokens == null) {
+            return Optional.of(jobResumeId);
+        }
+
+        Duration remaining = Duration.between(Instant.now(), expiresAt);
+
+        if (remaining.isNegative()) {
+            remaining = Duration.ZERO;
+        }
+
+        return Optional.of(
+            approvalTokens.toSignedTokenIfConfigured(jobResumeId, remaining.plus(APPROVAL_TOKEN_TTL_MARGIN))
+                .orElse(jobResumeId));
     }
 }

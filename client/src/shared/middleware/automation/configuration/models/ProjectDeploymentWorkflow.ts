@@ -99,6 +99,7 @@ export const ProjectDeploymentWorkflowLastExecutionStatusEnum = {
     Completed: 'COMPLETED',
     Failed: 'FAILED',
     Stopped: 'STOPPED',
+    Cancelled: 'CANCELLED',
 } as const;
 export type ProjectDeploymentWorkflowLastExecutionStatusEnum = typeof ProjectDeploymentWorkflowLastExecutionStatusEnum[keyof typeof ProjectDeploymentWorkflowLastExecutionStatusEnum];
 

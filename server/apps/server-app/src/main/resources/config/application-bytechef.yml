@@ -67,11 +67,27 @@ bytechef:
       provider: pgvector
   analytics:
     enabled: false
+  approval:
+    signed-token:
+      # Tolerance applied to signed approval link expiry checks default: PT60S
+      clock-skew: PT60S
+      # Lifetime of a signed approval/resume link default: P30D
+      default-ttl: P30D
+      # Base64 signing secrets accepted for verification after a rotation
+      # previous-secrets:
+      # Fail startup when no signing secret can be resolved default: false
+      required: false
+      # Base64 signing secret (at least 32 bytes); derived from the encryption key when unset
+      # secret:
   async:
     # Upper bound on concurrent @Async tasks on the default executor (mail, notifications, background work).
     # There is no queue: a submitter waits for a permit. Workflow task and trigger execution are bounded
     # separately by bytechef.worker.task.*.
     concurrency-limit: 200
+  automation:
+    approval-task:
+      reconciliation:
+        enabled: true
   cache:
     # Cache provider (redis | caffeine) default: caffeine
     provider: caffeine
@@ -177,6 +193,13 @@ bytechef:
     enabled: false
   upgrade:
     enabled: true
+  webhook:
+    discord:
+      # Discord application public key used to verify interactivity callbacks
+      public-key:
+    whatsapp:
+      # Token Meta echoes back when verifying the WhatsApp interactivity webhook
+      verify-token:
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
@@ -195,6 +218,20 @@ bytechef:
       # kept separate so a burst of scheduled runs cannot leave an interactive caller waiting for a permit.
       sync-concurrency-limit: 5
   workflow:
+    execution:
+      agent:
+        # Maximum nesting depth of sub-workflows called by AI agent tools default: 10
+        max-subflow-depth: 10
+      approval-escalation:
+        # Escalate a pending approval after this duration; the sweep is a no-op while unset
+        # after:
+        enabled: true
+      approval-expiry:
+        enabled: true
+      approval-reminder:
+        enabled: true
+        # Remind approvers this long before an approval expires default: PT24H
+        lead-time: PT24H
     output-storage:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
       provider: jdbc

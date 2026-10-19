@@ -64,6 +64,8 @@ public class JobBasicModel {
     
     STOPPED("STOPPED"),
     
+    CANCELLED("CANCELLED"),
+    
     FAILED("FAILED"),
     
     COMPLETED("COMPLETED");

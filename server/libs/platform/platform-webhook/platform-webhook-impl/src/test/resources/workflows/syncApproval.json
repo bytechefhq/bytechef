@@ -1,0 +1,12 @@
+{
+  "label": "Sync Approval",
+  "tasks": [ {
+    "name": "approval_1",
+    "type": "approval/v1/requestApproval",
+    "parameters": { }
+  }, {
+    "name": "afterApproval",
+    "type": "test/v1/next",
+    "parameters": { }
+  } ]
+}

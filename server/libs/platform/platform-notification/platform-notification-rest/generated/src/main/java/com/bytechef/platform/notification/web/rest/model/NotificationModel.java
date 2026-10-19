@@ -54,7 +54,9 @@ public class NotificationModel {
   public enum TypeEnum {
     EMAIL("EMAIL"),
     
-    WEBHOOK("WEBHOOK");
+    WEBHOOK("WEBHOOK"),
+    
+    SLACK("SLACK");
 
     private final String value;
 

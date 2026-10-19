@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -116,5 +117,17 @@ class ApprovalTokensTest {
 
     private static String base64Secret(String raw) {
         return EncodingUtils.base64EncodeToString(raw);
+    }
+
+    @Test
+    void testResolveJobResumeIdUnwrapsSignedToken() {
+        JobResumeId jobResumeId = JobResumeId.of("public", 42L);
+
+        String token = approvalTokens.toSignedToken(jobResumeId.toString(), TTL);
+
+        assertThat(approvalTokens.resolveJobResumeId(token)).contains(jobResumeId);
+        assertThat(approvalTokens.resolveJobResumeId(jobResumeId.toString())).contains(jobResumeId);
+        assertThat(approvalTokens.resolveJobResumeId(token + "x")).isEmpty();
+        assertThat(approvalTokens.resolveJobResumeId("garbage")).isEmpty();
     }
 }

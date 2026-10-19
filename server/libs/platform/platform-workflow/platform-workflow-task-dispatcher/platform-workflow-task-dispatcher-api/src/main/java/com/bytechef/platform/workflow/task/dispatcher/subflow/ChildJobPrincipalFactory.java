@@ -24,4 +24,12 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 public interface ChildJobPrincipalFactory {
 
     long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO);
+
+    /**
+     * Creates a top-level job, with no parent task execution, owned by the same principal as the reference job.
+     *
+     * @throws IllegalArgumentException if the job parameters name a parent task execution
+     * @throws IllegalStateException    if the reference job has no principal
+     */
+    long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO);
 }

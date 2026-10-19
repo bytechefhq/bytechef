@@ -84,6 +84,11 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public Optional<TaskExecution> fetchTaskExecution(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder

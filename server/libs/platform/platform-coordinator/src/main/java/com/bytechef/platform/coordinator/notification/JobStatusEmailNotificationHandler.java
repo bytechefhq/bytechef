@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @NotificationEventType({
-    Type.JOB_CANCELLED, Type.JOB_CREATED, Type.JOB_COMPLETED, Type.JOB_FAILED, Type.JOB_STARTED
+    Type.JOB_CANCELLED, Type.JOB_CREATED, Type.JOB_COMPLETED, Type.JOB_FAILED, Type.JOB_STARTED, Type.JOB_STOPPED
 })
 public class JobStatusEmailNotificationHandler implements EmailNotificationHandler {
 

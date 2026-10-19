@@ -28,5 +28,6 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     testImplementation(project(":server:libs:platform:platform-job-sync"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api")))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
 }

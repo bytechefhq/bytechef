@@ -47,6 +47,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.AiAgentComponentHandler;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
@@ -63,6 +64,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -76,11 +78,13 @@ import com.bytechef.platform.workflow.execution.facade.ApprovalFormFacadeImpl;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacadeImpl;
+import com.bytechef.platform.workflow.execution.service.InMemoryTaskStateService;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import com.bytechef.tenant.TenantContext;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.tracing.Tracer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -90,7 +94,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import org.awaitility.core.ConditionTimeoutException;
@@ -164,6 +167,8 @@ class AiAgentChatActionIntTest {
     @Autowired
     private WorkflowService workflowService;
 
+    private final ApprovalTokens approvalTokens = new SigningApprovalTokens();
+
     private ApplicationEventPublisher eventPublisher;
     private JobService jobService;
     private JobSyncExecutor jobSyncExecutor;
@@ -235,11 +240,16 @@ class AiAgentChatActionIntTest {
                 taskCoordinator.onResumeJobEvent(resumeJobEvent);
             });
 
+        StaticListableBeanFactory approvalTokensBeanFactory = new StaticListableBeanFactory();
+
+        approvalTokensBeanFactory.addBean("approvalTokens", approvalTokens);
+
         jobResumeFacade = new JobResumeFacadeImpl(
-            event -> {}, new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class),
+            event -> {}, approvalTokensBeanFactory.getBeanProvider(ApprovalTokens.class),
             new JobFacadeImpl(
                 eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService),
-            jobService, TransactionOperations.withoutTransaction());
+            jobService, new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class),
+            TransactionOperations.withoutTransaction(), taskExecutionService, taskStateService);
     }
 
     @Test
@@ -257,7 +267,7 @@ class AiAgentChatActionIntTest {
         assertThat(suspendOutput.toString()).contains(AgentToolSuspension.CONTINUE_PARAMETER_KEY);
 
         JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJob(
-            getJobResumeId(suspendedJob), Map.of("approved", true));
+            getSignedResumeToken(suspendedJob), Map.of("approved", true));
 
         assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.OK);
 
@@ -276,6 +286,22 @@ class AiAgentChatActionIntTest {
     }
 
     @Test
+    void testSuspendRecordsItsExpiryOnTheSuspendedTaskExecution() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
+
+        Long taskExecutionResumeId = MapUtils.getLong(
+            suspendedJob.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        TaskExecution suspendedTaskExecution = taskExecutionService.getTaskExecution(
+            Objects.requireNonNull(taskExecutionResumeId));
+
+        assertThat(SuspendUtils.extractSuspendExpiresAt(suspendedTaskExecution.getMetadata()))
+            .isAfter(Instant.now());
+    }
+
+    @Test
     void testApprovalFormShowsTheApprovalToolParametersNotTheAgentParameters() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
@@ -285,7 +311,8 @@ class AiAgentChatActionIntTest {
             new StaticListableBeanFactory().getBeanProvider(ApprovalTokens.class), jobService, taskExecutionService,
             taskStateService, TransactionOperations.withoutTransaction());
 
-        Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(getJobResumeId(suspendedJob));
+        Map<String, ?> approvalForm = approvalFormFacade.fetchApprovalForm(getJobResumeId(suspendedJob))
+            .orElseThrow();
 
         assertThat(approvalForm)
             .doesNotContainKey("userPrompt")
@@ -318,26 +345,25 @@ class AiAgentChatActionIntTest {
     }
 
     @Test
-    void testExpiredSuspendResumesTheAgentWithNoResponse() {
+    void testExpiredApprovalFailsTheRunInsteadOfResumingTheAgent() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
         assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
 
-        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeExpiredJob(getJobResumeId(suspendedJob));
+        String jobResumeId = getJobResumeId(suspendedJob);
 
-        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.OK);
+        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeExpiredJob(jobResumeId);
 
-        Job completedJob = awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
+        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.JOB_FAILED);
 
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(Objects.requireNonNull(completedJob.getOutputs()));
+        Job failedJob = jobService.getJob(Objects.requireNonNull(suspendedJob.getId()));
 
-        assertThat(outputs)
-            .extractingByKey("answer")
-            .isEqualTo(FINAL_ANSWER);
-        assertThat(getApprovalToolResponse(scriptedChatModel.getPrompts()
-            .get(1))).contains("NO_RESPONSE");
-        assertThat(taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(suspendedJob.getId())))
-            .hasSize(1);
+        assertThat(failedJob.getStatus()).isEqualTo(Job.Status.FAILED);
+        assertThat(failedJob.getError()
+            .getMessage()).startsWith("The pending approval expired at ");
+        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true)))
+            .isEqualTo(JobResumeOutcome.GONE);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(1);
     }
 
     @Test
@@ -346,7 +372,8 @@ class AiAgentChatActionIntTest {
 
         String jobResumeId = getJobResumeId(suspendedJob);
 
-        assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true))).isEqualTo(JobResumeOutcome.OK);
+        assertThat(jobResumeFacade.resumeJob(getSignedResumeToken(suspendedJob), Map.of("approved", true)))
+            .isEqualTo(JobResumeOutcome.OK);
 
         long jobId = Objects.requireNonNull(suspendedJob.getId());
 
@@ -361,21 +388,17 @@ class AiAgentChatActionIntTest {
     }
 
     @Test
-    void testResumeWithEmptyDataResumesTheAgentWithNoResponse() {
+    void testResumeWithoutAnApprovedDecisionIsRejectedAndTheAgentKeepsWaiting() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
         assertThat(suspendedJob.getStatus()).isEqualTo(Job.Status.STOPPED);
 
-        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJob(getJobResumeId(suspendedJob), Map.of());
+        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJob(getSignedResumeToken(suspendedJob), Map.of());
 
-        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.OK);
-
-        awaitJobStatus(Objects.requireNonNull(suspendedJob.getId()), Job.Status.COMPLETED);
-
-        List<Prompt> prompts = scriptedChatModel.getPrompts();
-
-        assertThat(prompts).hasSize(2);
-        assertThat(getApprovalToolResponse(prompts.get(1))).contains("NO_RESPONSE");
+        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+        assertThat(jobService.getJob(Objects.requireNonNull(suspendedJob.getId()))
+            .getStatus()).isEqualTo(Job.Status.STOPPED);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(1);
     }
 
     @Test
@@ -383,7 +406,7 @@ class AiAgentChatActionIntTest {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
         JobResumeOutcome jobStreamingResumeOutcome = jobResumeFacade.resumeJobStreaming(
-            getJobResumeId(suspendedJob), Map.of("approved", true), jobId -> {});
+            getSignedResumeToken(suspendedJob), Map.of("approved", true), jobId -> {});
 
         assertThat(jobStreamingResumeOutcome).isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
         assertThat(jobService.getJob(Objects.requireNonNull(suspendedJob.getId()))
@@ -428,7 +451,7 @@ class AiAgentChatActionIntTest {
     void testRepeatedResumeOfAnAnsweredApprovalIsGoneWhileTheJobRuns() {
         Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
 
-        String jobResumeId = getJobResumeId(suspendedJob);
+        String jobResumeId = getSignedResumeToken(suspendedJob);
 
         assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", true))).isEqualTo(JobResumeOutcome.OK);
         assertThat(jobResumeFacade.resumeJob(jobResumeId, Map.of("approved", false)))
@@ -509,6 +532,23 @@ class AiAgentChatActionIntTest {
         return toolResponse.responseData();
     }
 
+    @Test
+    void testUnsignedResumeIdCannotResolveAnApproval() {
+        Job suspendedJob = jobSyncExecutor.execute(new JobParametersDTO(WORKFLOW_ID, Map.of()), false);
+
+        JobResumeOutcome jobResumeOutcome = jobResumeFacade.resumeJob(
+            getJobResumeId(suspendedJob), Map.of("approved", true));
+
+        assertThat(jobResumeOutcome).isEqualTo(JobResumeOutcome.INVALID_ID);
+        assertThat(jobService.getJob(Objects.requireNonNull(suspendedJob.getId()))
+            .getStatus()).isEqualTo(Job.Status.STOPPED);
+        assertThat(scriptedChatModel.getPrompts()).hasSize(1);
+    }
+
+    private String getSignedResumeToken(Job job) {
+        return approvalTokens.toSignedToken(getJobResumeId(job), Duration.ofHours(1));
+    }
+
     private static String getJobResumeId(Job job) {
         String jobResumeId = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
 
@@ -545,24 +585,42 @@ class AiAgentChatActionIntTest {
         }
     }
 
-    private static class InMemoryTaskStateService implements TaskStateService {
+    private static final class SigningApprovalTokens implements ApprovalTokens {
 
-        private final Map<String, Object> values = new ConcurrentHashMap<>();
+        private static final String PREFIX = "v1.0.";
 
         @Override
-        public void delete(JobResumeId jobResumeId) {
-            values.remove(jobResumeId.toString());
+        public String toSignedToken(String innerToken, Duration ttl) {
+            return PREFIX + innerToken + ".signature";
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> fetchValue(JobResumeId jobResumeId) {
-            return Optional.ofNullable((T) values.get(jobResumeId.toString()));
+        public Optional<String> toSignedTokenIfConfigured(String innerToken) {
+            return Optional.of(toSignedToken(innerToken, Duration.ZERO));
         }
 
         @Override
-        public void save(JobResumeId jobResumeId, Object value) {
-            values.put(jobResumeId.toString(), value);
+        public Optional<String> toSignedTokenIfConfigured(String innerToken, Duration ttl) {
+            return Optional.of(toSignedToken(innerToken, ttl));
+        }
+
+        @Override
+        public Optional<String> parseSignedToken(String token) {
+            if (!looksLikeSignedToken(token)) {
+                return Optional.empty();
+            }
+
+            return Optional.of(token.substring(PREFIX.length(), token.lastIndexOf('.')));
+        }
+
+        @Override
+        public boolean looksLikeSignedToken(String token) {
+            return token.startsWith(PREFIX) && token.endsWith(".signature");
+        }
+
+        @Override
+        public boolean isSignedTokenRequired() {
+            return false;
         }
     }
 

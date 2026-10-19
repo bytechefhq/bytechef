@@ -1,3 +1,6 @@
+import ApprovalRequestMessage, {
+    ApprovalRequestDataI,
+} from '@/shared/components/ai-chat/messages/ApprovalRequestMessage';
 import AskUserQuestionMessage, {
     AskUserQuestionDataI,
 } from '@/shared/components/ai-chat/messages/AskUserQuestionMessage';
@@ -14,6 +17,7 @@ import SelectPropertyOptionMessage, {
 import {DataMessagePartProps} from '@assistant-ui/react';
 
 export const aiChatDataComponents = {
+    'approval-request': (props: DataMessagePartProps<ApprovalRequestDataI>) => <ApprovalRequestMessage {...props} />,
     'ask-user-question': (props: DataMessagePartProps<AskUserQuestionDataI>) => <AskUserQuestionMessage {...props} />,
     'create-connection': (props: DataMessagePartProps<CreateConnectionDataI>) => <CreateConnectionMessage {...props} />,
     'run-error': (props: DataMessagePartProps<RunErrorDataI>) => <RunErrorMessage {...props} />,

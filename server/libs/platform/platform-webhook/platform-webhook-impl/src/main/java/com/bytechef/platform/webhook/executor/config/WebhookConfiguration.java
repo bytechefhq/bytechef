@@ -32,6 +32,7 @@ import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.evaluator.Evaluator;
@@ -40,6 +41,8 @@ import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskDispatcher;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
@@ -112,8 +115,9 @@ public class WebhookConfiguration {
                 contextService, evaluator, jobService, -1, asyncMessageBroker,
                 getAdditionalApplicationEventListeners(
                     evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
-                getTaskCompletionHandlerFactories(
-                    contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
+                getSyncTaskCompletionHandlerFactories(
+                    contextService, coordinatorEventPublisher, counterService, evaluator, jobService,
+                    taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
                     childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
@@ -131,6 +135,21 @@ public class WebhookConfiguration {
 
             messageBroker.send(((MessageEvent<?>) event).getRoute(), event);
         };
+    }
+
+    List<TaskCompletionHandlerFactory> getSyncTaskCompletionHandlerFactories(
+        ContextService contextService, ApplicationEventPublisher eventPublisher, CounterService counterService,
+        Evaluator evaluator, JobService jobService, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
+
+        TaskCompletionHandlerFactory suspendRejectingTaskCompletionHandlerFactory =
+            (taskCompletionHandler, taskDispatcher) -> new SyncExecutionSuspendRejectingTaskCompletionHandler(
+                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl::suspendingTaskMessage);
+
+        return CollectionUtils.concat(
+            List.of(suspendRejectingTaskCompletionHandlerFactory),
+            getTaskCompletionHandlerFactories(
+                contextService, counterService, evaluator, taskExecutionService, taskFileStorage));
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
@@ -191,6 +210,8 @@ public class WebhookConfiguration {
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
+            (taskDispatcher) -> new SyncExecutionSuspendRejectingTaskDispatcher(
+                eventPublisher, jobService, taskExecutionService, WebhookWorkflowExecutorImpl::suspendingTaskMessage),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, evaluator, eventPublisher, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

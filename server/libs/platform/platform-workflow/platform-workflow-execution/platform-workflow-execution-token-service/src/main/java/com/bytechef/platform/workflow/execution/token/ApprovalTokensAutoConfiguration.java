@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.token;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -36,7 +37,7 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 @AutoConfiguration
-@EnableConfigurationProperties(ApprovalTokensProperties.class)
+@EnableConfigurationProperties(ApplicationProperties.class)
 public class ApprovalTokensAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalTokensAutoConfiguration.class);
@@ -46,10 +47,14 @@ public class ApprovalTokensAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ApprovalTokens approvalTokens(
-        ApprovalTokensProperties properties, ObjectProvider<Clock> clockProvider,
+        ApplicationProperties applicationProperties, ObjectProvider<Clock> clockProvider,
         ObjectProvider<EncryptionKey> encryptionKeyProvider) {
 
-        String explicitSecret = properties.getSecret();
+        ApplicationProperties.Approval approval = applicationProperties.getApproval();
+
+        ApplicationProperties.Approval.SignedToken signedToken = approval.getSignedToken();
+
+        String explicitSecret = signedToken.getSecret();
         String effectiveSecret;
 
         if (explicitSecret != null && !explicitSecret.isBlank()) {
@@ -64,7 +69,7 @@ public class ApprovalTokensAutoConfiguration {
             }
         }
 
-        if (properties.isRequired() && (effectiveSecret == null || effectiveSecret.isBlank())) {
+        if (signedToken.isRequired() && (effectiveSecret == null || effectiveSecret.isBlank())) {
             throw new IllegalStateException(
                 "bytechef.approval.signed-token.required=true but no signing secret is available. Either set "
                     + "bytechef.approval.signed-token.secret directly or ensure an EncryptionKey bean is on the "
@@ -80,8 +85,8 @@ public class ApprovalTokensAutoConfiguration {
         Clock clock = clockProvider.getIfAvailable(Clock::systemUTC);
 
         return new ApprovalTokensImpl(
-            clock, effectiveSecret, properties.getPreviousSecrets(), properties.getDefaultTtl(),
-            properties.getClockSkew(), properties.isRequired());
+            clock, effectiveSecret, signedToken.getPreviousSecrets(), signedToken.getDefaultTtl(),
+            signedToken.getClockSkew(), signedToken.isRequired());
     }
 
     private static String deriveSecretFromEncryptionKey(EncryptionKey encryptionKey) {

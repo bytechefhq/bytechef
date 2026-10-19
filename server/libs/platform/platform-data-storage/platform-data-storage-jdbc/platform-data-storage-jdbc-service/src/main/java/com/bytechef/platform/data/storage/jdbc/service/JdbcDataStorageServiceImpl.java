@@ -52,6 +52,12 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     }
 
     @Override
+    @Transactional
+    public void deleteScopeData(DataStorageScope scope, String scopeId) {
+        dataStorageRepository.deleteAllByScopeAndScopeId(scope.ordinal(), scopeId);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> @NonNull Optional<T> fetch(

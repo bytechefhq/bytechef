@@ -24,14 +24,40 @@ export type NotificationFormValuesType = {
     type: NotificationTypeEnum;
 };
 
-const formSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
-    notificationEventIds: z.array(z.string()).nonempty('Please select at least one notification event.'),
-    settings: z.record(z.string(), z.any()),
-    type: z.enum(['EMAIL', 'WEBHOOK'], {
-        message: 'Please select a notification type.',
-    }),
-});
+export const notificationFormSchema = z
+    .object({
+        name: z.string().min(1, 'Name is required').max(256, 'Name cannot be longer than 256 characters'),
+        notificationEventIds: z.array(z.string()).nonempty('Please select at least one notification event.'),
+        settings: z.record(z.string(), z.any()),
+        type: z.enum(['EMAIL', 'SLACK', 'WEBHOOK'], {
+            message: 'Please select a notification type.',
+        }),
+    })
+    .superRefine(({settings, type}, context) => {
+        if (type !== 'SLACK') {
+            return;
+        }
+
+        const slackWebhookUrl = settings.slackWebhookUrl;
+
+        if (typeof slackWebhookUrl !== 'string' || slackWebhookUrl.trim() === '') {
+            context.addIssue({
+                code: 'custom',
+                message: 'Slack webhook URL is required.',
+                path: ['settings', 'slackWebhookUrl'],
+            });
+
+            return;
+        }
+
+        if (!z.url().safeParse(slackWebhookUrl.trim()).success) {
+            context.addIssue({
+                code: 'custom',
+                message: 'Enter a valid Slack webhook URL.',
+                path: ['settings', 'slackWebhookUrl'],
+            });
+        }
+    });
 
 const emptyFormValues = {
     name: '',
@@ -163,9 +189,9 @@ export default function useNotifications() {
         }),
     ]);
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<z.infer<typeof notificationFormSchema>>({
         defaultValues: emptyFormValues,
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(notificationFormSchema),
     });
 
     const {getValues, reset} = form;

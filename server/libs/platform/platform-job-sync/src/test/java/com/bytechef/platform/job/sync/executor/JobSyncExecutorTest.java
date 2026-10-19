@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +34,7 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -47,6 +49,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
@@ -57,13 +60,17 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -228,6 +235,57 @@ class JobSyncExecutorTest {
 
     @Test
     @SuppressWarnings("PMD.UnusedLocalVariable")
+    void testWaitDoesNotReturnWhileTheJobIsStartedWithATerminatedLastTaskExecution() throws Exception {
+        long jobId = 505L;
+
+        Job startedJob = new Job();
+
+        startedJob.setId(jobId);
+        startedJob.setStatus(Job.Status.STARTED);
+
+        when(jobService.getJob(jobId)).thenReturn(startedJob);
+
+        TaskExecution completedTaskExecution = new TaskExecution();
+
+        completedTaskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.of(completedTaskExecution));
+
+        CountDownLatch awaitReturnedLatch = new CountDownLatch(1);
+
+        Thread thread = new Thread(() -> {
+            try {
+                TenantContext.runWithTenantId(TENANT, () -> jobSyncExecutor.awaitJob(jobId, false));
+            } finally {
+                awaitReturnedLatch.countDown();
+            }
+        });
+
+        thread.start();
+
+        waitForLatchRegistration(jobSyncExecutor, TENANT + "_" + jobId, Duration.ofMillis(250));
+
+        assertThat(awaitReturnedLatch.await(300, TimeUnit.MILLISECONDS)).isFalse();
+
+        Job stoppedJob = new Job();
+
+        stoppedJob.setId(jobId);
+        stoppedJob.setStatus(Job.Status.STOPPED);
+
+        when(jobService.getJob(jobId)).thenReturn(stoppedJob);
+
+        JobStatusApplicationEvent jobStatusApplicationEvent = new JobStatusApplicationEvent(
+            jobId, Job.Status.STOPPED);
+
+        jobStatusApplicationEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        memoryMessageBroker.send(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, jobStatusApplicationEvent);
+
+        assertThat(awaitReturnedLatch.await(1, TimeUnit.SECONDS)).isTrue();
+    }
+
+    @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testTaskStartedListenerInvokedAndJobIdDerivedFromTaskExecutionId() throws Exception {
         long jobId = 404L;
         long taskExecutionId = 9001L;
@@ -294,7 +352,7 @@ class JobSyncExecutorTest {
         failedJob.setError(new ExecutionError("Invalid expression: function perform(input) {}", List.of()));
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
@@ -324,7 +382,7 @@ class JobSyncExecutorTest {
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
         when(taskExecutionService.fetchLastJobTaskExecution(jobId))
-            .thenReturn(java.util.Optional.of(completedTaskExecution));
+            .thenReturn(Optional.of(completedTaskExecution));
         when(taskExecutionService.getJobTaskExecutions(jobId))
             .thenReturn(List.of(failedTaskExecution, completedTaskExecution));
 
@@ -343,7 +401,7 @@ class JobSyncExecutorTest {
         failedJob.setStatus(Job.Status.FAILED);
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
@@ -398,6 +456,64 @@ class JobSyncExecutorTest {
     }
 
     @Test
+    void testStartJobMarksTheJobAsASyncExecution() {
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
+
+        when(jobService.create(jobParametersDTOArgumentCaptor.capture(), any()))
+            .thenThrow(new IllegalStateException("job created"));
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.startJob(new JobParametersDTO("workflow-1", Map.of(), Map.of("existing", "value"))))
+                .hasMessage("job created");
+
+        JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
+
+        assertThat(jobParametersDTO.getMetadata())
+            .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
+            .containsEntry("existing", "value");
+    }
+
+    @Test
+    void testStartJobWithAJobFactoryMarksTheJobAsASyncExecution() {
+        AtomicReference<JobParametersDTO> jobParametersDTOReference = new AtomicReference<>();
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.startJob(
+                new JobParametersDTO("workflow-1", Map.of(), Map.of("existing", "value")),
+                jobParametersDTO -> {
+                    jobParametersDTOReference.set(jobParametersDTO);
+
+                    throw new IllegalStateException("job created");
+                }))
+                    .hasMessage("job created");
+
+        assertThat(jobParametersDTOReference.get()
+            .getMetadata())
+                .containsEntry(MetadataConstants.SYNC_EXECUTION, true)
+                .containsEntry("existing", "value");
+    }
+
+    @Test
+    void testExecuteWithAJobFactoryMarksTheJobAsASyncExecution() {
+        AtomicReference<JobParametersDTO> jobParametersDTOReference = new AtomicReference<>();
+
+        assertThatThrownBy(
+            () -> jobSyncExecutor.execute(
+                new JobParametersDTO("workflow-1", Map.of()),
+                jobParametersDTO -> {
+                    jobParametersDTOReference.set(jobParametersDTO);
+
+                    throw new IllegalStateException("job created");
+                },
+                false, taskExecutionCompleteEvent -> {}))
+                    .hasMessage("job created");
+
+        assertThat(jobParametersDTOReference.get()
+            .getMetadata()).containsEntry(MetadataConstants.SYNC_EXECUTION, true);
+    }
+
+    @Test
     void testTimedOutJobFailsWithAnErrorThatNamesTheJob() {
         long jobId = 707L;
 
@@ -408,6 +524,65 @@ class JobSyncExecutorTest {
             .hasMessage("Job 707 did not finish within 2000 milliseconds");
     }
 
+    @Test
+    void testTimedOutJobIsFailedEvenWhenTheFirstUpdateLosesToAConcurrentUpdate() {
+        long jobId = 717L;
+
+        stubStartedJob(jobId);
+
+        when(jobService.update(any(Job.class)))
+            .thenThrow(new OptimisticLockingFailureException("concurrent update"))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true, taskExecutionCompleteEvent -> {},
+            Duration.ofMillis(100)))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage("Job 717 did not finish within 100 milliseconds");
+    }
+
+    @Test
+    void testJobThatFinishesAsTheWaitTimesOutIsNotFailed() {
+        long jobId = 727L;
+
+        Job startedJob = new Job();
+
+        startedJob.setId(jobId);
+        startedJob.setStatus(Job.Status.STARTED);
+
+        Job completedJob = new Job();
+
+        completedJob.setId(jobId);
+        completedJob.setStatus(Job.Status.COMPLETED);
+
+        when(jobService.getJob(jobId)).thenReturn(startedJob, completedJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
+
+        Job job = jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100));
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+
+        verify(jobService, never()).update(any(Job.class));
+    }
+
+    @Test
+    void testInterruptedWaitKeepsTheInterruptFlag() {
+        long jobId = 737L;
+
+        stubStartedJob(jobId);
+
+        Thread.currentThread()
+            .interrupt();
+
+        try {
+            jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofSeconds(1));
+
+            assertThat(Thread.currentThread()
+                .isInterrupted()).isTrue();
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
     private void stubStartedJob(long jobId) {
         Job startedJob = new Job();
 
@@ -415,7 +590,7 @@ class JobSyncExecutorTest {
         startedJob.setStatus(Job.Status.STARTED);
 
         when(jobService.getJob(jobId)).thenReturn(startedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)

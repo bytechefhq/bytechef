@@ -79,8 +79,7 @@ flowchart LR
 Two consequences fall out of this. Work is **queued, not held on a request thread**, so a long task
 does not tie up a web worker - but a backlog shows up as queue depth rather than slow responses.
 And because each step is persisted before the next begins, a process that dies mid-run leaves a job
-that can be recovered rather than a half-finished one; see
-[Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery).
+whose completed steps are on record rather than lost.
 
 ## Scaling
 
@@ -166,11 +165,9 @@ covers the same boundary from your customers' point of view.
 
 ## What is watching it
 
-Health probes for liveness and readiness, metrics, logs and traces over OTLP, and a set of monitors
-that recover interrupted runs and purge expired history. See
-[Monitoring](/platform/use-bytechef/self-hosted/management/monitoring),
-[Observability](/platform/use-bytechef/self-hosted/management/observability), and
-[Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery).
+Health probes for liveness and readiness, and metrics, logs and traces over OTLP. See
+[Monitoring](/platform/use-bytechef/self-hosted/management/monitoring) and
+[Observability](/platform/use-bytechef/self-hosted/management/observability).
 
 ## Related reading
 

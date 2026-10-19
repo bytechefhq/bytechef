@@ -3,7 +3,7 @@ import DatePicker from '@/components/DatePicker/DatePicker';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
 import ApprovalForm from '@/shared/components/approval-form/ApprovalForm';
-import {CheckCircle2Icon, CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
+import {CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 
 import {useApprovalTaskDetail} from './hooks/useApprovalTaskDetail';
 
@@ -24,6 +24,7 @@ export default function ApprovalTaskDetail() {
     } = useApprovalTaskDetail();
 
     const isCompleted = approvalTask?.status === 'completed';
+    const isExpired = approvalTask?.status === 'expired';
 
     if (!approvalTask) {
         return (
@@ -57,6 +58,10 @@ export default function ApprovalTaskDetail() {
 
                     {approvalTask.status === 'completed' ? (
                         <p className="text-lg font-medium text-foreground">This approval task has been completed.</p>
+                    ) : approvalTask.status === 'expired' ? (
+                        <p className="text-lg font-medium text-foreground">
+                            This approval request has expired and can no longer be resolved.
+                        </p>
                     ) : approvalTask.jobResumeId ? (
                         <ApprovalForm
                             id={approvalTask.jobResumeId}
@@ -73,7 +78,7 @@ export default function ApprovalTaskDetail() {
                         <Label className="mb-2 block text-sm font-medium text-foreground">Status</Label>
 
                         <Select
-                            disabled={isCompleted}
+                            disabled={isCompleted || isExpired}
                             onValueChange={(value) => handleStatusChange(value as ApprovalTaskI['status'])}
                             value={approvalTask.status}
                         >
@@ -99,13 +104,6 @@ export default function ApprovalTaskDetail() {
                                     <div className="flex items-center gap-2">
                                         <ClockIcon className="size-4 text-blue-500" />
                                         In Progress
-                                    </div>
-                                </SelectItem>
-
-                                <SelectItem value="completed">
-                                    <div className="flex items-center gap-2">
-                                        <CheckCircle2Icon className="size-4 text-green-500" />
-                                        Completed
                                     </div>
                                 </SelectItem>
                             </SelectContent>

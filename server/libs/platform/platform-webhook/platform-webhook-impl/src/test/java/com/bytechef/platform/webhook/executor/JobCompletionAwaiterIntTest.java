@@ -30,9 +30,11 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepos
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.config.MemoryMessageBrokerConfiguration;
 import com.bytechef.message.broker.memory.config.MemoryMessageBrokerListenerRegistrarConfiguration;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.executor.config.JobCompletionAwaiterConfiguration;
@@ -40,6 +42,7 @@ import com.bytechef.platform.webhook.executor.config.SseStreamMessageBrokerConfi
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -126,6 +129,66 @@ class JobCompletionAwaiterIntTest {
 
         assertEquals(stoppedJob, awaitedJob);
         assertEquals(Job.Status.STOPPED, awaitedJob.getStatus());
+    }
+
+    @Test
+    void testWaitsThroughASuspendThatWaitsOnASubflow() throws Exception {
+        Job job = createJob(Job.Status.STARTED);
+        Job sentinelJob = createJob(Job.Status.STARTED);
+
+        long jobId = getJobId(job);
+
+        SseStreamBridgeRegistry.Registration registration = sseStreamBridgeRegistry.register(jobId, payload -> {});
+
+        CompletableFuture<Job> future = jobCompletionAwaiter.await(jobId, EVENT_AWAIT_TIMEOUT);
+        CompletableFuture<Job> sentinelFuture = jobCompletionAwaiter.await(getJobId(sentinelJob), EVENT_AWAIT_TIMEOUT);
+
+        job.setMetadata(
+            Map.of(MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.SUBFLOW_RESUME, true));
+        job.setStatus(Job.Status.STOPPED);
+
+        job = jobService.update(job);
+
+        sseStreamApplicationEventListener.onApplicationEvent(JobStatusApplicationEvent.suspended(jobId));
+
+        finishJob(sentinelJob, Job.Status.COMPLETED);
+
+        sentinelFuture.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS);
+
+        assertFalse(future.isDone());
+        assertFalse(
+            registration.completion()
+                .toCompletableFuture()
+                .isDone());
+
+        job.setMetadata(
+            Map.of(
+                MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.SUBFLOW_RESUME, true,
+                MetadataConstants.CONSUMED_JOB_RESUME_ID, "resume-1"));
+
+        finishJob(job, Job.Status.COMPLETED);
+
+        assertEquals(Job.Status.COMPLETED, future.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS)
+            .getStatus());
+
+        registration.completion()
+            .toCompletableFuture()
+            .get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void testKeepsWaitingWhenTheSubflowSuspendIsReadAfterTheJobWasResumed() throws Exception {
+        assertKeepsWaitingThroughASubflowSuspendReadAs(
+            Job.Status.STARTED, Map.of(MetadataConstants.SUBFLOW_RESUME, true));
+    }
+
+    @Test
+    void testKeepsWaitingWhenTheSubflowSuspendIsReadWhileItsResumeIsInFlight() throws Exception {
+        assertKeepsWaitingThroughASubflowSuspendReadAs(
+            Job.Status.STOPPED,
+            Map.of(
+                MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.SUBFLOW_RESUME, true,
+                MetadataConstants.CONSUMED_JOB_RESUME_ID, "resume-1"));
     }
 
     @Test
@@ -216,6 +279,42 @@ class JobCompletionAwaiterIntTest {
         assertTrue(elapsedNanos >= timeout.toNanos());
     }
 
+    private void assertKeepsWaitingThroughASubflowSuspendReadAs(Job.Status status, Map<String, ?> metadata)
+        throws Exception {
+
+        Job job = createJob(Job.Status.STARTED);
+        Job sentinelJob = createJob(Job.Status.STARTED);
+
+        long jobId = getJobId(job);
+
+        SseStreamBridgeRegistry.Registration registration = sseStreamBridgeRegistry.register(jobId, payload -> {});
+
+        CompletableFuture<Job> future = jobCompletionAwaiter.await(jobId, EVENT_AWAIT_TIMEOUT);
+        CompletableFuture<Job> sentinelFuture = jobCompletionAwaiter.await(getJobId(sentinelJob), EVENT_AWAIT_TIMEOUT);
+
+        job.setMetadata(metadata);
+        job.setStatus(status);
+
+        job = jobService.update(job);
+
+        sseStreamApplicationEventListener.onApplicationEvent(JobStatusApplicationEvent.suspended(jobId));
+
+        finishJob(sentinelJob, Job.Status.COMPLETED);
+
+        sentinelFuture.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS);
+
+        assertFalse(future.isDone());
+        assertFalse(
+            registration.completion()
+                .toCompletableFuture()
+                .isDone());
+
+        finishJob(job, Job.Status.COMPLETED);
+
+        assertEquals(Job.Status.COMPLETED, future.get(FUTURE_WAIT_SECONDS, TimeUnit.SECONDS)
+            .getStatus());
+    }
+
     private Job createJob(Job.Status status) {
         Job job = new Job();
 
@@ -252,8 +351,11 @@ class JobCompletionAwaiterIntTest {
         }
 
         @Bean
-        SseStreamApplicationEventListener sseStreamApplicationEventListener(MessageBroker messageBroker) {
-            return new SseStreamApplicationEventListener(messageBroker, mock(TaskExecutionService.class));
+        SseStreamApplicationEventListener sseStreamApplicationEventListener(
+            JobService jobService, MessageBroker messageBroker) {
+
+            return new SseStreamApplicationEventListener(
+                jobService, messageBroker, mock(TaskExecutionService.class), mock(TaskFileStorage.class));
         }
 
         @Bean

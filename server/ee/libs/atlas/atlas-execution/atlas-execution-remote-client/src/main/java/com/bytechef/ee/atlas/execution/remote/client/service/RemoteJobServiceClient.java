@@ -15,6 +15,8 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.LongConsumer;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +45,11 @@ public class RemoteJobServiceClient implements JobService {
                 .path(JOB_SERVICE + "/create")
                 .build(),
             new JobCreateRequest(jobParametersDTO, workflow), Job.class);
+    }
+
+    @Override
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow, LongConsumer jobCreatedCallback) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -78,7 +85,24 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public List<Long> getChildJobIds(long parentJobId) {
-        throw new UnsupportedOperationException();
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-child-job-ids/{parentJobId}")
+                .build(parentJobId),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Job> getStaleJobs(Job.Status status, java.time.Instant lastModifiedDateBefore) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-stale-jobs")
+                .queryParam("status", status.name())
+                .queryParam("lastModifiedDateBefore", lastModifiedDateBefore.toString())
+                .build(),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -119,6 +143,18 @@ public class RemoteJobServiceClient implements JobService {
                 .path(JOB_SERVICE + "/resume-to-status-started/{id}")
                 .build(id),
             null, Job.class);
+    }
+
+    @Override
+    public boolean tryClaimResume(Job job) {
+        Boolean claimed = loadBalancedRestClient.put(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/try-claim-resume")
+                .build(),
+            job, Boolean.class);
+
+        return Boolean.TRUE.equals(claimed);
     }
 
     @Override

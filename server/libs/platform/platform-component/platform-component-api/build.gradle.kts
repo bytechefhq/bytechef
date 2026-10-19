@@ -8,6 +8,7 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-core")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:core:commons:commons-util"))

@@ -32,6 +32,11 @@ public class RemoteNotificationServiceClient implements NotificationService {
     }
 
     @Override
+    public Notification getNotification(long notificationId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Notification> getNotifications() {
         throw new UnsupportedOperationException();
     }

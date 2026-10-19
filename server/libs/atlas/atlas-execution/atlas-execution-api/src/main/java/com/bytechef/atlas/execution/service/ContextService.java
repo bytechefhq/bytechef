@@ -18,11 +18,16 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.file.storage.domain.FileEntry;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface ContextService {
+
+    void deleteStackContexts(long stackId, Context.Classname classname);
+
+    List<FileEntry> getStackFileEntries(long stackId, Context.Classname classname);
 
     FileEntry peek(long stackId, Context.Classname classname);
 

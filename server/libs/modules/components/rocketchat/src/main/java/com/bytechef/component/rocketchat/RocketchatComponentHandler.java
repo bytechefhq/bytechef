@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.rocketchat.action.RocketchatCreateChannelAction;
 import com.bytechef.component.rocketchat.action.RocketchatSendChannelMessageAction;
 import com.bytechef.component.rocketchat.action.RocketchatSendDirectMessageAction;
+import com.bytechef.component.rocketchat.cluster.RocketchatApprovalChannel;
 import com.bytechef.component.rocketchat.connection.RocketchatConnection;
 import com.bytechef.component.rocketchat.trigger.RocketchatNewMessageTrigger;
 import com.google.auto.service.AutoService;
@@ -51,6 +52,7 @@ public class RocketchatComponentHandler implements ComponentHandler {
             RocketchatCreateChannelAction.ACTION_DEFINITION)
         .triggers(RocketchatNewMessageTrigger.TRIGGER_DEFINITION)
         .clusterElements(
+            RocketchatApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(RocketchatSendDirectMessageAction.ACTION_DEFINITION),
             tool(RocketchatSendChannelMessageAction.ACTION_DEFINITION),
             tool(RocketchatCreateChannelAction.ACTION_DEFINITION))

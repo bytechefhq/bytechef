@@ -16,16 +16,15 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
-import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction.CLAUDE_CODE_TOOLS;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeToolFunction;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import java.nio.file.Path;
-import org.jspecify.annotations.Nullable;
 import org.springaicommunity.agent.tools.GlobTool;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
@@ -36,20 +35,19 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsGlobTool {
 
-    public static final ClusterElementDefinition<ClaudeCodeToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ClaudeCodeToolFunction>clusterElement("globTool")
+    public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
+        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("globTool")
             .title("Glob Tool")
             .description("Fast file pattern matching tool for finding files by name patterns with glob syntax.")
-            .type(CLAUDE_CODE_TOOLS)
+            .type(TOOLS)
             .object(() -> AiAgentUtilsGlobTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters, Path workingDirectory,
-        @Nullable ChatModel chatModel) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         GlobTool globTool = GlobTool.builder()
-            .workingDirectory(workingDirectory)
+            .workingDirectory(Path.of(System.getProperty("user.dir")))
             .build();
 
         return ToolCallbackProvider.from(ToolCallbacks.from(globTool));
