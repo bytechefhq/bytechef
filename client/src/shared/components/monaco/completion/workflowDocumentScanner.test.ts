@@ -272,7 +272,12 @@ describe('scanWorkflowDocument parameter values', () => {
             '{"tasks": [{"name": "rows", "type": "a/v1/b", "parameters": {"id": "x", "count": 2, "on": true, "expr": "${t.a}", "nested": {"k": 1}, "": 1}}]}';
         const position = scanWorkflowDocument(source, source.indexOf('"": 1') + 1, 'json');
 
-        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({count: 2, id: 'x', on: true});
+        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({
+            count: 2,
+            id: 'x',
+            nested: {k: 1},
+            on: true,
+        });
         expect(position?.keysOf(['tasks', '0', 'parameters'])).toEqual(['id', 'count', 'on', 'expr', 'nested']);
         expect(position?.nameOf(['tasks', '0'])).toBe('rows');
     });
@@ -303,5 +308,30 @@ describe('scanWorkflowDocument string positions', () => {
         expect(scanWorkflowDocument(quoted, quoted.length, 'yaml')?.stringQuote).toBe("'");
         expect(scanWorkflowDocument(plain, plain.length, 'yaml')).toMatchObject({stringStart: plain.indexOf('ht')});
         expect(scanWorkflowDocument(plain, plain.length, 'yaml')?.stringQuote).toBeUndefined();
+    });
+});
+
+describe('scanWorkflowDocument bare JSON values', () => {
+    it('reports the key and start of a value being typed without quotes', () => {
+        const source = '{"tasks": [{"parameters": {"count": tr}}]}';
+        const cursor = source.indexOf('tr') + 2;
+
+        expect(scanWorkflowDocument(source, cursor, 'json')?.bareValue).toEqual({
+            path: ['tasks', '0', 'parameters', 'count'],
+            start: source.indexOf('tr'),
+        });
+    });
+
+    it('reports an empty bare value right after the colon and nothing inside a string', () => {
+        const empty = '{"tasks": [{"parameters": {"count": }}]}';
+        const quoted = '{"tasks": [{"parameters": {"count": "x"}}]}';
+
+        expect(scanWorkflowDocument(empty, empty.indexOf(': }') + 2, 'json')?.bareValue?.path).toEqual([
+            'tasks',
+            '0',
+            'parameters',
+            'count',
+        ]);
+        expect(scanWorkflowDocument(quoted, quoted.indexOf('x'), 'json')?.bareValue).toBeUndefined();
     });
 });

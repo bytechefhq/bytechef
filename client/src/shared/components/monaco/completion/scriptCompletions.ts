@@ -44,6 +44,7 @@ export type CompletionItemDraftType = {
 export interface ScriptCompletionRequestI {
     context: ScriptCompletionContextI | CustomComponentCompletionContextI | CodeWorkflowCompletionContextI;
     cursorOffset: number;
+    inline?: boolean;
     source: string;
 }
 
@@ -474,7 +475,7 @@ async function memberPathItems(
     }
 
     if (segments.length === 0) {
-        return context.language === 'javascript' ? [] : bareRootItems(scope);
+        return context.language === 'javascript' && !request.inline ? [] : bareRootItems(scope);
     }
 
     if (root === scope.contextName) {
