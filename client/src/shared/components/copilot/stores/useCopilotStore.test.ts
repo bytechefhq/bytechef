@@ -15,6 +15,51 @@ function contentOf(message: ThreadMessageLike | undefined): string {
 describe('useCopilotStore', () => {
     afterEach(resetStore);
 
+    describe('message ids', () => {
+        it('should give an added message without an id a stable id', () => {
+            const store = useCopilotStore.getState();
+
+            store.addMessage({content: 'u1', role: 'user'});
+            store.addMessage({content: 'u2', role: 'user'});
+
+            const {messages} = useCopilotStore.getState();
+
+            expect(messages[0]?.id).toEqual(expect.any(String));
+            expect(messages[1]?.id).toEqual(expect.any(String));
+            expect(messages[0]?.id).not.toBe(messages[1]?.id);
+        });
+
+        it('should keep the id an added message already has', () => {
+            useCopilotStore.getState().addMessage({content: 'u1', id: 'user-1', role: 'user'});
+
+            expect(useCopilotStore.getState().messages[0]?.id).toBe('user-1');
+        });
+
+        it('should give a streamed assistant message an id and keep it while streaming', () => {
+            const store = useCopilotStore.getState();
+
+            store.addMessage({content: 'u1', role: 'user'});
+            store.appendToLastAssistantMessage('a');
+
+            const streamedMessageId = useCopilotStore.getState().messages[1]?.id;
+
+            store.appendToLastAssistantMessage('ab');
+
+            expect(streamedMessageId).toEqual(expect.any(String));
+            expect(useCopilotStore.getState().messages[1]?.id).toBe(streamedMessageId);
+        });
+
+        it('should keep the id of an edited user message', () => {
+            const store = useCopilotStore.getState();
+
+            store.addMessage({content: 'u1', id: 'user-1', role: 'user'});
+            store.appendToLastAssistantMessage('a1');
+            store.editUserMessage(0, 'u1, edited');
+
+            expect(useCopilotStore.getState().messages).toEqual([{content: 'u1, edited', id: 'user-1', role: 'user'}]);
+        });
+    });
+
     describe('appendToLastAssistantMessage', () => {
         it('should create a new assistant message when the turn has none yet', () => {
             const store = useCopilotStore.getState();
