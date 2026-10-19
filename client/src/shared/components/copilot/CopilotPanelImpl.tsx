@@ -5,7 +5,8 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {aiChatDataComponents} from '@/shared/components/ai-chat/messages/aiChatDataComponents';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
-import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBoundary';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
@@ -16,11 +17,11 @@ import {
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
 import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
-import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
 import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -94,6 +95,21 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
     });
 
     const hasEnabledProvider = defaultModelData?.aiDefaultModel != null;
+
+    const catalogEnvironment = context?.environmentId ?? currentEnvironmentId;
+
+    const {data: providerCatalogData} = useAiProviderCatalogQuery(
+        {environment: String(catalogEnvironment)},
+        {enabled: catalogEnvironment >= 0}
+    );
+
+    const displayedModel = useMemo(() => {
+        if (selectedLlmProvider != null && selectedLlmModel != null) {
+            return {model: selectedLlmModel, provider: selectedLlmProvider};
+        }
+
+        return findAvailableRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
+    }, [currentWorkspaceId, providerCatalogData, selectedLlmModel, selectedLlmProvider]);
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -225,14 +241,8 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
                                             writeLastUsedModel(currentWorkspaceId, provider, model);
                                             setSelectedLlm(provider, model);
                                         }}
-                                        selectedModel={
-                                            selectedLlmModel ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
-                                        }
-                                        selectedProvider={
-                                            selectedLlmProvider ??
-                                            readLastUsedModel(currentWorkspaceId)?.provider ??
-                                            null
-                                        }
+                                        selectedModel={displayedModel?.model ?? null}
+                                        selectedProvider={displayedModel?.provider ?? null}
                                     />
                                 ) : null
                             }
