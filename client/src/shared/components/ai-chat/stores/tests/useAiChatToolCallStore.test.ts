@@ -102,6 +102,18 @@ describe('aiChatToolCallStore', () => {
     });
 
     describe('cross-chat cleanup', () => {
+        it('removeFromMessageIndex drops the named chat entries from the message index on', () => {
+            aiChatToolCallStore.getState().startToolCall('call-A1', 'research', 1, 'conv-A');
+            aiChatToolCallStore.getState().startToolCall('call-A3', 'research', 3, 'conv-A');
+            aiChatToolCallStore.getState().startToolCall('call-A5', 'research', 5, 'conv-A');
+            aiChatToolCallStore.getState().startToolCall('call-B5', 'research', 5, 'conv-B');
+
+            aiChatToolCallStore.getState().removeFromMessageIndex('conv-A', 3);
+
+            expect(aiChatToolCallStore.getState().order).toEqual(['call-A1', 'call-B5']);
+            expect(Object.keys(aiChatToolCallStore.getState().toolCalls)).toEqual(['call-A1', 'call-B5']);
+        });
+
         it('resetForChat drops only entries belonging to the named chat', () => {
             aiChatToolCallStore.getState().startToolCall('call-A1', 'research', 0, 'conv-A');
             aiChatToolCallStore.getState().startToolCall('call-A2', 'research', 0, 'conv-A');
