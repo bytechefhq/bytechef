@@ -32,6 +32,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.SchemaUtils.JsonSchemaPropertyFactory;
 import com.bytechef.platform.util.SchemaUtils.SchemaPropertyFactory;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -127,21 +128,28 @@ public record PropertyFactory() implements SchemaPropertyFactory {
     }
 
     private ModifiableArrayProperty getArrayProperty(String name, Object value) {
-        ModifiableArrayProperty arrayProperty;
+        ModifiableArrayProperty arrayProperty = ComponentDsl.array(name);
+
         Class<?> valueClass = value.getClass();
+        Object firstItem = null;
 
         if (valueClass.isArray()) {
-            arrayProperty = ComponentDsl.array(name);
+            if (Array.getLength(value) > 0) {
+                firstItem = Array.get(value, 0);
+            }
         } else {
-            arrayProperty = ComponentDsl.array(name);
-
             List<?> list = (List<?>) value;
 
             if (!list.isEmpty()) {
-                arrayProperty.items(
-                    (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                        null, list.getFirst(), PROPERTY_FACTORY));
+                firstItem = list.getFirst();
             }
+        }
+
+        if (firstItem != null) {
+            ModifiableValueProperty<?, ?> itemProperty =
+                (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(null, firstItem, PROPERTY_FACTORY);
+
+            arrayProperty.items(itemProperty);
         }
 
         return arrayProperty;

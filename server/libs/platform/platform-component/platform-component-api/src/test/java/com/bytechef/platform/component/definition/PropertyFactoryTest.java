@@ -90,6 +90,19 @@ class PropertyFactoryTest {
     }
 
     @Test
+    void testToOutputTypesTopLevelStringArrayItems() {
+        OutputResponse outputResponse = SchemaUtils.toOutput(
+            new String[] {
+                "first", "second"
+            }, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+
+        assertThat(outputResponse.outputSchema()).isInstanceOf(ArrayProperty.class);
+        assertThat(((ArrayProperty) outputResponse.outputSchema()).getItems())
+            .singleElement()
+            .isInstanceOf(StringProperty.class);
+    }
+
+    @Test
     void testToOutputKeepsJsonBodyAsObject() {
         OutputResponse outputResponse = SchemaUtils.toOutput(
             Map.of("method", "POST", "body", Map.of("invoiceId", "INV-1", "name", "Invoice")),

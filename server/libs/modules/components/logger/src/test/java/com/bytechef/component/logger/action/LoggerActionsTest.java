@@ -106,4 +106,35 @@ class LoggerActionsTest {
 
         assertEquals(List.of("Hello"), messages);
     }
+
+    @Test
+    void testPerformInfoLogsStringArrayElements() {
+        when(inputParameters.get(TEXT)).thenReturn(new String[] {
+            "first", "second"
+        });
+
+        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
+
+        assertEquals(List.of("[first, second]"), messages);
+    }
+
+    @Test
+    void testPerformInfoLogsPrimitiveArrayElements() {
+        when(inputParameters.get(TEXT)).thenReturn(new int[] {
+            1, 2
+        });
+
+        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
+
+        assertEquals(List.of("[1, 2]"), messages);
+    }
+
+    @Test
+    void testPerformInfoLogsListElements() {
+        when(inputParameters.get(TEXT)).thenReturn(List.of("first", "second"));
+
+        LoggerInfoAction.perform(inputParameters, connectionParameters, actionContext);
+
+        assertEquals(List.of("[first, second]"), messages);
+    }
 }
