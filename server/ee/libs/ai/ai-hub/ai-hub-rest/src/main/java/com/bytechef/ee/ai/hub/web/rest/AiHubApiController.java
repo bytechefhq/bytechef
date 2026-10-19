@@ -25,6 +25,7 @@ import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,6 +45,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -110,6 +113,8 @@ public class AiHubApiController {
     @Validated
     @PostMapping(value = "/ai/chat/ai_hub")
     public SseEmitter chat(@NonNull @RequestBody() AgUiParameters agUiParameters) {
+        rejectConnectedUser();
+
         long userId = userService.getCurrentUser()
             .getId();
 
@@ -149,6 +154,8 @@ public class AiHubApiController {
      */
     @GetMapping(value = "/ai/chat/ai_hub/{threadId}/attach")
     public SseEmitter attach(@PathVariable("threadId") String threadId) {
+        rejectConnectedUser();
+
         long userId = userService.getCurrentUser()
             .getId();
 
@@ -204,6 +211,14 @@ public class AiHubApiController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", "An unexpected error occurred while dispatching the agent"));
+    }
+
+    private static void rejectConnectedUser() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext.getAuthentication() instanceof ConnectedUserAuthentication) {
+            throw new AccessDeniedException("Connected users cannot use the AI Hub");
+        }
     }
 
     /**

@@ -43,11 +43,13 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -59,6 +61,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
@@ -92,6 +96,11 @@ class AiHubApiControllerTest {
     private final UserService userService = mock(UserService.class);
 
     private AiHubApiController controller;
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -456,6 +465,43 @@ class AiHubApiControllerTest {
     }
 
     @Test
+    void testTurnFromAConnectedUserIs403JsonBeforeAnyLookup() throws Exception {
+        authenticateConnectedUser();
+
+        mockMvc().perform(
+            post("/internal/ai/chat/ai_hub")
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(chatRequestBody("{\"mode\":\"BUILD\",\"workspaceId\":" + WORKSPACE_ID + "}")))
+            .andExpect(status().isForbidden())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("Access denied"));
+
+        verify(userService, never()).getCurrentUser();
+        verify(chatService, never()).findByThreadId(any());
+        verify(chatService, never()).create(anyLong(), anyLong(), anyInt(), any());
+        verify(buildAgent, never()).runAgent(any(RunAgentParameters.class), any(AgentSubscriber.class));
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
+    void testAttachFromAConnectedUserIs403JsonBeforeAnyLookup() throws Exception {
+        authenticateConnectedUser();
+
+        inFlightRunRegistry.tryStart(THREAD_ID, "run-1");
+
+        mockMvc().perform(
+            get("/internal/ai/chat/ai_hub/" + THREAD_ID + "/attach")
+                .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isForbidden())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").value("Access denied"));
+
+        verify(userService, never()).getCurrentUser();
+        verify(chatService, never()).findByThreadIdViewable(any(), anyLong());
+    }
+
+    @Test
     void testUnexpectedFailureOverHttpUnderEventStreamAcceptIs500Json() throws Exception {
         when(chatService.findByThreadId(THREAD_ID)).thenThrow(new IllegalStateException("database down"));
 
@@ -528,6 +574,14 @@ class AiHubApiControllerTest {
             .thenReturn(Optional.of(chat(OWNER_USER_ID, WORKSPACE_ID)));
 
         assertStatus(() -> controller.attach(THREAD_ID), HttpStatus.NOT_FOUND);
+    }
+
+    private static void authenticateConnectedUser() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(TestConnectedUserAuthentication.of("someone@localhost.com"));
+
+        SecurityContextHolder.setContext(securityContext);
     }
 
     private MockMvc mockMvc() {
