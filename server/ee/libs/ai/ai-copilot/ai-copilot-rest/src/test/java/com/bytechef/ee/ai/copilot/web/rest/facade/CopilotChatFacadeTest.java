@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -190,6 +191,35 @@ class CopilotChatFacadeTest {
 
         assertThat(colonLoginScope.split(":")).hasSize(4);
         assertThat(colonLoginScope + ":" + "y").isNotEqualTo(conversationScope(plainLoginParameters) + ":" + "x:y");
+    }
+
+    @Test
+    void testChatRejectsAConnectedUser() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new ConnectedUserAuthenticationToken("someone@localhost.com"));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        UserService userService = mock(UserService.class);
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(7L);
+        when(userService.fetchUserByLogin("someone@localhost.com")).thenReturn(Optional.of(user));
+
+        LocalAgent agent = localAgent("workflow_editor_ask");
+
+        CopilotChatFacadeImpl facadeWithUsers = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.empty(), Optional.empty(), Optional.of(userService),
+            Optional.empty());
+
+        AgUiParameters parameters = agUiParameters("ASK");
+
+        assertThatThrownBy(() -> facadeWithUsers.chat("workflow_editor", parameters))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(agUiService, never()).runAgent(any(), any());
+        verify(userService, never()).fetchUserByLogin(any());
     }
 
     @Test
@@ -799,6 +829,29 @@ class CopilotChatFacadeTest {
         verify(permissionService).hasWorkspaceRole(5L, "EDITOR");
         verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
         verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    private static final class ConnectedUserAuthenticationToken extends UsernamePasswordAuthenticationToken
+        implements ConnectedUserAuthentication {
+
+        private ConnectedUserAuthenticationToken(String externalUserId) {
+            super(externalUserId, "", List.of());
+        }
+
+        @Override
+        public long connectedUserId() {
+            return 1L;
+        }
+
+        @Override
+        public String externalUserId() {
+            return (String) getPrincipal();
+        }
+
+        @Override
+        public long environmentId() {
+            return 0L;
+        }
     }
 
     private static String conversationScope(AgUiParameters parameters) {
