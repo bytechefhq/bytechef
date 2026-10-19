@@ -75,6 +75,24 @@ describe('WorkflowExecutionsTabsPanel', () => {
         expect(screen.queryByTestId('logs-content')).not.toBeInTheDocument();
     });
 
+    it('does not read the logs when the run details are hidden', () => {
+        logsContentMock.mockClear();
+
+        renderPanel({activeTab: 'logs', detailsHidden: true, job, selectedItem: taskExecution});
+
+        expect(screen.queryByTestId('logs-content')).not.toBeInTheDocument();
+        expect(logsContentMock).not.toHaveBeenCalled();
+        expect(screen.getByText(/do not have permission to see the inputs, outputs and logs/)).toBeInTheDocument();
+    });
+
+    it('shows no output and no expand control when the run details are hidden', () => {
+        renderPanel({activeTab: 'output', detailsHidden: true, job, selectedItem: taskExecution});
+
+        expect(screen.queryByTestId('json-view')).not.toBeInTheDocument();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.getByText(/do not have permission to see the inputs, outputs and logs/)).toBeInTheDocument();
+    });
+
     it('widens the expanded output dialog past the default dialog width', () => {
         renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution});
 
