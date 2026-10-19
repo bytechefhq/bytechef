@@ -1,11 +1,14 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
+import {CONNECTIONS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Connection} from '@/shared/middleware/automation/configuration';
@@ -32,6 +35,10 @@ export const Connections = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const [searchParams] = useSearchParams();
+
+    const {captureEmptyStateAction} = useAnalytics();
+
+    const environmentScopeNote = useEnvironmentScopeNote('Connections');
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
@@ -76,6 +83,8 @@ export const Connections = () => {
 
     const componentRowsAreLoading = componentsLoading || connectionsIsLoading || unfilteredConnectionsIsLoading;
 
+    const isFirstRun = !hasActiveFilter && connections?.length === 0;
+
     return (
         <LayoutContainer
             header={
@@ -109,9 +118,10 @@ export const Connections = () => {
                                 tags={tags}
                             />
                         ) : (
-                            ''
+                            isFirstRun && 'Connections'
                         )
                     }
+                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -126,6 +136,7 @@ export const Connections = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
+            leftSidebarOpen={isFirstRun ? false : undefined}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[connectionsError, tagsError, unfilteredConnectionsError]} loading={isAnyLoading}>
@@ -141,8 +152,8 @@ export const Connections = () => {
                 ) : hasActiveFilter ? (
                     <EmptyFilterResult entityName="connections" entityTitle="Connections" />
                 ) : (
-                    <EmptyList
-                        button={
+                    <EmptyState
+                        actions={
                             componentDefinitions && (
                                 <ConnectionDialog
                                     componentDefinitions={componentDefinitions}
@@ -153,15 +164,22 @@ export const Connections = () => {
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                     connectionsQueryKey={ConnectionKeys.connections}
-                                    triggerNode={<Button label="Create Connection" />}
+                                    triggerNode={
+                                        <Button
+                                            label="Create Connection"
+                                            onClick={() => captureEmptyStateAction('connections', 'create_connection')}
+                                        />
+                                    }
                                     useCreateConnectionMutation={useCreateConnectionMutation}
                                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                                 />
                             )
                         }
-                        icon={<Link2Icon className="size-24 text-gray-300" />}
-                        message="You do not have any Connections created yet."
-                        title="No Connections"
+                        description="A connection stores the credentials an app needs, like an API key or an OAuth sign-in, so workflow steps can act for you. You can also create one from a step while building a workflow."
+                        docsLink={{href: CONNECTIONS_DOCUMENTATION_URL, label: 'How connections work'}}
+                        icon={<Link2Icon />}
+                        note={environmentScopeNote}
+                        title="Connect your first app"
                     />
                 )}
             </PageLoader>
