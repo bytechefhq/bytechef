@@ -19,8 +19,10 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade;
+import com.bytechef.platform.configuration.web.rest.model.ComponentActionDynamicPropertiesRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import java.util.List;
+import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,26 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
             CollectionUtils.map(
                 workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
                     workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, propertyName,
+                    lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
+                property -> conversionService.convert(property, PropertyModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<PropertyModel>> getWorkflowNodeComponentActionDynamicProperties(
+        String workflowId, String workflowNodeName, String propertyName, Long environmentId,
+        ComponentActionDynamicPropertiesRequestModel componentActionDynamicPropertiesRequestModel) {
+
+        List<String> lookupDependsOnPaths = componentActionDynamicPropertiesRequestModel.getLookupDependsOnPaths();
+        Map<String, Object> parameters = componentActionDynamicPropertiesRequestModel.getParameters();
+
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
+                    workflowId, workflowNodeName, componentActionDynamicPropertiesRequestModel.getComponentName(),
+                    componentActionDynamicPropertiesRequestModel.getComponentVersion(),
+                    componentActionDynamicPropertiesRequestModel.getActionName(), propertyName,
+                    componentActionDynamicPropertiesRequestModel.getConnectionKey(),
+                    parameters == null ? Map.of() : parameters,
                     lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
