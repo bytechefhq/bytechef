@@ -106,6 +106,10 @@ While `PENDING_DELETION` (and, for the request-path guards, `PURGED` too):
 - Registration's duplicate-email check consults `tenant_deletion` as well as live tenants, so an address cannot
   re-register during the grace period and end up owning two tenants after a support cancellation (my call).
 
+`OneTimeSchedulerJob` and `DynamicWebhookTriggerRefreshJob` carry no tenant id, so they are not guarded at runtime;
+they are cancelled during request teardown instead (disabling deployments cancels dynamic-webhook refresh, request
+step 5 cancels one-time tasks, and the scheduler sweep removes leftovers).
+
 ### Purge (scheduled, after the grace period)
 
 A platform-coordinator sweep picks up rows whose grace period has elapsed:
@@ -125,6 +129,10 @@ A platform-coordinator sweep picks up rows whose grace period has elapsed:
 6. Delete the tenant's users' registration rows in the public schema, unless the login still belongs to another
    tenant.
 7. Mark the row `PURGED`. Keep it forever as the tombstone.
+
+Before any step runs, the sweep claims the row by setting `purge_claimed_date` to now. A claim older than 1 hour (a
+chosen value) can be reclaimed by another coordinator, which is how a crashed purge resumes. The claim is also what
+keeps two coordinators from purging the same tenant at once.
 
 Purge steps are idempotent and rerun until the row is marked purged, so a crashed purge resumes on the next sweep.
 
@@ -202,7 +210,6 @@ refresh jobs live on a separate SPI, `ConnectionRefreshScheduler` (Quartz and AW
 - Where the single request-path filter sits in the security chain, and the exact dispatch points for webhooks and
   scheduled executions. `MultiTenantInternalFilter` throws when a session has no tenant on `/api/internal` and
   `/graphql`, so the deletion request endpoint must sit on a path that filter covers.
-- Whether the sweep holds a distributed lock (one coordinator purges a tenant at a time).
 
 ## Found along the way (out of scope)
 
