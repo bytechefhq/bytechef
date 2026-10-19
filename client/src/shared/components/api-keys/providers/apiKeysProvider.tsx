@@ -12,7 +12,15 @@ export interface SimpleMutationProps {
     onError?: (error: Error) => void;
 }
 
+export interface ApiKeysPermissionsI {
+    canCreate: boolean;
+    canManage: boolean;
+    canView: boolean;
+    loading: boolean;
+}
+
 export interface ApiKeysProviderStateI {
+    permissions?: ApiKeysPermissionsI;
     useApiKeysQuery: () => UseQueryResult<ApiKey[], Error>;
     useCreateApiKeyMutation: (props?: CreateApiKeyMutationProps) => UseMutationResult<unknown, Error>;
     useDeleteApiKeyMutation: (props?: SimpleMutationProps) => UseMutationResult<unknown, Error>;

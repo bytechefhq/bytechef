@@ -5,6 +5,7 @@ import ApiKeyDeleteDialog from '@/shared/components/api-keys/components/ApiKeyDe
 import ApiKeyDialog from '@/shared/components/api-keys/components/ApiKeyDialog';
 import ApiKeyTable from '@/shared/components/api-keys/components/ApiKeyTable';
 import useApiKeys from '@/shared/components/api-keys/hooks/useApiKeys';
+import {useApiKeysProvider} from '@/shared/components/api-keys/providers/apiKeysProvider';
 import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -22,8 +23,14 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
 
     const {apiKeys, apiKeysError, apiKeysLoading} = useApiKeys();
 
+    const {permissions} = useApiKeysProvider();
+
+    const canCreate = permissions?.canCreate ?? true;
+    const canManage = permissions?.canManage ?? true;
+    const canView = permissions?.canView ?? true;
+
     return (
-        <PageLoader errors={[apiKeysError]} loading={apiKeysLoading}>
+        <PageLoader errors={[apiKeysError]} loading={apiKeysLoading || !!permissions?.loading}>
             <LayoutContainer
                 header={
                     <Header
@@ -31,20 +38,30 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                         description={description}
                         position="main"
                         right={
-                            apiKeys && apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
+                            canCreate &&
+                            apiKeys &&
+                            apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
                         }
                         title={title}
                     />
                 }
                 leftSidebarOpen={false}
             >
-                {apiKeys && apiKeys.length > 0 ? (
-                    <ApiKeyTable apiKeys={apiKeys} />
+                {!canView ? (
+                    <EmptyList
+                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="Only workspace editors can create and manage API keys."
+                        title="No Access"
+                    />
+                ) : apiKeys && apiKeys.length > 0 ? (
+                    <ApiKeyTable apiKeys={apiKeys} canManage={canManage} />
                 ) : (
                     <EmptyList
-                        button={<Button onClick={() => setShowEditDialog(true)}>New API Key</Button>}
+                        button={
+                            canCreate ? <Button onClick={() => setShowEditDialog(true)}>New API Key</Button> : undefined
+                        }
                         icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new API key."
+                        message={canCreate ? 'Get started by creating a new API key.' : undefined}
                         title="No API Keys"
                     />
                 )}
