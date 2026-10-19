@@ -334,3 +334,84 @@ PLAYWRIGHT_LIVE=1 PLAYWRIGHT_MCP_SECRET_KEY=<secret> npx playwright test tests/c
 `copilotRegressions.spec.ts` pins bugs that unit tests missed: the editor's connection issue clearing after a
 Copilot binding (C-H6), the Build/Ask mode following the conversation (F6), editing and reloading messages, the
 model picker's remembered model, coded run errors (E1) and the no-AI-provider empty state.
+
+## AI Hub Specs (#6377)
+
+The AI Hub specs live in `tests/ai-hub/`. Like the Copilot specs, they come in a deterministic kind and a live kind.
+
+### Deterministic specs
+
+Every file except `aiHubLive.spec.ts` runs against any local server with the hub turned on, with no AI model
+configured. The hub's turns never reach a model:
+
+- **`utils/agUiStreamStub.ts`** serves the hub's turn endpoint (`AI_HUB_CHAT_URL`,
+  `POST /api/platform/internal/ai/chat/ai_hub`). On top of what the Copilot specs use, `stubAgUiRun` accepts the
+  browser context (every tab of a test shares the stub), `rejectedRun(status, body)` answers with a plain status, such
+  as the hub's `409 {"error":"TURN_IN_FLIGHT"}`, and a turn may hold a gate from `createAgUiGate()`. A gated turn is
+  streamed through a local server, so the events before the gate reach the page while the turn stays open until the
+  spec calls `release()`; that is how a spec sees a tool that is still running, presses Stop, or sends from a second
+  tab mid-turn. `toolCallStarted` and `toolCallResult` split a tool call around such a gate.
+- **`utils/aiHubUtils.ts`** turns the hub on by patching `/actuator/info` (`overrideAiApplicationInfo`, also used to
+  turn it off), stubs the model catalog, and answers `generateAiHubChatTitle` with a fixed title instead of a model
+  (`prepareAiHub`). It creates and deletes chats, workflows and projects through the API, builds the
+  `openWorkflowTab` and approval results the server's tools return, serves the approval continuation on the attach
+  endpoint (`stubAiHubAttach`), and records every toast (`recordToasts`) and the hub's retry state
+  (`recordZustandDevtoolsStates`, which reads the stores through the Redux DevTools hook of a development build).
+- **`fixtures/aiHubChats.ts`** (`aiHubChatsTest`) deletes the chats a test's page created.
+- **`pages/aiHubPage.ts`** is the hub page object (composer, Build switch, messages, edit and refresh, chats sidebar,
+  workflow tabs, toasts).
+
+Specs that need a workflow tab use real projects and workflows from the project fixtures; the stubbed tool results
+point at them, so the embedded editor loads real data. No spec depends on an id already in the database.
+
+### Live specs
+
+`aiHubLive.spec.ts` is tagged `@live` and skips unless `PLAYWRIGHT_LIVE=1`. It needs a server with
+`bytechef.ai.hub.enabled=true`, `bytechef.ai.copilot.enabled=true` and a configured AI model, and drives sections 2,
+3, 5, 6, 7 and 8 of #6377 end to end. The parity test (section 8) also needs `PLAYWRIGHT_MCP_SECRET_KEY` (and
+`PLAYWRIGHT_MCP_BEARER_TOKEN` when the MCP requires one). The approval tests skip when the workspace already holds a
+rule for the tool they gate.
+
+Section 9 needs a server restart per setting, so the configuration test asserts the state of the run it is given:
+
+| Variable                | Purpose                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PLAYWRIGHT_HUB_CONFIG` | `on` (hub and Copilot on), `hub-off` (hub off, Copilot on) or `copilot-off` (hub on, Copilot off). Runs the `@live AI Hub configuration` test, which checks the reported flags, the navigation, the `/automation` redirect, the hub endpoint, the Copilot button and the management MCP tools for that setting |
+
+```bash
+cd client
+
+# Deterministic
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 npx playwright test tests/ai-hub
+
+# Live, once, without retries
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 PLAYWRIGHT_LIVE=1 PLAYWRIGHT_MCP_SECRET_KEY=<secret> \
+  npx playwright test tests/ai-hub/aiHubLive.spec.ts --workers=1 --retries=0
+
+# Configuration, once per server setting
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 PLAYWRIGHT_LIVE=1 PLAYWRIGHT_HUB_CONFIG=hub-off \
+  npx playwright test tests/ai-hub/aiHubLive.spec.ts -g configuration --workers=1 --retries=0
+```
+
+### Scenario coverage
+
+| #6377 scenario                   | Spec                                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Entry and navigation          | `aiHubNavigation.spec.ts`; the page shell in `aiHub.spec.ts`                                                                    |
+| 2. Chats                         | `aiHubChats.spec.ts`; a model-made title and a real reload in `aiHubLive.spec.ts`                                               |
+| 3. Building a workflow           | `aiHubBuild.spec.ts`; a real build with two Slack connections in `aiHubLive.spec.ts`                                            |
+| 4. Workflow tab                  | `aiHubWorkflowTab.spec.ts`                                                                                                      |
+| 5. Projects and deployments      | `aiHubLive.spec.ts`                                                                                                             |
+| 6. Tool approvals                | `aiHubApprovals.spec.ts` (cards, decisions, expiry, settings page); the gate itself in `aiHubLive.spec.ts`                      |
+| 7. Modes and roles               | `aiHubModesAndRoles.spec.ts`; the second tab in `aiHubRegressions.spec.ts`; ASK and Stop on a real model in `aiHubLive.spec.ts` |
+| 8. Parity across the three doors | `aiHubLive.spec.ts`                                                                                                             |
+| 9. Configuration                 | `aiHubLive.spec.ts` with `PLAYWRIGHT_HUB_CONFIG`; the hub-off navigation also in `aiHubNavigation.spec.ts`                      |
+
+Not covered: another user's chat and a workspace VIEWER need a second user in the workspace, and switching
+workspaces needs a second workspace; the specs only log in as the admin.
+
+`aiHubRegressions.spec.ts` pins hub bugs that unit tests missed: the workflow tab's connection issue clearing after a
+binding (H6), the composer placeholder after an approval (H7), the in-flight notice in a second tab (H9/H12), a
+deleted workflow's tab (H11), reloaded approvals and pickers (H13), the model picker (H14), the running
+`buildWorkflow` row (P1), coded run errors and the no-provider state (E1/H16), editing and reloading by message id, the
+retry state for tool failures, an approval for a dropped call, and a workflow tab fetching its workflow once (F5).
