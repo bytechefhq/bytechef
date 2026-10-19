@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.configuration.web.rest.model.ComponentActionDynamicPropertiesRequestModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:46:07.669852+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-node-dynamic-properties", description = "The Platform Workflow Node Dynamic Properties Internal API")
 public interface WorkflowNodeDynamicPropertiesApi {
@@ -81,6 +82,56 @@ public interface WorkflowNodeDynamicPropertiesApi {
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
         @Parameter(name = "lookupDependsOnPaths", description = "The list of dependency paths.", in = ParameterIn.QUERY) @RequestParam(value = "lookupDependsOnPaths", required = false) @Nullable List<String> lookupDependsOnPaths
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" }, { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_WORKFLOW_NODE_COMPONENT_ACTION_DYNAMIC_PROPERTIES = "/workflows/{id}/workflow-nodes/{workflowNodeName}/component-actions/dynamic-properties/{propertyName}";
+    /**
+     * POST /workflows/{id}/workflow-nodes/{workflowNodeName}/component-actions/dynamic-properties/{propertyName} : Get dynamic properties for a property of a component action called from a script workflow node
+     * Get dynamic properties for a property of a component action called from a script workflow node.
+     *
+     * @param id The workflow id (required)
+     * @param workflowNodeName The name of a workflow&#39;s script task (E.g. script_1) (required)
+     * @param propertyName The name of a property. (required)
+     * @param environmentId The id of an environment. (required)
+     * @param componentActionDynamicPropertiesRequestModel  (required)
+     * @return The list of dynamic properties. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkflowNodeComponentActionDynamicProperties",
+        summary = "Get dynamic properties for a property of a component action called from a script workflow node",
+        description = "Get dynamic properties for a property of a component action called from a script workflow node.",
+        tags = { "workflow-node-dynamic-properties" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of dynamic properties.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = WorkflowNodeDynamicPropertiesApi.PATH_GET_WORKFLOW_NODE_COMPONENT_ACTION_DYNAMIC_PROPERTIES,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<List<PropertyModel>> getWorkflowNodeComponentActionDynamicProperties(
+        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow's script task (E.g. script_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "ComponentActionDynamicPropertiesRequestModel", description = "", required = true) @Valid @RequestBody ComponentActionDynamicPropertiesRequestModel componentActionDynamicPropertiesRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
