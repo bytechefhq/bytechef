@@ -18,6 +18,7 @@ package com.bytechef.security.config;
 
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,9 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,6 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -51,6 +56,105 @@ import org.springframework.web.cors.CorsConfigurationSource;
  * @author Ivica Cardic
  */
 class SecurityConfigurationIntTest {
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
+            ErrorDispatch.ErrorDispatchConfiguration.class
+        })
+    class ErrorDispatch {
+
+        @MockitoBean
+        private AuthenticationFailureHandler authenticationFailureHandler;
+
+        @MockitoBean
+        private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private PasswordEncoder passwordEncoder;
+
+        @MockitoBean
+        private RememberMeServices rememberMeServices;
+
+        @ParameterizedTest
+        @ValueSource(ints = {
+            400, 404, 406, 500
+        })
+        void testErrorDispatchSurfacesOriginalStatus(int statusCode) throws Exception {
+            mockMvc.perform(
+                get("/error")
+                    .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, statusCode)
+                    .requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/api/automation/internal/test")
+                    .with(request -> {
+                        request.setDispatcherType(DispatcherType.ERROR);
+
+                        return request;
+                    }))
+                .andExpect(status().is(statusCode));
+        }
+
+        @Test
+        void testDirectRequestToErrorPathIsForwardedToSpa() throws Exception {
+            mockMvc.perform(
+                get("/error")
+                    .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 406))
+                .andExpect(forwardedUrl("/index.html"));
+        }
+
+        @Test
+        void testRequestDispatchWithErrorAttributesIsDenied() throws Exception {
+            mockMvc.perform(
+                get("/other.html")
+                    .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 406))
+                .andExpect(status().isForbidden());
+        }
+
+        @TestConfiguration
+        static class ErrorDispatchConfiguration {
+
+            @Bean
+            List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SecurityConfigurerContributor> securityConfigurerContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SpaWebFilterContributor> spaWebFilterContributors() {
+                return List.of();
+            }
+
+            @RestController
+            static class ErrorPathController {
+
+                @GetMapping("/error")
+                ResponseEntity<Void> error(HttpServletRequest request) {
+                    Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+
+                    return ResponseEntity.status(statusCode)
+                        .build();
+                }
+
+                @GetMapping("/other.html")
+                String other() {
+                    return "other";
+                }
+            }
+        }
+    }
 
     @Nested
     @NestedTestConfiguration(OVERRIDE)
