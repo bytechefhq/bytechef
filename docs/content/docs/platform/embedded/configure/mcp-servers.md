@@ -102,6 +102,8 @@ Each server has a **Require authentication** setting, on for every newly created
 - **On** - the request's `Authorization` header must carry a ByteChef-signed JWT minted with the tenant's signing key: its `kid` header identifies the signing key and its `sub` claim carries the external user id. The JWT resolves the caller to a ConnectedUser, created on first use; a disabled ConnectedUser is rejected. A request without a valid JWT is rejected with `401` - an API key is not accepted.
 - **Off** - the endpoint serves the request using the URL secret alone. No credential is required, any token sent is ignored, and no ConnectedUser is resolved. A component tool that needs a connection, and every workflow tool, then fails with an error saying the tool requires a connected user and that authentication must be enabled on the MCP server.
 
+A disabled server answers a request carrying a valid JWT - or any request, when authentication is off - with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`, and no sign-in challenge. A request without a valid JWT to a server that requires one still gets `401`.
+
 Servers created before this setting existed default to off, so they keep working unchanged - except servers that already had **Enforce tool authorization** on, which default to on. The server rejects **Enforce tool authorization** without **Require authentication**, since an anonymous caller has no identity to authorize.
 
 ### When a tool needs the user's account
