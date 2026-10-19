@@ -56,6 +56,9 @@ public class WorkflowNodeTestOutput {
     @Column("sample_output")
     private MapWrapper sampleOutput;
 
+    @Column("sample_output_truncated")
+    private boolean sampleOutputTruncated;
+
     @Column("workflow_node_name")
     private String workflowNodeName;
 
@@ -151,6 +154,10 @@ public class WorkflowNodeTestOutput {
         return MapUtils.get(sampleOutput.getMap(), "sampleOutput");
     }
 
+    public boolean isSampleOutputTruncated() {
+        return sampleOutputTruncated;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -177,6 +184,10 @@ public class WorkflowNodeTestOutput {
 
     public void setSampleOutput(Object sampleOutput) {
         this.sampleOutput = new MapWrapper(Map.of("sampleOutput", sampleOutput));
+    }
+
+    public void setSampleOutputTruncated(boolean sampleOutputTruncated) {
+        this.sampleOutputTruncated = sampleOutputTruncated;
     }
 
     public void setTypeName(String typeName) {
@@ -215,6 +226,7 @@ public class WorkflowNodeTestOutput {
             ", typeVersion=" + typeVersion +
             ", outputSchema=" + outputSchema +
             ", sampleOutput=" + sampleOutput +
+            ", sampleOutputTruncated=" + sampleOutputTruncated +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

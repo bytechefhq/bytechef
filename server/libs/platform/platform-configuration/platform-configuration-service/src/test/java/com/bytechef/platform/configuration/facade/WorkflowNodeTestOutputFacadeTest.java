@@ -34,6 +34,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.ComponentConnection;
@@ -81,6 +82,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class WorkflowNodeTestOutputFacadeTest {
 
     private static final long ENVIRONMENT_ID = 0L;
+    private static final int MAX_SAMPLE_ITEMS = 5;
     private static final String WORKFLOW_ID = "workflow1";
 
     @Mock
@@ -119,14 +121,23 @@ class WorkflowNodeTestOutputFacadeTest {
     @Mock
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
+    private final ApplicationProperties applicationProperties = new ApplicationProperties();
+
     private WorkflowNodeTestOutputFacadeImpl workflowNodeTestOutputFacade;
 
     @BeforeEach
     void setUp() {
+
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        ApplicationProperties.Workflow.TestOutput testOutput = workflow.getTestOutput();
+
+        testOutput.setMaxSampleItems(MAX_SAMPLE_ITEMS);
+
         workflowNodeTestOutputFacade = new WorkflowNodeTestOutputFacadeImpl(
-            actionDefinitionFacade, clusterElementDefinitionService, List.of(), connectionService,
-            editorTempFileStorage, evaluator, jobPrincipalAccessorRegistry, triggerDefinitionFacade,
-            workflowNodeTestOutputService,
+            actionDefinitionFacade, applicationProperties, clusterElementDefinitionService, List.of(),
+            connectionService, editorTempFileStorage, evaluator, jobPrincipalAccessorRegistry,
+            triggerDefinitionFacade, workflowNodeTestOutputService,
             workflowNodeOutputFacade, webhookTriggerTestFacade, workflowService, workflowTestConfigurationService);
     }
 
@@ -165,7 +176,8 @@ class WorkflowNodeTestOutputFacadeTest {
         ArgumentCaptor<OutputResponse> outputResponseCaptor = ArgumentCaptor.forClass(OutputResponse.class);
 
         verify(workflowNodeTestOutputService).save(
-            eq(WORKFLOW_ID), eq("postgresql_1"), any(), outputResponseCaptor.capture(), eq(ENVIRONMENT_ID));
+            eq(WORKFLOW_ID), eq("postgresql_1"), any(), outputResponseCaptor.capture(), eq(false),
+            eq(ENVIRONMENT_ID));
 
         OutputResponse savedOutputResponse = outputResponseCaptor.getValue();
 
@@ -198,7 +210,7 @@ class WorkflowNodeTestOutputFacadeTest {
 
         verify(workflowNodeTestOutputService).save(
             eq(WORKFLOW_ID), eq("awsS3_1"), any(WorkflowNodeType.class), outputResponseCaptor.capture(),
-            eq(ENVIRONMENT_ID));
+            eq(false), eq(ENVIRONMENT_ID));
 
         OutputResponse savedOutputResponse = outputResponseCaptor.getValue();
 
@@ -244,7 +256,7 @@ class WorkflowNodeTestOutputFacadeTest {
             webhookRequest);
 
         verify(workflowNodeTestOutputService).save(
-            eq(WORKFLOW_ID), eq("trigger_2"), any(WorkflowNodeType.class), any(), eq(ENVIRONMENT_ID));
+            eq(WORKFLOW_ID), eq("trigger_2"), any(WorkflowNodeType.class), any(), eq(false), eq(ENVIRONMENT_ID));
         verify(webhookTriggerTestFacade).disableTrigger(
             WORKFLOW_ID, "trigger_2", ENVIRONMENT_ID, PlatformType.AUTOMATION);
     }
@@ -271,8 +283,9 @@ class WorkflowNodeTestOutputFacadeTest {
 
         WorkflowNodeTestOutputFacadeImpl workflowNodeTestOutputFacadeWithProvider =
             new WorkflowNodeTestOutputFacadeImpl(
-                actionDefinitionFacade, clusterElementDefinitionService, List.of(codeEditorScriptInputProvider),
-                connectionService, editorTempFileStorage, evaluator, jobPrincipalAccessorRegistry,
+                actionDefinitionFacade, applicationProperties, clusterElementDefinitionService,
+                List.of(codeEditorScriptInputProvider), connectionService, editorTempFileStorage, evaluator,
+                jobPrincipalAccessorRegistry,
                 triggerDefinitionFacade, workflowNodeTestOutputService, workflowNodeOutputFacade,
                 webhookTriggerTestFacade, workflowService, workflowTestConfigurationService);
 
@@ -327,8 +340,8 @@ class WorkflowNodeTestOutputFacadeTest {
 
         when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
 
-        List<Map<String, Object>> rows = IntStream.range(0, 150)
-            .mapToObj(index -> Map.<String, Object>of("id", index, "tags", List.of(IntStream.range(0, 150)
+        List<Map<String, Object>> rows = IntStream.range(0, 8)
+            .mapToObj(index -> Map.<String, Object>of("id", index, "tags", List.of(IntStream.range(0, 8)
                 .boxed()
                 .toArray())))
             .toList();
@@ -340,7 +353,7 @@ class WorkflowNodeTestOutputFacadeTest {
 
         verify(workflowNodeTestOutputService).save(
             eq(WORKFLOW_ID), eq("oracle_1"), any(WorkflowNodeType.class), outputResponseArgumentCaptor.capture(),
-            eq(ENVIRONMENT_ID));
+            eq(true), eq(ENVIRONMENT_ID));
 
         OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
 
@@ -349,12 +362,12 @@ class WorkflowNodeTestOutputFacadeTest {
         List<Map<String, Object>> sampleRows = (List<Map<String, Object>>) sampleOutput.get("rows");
 
         Assertions.assertThat(sampleRows)
-            .hasSize(WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS);
+            .hasSize(MAX_SAMPLE_ITEMS);
         Assertions.assertThat((List<Object>) sampleRows.getFirst()
             .get("tags"))
-            .hasSize(WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS);
+            .hasSize(MAX_SAMPLE_ITEMS);
         Assertions.assertThat(sampleRows.getLast())
-            .containsEntry("id", WorkflowNodeTestOutputFacadeImpl.MAX_SAMPLE_OUTPUT_ITEMS - 1);
+            .containsEntry("id", MAX_SAMPLE_ITEMS - 1);
     }
 
     @Test
@@ -377,7 +390,7 @@ class WorkflowNodeTestOutputFacadeTest {
 
         verify(workflowNodeTestOutputService).save(
             eq(WORKFLOW_ID), eq("oracle_1"), any(WorkflowNodeType.class), outputResponseArgumentCaptor.capture(),
-            eq(ENVIRONMENT_ID));
+            eq(false), eq(ENVIRONMENT_ID));
 
         OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
 

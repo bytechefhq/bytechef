@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-19T13:15:01.747601+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowNodeOutputModel {
 
   private @Nullable ActionDefinitionBasicModel actionDefinition;
@@ -35,6 +35,8 @@ public class WorkflowNodeOutputModel {
   private @Nullable ClusterElementDefinitionBasicModel clusterElementDefinition;
 
   private @Nullable OutputResponseModel outputResponse;
+
+  private Boolean sampleOutputTruncated = false;
 
   private @Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition;
 
@@ -118,6 +120,27 @@ public class WorkflowNodeOutputModel {
   @JsonProperty("outputResponse")
   public void setOutputResponse(@Nullable OutputResponseModel outputResponse) {
     this.outputResponse = outputResponse;
+  }
+
+  public WorkflowNodeOutputModel sampleOutputTruncated(Boolean sampleOutputTruncated) {
+    this.sampleOutputTruncated = sampleOutputTruncated;
+    return this;
+  }
+
+  /**
+   * If lists in the sample output were cut to the configured maximum number of items
+   * @return sampleOutputTruncated
+   */
+  
+  @Schema(name = "sampleOutputTruncated", description = "If lists in the sample output were cut to the configured maximum number of items", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutputTruncated")
+  public Boolean getSampleOutputTruncated() {
+    return sampleOutputTruncated;
+  }
+
+  @JsonProperty("sampleOutputTruncated")
+  public void setSampleOutputTruncated(Boolean sampleOutputTruncated) {
+    this.sampleOutputTruncated = sampleOutputTruncated;
   }
 
   public WorkflowNodeOutputModel taskDispatcherDefinition(@Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
@@ -237,6 +260,7 @@ public class WorkflowNodeOutputModel {
     return Objects.equals(this.actionDefinition, workflowNodeOutput.actionDefinition) &&
         Objects.equals(this.clusterElementDefinition, workflowNodeOutput.clusterElementDefinition) &&
         Objects.equals(this.outputResponse, workflowNodeOutput.outputResponse) &&
+        Objects.equals(this.sampleOutputTruncated, workflowNodeOutput.sampleOutputTruncated) &&
         Objects.equals(this.taskDispatcherDefinition, workflowNodeOutput.taskDispatcherDefinition) &&
         Objects.equals(this.testOutputResponse, workflowNodeOutput.testOutputResponse) &&
         Objects.equals(this.triggerDefinition, workflowNodeOutput.triggerDefinition) &&
@@ -246,7 +270,7 @@ public class WorkflowNodeOutputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionDefinition, clusterElementDefinition, outputResponse, taskDispatcherDefinition, testOutputResponse, triggerDefinition, variableOutputResponse, workflowNodeName);
+    return Objects.hash(actionDefinition, clusterElementDefinition, outputResponse, sampleOutputTruncated, taskDispatcherDefinition, testOutputResponse, triggerDefinition, variableOutputResponse, workflowNodeName);
   }
 
   @Override
@@ -256,6 +280,7 @@ public class WorkflowNodeOutputModel {
     sb.append("    actionDefinition: ").append(toIndentedString(actionDefinition)).append("\n");
     sb.append("    clusterElementDefinition: ").append(toIndentedString(clusterElementDefinition)).append("\n");
     sb.append("    outputResponse: ").append(toIndentedString(outputResponse)).append("\n");
+    sb.append("    sampleOutputTruncated: ").append(toIndentedString(sampleOutputTruncated)).append("\n");
     sb.append("    taskDispatcherDefinition: ").append(toIndentedString(taskDispatcherDefinition)).append("\n");
     sb.append("    testOutputResponse: ").append(toIndentedString(testOutputResponse)).append("\n");
     sb.append("    triggerDefinition: ").append(toIndentedString(triggerDefinition)).append("\n");

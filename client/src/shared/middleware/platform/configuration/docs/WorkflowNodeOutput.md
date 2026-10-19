@@ -10,6 +10,7 @@ Name | Type
 `actionDefinition` | [ActionDefinitionBasic](ActionDefinitionBasic.md)
 `clusterElementDefinition` | [ClusterElementDefinitionBasic](ClusterElementDefinitionBasic.md)
 `outputResponse` | [OutputResponse](OutputResponse.md)
+`sampleOutputTruncated` | boolean
 `taskDispatcherDefinition` | [TaskDispatcherDefinitionBasic](TaskDispatcherDefinitionBasic.md)
 `testOutputResponse` | boolean
 `triggerDefinition` | [TriggerDefinitionBasic](TriggerDefinitionBasic.md)
@@ -26,6 +27,7 @@ const example = {
   "actionDefinition": null,
   "clusterElementDefinition": null,
   "outputResponse": null,
+  "sampleOutputTruncated": null,
   "taskDispatcherDefinition": null,
   "testOutputResponse": null,
   "triggerDefinition": null,

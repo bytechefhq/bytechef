@@ -213,7 +213,7 @@ class TestTaskDispatcherPreSendProcessorTest {
             .thenReturn(List.of());
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-            null, null, new OutputResponse(null, "not-a-map", null), null, false, null, TASK_NAME);
+            null, null, new OutputResponse(null, "not-a-map", null), false, null, false, null, TASK_NAME);
 
         when(workflowNodeOutputFacade.getWorkflowNodeOutput(
             WORKFLOW_ID, TASK_NAME, Environment.DEVELOPMENT.ordinal()))
@@ -249,7 +249,7 @@ class TestTaskDispatcherPreSendProcessorTest {
         ResumeResponse resumeResponse = ResumeResponse.of(resumeData);
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-            null, null, new OutputResponse(null, resumeResponse, null), null, false, null, TASK_NAME);
+            null, null, new OutputResponse(null, resumeResponse, null), false, null, false, null, TASK_NAME);
 
         when(workflowNodeOutputFacade.getWorkflowNodeOutput(
             WORKFLOW_ID, TASK_NAME, Environment.DEVELOPMENT.ordinal()))

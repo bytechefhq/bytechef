@@ -67,8 +67,8 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
             : null;
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = new WorkflowNodeOutputDTO(
-            null, clusterElementOutputDTO.clusterElementDefinition(),
-            outputResponse, null, clusterElementOutputDTO.testOutputResponse(), null,
+            null, clusterElementOutputDTO.clusterElementDefinition(), outputResponse,
+            clusterElementOutputDTO.sampleOutputTruncated(), null, clusterElementOutputDTO.testOutputResponse(), null,
             clusterElementOutputDTO.clusterElementName());
 
         return ResponseEntity.ok(
