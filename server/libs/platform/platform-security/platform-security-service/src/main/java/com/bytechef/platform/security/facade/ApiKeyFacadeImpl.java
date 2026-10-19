@@ -17,11 +17,18 @@
 package com.bytechef.platform.security.facade;
 
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +50,72 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
 
     @Override
     public ApiKey create(ApiKey apiKey, PlatformType type) {
+        checkNotConnectedUser();
+
+        if (!isTenantAdmin()) {
+            throw new AccessDeniedException("Only a tenant admin may create this API key");
+        }
+
+        return createOwnedApiKey(apiKey, type);
+    }
+
+    @Override
+    public ApiKey createAutomationApiKey(ApiKey apiKey) {
+        checkNotConnectedUser();
+
+        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+    }
+
+    @Override
+    public void delete(long id) {
+        checkNotConnectedUser();
+
+        getOwnedApiKey(id);
+
+        apiKeyService.delete(id);
+    }
+
+    @Override
+    public List<ApiKey> getAdminApiKeys(long environmentId) {
+        checkNotConnectedUser();
+
+        if (!isTenantAdmin()) {
+            throw new AccessDeniedException("Only a tenant admin may list platform API keys");
+        }
+
+        return apiKeyService.getApiKeys(environmentId, null);
+    }
+
+    @Override
+    public ApiKey getApiKey(long id) {
+        checkNotConnectedUser();
+
+        return getOwnedApiKey(id);
+    }
+
+    @Override
+    public List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
+        checkNotConnectedUser();
+
+        return filterOwned(apiKeyService.getApiKeys(environmentId, type));
+    }
+
+    @Override
+    public ApiKey update(ApiKey apiKey) {
+        checkNotConnectedUser();
+
+        getOwnedApiKey(apiKey.getId());
+
+        return apiKeyService.update(apiKey);
+    }
+
+    private static void checkNotConnectedUser() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user has no platform API keys");
+        }
+    }
+
+    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);
@@ -51,28 +124,37 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
         return apiKeyService.create(apiKey);
     }
 
-    @Override
-    public void delete(long id) {
-        apiKeyService.delete(id);
+    private List<ApiKey> filterOwned(List<ApiKey> apiKeys) {
+        if (isTenantAdmin()) {
+            return apiKeys;
+        }
+
+        Long currentUserId = fetchCurrentUserId();
+
+        return apiKeys.stream()
+            .filter(apiKey -> Objects.equals(apiKey.getUserId(), currentUserId))
+            .toList();
     }
 
-    @Override
-    public java.util.List<ApiKey> getAdminApiKeys(long environmentId) {
-        return apiKeyService.getApiKeys(environmentId, null);
+    private ApiKey getOwnedApiKey(long id) {
+        ApiKey apiKey = apiKeyService.getApiKey(id);
+
+        if (isTenantAdmin() || Objects.equals(apiKey.getUserId(), fetchCurrentUserId())) {
+            return apiKey;
+        }
+
+        throw new IllegalArgumentException("Api key not found for id: " + id);
     }
 
-    @Override
-    public ApiKey getApiKey(long id) {
-        return apiKeyService.getApiKey(id);
+    @Nullable
+    private Long fetchCurrentUserId() {
+        return SecurityUtils.fetchCurrentUserLogin()
+            .flatMap(userService::fetchUserByLogin)
+            .map(User::getId)
+            .orElse(null);
     }
 
-    @Override
-    public java.util.List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
-        return apiKeyService.getApiKeys(environmentId, type);
-    }
-
-    @Override
-    public ApiKey update(ApiKey apiKey) {
-        return apiKeyService.update(apiKey);
+    private static boolean isTenantAdmin() {
+        return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
     }
 }
