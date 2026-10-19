@@ -69,6 +69,16 @@ class TenantDeletionRepositoryIntTest {
     }
 
     @Test
+    void testClaimForPurgeRejectsFuturePurgeAfter() {
+        Instant now = Instant.now()
+            .truncatedTo(ChronoUnit.SECONDS);
+
+        tenantDeletionRepository.markPendingDeletion(TENANT_ID, "admin@x", now.plus(Duration.ofDays(30)));
+
+        assertThat(tenantDeletionRepository.claimForPurge(TENANT_ID, now)).isFalse();
+    }
+
+    @Test
     void testGetDueForPurgeReturnsOnlyElapsedPendingRows() {
         Instant now = Instant.now()
             .truncatedTo(ChronoUnit.SECONDS);

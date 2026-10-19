@@ -54,7 +54,7 @@ public class TenantDeletionRepository {
 
     public boolean claimForPurge(String tenantId, Instant now) {
         String sql = "UPDATE public.tenant_deletion SET purge_claimed_date = ? WHERE tenant_id = ? AND status = ? " +
-            "AND (purge_claimed_date IS NULL OR purge_claimed_date < ?::timestamp - interval '1 hour')";
+            "AND purge_after <= ? AND (purge_claimed_date IS NULL OR purge_claimed_date < ?::timestamp - interval '1 hour')";
 
         try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -63,6 +63,7 @@ public class TenantDeletionRepository {
             preparedStatement.setString(2, tenantId);
             preparedStatement.setInt(3, STATUS_PENDING_DELETION);
             preparedStatement.setObject(4, toLocalDateTime(now));
+            preparedStatement.setObject(5, toLocalDateTime(now));
 
             return preparedStatement.executeUpdate() == 1;
         } catch (SQLException sqle) {
