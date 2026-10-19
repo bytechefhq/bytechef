@@ -16,6 +16,7 @@
 
 package com.bytechef.tenant.util;
 
+import com.bytechef.tenant.TenantContext;
 import java.util.regex.Pattern;
 
 /**
@@ -30,7 +31,7 @@ public final class TenantIdUtils {
 
     public static String requireValid(String tenantId) {
         if (tenantId == null || !TENANT_ID_PATTERN.matcher(tenantId)
-            .matches()) {
+            .matches() || TenantContext.DEFAULT_TENANT_ID.equalsIgnoreCase(tenantId)) {
 
             throw new IllegalArgumentException("Invalid tenant id");
         }

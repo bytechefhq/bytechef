@@ -94,4 +94,12 @@ class RedisChatMemoryTenantTeardownContributorTest {
 
         verifyNoInteractions(redisClient);
     }
+
+    @Test
+    void testDefaultTenantIsNeverTouched() {
+        assertThatThrownBy(() -> contributor.afterSchemaDrop("public"))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(redisClient);
+    }
 }

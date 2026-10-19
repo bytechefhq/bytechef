@@ -70,4 +70,15 @@ class FilesystemFileStorageServiceDeleteTenantFilesTest {
         assertThatThrownBy(() -> service.deleteTenantFiles("../000002"))
             .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void testDefaultTenantDirectoryIsKept() throws IOException {
+        Path publicDirectory = Files.createDirectories(baseDirectory.resolve("public/data"));
+
+        FilesystemFileStorageService service = new FilesystemFileStorageService(baseDirectory.toString());
+
+        assertThatThrownBy(() -> service.deleteTenantFiles("public")).isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(publicDirectory).exists();
+    }
 }
