@@ -52,7 +52,8 @@ class JdbcChatMemoryConfiguration {
 
         return new OrderedJdbcChatMemoryRepository(
             jdbcChatMemoryRepository, jdbcTemplate,
-            JdbcChatMemoryUtils.getSelectConversationIdsOrderedSql(dialect));
+            JdbcChatMemoryUtils.getSelectConversationIdsOrderedSql(dialect),
+            JdbcChatMemoryUtils.getSelectFirstMessagesSql(dialect));
     }
 
     @Bean
