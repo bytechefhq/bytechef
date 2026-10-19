@@ -27,6 +27,7 @@ import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
@@ -63,7 +64,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * views of the project, workflow and deployment tools, the read pickers and {@code openWorkflowTab}. BUILD holds the
  * full project tools, the workflow lifecycle tools (no tool that writes workflow content), the deployment write tools,
  * every picker, {@code openWorkflowTab}, and the {@code buildWorkflow} / {@code importWorkflow} delegates, which are
- * the only way it authors workflow content.
+ * the only way it authors workflow content. The delegates' sub-agents never see a tool the approval gate gates by
+ * default ({@link AiHubGatedToolFilterAdvisor}).
  * </p>
  *
  * <p>
@@ -139,7 +141,8 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
-                INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
+                INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
+                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback, workspaceFacade)));
 
         requireBuildWorkflow(toolCallbacks);
