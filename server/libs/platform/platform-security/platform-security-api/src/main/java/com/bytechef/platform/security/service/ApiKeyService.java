@@ -39,6 +39,8 @@ public interface ApiKeyService {
 
     ApiKey getApiKey(String secretKey, long environmentId);
 
+    Optional<ApiKey> fetchApiKey(long id);
+
     ApiKey getApiKey(long id);
 
     List<ApiKey> getApiKeys(long environmentId, @Nullable PlatformType type);
