@@ -6,9 +6,10 @@ import {useShallow} from 'zustand/react/shallow';
 
 /**
  * Shows why the user's last message got no answer, with a Retry that sends it again and a Dismiss. The runtime provider
- * raises it for a tool failure the run ended with and never recovered from, for a turn request that failed (such as an
- * HTTP 500), and for a chat that could not be created; each of these is reported only here, not in a toast as well. A
- * run error, which shows in the chat, or a Stop raises nothing. Must render inside the runtime provider.
+ * raises it for a tool failure the run ended with and never recovered from, and for a turn request that failed (such as
+ * an HTTP 500); each of these is reported only here, not in a toast as well. A chat that could not be created is
+ * reported by a toast instead, a run error shows in the chat, and a Stop raises nothing. Must render inside the runtime
+ * provider.
  */
 const AiHubRetryBanner = () => {
     const {clearError, currentError} = useAiChatRetryableErrorStore(
