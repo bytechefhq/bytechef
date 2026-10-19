@@ -15,7 +15,7 @@ const isAvailableModel = (
     return provider.supportsModelById || provider.models.some((model) => model.name === modelName);
 };
 
-export const resolveRememberedModel = (
+export const findAvailableRememberedModel = (
     workspaceId: number | null | undefined,
     providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined
 ): {model: string; provider: string} | null => {
@@ -25,15 +25,22 @@ export const resolveRememberedModel = (
 
     const lastUsedModel = readLastUsedModel(workspaceId);
 
-    if (lastUsedModel == null) {
-        return null;
-    }
-
-    if (!isAvailableModel(providerCatalog, lastUsedModel.provider, lastUsedModel.model)) {
-        writeLastUsedModel(workspaceId, null, null);
-
+    if (lastUsedModel == null || !isAvailableModel(providerCatalog, lastUsedModel.provider, lastUsedModel.model)) {
         return null;
     }
 
     return lastUsedModel;
+};
+
+export const resolveRememberedModel = (
+    workspaceId: number | null | undefined,
+    providerCatalog: AiProviderCatalogQuery['aiProviderCatalog'] | undefined
+): {model: string; provider: string} | null => {
+    const availableRememberedModel = findAvailableRememberedModel(workspaceId, providerCatalog);
+
+    if (availableRememberedModel == null && workspaceId != null && providerCatalog != null) {
+        writeLastUsedModel(workspaceId, null, null);
+    }
+
+    return availableRememberedModel;
 };
