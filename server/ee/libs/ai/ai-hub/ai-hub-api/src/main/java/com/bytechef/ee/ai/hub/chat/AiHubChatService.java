@@ -105,9 +105,9 @@ public interface AiHubChatService {
 
     /**
      * Like {@link #findByThreadId}, but empty when the chat is in {@code DELETED} status or its thread is retired
-     * because the chat is being deleted.
+     * because the chat is being deleted. An ARCHIVED chat is returned.
      */
-    Optional<AiHubChat> findActiveByThreadId(String threadId);
+    Optional<AiHubChat> findNotDeletedByThreadId(String threadId);
 
     /**
      * Looks a chat up by thread id and keeps it only when the requester may view it.
