@@ -15,8 +15,10 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -48,10 +50,6 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
 
         McpServer mcpServer = getMcpServer(embeddedMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey());
 
-        if (!mcpServer.isEnabled()) {
-            throw new BadCredentialsException("MCP server is disabled");
-        }
-
         Environment mcpServerEnvironment = mcpServer.getEnvironment();
 
         boolean environmentMatches =
@@ -62,6 +60,8 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
         }
 
         if (!mcpServer.isAuthenticationRequired()) {
+            checkEnabled(mcpServer);
+
             return McpAnonymousAuthenticationToken.ofEmbeddedMcpServer(mcpServer.getId());
         }
 
@@ -77,8 +77,23 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
 
         long environmentId = embeddedMcpServerApiKeyAuthenticationToken.getEnvironmentId();
 
-        ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
-            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
+        Optional<ConnectedUser> existingConnectedUser = connectedUserService.fetchConnectedUser(
+            externalUserId, environmentId);
+
+        if (existingConnectedUser.isPresent()) {
+            ConnectedUser connectedUser = existingConnectedUser.get();
+
+            org.springframework.security.core.userdetails.User user = createSpringSecurityUser(
+                externalUserId, connectedUser);
+
+            checkEnabled(mcpServer);
+
+            return new EmbeddedMcpServerApiKeyAuthenticationToken(environmentId, connectedUser.getId(), user);
+        }
+
+        checkEnabled(mcpServer);
+
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(externalUserId, environmentId);
 
         return new EmbeddedMcpServerApiKeyAuthenticationToken(
             environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser));
@@ -87,6 +102,12 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(EmbeddedMcpServerApiKeyAuthenticationToken.class);
+    }
+
+    private static void checkEnabled(McpServer mcpServer) {
+        if (!mcpServer.isEnabled()) {
+            throw new McpServerDisabledException(McpServerDisabledException.MCP_SERVER_MESSAGE);
+        }
     }
 
     private McpServer getMcpServer(@Nullable String mcpServerSecretKey) {
