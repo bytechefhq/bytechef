@@ -55,6 +55,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -265,6 +266,83 @@ public class ProjectWorkflowExecutionFacadeTest {
         TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
 
         assertThat(taskExecutionDTO.childJob()).isNull();
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionWithoutDetailsScopeOmitsTaskData() {
+        taskExecution.setError(new ExecutionError("secret payload", List.of()));
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getChildJobs(List.of(1L)))
+            .thenReturn(List.of());
+        when(permissionService.hasResourceScope(10L, "Job", "EXECUTION_DETAILS_VIEW"))
+            .thenReturn(false);
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        assertThat(taskExecutionDTO.input())
+            .isNull();
+        assertThat(taskExecutionDTO.output())
+            .isNull();
+        assertThat(taskExecutionDTO.error())
+            .isNull();
+        assertThat(taskExecutionDTO.id())
+            .isEqualTo(1L);
+
+        verify(taskFileStorage, never()).readContextValue(any());
+        verify(taskFileStorage, never()).readTaskExecutionOutput(any());
+    }
+
+    @Test
+    public void testWithoutDetailsOmitsPayloadsOfNestedTaskExecutionsAndChildJobs() {
+        Job job = new Job(20L);
+
+        job.setError(new ExecutionError("job failure", List.of()));
+        job.setInputs(Map.of("email", "someone@example.com"));
+
+        TaskExecutionDTO childTaskExecutionDTO = new TaskExecutionDTO(
+            taskExecution, "Child", "icon", Map.of("input", "child-input"), "child-output", null);
+        TaskExecutionDTO subflowTaskExecutionDTO = new TaskExecutionDTO(
+            taskExecution, "Subflow", "icon", Map.of("input", "subflow-input"), "subflow-output",
+            new JobDTO(job, Map.of("result", "child-job-output"), List.of(childTaskExecutionDTO)));
+
+        JobDTO jobDTO = new JobDTO(job, Map.of("result", "job-output"), List.of(subflowTaskExecutionDTO))
+            .withoutDetails();
+
+        assertThat(jobDTO.inputs())
+            .isEmpty();
+        assertThat(jobDTO.outputs())
+            .isNull();
+        assertThat(jobDTO.error())
+            .isNull();
+        assertThat(jobDTO.status())
+            .isEqualTo(job.getStatus());
+
+        TaskExecutionDTO redactedSubflowTaskExecutionDTO = jobDTO.taskExecutions()
+            .getFirst();
+
+        assertThat(redactedSubflowTaskExecutionDTO.input())
+            .isNull();
+        assertThat(redactedSubflowTaskExecutionDTO.output())
+            .isNull();
+        assertThat(redactedSubflowTaskExecutionDTO.title())
+            .isEqualTo("Subflow");
+
+        JobDTO redactedChildJobDTO = redactedSubflowTaskExecutionDTO.childJob();
+
+        assertThat(redactedChildJobDTO.outputs())
+            .isNull();
+        assertThat(redactedChildJobDTO.inputs())
+            .isEmpty();
+        assertThat(redactedChildJobDTO.taskExecutions())
+            .singleElement()
+            .satisfies(redactedChildTaskExecutionDTO -> {
+                assertThat(redactedChildTaskExecutionDTO.input())
+                    .isNull();
+                assertThat(redactedChildTaskExecutionDTO.output())
+                    .isNull();
+            });
     }
 
     @Test

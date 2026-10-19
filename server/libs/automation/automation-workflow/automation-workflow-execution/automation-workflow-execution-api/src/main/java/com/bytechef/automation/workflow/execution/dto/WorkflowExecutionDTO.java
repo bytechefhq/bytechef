@@ -42,6 +42,12 @@ public record WorkflowExecutionDTO(
         this(id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null);
     }
 
+    public WorkflowExecutionDTO withoutDetails() {
+        return new WorkflowExecutionDTO(
+            id, project, projectDeployment, projectVersion, job == null ? null : job.withoutDetails(), workflow,
+            triggerExecution == null ? null : triggerExecution.withoutDetails(), focusPath, taskExecutionCount);
+    }
+
     public boolean isTriggerOnly() {
         return job == null;
     }
