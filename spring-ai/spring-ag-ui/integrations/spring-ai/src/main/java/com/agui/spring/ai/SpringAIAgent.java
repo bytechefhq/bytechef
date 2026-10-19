@@ -142,16 +142,16 @@ public class SpringAIAgent extends LocalAgent {
         var runId = input.runId();
         var state = input.state();
 
-        input.messages().forEach((message) -> {
-            if (messages.stream().filter((m) -> m.equals(message)).findAny().isEmpty()) {
-                messages.add(message);
-            }
-        });
+        List<BaseMessage> runMessages = new ArrayList<>(this.messages);
+
+        if (Objects.nonNull(input.messages())) {
+            runMessages.addAll(input.messages());
+        }
 
         String content;
 
         try {
-            var userMessage = this.getLatestUserMessage(messages);
+            var userMessage = this.getLatestUserMessage(runMessages);
             content = userMessage.getContent();
         } catch (AGUIException e) {
             log.error("Agent '{}' could not resolve the latest user message for threadId={} runId={}",
