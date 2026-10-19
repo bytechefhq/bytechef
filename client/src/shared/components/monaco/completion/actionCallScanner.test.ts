@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 
-import {findActionCallKeySlot, findActionCallValueSlot} from './actionCallScanner';
+import {findActionCallKeySlot, findActionCallValueSlot, findConnectionNameArgument} from './actionCallScanner';
 
 const at = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javascript') =>
     findActionCallKeySlot(source, source.length, language);
@@ -8,6 +8,7 @@ const at = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javasc
 describe('findActionCallKeySlot', () => {
     it('finds a bare key being typed in the first argument', () => {
         expect(at('function perform(input, connection, context) {\n  context.component.httpClient.get({ ur')).toEqual({
+            argumentStart: 82,
             calleeText: 'context.component.httpClient.get',
             existingKeys: [],
             prefix: 'ur',
@@ -31,6 +32,7 @@ describe('findActionCallKeySlot', () => {
 
     it('finds a Python key inside quotes', () => {
         expect(at('context.component.googleMaps.get_address({"latitude": 1, "lon', 'python')).toEqual({
+            argumentStart: 41,
             calleeText: 'context.component.googleMaps.get_address',
             existingKeys: ['latitude'],
             prefix: 'lon',
@@ -100,6 +102,7 @@ describe('findActionCallValueSlot', () => {
 
     it('finds an unquoted value being typed after a key', () => {
         expect(valueAt('context.component.a.b({uri: "x", method: PO')).toEqual({
+            argumentStart: 22,
             calleeText: 'context.component.a.b',
             prefix: 'PO',
             propertyPath: ['method'],
@@ -149,5 +152,34 @@ describe('findActionCallKeySlot nested values', () => {
             propertyPath: ['items', '1'],
             rootValues: {body: {mode: 'raw', size: 2}, items: [{type: 'a'}, {type: 'list'}]},
         });
+    });
+});
+
+describe('findActionCallKeySlot arrays', () => {
+    it('keeps arrays of literals and drops arrays with any other element', () => {
+        const source =
+            "context.component.a.b({tags: ['x', 'y'], ids: [1, -2], other: [foo], mixed: ['a', f()], items: [{k: 1}], ";
+
+        expect(findActionCallKeySlot(source, source.length, 'javascript')?.rootValues).toEqual({
+            ids: [1, -2],
+            items: [{k: 1}],
+            tags: ['x', 'y'],
+        });
+    });
+});
+
+describe('findConnectionNameArgument', () => {
+    it('reads the connection name after the first argument, past nested braces and strings', () => {
+        const source = "context.component.slack.send({text: '}', blocks: [{a: 1}]}, 'slack_personal')";
+
+        expect(findConnectionNameArgument(source, source.indexOf('({') + 1, 'javascript')).toBe('slack_personal');
+    });
+
+    it('returns undefined without a literal second argument', () => {
+        const withoutName = 'context.component.slack.send({text: 1})';
+        const withVariable = 'context.component.slack.send({text: 1}, name)';
+
+        expect(findConnectionNameArgument(withoutName, withoutName.indexOf('({') + 1, 'javascript')).toBeUndefined();
+        expect(findConnectionNameArgument(withVariable, withVariable.indexOf('({') + 1, 'javascript')).toBeUndefined();
     });
 });

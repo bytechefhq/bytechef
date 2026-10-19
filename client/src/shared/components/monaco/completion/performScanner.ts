@@ -190,10 +190,15 @@ function skipString(source: string, index: number, end: number): number {
     return position;
 }
 
-function collectOpenBraceBodyStarts(source: string, cursorOffset: number, language: ScriptLanguageType): Set<number> {
+function collectOpenBraceBodyStarts(
+    source: string,
+    scanStart: number,
+    cursorOffset: number,
+    language: ScriptLanguageType
+): Set<number> {
     const openBodyStarts: number[] = [];
 
-    for (let index = 0; index < cursorOffset; index++) {
+    for (let index = scanStart; index < cursorOffset; index++) {
         const character = source.charAt(index);
 
         if (character === '"' || character === "'" || (character === '`' && language === 'javascript')) {
@@ -370,17 +375,40 @@ function collectHeads(source: string, language: ScriptLanguageType): FunctionHea
     return collectJavaScriptHeads(source);
 }
 
+function isOnCommentedLine(source: string, offset: number, language: ScriptLanguageType): boolean {
+    const linePrefix = source.slice(source.lastIndexOf('\n', offset - 1) + 1, offset);
+
+    if (language !== 'javascript') {
+        return linePrefix.includes('#');
+    }
+
+    return (
+        linePrefix.includes('//') ||
+        /^\s*\*/.test(linePrefix) ||
+        linePrefix.lastIndexOf('/*') > linePrefix.lastIndexOf('*/')
+    );
+}
+
 function findContainingHeads(source: string, cursorOffset: number, language: ScriptLanguageType): FunctionHeadI[] {
+    const heads = collectHeads(source, language).filter(
+        (head) => head.start < cursorOffset && !isOnCommentedLine(source, head.start, language)
+    );
+    const braceBodyStarts = heads.filter((head) => head.bodyKind === 'braces').map((head) => head.bodyStart);
+
     let openBraceBodyStarts: Set<number> | undefined;
 
     const getOpenBraceBodyStarts = () => {
-        openBraceBodyStarts ??= collectOpenBraceBodyStarts(source, cursorOffset, language);
+        openBraceBodyStarts ??= collectOpenBraceBodyStarts(
+            source,
+            Math.min(...braceBodyStarts) - 1,
+            cursorOffset,
+            language
+        );
 
         return openBraceBodyStarts;
     };
 
-    return collectHeads(source, language)
-        .filter((head) => head.start < cursorOffset)
+    return heads
         .sort((first, second) => second.start - first.start || second.bodyStart - first.bodyStart)
         .filter((head) => headContainsCursor(source, head, cursorOffset, getOpenBraceBodyStarts));
 }

@@ -524,3 +524,44 @@ describe('getScriptCompletions for action property values', () => {
         );
     });
 });
+
+describe('getScriptCompletions connection choice', () => {
+    const optionsCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () => [{name: 'channel', optionsDataSource: {}, type: 'STRING'}] as unknown as Property[]
+        ),
+    };
+
+    const contextWith = (loadOptions: ScriptCompletionContextI['loadOptions']): ScriptCompletionContextI => ({
+        components: optionsCatalog,
+        connections: [
+            {componentName: 'slack', componentVersion: 1, name: 'slack_work'},
+            {componentName: 'slack', componentVersion: 1, name: 'slack_personal'},
+        ],
+        input: {},
+        kind: 'script',
+        language: 'javascript',
+        loadOptions,
+        workflowNodeName: 'script_1',
+    });
+
+    it('uses the connection named in the call', async () => {
+        const loadOptions = vi.fn(async () => []);
+        const before = 'function perform(input, connection, context) {\n  context.component.slack.send({channel: ';
+        const source = `${before}}, 'slack_personal')\n}`;
+
+        await getScriptCompletions({context: contextWith(loadOptions), cursorOffset: before.length, source});
+
+        expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({connectionKey: 'slack_personal'}));
+    });
+
+    it('sends no connection when several match and the call names none', async () => {
+        const loadOptions = vi.fn(async () => []);
+        const source = 'function perform(input, connection, context) {\n  context.component.slack.send({channel: ';
+
+        await getScriptCompletions({context: contextWith(loadOptions), cursorOffset: source.length, source});
+
+        expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({connectionKey: undefined}));
+    });
+});

@@ -167,3 +167,28 @@ describe('findPerformScope', () => {
         expect(findPerformScope(source, source.length, 'python', 'context')).toMatchObject({contextName: 'context'});
     });
 });
+
+describe('findPerformScope with code before the function', () => {
+    it('ignores a quote inside a regular expression before the function head', () => {
+        const source = "const r = /'/; function perform(input, context) {\n  context.";
+
+        expect(findPerformScope(source, source.length, 'javascript', 'context')).toMatchObject({
+            contextName: 'context',
+        });
+    });
+});
+
+describe('findPerformScope with commented-out functions', () => {
+    it('ignores a function head on a commented line', () => {
+        const source =
+            '// old: function perform(input, context) {\nfunction helper() {\n  return 1;\n}\nconst x = context.';
+
+        expect(findPerformScope(source, source.length, 'javascript', 'context')).toBeUndefined();
+    });
+
+    it('ignores a Python function head on a commented line', () => {
+        const source = '# def perform(input, context):\n    context.';
+
+        expect(findPerformScope(source, source.length, 'python', 'context')).toBeUndefined();
+    });
+});

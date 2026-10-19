@@ -526,3 +526,39 @@ describe('bare JSON values and inline scripts', () => {
         );
     });
 });
+
+describe('review fixes for the workflow definition sheet', () => {
+    const fixCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () =>
+                [
+                    {name: 'format', type: 'STRING'},
+                    {displayCondition: "format == 'xml'", name: 'xmlRoot', type: 'STRING'},
+                    {name: 'who', options: [{value: '@channel'}, {value: '.nan'}, {value: 'plain'}], type: 'STRING'},
+                ] as unknown as Property[]
+        ),
+    };
+
+    it('treats an = expression as unknown so it does not hide properties', async () => {
+        const source = '{"tasks": [{"type": "x/v1/y", "parameters": {"format": "=input.fmt", "": 1}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: fixCatalog, format: 'json'},
+            cursorOffset: source.indexOf('"": 1') + 1,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['xmlRoot', 'who']);
+    });
+
+    it('quotes YAML values that would not survive as plain scalars', async () => {
+        const source = 'tasks:\n  - type: x/v1/y\n    parameters:\n      who: ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: fixCatalog, format: 'yaml'},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['"@channel"', '".nan"', 'plain']);
+    });
+});
