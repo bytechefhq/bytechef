@@ -70,29 +70,42 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
      */
     List<AiHubChat> findAllByThreadIdIn(Collection<String> threadIds);
 
-    /** Sets the title and clears {@code auto_titled}, touching no other column. */
+    /**
+     * Sets the title and clears {@code auto_titled}, touching no other column, unless the row's current status is
+     * {@code deletedStatus}.
+     *
+     * @return the number of rows updated, {@code 0} when the chat is deleted
+     */
     @Modifying
     @Query("""
         UPDATE ai_hub_chat SET title = :title, auto_titled = false, updated_at = :updatedAt
-        WHERE id = :id
+        WHERE id = :id AND status <> :deletedStatus
         """)
-    void updateTitle(long id, String title, LocalDateTime updatedAt);
+    int updateTitleUnlessDeleted(long id, String title, int deletedStatus, LocalDateTime updatedAt);
 
-    /** Sets the last preview, touching no other column. */
+    /**
+     * Sets the last preview, touching no other column, unless the row's current status is {@code deletedStatus}.
+     *
+     * @return the number of rows updated, {@code 0} when the chat is deleted
+     */
     @Modifying
     @Query("""
         UPDATE ai_hub_chat SET last_preview = :lastPreview, updated_at = :updatedAt
-        WHERE id = :id
+        WHERE id = :id AND status <> :deletedStatus
         """)
-    void updateLastPreview(long id, String lastPreview, LocalDateTime updatedAt);
+    int updateLastPreviewUnlessDeleted(long id, String lastPreview, int deletedStatus, LocalDateTime updatedAt);
 
-    /** Sets the message count, touching no other column. */
+    /**
+     * Sets the message count, touching no other column, unless the row's current status is {@code deletedStatus}.
+     *
+     * @return the number of rows updated, {@code 0} when the chat is deleted
+     */
     @Modifying
     @Query("""
         UPDATE ai_hub_chat SET message_count = :messageCount, updated_at = :updatedAt
-        WHERE id = :id
+        WHERE id = :id AND status <> :deletedStatus
         """)
-    void updateMessageCount(long id, int messageCount, LocalDateTime updatedAt);
+    int updateMessageCountUnlessDeleted(long id, int messageCount, int deletedStatus, LocalDateTime updatedAt);
 
     /** Sets {@code updated_at}, touching no other column. */
     @Modifying
@@ -102,11 +115,15 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
         """)
     void updateUpdatedAt(long id, LocalDateTime updatedAt);
 
-    /** Sets the status ordinal, touching no other column. */
+    /**
+     * Sets the status ordinal, touching no other column, unless the row's current status is {@code deletedStatus}.
+     *
+     * @return the number of rows updated, {@code 0} when the chat is already deleted
+     */
     @Modifying
     @Query("""
         UPDATE ai_hub_chat SET status = :status, updated_at = :updatedAt
-        WHERE id = :id
+        WHERE id = :id AND status <> :deletedStatus
         """)
-    void updateStatus(long id, int status, LocalDateTime updatedAt);
+    int updateStatusUnlessDeleted(long id, int status, int deletedStatus, LocalDateTime updatedAt);
 }
