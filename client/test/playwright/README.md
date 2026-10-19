@@ -355,8 +355,7 @@ configured. The hub's turns never reach a model:
   turn it off), stubs the model catalog, and answers `generateAiHubChatTitle` with a fixed title instead of a model
   (`prepareAiHub`). It creates and deletes chats, workflows and projects through the API, builds the
   `openWorkflowTab` and approval results the server's tools return, serves the approval continuation on the attach
-  endpoint (`stubAiHubAttach`), and records every toast (`recordToasts`) and the hub's retry state
-  (`recordZustandDevtoolsStates`, which reads the stores through the Redux DevTools hook of a development build).
+  endpoint (`stubAiHubAttach`), and records every toast (`recordToasts`).
 - **`fixtures/aiHubChats.ts`** (`aiHubChatsTest`) deletes the chats a test's page created.
 - **`pages/aiHubPage.ts`** is the hub page object (composer, Build switch, messages, edit and refresh, chats sidebar,
   workflow tabs, toasts).
@@ -414,4 +413,4 @@ workspaces needs a second workspace; the specs only log in as the admin.
 binding (H6), the composer placeholder after an approval (H7), the in-flight notice in a second tab (H9/H12), a
 deleted workflow's tab (H11), reloaded approvals and pickers (H13), the model picker (H14), the running
 `buildWorkflow` row (P1), coded run errors and the no-provider state (E1/H16), editing and reloading by message id, the
-retry state for tool failures, an approval for a dropped call, and a workflow tab fetching its workflow once (F5).
+retry banner for tool failures, an approval for a dropped call, and a workflow tab fetching its workflow once (F5).
