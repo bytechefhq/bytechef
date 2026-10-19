@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
+import {useApiKeysStore} from '@/shared/components/api-keys/stores/useApiKeysStore';
 import {ApiKey} from '@/shared/middleware/graphql';
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
