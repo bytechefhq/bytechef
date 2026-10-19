@@ -24,6 +24,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -94,27 +95,72 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticateRejectsDisabledMcpServerWhenAuthenticationNotRequired() {
+    void testAuthenticateReportsDisabledMcpServerWhenAuthenticationNotRequired() {
         mockMcpServer(PlatformType.EMBEDDED, false, false);
 
-        assertThatExceptionOfType(BadCredentialsException.class)
+        assertThatExceptionOfType(McpServerDisabledException.class)
             .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
                 new EmbeddedMcpServerApiKeyAuthenticationToken(
                     ENVIRONMENT_ID, null, "public", MCP_SERVER_SECRET_KEY)))
-            .withMessage("MCP server is disabled");
+            .withMessage(McpServerDisabledException.MCP_SERVER_MESSAGE);
     }
 
     @Test
-    void testAuthenticateRejectsDisabledMcpServerWhenAuthenticationRequired() {
+    void testAuthenticateReportsDisabledMcpServerToAValidConnectedUser() {
+        mockMcpServer(PlatformType.EMBEDDED, true, false);
+
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        when(connectedUser.isEnabled()).thenReturn(true);
+        when(connectedUser.getExternalId()).thenReturn(EXTERNAL_USER_ID);
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser));
+
+        assertThatExceptionOfType(McpServerDisabledException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)))
+            .withMessage(McpServerDisabledException.MCP_SERVER_MESSAGE);
+    }
+
+    @Test
+    void testAuthenticateReportsDisabledMcpServerWithoutCreatingANewConnectedUser() {
+        mockMcpServer(PlatformType.EMBEDDED, true, false);
+
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(McpServerDisabledException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)));
+
+        verify(connectedUserService, never()).createConnectedUser(anyString(), anyLong());
+    }
+
+    @Test
+    void testAuthenticateRejectsMissingTokenOnDisabledMcpServerAsInvalidCredentials() {
         mockMcpServer(PlatformType.EMBEDDED, true, false);
 
         assertThatExceptionOfType(BadCredentialsException.class)
             .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
                 new EmbeddedMcpServerApiKeyAuthenticationToken(
-                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)))
-            .withMessage("MCP server is disabled");
+                    ENVIRONMENT_ID, null, "public", MCP_SERVER_SECRET_KEY)));
+    }
 
-        verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
+    @Test
+    void testAuthenticateRejectsDisabledConnectedUserOnDisabledMcpServerAsNotActivated() {
+        mockMcpServer(PlatformType.EMBEDDED, true, false);
+
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        when(connectedUser.isEnabled()).thenReturn(false);
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser));
+
+        assertThatExceptionOfType(UserNotActivatedException.class)
+            .isThrownBy(() -> embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+                new EmbeddedMcpServerApiKeyAuthenticationToken(
+                    ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY)));
     }
 
     @Test
