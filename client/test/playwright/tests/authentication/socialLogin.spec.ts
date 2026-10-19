@@ -8,6 +8,7 @@ import {
     expectSignInRefused,
     expectSignedInto,
     inviteAndClaimUser,
+    inviteUser,
     signInAtGitHubMock,
     signInAtOidcMock,
     startSocialSignIn,
@@ -67,6 +68,20 @@ test.describe('Social login (#1874)', () => {
         await expectSignedInto(page);
 
         expect((await currentAccount(page)).login).toBe(googleAccount.login);
+    });
+
+    test('a pending invitee accepts the invitation by signing in with Google', async ({page}) => {
+        const email = uniqueEmail('pending');
+
+        await inviteUser(adminApiContext, email);
+
+        await startSocialSignIn(page, 'Google');
+
+        await signInAtOidcMock(page, {email, email_verified: true, sub: `google-${uniqueSuffix()}`});
+
+        await expectSignedInto(page);
+
+        expect((await currentAccount(page)).email).toBe(email);
     });
 
     test('GitHub reads the primary verified email when the profile hides it', async ({page}) => {

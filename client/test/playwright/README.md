@@ -251,8 +251,8 @@ unless `BYTECHEF_E2E_AUTHENTICATION_MOCKS=1` is set.
     BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED=true
     ```
 
-    Mail must reach Mailpit (the dev profile's default): invited users are claimed through the mailed claim link. Set
-    `PLAYWRIGHT_MAILPIT_URL` when Mailpit is not on `http://localhost:8025`.
+    Mail must reach Mailpit (the dev profile's default): invited users set their password and activate through the
+    mailed invitation link. Set `PLAYWRIGHT_MAILPIT_URL` when Mailpit is not on `http://localhost:8025`.
 
 3. Run the specs:
 
