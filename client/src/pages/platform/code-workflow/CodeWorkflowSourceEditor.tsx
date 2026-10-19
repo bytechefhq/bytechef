@@ -8,7 +8,7 @@ import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
 import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
-import {useDynamicPropertiesLoader} from '@/shared/components/monaco/completion/useDynamicPropertiesLoader';
+import {useOperationPropertyLoaders} from '@/shared/components/monaco/completion/useOperationPropertyLoaders';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
@@ -130,7 +130,7 @@ const CodeWorkflowSourceEditor = ({
     const workflowId = useWorkflowDataStore((state) => state.workflow.id);
 
     const components = useComponentCatalog({embedded});
-    const loadDynamicProperties = useDynamicPropertiesLoader(workflowId, currentEnvironmentId);
+    const operationPropertyLoaders = useOperationPropertyLoaders(workflowId, currentEnvironmentId);
 
     const completionContext = useMemo<CompletionContextType | undefined>(
         () =>
@@ -139,10 +139,10 @@ const CodeWorkflowSourceEditor = ({
                       components,
                       kind: 'codeWorkflow',
                       language: monacoLanguage as ScriptLanguageType,
-                      loadDynamicProperties,
+                      ...operationPropertyLoaders,
                   }
                 : undefined,
-        [components, loadDynamicProperties, monacoLanguage]
+        [components, monacoLanguage, operationPropertyLoaders]
     );
 
     useCompletionContext(model, completionContext);

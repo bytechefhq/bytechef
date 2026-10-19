@@ -286,3 +286,22 @@ describe('scanWorkflowDocument parameter values', () => {
         expect(position?.nameOf(['tasks', '0'])).toBe('rows');
     });
 });
+
+describe('scanWorkflowDocument string positions', () => {
+    it('reports where a JSON string starts and its quote', () => {
+        const source = '{"tasks": [{"parameters": {"uri": "ht"}}]}';
+        const position = scanWorkflowDocument(source, source.indexOf('ht') + 2, 'json');
+
+        expect(position?.stringStart).toBe(source.indexOf('ht'));
+        expect(position?.stringQuote).toBe('"');
+    });
+
+    it('reports a YAML single quote and no quote for a plain value', () => {
+        const quoted = "tasks:\n  - parameters:\n      uri: 'ht";
+        const plain = 'tasks:\n  - parameters:\n      uri: ht';
+
+        expect(scanWorkflowDocument(quoted, quoted.length, 'yaml')?.stringQuote).toBe("'");
+        expect(scanWorkflowDocument(plain, plain.length, 'yaml')).toMatchObject({stringStart: plain.indexOf('ht')});
+        expect(scanWorkflowDocument(plain, plain.length, 'yaml')?.stringQuote).toBeUndefined();
+    });
+});

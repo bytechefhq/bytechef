@@ -1,8 +1,13 @@
 import {describe, expect, it, vi} from 'vitest';
 
-import {buildPropertyItems, findNestedProperties, getPropertyCompletionItems} from './propertyCompletions';
+import {
+    buildPropertyItems,
+    findNestedProperties,
+    getPropertyCompletionItems,
+    getPropertyValueItems,
+} from './propertyCompletions';
 
-import type {Property} from '@/shared/middleware/platform/configuration';
+import type {Option, Property} from '@/shared/middleware/platform/configuration';
 
 const properties = [
     {description: 'Target address', name: 'uri', required: true, type: 'STRING'},
@@ -160,5 +165,126 @@ describe('getPropertyCompletionItems', () => {
         });
 
         expect(items).toEqual([]);
+    });
+});
+
+describe('getPropertyValueItems', () => {
+    const valueProperties = [
+        {
+            name: 'method',
+            options: [
+                {description: 'Read', label: 'GET', value: 'GET'},
+                {label: 'Create', value: 'POST'},
+            ],
+            type: 'STRING',
+        },
+        {name: 'followRedirect', type: 'BOOLEAN'},
+        {name: 'baseId', type: 'STRING'},
+        {name: 'tableId', optionsDataSource: {optionsLookupDependsOn: ['baseId']}, type: 'STRING'},
+        {name: 'headers', properties: [{name: 'mode', options: [{value: 'a'}], type: 'STRING'}], type: 'OBJECT'},
+        {name: 'mixed', options: [{value: {nested: true}}, {value: 3}], type: 'STRING'},
+    ] as unknown as Property[];
+
+    const request = {
+        parameters: {},
+        presentKeys: [],
+        properties: valueProperties,
+        propertyPath: ['method'],
+        replaceLength: 2,
+        toInsertText: (value: unknown) => `<${String(value)}>`,
+    };
+
+    it('offers static options with labels, values and descriptions', async () => {
+        const items = await getPropertyValueItems(request);
+
+        expect(items).toEqual([
+            {
+                documentation: 'Read',
+                filterText: 'GET',
+                insertAsSnippet: false,
+                insertText: '<GET>',
+                kind: 'value',
+                label: 'GET',
+                replaceLength: 2,
+                sortText: '000',
+            },
+            {
+                detail: 'POST',
+                documentation: undefined,
+                filterText: 'POST Create',
+                insertAsSnippet: false,
+                insertText: '<POST>',
+                kind: 'value',
+                label: 'Create',
+                replaceLength: 2,
+                sortText: '001',
+            },
+        ]);
+    });
+
+    it('offers true and false for a boolean property', async () => {
+        const items = await getPropertyValueItems({...request, propertyPath: ['followRedirect']});
+
+        expect(items.map((item) => item.insertText)).toEqual(['<true>', '<false>']);
+    });
+
+    it('offers options of a nested property', async () => {
+        const items = await getPropertyValueItems({...request, propertyPath: ['headers', 'mode']});
+
+        expect(items.map((item) => item.label)).toEqual(['a']);
+    });
+
+    it('skips options that are not plain values or that cannot be written at the cursor', async () => {
+        const items = await getPropertyValueItems({
+            ...request,
+            propertyPath: ['mixed'],
+            toInsertText: (value: unknown) => (typeof value === 'number' ? undefined : String(value)),
+        });
+
+        expect(items).toEqual([]);
+    });
+
+    it('loads options from the connection with the other written values', async () => {
+        const loadOptions = vi.fn(async () => [{label: 'Customers', value: 'tbl1'}] as Option[]);
+
+        const items = await getPropertyValueItems({
+            ...request,
+            loadOptions,
+            parameters: {baseId: 'app1', tableId: 'tb'},
+            presentKeys: ['baseId', 'tableId'],
+            propertyPath: ['tableId'],
+        });
+
+        expect(items.map((item) => [item.label, item.insertText])).toEqual([['Customers', '<tbl1>']]);
+        expect(loadOptions).toHaveBeenCalledWith('tableId', ['baseId'], {baseId: 'app1'});
+    });
+
+    it('offers nothing when the options cannot be loaded', async () => {
+        const items = await getPropertyValueItems({
+            ...request,
+            loadOptions: vi.fn(async () => {
+                throw new Error('failed');
+            }),
+            propertyPath: ['tableId'],
+        });
+
+        expect(items).toEqual([]);
+    });
+
+    it('offers static options of a dynamic property', async () => {
+        const items = await getPropertyValueItems({
+            ...request,
+            loadDynamicProperties: vi.fn(async () => [
+                {name: 'Status', options: [{value: 'Done'}], type: 'STRING'},
+            ]) as unknown as (
+                propertyName: string,
+                lookupDependsOnPaths: string[],
+                parameters: Record<string, unknown>
+            ) => Promise<Property[]>,
+            properties: [{name: 'fields', type: 'DYNAMIC_PROPERTIES'}] as unknown as Property[],
+            propertyPath: ['fields', 'Status'],
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['Done']);
     });
 });
