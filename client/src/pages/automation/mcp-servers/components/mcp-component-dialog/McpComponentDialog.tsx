@@ -2,6 +2,7 @@ import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import McpComponentDialogShell, {
     type McpComponentDialogProps,
 } from '@/shared/components/mcp-server/McpComponentDialogShell';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 
 import McpComponentDialogComponentSelectionStep from './McpComponentDialogComponentSelectionStep';
 import McpComponentDialogToolSelectionStep from './McpComponentDialogToolSelectionStep';
@@ -25,6 +26,8 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
         setSelectedConnection,
         setSelectedTools,
     } = useMcpComponentDialog({mcpComponent, mcpServerId, onOpenChange, open});
+
+    const ff_6383 = useFeatureFlagsStore()('ff-6383');
 
     return (
         <McpComponentDialogShell
@@ -58,26 +61,28 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
                         selectedTools={selectedTools}
                     />
 
-                    <fieldset className="mt-4 space-y-2 border-0 p-0 px-1">
-                        <label className="text-sm font-medium" htmlFor="mcp-component-required-authorities">
-                            Required Authorities
-                        </label>
+                    {ff_6383 && (
+                        <fieldset className="mt-4 space-y-2 border-0 p-0 px-1">
+                            <label className="text-sm font-medium" htmlFor="mcp-component-required-authorities">
+                                Required Authorities
+                            </label>
 
-                        <MultiSelect
-                            id="mcp-component-required-authorities"
-                            onValueChange={setRequiredAuthorities}
-                            options={authorityOptions}
-                            optionsLoading={authoritiesLoading}
-                            placeholder="Select authorities"
-                            searchable
-                            value={requiredAuthorities}
-                        />
+                            <MultiSelect
+                                id="mcp-component-required-authorities"
+                                onValueChange={setRequiredAuthorities}
+                                options={authorityOptions}
+                                optionsLoading={authoritiesLoading}
+                                placeholder="Select authorities"
+                                searchable
+                                value={requiredAuthorities}
+                            />
 
-                        <p className="text-xs text-muted-foreground">
-                            When the server enforces tool authorization, only callers holding one of these authorities
-                            see this component&apos;s tools.
-                        </p>
-                    </fieldset>
+                            <p className="text-xs text-muted-foreground">
+                                When the server enforces tool authorization, only callers holding one of these
+                                authorities see this component&apos;s tools.
+                            </p>
+                        </fieldset>
+                    )}
                 </>
             )}
         </McpComponentDialogShell>
