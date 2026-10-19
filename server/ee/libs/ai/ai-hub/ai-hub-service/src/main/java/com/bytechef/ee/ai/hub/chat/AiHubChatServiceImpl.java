@@ -725,6 +725,17 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<AiHubChat> findActiveByThreadId(String threadId) {
+        if (inFlightRunRegistry.isRetired(threadId)) {
+            return Optional.empty();
+        }
+
+        return chatRepository.findByThreadId(threadId)
+            .filter(chat -> !isDeleted(chat));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<AiHubChat> findByThreadIdViewable(String threadId, long requesterUserId) {
         return chatRepository.findByThreadId(threadId)
             .filter(chat -> !isDeleted(chat) && accessPolicy.canView(chat, requesterUserId));
