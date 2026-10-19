@@ -1,3 +1,5 @@
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {useIsMobile} from '@/shared/hooks/useIsMobile';
 import {PropsWithChildren, ReactNode, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -59,8 +61,11 @@ const LayoutContainer = ({
     // Uncontrolled by default so the header's toggle works on any page with a sidebar without that page
     // owning the state. A page that passes leftSidebarOpen keeps full control.
     const [uncontrolledLeftSidebarOpen, setUncontrolledLeftSidebarOpen] = useState(true);
+    const [mobileLeftSidebarOpen, setMobileLeftSidebarOpen] = useState(false);
 
     const parentLeftSidebarToggle = useLeftSidebarToggle();
+
+    const isMobile = useIsMobile();
 
     const isLeftSidebarControlled = leftSidebarOpen !== undefined;
     const leftSidebarIsOpen = isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen;
@@ -70,10 +75,11 @@ const LayoutContainer = ({
     const ownLeftSidebarToggle = useMemo(
         () => ({
             hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled,
-            leftSidebarOpen: leftSidebarIsOpen,
-            toggleLeftSidebar: () => setUncontrolledLeftSidebarOpen((open) => !open),
+            leftSidebarOpen: isMobile ? mobileLeftSidebarOpen : leftSidebarIsOpen,
+            toggleLeftSidebar: () =>
+                isMobile ? setMobileLeftSidebarOpen((open) => !open) : setUncontrolledLeftSidebarOpen((open) => !open),
         }),
-        [isLeftSidebarControlled, leftSidebarBody, leftSidebarIsOpen]
+        [isLeftSidebarControlled, isMobile, leftSidebarBody, leftSidebarIsOpen, mobileLeftSidebarOpen]
     );
 
     // A LayoutContainer with no sidebar of its own must not shadow an outer one's toggle: every Settings page
@@ -93,6 +99,14 @@ const LayoutContainer = ({
         return () => clearTimeout(timerId);
     }, [leftSidebarIsOpen]);
 
+    const leftSidebarNav = (
+        <nav className="flex h-full flex-col">
+            {leftSidebarHeader}
+
+            <div className="size-full overflow-y-auto px-2 pb-4">{leftSidebarBody}</div>
+        </nav>
+    );
+
     return (
         <LeftSidebarToggleContext.Provider value={leftSidebarToggle}>
             <div className={twMerge('size-full overflow-auto', className)}>
@@ -107,12 +121,22 @@ const LayoutContainer = ({
                             leftSidebarWidths[leftSidebarWidth][0]
                         )}
                     >
-                        <nav className="flex h-full flex-col">
-                            {leftSidebarHeader}
-
-                            <div className="size-full overflow-y-auto px-2 pb-4">{leftSidebarBody}</div>
-                        </nav>
+                        {leftSidebarNav}
                     </aside>
+                )}
+
+                {isMobile && ownLeftSidebarToggle.hasLeftSidebar && (
+                    <Sheet onOpenChange={setMobileLeftSidebarOpen} open={mobileLeftSidebarOpen}>
+                        <SheetContent className="w-72 bg-muted p-0" side="left">
+                            <SheetHeader className="sr-only">
+                                <SheetTitle>Sidebar</SheetTitle>
+
+                                <SheetDescription>Displays the page sidebar.</SheetDescription>
+                            </SheetHeader>
+
+                            {leftSidebarNav}
+                        </SheetContent>
+                    </Sheet>
                 )}
 
                 <div
