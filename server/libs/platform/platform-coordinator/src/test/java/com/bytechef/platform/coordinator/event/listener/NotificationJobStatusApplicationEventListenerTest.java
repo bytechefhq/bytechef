@@ -36,13 +36,12 @@ import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSender;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 
 /**
  * @author Ivica Cardic
@@ -52,9 +51,7 @@ import org.mockito.ArgumentCaptor;
 })
 class NotificationJobStatusApplicationEventListenerTest {
 
-    private static final Instant START = Instant.parse("2026-10-19T10:00:00Z");
-
-    private final Clock clock = mock(Clock.class);
+    private final ConcurrentMapCache claimCache = new ConcurrentMapCache(NotificationThrottle.CLAIM_CACHE_NAME);
     private final JobService jobService = mock(JobService.class);
     private final NotificationHandler notificationHandler = mock(NotificationHandler.class);
     private final NotificationHandlerRegistry notificationHandlerRegistry = mock(NotificationHandlerRegistry.class);
@@ -64,7 +61,9 @@ class NotificationJobStatusApplicationEventListenerTest {
     private final NotificationJobStatusApplicationEventListener notificationJobStatusApplicationEventListener =
         new NotificationJobStatusApplicationEventListener(
             null, jobService, notificationHandlerRegistry, notificationSenderRegistry, notificationService,
-            new NotificationThrottle(Duration.ofHours(1), clock));
+            new NotificationThrottle(
+                claimCache, new ConcurrentMapCache(NotificationThrottle.SUPPRESSED_COUNT_CACHE_NAME),
+                Duration.ofHours(1)));
 
     @BeforeEach
     void beforeEach() {
@@ -94,8 +93,8 @@ class NotificationJobStatusApplicationEventListenerTest {
 
     @Test
     void testRepeatedFailuresOfTheSameWorkflowSendOneNotificationPerWindow() {
-        failJobAt(1L, START);
-        failJobAt(2L, START.plus(Duration.ofMinutes(5)));
+        failJob(1L);
+        failJob(2L);
 
         ArgumentCaptor<NotificationHandlerContext> notificationHandlerContextArgumentCaptor =
             ArgumentCaptor.forClass(NotificationHandlerContext.class);
@@ -111,9 +110,12 @@ class NotificationJobStatusApplicationEventListenerTest {
 
     @Test
     void testFirstNotificationAfterTheWindowCarriesTheSuppressedCount() {
-        failJobAt(1L, START);
-        failJobAt(2L, START.plus(Duration.ofMinutes(5)));
-        failJobAt(3L, START.plus(Duration.ofHours(1)));
+        failJob(1L);
+        failJob(2L);
+
+        claimCache.clear();
+
+        failJob(3L);
 
         ArgumentCaptor<NotificationHandlerContext> notificationHandlerContextArgumentCaptor =
             ArgumentCaptor.forClass(NotificationHandlerContext.class);
@@ -129,8 +131,8 @@ class NotificationJobStatusApplicationEventListenerTest {
 
     @Test
     void testFailuresOfDifferentWorkflowsAreNotThrottledTogether() {
-        failJobAt(1L, START);
-        failJobAt(4L, START.plus(Duration.ofMinutes(5)));
+        failJob(1L);
+        failJob(4L);
 
         verify(notificationSender, times(2)).send(
             any(Notification.class), eq(notificationHandler), any(NotificationHandlerContext.class));
@@ -138,9 +140,9 @@ class NotificationJobStatusApplicationEventListenerTest {
 
     @Test
     void testRepeatedCompletionsOfTheSameWorkflowAreNotThrottled() {
-        completeJobAt(1L, START);
-        completeJobAt(2L, START.plus(Duration.ofMinutes(5)));
-        completeJobAt(3L, START.plus(Duration.ofMinutes(10)));
+        completeJob(1L);
+        completeJob(2L);
+        completeJob(3L);
 
         ArgumentCaptor<NotificationHandlerContext> notificationHandlerContextArgumentCaptor =
             ArgumentCaptor.forClass(NotificationHandlerContext.class);
@@ -153,19 +155,14 @@ class NotificationJobStatusApplicationEventListenerTest {
             .containsOnly(0L);
     }
 
-    private void completeJobAt(long jobId, Instant instant) {
-        changeJobStatusAt(jobId, Job.Status.COMPLETED, instant);
-    }
-
-    private void failJobAt(long jobId, Instant instant) {
-        changeJobStatusAt(jobId, Job.Status.FAILED, instant);
-    }
-
-    private void changeJobStatusAt(long jobId, Job.Status status, Instant instant) {
-        when(clock.instant()).thenReturn(instant);
-
+    private void completeJob(long jobId) {
         notificationJobStatusApplicationEventListener.onApplicationEvent(
-            new JobStatusApplicationEvent(jobId, status));
+            new JobStatusApplicationEvent(jobId, Job.Status.COMPLETED));
+    }
+
+    private void failJob(long jobId) {
+        notificationJobStatusApplicationEventListener.onApplicationEvent(
+            new JobStatusApplicationEvent(jobId, Job.Status.FAILED));
     }
 
     private static Job createJob(long id, String workflowId) {

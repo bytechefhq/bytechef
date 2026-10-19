@@ -17,69 +17,58 @@
 package com.bytechef.platform.coordinator.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.notification.domain.NotificationEvent;
-import java.time.Clock;
+import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
-import java.time.Instant;
+import java.util.OptionalLong;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import org.springframework.cache.Cache;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
  * @author Ivica Cardic
  */
 class NotificationThrottleTest {
 
-    private static final Instant START = Instant.parse("2026-10-19T10:00:00Z");
-
-    private final Clock clock = mock(Clock.class);
-    private final NotificationThrottle notificationThrottle = new NotificationThrottle(Duration.ofHours(1), clock);
+    private final ConcurrentMapCacheManager concurrentMapCacheManager = createCacheManager();
+    private final Cache claimCache = concurrentMapCacheManager.getCache(NotificationThrottle.CLAIM_CACHE_NAME);
+    private final Cache suppressedCountCache = concurrentMapCacheManager.getCache(
+        NotificationThrottle.SUPPRESSED_COUNT_CACHE_NAME);
+    private final NotificationThrottle notificationThrottle = new NotificationThrottle(
+        claimCache, suppressedCountCache, Duration.ofHours(1));
 
     @Test
     void testFirstNotificationIsSentWithNoSuppressedCount() {
-        when(clock.instant()).thenReturn(START);
-
         assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
             .hasValue(0);
     }
 
     @Test
-    void testRepeatedNotificationWithinTheWindowIsSuppressed() {
-        when(clock.instant()).thenReturn(START);
-
+    void testRepeatedNotificationWhileClaimedIsSuppressed() {
         notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
-
-        when(clock.instant()).thenReturn(START.plus(Duration.ofMinutes(59)));
 
         assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
             .isEmpty();
     }
 
     @Test
-    void testNotificationAfterTheWindowIsSentWithTheSuppressedCount() {
-        when(clock.instant()).thenReturn(START);
-
+    void testNotificationAfterTheClaimExpiresIsSentWithTheSuppressedCount() {
         notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
 
-        for (int i = 1; i <= 3; i++) {
-            when(clock.instant()).thenReturn(START.plus(Duration.ofMinutes(5L * i)));
-
+        for (int i = 0; i < 3; i++) {
             notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
         }
 
-        when(clock.instant()).thenReturn(START.plus(Duration.ofHours(1)));
+        claimCache.clear();
 
         assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
             .hasValue(3);
 
-        when(clock.instant()).thenReturn(START.plus(Duration.ofHours(1))
-            .plus(Duration.ofMinutes(5)));
+        notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
 
-        assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
-            .isEmpty();
-
-        when(clock.instant()).thenReturn(START.plus(Duration.ofHours(2)));
+        claimCache.clear();
 
         assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
             .hasValue(1);
@@ -87,8 +76,6 @@ class NotificationThrottleTest {
 
     @Test
     void testDifferentNotificationWorkflowOrEventTypeIsThrottledSeparately() {
-        when(clock.instant()).thenReturn(START);
-
         notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
 
         assertThat(notificationThrottle.tryAcquire(2L, "workflow1", NotificationEvent.Type.JOB_FAILED))
@@ -100,14 +87,57 @@ class NotificationThrottleTest {
     }
 
     @Test
-    void testZeroWindowDisablesThrottling() {
-        NotificationThrottle disabledNotificationThrottle = new NotificationThrottle(Duration.ZERO, clock);
+    void testDifferentTenantsAreThrottledSeparately() {
+        notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
 
-        when(clock.instant()).thenReturn(START);
+        AtomicReference<OptionalLong> suppressedCount = new AtomicReference<>();
+
+        TenantContext.runWithTenantId(
+            "tenant2",
+            () -> suppressedCount.set(
+                notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED)));
+
+        assertThat(suppressedCount.get()).hasValue(0);
+    }
+
+    @Test
+    void testOnlyOneOfTheInstancesSharingTheCachesSendsPerWindow() {
+        NotificationThrottle otherNotificationThrottle = new NotificationThrottle(
+            claimCache, suppressedCountCache, Duration.ofHours(1));
+
+        assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .hasValue(0);
+        assertThat(otherNotificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .isEmpty();
+        assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .isEmpty();
+
+        claimCache.clear();
+
+        assertThat(otherNotificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .hasValue(2);
+        assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .isEmpty();
+    }
+
+    @Test
+    void testZeroWindowDisablesThrottlingWithoutTouchingTheCaches() {
+        NotificationThrottle disabledNotificationThrottle = new NotificationThrottle(
+            claimCache, suppressedCountCache, Duration.ZERO);
 
         disabledNotificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED);
 
         assertThat(disabledNotificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
             .hasValue(0);
+        assertThat(notificationThrottle.tryAcquire(1L, "workflow1", NotificationEvent.Type.JOB_FAILED))
+            .hasValue(0);
+    }
+
+    private static ConcurrentMapCacheManager createCacheManager() {
+        ConcurrentMapCacheManager concurrentMapCacheManager = new ConcurrentMapCacheManager();
+
+        concurrentMapCacheManager.setStoreByValue(true);
+
+        return concurrentMapCacheManager;
     }
 }

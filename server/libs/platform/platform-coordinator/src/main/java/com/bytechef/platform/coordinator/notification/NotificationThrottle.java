@@ -17,38 +17,31 @@
 package com.bytechef.platform.coordinator.notification;
 
 import com.bytechef.platform.notification.domain.NotificationEvent;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.time.Clock;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.OptionalLong;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicLong;
 import org.jspecify.annotations.Nullable;
+import org.springframework.cache.Cache;
 
 /**
  * @author Ivica Cardic
  */
 public class NotificationThrottle {
 
-    private static final int MAXIMUM_SIZE = 10_000;
+    public static final String CLAIM_CACHE_NAME =
+        "com.bytechef.platform.coordinator.notification.NotificationThrottle.claim";
+    public static final String SUPPRESSED_COUNT_CACHE_NAME =
+        "com.bytechef.platform.coordinator.notification.NotificationThrottle.suppressedCount";
 
-    private final Clock clock;
-    private final ConcurrentMap<Key, State> states;
+    private final Cache claimCache;
+    private final Cache suppressedCountCache;
     private final Duration window;
 
-    public NotificationThrottle(Duration window) {
-        this(window, Clock.systemUTC());
-    }
-
-    public NotificationThrottle(Duration window, Clock clock) {
-        Cache<Key, State> cache = Caffeine.newBuilder()
-            .maximumSize(MAXIMUM_SIZE)
-            .build();
-
-        this.clock = clock;
-        this.states = cache.asMap();
+    @SuppressFBWarnings("EI")
+    public NotificationThrottle(Cache claimCache, Cache suppressedCountCache, Duration window) {
+        this.claimCache = claimCache;
+        this.suppressedCountCache = suppressedCountCache;
         this.window = window;
     }
 
@@ -57,27 +50,18 @@ public class NotificationThrottle {
             return OptionalLong.of(0);
         }
 
-        Instant now = clock.instant();
-        AtomicLong suppressedCount = new AtomicLong(-1);
+        String key = TenantCacheKeyUtils.getKey(notificationId, workflowId, eventType);
 
-        states.compute(new Key(notificationId, workflowId, eventType), (key, state) -> {
-            if (state == null || !now.isBefore(state.lastSentDate.plus(window))) {
-                suppressedCount.set(state == null ? 0 : state.suppressedCount);
+        Long suppressedCount = suppressedCountCache.get(key, Long.class);
 
-                return new State(now, 0);
-            }
+        if (claimCache.putIfAbsent(key, Boolean.TRUE) == null) {
+            suppressedCountCache.evict(key);
 
-            return new State(state.lastSentDate, state.suppressedCount + 1);
-        });
+            return OptionalLong.of(suppressedCount == null ? 0 : suppressedCount);
+        }
 
-        long count = suppressedCount.get();
+        suppressedCountCache.put(key, suppressedCount == null ? 1 : suppressedCount + 1);
 
-        return count < 0 ? OptionalLong.empty() : OptionalLong.of(count);
-    }
-
-    private record Key(Long notificationId, @Nullable String workflowId, NotificationEvent.Type eventType) {
-    }
-
-    private record State(Instant lastSentDate, long suppressedCount) {
+        return OptionalLong.empty();
     }
 }

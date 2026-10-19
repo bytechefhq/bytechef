@@ -22,6 +22,8 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.cache.autoconfigure.RedisCacheManagerBuilderCustomizer;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,6 +31,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
@@ -41,25 +44,39 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 public class CacheConfiguration implements CachingConfigurer {
 
+    private static final Duration MINIMUM_NOTIFICATION_THROTTLE_TTL = Duration.ofMinutes(10);
+    private static final String NOTIFICATION_THROTTLE_CLAIM_CACHE =
+        "com.bytechef.platform.coordinator.notification.NotificationThrottle.claim";
+    private static final String NOTIFICATION_THROTTLE_SUPPRESSED_COUNT_CACHE =
+        "com.bytechef.platform.coordinator.notification.NotificationThrottle.suppressedCount";
+    private static final String NOTIFICATION_THROTTLE_WINDOW_PROPERTY =
+        "bytechef.mail.failure-notification-throttle-window";
     private static final String REENTRANT_LOCK_CACHE =
         "com.bytechef.platform.component.aspect.TokenRefreshHandler.reentrantLock";
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "redis")
-    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer(Environment environment) {
         Class<?> clazz = getClass();
+        Duration notificationThrottleWindow = getNotificationThrottleWindow(environment);
 
         return (builder) -> {
             ClassLoader classLoader = clazz.getClassLoader();
 
-            builder.cacheDefaults(getCacheConfiguration(10, classLoader))
-                .withCacheConfiguration(REENTRANT_LOCK_CACHE, getCacheConfiguration(1, classLoader));
+            builder.cacheDefaults(getCacheConfiguration(Duration.ofMinutes(10), classLoader))
+                .withCacheConfiguration(REENTRANT_LOCK_CACHE, getCacheConfiguration(Duration.ofMinutes(1), classLoader))
+                .withCacheConfiguration(
+                    NOTIFICATION_THROTTLE_CLAIM_CACHE,
+                    getCacheConfiguration(getClaimTtl(notificationThrottleWindow), classLoader))
+                .withCacheConfiguration(
+                    NOTIFICATION_THROTTLE_SUPPRESSED_COUNT_CACHE,
+                    getCacheConfiguration(getSuppressedCountTtl(notificationThrottleWindow), classLoader));
         };
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "caffeine")
-    public CacheManager cacheManager() {
+    public CacheManager cacheManager(Environment environment) {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
 
         caffeineCacheManager.setCaffeine(
@@ -74,6 +91,22 @@ public class CacheConfiguration implements CachingConfigurer {
                 .recordStats()
                 .build());
 
+        Duration notificationThrottleWindow = getNotificationThrottleWindow(environment);
+
+        caffeineCacheManager.registerCustomCache(
+            NOTIFICATION_THROTTLE_CLAIM_CACHE,
+            Caffeine.newBuilder()
+                .maximumSize(10_000)
+                .expireAfterWrite(getClaimTtl(notificationThrottleWindow))
+                .build());
+
+        caffeineCacheManager.registerCustomCache(
+            NOTIFICATION_THROTTLE_SUPPRESSED_COUNT_CACHE,
+            Caffeine.newBuilder()
+                .maximumSize(10_000)
+                .expireAfterWrite(getSuppressedCountTtl(notificationThrottleWindow))
+                .build());
+
         return caffeineCacheManager;
     }
 
@@ -82,10 +115,28 @@ public class CacheConfiguration implements CachingConfigurer {
         return new TenantKeyGenerator();
     }
 
-    private static RedisCacheConfiguration getCacheConfiguration(int minutes, ClassLoader clazz) {
+    private static RedisCacheConfiguration getCacheConfiguration(Duration ttl, ClassLoader clazz) {
         return RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(minutes))
+            .entryTtl(ttl)
             .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
             .serializeValuesWith(SerializationPair.fromSerializer(new JdkSerializationRedisSerializer(clazz)));
+    }
+
+    private static Duration getClaimTtl(Duration window) {
+        return window.isZero() || window.isNegative() ? MINIMUM_NOTIFICATION_THROTTLE_TTL : window;
+    }
+
+    private static Duration getNotificationThrottleWindow(Environment environment) {
+        Binder binder = Binder.get(environment);
+
+        BindResult<Duration> bindResult = binder.bind(NOTIFICATION_THROTTLE_WINDOW_PROPERTY, Duration.class);
+
+        return bindResult.isBound() ? bindResult.get() : Duration.ofHours(1);
+    }
+
+    private static Duration getSuppressedCountTtl(Duration window) {
+        Duration ttl = window.multipliedBy(2);
+
+        return ttl.compareTo(MINIMUM_NOTIFICATION_THROTTLE_TTL) < 0 ? MINIMUM_NOTIFICATION_THROTTLE_TTL : ttl;
     }
 }
