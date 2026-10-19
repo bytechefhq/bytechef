@@ -3302,6 +3302,8 @@ export type Query = {
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  myWorkspaceRole?: Maybe<Scalars['String']['output']>;
+  myWorkspaceScopes: Array<Scalars['String']['output']>;
   oauth2ConsentClient?: Maybe<OAuth2ConsentClient>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
@@ -3918,6 +3920,17 @@ export type QueryMcpToolArgs = {
 
 export type QueryMcpToolsByComponentIdArgs = {
   mcpComponentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMyWorkspaceRoleArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyWorkspaceScopesArgs = {
+  environment?: InputMaybe<EnvironmentEnum>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
