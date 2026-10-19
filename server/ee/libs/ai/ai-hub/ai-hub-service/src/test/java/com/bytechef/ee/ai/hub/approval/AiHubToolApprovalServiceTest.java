@@ -100,6 +100,34 @@ class AiHubToolApprovalServiceTest {
     }
 
     @Test
+    void testRecordToolCallIdStoresTheIdOfTheHeldCall() {
+        AiHubToolApproval approval = pendingApproval();
+
+        when(repository.findById(5L)).thenReturn(Optional.of(approval));
+
+        service.recordToolCallId(5L, "call-1");
+
+        assertThat(approval.getToolCallId()).isEqualTo("call-1");
+
+        verify(repository).save(approval);
+    }
+
+    @Test
+    void testRecordToolCallIdKeepsAnIdAlreadyRecorded() {
+        AiHubToolApproval approval = pendingApproval();
+
+        approval.setToolCallId("call-1");
+
+        when(repository.findById(5L)).thenReturn(Optional.of(approval));
+
+        service.recordToolCallId(5L, "call-2");
+
+        assertThat(approval.getToolCallId()).isEqualTo("call-1");
+
+        verify(repository, never()).save(any());
+    }
+
+    @Test
     void testGetThrowsNotFoundForAnUnknownId() {
         when(repository.findById(5L)).thenReturn(Optional.empty());
 
