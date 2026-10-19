@@ -34,6 +34,7 @@ import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -136,17 +137,47 @@ class AutomationA2AServerApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticateWithDisabledA2aServerFails() {
+    void testAuthenticateWithDisabledA2aServerReportsTheServerDisabledWhenAuthenticationIsNotRequired() {
         A2aServer a2aServer = mock(A2aServer.class);
 
         when(a2aServer.isEnabled()).thenReturn(false);
         when(a2aServer.isAuthenticationRequired()).thenReturn(false);
         when(a2aServerService.fetchA2aServer("server-secret")).thenReturn(Optional.of(a2aServer));
 
-        assertThatExceptionOfType(BadCredentialsException.class)
+        assertThatExceptionOfType(McpServerDisabledException.class)
             .isThrownBy(() -> provider.authenticate(getUnauthenticatedToken()))
-            .withMessage("A2A server is disabled");
+            .withMessage(McpServerDisabledException.A2A_SERVER_MESSAGE);
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithDisabledA2aServerAndValidApiKeyReportsTheServerDisabled() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockA2aServer(Environment.PRODUCTION);
+
+        A2aServer a2aServer = a2aServerService.fetchA2aServer("server-secret")
+            .orElseThrow();
+
+        when(a2aServer.isEnabled()).thenReturn(false);
+
+        assertThatExceptionOfType(McpServerDisabledException.class)
+            .isThrownBy(() -> provider.authenticate(getUnauthenticatedToken()))
+            .withMessage(McpServerDisabledException.A2A_SERVER_MESSAGE);
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
+    }
+
+    @Test
+    void testAuthenticateWithDisabledA2aServerAndInvalidApiKeyFailsAsInvalidCredentials() {
+        mockApiKey(PlatformType.EMBEDDED, Environment.PRODUCTION);
+        mockA2aServer(Environment.PRODUCTION);
+
+        A2aServer a2aServer = a2aServerService.fetchA2aServer("server-secret")
+            .orElseThrow();
+
+        when(a2aServer.isEnabled()).thenReturn(false);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> provider.authenticate(getUnauthenticatedToken()));
     }
 
     @Test
