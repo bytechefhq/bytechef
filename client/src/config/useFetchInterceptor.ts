@@ -53,6 +53,24 @@ function handlesErrorInline(url: string): boolean {
     );
 }
 
+async function isAiHubAuthorizationRefusal(url: string, response: Response): Promise<boolean> {
+    if (!AI_HUB_CHAT_URL_PATTERN.test(url)) {
+        return false;
+    }
+
+    try {
+        const body: unknown = await response.clone().json();
+
+        if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+            return false;
+        }
+
+        return Object.keys(body).length === 1 && typeof (body as {error?: unknown}).error === 'string';
+    } catch {
+        return false;
+    }
+}
+
 const AUTHENTICATION_REQUIRED_ERROR_CODE = 'AUTHENTICATION_REQUIRED';
 
 interface GraphQlErrorI {
@@ -274,7 +292,7 @@ export default function useFetchInterceptor() {
 
             const url = resolveUrl(input);
 
-            if (!isCsrfProtectedUrl(url)) {
+            if (!isCsrfProtectedUrl(url) || (await isAiHubAuthorizationRefusal(url, response))) {
                 return response;
             }
 
@@ -290,7 +308,8 @@ export default function useFetchInterceptor() {
 
             if (
                 retriedResponse.status === 403 &&
-                !isAccessDeniedProblemDetail(await readProblemDetail(retriedResponse))
+                !isAccessDeniedProblemDetail(await readProblemDetail(retriedResponse)) &&
+                !(await isAiHubAuthorizationRefusal(url, retriedResponse))
             ) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();

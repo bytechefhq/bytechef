@@ -65,7 +65,9 @@ test.describe('AI Hub modes and roles', () => {
         await hubRun.waitForRequest(0);
 
         await test.step('Assert the refusal is shown in the hub', async () => {
-            await expect(page.getByText(/not accessible to the current user|HTTP 403/).first()).toBeVisible();
+            await expect(aiHubPage.runErrors).toHaveText(/You don't have permission to do this in this workspace\./);
+
+            expect(hubRun.requests).toHaveLength(1);
         });
 
         await test.step('Assert the user is still logged in on the hub', async () => {
@@ -73,7 +75,7 @@ test.describe('AI Hub modes and roles', () => {
 
             await expect(aiHubPage.composerInput).toBeVisible();
 
-            expect(await readRecordedToasts(page)).not.toContainEqual(expect.objectContaining({text: 'Error'}));
+            expect(await readRecordedToasts(page)).toEqual([]);
         });
     });
 
