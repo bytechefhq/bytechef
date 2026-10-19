@@ -1,4 +1,5 @@
 import ImportApp from '@/ImportApp';
+import AiHubEnabled from '@/ee/pages/automation/ai-hub/AiHubEnabled';
 import DevelopmentIntegrationInstanceConfigurationsRedirect from '@/ee/pages/embedded/integration-instance-configurations/DevelopmentIntegrationInstanceConfigurationsRedirect';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
@@ -198,9 +199,11 @@ const currentWorkspaceSettingsRoutes = {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
-                        <LazyLoadWrapper>
-                            <AiHubToolApprovals />
-                        </LazyLoadWrapper>
+                        <AiHubEnabled>
+                            <LazyLoadWrapper>
+                                <AiHubToolApprovals />
+                            </LazyLoadWrapper>
+                        </AiHubEnabled>
                     </EEVersion>
                 </PrivateRoute>
             ),
@@ -880,9 +883,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHub />
-                                                </LazyLoadWrapper>
+                                                <AiHubEnabled>
+                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                        <AiHub />
+                                                    </LazyLoadWrapper>
+                                                </AiHubEnabled>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
@@ -892,9 +897,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
-                                                <LazyLoadWrapper hasLeftSidebar>
-                                                    <AiHub />
-                                                </LazyLoadWrapper>
+                                                <AiHubEnabled>
+                                                    <LazyLoadWrapper hasLeftSidebar>
+                                                        <AiHub />
+                                                    </LazyLoadWrapper>
+                                                </AiHubEnabled>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
