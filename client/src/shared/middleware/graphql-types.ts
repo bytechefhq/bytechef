@@ -1813,11 +1813,12 @@ export type Mutation = {
    */
   removeWorkspaceUser: Scalars['Boolean']['output'];
   /**
-   * Remove a member's role in one environment, denying them there. Fails when it is the only
-   * role the member holds (remove the member from the workspace instead), and when the member
-   * holds no role specific to that environment, including a member whose access there comes
-   * from a workspace-wide role. Requires the WORKSPACE_MEMBER_MANAGE scope in the named
-   * environment.
+   * Remove a member's role in one environment, denying them there. Removing their last
+   * environment role turns it into a workspace-wide role, so the member keeps that role in
+   * every environment; that widening requires the WORKSPACE_MEMBER_MANAGE scope in every
+   * environment. Fails when the member holds no role specific to that environment, including
+   * a member whose access there comes from a workspace-wide role. Requires the
+   * WORKSPACE_MEMBER_MANAGE scope in the named environment.
    */
   removeWorkspaceUserEnvironmentRole: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];

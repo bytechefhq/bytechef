@@ -59,6 +59,28 @@ const WorkspaceUserEnvironmentRoles = ({
 
     const isLastEnvironmentRole = orderedRoles.length === 1;
 
+    const canManageEveryEnvironment = ENVIRONMENT_ORDER.every((environment) =>
+        manageableEnvironments.includes(environment)
+    );
+
+    const pendingRemovalRoleLabel = useMemo(() => {
+        const pendingRemovalRole = orderedRoles.find(
+            (environmentRole) => environmentRole.environment === pendingRemoval
+        );
+
+        if (!pendingRemovalRole) {
+            return '';
+        }
+
+        if (pendingRemovalRole.customRoleId) {
+            return (
+                customRoles.find((customRole) => customRole.id === String(pendingRemovalRole.customRoleId))?.name || ''
+            );
+        }
+
+        return pendingRemovalRole.workspaceRole ? getRoleLabel(pendingRemovalRole.workspaceRole) : '';
+    }, [customRoles, orderedRoles, pendingRemoval]);
+
     return (
         <div className="space-y-2">
             {orderedRoles.map((environmentRole) => (
@@ -98,16 +120,17 @@ const WorkspaceUserEnvironmentRoles = ({
                         </SelectContent>
                     </Select>
 
-                    {manageableEnvironments.includes(environmentRole.environment) && !isLastEnvironmentRole && (
-                        <button
-                            aria-label={`Remove ${ENVIRONMENT_LABELS[environmentRole.environment]} role`}
-                            className="text-destructive hover:text-destructive/80"
-                            onClick={() => setPendingRemoval(environmentRole.environment)}
-                            type="button"
-                        >
-                            <Trash2Icon className="size-4" />
-                        </button>
-                    )}
+                    {manageableEnvironments.includes(environmentRole.environment) &&
+                        (canManageEveryEnvironment || !isLastEnvironmentRole) && (
+                            <button
+                                aria-label={`Remove ${ENVIRONMENT_LABELS[environmentRole.environment]} role`}
+                                className="text-destructive hover:text-destructive/80"
+                                onClick={() => setPendingRemoval(environmentRole.environment)}
+                                type="button"
+                            >
+                                <Trash2Icon className="size-4" />
+                            </button>
+                        )}
                 </div>
             ))}
 
@@ -143,7 +166,9 @@ const WorkspaceUserEnvironmentRoles = ({
                             <AlertDialogTitle>Remove the {ENVIRONMENT_LABELS[pendingRemoval]} role?</AlertDialogTitle>
 
                             <AlertDialogDescription>
-                                {`They will lose access to ${ENVIRONMENT_LABELS[pendingRemoval]}. Their roles in the other environments are unchanged.`}
+                                {isLastEnvironmentRole
+                                    ? `This is their only environment role, so it becomes a workspace-wide role. They will keep the ${pendingRemovalRoleLabel} role in every environment.`
+                                    : `They will lose access to ${ENVIRONMENT_LABELS[pendingRemoval]}. Their roles in the other environments are unchanged.`}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
 

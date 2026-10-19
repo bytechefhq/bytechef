@@ -176,6 +176,27 @@ class WorkspaceUserAuditMapperTest {
     }
 
     @Test
+    void testEnvironmentRoleRemovedRecordsNoWideningForAWorkspaceWideMember() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal())).thenReturn(Optional.empty());
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR)));
+
+        Map<String, Object> arguments = arguments(
+            "userId", USER_ID, "workspaceId", WORKSPACE_ID, "environment", Environment.PRODUCTION);
+
+        Object captured = workspaceUserAuditMapper.capture(
+            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED, arguments, null, null));
+
+        assertThat(workspaceUserAuditMapper.map(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED, arguments, null, captured)))
+                .containsExactlyInAnyOrderEntriesOf(
+                    Map.of(
+                        "workspaceId", "1", "userId", "2", "environment", "PRODUCTION", "widenedToWorkspaceWide",
+                        "false"));
+    }
+
+    @Test
     void testCaptureOfAddedReadsNothing() {
         assertThat(workspaceUserAuditMapper.capture(invocation(
             WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED, arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID),
