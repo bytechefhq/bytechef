@@ -7,11 +7,14 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }
