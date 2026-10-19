@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.jdbc.operation;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import java.sql.ResultSet;
@@ -32,6 +34,9 @@ import javax.sql.DataSource;
  */
 public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object>>> {
 
+    public static final int DEFAULT_MAX_ROWS = 10000;
+    public static final int MAX_MAX_ROWS = Integer.MAX_VALUE - 1;
+
     public record QueryColumn(String name, int type) {
     }
 
@@ -46,8 +51,9 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
     public QueryResult executeWithColumns(Map<String, ?> inputParameters, DataSource dataSource) {
         Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
         String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
+        int maxRows = getMaxRows(inputParameters);
 
-        return JdbcExecutor.query(
+        QueryResult queryResult = JdbcExecutor.query(
             queryStatement, paramMap, (ResultSet rs) -> {
                 ResultSetMetaData rsMetaData = rs.getMetaData();
 
@@ -74,15 +80,22 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
                 }
 
                 return new QueryResult(columns, rows);
-            }, dataSource);
+            }, maxRows + 1, dataSource);
+
+        List<Map<String, Object>> rows = queryResult.rows();
+
+        checkRowCount(rows.size(), maxRows);
+
+        return queryResult;
     }
 
     @Override
     public List<Map<String, Object>> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
         String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
+        int maxRows = getMaxRows(inputParameters);
 
-        return JdbcExecutor.query(
+        List<Map<String, Object>> rows = JdbcExecutor.query(
             queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
                 Map<String, Object> row = new HashMap<>();
 
@@ -97,6 +110,30 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
                 }
 
                 return row;
-            }, dataSource);
+            }, maxRows + 1, dataSource);
+
+        checkRowCount(rows.size(), maxRows);
+
+        return rows;
+    }
+
+    private static void checkRowCount(int rowCount, int maxRows) {
+        if (rowCount > maxRows) {
+            throw new ConfigurationException(
+                "The query returned more than " + maxRows + " rows. Narrow the query or increase Max Rows.",
+                ComponentErrorType.QUERY_MAX_ROWS_EXCEEDED);
+        }
+    }
+
+    private static int getMaxRows(Map<String, ?> inputParameters) {
+        int maxRows = MapUtils.getInteger(inputParameters, JdbcConstants.MAX_ROWS, DEFAULT_MAX_ROWS);
+
+        if (maxRows < 1 || maxRows > MAX_MAX_ROWS) {
+            throw new ConfigurationException(
+                "Max Rows must be between 1 and " + MAX_MAX_ROWS + ", but was " + maxRows + ".",
+                ComponentErrorType.INVALID_MAX_ROWS);
+        }
+
+        return maxRows;
     }
 }
