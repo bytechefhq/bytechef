@@ -34,7 +34,10 @@ import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -44,7 +47,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -54,9 +56,13 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  */
 public class JdbcItemReader implements ItemReader {
 
+    static final int FETCH_SIZE = 1000;
+
+    private Connection connection;
     private SingleConnectionDataSource dataSource;
-    private Iterator<Map<String, Object>> iterator;
     private final String jdbcDriverClassName;
+    private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
     private final String urlTemplate;
 
     public JdbcItemReader(String urlTemplate, String jdbcDriverClassName) {
@@ -102,16 +108,29 @@ public class JdbcItemReader implements ItemReader {
 
     @Override
     public void close() {
-        if (dataSource != null) {
-            try {
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+
+            if (connection != null && !connection.getAutoCommit()) {
+                connection.rollback();
+            }
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            if (dataSource != null) {
                 dataSource.close();
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
             }
         }
     }
 
     @Override
+    @SuppressFBWarnings(value = "SQL_INJECTION_JDBC", justification = "The condition is user-supplied SQL by design")
     public void open(
         Parameters inputParameters, Parameters connectionParameters, Context context,
         ExecutionContext executionContext) {
@@ -120,32 +139,48 @@ public class JdbcItemReader implements ItemReader {
 
         String query = buildSelectQuery(inputParameters);
 
-        List<Map<String, Object>> rows = JdbcExecutor.query(
-            query, Map.of(), (ResultSet resultSet, int rowNum) -> {
-                Map<String, Object> row = new HashMap<>();
+        try {
+            this.connection = dataSource.getConnection();
 
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int columnCount = metaData.getColumnCount();
+            connection.setAutoCommit(false);
 
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnName(i);
+            this.preparedStatement = connection.prepareStatement(
+                query, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 
-                    row.put(columnName, resultSet.getObject(i));
-                }
+            int fetchSize = jdbcDriverClassName.startsWith("com.mysql") ? Integer.MIN_VALUE : FETCH_SIZE;
 
-                return row;
-            }, dataSource);
+            preparedStatement.setFetchSize(fetchSize);
 
-        this.iterator = rows.iterator();
+            this.resultSet = preparedStatement.executeQuery();
+        } catch (SQLException sqlException) {
+            close();
+
+            throw new RuntimeException("Failed to read table rows", sqlException);
+        }
     }
 
     @Override
     public Map<String, Object> read() {
-        if (iterator.hasNext()) {
-            return iterator.next();
-        }
+        try {
+            if (!resultSet.next()) {
+                return null;
+            }
 
-        return null;
+            Map<String, Object> row = new HashMap<>();
+
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnName(i);
+
+                row.put(columnName, resultSet.getObject(i));
+            }
+
+            return row;
+        } catch (SQLException sqlException) {
+            throw new RuntimeException("Failed to read table row", sqlException);
+        }
     }
 
     @Override
