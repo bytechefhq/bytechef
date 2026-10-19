@@ -77,6 +77,9 @@ Rules (`AiHubToolApprovalPolicy.Decision.isGated`):
   `rollback`, `promote` followed by an uppercase letter.
 - A workspace rule (`AiHubToolApprovalRule`, mode `REQUIRE` or `EXEMPT`) adds to or lifts that. `EXEMPT` always wins.
 - If the rule lookup fails, only the built-in defaults gate.
+- The `buildWorkflow` / `importWorkflow` sub-agents never see a tool gated by default: the hub decorates their chat
+  client with `AiHubGatedToolFilterAdvisor`, so destructive calls stay on the hub's own gated tools. The Copilot's
+  use of the same sub-agents is unchanged.
 
 A gated call creates a `PENDING` `AiHubToolApproval` and returns a `tool-approval-request` envelope instead of
 running; a second gated call while one is pending gets a `deferred` result; a persistence failure returns a refusal
