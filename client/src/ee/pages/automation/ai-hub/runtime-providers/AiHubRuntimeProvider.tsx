@@ -11,6 +11,7 @@ import {
     useAiHubRunStateStore,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {sanitizeAssistantMessages} from '@/ee/pages/automation/ai-hub/runtime-providers/stripLeakedToolMarkup';
+import {getServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -136,9 +137,18 @@ export function stampOptimisticTurnMarker(message: ThreadMessageLike, marker: st
 }
 
 export function removeOptimisticTurnMessages(marker: string): void {
-    useAiHubStore.setState((state) => ({
-        messages: state.messages.filter((message) => getOptimisticTurnMarker(message) !== marker),
-    }));
+    useAiHubStore.setState((state) => {
+        const removedServerRowIndexes = state.messages
+            .filter((message) => getOptimisticTurnMarker(message) === marker)
+            .map((message) => getServerRowIndex(message))
+            .filter((serverRowIndex): serverRowIndex is number => serverRowIndex != null);
+
+        return {
+            messages: state.messages.filter((message) => getOptimisticTurnMarker(message) !== marker),
+            nextServerRowIndex:
+                removedServerRowIndexes.length > 0 ? Math.min(...removedServerRowIndexes) : state.nextServerRowIndex,
+        };
+    });
 }
 
 interface BuildSubscriberDepsI {
@@ -414,6 +424,10 @@ export const buildAiHubSubscriber = ({
                 currentAssistantMessageIndex = useAiHubStore.getState().messages.length - 1;
             } else {
                 appendToLastAssistantMessage(text);
+            }
+
+            if (text.trim().length > 0) {
+                useAiHubStore.getState().tagServerRow(currentAssistantMessageIndex);
             }
 
             currentAssistantMessageHasOutput = true;
@@ -759,6 +773,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             });
 
             if (continuationStarted) {
+                useAiHubStore.getState().setNextServerRowIndex(useAiHubStore.getState().nextServerRowIndex + 1);
+
                 addMessage({content: '', role: 'assistant'});
 
                 aiHubChatsStore.getState().setActivityState(currentChatId, 'running');
@@ -939,6 +955,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         addMessage(stampOptimisticTurnMarker({content: input, role: 'user'}, optimisticTurnMarker));
 
+        useAiHubStore.getState().tagServerRow(useAiHubStore.getState().messages.length - 1);
+
         const turnStarted = await bootstrapAiHubTurnRunState({
             createChatIfNeeded: async () => {
                 if (aiHubChatsStore.getState().currentChatId != null) {
@@ -1047,17 +1065,26 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const input = message.content[0].text;
         const persistedChatId = aiHubChatsStore.getState().currentChatId;
+        const editedServerRowIndex = getServerRowIndex(useAiHubStore.getState().messages[editedIndex]);
+
+        if (persistedChatId != null && editedServerRowIndex == null) {
+            toast.error('Could not resolve edited message');
+
+            return;
+        }
 
         try {
-            if (persistedChatId != null && currentWorkspaceId != null) {
+            if (persistedChatId != null && editedServerRowIndex != null && currentWorkspaceId != null) {
                 await truncateChatMessagesMutation.mutateAsync({
-                    fromMessageIndex: editedIndex,
+                    fromMessageIndex: editedServerRowIndex,
                     id: String(persistedChatId),
                     workspaceId: String(currentWorkspaceId),
                 });
             }
 
             editUserMessage(editedIndex, input);
+
+            useAiHubStore.getState().setNextServerRowIndex((editedServerRowIndex ?? 0) + 1);
 
             agent.setMessages(agent.messages.slice(0, editedIndex));
             agent.addMessage({content: input, id: getRandomId(), role: 'user'});
@@ -1085,6 +1112,13 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const persistedChatId = aiHubChatsStore.getState().currentChatId;
         const currentMessages = useAiHubStore.getState().messages;
+        const parentServerRowIndex = parentIndex < 0 ? 0 : getServerRowIndex(currentMessages[parentIndex]);
+
+        if (persistedChatId != null && parentServerRowIndex == null) {
+            toast.error('Could not resolve message to refresh');
+
+            return;
+        }
         const lastUserContent = currentMessages[parentIndex]?.content;
         const lastUserInput =
             typeof lastUserContent === 'string'
@@ -1097,15 +1131,18 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                   : '';
 
         try {
-            if (persistedChatId != null && currentWorkspaceId != null) {
+            if (persistedChatId != null && parentServerRowIndex != null && currentWorkspaceId != null) {
                 await truncateChatMessagesMutation.mutateAsync({
-                    fromMessageIndex: parentIndex + 1,
+                    fromMessageIndex: parentServerRowIndex,
                     id: String(persistedChatId),
                     workspaceId: String(currentWorkspaceId),
                 });
             }
 
-            useAiHubStore.setState({messages: currentMessages.slice(0, parentIndex + 1)});
+            useAiHubStore.setState({
+                messages: currentMessages.slice(0, parentIndex + 1),
+                nextServerRowIndex: (parentServerRowIndex ?? 0) + (parentIndex < 0 ? 0 : 1),
+            });
 
             agent.setMessages(agent.messages.slice(0, parentIndex + 1));
 

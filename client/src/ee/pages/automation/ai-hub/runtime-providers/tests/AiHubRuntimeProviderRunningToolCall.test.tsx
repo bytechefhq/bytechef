@@ -133,7 +133,7 @@ describe('a live AI Hub turn running buildWorkflow', () => {
             {text: "Now I'll build the workflow.", type: 'text'},
             expect.objectContaining({toolName: 'buildWorkflow', type: 'tool-call'}),
         ]);
-        expect(projectedMessages[2]).toEqual({content: 'The workflow is ready.', role: 'assistant'});
+        expect(projectedMessages[2]).toMatchObject({content: 'The workflow is ready.', role: 'assistant'});
     });
 
     it('puts text after a tool call that opened the turn in its own bubble below the tool call', () => {
@@ -168,6 +168,6 @@ describe('a live AI Hub turn running buildWorkflow', () => {
         expect(projectedMessages[1].content).toEqual([
             expect.objectContaining({toolName: 'buildWorkflow', type: 'tool-call'}),
         ]);
-        expect(projectedMessages[2]).toEqual({content: 'Done.', role: 'assistant'});
+        expect(projectedMessages[2]).toMatchObject({content: 'Done.', role: 'assistant'});
     });
 });
