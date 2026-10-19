@@ -171,15 +171,20 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     }
 
     @Override
-    public List<Property> getWorkflowNodeComponentActionDynamicProperties(
-        String workflowId, String workflowNodeName, String componentName, int componentVersion, String actionName,
-        String propertyName, @Nullable String connectionKey, Map<String, ?> parameters,
-        List<String> lookupDependsOnPaths, long environmentId) {
+    public List<Property> getWorkflowNodeComponentOperationDynamicProperties(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId) {
 
-        List<ComponentConnection> componentConnections = componentConnectionFacade
-            .getWorkflowNodeComponentConnections(workflowId, workflowNodeName)
-            .stream()
-            .filter(componentConnection -> Objects.equals(componentConnection.componentName(), componentName))
+        List<ComponentConnection> declaredComponentConnections = clusterElementNode == null
+            ? componentConnectionFacade.getWorkflowNodeComponentConnections(workflowId, workflowNodeName)
+            : componentConnectionFacade.getClusterElementComponentConnections(
+                workflowId, workflowNodeName, clusterElementNode.clusterElementTypeName(),
+                clusterElementNode.clusterElementWorkflowNodeName());
+
+        List<ComponentConnection> componentConnections = declaredComponentConnections.stream()
+            .filter(componentConnection -> Objects.equals(
+                componentConnection.componentName(), componentOperation.componentName()))
             .filter(componentConnection -> connectionKey == null || Objects.equals(
                 componentConnection.key(), connectionKey))
             .toList();
@@ -206,8 +211,15 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             return List.of();
         }
 
+        if (componentOperation.trigger()) {
+            return triggerDefinitionFacade.executeDynamicProperties(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, connectionId);
+        }
+
         return actionDefinitionFacade.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, parameters, lookupDependsOnPaths, workflowId,
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, workflowId,
             connectionId);
     }
 

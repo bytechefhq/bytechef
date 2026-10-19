@@ -19,7 +19,10 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade;
-import com.bytechef.platform.configuration.web.rest.model.ComponentActionDynamicPropertiesRequestModel;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ClusterElementNode;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ComponentOperation;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationDynamicPropertiesRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationDynamicPropertiesRequestModel.OperationTypeEnum;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import java.util.List;
 import java.util.Map;
@@ -60,20 +63,29 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getWorkflowNodeComponentActionDynamicProperties(
+    public ResponseEntity<List<PropertyModel>> getWorkflowNodeComponentOperationDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, Long environmentId,
-        ComponentActionDynamicPropertiesRequestModel componentActionDynamicPropertiesRequestModel) {
+        ComponentOperationDynamicPropertiesRequestModel componentOperationDynamicPropertiesRequestModel) {
 
-        List<String> lookupDependsOnPaths = componentActionDynamicPropertiesRequestModel.getLookupDependsOnPaths();
-        Map<String, Object> parameters = componentActionDynamicPropertiesRequestModel.getParameters();
+        String clusterElementType = componentOperationDynamicPropertiesRequestModel.getClusterElementType();
+        String clusterElementWorkflowNodeName =
+            componentOperationDynamicPropertiesRequestModel.getClusterElementWorkflowNodeName();
+        List<String> lookupDependsOnPaths = componentOperationDynamicPropertiesRequestModel.getLookupDependsOnPaths();
+        Map<String, Object> parameters = componentOperationDynamicPropertiesRequestModel.getParameters();
+
+        ClusterElementNode clusterElementNode = clusterElementType == null || clusterElementWorkflowNodeName == null
+            ? null : new ClusterElementNode(clusterElementType, clusterElementWorkflowNodeName);
+        ComponentOperation componentOperation = new ComponentOperation(
+            componentOperationDynamicPropertiesRequestModel.getComponentName(),
+            componentOperationDynamicPropertiesRequestModel.getComponentVersion(),
+            componentOperationDynamicPropertiesRequestModel.getOperationName(),
+            componentOperationDynamicPropertiesRequestModel.getOperationType() == OperationTypeEnum.TRIGGER);
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-                    workflowId, workflowNodeName, componentActionDynamicPropertiesRequestModel.getComponentName(),
-                    componentActionDynamicPropertiesRequestModel.getComponentVersion(),
-                    componentActionDynamicPropertiesRequestModel.getActionName(), propertyName,
-                    componentActionDynamicPropertiesRequestModel.getConnectionKey(),
+                workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                    workflowId, workflowNodeName, clusterElementNode, componentOperation, propertyName,
+                    componentOperationDynamicPropertiesRequestModel.getConnectionKey(),
                     parameters == null ? Map.of() : parameters,
                     lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
                 property -> conversionService.convert(property, PropertyModel.class)));
