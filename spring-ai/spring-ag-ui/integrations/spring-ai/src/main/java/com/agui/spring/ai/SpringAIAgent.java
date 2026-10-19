@@ -26,11 +26,12 @@ import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.json.JsonMapper;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.concurrent.ConcurrentHashMap;
-import tools.jackson.databind.json.JsonMapper;
 
 import static com.agui.server.EventFactory.*;
 import static java.util.stream.Collectors.toList;
@@ -231,6 +232,18 @@ public class SpringAIAgent extends LocalAgent {
      */
     protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
         return throwable.getMessage();
+    }
+
+    /**
+     * Hook for subclasses to choose the error text the TOOL_CALL_RESULT of a failed tool call carries to the client.
+     * Default returns the throwable's message, or its simple class name when it has none.
+     *
+     * @param input     the current run input
+     * @param throwable the failure the tool threw
+     * @return the error text sent to the client
+     */
+    protected String toolErrorMessage(RunAgentInput input, Throwable throwable) {
+        return throwable.getMessage() == null ? throwable.getClass().getSimpleName() : throwable.getMessage();
     }
 
     /**
@@ -451,7 +464,10 @@ public class SpringAIAgent extends LocalAgent {
                     mergedCallbacks
                         .stream()
                         .map(toolCallback -> new AgUiFunctionToolCallback(
-                            toolCallback, new ToolCallEventEmitter(textMessageStream, toolEventConsumer)))
+                            toolCallback,
+                            new ToolCallEventEmitter(
+                                textMessageStream, toolEventConsumer,
+                                throwable -> this.toolErrorMessage(input, throwable))))
                         .collect(toList())
                 );
             } catch (RuntimeException e) {
@@ -530,11 +546,16 @@ public class SpringAIAgent extends LocalAgent {
 
         private final TextMessageStream textMessageStream;
         private final Consumer<BaseEvent> toolEventConsumer;
+        private final Function<Throwable, String> toolErrorMessage;
         private final Map<String, String> parentMessageIds = new ConcurrentHashMap<>();
 
-        private ToolCallEventEmitter(TextMessageStream textMessageStream, Consumer<BaseEvent> toolEventConsumer) {
+        private ToolCallEventEmitter(
+            TextMessageStream textMessageStream, Consumer<BaseEvent> toolEventConsumer,
+            Function<Throwable, String> toolErrorMessage) {
+
             this.textMessageStream = textMessageStream;
             this.toolEventConsumer = toolEventConsumer;
+            this.toolErrorMessage = toolErrorMessage;
         }
 
         @Override
@@ -554,10 +575,9 @@ public class SpringAIAgent extends LocalAgent {
         }
 
         @Override
-        public void onToolCallFailed(String toolCallId, RuntimeException exception) {
-            var message = exception.getMessage() == null ? exception.getClass().getSimpleName() : exception.getMessage();
-
-            emitResult(toolCallId, ERROR_JSON_MAPPER.writeValueAsString(Map.of("error", message)));
+        public void onToolCallFailed(String toolCallId, Throwable throwable) {
+            emitResult(
+                toolCallId, ERROR_JSON_MAPPER.writeValueAsString(Map.of("error", toolErrorMessage.apply(throwable))));
         }
 
         private void emitResult(String toolCallId, String content) {
