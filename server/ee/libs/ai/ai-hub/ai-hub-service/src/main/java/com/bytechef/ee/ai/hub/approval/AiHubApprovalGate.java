@@ -47,6 +47,14 @@ public class AiHubApprovalGate {
     }
 
     /**
+     * Records the id of the model's tool call an approval holds, so later checks follow that call rather than any call
+     * with the same tool name and arguments.
+     */
+    public void recordToolCallId(long approvalId, String toolCallId) {
+        approvalService.recordToolCallId(approvalId, toolCallId);
+    }
+
+    /**
      * Wraps {@code callback} with the tool approval gate. Returns {@code callback} unchanged when it is already
      * wrapped, so re-wrapping at a second registration site doesn't nest the gate twice.
      */

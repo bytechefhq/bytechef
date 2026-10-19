@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.event.BaseEvent;
 import com.agui.core.event.RunErrorEvent;
+import com.agui.core.event.TextMessageContentEvent;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
@@ -52,15 +53,19 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -88,7 +93,7 @@ class AiHubTurnToolDispatchTest {
     private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogChatModelFactory catalogChatModelFactory = mock(CatalogChatModelFactory.class);
     private final AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
-    private final InFlightAiHubRunRegistry inFlightRunRegistry = new InFlightAiHubRunRegistry();
+    private final InFlightAiHubRunRegistry inFlightRunRegistry = fixtures.inFlightRunRegistry;
     private final PromptCapturingChatModel providerChatModel = new PromptCapturingChatModel();
 
     private AiHubApiController controller;
@@ -243,6 +248,44 @@ class AiHubTurnToolDispatchTest {
         verify(catalogChatModelFactory, never()).createChatModel(any(), anyString(), any(), any());
     }
 
+    @Test
+    void testAStopMidStreamLeavesOnlyTheUserRowInTheSession() throws InterruptedException {
+        activateDefaultProvider();
+
+        Sinks.Many<ChatResponse> modelStream = Sinks.many()
+            .unicast()
+            .onBackpressureBuffer();
+
+        providerChatModel.streamOverride = modelStream.asFlux();
+
+        startTurn("BUILD", null);
+
+        modelStream.tryEmitNext(textChunk("Building the"));
+
+        inFlightRunRegistry.attach(THREAD_ID)
+            .orElseThrow()
+            .filter(TextMessageContentEvent.class::isInstance)
+            .blockFirst(Duration.ofSeconds(10));
+
+        inFlightRunRegistry.cancel(THREAD_ID);
+
+        modelStream.tryEmitNext(textChunk(" workflow."));
+        modelStream.tryEmitComplete();
+
+        for (int attempt = 0; attempt < 100 && inFlightRunRegistry.isInFlight(THREAD_ID); attempt++) {
+            Thread.sleep(50);
+        }
+
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+        assertThat(fixtures.sessionMemory.sessionService()
+            .getEvents(THREAD_ID, EventFilter.all())).extracting(SessionEvent::getMessageType)
+                .containsExactly(MessageType.USER);
+    }
+
+    private static ChatResponse textChunk(String text) {
+        return new ChatResponse(List.of(new Generation(new AssistantMessage(text))));
+    }
+
     private void activateDefaultProvider() {
         when(aiProviderFacade.getAiDefaultChatModel(ENVIRONMENT))
             .thenReturn(new AiDefaultModelDTO(Provider.ANTHROPIC.getKey(), DEFAULT_MODEL));
@@ -252,6 +295,16 @@ class AiHubTurnToolDispatchTest {
     }
 
     private List<BaseEvent> runTurn(String mode, @Nullable String selectedModel) {
+        startTurn(mode, selectedModel);
+
+        Flux<BaseEvent> runEvents = inFlightRunRegistry.attach(THREAD_ID)
+            .orElseThrow();
+
+        return runEvents.collectList()
+            .block(Duration.ofSeconds(30));
+    }
+
+    private void startTurn(String mode, @Nullable String selectedModel) {
         State state = new State();
 
         state.set("mode", mode);
@@ -280,12 +333,6 @@ class AiHubTurnToolDispatchTest {
         agUiParameters.setThreadId(THREAD_ID);
 
         controller.chat(agUiParameters);
-
-        Flux<BaseEvent> runEvents = inFlightRunRegistry.attach(THREAD_ID)
-            .orElseThrow();
-
-        return runEvents.collectList()
-            .block(Duration.ofSeconds(30));
     }
 
     private List<String> sentToolNames() {
@@ -310,6 +357,7 @@ class AiHubTurnToolDispatchTest {
         private final List<Prompt> prompts = new CopyOnWriteArrayList<>();
 
         private volatile @Nullable RuntimeException streamFailure;
+        private volatile @Nullable Flux<ChatResponse> streamOverride;
 
         @Override
         public ChatResponse call(Prompt prompt) {
@@ -326,6 +374,12 @@ class AiHubTurnToolDispatchTest {
 
             if (failure != null) {
                 return Flux.error(failure);
+            }
+
+            Flux<ChatResponse> override = streamOverride;
+
+            if (override != null) {
+                return override;
             }
 
             return Flux.just(chatResponse());

@@ -91,6 +91,7 @@ public final class AiHubAgentFixtures {
         mock(ScopedProjectGuard.class), workspaceFacade);
     public final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools =
         new ProjectWorkflowLifecycleTools(projectWorkflowTools);
+    public final InFlightAiHubRunRegistry inFlightRunRegistry = new InFlightAiHubRunRegistry();
     public final ReadProjectTools readProjectTools = new ReadProjectTools(projectTools);
     public final ReadProjectWorkflowTools readProjectWorkflowTools = new ReadProjectWorkflowTools(projectWorkflowTools);
     public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
@@ -191,10 +192,16 @@ public final class AiHubAgentFixtures {
     }
 
     @SuppressWarnings("unchecked")
-    private static ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider() {
+    private ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider() {
         ObjectProvider<InFlightAiHubRunRegistry> provider = mock(ObjectProvider.class);
 
-        when(provider.getIfAvailable()).thenReturn(new InFlightAiHubRunRegistry());
+        doAnswer(invocation -> {
+            invocation.<Consumer<InFlightAiHubRunRegistry>>getArgument(0)
+                .accept(inFlightRunRegistry);
+
+            return null;
+        }).when(provider)
+            .ifAvailable(any());
 
         return provider;
     }

@@ -64,8 +64,10 @@ public interface AiHubChatService {
 
     /**
      * Drops everything after the visible message with id {@code messageId}, tool events included, and the message
-     * itself unless {@code keepMessage}, and supersedes every pending tool approval whose call it dropped. While a turn
-     * runs in the chat it refuses with a conflict before dropping anything.
+     * itself unless {@code keepMessage}, then supersedes every pending tool approval whose call it dropped. While a
+     * turn runs in the chat it refuses with a conflict before dropping anything. The supersede is atomic with the drop
+     * only when the session store shares the chat's transaction, as the JDBC store does; with any other store a failure
+     * between the two leaves an approval pending, and the resolve-time check refuses it.
      *
      * @return the number of session events dropped, or empty when the chat never held a message with that id; a message
      *         an earlier edit or reload already dropped is refused with a conflict
@@ -74,10 +76,13 @@ public interface AiHubChatService {
         long chatId, long requesterWorkspaceId, long requesterUserId, String messageId, boolean keepMessage);
 
     /**
-     * Whether the active session of {@code threadId} still holds a call of {@code toolName} with {@code arguments}; a
-     * call an edit or reload truncated away no longer counts. No access check: callers verify access themselves.
+     * Whether the active session of {@code threadId} still holds the tool call an approval is for; a call an edit or
+     * reload truncated away no longer counts. With a {@code toolCallId} only that call counts; without one, for an
+     * approval recorded before tool call ids were, any call of {@code toolName} with {@code arguments} does, blank
+     * arguments counting as an empty object. No access check: callers verify access themselves.
      */
-    boolean containsActiveToolCall(String threadId, String toolName, String arguments);
+    boolean containsActiveToolCall(
+        String threadId, @Nullable String toolCallId, String toolName, String arguments);
 
     /**
      * Appends an assistant message to the chat's session. Blank content is ignored.

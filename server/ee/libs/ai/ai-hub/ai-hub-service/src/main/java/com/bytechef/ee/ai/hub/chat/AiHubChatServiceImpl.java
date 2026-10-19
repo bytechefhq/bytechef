@@ -423,7 +423,9 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean containsActiveToolCall(String threadId, String toolName, String arguments) {
+    public boolean containsActiveToolCall(
+        String threadId, @Nullable String toolCallId, String toolName, String arguments) {
+
         AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
 
         if (sessionMemory == null) {
@@ -433,13 +435,14 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return containsToolCall(
             sessionMemory.sessionService()
                 .getEvents(threadId, EventFilter.active()),
-            toolName, arguments);
+            toolCallId, toolName, arguments);
     }
 
     private void supersedePendingApprovalsOfDroppedToolCalls(AiHubChat chat, List<SessionEvent> keptEvents) {
         for (AiHubToolApproval approval : approvalService.list(Objects.requireNonNull(chat.getId()))) {
             if (approval.getStatus() == AiHubToolApproval.Status.PENDING
-                && !containsToolCall(keptEvents, approval.getToolName(), approval.getArguments())) {
+                && !containsToolCall(
+                    keptEvents, approval.getToolCallId(), approval.getToolName(), approval.getArguments())) {
 
                 approval.setStatus(AiHubToolApproval.Status.SUPERSEDED);
 
@@ -453,11 +456,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             .anyMatch(event -> eventId.equals(event.getId()));
     }
 
-    private static boolean containsToolCall(List<SessionEvent> events, String toolName, String arguments) {
+    private static boolean containsToolCall(
+        List<SessionEvent> events, @Nullable String toolCallId, String toolName, String arguments) {
+
         for (SessionEvent event : events) {
             if (event.getMessage() instanceof AssistantMessage assistantMessage) {
                 for (AssistantMessage.ToolCall toolCall : assistantMessage.getToolCalls()) {
-                    if (toolName.equals(toolCall.name()) && sameArguments(arguments, toolCall.arguments())) {
+                    if (isApprovedToolCall(toolCall, toolCallId, toolName, arguments)) {
                         return true;
                     }
                 }
@@ -467,20 +472,37 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return false;
     }
 
-    private static boolean sameArguments(String arguments, @Nullable String toolCallArguments) {
-        if (toolCallArguments == null) {
+    private static boolean isApprovedToolCall(
+        AssistantMessage.ToolCall toolCall, @Nullable String toolCallId, String toolName, String arguments) {
+
+        if (!toolName.equals(toolCall.name())) {
             return false;
         }
 
-        if (arguments.equals(toolCallArguments)) {
+        if (toolCallId != null) {
+            return toolCallId.equals(toolCall.id());
+        }
+
+        return sameArguments(arguments, toolCall.arguments());
+    }
+
+    private static boolean sameArguments(@Nullable String arguments, @Nullable String toolCallArguments) {
+        String normalizedArguments = normalizeArguments(arguments);
+        String normalizedToolCallArguments = normalizeArguments(toolCallArguments);
+
+        if (normalizedArguments.equals(normalizedToolCallArguments)) {
             return true;
         }
 
         try {
-            return Objects.equals(JsonUtils.read(arguments), JsonUtils.read(toolCallArguments));
+            return Objects.equals(JsonUtils.read(normalizedArguments), JsonUtils.read(normalizedToolCallArguments));
         } catch (RuntimeException exception) {
             return false;
         }
+    }
+
+    private static String normalizeArguments(@Nullable String arguments) {
+        return arguments == null || arguments.isBlank() ? "{}" : arguments;
     }
 
     @Override

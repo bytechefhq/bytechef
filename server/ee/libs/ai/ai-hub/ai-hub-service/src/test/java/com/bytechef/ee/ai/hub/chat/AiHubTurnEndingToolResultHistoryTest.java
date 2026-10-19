@@ -26,7 +26,9 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -198,14 +200,45 @@ class AiHubTurnEndingToolResultHistoryTest {
 
         AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
 
-        assertThat(chatService.containsActiveToolCall(THREAD_ID, "deleteWorkflow", "{}")).isTrue();
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, null, "deleteWorkflow", "{}")).isTrue();
 
         chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, FIRST_USER_MESSAGE_ID, true);
 
-        assertThat(chatService.containsActiveToolCall(THREAD_ID, "deleteWorkflow", "{}")).isFalse();
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, null, "deleteWorkflow", "{}")).isFalse();
         assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
 
         verify(approvalService).save(approval);
+    }
+
+    @Test
+    void testAnIdenticalCallKeptInAnEarlierTurnDoesNotKeepADroppedApprovalAlive() {
+        chatModel.reply(toolCallResponse("", "call-first", "deleteWorkflow"), textResponse("Deleted."));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", "{\"deleted\":true}"));
+
+        AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
+
+        chatModel.reply(toolCallResponse("", "call-second", "deleteWorkflow"));
+
+        runTurn("Delete it again", SECOND_USER_MESSAGE_ID, tool("deleteWorkflow", APPROVAL_REQUEST_RESULT));
+
+        assertThat(approval.getToolCallId()).isEqualTo("call-second");
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, true);
+
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, "call-first", "deleteWorkflow", "{}")).isTrue();
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, "call-second", "deleteWorkflow", "{}")).isFalse();
+        assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+    }
+
+    @Test
+    void testAGatedToolCalledWithBlankArgumentsMatchesItsApprovalsEmptyObject() {
+        chatModel.reply(toolCallResponse("", "call-delete", "deleteWorkflow", ""));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", APPROVAL_REQUEST_RESULT));
+
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, null, "deleteWorkflow", "{}")).isTrue();
+        assertThat(chatService.containsActiveToolCall(THREAD_ID, null, "deleteWorkflow", "")).isTrue();
     }
 
     @Test
@@ -457,9 +490,18 @@ class AiHubTurnEndingToolResultHistoryTest {
             .toolEventsJson()).doesNotContain("blank-result");
     }
 
+    private void recordApprovalToolCall(long approvalId, String toolCallId) {
+        for (AiHubToolApproval approval : approvalService.list(CHAT_ID)) {
+            if (approval.getId() == approvalId) {
+                approval.setToolCallId(toolCallId);
+            }
+        }
+    }
+
     private AiHubToolApproval pendingApproval(String toolName, String arguments) {
         AiHubToolApproval approval = new AiHubToolApproval();
 
+        approval.setId(3L);
         approval.setChatId(CHAT_ID);
         approval.setThreadId(THREAD_ID);
         approval.setToolName(toolName);
@@ -542,7 +584,8 @@ class AiHubTurnEndingToolResultHistoryTest {
             .user(userText)
             .toolCallbacks(toolCallback)
             .advisors(
-                sessionMemory.createSessionMemoryAdvisor(), sessionMemory.createTurnEndingToolResultAdvisor(),
+                sessionMemory.createSessionMemoryAdvisor(),
+                sessionMemory.createTurnEndingToolResultAdvisor(this::recordApprovalToolCall),
                 toolCallingAdvisor, sessionMemory.createResentUserMessageAdvisor())
             .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, THREAD_ID)
                 .param(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, userMessageId))
@@ -556,9 +599,13 @@ class AiHubTurnEndingToolResultHistoryTest {
     }
 
     private static ChatResponse toolCallResponse(String text, String toolCallId, String toolName) {
+        return toolCallResponse(text, toolCallId, toolName, "{}");
+    }
+
+    private static ChatResponse toolCallResponse(String text, String toolCallId, String toolName, String arguments) {
         AssistantMessage assistantMessage = AssistantMessage.builder()
             .content(text)
-            .toolCalls(List.of(new ToolCall(toolCallId, "function", toolName, "{}")))
+            .toolCalls(List.of(new ToolCall(toolCallId, "function", toolName, arguments)))
             .build();
 
         return new ChatResponse(List.of(new Generation(assistantMessage)));
@@ -586,16 +633,17 @@ class AiHubTurnEndingToolResultHistoryTest {
     private static final class ScriptedChatModel implements ChatModel {
 
         private final List<Prompt> prompts = new ArrayList<>();
+        private final Deque<ChatResponse> nextResponses = new ArrayDeque<>();
         private @Nullable RuntimeException nextFailure;
-        private @Nullable ChatResponse nextResponse;
 
         void fail(RuntimeException failure) {
             nextFailure = failure;
         }
 
-        void reply(ChatResponse chatResponse) {
+        void reply(ChatResponse... chatResponses) {
             nextFailure = null;
-            nextResponse = chatResponse;
+            nextResponses.clear();
+            nextResponses.addAll(List.of(chatResponses));
         }
 
         @Override
@@ -606,7 +654,7 @@ class AiHubTurnEndingToolResultHistoryTest {
                 throw nextFailure;
             }
 
-            return Objects.requireNonNull(nextResponse);
+            return Objects.requireNonNull(nextResponses.size() > 1 ? nextResponses.poll() : nextResponses.peek());
         }
 
         @Override
