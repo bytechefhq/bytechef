@@ -50,6 +50,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -347,6 +348,7 @@ class PermissionServiceIntTest {
                 user.setId(entry.getValue());
                 user.setLogin(entry.getKey());
 
+                when(userService.fetchUserByLogin(entry.getKey())).thenReturn(Optional.of(user));
                 when(userService.getUser(entry.getKey())).thenReturn(user);
             }
 
