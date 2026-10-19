@@ -309,7 +309,6 @@ class AiHubChatServiceTest {
         chat.setMessageCount(3);
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(chatRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         AiHubChatPatch patch = new AiHubChatPatch("New title", null, null, null);
 
@@ -318,6 +317,42 @@ class AiHubChatServiceTest {
         assertThat(result.getTitle()).isEqualTo("New title");
         assertThat(result.getMessageCount()).isEqualTo(3);
         assertThat(result.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+
+        verify(chatRepository).updateTitle(eq(1L), eq("New title"), any(LocalDateTime.class));
+        verify(chatRepository, never()).updateLastPreview(anyLong(), any(), any());
+        verify(chatRepository, never()).updateMessageCount(anyLong(), anyInt(), any());
+        verify(chatRepository, never()).updateStatus(anyLong(), anyInt(), any());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testPatchUpdatesPreviewAndMessageCountWithoutTouchingTheTitle() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", 4, null));
+
+        verify(chatRepository).updateLastPreview(eq(1L), eq("Latest preview"), any(LocalDateTime.class));
+        verify(chatRepository).updateMessageCount(eq(1L), eq(4), any(LocalDateTime.class));
+        verify(chatRepository, never()).updateTitle(anyLong(), any(), any());
+        verify(chatRepository, never()).updateStatus(anyLong(), anyInt(), any());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testPatchRejectsANegativeMessageCountBeforeWriting() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, -1, null)))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(chatRepository, never()).updateMessageCount(anyLong(), anyInt(), any());
     }
 
     @Test
@@ -440,12 +475,13 @@ class AiHubChatServiceTest {
         List<SessionEvent> events = givenActiveEvents();
 
         when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
 
         OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-200", false);
 
         assertThat(deleted).hasValue(2);
+
+        verify(chatRepository).updateUpdatedAt(eq(1L), any(LocalDateTime.class));
+        verify(chatRepository, never()).save(any());
         assertThat(archivedEventIds()).containsExactlyInAnyOrder(events.get(1)
             .getId(),
             events.get(2)
@@ -457,8 +493,6 @@ class AiHubChatServiceTest {
         List<SessionEvent> events = givenActiveEvents();
 
         when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
 
         OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
 
@@ -689,11 +723,12 @@ class AiHubChatServiceTest {
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         chatService.appendAssistantMessage(1L, WORKSPACE_ID, USER_ID, "hello");
 
         verify(sessionRepository).appendEvent(any(SessionEvent.class));
+        verify(chatRepository).updateUpdatedAt(eq(1L), any(LocalDateTime.class));
+        verify(chatRepository, never()).save(any());
     }
 
     @Test

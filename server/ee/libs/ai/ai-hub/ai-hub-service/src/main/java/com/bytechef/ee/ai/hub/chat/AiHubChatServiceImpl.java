@@ -321,32 +321,51 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return text != null && !text.isBlank();
     }
 
+    /**
+     * Updates only the columns {@code chatPatch} names, each with its own UPDATE, so concurrent patches of different
+     * fields never overwrite each other. Returns the chat as stored afterwards.
+     */
     @Override
     public AiHubChat patch(long chatId, long requesterWorkspaceId, long requesterUserId, AiHubChatPatch chatPatch) {
         AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
 
-        if (chatPatch.title() != null) {
-            chat.setTitle(chatPatch.title());
+        LocalDateTime updatedAt = LocalDateTime.now(clock);
+
+        String title = chatPatch.title();
+
+        if (title != null) {
+            chat.setTitle(title);
             chat.setAutoTitled(false);
+
+            chatRepository.updateTitle(chatId, chat.getTitle(), updatedAt);
         }
 
-        if (chatPatch.lastPreview() != null) {
-            chat.setLastPreview(chatPatch.lastPreview());
+        String lastPreview = chatPatch.lastPreview();
+
+        if (lastPreview != null) {
+            chat.setLastPreview(lastPreview);
+
+            chatRepository.updateLastPreview(chatId, chat.getLastPreview(), updatedAt);
         }
 
         Integer messageCount = chatPatch.messageCount();
 
         if (messageCount != null) {
             chat.setMessageCount(messageCount);
+
+            chatRepository.updateMessageCount(chatId, chat.getMessageCount(), updatedAt);
         }
 
-        if (chatPatch.status() != null) {
-            chat.setStatus(chatPatch.status());
+        AiHubChatStatus status = chatPatch.status();
+
+        if (status != null) {
+            chat.setStatus(status);
+
+            chatRepository.updateStatus(chatId, status.ordinal(), updatedAt);
         }
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-
-        return chatRepository.save(chat);
+        return chatRepository.findById(chatId)
+            .orElseThrow(() -> new NotFoundException("AiHubChat not found"));
     }
 
     @Override
@@ -418,8 +437,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             chat, activeEvents.subList(0, cutoffEventIndex), activeEvents.get(messageEventIndex)
                 .getTimestamp());
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-        chatRepository.save(chat);
+        chatRepository.updateUpdatedAt(chatId, LocalDateTime.now(clock));
 
         return OptionalInt.of(activeEvents.size() - cutoffEventIndex);
     }
@@ -553,8 +571,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
                     .message(new AssistantMessage(content))
                     .build());
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-        chatRepository.save(chat);
+        chatRepository.updateUpdatedAt(chatId, LocalDateTime.now(clock));
     }
 
     @Override
