@@ -29,6 +29,11 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.CatalogModel;
+import com.bytechef.platform.ai.model.catalog.Limit;
+import com.bytechef.platform.ai.model.catalog.Modalities;
+import com.bytechef.platform.ai.model.catalog.Modalities.Modality;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
@@ -56,6 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,6 +105,9 @@ class AiProviderFacadeIntTest {
 
     @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockitoBean
+    private ModelCatalog modelCatalog;
 
     @Autowired
     private PropertyRepository propertyRepository;
@@ -326,6 +335,24 @@ class AiProviderFacadeIntTest {
 
         assertThat(getSavedProperty(Provider.OLLAMA).getValue())
             .isEqualTo(Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"));
+    }
+
+    @Test
+    void testGetChatProviderCatalogFillsLabelFromModelsDevDisplayName() {
+        ComponentDefinition anthropicDefinition = mockChatComponentDefinition(
+            "anthropic", "anthropic-icon", List.of(mockOption("claude-sonnet-4-6", "claude-sonnet-4-6")));
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(anthropicDefinition));
+        when(modelCatalog.fetchModel("anthropic", "claude-sonnet-4-6"))
+            .thenReturn(Optional.of(catalogModel("claude-sonnet-4-6", "Claude Sonnet 4.6")));
+
+        AiProviderCatalogItemDTO anthropic = getCatalogItem(Provider.ANTHROPIC);
+
+        AiProviderCatalogItemDTO.Model model = anthropic.models()
+            .getFirst();
+
+        assertThat(model.label()).isEqualTo("Claude Sonnet 4.6");
+        assertThat(model.name()).isEqualTo("claude-sonnet-4-6");
     }
 
     @Test
@@ -733,6 +760,13 @@ class AiProviderFacadeIntTest {
             .filter(aiProvider -> aiProvider.id() == provider.getId())
             .findFirst()
             .orElseThrow();
+    }
+
+    private static CatalogModel catalogModel(String id, String name) {
+        return new CatalogModel(
+            id, name, null, null, false, false, false, false, false, false, null, null, null,
+            CatalogModel.Status.ACTIVE, new Modalities(List.of(Modality.TEXT), List.of(Modality.TEXT)),
+            new Limit(null, null, null), null);
     }
 
     private AiProviderCatalogItemDTO getCatalogItem(Provider provider) {
