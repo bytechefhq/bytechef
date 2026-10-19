@@ -21,6 +21,7 @@ import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.ee.ai.hub.agent.NonEmptyToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,6 +131,23 @@ class AiHubApprovalGateToolCallbackTest {
 
         assertThat(result).contains("\"error\"")
             .contains("the tool was not executed");
+        verify(delegate, never()).call(anyString(), any());
+        verify(approvalService, never()).createPending(any());
+    }
+
+    @Test
+    void testGatedCallForAChatInDeletedStatusIsRefused() {
+        ToolCallback wrapped = gate(Set.of(), Set.of());
+
+        AiHubChat chat = new AiHubChat(USER_ID);
+
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setStatus(AiHubChatStatus.DELETED);
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        assertThat(wrapped.call("{}", toolContext())).contains("the tool was not executed");
         verify(delegate, never()).call(anyString(), any());
         verify(approvalService, never()).createPending(any());
     }
