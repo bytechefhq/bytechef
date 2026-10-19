@@ -1,6 +1,13 @@
 import {ComponentDefinitionApi as EmbeddedComponentDefinitionApi} from '@/ee/shared/middleware/embedded/configuration';
 import {ComponentDefinitionApi as AutomationComponentDefinitionApi} from '@/shared/middleware/automation/configuration';
 import {
+    ComponentPropertyDisplayConditionsDocument,
+    type ComponentPropertyDisplayConditionsQuery,
+    type ComponentPropertyDisplayConditionsQueryVariables,
+} from '@/shared/middleware/graphql';
+import {ComponentOperationType} from '@/shared/middleware/graphql-types';
+import {fetcher} from '@/shared/middleware/graphqlFetcher';
+import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasic,
@@ -83,6 +90,33 @@ export function useComponentCatalog(options?: {embedded?: boolean}): ComponentCa
                     queryKey: ComponentDefinitionKeys.componentDefinition(request),
                     staleTime: DEFINITION_STALE_TIME,
                 });
+            },
+            getDisplayConditions: async (componentName, componentVersion, operationName, operationKind, parameters) => {
+                const resolvedVersion = resolveVersion(componentName, componentVersion);
+
+                if (resolvedVersion === undefined) {
+                    return {};
+                }
+
+                const variables = {
+                    componentName,
+                    componentVersion: resolvedVersion,
+                    operationName,
+                    operationType:
+                        operationKind === 'trigger' ? ComponentOperationType.Trigger : ComponentOperationType.Action,
+                    parameters,
+                };
+
+                const data = await queryClient.fetchQuery({
+                    queryFn: fetcher<
+                        ComponentPropertyDisplayConditionsQuery,
+                        ComponentPropertyDisplayConditionsQueryVariables
+                    >(ComponentPropertyDisplayConditionsDocument, variables),
+                    queryKey: ['componentPropertyDisplayConditions', variables],
+                    staleTime: DEFINITION_STALE_TIME,
+                });
+
+                return (data.componentPropertyDisplayConditions ?? {}) as Record<string, boolean>;
             },
             getOperationProperties: async (componentName, componentVersion, operationName, operationKind) => {
                 const resolvedVersion = resolveVersion(componentName, componentVersion);

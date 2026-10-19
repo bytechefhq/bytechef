@@ -1,7 +1,7 @@
 import {type ActionCallKeySlotType, findActionCallKeySlot} from './actionCallScanner';
 import {parseMemberPath} from './memberPath';
 import {findEnclosingFunctionName, findPerformScope} from './performScanner';
-import {buildPropertyItems, findNestedProperties} from './propertyCompletions';
+import {getPropertyCompletionItems} from './propertyCompletions';
 import {buildActionCallSnippet, buildFunctionSnippet} from './snippets';
 import {
     type EnclosingTaskType,
@@ -274,9 +274,10 @@ async function actionPropertyItems(
     }
 
     const [, componentName, actionName] = calleePath.segments;
-    const declaredVersion = declaredConnections(request).find(
+    const declaredConnection = declaredConnections(request).find(
         (connection) => connection.componentName === componentName
-    )?.componentVersion;
+    );
+    const declaredVersion = declaredConnection?.componentVersion;
 
     const properties = await context.components.getOperationProperties(
         componentName,
@@ -284,9 +285,31 @@ async function actionPropertyItems(
         actionName,
         'action'
     );
-    const nestedProperties = findNestedProperties(properties, keySlot.propertyPath);
+    const {loadDynamicProperties, workflowNodeName} = context.kind === 'script' ? context : {};
 
-    return nestedProperties ? buildPropertyItems(nestedProperties, keySlot.existingKeys) : [];
+    return getPropertyCompletionItems({
+        existingKeys: keySlot.existingKeys,
+        loadDisplayConditions: (parameters) =>
+            context.components.getDisplayConditions(componentName, declaredVersion, actionName, 'action', parameters),
+        loadDynamicProperties:
+            loadDynamicProperties && workflowNodeName && declaredVersion !== undefined
+                ? (propertyName, lookupDependsOnPaths, parameters) =>
+                      loadDynamicProperties({
+                          actionName,
+                          componentName,
+                          componentVersion: declaredVersion,
+                          connectionKey: declaredConnection?.name,
+                          lookupDependsOnPaths,
+                          parameters,
+                          propertyName,
+                          workflowNodeName,
+                      })
+                : undefined,
+        parameters: keySlot.rootValues,
+        presentKeys: keySlot.rootKeys,
+        properties,
+        propertyPath: keySlot.propertyPath,
+    });
 }
 
 export async function getScriptCompletions(request: ScriptCompletionRequestI): Promise<CompletionItemDraftType[]> {
