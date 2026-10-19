@@ -132,7 +132,7 @@ class AiHubApprovalGateToolCallbackTest {
     void testGatedCallForADeletedChatIsRefused() {
         ToolCallback wrapped = gate(Set.of(), Set.of());
 
-        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+        when(chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.empty());
 
         String result = wrapped.call("{}", toolContext());
 
@@ -148,7 +148,7 @@ class AiHubApprovalGateToolCallbackTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
 
         @SuppressWarnings("unchecked")
-        AiHubChatService activeChatService = new AiHubChatServiceImpl(
+        AiHubChatService notDeletedChatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, mock(ObjectProvider.class), registry,
             mock(PlatformTransactionManager.class));
 
@@ -161,7 +161,8 @@ class AiHubApprovalGateToolCallbackTest {
         when(chatRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
         AiHubToolApprovalPolicy policy = workspaceId -> new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of());
-        ToolCallback wrapped = new AiHubApprovalGateToolCallback(delegate, policy, approvalService, activeChatService);
+        ToolCallback wrapped =
+            new AiHubApprovalGateToolCallback(delegate, policy, approvalService, notDeletedChatService);
 
         registry.retireThread(THREAD_ID);
 
@@ -181,7 +182,7 @@ class AiHubApprovalGateToolCallbackTest {
     void testUngatedCallForADeletedChatPassesThrough() {
         ToolCallback wrapped = gate(Set.of(), Set.of("deleteProject"));
 
-        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+        when(chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.empty());
 
         assertThat(wrapped.call("{}", toolContext())).isEqualTo("{\"deleted\":true}");
     }
@@ -265,7 +266,7 @@ class AiHubApprovalGateToolCallbackTest {
         chat.setWorkspaceId(WORKSPACE_ID);
         chat.setThreadId(THREAD_ID);
 
-        when(chatService.findActiveByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
         AiHubToolApprovalPolicy policy = workspaceId -> new AiHubToolApprovalPolicy.Decision(required, exempt);
 
