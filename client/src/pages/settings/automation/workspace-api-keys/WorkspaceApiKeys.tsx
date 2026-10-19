@@ -5,6 +5,8 @@ import {
     CreateApiKeyMutationProps,
     SimpleMutationProps,
 } from '@/shared/components/api-keys/providers/apiKeysProvider';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {
     ApiKey,
     useCreateWorkspaceApiKeyMutation,
@@ -21,18 +23,28 @@ const WorkspaceApiKeys = () => {
 
     const queryClient = useQueryClient();
 
+    const {loading: scopesLoading} = useLoadWorkspaceScopes(workspaceId);
+
+    const canCreate = useHasWorkspaceScope(workspaceId, 'API_KEY_CREATE');
+    const canManage = useHasWorkspaceScope(workspaceId, 'API_KEY_DELETE');
+    const canView = useHasWorkspaceScope(workspaceId, 'API_KEY_VIEW');
+
     return (
         <ApiKeysProvider
             value={{
+                permissions: {canCreate, canManage, canView, loading: scopesLoading},
                 useApiKeysQuery: () => {
                     const {
                         data: {workspaceApiKeys} = {},
                         error,
                         isLoading,
-                    } = useWorkspaceApiKeysQuery({
-                        environmentId: `${environmentId}`,
-                        workspaceId: `${workspaceId}`,
-                    });
+                    } = useWorkspaceApiKeysQuery(
+                        {
+                            environmentId: `${environmentId}`,
+                            workspaceId: `${workspaceId}`,
+                        },
+                        {enabled: canView}
+                    );
 
                     return {
                         data: workspaceApiKeys,
