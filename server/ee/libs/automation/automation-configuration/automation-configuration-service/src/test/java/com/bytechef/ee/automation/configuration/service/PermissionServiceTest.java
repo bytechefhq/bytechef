@@ -2657,6 +2657,7 @@ class PermissionServiceTest {
         private static final long PRIVATE_CONNECTION_ID = 10L;
         private static final long WORKSPACE_CONNECTION_ID = 11L;
         private static final long ORGANIZATION_CONNECTION_ID = 12L;
+        private static final long OTHER_WORKSPACE_ID = 8L;
 
         @BeforeEach
         void setUp() {
@@ -2825,6 +2826,124 @@ class PermissionServiceTest {
                     .hasResourceScopeIfProjectWorkflow("workflow-1", PRIVATE_CONNECTION_ID, CONNECTION,
                         "CONNECTION_EDIT"))
                             .isTrue();
+        }
+
+        @Test
+        void testOrganizationConnectionIsUsableInAnyWorkspaceOfItsEnvironment() {
+            authenticate("ana");
+
+            PermissionServiceImpl permissionService = connectionUsageService(
+                Environment.DEVELOPMENT, mock(ProjectRepository.class));
+
+            assertThat(
+                permissionService.canUseConnectionInWorkspace(
+                    ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                        .isTrue();
+        }
+
+        @Test
+        void testOrganizationConnectionIsUsableInAProjectWorkflowOfAnyWorkspace() {
+            authenticate("ana");
+
+            ProjectRepository projectRepository = mock(ProjectRepository.class);
+            Project project = new Project();
+
+            project.setWorkspaceId(OTHER_WORKSPACE_ID);
+
+            when(projectRepository.findByWorkflowId("workflow-1")).thenReturn(Optional.of(project));
+
+            assertThat(
+                connectionUsageService(Environment.DEVELOPMENT, projectRepository)
+                    .canUseConnectionInWorkflow(ORGANIZATION_CONNECTION_ID, "workflow-1", Environment.DEVELOPMENT))
+                        .isTrue();
+        }
+
+        @Test
+        void testOrganizationConnectionOfAnotherEnvironmentIsNotUsable() {
+            authenticate("ana");
+
+            PermissionServiceImpl permissionService = connectionUsageService(
+                Environment.PRODUCTION, mock(ProjectRepository.class));
+
+            assertThat(
+                permissionService.canUseConnectionInWorkspace(
+                    ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                        .isFalse();
+        }
+
+        @Test
+        void testPrivateConnectionOfAnotherMemberIsNotUsable() {
+            authenticate("ana");
+
+            PermissionServiceImpl permissionService = connectionUsageService(
+                Environment.DEVELOPMENT, mock(ProjectRepository.class));
+
+            assertThat(
+                permissionService.canUseConnectionInWorkspace(
+                    PRIVATE_CONNECTION_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+                        .isFalse();
+        }
+
+        @Test
+        void testOrganizationConnectionIsNotUsableWithoutTheConnectionViewScope() {
+            authenticate("ana");
+
+            CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+            when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+            PermissionServiceImpl permissionService = new PermissionServiceImpl(
+                currentUserResolver, mock(PermissionScopeRegistry.class), mock(ProjectRepository.class),
+                mock(WorkspaceScopeCacheService.class), mock(WorkspaceUserRepository.class),
+                List.of(connectionOwnershipResolver()), List.of(connectionVisibilityProvider()),
+                visibilityResolver(Set.of()), List.of(connectionEnvironmentResolver(Environment.DEVELOPMENT)),
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+
+            assertThat(
+                permissionService.canUseConnectionInWorkspace(
+                    ORGANIZATION_CONNECTION_ID, OTHER_WORKSPACE_ID, Environment.DEVELOPMENT))
+                        .isFalse();
+        }
+
+        private static PermissionServiceImpl connectionUsageService(
+            Environment connectionEnvironment, ProjectRepository projectRepository) {
+
+            CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+
+            when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+
+            WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+
+            when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+                .thenReturn(Set.of("CONNECTION_VIEW"));
+
+            return new PermissionServiceImpl(
+                currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
+                workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+                List.of(connectionOwnershipResolver()), List.of(connectionVisibilityProvider()),
+                visibilityResolver(Set.of()), List.of(connectionEnvironmentResolver(connectionEnvironment)),
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+                mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+        }
+
+        private static ResourceEnvironmentResolver connectionEnvironmentResolver(Environment environment) {
+            return new ResourceEnvironmentResolver() {
+
+                @Override
+                public String resourceType() {
+                    return CONNECTION;
+                }
+
+                @Override
+                public Optional<Environment> fetchEnvironment(Serializable id) {
+                    return Optional.of(environment);
+                }
+            };
         }
 
         /**

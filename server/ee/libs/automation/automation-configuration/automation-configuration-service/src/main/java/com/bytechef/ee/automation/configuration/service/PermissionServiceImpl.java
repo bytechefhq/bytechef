@@ -774,9 +774,23 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        OptionalLong connectionWorkspaceId = resolveOwner(CONNECTION, connectionId).workspaceId();
+        ResourceOwner connectionOwner = resolveOwner(CONNECTION, connectionId);
 
-        if (connectionWorkspaceId.isEmpty() || connectionWorkspaceId.getAsLong() != workspaceId) {
+        if (connectionOwner.embedded()) {
+            return false;
+        }
+
+        if (!isResourceVisible(connectionId, CONNECTION)) {
+            return false;
+        }
+
+        OptionalLong connectionWorkspaceId = connectionOwner.workspaceId();
+
+        if (connectionWorkspaceId.isEmpty()) {
+            if (!isOrganizationVisible(connectionId, CONNECTION)) {
+                return false;
+            }
+        } else if (connectionWorkspaceId.getAsLong() != workspaceId) {
             return false;
         }
 
