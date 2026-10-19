@@ -71,9 +71,7 @@ class CopilotAgentMcpContributorConfigurationTest {
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
                 .name())
-            .containsExactlyInAnyOrder(
-                "buildWorkflow", "writeScript", "configureClusterElement", "authorSkill",
-                "debugWorkflowExecution", "importWorkflow");
+            .containsExactlyInAnyOrder("buildWorkflow", "authorSkill", "debugWorkflowExecution", "importWorkflow");
     }
 
     @Test

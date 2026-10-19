@@ -21,14 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.configuration.tool.ClusterElementTools;
 import com.bytechef.automation.configuration.tool.ProjectTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
-import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.configuration.tool.WorkspaceTools;
-import com.bytechef.platform.component.tool.ComponentTools;
-import com.bytechef.platform.component.tool.TaskTools;
-import com.bytechef.platform.workflow.tool.TaskDispatcherTools;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
 import java.util.List;
@@ -49,13 +44,8 @@ class ManagementMcpServerConfigurationIntTest {
         "listProjects", "searchProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
-        .withBean(ComponentTools.class, () -> mock(ComponentTools.class))
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
-        .withBean(TaskTools.class, () -> mock(TaskTools.class))
-        .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
-        .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
-        .withBean(ClusterElementTools.class, () -> mock(ClusterElementTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
         .withUserConfiguration(ManagementMcpServerConfiguration.class);
 
@@ -127,7 +117,10 @@ class ManagementMcpServerConfigurationIntTest {
 
             assertThat(toolNames)
                 .contains("createProjectWorkflow", "deleteWorkflow", "saveWorkflowTestConnection")
-                .doesNotContain("updateWorkflow");
+                .doesNotContain(
+                    "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
+                    "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
+                    "updateWorkflowRootProperties");
         });
     }
 

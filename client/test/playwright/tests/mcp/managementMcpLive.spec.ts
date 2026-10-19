@@ -106,12 +106,29 @@ test.describe('@live Management MCP', () => {
         return {projectId: projectInfo.id, workflowId: projectWorkflowInfo.workflow_id, workspaceId: workspaces[0].id};
     };
 
-    test('tools/list offers no updateWorkflow and createProjectWorkflow takes a name, not a definition', async () => {
+    test('tools/list offers buildWorkflow but no workflow-part tools, and createProjectWorkflow takes a name, not a definition', async () => {
         const tools = await mcpClient.listTools();
 
         const toolNames = tools.map((tool) => tool.name);
 
         expect(toolNames).not.toContain('updateWorkflow');
+
+        expect(toolNames).toContain('buildWorkflow');
+
+        expect(
+            toolNames.filter((toolName) =>
+                [
+                    'configureClusterElement',
+                    'getActionDefinition',
+                    'getTaskProperties',
+                    'listComponents',
+                    'listTaskDispatchers',
+                    'updateClusterElementTask',
+                    'updateScriptComponentCode',
+                    'writeScript',
+                ].includes(toolName)
+            )
+        ).toEqual([]);
 
         const createProjectWorkflowTool = tools.find((tool) => tool.name === 'createProjectWorkflow');
 
