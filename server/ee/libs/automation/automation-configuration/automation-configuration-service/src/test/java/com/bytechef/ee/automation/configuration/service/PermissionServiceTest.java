@@ -60,7 +60,6 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
@@ -867,7 +866,7 @@ class PermissionServiceTest {
         securityUtilsMock.when(SecurityUtils::fetchCurrentUserLogin)
             .thenReturn(Optional.of(CONNECTED_USER_EXTERNAL_ID));
 
-        when(userService.getUser(CONNECTED_USER_EXTERNAL_ID)).thenThrow(new UserNotFoundException());
+        when(userService.fetchUserByLogin(CONNECTED_USER_EXTERNAL_ID)).thenReturn(Optional.empty());
     }
 
     private PermissionServiceImpl createConnectionService(long connectionWorkspaceId, Environment environment) {
