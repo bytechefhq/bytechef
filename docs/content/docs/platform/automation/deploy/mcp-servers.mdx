@@ -105,6 +105,8 @@ Switching a server on is refused with an *incomplete tool mapping* error, naming
 fault, while any exposed workflow has a blank **Tool Name** or leaves a required trigger input
 unmapped. Complete those mappings first, then flip the **Enabled** switch.
 
+While a server is off, a request with a valid credential - or any request, when the server does not require authentication - is answered with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`. The response carries no sign-in challenge, so an MCP client reports the server as unavailable instead of asking you to sign in. A request without a valid credential to a server that requires one still gets `401`, whether the server is on or off.
+
 ---
 
 ## Get the server URL
