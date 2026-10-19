@@ -59,8 +59,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsTaskTool {
 
-    private static final String APPROVAL = "approval";
-    private static final String REQUEST_APPROVAL = "requestApproval";
     private static final String TASK_TOOL = "taskTool";
 
     private final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -143,7 +141,17 @@ public class AiAgentUtilsTaskTool {
     private static void checkSubagentTool(ClusterElement subagentClusterElement, ClusterElement toolClusterElement) {
         String clusterElementName = toolClusterElement.getClusterElementName();
 
-        if (APPROVAL.equals(toolClusterElement.getComponentName()) && REQUEST_APPROVAL.equals(clusterElementName)) {
+        if (AiAgentUtilsApprovalGate.APPROVAL_GATE.equals(clusterElementName)) {
+            throw new IllegalStateException(
+                ("Approval gate '%s' cannot be attached to subagent '%s' — a subagent cannot pause for an approval. " +
+                    "Attach the gate directly to the agent instead.")
+                        .formatted(
+                            toolClusterElement.getWorkflowNodeName(), subagentClusterElement.getWorkflowNodeName()));
+        }
+
+        if (AiAgentUtilsApprovalGate.APPROVAL.equals(toolClusterElement.getComponentName()) &&
+            AiAgentUtilsApprovalGate.REQUEST_APPROVAL.equals(clusterElementName)) {
+
             throw new IllegalStateException(
                 ("'requestApproval' tool '%s' cannot be attached to subagent '%s' — a subagent cannot pause for an " +
                     "approval. Attach it directly to the agent instead.")

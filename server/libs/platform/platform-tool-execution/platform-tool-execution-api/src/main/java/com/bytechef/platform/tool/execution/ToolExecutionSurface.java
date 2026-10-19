@@ -21,5 +21,6 @@ package com.bytechef.platform.tool.execution;
  */
 public enum ToolExecutionSurface {
 
-    MCP_AUTOMATION
+    MCP_AUTOMATION,
+    AI_AGENT
 }

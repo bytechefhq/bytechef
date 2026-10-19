@@ -133,7 +133,8 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
   payloads to named events. On COMPLETED, `SseStreamApplicationEventListener` sends a named `result` event (taken from
   the `WEBHOOK_RESPONSE`-tagged task) before the terminal status event.
 - **Sync callers cannot pause.**
-  - `SuspendingTasks` tells the steps that can pause a run: `approval/`, `wait/` and `waitForApproval/` tasks.
+  - `SuspendingTasks` tells the steps that can pause a run: `approval/`, `wait/` and `waitForApproval/` tasks, and AI
+    agents with an `approvalGate` anywhere in their cluster elements.
   - `WebhookWorkflowExecutorImpl.executeSync` rejects a workflow with such a task anywhere in it, nested ones
     included, before the run starts (`ConfigurationException`, `SUSPENDING_TASK_IN_SYNC_EXECUTION`, unwrapped by
     `WebhookTriggerController` rather than surfacing as a 500).
@@ -158,8 +159,8 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
   resumed turn re-issues those calls (ids suffixed `_deferred`), and they run without depending on the model to repeat
   them. This applies to every suspending tool.
 - **No approval under a subagent.** A `requestApproval` tool under a subagent is rejected by
-  `WorkflowValidator.validateApprovalPlacement` (a save-time error attributed to the node, recursively through nested
-  task tools) and by `AiAgentUtilsTaskTool.checkSubagentTools` before the agent runs, because the suspend would be
+  `WorkflowValidator.validateApprovalGatePlacement` (a save-time error attributed to the node, recursively through
+  nested task tools) and by `AiAgentUtilsTaskTool.checkSubagentTools` before the agent runs, because the suspend would be
   lost in the subagent's own ChatClient.
 - **Chat-only channel validation.** `WorkflowValidator.validateChatOnlyApprovalChannels` adds a warning, attributed
   to the node, when a workflow with no `chat/` trigger has a task whose `approvalChannels` are all chat. Such runs
@@ -192,3 +193,47 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
 
 - **Only approval-scoped sweeps exist.** There is no orphaned-job recovery, no worker heartbeat, no per-run timeout
   and no retention monitor. A run that never resolves its approval ends only through expiry or stop.
+
+## AI-agent approval gate
+
+- **The gate is a cluster element.** `aiAgentUtils/v1/approvalGate` (`AiAgentUtilsApprovalGate`, TOOLS type, titled
+  "Approval Gate Tool") is registered in `AiAgentUtilsComponentHandler` with two child types: `TOOLS` (what it gates)
+  and `APPROVAL_CHANNELS` (where requests go). Its properties are `name` (required) and
+  `approvalExpiresIn`/`approvalExpiresInUnit` (`ToolConstants`; blank means 60 days). It builds its children through
+  `ClusterElementToolCallbacks` and returns them already wrapped in `ApprovalGateToolCallback`, so the agent action
+  has no gate special case on the way in. Simulation, observation and suspension-failure wrapping run over the
+  flattened list afterwards. An agent may carry several gates, each with its own channels and expiry.
+- **`ApprovalGateToolCallback.call`:**
+  - In an editor run it returns `EDITOR_ENVIRONMENT_RESULT`. Nothing is delivered and nothing suspends.
+  - Otherwise it calls `getApprovalLinks(expiresAt)` and delivers to every channel, best-effort, with the same
+    server-owned parameters as the approval step (`FORM_TITLE`/`FORM_DESCRIPTION`, which embed the AI-chosen tool
+    arguments, `EXPIRES_AT`, `RESUME_ID`, `SHORT_RESUME_ID`, …).
+  - An **empty channel list delivers to the chat channel**, which throws outside a `STREAMED_EXECUTION` run.
+  - When there are no links or every channel fails, it throws `ToolSuspensionException`, which fails the agent
+    rather than letting the model continue.
+  - Then it suspends with `GatedToolSuspension.toContinueParameters()`: `GATED_TOOL_NAME`, `GATED_TOOL_INPUT`,
+    `formUrl`, `approvalRaisedAt`, `APPROVAL_RESUME=true`, `APPROVAL_FORM_PARAMETERS`. It returns
+    `ToolSuspension.suspendedToolResult`, a per-suspend random sentinel, so tool output cannot impersonate a suspend.
+  - It records `APPROVAL_REQUIRED` via `ToolExecutionRecorder`.
+- **Resume.** `AbstractAiAgentChatAction.buildResumedRequestSpec` reads `GatedToolSuspension.from(continueParameters)`
+  and `GateDecision.from(resumeData)`. Only `approved == true` (or `"true"`) is `Approved`, so anything else denies.
+  - Denied → `{denied, reason, deniedBy}`.
+  - Approved (`resolveGatedToolResumeData`) → rebuilds the agent's TOOLS, matches the gated tool by name, unwraps it
+    with `DelegatingToolCallback.unwrap` (`ai/llm`), and runs the RAW callback with the stored arguments, honoring
+    tool simulations. It returns `{approvedByReviewer, reviewerComment, reviewer, result|error}`.
+  - It throws if the tool is no longer configured.
+  - The gate (`ai/agent/utils`) and the agent action (`ai/agent`) couple only through `ToolSuspendConstants`,
+    `GatedToolSuspension` and `GateDecision` (`platform-ai-api`).
+- **Deferred gated calls.** A gated call that `DeferredToolCallReplay` re-issues on resume raises its own approval in
+  turn.
+- **Placement rules, enforced twice.** `WorkflowValidator.validateApprovalGatePlacement` reports these as save-time
+  errors, attributed to a node. `AiAgentUtilsApprovalGate.checkGatableChild` and `AiAgentUtilsTaskTool.checkSubagentTools`
+  reject the same cases at run time, before the agent runs. The rules apply recursively through nested task tools:
+  - no `requestApproval` under a gate (it already raises its own approval);
+  - no gate under a gate;
+  - no gate and no `requestApproval` under a **subagent**, because the sentinel would be lost in the subagent's own
+    ChatClient and the suspend orphaned.
+- **Chat-only gate warning.** `validateChatOnlyApprovalChannels` also warns, attributed to the gate node, when a
+  workflow with no `chat/` trigger has a gate whose channels are chat-only or **absent** (absent defaults to chat).
+- **Client.** `useAiAgentTools` groups tools nested in an `approvalGate` into `toolGroups` with the gate's label and
+  channel labels. Ungated tools stay in `tools`.

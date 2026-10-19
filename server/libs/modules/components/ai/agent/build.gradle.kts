@@ -30,4 +30,13 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     testImplementation(testFixtures(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api")))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
+    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
+
+    testImplementation(project(":server:libs:modules:components:ai:agent:utils"))
+}
+
+subprojects {
+    dependencies {
+        implementation(project(":server:libs:modules:components:ai:llm"))
+    }
 }
