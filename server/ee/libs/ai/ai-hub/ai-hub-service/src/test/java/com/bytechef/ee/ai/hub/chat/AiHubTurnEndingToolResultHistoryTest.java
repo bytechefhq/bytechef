@@ -25,6 +25,7 @@ import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Flux;
 
 /**
@@ -229,6 +231,47 @@ class AiHubTurnEndingToolResultHistoryTest {
         assertThat(chatService.containsActiveToolCall(THREAD_ID, "call-first", "deleteWorkflow", "{}")).isTrue();
         assertThat(chatService.containsActiveToolCall(THREAD_ID, "call-second", "deleteWorkflow", "{}")).isFalse();
         assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+    }
+
+    @Test
+    void testAnIdlessApprovalCreatedInATruncatedTurnIsSupersededDespiteAnIdenticalEarlierCall() {
+        chatModel.reply(toolCallResponse("", "call-first", "deleteWorkflow"), textResponse("Deleted."));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", "{\"deleted\":true}"));
+
+        chatModel.reply(textResponse("Stopped before the approval result was stored."));
+
+        runTurn("Delete it again", SECOND_USER_MESSAGE_ID);
+
+        AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
+
+        ReflectionTestUtils.setField(approval, "createdDate", Instant.now());
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, true);
+
+        assertThat(approval.getToolCallId()).isNull();
+        assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+    }
+
+    @Test
+    void testAnIdlessApprovalOlderThanTheTruncatedTurnKeepsTheNameAndArgumentsMatch() {
+        chatModel.reply(toolCallResponse("", "call-first", "deleteWorkflow", "{}"));
+
+        runTurn("Delete the workflow", FIRST_USER_MESSAGE_ID, tool("deleteWorkflow", APPROVAL_REQUEST_RESULT));
+
+        AiHubToolApproval approval = pendingApproval("deleteWorkflow", "{}");
+
+        approval.setToolCallId(null);
+
+        ReflectionTestUtils.setField(approval, "createdDate", Instant.EPOCH);
+
+        chatModel.reply(textResponse("Waiting for your approval."));
+
+        runTurn("Is it done?", SECOND_USER_MESSAGE_ID);
+
+        chatService.truncateMessages(CHAT_ID, WORKSPACE_ID, USER_ID, SECOND_USER_MESSAGE_ID, true);
+
+        assertThat(approval.getStatus()).isEqualTo(AiHubToolApproval.Status.PENDING);
     }
 
     @Test
@@ -490,9 +533,9 @@ class AiHubTurnEndingToolResultHistoryTest {
             .toolEventsJson()).doesNotContain("blank-result");
     }
 
-    private void recordApprovalToolCall(long approvalId, String toolCallId) {
+    private void recordApprovalToolCall(String threadId, long approvalId, String toolCallId) {
         for (AiHubToolApproval approval : approvalService.list(CHAT_ID)) {
-            if (approval.getId() == approvalId) {
+            if (approval.getId() == approvalId && threadId.equals(approval.getThreadId())) {
                 approval.setToolCallId(toolCallId);
             }
         }

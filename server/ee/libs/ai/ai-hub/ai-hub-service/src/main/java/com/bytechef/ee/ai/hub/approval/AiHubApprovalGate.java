@@ -47,11 +47,11 @@ public class AiHubApprovalGate {
     }
 
     /**
-     * Records the id of the model's tool call an approval holds, so later checks follow that call rather than any call
-     * with the same tool name and arguments.
+     * Records the id of the model's tool call an approval of {@code threadId} holds, so later checks follow that call
+     * rather than any call with the same tool name and arguments.
      */
-    public void recordToolCallId(long approvalId, String toolCallId) {
-        approvalService.recordToolCallId(approvalId, toolCallId);
+    public void recordToolCallId(String threadId, long approvalId, String toolCallId) {
+        approvalService.recordToolCallId(threadId, approvalId, toolCallId);
     }
 
     /**

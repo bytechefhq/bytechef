@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
@@ -40,6 +41,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.IntStream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -714,6 +716,51 @@ class AiHubChatServiceTest {
         assertThat(chatService.cancelAiHubRun(1L, WORKSPACE_ID, USER_ID, "run-1")).isTrue();
 
         verify(inFlightRunRegistry).cancel(THREAD_ID, "run-1");
+    }
+
+    @Test
+    void testCancelAiHubRunSupersedesThePendingApprovalsWhoseCallWasNeverRecorded() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+        when(inFlightRunRegistry.cancel(THREAD_ID, "run-1")).thenReturn(true);
+
+        AiHubToolApproval idlessPendingApproval = approval(AiHubToolApproval.Status.PENDING, null);
+        AiHubToolApproval recordedPendingApproval = approval(AiHubToolApproval.Status.PENDING, "call-1");
+        AiHubToolApproval idlessApprovedApproval = approval(AiHubToolApproval.Status.APPROVED, null);
+
+        when(approvalService.list(1L))
+            .thenReturn(List.of(idlessPendingApproval, recordedPendingApproval, idlessApprovedApproval));
+
+        chatService.cancelAiHubRun(1L, WORKSPACE_ID, USER_ID, "run-1");
+
+        assertThat(idlessPendingApproval.getStatus()).isEqualTo(AiHubToolApproval.Status.SUPERSEDED);
+        assertThat(recordedPendingApproval.getStatus()).isEqualTo(AiHubToolApproval.Status.PENDING);
+        assertThat(idlessApprovedApproval.getStatus()).isEqualTo(AiHubToolApproval.Status.APPROVED);
+
+        verify(approvalService).save(idlessPendingApproval);
+        verify(approvalService, times(1)).save(any());
+    }
+
+    @Test
+    void testCancelAiHubRunWithNoLiveRunLeavesApprovalsAlone() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+        when(inFlightRunRegistry.cancel(THREAD_ID, "run-1")).thenReturn(false);
+
+        chatService.cancelAiHubRun(1L, WORKSPACE_ID, USER_ID, "run-1");
+
+        verify(approvalService, never()).list(anyLong());
+    }
+
+    private static AiHubToolApproval approval(AiHubToolApproval.Status status, @Nullable String toolCallId) {
+        AiHubToolApproval approval = new AiHubToolApproval();
+
+        approval.setStatus(status);
+        approval.setToolCallId(toolCallId);
+        approval.setToolName("deleteWorkflow");
+        approval.setArguments("{}");
+
+        return approval;
     }
 
     @Test
