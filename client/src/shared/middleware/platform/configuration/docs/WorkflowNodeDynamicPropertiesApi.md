@@ -97,7 +97,7 @@ No authorization required
 
 ## getWorkflowNodeComponentOperationDynamicProperties
 
-> Array&lt;Property&gt; getWorkflowNodeComponentOperationDynamicProperties(id, workflowNodeName, propertyName, environmentId, componentOperationDynamicPropertiesRequest)
+> Array&lt;Property&gt; getWorkflowNodeComponentOperationDynamicProperties(id, workflowNodeName, propertyName, environmentId, componentOperationPropertyRequest)
 
 Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node
 
@@ -125,8 +125,8 @@ async function example() {
     propertyName: propertyName_example,
     // number | The id of an environment.
     environmentId: 789,
-    // ComponentOperationDynamicPropertiesRequest
-    componentOperationDynamicPropertiesRequest: ...,
+    // ComponentOperationPropertyRequest
+    componentOperationPropertyRequest: ...,
   } satisfies GetWorkflowNodeComponentOperationDynamicPropertiesRequest;
 
   try {
@@ -150,7 +150,7 @@ example().catch(console.error);
 | **workflowNodeName** | `string` | The name of a workflow\&#39;s task or trigger (E.g. script_1) | [Defaults to `undefined`] |
 | **propertyName** | `string` | The name of a property. | [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
-| **componentOperationDynamicPropertiesRequest** | [ComponentOperationDynamicPropertiesRequest](ComponentOperationDynamicPropertiesRequest.md) |  | |
+| **componentOperationPropertyRequest** | [ComponentOperationPropertyRequest](ComponentOperationPropertyRequest.md) |  | |
 
 ### Return type
 
