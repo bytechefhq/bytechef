@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.ai.hub.memory;
 
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +45,20 @@ public class AiHubTurnEndingToolResultAdvisor implements CallAdvisor, StreamAdvi
 
     private static final Logger log = LoggerFactory.getLogger(AiHubTurnEndingToolResultAdvisor.class);
 
+    private static final String APPROVAL_REQUEST_KIND = "tool-approval-request";
+
+    private final BiConsumer<Long, String> approvalToolCallRecorder;
     private final SessionService sessionService;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubTurnEndingToolResultAdvisor(SessionService sessionService) {
+        this(sessionService, (approvalId, toolCallId) -> {});
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public AiHubTurnEndingToolResultAdvisor(
+        SessionService sessionService, BiConsumer<Long, String> approvalToolCallRecorder) {
+
+        this.approvalToolCallRecorder = approvalToolCallRecorder;
         this.sessionService = sessionService;
     }
 
@@ -115,6 +128,27 @@ public class AiHubTurnEndingToolResultAdvisor implements CallAdvisor, StreamAdvi
                 .build());
         } catch (RuntimeException exception) {
             log.warn("Failed to store the turn-ending tool result for session {}", sessionId, exception);
+        }
+
+        toolResponses.forEach(this::recordApprovalToolCall);
+    }
+
+    private void recordApprovalToolCall(ToolResponse toolResponse) {
+        String responseData = toolResponse.responseData();
+
+        if (responseData == null || !responseData.contains(APPROVAL_REQUEST_KIND)) {
+            return;
+        }
+
+        try {
+            if (JsonUtils.read(responseData) instanceof Map<?, ?> response
+                && APPROVAL_REQUEST_KIND.equals(response.get("kind"))
+                && response.get("approvalId") instanceof Number approvalId) {
+
+                approvalToolCallRecorder.accept(approvalId.longValue(), toolResponse.id());
+            }
+        } catch (RuntimeException exception) {
+            log.warn("Failed to record the tool call of approval result {}", toolResponse.id(), exception);
         }
     }
 
