@@ -247,7 +247,8 @@ class JobApiControllerIntTest {
                     "getJob",
                     new GuardCase(
                         guardedApi -> guardedApi.getJob(JOB_ID),
-                        permissionService -> permissionService.hasResourceScope(JOB_ID, "Job", "EXECUTION_VIEW"))),
+                        permissionService -> permissionService.hasResourceScope(JOB_ID, "Job",
+                            "EXECUTION_DETAILS_VIEW"))),
                 Named.of(
                     "getJobsPage",
                     new GuardCase(guardedApi -> guardedApi.getJobsPage(0), PermissionService::isTenantAdmin)),
@@ -260,7 +261,8 @@ class JobApiControllerIntTest {
                         guardedApi -> guardedApi.restartJob(JOB_ID),
                         permissionService -> permissionService.hasResourceScope(JOB_ID, "Job", "DEPLOYMENT_EDIT"),
                         (permissionService, jobService) -> {
-                            when(permissionService.hasResourceScope(JOB_ID, "Job", "EXECUTION_VIEW")).thenReturn(true);
+                            when(permissionService.hasResourceScope(JOB_ID, "Job", "EXECUTION_DETAILS_VIEW"))
+                                .thenReturn(true);
 
                             doReturn(new Job(JOB_ID)).when(jobService)
                                 .getJob(JOB_ID);

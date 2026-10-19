@@ -222,6 +222,36 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testDevelopmentViewerSeesRunsButNotTheirDetails() {
+        long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.VIEWER, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        assertThat(permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_VIEW"))
+            .isTrue();
+        assertThat(
+            permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isFalse();
+    }
+
+    @Test
+    void testDevelopmentEditorSeesRunDetailsOnlyInDevelopment() {
+        Project project = createProject();
+
+        long developmentDeploymentId = saveDeployment(project, Environment.DEVELOPMENT);
+        long productionDeploymentId = saveDeployment(project, Environment.PRODUCTION);
+
+        authenticate(createMember(workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT), AuthorityConstants.USER);
+
+        assertThat(
+            permissionService.hasResourceScope(developmentDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isTrue();
+        assertThat(
+            permissionService.hasResourceScope(productionDeploymentId, "ProjectDeployment", "EXECUTION_DETAILS_VIEW"))
+                .isFalse();
+    }
+
+    @Test
     void testMemberOfAnotherWorkspaceIsDeniedTheDeploymentById() {
         long developmentDeploymentId = saveDeployment(createProject(), Environment.DEVELOPMENT);
 

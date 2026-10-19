@@ -306,6 +306,22 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     @Test
+    void testGetWorkflowExecutionTaskExecutionWithoutDetailsScopeOmitsTaskData() {
+        Job job = saveJob(createWorkflowId(createProject(workspace)), null);
+        TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+        when(permissionService.hasResourceScope(getId(job), "Job", "EXECUTION_DETAILS_VIEW")).thenReturn(false);
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(
+            getId(job), getId(taskExecution));
+
+        assertThat(taskExecutionDTO.id()).isEqualTo(getId(taskExecution));
+        assertThat(taskExecutionDTO.input()).isNull();
+        assertThat(taskExecutionDTO.output()).isNull();
+        assertThat(taskExecutionDTO.error()).isNull();
+    }
+
+    @Test
     void testGetWorkflowExecutionTaskExecutionAttachesShallowChildJob() {
         String workflowId = createWorkflowId(createProject(workspace));
 

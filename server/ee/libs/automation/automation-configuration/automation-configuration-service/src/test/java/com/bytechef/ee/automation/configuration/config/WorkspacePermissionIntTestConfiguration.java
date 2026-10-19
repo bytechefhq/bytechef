@@ -20,6 +20,7 @@ import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScop
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.ExecutionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
@@ -68,10 +69,10 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     A2aPermissionScopeProvider.class, ApiKeyPermissionScopeProvider.class, CacheConfiguration.class,
     ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, DeploymentPermissionScopeProvider.class,
-    EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
-    PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
-    ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
-    WorkflowPermissionScopeProvider.class,
+    EmbeddedOwnerContributorsTestConfiguration.class, ExecutionPermissionScopeProvider.class,
+    LiquibaseConfiguration.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
+    PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class, ProjectCallback.class,
+    ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class, WorkflowPermissionScopeProvider.class,
     WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
     WorkspaceScopeCacheService.class, WorkspaceUserAuditMapper.class
 })
