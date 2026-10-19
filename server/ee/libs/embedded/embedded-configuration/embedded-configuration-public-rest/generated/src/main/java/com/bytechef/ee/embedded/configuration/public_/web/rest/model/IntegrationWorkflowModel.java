@@ -26,12 +26,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("IntegrationWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationWorkflowModel {
 
   private @Nullable String description;
 
-  @Valid
   private List<@Valid InputModel> inputs = new ArrayList<>();
 
   private @Nullable String label;
@@ -76,7 +75,7 @@ public class IntegrationWorkflowModel {
    * Get inputs
    * @return inputs
    */
-  @Valid 
+  
   @Schema(name = "inputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public List<@Valid InputModel> getInputs() {

@@ -50,20 +50,14 @@ import {
 export interface BooleanProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {boolean}
-     * @memberof BooleanProperty
      */
     defaultValue?: boolean;
     /**
      * The property sample value.
-     * @type {boolean}
-     * @memberof BooleanProperty
      */
     exampleValue?: boolean;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof BooleanProperty
      */
     options?: Array<Option>;
 }

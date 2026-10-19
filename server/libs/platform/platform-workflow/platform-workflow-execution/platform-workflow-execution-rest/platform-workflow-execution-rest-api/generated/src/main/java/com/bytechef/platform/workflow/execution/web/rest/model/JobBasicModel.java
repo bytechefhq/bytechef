@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.308008+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class JobBasicModel {
 
   private @Nullable String createdBy;
@@ -47,7 +47,6 @@ public class JobBasicModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
-  @Valid
   private Map<String, Object> metadata = new HashMap<>();
 
   private Integer priority;

@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiAgentTestRuntimeProvider from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/runtime-providers/AiAgentTestRuntimeProvider';
 import {MessageSquareXIcon, PlayIcon, SparklesIcon, WorkflowIcon, XIcon} from 'lucide-react';
+import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {Thread} from './AiAgentTestingPanelThread';
@@ -11,12 +12,28 @@ interface AiAgentTestingPanelProps {
     contentClassName?: string;
     headerClassName?: string;
     onClose?: () => void;
+    skipIntro?: boolean;
 }
 
-export default function AiAgentTestingPanel({contentClassName, headerClassName, onClose}: AiAgentTestingPanelProps) {
+export default function AiAgentTestingPanel({
+    contentClassName,
+    headerClassName,
+    onClose,
+    skipIntro = false,
+}: Readonly<AiAgentTestingPanelProps>) {
     const {conversationId, handleReset, handleTestAgent, isTestingAgent} = useAiAgentTestingPanel();
 
+    useEffect(() => {
+        if (skipIntro && !isTestingAgent) {
+            handleTestAgent();
+        }
+    }, [handleTestAgent, isTestingAgent, skipIntro]);
+
     if (!isTestingAgent) {
+        if (skipIntro) {
+            return null;
+        }
+
         return (
             <div className="flex size-full flex-col gap-4">
                 <div className={headerClassName}>

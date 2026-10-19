@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { AutomationWorkflowProjectWorkflowInput } from './AutomationWorkflowProjectWorkflowInput';
 import {
     AutomationWorkflowProjectWorkflowInputFromJSON,
@@ -36,98 +36,66 @@ import {
 export interface ConnectedUserProjectWorkflow {
     /**
      * The created date of a workflow.
-     * @type {Date}
-     * @memberof ConnectedUserProjectWorkflow
      */
     createdDate?: Date;
     /**
      * The description of a workflow.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     description?: string;
     /**
      * The definition of a workflow.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     definition?: string;
     /**
      * The last modified date of a workflow.
-     * @type {Date}
-     * @memberof ConnectedUserProjectWorkflow
      */
     lastModifiedDate?: Date;
     /**
      * If a workflow is enabled or not.
-     * @type {boolean}
-     * @memberof ConnectedUserProjectWorkflow
      */
     enabled?: boolean;
     /**
      * The label of a workflow.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     label?: string;
     /**
      * The reference code of a workflow.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     workflowUuid?: string;
     /**
      * The workflow version, if null a workflow is not yet published
-     * @type {number}
-     * @memberof ConnectedUserProjectWorkflow
      */
     workflowVersion?: number;
     /**
      * COPY when the workflow is the user's own editable copy; REFERENCE when it points at a shared automation workflow.
-     * @type {ConnectedUserProjectWorkflowKindEnum}
-     * @memberof ConnectedUserProjectWorkflow
      */
     kind?: ConnectedUserProjectWorkflowKindEnum;
     /**
      * For REFERENCE rows, the uuid of the automation workflow being referenced.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     automationWorkflowUuid?: string;
     /**
      * For COPY rows, the uuid of the automation workflow template the copy was created from. Null otherwise.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     copiedFromWorkflowUuid?: string;
     /**
      * True when a REFERENCE points at an automation workflow that is no longer served.
-     * @type {boolean}
-     * @memberof ConnectedUserProjectWorkflow
      */
     dangling?: boolean;
     /**
      * The components used by the workflow.
-     * @type {Array<AutomationWorkflowProjectComponent>}
-     * @memberof ConnectedUserProjectWorkflow
      */
     components?: Array<AutomationWorkflowProjectComponent>;
     /**
      * The values the connected user is asked for before this workflow runs.
-     * @type {Array<AutomationWorkflowProjectWorkflowInput>}
-     * @memberof ConnectedUserProjectWorkflow
      */
     inputs?: Array<AutomationWorkflowProjectWorkflowInput>;
     /**
      * The values the connected user has already supplied, keyed by input name.
-     * @type {{ [key: string]: any; }}
-     * @memberof ConnectedUserProjectWorkflow
      */
     inputValues?: { [key: string]: any; };
     /**
      * Why a REFERENCE needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or UPDATE_PENDING. Null when healthy or for COPY rows.
-     * @type {string}
-     * @memberof ConnectedUserProjectWorkflow
      */
     attentionReason?: string;
 }
@@ -138,7 +106,7 @@ export interface ConnectedUserProjectWorkflow {
  */
 export const ConnectedUserProjectWorkflowKindEnum = {
     Copy: 'COPY',
-    Reference: 'REFERENCE'
+    Reference: 'REFERENCE',
 } as const;
 export type ConnectedUserProjectWorkflowKindEnum = typeof ConnectedUserProjectWorkflowKindEnum[keyof typeof ConnectedUserProjectWorkflowKindEnum];
 
@@ -160,10 +128,10 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
     }
     return {
         
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'definition': json['definition'] == null ? undefined : json['definition'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'label': json['label'] == null ? undefined : json['label'],
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
@@ -190,10 +158,10 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
 
     return {
         
-        'createdDate': value['createdDate'] == null ? value['createdDate'] : value['createdDate'].toISOString(),
+        'createdDate': value['createdDate'] == null ? value['createdDate'] : serializeDateTime(value['createdDate']),
         'description': value['description'],
         'definition': value['definition'],
-        'lastModifiedDate': value['lastModifiedDate'] == null ? value['lastModifiedDate'] : value['lastModifiedDate'].toISOString(),
+        'lastModifiedDate': value['lastModifiedDate'] == null ? value['lastModifiedDate'] : serializeDateTime(value['lastModifiedDate']),
         'enabled': value['enabled'],
         'label': value['label'],
         'workflowUuid': value['workflowUuid'],

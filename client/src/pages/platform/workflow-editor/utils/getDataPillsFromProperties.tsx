@@ -2,17 +2,6 @@ import {ComponentPropertiesType, DataPillType, PropertyAllType} from '@/shared/t
 
 import getSubProperties from './getSubProperties';
 
-const getExistingProperties = (properties: Array<PropertyAllType>): Array<PropertyAllType> =>
-    properties.filter((property) => {
-        if (property.properties) {
-            return getExistingProperties(property.properties);
-        } else if (property.items) {
-            return getExistingProperties(property.items);
-        }
-
-        return !!property.name;
-    });
-
 export default function getDataPillsFromProperties(
     properties: Array<ComponentPropertiesType>,
     previousNodeNames: Array<string>
@@ -45,11 +34,9 @@ export default function getDataPillsFromProperties(
             return;
         }
 
-        const existingProperties = getExistingProperties(componentProperty.properties);
-
         const allPropertiesFlat: Array<DataPillType> = [];
 
-        existingProperties.forEach((property) => {
+        (componentProperty.properties as Array<PropertyAllType>).forEach((property) => {
             const {items, name, properties} = property;
 
             const subProperties = properties?.length ? properties : items;

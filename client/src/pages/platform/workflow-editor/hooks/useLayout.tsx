@@ -22,12 +22,15 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
+import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import animateNodePositions from '../utils/animateNodePositions';
+import {layoutClusterFrames} from '../utils/clusterFrame/layoutClusterFrames';
 import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
 import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createConditionEdges';
@@ -61,6 +64,7 @@ import {containsNodePosition} from '../utils/postDagreConstraints';
 import removeTrailingBranchPlaceholders from '../utils/removeTrailingBranchPlaceholders';
 import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
+import useClusterElementsViewMode from './useClusterElementsViewMode';
 
 function getClusterElementsFingerprint(clusterElements: unknown): string {
     if (!clusterElements || typeof clusterElements !== 'object') {
@@ -84,8 +88,11 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
                 const nestedClusterElements = getNestedClusterElements(element);
                 const nestedFingerprint = getClusterElementsFingerprint(nestedClusterElements);
                 const nestedFingerprintPart = nestedFingerprint ? '{' + nestedFingerprint + '}' : '';
+                const nodePosition = (element as {metadata?: {ui?: {nodePosition?: {x: number; y: number}}}}).metadata
+                    ?.ui?.nodePosition;
+                const positionPart = nodePosition ? `@${nodePosition.x},${nodePosition.y}` : '';
 
-                return `${elementName}:${element.type}${nestedFingerprintPart}`;
+                return `${elementName}:${element.type}${positionPart}${nestedFingerprintPart}`;
             });
 
             return `${elementKey}[${elementFingerprints.join(';')}]`;
@@ -154,6 +161,7 @@ export default function useLayout({
     const storeDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const layoutDirection = directionProp || storeDirection;
     const layoutEngine = useLayoutEngineStore((state) => state.layoutEngine);
+    const clusterFrameLockedByRootId = useWorkflowEditorStore((state) => state.clusterFrameLockedByRootId);
 
     // Selective subscriptions with structural equality — prevents re-renders on parameter-only
     // changes (typing). Only re-renders when task graph structure changes (add/delete node).
@@ -215,6 +223,24 @@ export default function useLayout({
     // progress) or a failed layout computation — without it either path left
     // the canvas stale until an unrelated dependency changed.
     const [layoutRetryNonce, setLayoutRetryNonce] = useState(0);
+    const clusterElementsViewMode = useClusterElementsViewMode();
+
+    const workflowId = useWorkflowDataStore((state) => state.workflow.id);
+    const collapsedClusterRootIds = useClusterFrameCollapsedStore((state) =>
+        workflowId ? state.collapsedByWorkflowId[workflowId] : undefined
+    );
+
+    const boxModeClusterRootIds = useMemo(
+        () =>
+            clusterElementsViewMode === 'box'
+                ? (tasks ?? [])
+                      .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
+                      .map((task) => task.name)
+                : [],
+        [clusterElementsViewMode, collapsedClusterRootIds, tasks]
+    );
+
+    const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(boxModeClusterRootIds);
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const layoutRetryStateRef = useRef(createLayoutRetryState());
@@ -759,6 +785,10 @@ export default function useLayout({
             return;
         }
 
+        if (boxModeClusterRootIds.length > 0 && !definitionsReady) {
+            return;
+        }
+
         let isCancelled = false;
 
         let layoutNodes = allNodes;
@@ -895,7 +925,12 @@ export default function useLayout({
         // deleted task dispatcher children disappear at the same time as the parent,
         // rather than lingering until the async layout calculation resolves.
         const newNodeIds = new Set(
-            [...layoutNodes, ...hiddenTrailingBranchPlaceholderNodes, ...stickyNoteNodes].map((node) => node.id)
+            [
+                ...layoutNodes,
+                ...hiddenTrailingBranchPlaceholderNodes,
+                ...stickyNoteNodes,
+                ...Object.values(nodesByRootId).flat(),
+            ].map((node) => node.id)
         );
         const prunedNodes = frozenNodes.filter((node) => newNodeIds.has(node.id));
 
@@ -907,6 +942,13 @@ export default function useLayout({
             setEdges(currentEdges.filter((edge) => newNodeIds.has(edge.source) && newNodeIds.has(edge.target)));
         }
 
+        const framedClusters = layoutClusterFrames(
+            layoutNodes,
+            edges,
+            {edgesByRootId, nodesByRootId},
+            clusterFrameLockedByRootId
+        );
+
         const layoutFunction =
             layoutEngine === 'elk' && isElkLayoutSupported(layoutNodes) ? getElkLayoutElements : getLayoutElements;
 
@@ -914,16 +956,26 @@ export default function useLayout({
             canvasHeight: canvasHeightRef.current,
             canvasWidth: canvasWidthRef.current,
             direction: layoutDirection,
-            edges,
-            nodes: layoutNodes,
+            edges: framedClusters.outerEdges,
+            nodes: framedClusters.outerNodes,
             savedPositionCrossAxisShift,
         })
-            .then((elements) => {
+            .then((layoutElements) => {
                 if (isCancelled) {
                     return;
                 }
 
-                useLayoutEngineStore.getState().setLastAppliedLayoutEngine(elements.engine);
+                useLayoutEngineStore.getState().setLastAppliedLayoutEngine(layoutElements.engine);
+
+                const clusterMemberNodes = readOnlyWorkflow
+                    ? framedClusters.memberNodes.map((node) => ({...node, draggable: false}))
+                    : framedClusters.memberNodes;
+
+                const elements = {
+                    ...layoutElements,
+                    edges: [...layoutElements.edges, ...framedClusters.memberEdges],
+                    nodes: [...layoutElements.nodes, ...clusterMemberNodes],
+                };
 
                 const targetNodes: Node[] = [
                     ...elements.nodes,
@@ -998,7 +1050,21 @@ export default function useLayout({
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layoutDirection, layoutEngine, layoutResetCounter, layoutRetryNonce, tasks, triggers, isWorkflowLoaded]);
+    }, [
+        layoutDirection,
+        layoutEngine,
+        layoutResetCounter,
+        layoutRetryNonce,
+        tasks,
+        triggers,
+        isWorkflowLoaded,
+        boxModeClusterRootIds,
+        definitionsReady,
+        edgesByRootId,
+        nodesByRootId,
+        clusterFrameLockedByRootId,
+        clusterElementsViewMode,
+    ]);
 
     useEffect(() => {
         if (!isWorkflowLoaded && !readOnlyWorkflow) {

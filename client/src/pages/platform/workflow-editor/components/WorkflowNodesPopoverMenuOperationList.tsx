@@ -2,42 +2,36 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinition,
     ActionDefinitionApi,
-    ClusterElementDefinitionApi,
     ComponentDefinition,
     TriggerDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
-import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
-import {ClickedOperationType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, Loader2Icon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
-import {
-    convertNameToSnakeCase,
-    getClusterElementsLabel,
-    initializeClusterElementsObject,
-} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {convertNameToSnakeCase, getClusterElementsLabel} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import addClusterElementToClusterRoot from '../utils/addClusterElementToClusterRoot';
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
-import {getTask} from '../utils/getTask';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleComponentAddedSuccess, {
     handleComponentAddedError,
     openNodeDetailsPanelForNewNode,
 } from '../utils/handleComponentAddedSuccess';
 import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
-import processClusterElementsHierarchy from '../utils/processClusterElementsHierarchy';
+import {resolveClusterRootId} from '../utils/resolveClusterRootId';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
@@ -76,19 +70,46 @@ const WorkflowNodesPopoverMenuOperationList = ({
         }))
     );
 
-    const {
-        clusterElementsCanvasOpen,
-        mainClusterRootComponentDefinition,
-        rootClusterElementNodeData,
-        setRootClusterElementNodeData,
-    } = useWorkflowEditorStore(
-        useShallow((state) => ({
-            clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
-            mainClusterRootComponentDefinition: state.mainClusterRootComponentDefinition,
-            rootClusterElementNodeData: state.rootClusterElementNodeData,
-            setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-        }))
-    );
+    const {clusterRootComponentDefinitions, rootClusterElementNodeData, setRootClusterElementNodeData} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                clusterRootComponentDefinitions: state.clusterRootComponentDefinitions,
+                rootClusterElementNodeData: state.rootClusterElementNodeData,
+                setRootClusterElementNodeData: state.setRootClusterElementNodeData,
+            }))
+        );
+
+    const mainClusterRootNodeData = useMemo(() => {
+        const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+
+        if (!sourceNode) {
+            return rootClusterElementNodeData?.componentName && rootClusterElementNodeData?.workflowNodeName
+                ? rootClusterElementNodeData
+                : undefined;
+        }
+
+        const sourceNodeData = sourceNode.data as NodeDataType;
+        const mainClusterRootId = resolveClusterRootId(sourceNodeData);
+
+        if (!mainClusterRootId) {
+            return rootClusterElementNodeData?.componentName && rootClusterElementNodeData?.workflowNodeName
+                ? rootClusterElementNodeData
+                : undefined;
+        }
+
+        const mainClusterRootNode = nodes.find((node) => node.id === mainClusterRootId);
+
+        if (mainClusterRootNode) {
+            return mainClusterRootNode.data as NodeDataType;
+        }
+
+        return rootClusterElementNodeData?.componentName && rootClusterElementNodeData?.workflowNodeName
+            ? rootClusterElementNodeData
+            : undefined;
+    }, [nodes, rootClusterElementNodeData, sourceNodeId]);
+
+    const mainClusterRootComponentDefinition =
+        clusterRootComponentDefinitions[mainClusterRootNodeData?.workflowNodeName ?? ''];
     const {currentNode, setCurrentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -105,8 +126,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const queryClient = useQueryClient();
 
-    const {actions, clusterElement, clusterElements, clusterRoot, icon, name, title, triggers, version} =
-        componentDefinition;
+    const {actions, clusterElements, clusterRoot, icon, name, title, triggers, version} = componentDefinition;
 
     const clusterElementOperations = useMemo(() => {
         if (!clusterElementType) {
@@ -120,10 +140,29 @@ const WorkflowNodesPopoverMenuOperationList = ({
         return matchingOperations;
     }, [clusterElementType, clusterElements]);
 
-    const operations = useMemo(
-        () => (trigger ? triggers : clusterElementsCanvasOpen && clusterElement ? clusterElementOperations : actions),
-        [trigger, triggers, clusterElementsCanvasOpen, clusterElement, clusterElementOperations, actions]
-    );
+    const operations = useMemo(() => {
+        if (trigger) {
+            return triggers;
+        }
+
+        if (clusterElementType) {
+            return clusterElementOperations;
+        }
+
+        return actions;
+    }, [trigger, triggers, clusterElementType, clusterElementOperations, actions]);
+
+    const operationsHeading = useMemo(() => {
+        if (trigger) {
+            return 'Triggers';
+        }
+
+        if (clusterElementType) {
+            return getClusterElementsLabel(clusterElementType);
+        }
+
+        return 'Actions';
+    }, [trigger, clusterElementType]);
 
     const getNodeData = useCallback(
         (operation: ClickedOperationType, definition: ActionDefinition | TriggerDefinition) => {
@@ -181,103 +220,73 @@ const WorkflowNodesPopoverMenuOperationList = ({
     );
 
     const saveClusterElementToWorkflow = useCallback(
-        ({
-            clusterElementData,
+        async ({
+            clusterElementName,
             clusterElementType,
             isMultipleElements = false,
+            label,
             sourceNodeId,
         }: {
-            clusterElementData: ClusterElementItemType;
+            clusterElementName: string;
             clusterElementType: string;
             isMultipleElements?: boolean;
+            label?: string;
             sourceNodeId: string;
         }) => {
             if (!workflow.definition || !mainClusterRootComponentDefinition) {
                 return;
             }
 
-            if (!rootClusterElementNodeData?.workflowNodeName || !rootClusterElementNodeData?.componentName) {
+            if (!mainClusterRootNodeData?.workflowNodeName || !mainClusterRootNodeData?.componentName) {
                 console.error('Root cluster element node data is missing required properties');
 
                 return;
             }
 
-            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-            const mainClusterRootTask = getTask({
-                tasks: workflowDefinitionTasks,
-                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+            const nestedClusterElements = await addClusterElementToClusterRoot({
+                clusterElementName,
+                clusterElementType,
+                clusterRootComponentDefinition: mainClusterRootComponentDefinition,
+                clusterRootId: mainClusterRootNodeData.workflowNodeName,
+                componentDefinition,
+                isMultipleElements,
+                label,
+                queryClient,
+                sourceNodeId,
+                updateWorkflowMutation: updateWorkflowMutation!,
+                workflow,
             });
 
-            if (!mainClusterRootTask) {
+            if (!nestedClusterElements) {
                 return;
             }
 
-            const clusterElements = initializeClusterElementsObject({
-                clusterElementsData: mainClusterRootTask.clusterElements || {},
-                mainClusterRootComponentDefinition,
-                mainClusterRootTask,
-            });
-
-            const updatedClusterElements = processClusterElementsHierarchy({
-                clusterElementData,
-                clusterElements,
-                elementType: clusterElementType,
-                isMultipleElements,
-                mainRootId: rootClusterElementNodeData.workflowNodeName,
-                sourceNodeId,
-            });
-
-            const updatedNodeData = {
-                ...mainClusterRootTask,
-                clusterElements: updatedClusterElements.nestedClusterElements,
-            };
-
             setRootClusterElementNodeData({
-                ...rootClusterElementNodeData,
-                clusterElements: updatedClusterElements.nestedClusterElements,
-            } as typeof rootClusterElementNodeData);
+                ...mainClusterRootNodeData,
+                clusterElements: nestedClusterElements,
+            } as typeof mainClusterRootNodeData);
 
             if (currentNode?.clusterRoot && !currentNode.isNestedClusterRoot) {
                 setCurrentNode({
                     ...currentNode,
-                    clusterElements: updatedClusterElements.nestedClusterElements,
+                    clusterElements: nestedClusterElements,
                 });
             }
 
             if (workflowNodeDetailsPanelOpen && currentNode?.workflowNodeName === sourceNodeName) {
                 setCurrentNode({
-                    ...rootClusterElementNodeData,
-                    clusterElements: updatedClusterElements.nestedClusterElements,
+                    ...mainClusterRootNodeData,
+                    clusterElements: nestedClusterElements,
                 });
 
                 setWorkflowNodeDetailsPanelOpen(false);
             }
-
-            saveWorkflowDefinition({
-                nodeData: {
-                    ...updatedNodeData,
-                    componentName: rootClusterElementNodeData.componentName,
-                    workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                },
-                onSuccess: () => {
-                    handleComponentAddedSuccess({
-                        nodeData: {
-                            ...updatedNodeData,
-                            componentName: rootClusterElementNodeData.componentName,
-                            workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                        },
-                        queryClient,
-                        workflow,
-                    });
-                },
-                updateWorkflowMutation: updateWorkflowMutation!,
-            });
         },
         [
             workflow,
             mainClusterRootComponentDefinition,
-            rootClusterElementNodeData,
+            mainClusterRootNodeData,
+            componentDefinition,
             setRootClusterElementNodeData,
             currentNode,
             workflowNodeDetailsPanelOpen,
@@ -326,43 +335,14 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     return;
                 }
 
-                if (clusterElementsCanvasOpen && clusterElementType) {
+                if (clusterElementType) {
                     captureComponentUsed(componentName, undefined, operationName);
 
-                    const getClusterElementDefinitionRequest = {
+                    await saveClusterElementToWorkflow({
                         clusterElementName: operationName,
-                        clusterElementType: clusterElementType ? convertNameToSnakeCase(clusterElementType) : undefined,
-                        componentName,
-                        componentVersion: version,
-                    };
-
-                    const clickedClusterElementDefinition = await queryClient.fetchQuery({
-                        queryFn: () =>
-                            new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
-                                getClusterElementDefinitionRequest
-                            ),
-                        queryKey: ClusterElementDefinitionKeys.clusterElementDefinition(
-                            getClusterElementDefinitionRequest
-                        ),
-                        staleTime: DEFINITION_STALE_TIME,
-                    });
-
-                    const clusterElementData = {
-                        clusterElements: componentDefinition.clusterRoot ? {} : undefined,
-                        label: clickedOperation.componentLabel,
-                        metadata: {},
-                        name: getFormattedName(componentName),
-                        parameters:
-                            getParametersWithDefaultValues({
-                                properties: clickedClusterElementDefinition?.properties as Array<PropertyAllType>,
-                            }) || {},
-                        type: `${componentName}/v${version}/${operationName}`,
-                    };
-
-                    saveClusterElementToWorkflow({
-                        clusterElementData,
                         clusterElementType,
                         isMultipleElements: multipleClusterElementsNode,
+                        label: clickedOperation.componentLabel,
                         sourceNodeId,
                     });
 
@@ -431,7 +411,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             updateWorkflowMutation: updateWorkflowMutation!,
                             workflow,
                         });
-                    } else if (!clusterElementsCanvasOpen) {
+                    } else {
                         const placeholderNode = nodes.find((node) => node.id === sourceNodeId);
 
                         if (!placeholderNode) {
@@ -473,7 +453,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             loadingOperationName,
             setLatestComponentDefinition,
             trigger,
-            clusterElementsCanvasOpen,
             clusterElementType,
             queryClient,
             getNodeData,
@@ -506,13 +485,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 <div className="flex w-full flex-col">
                     <h2 className="text-lg font-semibold">{title}</h2>
 
-                    <h3 className="text-sm text-muted-foreground">
-                        {trigger
-                            ? 'Triggers'
-                            : clusterElementsCanvasOpen
-                              ? getClusterElementsLabel(clusterElementType as string)
-                              : 'Actions'}
-                    </h3>
+                    <h3 className="text-sm text-muted-foreground">{operationsHeading}</h3>
                 </div>
             </header>
 

@@ -30,10 +30,16 @@ import {
 } from '../models/CheckoutSessionRequest';
 
 export interface CreateCheckoutSessionRequest {
+    /**
+     * 
+     */
     checkoutSessionRequest: CheckoutSessionRequest;
 }
 
 export interface UpgradeSubscriptionRequest {
+    /**
+     * 
+     */
     checkoutSessionRequest: CheckoutSessionRequest;
 }
 

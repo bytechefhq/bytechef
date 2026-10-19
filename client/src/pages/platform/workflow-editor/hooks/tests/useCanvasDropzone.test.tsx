@@ -1,11 +1,21 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 
-import {CANVAS_DRAG_DATA_TYPE, CanvasDragKindType, TRIGGER_DRAG_DATA_TYPE} from '../../utils/canvasDragData';
+import {
+    CANVAS_DRAG_DATA_TYPE,
+    CanvasDragKindType,
+    TRIGGER_DRAG_DATA_TYPE,
+    getClusterElementTypeDragDataType,
+} from '../../utils/canvasDragData';
 import useCanvasDropzone from '../useCanvasDropzone';
 
-const Dropzone = ({acceptedDragKind}: {acceptedDragKind: CanvasDragKindType}) => {
-    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone(acceptedDragKind);
+interface DropzonePropsI {
+    acceptedDragKind: CanvasDragKindType;
+    clusterElementType?: string;
+}
+
+const Dropzone = ({acceptedDragKind, clusterElementType}: DropzonePropsI) => {
+    const {dropzoneHandlers, isDropzoneActive} = useCanvasDropzone(acceptedDragKind, clusterElementType);
 
     return (
         <div data-active={isDropzoneActive} data-testid="dropzone" {...dropzoneHandlers}>
@@ -79,5 +89,25 @@ describe('useCanvasDropzone', () => {
         fireEvent.dragEnd(document);
 
         expect(dropzone).toHaveAttribute('data-active', 'false');
+    });
+
+    it('accepts a drag on a cluster element placeholder only when the component has an element of its type', () => {
+        render(<Dropzone acceptedDragKind="task" clusterElementType="chatMemory" />);
+
+        const dropzone = screen.getByTestId('dropzone');
+
+        const toolsDragOverAllowed = fireEvent.dragOver(dropzone, {
+            dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, getClusterElementTypeDragDataType('TOOLS')]},
+        });
+
+        expect(toolsDragOverAllowed).toBe(true);
+        expect(dropzone).toHaveAttribute('data-active', 'false');
+
+        const chatMemoryDragOverAllowed = fireEvent.dragOver(dropzone, {
+            dataTransfer: {types: [CANVAS_DRAG_DATA_TYPE, getClusterElementTypeDragDataType('CHAT_MEMORY')]},
+        });
+
+        expect(chatMemoryDragOverAllowed).toBe(false);
+        expect(dropzone).toHaveAttribute('data-active', 'true');
     });
 });

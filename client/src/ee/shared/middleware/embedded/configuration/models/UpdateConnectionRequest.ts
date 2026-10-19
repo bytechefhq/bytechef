@@ -29,26 +29,18 @@ import {
 export interface UpdateConnectionRequest {
     /**
      * The name of a connection.
-     * @type {string}
-     * @memberof UpdateConnectionRequest
      */
     name: string;
     /**
      * Whether every connected user in the same environment may use this connection.
-     * @type {boolean}
-     * @memberof UpdateConnectionRequest
      */
     shared?: boolean;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof UpdateConnectionRequest
      */
     tags: Array<Tag>;
     /**
      * 
-     * @type {number}
-     * @memberof UpdateConnectionRequest
      */
     version?: number;
 }

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { IntegrationBasic } from './IntegrationBasic';
 import {
     IntegrationBasicFromJSON,
@@ -50,116 +50,78 @@ import {
 export interface IntegrationInstanceConfiguration {
     /**
      * The created by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly createdDate?: Date;
     /**
      * The description of an integration configuration.
-     * @type {string}
-     * @memberof IntegrationInstanceConfiguration
      */
     description?: string;
     /**
      * If an integration instance configuration is enabled or not.
-     * @type {boolean}
-     * @memberof IntegrationInstanceConfiguration
      */
     enabled?: boolean;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof IntegrationInstanceConfiguration
      */
     environmentId?: number;
     /**
      * The id of an integration instance configuration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly id?: number;
     /**
      * Th id of an integration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfiguration
      */
     integrationId?: number;
     /**
      * The version of an integration.
-     * @type {number}
-     * @memberof IntegrationInstanceConfiguration
      */
     integrationVersion?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of an integration instance configuration.
-     * @type {string}
-     * @memberof IntegrationInstanceConfiguration
      */
     name: string;
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof IntegrationInstanceConfiguration
      */
     authorizationType?: AuthorizationType;
     /**
      * The connection authorization parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly connectionAuthorizationParameters?: { [key: string]: any; };
     /**
      * The connection parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfiguration
      */
     readonly connectionConnectionParameters?: { [key: string]: any; };
     /**
      * The parameters of an integration connection, usually oauth2 related data.
-     * @type {{ [key: string]: any; }}
-     * @memberof IntegrationInstanceConfiguration
      */
     connectionParameters?: { [key: string]: any; };
     /**
      * 
-     * @type {IntegrationBasic}
-     * @memberof IntegrationInstanceConfiguration
      */
     integration?: IntegrationBasic;
     /**
      * The array of integration instance configuration workflows.
-     * @type {Array<IntegrationInstanceConfigurationWorkflow>}
-     * @memberof IntegrationInstanceConfiguration
      */
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     /**
      * The array of tags.
-     * @type {Array<Tag>}
-     * @memberof IntegrationInstanceConfiguration
      */
     tags?: Array<Tag>;
     /**
      * 
-     * @type {number}
-     * @memberof IntegrationInstanceConfiguration
      */
     version?: number;
 }
@@ -185,7 +147,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
@@ -193,7 +155,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],

@@ -62,4 +62,13 @@ describe('getDataPillsFromProperties', () => {
 
         expect(dataPills.map((dataPill) => dataPill.value)).toEqual(['component_1', 'component_1.subject']);
     });
+
+    it('offers an indexed data pill for an output that is an array of primitives', () => {
+        const dataPills = getDataPillsFromProperties(
+            [componentProperties('textHelper_1', [{type: 'STRING'} as PropertyAllType])],
+            ['textHelper_1']
+        );
+
+        expect(dataPills.map((dataPill) => dataPill.value)).toEqual(['textHelper_1', 'textHelper_1[index]']);
+    });
 });

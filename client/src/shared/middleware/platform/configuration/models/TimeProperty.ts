@@ -57,26 +57,18 @@ import {
 export interface TimeProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {string}
-     * @memberof TimeProperty
      */
     defaultValue?: string;
     /**
      * The property sample value.
-     * @type {string}
-     * @memberof TimeProperty
      */
     exampleValue?: string;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof TimeProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof TimeProperty
      */
     optionsDataSource?: OptionsDataSource;
 }

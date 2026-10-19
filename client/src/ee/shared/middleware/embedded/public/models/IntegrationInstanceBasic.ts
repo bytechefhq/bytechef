@@ -29,26 +29,18 @@ import {
 export interface IntegrationInstanceBasic {
     /**
      * The id of an integration instance.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     id?: number;
     /**
      * The id of the connection this integration instance uses.
-     * @type {number}
-     * @memberof IntegrationInstanceBasic
      */
     readonly connectionId?: number;
     /**
      * 
-     * @type {CredentialStatus}
-     * @memberof IntegrationInstanceBasic
      */
     credentialStatus?: CredentialStatus;
     /**
      * If an integration instance is enabled or not
-     * @type {boolean}
-     * @memberof IntegrationInstanceBasic
      */
     enabled: boolean;
 }

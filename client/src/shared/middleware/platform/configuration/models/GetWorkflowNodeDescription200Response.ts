@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface GetWorkflowNodeDescription200Response {
     /**
      * 
-     * @type {string}
-     * @memberof GetWorkflowNodeDescription200Response
      */
     description?: string;
 }

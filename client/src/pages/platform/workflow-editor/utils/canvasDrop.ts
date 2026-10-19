@@ -2,13 +2,15 @@ import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-import {CANVAS_DRAG_DATA_TYPE, getCanvasDragKind} from './canvasDragData';
+import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {CANVAS_DRAG_DATA_TYPE, carriesClusterElementType, getCanvasDragKind} from './canvasDragData';
 import resolveCanvasDropTarget from './resolveCanvasDropTarget';
 import resolveTargetTriggerName from './resolveTargetTriggerName';
 
 type CanvasDragEventType = Pick<DragEvent, 'preventDefault' | 'target'> & {dataTransfer: DataTransfer};
 
 interface CanvasDropHandlersI {
+    onDropOnClusterElementPlaceholder: (targetNode: Node, droppedNode: ClickedDefinitionType) => void;
     onDropOnPlaceholderNode: (targetNode: Node, droppedNode: ClickedDefinitionType) => void;
     onDropOnTriggerNode: (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void;
     onDropOnTriggerPlaceholder: (droppedNode: ClickedDefinitionType) => void;
@@ -31,7 +33,13 @@ export function handleCanvasDragOver(event: CanvasDragEventType, edges: Edge[], 
 
     const dragKind = getCanvasDragKind(event.dataTransfer);
 
-    if (dragKind && !resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target})) {
+    const dropTarget = dragKind ? resolveCanvasDropTarget({dragKind, edges, nodes, target: event.target}) : undefined;
+
+    const isRefusedClusterElementDrop =
+        dropTarget?.type === 'clusterElementPlaceholder' &&
+        !carriesClusterElementType(event.dataTransfer, (dropTarget.node.data as NodeDataType).clusterElementType!);
+
+    if (dragKind && (!dropTarget || isRefusedClusterElementDrop)) {
         event.dataTransfer.dropEffect = 'none';
 
         return;
@@ -98,6 +106,16 @@ export function handleCanvasDrop({
 
         if (targetTriggerName) {
             handlers.onDropOnTriggerNode({...droppedNode, trigger: true}, targetTriggerName);
+        }
+    } else if (dropTarget.type === 'clusterElementPlaceholder') {
+        const clusterElementType = convertNameToSnakeCase((dropTarget.node.data as NodeDataType).clusterElementType!);
+
+        const clusterElementsCount = componentDefinitions.find(
+            (componentDefinition) => componentDefinition.name === droppedNodeName
+        )?.clusterElementsCount;
+
+        if (clusterElementsCount?.[clusterElementType]) {
+            handlers.onDropOnClusterElementPlaceholder(dropTarget.node, droppedNode);
         }
     } else if (dropTarget.type === 'placeholder') {
         handlers.onDropOnPlaceholderNode(dropTarget.node, droppedNode);

@@ -253,7 +253,7 @@ async function example() {
     projectId: 789,
     // number | The id of a project deployment. (optional)
     projectDeploymentId: 789,
-    // string | The id of a workflow. (optional)
+    // string | The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set. (optional)
     workflowId: workflowId_example,
     // number | The project version the workflow executions ran. Only applies together with workflowId. (optional)
     projectVersion: 56,

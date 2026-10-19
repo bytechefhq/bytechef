@@ -57,56 +57,38 @@ import {
 export interface NumberProperty extends ValueProperty {
     /**
      * The property default value.
-     * @type {number}
-     * @memberof NumberProperty
      */
     defaultValue?: number;
     /**
      * The property sample value.
-     * @type {number}
-     * @memberof NumberProperty
      */
     exampleValue?: number;
     /**
      * The number value precision.
-     * @type {number}
-     * @memberof NumberProperty
      */
     maxNumberPrecision?: number;
     /**
      * The maximum property value.
-     * @type {number}
-     * @memberof NumberProperty
      */
     maxValue?: number;
     /**
      * The number value precision.
-     * @type {number}
-     * @memberof NumberProperty
      */
     minNumberPrecision?: number;
     /**
      * The minimum property value.
-     * @type {number}
-     * @memberof NumberProperty
      */
     minValue?: number;
     /**
      * The number value precision.
-     * @type {number}
-     * @memberof NumberProperty
      */
     numberPrecision?: number;
     /**
      * The list of valid property options.
-     * @type {Array<Option>}
-     * @memberof NumberProperty
      */
     options?: Array<Option>;
     /**
      * 
-     * @type {OptionsDataSource}
-     * @memberof NumberProperty
      */
     optionsDataSource?: OptionsDataSource;
 }

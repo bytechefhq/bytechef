@@ -203,8 +203,9 @@ describe('ActivationDialog', () => {
         connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
 
         const onActivated = vi.fn();
+        const onClose = vi.fn();
 
-        renderDialog({onActivated});
+        renderDialog({onActivated, onClose});
 
         const row = await screen.findByTestId('connect-row-slack');
 
@@ -226,7 +227,8 @@ describe('ActivationDialog', () => {
         expect(JSON.parse(provision!.body!)).toEqual({connections: {slack: 9}, inputs: {channel: '#general'}});
         expect(enable!.body).toBeUndefined();
         expect(calls.indexOf(provision!)).toBeLessThan(calls.indexOf(enable!));
-        expect(screen.getByRole('button', {name: 'Done'})).toBeInTheDocument();
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole('button', {name: 'Done'})).not.toBeInTheDocument();
     });
 
     it('returns to Connect and highlights the component the server reports missing, after deprovisioning', async () => {
@@ -348,11 +350,13 @@ describe('ActivationDialog', () => {
             throw new Error('host bug');
         });
 
-        renderDialog({onActivated, workflowTemplateId: 'wf-plain'});
+        const onClose = vi.fn();
+
+        renderDialog({onActivated, onClose, workflowTemplateId: 'wf-plain'});
 
         await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
 
-        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         expect(onActivated).toHaveBeenCalledWith('wf-plain');
         expect(calls.some(isDeprovision)).toBe(false);
         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -365,7 +369,9 @@ describe('ActivationDialog', () => {
             releaseProvision = resolve;
         });
 
-        renderDialog({workflowTemplateId: 'wf-plain'});
+        const onClose = vi.fn();
+
+        renderDialog({onClose, workflowTemplateId: 'wf-plain'});
 
         const activateButton = await screen.findByRole('button', {name: 'Activate'});
 
@@ -377,7 +383,7 @@ describe('ActivationDialog', () => {
 
         await act(async () => releaseProvision());
 
-        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         expect(calls.filter((call) => call.url.endsWith('/provision') && call.method === 'POST')).toHaveLength(1);
     });
 
@@ -570,5 +576,40 @@ describe('ActivationDialog', () => {
         const footer = await screen.findByRole('contentinfo');
 
         expect(within(footer).getByText(/Powered by/)).toBeInTheDocument();
+    });
+    describe('Connect', () => {
+        it('is offered while the user has not connected the integration', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
+
+        it('stays offered once the user has a working connection, to add another account', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            expect(within(row).getByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
+
+        it('asks the connect dialog for a new connection', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await userEvent.click(await within(row).findByRole('button', {name: 'Connect'}));
+
+            await waitFor(() =>
+                expect(useConnectDialogMock).toHaveBeenCalledWith(
+                    expect.objectContaining({connectionOnly: true, newConnection: true})
+                )
+            );
+        });
     });
 });

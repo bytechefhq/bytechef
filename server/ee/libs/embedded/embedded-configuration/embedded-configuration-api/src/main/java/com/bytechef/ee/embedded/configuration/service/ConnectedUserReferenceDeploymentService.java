@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,6 +25,8 @@ public interface ConnectedUserReferenceDeploymentService {
 
     Optional<ConnectedUserReferenceDeployment> fetchConnectedUserReferenceDeployment(
         long connectedUserId, long projectId);
+
+    List<ConnectedUserReferenceDeployment> getConnectedUserReferenceDeployments(long connectedUserId);
 
     boolean isReferenceDeployment(long projectDeploymentId);
 }

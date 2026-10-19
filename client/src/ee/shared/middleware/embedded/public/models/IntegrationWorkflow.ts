@@ -29,26 +29,18 @@ import {
 export interface IntegrationWorkflow {
     /**
      * The description of a workflow.
-     * @type {string}
-     * @memberof IntegrationWorkflow
      */
     description?: string;
     /**
      * 
-     * @type {Array<Input>}
-     * @memberof IntegrationWorkflow
      */
     inputs?: Array<Input>;
     /**
      * The label of a workflow.
-     * @type {string}
-     * @memberof IntegrationWorkflow
      */
     label?: string;
     /**
      * The reference code of a workflow.
-     * @type {string}
-     * @memberof IntegrationWorkflow
      */
     workflowUuid?: string;
 }

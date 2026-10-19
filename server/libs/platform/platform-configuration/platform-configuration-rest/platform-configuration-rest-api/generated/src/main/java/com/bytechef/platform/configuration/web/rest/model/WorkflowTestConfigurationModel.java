@@ -30,10 +30,9 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.774564+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowTestConfigurationModel {
 
-  @Valid
   private List<@Valid WorkflowTestConfigurationConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String createdBy;
@@ -43,7 +42,6 @@ public class WorkflowTestConfigurationModel {
 
   private Long environmentId;
 
-  @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private @Nullable String lastModifiedBy;
@@ -83,7 +81,7 @@ public class WorkflowTestConfigurationModel {
    * The connections used by workflow test.
    * @return connections
    */
-  @Valid 
+  
   @Schema(name = "connections", description = "The connections used by workflow test.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid WorkflowTestConfigurationConnectionModel> getConnections() {

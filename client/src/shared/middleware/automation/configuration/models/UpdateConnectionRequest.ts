@@ -29,20 +29,14 @@ import {
 export interface UpdateConnectionRequest {
     /**
      * The name of a connection.
-     * @type {string}
-     * @memberof UpdateConnectionRequest
      */
     name: string;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof UpdateConnectionRequest
      */
     tags: Array<Tag>;
     /**
      * 
-     * @type {number}
-     * @memberof UpdateConnectionRequest
      */
     version?: number;
 }

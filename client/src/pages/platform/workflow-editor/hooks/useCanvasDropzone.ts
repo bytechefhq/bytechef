@@ -1,13 +1,15 @@
 import {type DragEvent, useCallback, useEffect, useState} from 'react';
 
-import {CanvasDragKindType, getCanvasDragKind} from '../utils/canvasDragData';
+import {CanvasDragKindType, carriesClusterElementType, getCanvasDragKind} from '../utils/canvasDragData';
 
-export default function useCanvasDropzone(acceptedDragKind: CanvasDragKindType) {
+export default function useCanvasDropzone(acceptedDragKind: CanvasDragKindType, clusterElementType?: string) {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
 
     const isAcceptedDrag = useCallback(
-        (event: DragEvent) => getCanvasDragKind(event.dataTransfer) === acceptedDragKind,
-        [acceptedDragKind]
+        (event: DragEvent) =>
+            getCanvasDragKind(event.dataTransfer) === acceptedDragKind &&
+            (!clusterElementType || carriesClusterElementType(event.dataTransfer, clusterElementType)),
+        [acceptedDragKind, clusterElementType]
     );
 
     const handleDragEnter = useCallback(

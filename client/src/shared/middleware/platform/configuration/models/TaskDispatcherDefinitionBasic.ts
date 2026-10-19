@@ -29,62 +29,42 @@ import {
 export interface TaskDispatcherDefinitionBasic {
     /**
      * The description.
-     * @type {string}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     icon?: string;
     /**
      * The task dispatcher name.
-     * @type {string}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     name: string;
     /**
      * Does task dispatcher defines output.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     outputDefined: boolean;
     /**
      * Does task dispatcher defines output function.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     outputFunctionDefined?: boolean;
     /**
      * Does task dispatcher defines output schema.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     outputSchemaDefined?: boolean;
     /**
      * 
-     * @type {Resources}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     resources?: Resources;
     /**
      * The title
-     * @type {string}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     title?: string;
     /**
      * Does task dispatcher define dynamic variable properties.
-     * @type {boolean}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     variablePropertiesDefined?: boolean;
     /**
      * The version of a task dispatcher.
-     * @type {number}
-     * @memberof TaskDispatcherDefinitionBasic
      */
     version: number;
 }

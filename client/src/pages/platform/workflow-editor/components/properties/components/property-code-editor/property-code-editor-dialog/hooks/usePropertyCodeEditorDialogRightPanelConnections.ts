@@ -3,6 +3,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
 import saveWorkflowDefinitionUpdate from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinitionUpdate';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -39,7 +40,8 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
 
-    const isClusterElement = currentNode?.clusterElementType && rootClusterElementNodeData?.workflowNodeName;
+    const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
+    const isClusterElement = currentNode?.clusterElementType && mainClusterRootName;
 
     const {
         ConnectionKeys,
@@ -56,9 +58,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
         environmentId: currentEnvironmentId,
         workflowId: workflow.id!,
-        workflowNodeName: isClusterElement
-            ? (rootClusterElementNodeData?.workflowNodeName as string)
-            : workflowNodeName,
+        workflowNodeName: isClusterElement ? (mainClusterRootName as string) : workflowNodeName,
     });
 
     const saveConnections = (

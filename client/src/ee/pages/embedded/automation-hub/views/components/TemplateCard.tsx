@@ -1,7 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {Badge} from '@/components/ui/badge';
-import {Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {SetAutomationEnabledRequestI} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {describeAttentionReason} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import {canOpenInBuilder, useBuilderAccess} from '@/ee/pages/embedded/automation-hub/utils/builderAccess';
@@ -11,12 +11,12 @@ import AutomationCardMenu from '@/ee/pages/embedded/automation-hub/views/compone
 import AutomationInputsDialog from '@/ee/pages/embedded/automation-hub/views/components/AutomationInputsDialog';
 import AutomationStatusButton from '@/ee/pages/embedded/automation-hub/views/components/AutomationStatusButton';
 import AutomationVersion from '@/ee/pages/embedded/automation-hub/views/components/AutomationVersion';
+import ComponentIconStack from '@/ee/pages/embedded/automation-hub/views/components/ComponentIconStack';
 import {
     AutomationWorkflowProjectWorkflowTemplate,
     ConnectedUserProjectWorkflow,
 } from '@/ee/shared/middleware/embedded/public';
 import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -85,7 +85,7 @@ const TemplateCard = ({
             )}
         >
             <CardHeader className="px-3">
-                <CardTitle className="flex min-w-0 items-center gap-2 self-center text-base">
+                <CardTitle className="flex min-h-9 min-w-0 items-center gap-2 self-center text-base">
                     <h3 className="truncate text-base font-semibold" title={label}>
                         {label}
                     </h3>
@@ -96,7 +96,7 @@ const TemplateCard = ({
                 </CardTitle>
 
                 {description && (
-                    <CardDescription className="line-clamp-2" title={description}>
+                    <CardDescription className="col-span-full line-clamp-2" title={description}>
                         {description}
                     </CardDescription>
                 )}
@@ -121,21 +121,9 @@ const TemplateCard = ({
                 )}
             </CardHeader>
 
-            {!!template.components?.length && (
-                <CardContent className="flex items-center -space-x-2 px-3">
-                    {template.components.map((component) => (
-                        <div
-                            className="flex size-9 shrink-0 items-center justify-center rounded-full border bg-background p-1.5"
-                            key={`component-${component.name}`}
-                            title={component.title || component.name}
-                        >
-                            {component.icon && <InlineSVG className="size-5 flex-none" src={component.icon} />}
-                        </div>
-                    ))}
-                </CardContent>
-            )}
-
             <CardFooter className="mt-auto justify-end px-3">
+                <ComponentIconStack components={template.components} />
+
                 {automation ? (
                     <>
                         <AutomationStatusButton

@@ -1,4 +1,4 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseHeader from '../KnowledgeBaseHeader';
@@ -6,14 +6,6 @@ import KnowledgeBaseHeader from '../KnowledgeBaseHeader';
 vi.mock('@/shared/layout/Header', () => ({
     default: ({title}: {centerTitle?: boolean; position?: string; title: React.ReactNode}) => (
         <header data-testid="header">{title}</header>
-    ),
-}));
-
-vi.mock('@/components/Button/Button', () => ({
-    default: ({icon, onClick}: {icon?: React.ReactNode; onClick?: () => void; size?: string; variant?: string}) => (
-        <button data-testid="back-button" onClick={onClick}>
-            {icon}
-        </button>
     ),
 }));
 
@@ -27,38 +19,29 @@ afterEach(() => {
 });
 
 describe('KnowledgeBaseHeader', () => {
-    const mockOnBackClick = vi.fn();
-
     it('renders header component', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
+        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
 
         expect(screen.getByTestId('header')).toBeInTheDocument();
     });
 
     it('renders knowledge base name', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
+        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
 
         expect(screen.getByText('Test KB')).toBeInTheDocument();
     });
 
     it('renders Loading... when name is undefined', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName={undefined} onBackClick={mockOnBackClick} />);
+        render(<KnowledgeBaseHeader knowledgeBaseName={undefined} />);
 
         expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
 
-    it('renders back button', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
+    // The sidebar lists every knowledge base and the header carries the sidebar toggle, so a back arrow would
+    // only duplicate a one-click way back.
+    it('renders no back button', () => {
+        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
 
-        expect(screen.getByTestId('back-button')).toBeInTheDocument();
-    });
-
-    it('calls onBackClick when back button is clicked', async () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" onBackClick={mockOnBackClick} />);
-
-        const backButton = screen.getByTestId('back-button');
-        await userEvent.click(backButton);
-
-        expect(mockOnBackClick).toHaveBeenCalled();
+        expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 });

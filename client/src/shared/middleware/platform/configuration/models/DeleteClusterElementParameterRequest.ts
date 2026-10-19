@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface DeleteClusterElementParameterRequest {
     /**
      * The workflow node parameter path.
-     * @type {string}
-     * @memberof DeleteClusterElementParameterRequest
      */
     path: string;
 }

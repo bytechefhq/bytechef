@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeployment")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.834141+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProjectDeploymentModel {
 
   private @Nullable String createdBy;
@@ -61,10 +61,8 @@ public class ProjectDeploymentModel {
 
   private @Nullable Object project;
 
-  @Valid
   private List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows = new ArrayList<>();
 
-  @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private @Nullable Integer version;
@@ -370,7 +368,7 @@ public class ProjectDeploymentModel {
    * Get projectDeploymentWorkflows
    * @return projectDeploymentWorkflows
    */
-  @Valid 
+  
   @Schema(name = "projectDeploymentWorkflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectDeploymentWorkflows")
   public List<@Valid ProjectDeploymentWorkflowModel> getProjectDeploymentWorkflows() {
@@ -399,7 +397,7 @@ public class ProjectDeploymentModel {
    * Get tags
    * @return tags
    */
-  @Valid 
+  
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

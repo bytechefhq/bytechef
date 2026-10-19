@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ProjectStatus } from './ProjectStatus';
 import {
     ProjectStatusFromJSON,
@@ -43,98 +43,66 @@ import {
 export interface Project {
     /**
      * The created by.
-     * @type {string}
-     * @memberof Project
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Project
      */
     readonly createdDate?: Date;
     /**
      * The description of a project.
-     * @type {string}
-     * @memberof Project
      */
     description?: string;
     /**
      * The id of a project.
-     * @type {number}
-     * @memberof Project
      */
     readonly id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Project
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Project
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a project.
-     * @type {string}
-     * @memberof Project
      */
     name: string;
     /**
      * The last published date.
-     * @type {Date}
-     * @memberof Project
      */
     readonly lastPublishedDate?: Date;
     /**
      * 
-     * @type {ProjectStatus}
-     * @memberof Project
      */
     lastStatus?: ProjectStatus;
     /**
      * The last version of a project.
-     * @type {number}
-     * @memberof Project
      */
     readonly lastProjectVersion?: number;
     /**
      * The uuid of a project.
-     * @type {string}
-     * @memberof Project
      */
     uuid?: string;
     /**
      * 
-     * @type {Category}
-     * @memberof Project
      */
     category?: Category;
     /**
      * The project workflow ids belonging to this project.
-     * @type {Array<number>}
-     * @memberof Project
      */
     projectWorkflowIds?: Array<number>;
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof Project
      */
     tags?: Array<Tag>;
     /**
      * The workspace id.
-     * @type {number}
-     * @memberof Project
      */
     workspaceId: number;
     /**
      * 
-     * @type {number}
-     * @memberof Project
      */
     version?: number;
 }
@@ -161,13 +129,13 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
-        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
+        'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (parseDateTime(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],

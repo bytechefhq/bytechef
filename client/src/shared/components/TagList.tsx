@@ -103,7 +103,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
             {isNewTagWindowVisible ? (
                 <>
                     <CreatableSelect
-                        className="w-40 text-start"
+                        className="w-52 text-start"
                         name="newTag"
                         onChange={(selectedOption: OnChangeValue<SelectOptionType, false>) => {
                             if (selectedOption) {
@@ -132,6 +132,12 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                                 padding: '0',
                             }),
                             dropdownIndicator: (styles: any) => ({...styles, cursor: 'pointer', padding: '0.2rem'}),
+                            placeholder: (styles: any) => ({
+                                ...styles,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                            }),
                             valueContainer: (styles: any) => ({...styles, padding: '0 0.4rem'}),
                         }}
                     />

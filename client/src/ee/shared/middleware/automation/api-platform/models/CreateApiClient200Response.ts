@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateApiClient200Response {
     /**
      * The secret API key.
-     * @type {string}
-     * @memberof CreateApiClient200Response
      */
     secretKey?: string;
 }

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { ProjectDeploymentWorkflowConnection } from './ProjectDeploymentWorkflowConnection';
 import {
     ProjectDeploymentWorkflowConnectionFromJSON,
@@ -29,92 +29,62 @@ import {
 export interface ProjectDeploymentWorkflow {
     /**
      * The created by.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly createdDate?: Date;
     /**
      * The input parameters of an project deployment used as workflow input values.
-     * @type {{ [key: string]: any; }}
-     * @memberof ProjectDeploymentWorkflow
      */
     inputs?: { [key: string]: any; };
     /**
      * The connections used by a project deployment.
-     * @type {Array<ProjectDeploymentWorkflowConnection>}
-     * @memberof ProjectDeploymentWorkflow
      */
     connections?: Array<ProjectDeploymentWorkflowConnection>;
     /**
      * If a workflow is enabled or not in the project deployment workflow.
-     * @type {boolean}
-     * @memberof ProjectDeploymentWorkflow
      */
     enabled?: boolean;
     /**
      * The id of a project deployment workflow.
-     * @type {number}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly id?: number;
     /**
      * The last execution date of a project deployment.
-     * @type {Date}
-     * @memberof ProjectDeploymentWorkflow
      */
     lastExecutionDate?: Date;
     /**
      * The last execution status of a project deployment.
-     * @type {ProjectDeploymentWorkflowLastExecutionStatusEnum}
-     * @memberof ProjectDeploymentWorkflow
      */
     lastExecutionStatus?: ProjectDeploymentWorkflowLastExecutionStatusEnum;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly lastModifiedDate?: Date;
     /**
      * The id of a project deployment.
-     * @type {number}
-     * @memberof ProjectDeploymentWorkflow
      */
     projectDeploymentId?: number;
     /**
      * The url of a static url used to trigger a workflow.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflow
      */
     staticWebhookUrl?: string;
     /**
      * The id of a workflow.
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflow
      */
     workflowId?: string;
     /**
      * The workflow uuid
-     * @type {string}
-     * @memberof ProjectDeploymentWorkflow
      */
     readonly workflowUuid?: string;
     /**
      * 
-     * @type {number}
-     * @memberof ProjectDeploymentWorkflow
      */
     version?: number;
 }
@@ -129,7 +99,7 @@ export const ProjectDeploymentWorkflowLastExecutionStatusEnum = {
     Completed: 'COMPLETED',
     Failed: 'FAILED',
     Stopped: 'STOPPED',
-    Cancelled: 'CANCELLED'
+    Cancelled: 'CANCELLED',
 } as const;
 export type ProjectDeploymentWorkflowLastExecutionStatusEnum = typeof ProjectDeploymentWorkflowLastExecutionStatusEnum[keyof typeof ProjectDeploymentWorkflowLastExecutionStatusEnum];
 
@@ -152,15 +122,15 @@ export function ProjectDeploymentWorkflowFromJSONTyped(json: any, ignoreDiscrimi
     return {
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ProjectDeploymentWorkflowConnectionFromJSON)),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastExecutionStatus': json['lastExecutionStatus'] == null ? undefined : json['lastExecutionStatus'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'projectDeploymentId': json['projectDeploymentId'] == null ? undefined : json['projectDeploymentId'],
         'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
@@ -183,7 +153,7 @@ export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploym
         'inputs': value['inputs'],
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(ProjectDeploymentWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
-        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : value['lastExecutionDate'].toISOString(),
+        'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : serializeDateTime(value['lastExecutionDate']),
         'lastExecutionStatus': value['lastExecutionStatus'],
         'projectDeploymentId': value['projectDeploymentId'],
         'staticWebhookUrl': value['staticWebhookUrl'],

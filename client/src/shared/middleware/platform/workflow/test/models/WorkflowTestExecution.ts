@@ -36,14 +36,10 @@ import {
 export interface WorkflowTestExecution {
     /**
      * 
-     * @type {Job}
-     * @memberof WorkflowTestExecution
      */
     job?: Job;
     /**
      * 
-     * @type {TriggerExecution}
-     * @memberof WorkflowTestExecution
      */
     triggerExecution?: TriggerExecution;
 }

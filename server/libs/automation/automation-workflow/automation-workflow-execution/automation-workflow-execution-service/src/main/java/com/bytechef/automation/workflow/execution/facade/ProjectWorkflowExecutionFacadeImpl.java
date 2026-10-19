@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -78,6 +79,7 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -92,6 +94,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider;
     private final ContextService contextService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -111,7 +114,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowExecutionFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
+        ComponentDefinitionService componentDefinitionService,
+        ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider,
+        ContextService contextService, Evaluator evaluator,
         EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
         JobService jobService,
         PrincipalJobService principalJobService,
@@ -122,6 +127,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserProjectDeploymentResolverProvider = connectedUserProjectDeploymentResolverProvider;
         this.contextService = contextService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
@@ -216,8 +222,14 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
-        int pageNumber) {
+        Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
+        long workspaceId, int pageNumber) {
+
+        if (connectedUserId != null) {
+            return getConnectedUserWorkflowExecutions(
+                connectedUserId, environmentId, jobStatus, jobStartDate, jobEndDate, workflowId, projectVersion,
+                pageNumber);
+        }
 
         List<ProjectDeployment> embeddedProjectDeployments = null;
         List<String> workflowIds = new ArrayList<>();
@@ -254,6 +266,57 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         if (projectDeploymentIds.isEmpty()) {
             return Page.empty();
         }
+
+        return getWorkflowExecutionPage(
+            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, workflowIds, projectId, pageNumber);
+    }
+
+    private Page<WorkflowExecutionDTO> getConnectedUserWorkflowExecutions(
+        long connectedUserId, @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable Instant jobStartDate,
+        @Nullable Instant jobEndDate, @Nullable String workflowId, @Nullable Integer projectVersion, int pageNumber) {
+
+        ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver =
+            connectedUserProjectDeploymentResolverProvider.getIfAvailable();
+
+        if (connectedUserProjectDeploymentResolver == null) {
+            return Page.empty();
+        }
+
+        List<Long> connectedUserProjectDeploymentIds = connectedUserProjectDeploymentResolver.getProjectDeploymentIds(
+            connectedUserId);
+
+        if (connectedUserProjectDeploymentIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentService
+            .getProjectDeployments(connectedUserProjectDeploymentIds)
+            .stream()
+            .filter(projectDeployment -> environment == null || projectDeployment.getEnvironment() == environment)
+            .toList();
+
+        if (projectDeployments.isEmpty()) {
+            return Page.empty();
+        }
+
+        List<String> workflowIds = workflowId == null
+            ? getProjectDeploymentWorkflowIds(projectDeployments)
+            : getWorkflowVersionWorkflowIds(workflowId, projectVersion);
+
+        if (workflowIds.isEmpty()) {
+            return Page.empty();
+        }
+
+        return getWorkflowExecutionPage(
+            jobStatus, jobStartDate, jobEndDate, CollectionUtils.map(projectDeployments, ProjectDeployment::getId),
+            workflowIds, null, pageNumber);
+    }
+
+    private Page<WorkflowExecutionDTO> getWorkflowExecutionPage(
+        @Nullable Status jobStatus, @Nullable Instant jobStartDate, @Nullable Instant jobEndDate,
+        List<Long> projectDeploymentIds, List<String> workflowIds, @Nullable Long projectId, int pageNumber) {
 
         Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
             jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
@@ -576,14 +639,31 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
             .stream()
             .findFirst()
-            .map(projectWorkflow -> projectWorkflowService
-                .getProjectWorkflows(projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString())
-                .stream()
-                .filter(versionProjectWorkflow -> projectVersion == null ||
-                    projectVersion.equals(versionProjectWorkflow.getProjectVersion()))
-                .map(ProjectWorkflow::getWorkflowId)
-                .toList())
-            .orElseGet(() -> List.of(workflowId));
+            .map(projectWorkflow -> filterProjectVersionWorkflowIds(
+                projectWorkflowService.getProjectWorkflows(
+                    projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString()),
+                projectVersion))
+            .orElseGet(() -> getWorkflowUuidWorkflowIds(workflowId, projectVersion));
+    }
+
+    private List<String> getWorkflowUuidWorkflowIds(String workflowUuid, Integer projectVersion) {
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowUuidProjectWorkflows(workflowUuid);
+
+        if (projectWorkflows.isEmpty()) {
+            return List.of(workflowUuid);
+        }
+
+        return filterProjectVersionWorkflowIds(projectWorkflows, projectVersion);
+    }
+
+    private static List<String> filterProjectVersionWorkflowIds(
+        List<ProjectWorkflow> projectWorkflows, Integer projectVersion) {
+
+        return projectWorkflows.stream()
+            .filter(projectWorkflow -> projectVersion == null ||
+                projectVersion.equals(projectWorkflow.getProjectVersion()))
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
     }
 
     private DefinitionResult getDefinition(String type, Map<String, DefinitionResult> definitionResultCache) {

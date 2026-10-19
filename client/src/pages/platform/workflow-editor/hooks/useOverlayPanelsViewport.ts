@@ -23,6 +23,7 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
     const {setViewport} = useReactFlow();
 
     const {
+        agentPlaygroundOpen,
         dataPillPanelOpen,
         issuesSidebarOpen,
         rightSidebarOpen,
@@ -40,6 +41,7 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
         const [currentX, currentY, zoom] = storeApi.getState().transform;
 
         const offset = computeOverlayViewportOffset({
+            agentPlaygroundOpen,
             dataPillPanelOpen,
             issuesSidebarOpen,
             rightSidebarOpen,
@@ -73,6 +75,7 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
 
         setViewport(viewport, {duration: OVERLAY_PAN_DURATION, ease: easeOutCubic, interpolate: 'linear'});
     }, [
+        agentPlaygroundOpen,
         clusterElementsCanvasOpen,
         dataPillPanelOpen,
         enabled,

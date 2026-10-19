@@ -20,22 +20,55 @@ import {
 } from '../models/WorkflowNodeOutput';
 
 export interface GetClusterElementOutputRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The name of a cluster element type.
+     */
     clusterElementType: string;
+    /**
+     * The name of a cluster element workflow node.
+     */
     clusterElementWorkflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 
 export interface GetPreviousWorkflowNodeOutputsRequest {
+    /**
+     * The workflow id for which to return all used action definitions
+     */
     id: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
+    /**
+     * The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)
+     */
     lastWorkflowNodeName?: string;
 }
 
 export interface GetWorkflowNodeOutputRequest {
+    /**
+     * The workflow id
+     */
     id: string;
+    /**
+     * The name of a workflow's action task or trigger (E.g. mailchimp_1)
+     */
     workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
     environmentId: number;
 }
 

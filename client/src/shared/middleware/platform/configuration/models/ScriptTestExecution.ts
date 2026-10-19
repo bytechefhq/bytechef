@@ -29,14 +29,10 @@ import {
 export interface ScriptTestExecution {
     /**
      * 
-     * @type {ExecutionError}
-     * @memberof ScriptTestExecution
      */
     error?: ExecutionError;
     /**
      * The result output of testing a script.
-     * @type {object}
-     * @memberof ScriptTestExecution
      */
     output?: object;
 }

@@ -148,50 +148,28 @@ const ThreadWelcome: FC = () => {
 
 const ThreadSuggestions: FC = () => {
     return (
-        <div className="aui-thread-welcome-suggestions grid w-full gap-2 pb-4 @md:grid-cols-2">
+        <div className="aui-thread-welcome-suggestions flex w-full flex-col items-center gap-2 px-4">
             {[
-                {
-                    action: 'What can you help me with?',
-                    label: 'you help me with?',
-                    title: 'What can',
-                },
-                {
-                    action: 'What tools do you have access to?',
-                    label: 'do you have access to?',
-                    title: 'What tools',
-                },
-                {
-                    action: 'Summarize your instructions and capabilities',
-                    label: 'your instructions and capabilities',
-                    title: 'Summarize',
-                },
-                {
-                    action: 'Walk me through how you would handle a typical request',
-                    label: 'you would handle a typical request',
-                    title: 'Walk me through how',
-                },
+                'What can you help me with?',
+                'What tools do you have access to?',
+                'Summarize your instructions and capabilities',
+                'Walk me through how you would handle a typical request',
             ].map((suggestedAction, index) => (
                 <m.div
                     animate={{opacity: 1, y: 0}}
-                    className="aui-thread-welcome-suggestion-display nth-[n+3]:hidden @md:nth-[n+3]:block"
+                    className="aui-thread-welcome-suggestion-display"
                     exit={{opacity: 0, y: 20}}
                     initial={{opacity: 0, y: 20}}
-                    key={`suggested-action-${suggestedAction.title}-${index}`}
+                    key={suggestedAction}
                     transition={{delay: 0.05 * index}}
                 >
-                    <ThreadPrimitive.Suggestion asChild prompt={suggestedAction.action} send>
+                    <ThreadPrimitive.Suggestion asChild prompt={suggestedAction} send>
                         <Button
-                            aria-label={suggestedAction.action}
-                            className="aui-thread-welcome-suggestion h-auto w-full flex-1 flex-wrap items-start justify-start gap-1 rounded-3xl border px-5 py-4 text-left text-sm @md:flex-col dark:hover:bg-accent/60"
+                            aria-label={suggestedAction}
+                            className="aui-thread-welcome-suggestion h-auto gap-1.5 rounded-full border border-border/60 px-3.5 py-1.5 text-sm font-normal whitespace-nowrap text-foreground transition-colors hover:bg-muted"
                             variant="ghost"
                         >
-                            <span className="aui-thread-welcome-suggestion-text-1 font-medium">
-                                {suggestedAction.title}
-                            </span>
-
-                            <span className="aui-thread-welcome-suggestion-text-2 text-muted-foreground">
-                                {suggestedAction.label}
-                            </span>
+                            {suggestedAction}
                         </Button>
                     </ThreadPrimitive.Suggestion>
                 </m.div>

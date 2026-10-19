@@ -29,32 +29,22 @@ import {
 export interface AutomationWorkflowProject {
     /**
      * The id of the automation workflow project.
-     * @type {number}
-     * @memberof AutomationWorkflowProject
      */
     id?: number;
     /**
      * The name of the automation workflow project.
-     * @type {string}
-     * @memberof AutomationWorkflowProject
      */
     name?: string;
     /**
      * The description of the automation workflow project.
-     * @type {string}
-     * @memberof AutomationWorkflowProject
      */
     description?: string;
     /**
      * Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.
-     * @type {boolean}
-     * @memberof AutomationWorkflowProject
      */
     automationHubVisible?: boolean;
     /**
      * The list of automation workflow templates belonging to this project.
-     * @type {Array<AutomationWorkflowProjectWorkflowTemplate>}
-     * @memberof AutomationWorkflowProject
      */
     workflowTemplates?: Array<AutomationWorkflowProjectWorkflowTemplate>;
 }

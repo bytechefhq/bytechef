@@ -44,7 +44,7 @@
 }
 
 .controls {
-    align-items: center;
+    align-items: stretch;
     display: flex;
     gap: 8px;
 }
@@ -108,6 +108,10 @@
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+}
+
+.footerActions button {
+    white-space: nowrap;
 }
 
 .retryRow {

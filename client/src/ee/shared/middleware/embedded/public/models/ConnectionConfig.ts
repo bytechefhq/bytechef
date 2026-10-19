@@ -43,20 +43,14 @@ import {
 export interface ConnectionConfig {
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof ConnectionConfig
      */
     authorizationType?: AuthorizationType;
     /**
      * 
-     * @type {Array<Input>}
-     * @memberof ConnectionConfig
      */
     inputs?: Array<Input>;
     /**
      * 
-     * @type {OAuth2}
-     * @memberof ConnectionConfig
      */
     oauth2?: OAuth2;
 }

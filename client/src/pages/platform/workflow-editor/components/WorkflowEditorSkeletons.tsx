@@ -51,7 +51,7 @@ export const DescriptionTabSkeleton = () => (
 const DATA_PILL_PANEL_SKELETON_BASE_CLASSES =
     'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
 const DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT =
-    'absolute bottom-6 right-data-pill-panel-placement top-[9px] rounded-md';
+    'absolute bottom-6 right-data-pill-panel-placement top-[15px] rounded-md';
 
 export const DataPillPanelSkeleton = ({
     className = DATA_PILL_PANEL_SKELETON_DEFAULT_PLACEMENT,

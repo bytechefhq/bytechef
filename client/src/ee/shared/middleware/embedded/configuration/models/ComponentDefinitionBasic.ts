@@ -29,68 +29,46 @@ import {
 export interface ComponentDefinitionBasic {
     /**
      * The number of actions a component has
-     * @type {number}
-     * @memberof ComponentDefinitionBasic
      */
     actionsCount?: number;
     /**
      * The number of cluster elements a component has
-     * @type {{ [key: string]: number; }}
-     * @memberof ComponentDefinitionBasic
      */
     clusterElementsCount?: { [key: string]: number; };
     /**
      * Is the component cluster root.
-     * @type {boolean}
-     * @memberof ComponentDefinitionBasic
      */
     clusterRoot?: boolean;
     /**
      * The list of categories the component belongs to.
-     * @type {Array<ComponentCategory>}
-     * @memberof ComponentDefinitionBasic
      */
     componentCategories?: Array<ComponentCategory>;
     /**
      * The description.
-     * @type {string}
-     * @memberof ComponentDefinitionBasic
      */
     description?: string;
     /**
      * The icon.
-     * @type {string}
-     * @memberof ComponentDefinitionBasic
      */
     icon?: string;
     /**
      * The number of selectable workflow inputs a component declares
-     * @type {number}
-     * @memberof ComponentDefinitionBasic
      */
     inputsCount?: number;
     /**
      * The name of a component.
-     * @type {string}
-     * @memberof ComponentDefinitionBasic
      */
     name: string;
     /**
      * The title
-     * @type {string}
-     * @memberof ComponentDefinitionBasic
      */
     title?: string;
     /**
      * The number of triggers a component has
-     * @type {number}
-     * @memberof ComponentDefinitionBasic
      */
     triggersCount?: number;
     /**
      * The version of a component.
-     * @type {number}
-     * @memberof ComponentDefinitionBasic
      */
     version: number;
 }

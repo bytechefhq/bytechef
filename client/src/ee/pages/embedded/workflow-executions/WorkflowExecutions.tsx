@@ -96,6 +96,9 @@ export const WorkflowExecutions = () => {
     const [filterAutomations, setFilterAutomations] = useState<number>(
         searchParams.get('automations') ? +searchParams.get('automations')! : 0
     );
+    const [filterConnectedUserId, setFilterConnectedUserId] = useState<number | undefined>(
+        searchParams.get('connectedUserId') ? +searchParams.get('connectedUserId')! : undefined
+    );
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
@@ -111,9 +114,6 @@ export const WorkflowExecutions = () => {
     );
     const [filterPageNumber, setFilterPageNumber] = useState<number | undefined>(
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
-    );
-    const [filterProjectId, setFilterProjectId] = useState<number | undefined>(
-        searchParams.get('projectId') ? +searchParams.get('projectId')! : undefined
     );
     const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
         searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
@@ -152,6 +152,7 @@ export const WorkflowExecutions = () => {
         workflowExecutionsIsFetching,
         workflowExecutionsIsLoading,
     } = useWorkflowExecutions(filterAutomations, {
+        connectedUserId: filterConnectedUserId,
         environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
         integrationId: filterIntegrationId,
@@ -160,7 +161,6 @@ export const WorkflowExecutions = () => {
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
         pageNumber: filterPageNumber,
-        projectId: filterProjectId,
         workflowId: filterWorkflowId,
     });
 
@@ -171,6 +171,22 @@ export const WorkflowExecutions = () => {
         false,
         !!integrationInstanceConfiguration
     );
+
+    const automationWorkflows = useMemo(() => {
+        const workflowsById = new Map<string, {id: string; label?: string | null}>();
+
+        connectedUserProjects
+            ?.filter(
+                (connectedUserProject) =>
+                    !filterConnectedUserId || +connectedUserProject.connectedUser.id === filterConnectedUserId
+            )
+            .flatMap((connectedUserProject) => connectedUserProject.connectedUserProjectWorkflows)
+            .forEach((connectedUserProjectWorkflow) =>
+                workflowsById.set(connectedUserProjectWorkflow.workflow.id, connectedUserProjectWorkflow.workflow)
+            );
+
+        return [...workflowsById.values()];
+    }, [connectedUserProjects, filterConnectedUserId]);
 
     const emptyListMessage =
         !filterStatus &&
@@ -193,6 +209,7 @@ export const WorkflowExecutions = () => {
         () =>
             getWorkflowExecutionsFilters({
                 automations: filterAutomations,
+                connectedUserId: filterConnectedUserId,
                 connectedUserProjects,
                 endDate: filterEndDate,
                 integrationId: filterIntegrationId,
@@ -200,19 +217,21 @@ export const WorkflowExecutions = () => {
                 integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
                 integrationInstanceConfigurations,
                 integrations,
-                projectId: filterProjectId,
                 startDate: filterStartDate,
                 status: filterStatus,
                 workflowId: filterWorkflowId,
-                workflows,
+                workflows: filterAutomations
+                    ? automationWorkflows.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
+                    : workflows,
             }),
         [
+            automationWorkflows,
             connectedUserProjects,
             filterAutomations,
+            filterConnectedUserId,
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
             filterStartDate,
             filterStatus,
             filterWorkflowId,
@@ -230,18 +249,19 @@ export const WorkflowExecutions = () => {
         endDate?: Date,
         integrationId?: number,
         integrationInstanceConfigurationId?: number,
-        projectId?: number,
+        connectedUserId?: number,
         workflowId?: string,
         pageNumber?: number
     ) {
         navigate(
-            `/embedded/executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&projectId=${projectId ? projectId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/embedded/executions?automations=${automations ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&connectedUserId=${connectedUserId ? connectedUserId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
     const handleAutomationChange = (automations: string) => {
         setFilterAutomations(Number(automations));
         setFilterPageNumber(undefined);
+        setFilterWorkflowId(undefined);
 
         filter(
             Number(automations),
@@ -250,8 +270,8 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
-            filterWorkflowId,
+            filterConnectedUserId,
+            undefined,
             undefined
         );
     };
@@ -271,7 +291,7 @@ export const WorkflowExecutions = () => {
             normalizedDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             undefined
         );
@@ -294,7 +314,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             integrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             undefined
         );
@@ -317,7 +337,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             integrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             undefined
         );
@@ -333,7 +353,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             pageNumber
         );
@@ -354,7 +374,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             undefined
         );
@@ -377,20 +397,20 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             filterWorkflowId,
             undefined
         );
     };
 
-    const handleProjectChange = (item?: ComboBoxItemType) => {
-        let projectId;
+    const handleConnectedUserChange = (item?: ComboBoxItemType) => {
+        let connectedUserId;
 
         if (item?.value) {
-            projectId = Number(item.value);
+            connectedUserId = Number(item.value);
         }
 
-        setFilterProjectId(projectId);
+        setFilterConnectedUserId(connectedUserId);
         setFilterPageNumber(undefined);
 
         filter(
@@ -400,7 +420,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            projectId,
+            connectedUserId,
             filterWorkflowId,
             undefined
         );
@@ -423,7 +443,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             filterIntegrationInstanceConfigurationId,
-            filterProjectId,
+            filterConnectedUserId,
             workflowId,
             undefined
         );
@@ -441,7 +461,7 @@ export const WorkflowExecutions = () => {
             filterEndDate,
             filterIntegrationId,
             undefined,
-            filterProjectId,
+            filterConnectedUserId,
             undefined,
             undefined
         );
@@ -596,11 +616,31 @@ export const WorkflowExecutions = () => {
                                     ANY_FILTER_OPTION,
                                     ...(connectedUserProjects?.map((connectedUserProject) => ({
                                         label: <ConnectedUserLabel project={connectedUserProject} />,
-                                        value: +connectedUserProject.projectId,
+                                        value: +connectedUserProject.connectedUser.id,
                                     })) ?? []),
                                 ]}
-                                onChange={handleProjectChange}
-                                value={filterProjectId}
+                                onChange={handleConnectedUserChange}
+                                value={filterConnectedUserId}
+                            />
+                        </div>
+                    )}
+
+                    {!!filterAutomations && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>Workflow</Label>
+
+                            <ComboBox
+                                items={[
+                                    ANY_FILTER_OPTION,
+                                    ...automationWorkflows.map((workflow) => ({
+                                        label: workflow.label || 'undefined label',
+                                        value: workflow.id,
+                                    })),
+                                ]}
+                                maxHeight
+                                name="workflow"
+                                onChange={handleWorkflowChange}
+                                value={filterWorkflowId}
                             />
                         </div>
                     )}

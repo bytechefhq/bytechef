@@ -3,6 +3,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import WorkflowPreviewSvg from '@/pages/automation/template/workflow-template/components/WorkflowPreviewSvg';
+import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useImportProjectTemplateMutation, useProjectTemplateQuery} from '@/shared/middleware/graphql';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
@@ -18,6 +19,7 @@ const ProjectTemplate = ({
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const {captureProjectCreatedFromTemplate, captureProjectWorkflowCreatedFromTemplate} = useAnalytics();
     const navigate = useNavigate();
     const {id} = useParams();
 
@@ -28,6 +30,10 @@ const ProjectTemplate = ({
 
     const importProjectTemplateMutation = useImportProjectTemplateMutation({
         onSuccess: () => {
+            captureProjectCreatedFromTemplate();
+
+            projectTemplate?.workflows.forEach(() => captureProjectWorkflowCreatedFromTemplate());
+
             navigate('/automation/projects');
         },
     });

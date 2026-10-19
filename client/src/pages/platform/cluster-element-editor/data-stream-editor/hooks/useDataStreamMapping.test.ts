@@ -4,7 +4,7 @@ import {type ReactNode, createElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 interface MockWorkflowEditorStoreStateI {
-    mainClusterRootComponentDefinition: object | null;
+    clusterRootComponentDefinitions: Record<string, object>;
     rootClusterElementNodeData: {
         clusterElements?: Record<string, unknown> | unknown[];
         componentName?: string;
@@ -161,7 +161,7 @@ describe('useDataStreamMapping', () => {
         vi.clearAllMocks();
 
         mockEditorStoreState = {
-            mainClusterRootComponentDefinition: null,
+            clusterRootComponentDefinitions: {},
             rootClusterElementNodeData: null,
             setRootClusterElementNodeData: vi.fn(),
         };

@@ -19,7 +19,7 @@
  */
 export const IntegrationStatus = {
     Draft: 'DRAFT',
-    Published: 'PUBLISHED'
+    Published: 'PUBLISHED',
 } as const;
 export type IntegrationStatus = typeof IntegrationStatus[keyof typeof IntegrationStatus];
 

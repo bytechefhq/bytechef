@@ -46,6 +46,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -69,6 +70,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.data.domain.Page;
 
 /**
@@ -104,7 +106,9 @@ public class ProjectWorkflowExecutionFacadeTest {
         workflowExecutionRowService = mock(WorkflowExecutionRowService.class);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
-            componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
+            componentDefinitionService,
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+            contextService, evaluator, mock(EnvironmentService.class),
             workflowExecutionRowService, jobService, mock(PrincipalJobService.class), projectFacade,
             projectDeploymentService, mock(ProjectService.class), projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
@@ -318,6 +322,35 @@ public class ProjectWorkflowExecutionFacadeTest {
 
             verify(projectDeploymentService, times(1)).getProjectDeployments(
                 eq(true), any(), any(), any(), any());
+        }
+
+        @Test
+        @SuppressWarnings("unchecked")
+        public void testEmbeddedWorkflowFilterByReferenceWorkflowUuidCoversEveryCatalogVersion() {
+            String referenceWorkflowUuid = UUID.randomUUID()
+                .toString();
+
+            when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(referenceWorkflowUuid)))
+                .thenReturn(List.of());
+            when(projectWorkflowService.getWorkflowUuidProjectWorkflows(referenceWorkflowUuid))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(
+                            CATALOG_PROJECT_ID, 1, CATALOG_WORKFLOW_ID, UUID.fromString(referenceWorkflowUuid)),
+                        new ProjectWorkflow(
+                            CATALOG_PROJECT_ID, 2, "catalog-workflow-v2", UUID.fromString(referenceWorkflowUuid))));
+
+            facade.getWorkflowExecutions(
+                true, null, null, null, null, null, null, referenceWorkflowUuid, null, WORKSPACE_ID, 0);
+
+            ArgumentCaptor<List<String>> workflowIdsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+            verify(workflowExecutionRowService).getWorkflowExecutionRows(
+                any(), any(), any(), eq(List.of(REFERENCE_DEPLOYMENT_ID, OTHER_WORKSPACE_DEPLOYMENT_ID)),
+                eq(PlatformType.AUTOMATION), workflowIdsArgumentCaptor.capture(), anyBoolean(), anyList(), anyInt());
+
+            assertThat(workflowIdsArgumentCaptor.getValue()).containsExactly(
+                CATALOG_WORKFLOW_ID, "catalog-workflow-v2");
         }
 
         @Test

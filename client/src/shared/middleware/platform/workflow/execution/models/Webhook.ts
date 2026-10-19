@@ -29,20 +29,14 @@ import {
 export interface Webhook {
     /**
      * 
-     * @type {string}
-     * @memberof Webhook
      */
     type?: string;
     /**
      * 
-     * @type {string}
-     * @memberof Webhook
      */
     url?: string;
     /**
      * 
-     * @type {WebhookRetry}
-     * @memberof Webhook
      */
     retry?: WebhookRetry;
 }

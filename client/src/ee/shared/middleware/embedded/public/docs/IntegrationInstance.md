@@ -8,6 +8,7 @@ The integration instance represents a configured integration for a specific user
 Name | Type
 ------------ | -------------
 `id` | number
+`connectionId` | number
 `credentialStatus` | [CredentialStatus](CredentialStatus.md)
 `enabled` | boolean
 `mcpTools` | [Array&lt;McpIntegrationInstanceTool&gt;](McpIntegrationInstanceTool.md)
@@ -22,6 +23,7 @@ import type { IntegrationInstance } from ''
 // TODO: Update the object below with actual values
 const example = {
   "id": null,
+  "connectionId": null,
   "credentialStatus": null,
   "enabled": null,
   "mcpTools": null,

@@ -20,6 +20,9 @@ import {
 } from '../models/Category';
 
 export interface GetProjectCategoriesRequest {
+    /**
+     * The id of a workspace.
+     */
     id: number;
 }
 

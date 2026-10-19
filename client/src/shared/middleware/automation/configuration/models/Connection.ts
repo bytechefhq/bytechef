@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
 import type { CredentialStatus } from './CredentialStatus';
 import {
     CredentialStatusFromJSON,
@@ -43,116 +43,78 @@ import {
 export interface Connection {
     /**
      * If a connection is used in any of active workflows.
-     * @type {boolean}
-     * @memberof Connection
      */
     readonly active?: boolean;
     /**
      * 
-     * @type {AuthorizationType}
-     * @memberof Connection
      */
     authorizationType?: AuthorizationType;
     /**
      * The authorization parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof Connection
      */
     readonly authorizationParameters?: { [key: string]: any; };
     /**
      * The base URI of a connection.
-     * @type {string}
-     * @memberof Connection
      */
     baseUri?: string;
     /**
      * The name of a component that uses this connection.
-     * @type {string}
-     * @memberof Connection
      */
     componentName: string;
     /**
      * The connection parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof Connection
      */
     readonly connectionParameters?: { [key: string]: any; };
     /**
      * The version of a component that uses this connection.
-     * @type {number}
-     * @memberof Connection
      */
     connectionVersion: number;
     /**
      * The created by.
-     * @type {string}
-     * @memberof Connection
      */
     readonly createdBy?: string;
     /**
      * The created date.
-     * @type {Date}
-     * @memberof Connection
      */
     readonly createdDate?: Date;
     /**
      * 
-     * @type {CredentialStatus}
-     * @memberof Connection
      */
     credentialStatus?: CredentialStatus;
     /**
      * The id of an environment.
-     * @type {number}
-     * @memberof Connection
      */
     environmentId?: number;
     /**
      * The id of a connection.
-     * @type {number}
-     * @memberof Connection
      */
     readonly id?: number;
     /**
      * The last modified by.
-     * @type {string}
-     * @memberof Connection
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
-     * @type {Date}
-     * @memberof Connection
      */
     readonly lastModifiedDate?: Date;
     /**
      * The name of a connection.
-     * @type {string}
-     * @memberof Connection
      */
     name: string;
     /**
      * The parameters of a connection.
-     * @type {{ [key: string]: any; }}
-     * @memberof Connection
      */
     parameters: { [key: string]: any; };
     /**
      * 
-     * @type {Array<Tag>}
-     * @memberof Connection
      */
     tags?: Array<Tag>;
     /**
      * 
-     * @type {number}
-     * @memberof Connection
      */
     version?: number;
     /**
      * 
-     * @type {number}
-     * @memberof Connection
      */
     workspaceId?: number;
 }
@@ -188,12 +150,12 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
         'connectionVersion': json['connectionVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
-        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
+        'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),

@@ -19,7 +19,7 @@
  */
 export const ProjectStatus = {
     Draft: 'DRAFT',
-    Published: 'PUBLISHED'
+    Published: 'PUBLISHED',
 } as const;
 export type ProjectStatus = typeof ProjectStatus[keyof typeof ProjectStatus];
 

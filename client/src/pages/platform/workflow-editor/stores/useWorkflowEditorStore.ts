@@ -5,9 +5,17 @@ import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/t
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+export interface PendingClusterElementDropI {
+    componentDefinition: ComponentDefinition;
+    placeholderId: string;
+}
+
 export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
+
+    clusterFrameLockedByRootId: Record<string, boolean>;
+    setClusterFrameLocked: (clusterRootId: string, locked: boolean) => void;
 
     copiedNode: NodeDataType | undefined;
     setCopiedNode: (copiedNode: NodeDataType | undefined) => void;
@@ -15,13 +23,14 @@ export interface WorkflowEditorI {
     copiedWorkflowId: string | undefined;
     setCopiedWorkflowId: (copiedWorkflowId: string | undefined) => void;
 
-    mainClusterRootComponentDefinition: ComponentDefinition | undefined;
-    setMainClusterRootComponentDefinition: (
-        mainClusterRootComponentDefinition: ComponentDefinition | undefined
-    ) => void;
+    clusterRootComponentDefinitions: Record<string, ComponentDefinition>;
+    setClusterRootComponentDefinition: (clusterRootId: string, definition: ComponentDefinition) => void;
 
     nodesLocked: boolean;
     setNodesLocked: (nodesLocked: boolean) => void;
+
+    pendingClusterElementDrop: PendingClusterElementDropI | undefined;
+    setPendingClusterElementDrop: (pendingClusterElementDrop: PendingClusterElementDropI | undefined) => void;
 
     nestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     setNestedClusterRootsComponentDefinitions: (
@@ -74,6 +83,15 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     clusterElementsCanvasOpen,
                 })),
 
+            clusterFrameLockedByRootId: {},
+            setClusterFrameLocked: (clusterRootId, locked) =>
+                set((state) => ({
+                    clusterFrameLockedByRootId: {
+                        ...state.clusterFrameLockedByRootId,
+                        [clusterRootId]: locked,
+                    },
+                })),
+
             copiedNode: undefined,
             setCopiedNode: (copiedNode) =>
                 set(() => ({
@@ -86,16 +104,26 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     copiedWorkflowId,
                 })),
 
-            mainClusterRootComponentDefinition: undefined,
-            setMainClusterRootComponentDefinition: (mainClusterRootComponentDefinition) =>
-                set(() => ({
-                    mainClusterRootComponentDefinition,
+            clusterRootComponentDefinitions: {},
+
+            setClusterRootComponentDefinition: (clusterRootId, definition) =>
+                set((state) => ({
+                    clusterRootComponentDefinitions: {
+                        ...state.clusterRootComponentDefinitions,
+                        [clusterRootId]: definition,
+                    },
                 })),
 
             nodesLocked: true,
             setNodesLocked: (nodesLocked) =>
                 set(() => ({
                     nodesLocked,
+                })),
+
+            pendingClusterElementDrop: undefined,
+            setPendingClusterElementDrop: (pendingClusterElementDrop) =>
+                set(() => ({
+                    pendingClusterElementDrop,
                 })),
 
             nestedClusterRootsComponentDefinitions: {},

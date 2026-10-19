@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface CreateSigningKey200Response {
     /**
      * The private key.
-     * @type {string}
-     * @memberof CreateSigningKey200Response
      */
     privateKey?: string;
 }

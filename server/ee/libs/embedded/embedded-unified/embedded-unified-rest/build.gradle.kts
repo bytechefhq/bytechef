@@ -18,7 +18,8 @@ val generateAccountingOpenAPISpring by tasks.registering(org.openapitools.genera
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "page" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice"
+            "page" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice",
+            "page_1" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice"
         )
     )
 }
@@ -39,7 +40,8 @@ val generateCRMOpenAPISpring by tasks.registering(org.openapitools.generator.gra
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
-            "page" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice"
+            "page" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice",
+            "page_1" to "com.bytechef.ee.embedded.unified.pagination.CursorPageSlice"
         )
     )
 }

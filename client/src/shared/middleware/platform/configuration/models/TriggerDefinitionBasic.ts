@@ -36,62 +36,42 @@ import {
 export interface TriggerDefinitionBasic {
     /**
      * The component name.
-     * @type {string}
-     * @memberof TriggerDefinitionBasic
      */
     componentName: string;
     /**
      * The component version.
-     * @type {number}
-     * @memberof TriggerDefinitionBasic
      */
     componentVersion: number;
     /**
      * The description.
-     * @type {string}
-     * @memberof TriggerDefinitionBasic
      */
     description?: string;
     /**
      * 
-     * @type {Help}
-     * @memberof TriggerDefinitionBasic
      */
     help?: Help;
     /**
      * The action name.
-     * @type {string}
-     * @memberof TriggerDefinitionBasic
      */
     name: string;
     /**
      * Does trigger defines output.
-     * @type {boolean}
-     * @memberof TriggerDefinitionBasic
      */
     outputDefined: boolean;
     /**
      * Does trigger defines output function.
-     * @type {boolean}
-     * @memberof TriggerDefinitionBasic
      */
     outputFunctionDefined: boolean;
     /**
      * Does trigger defines output schema.
-     * @type {boolean}
-     * @memberof TriggerDefinitionBasic
      */
     outputSchemaDefined?: boolean;
     /**
      * The title
-     * @type {string}
-     * @memberof TriggerDefinitionBasic
      */
     title?: string;
     /**
      * 
-     * @type {TriggerType}
-     * @memberof TriggerDefinitionBasic
      */
     type: TriggerType;
 }

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserReferenceDeploymentRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,12 @@ public class ConnectedUserReferenceDeploymentServiceImpl implements ConnectedUse
         long connectedUserId, long projectId) {
 
         return connectedUserReferenceDeploymentRepository.findByConnectedUserIdAndProjectId(connectedUserId, projectId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectedUserReferenceDeployment> getConnectedUserReferenceDeployments(long connectedUserId) {
+        return connectedUserReferenceDeploymentRepository.findAllByConnectedUserId(connectedUserId);
     }
 
     @Override
