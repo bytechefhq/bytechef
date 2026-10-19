@@ -40,10 +40,16 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useProjectTemplateQuery: () => ({
         data: {
             projectTemplate: {
-                components: [],
+                components: [
+                    {key: 'workflow-1', value: []},
+                    {key: 'workflow-2', value: []},
+                ],
                 description: 'Template description',
                 project: {name: 'Template Project'},
-                workflows: [],
+                workflows: [
+                    {id: 'workflow-1', label: 'First Workflow'},
+                    {id: 'workflow-2', label: 'Second Workflow'},
+                ],
             },
         },
     }),
@@ -69,13 +75,13 @@ describe('ProjectTemplate', () => {
         expect(hoisted.mutate).toHaveBeenCalledWith({id: 'template-1', sharedProject: false, workspaceId: '7'});
     });
 
-    it('should capture analytics and navigate to projects on successful import', async () => {
+    it('should capture the project and one event per template workflow on successful import', async () => {
         renderProjectTemplate();
 
         await userEvent.click(screen.getByRole('button', {name: 'Import now'}));
 
         expect(hoisted.captureProjectCreatedFromTemplate).toHaveBeenCalledTimes(1);
-        expect(hoisted.captureProjectWorkflowCreatedFromTemplate).toHaveBeenCalledTimes(1);
+        expect(hoisted.captureProjectWorkflowCreatedFromTemplate).toHaveBeenCalledTimes(2);
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
     });
 });

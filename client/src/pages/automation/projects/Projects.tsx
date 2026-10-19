@@ -50,7 +50,7 @@ const Projects = () => {
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const {captureProjectImported, captureProjectWorkflowImported} = useAnalytics();
+    const {captureProjectImported} = useAnalytics();
 
     const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
 
@@ -59,7 +59,6 @@ const Projects = () => {
     const importProjectMutation = useImportProjectMutation({
         onSuccess: () => {
             captureProjectImported();
-            captureProjectWorkflowImported();
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 

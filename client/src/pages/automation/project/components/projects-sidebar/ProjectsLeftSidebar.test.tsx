@@ -109,6 +109,11 @@ vi.mock('@/pages/automation/project/hooks/useImportProjectWorkflow', () => ({
     useImportProjectWorkflow: (projectId: number) => mockUseImportProjectWorkflow(projectId),
 }));
 
+const mockCaptureProjectImported = vi.hoisted(() => vi.fn());
+vi.mock('@/shared/hooks/useAnalytics', () => ({
+    useAnalytics: () => ({captureProjectImported: mockCaptureProjectImported}),
+}));
+
 const mockImportProjectMutate = vi.hoisted(() => vi.fn());
 vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -357,6 +362,7 @@ describe('ProjectsLeftSidebar', () => {
         fireEvent.change(fileInputByAccept('.zip'), {target: {files: [file]}});
 
         expect(mockImportProjectMutate).toHaveBeenCalledWith({file, workspaceId: 10});
+        expect(mockCaptureProjectImported).toHaveBeenCalledTimes(1);
         expect(mockToast).toHaveBeenCalledWith('Project is imported.');
     });
 
