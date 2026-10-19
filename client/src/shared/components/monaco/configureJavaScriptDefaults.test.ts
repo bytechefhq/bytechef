@@ -3,7 +3,7 @@ import {describe, expect, it, vi} from 'vitest';
 import {configureJavaScriptDefaults} from './configureJavaScriptDefaults';
 
 describe('configureJavaScriptDefaults', () => {
-    it('checks JavaScript so the language service stops listing every identifier, without type errors or hints', () => {
+    it('checks JavaScript so the language service stops listing every identifier, without type errors or implicit-any hints', () => {
         const javascriptDefaults = {
             getCompilerOptions: vi.fn(() => ({allowNonTsExtensions: true})),
             getDiagnosticsOptions: vi.fn(() => ({noSyntaxValidation: false})),

@@ -3,8 +3,10 @@ import {
     type ActionCallValueSlotType,
     findActionCallKeySlot,
     findActionCallValueSlot,
+    findConnectionNameArgument,
 } from './actionCallScanner';
-import {parseMemberPath} from './memberPath';
+import {getCursorLexicalState} from './cursorLexicalState';
+import {type MemberPathType, parseMemberPath} from './memberPath';
 import {findEnclosingFunctionName, findPerformScope} from './performScanner';
 import {getPropertyCompletionItems, getPropertyValueItems} from './propertyCompletions';
 import {buildActionCallSnippet, buildFunctionSnippet} from './snippets';
@@ -53,7 +55,8 @@ type ContextType = ScriptCompletionRequestI['context'];
 const SCRIPT_CONTEXT_MEMBERS = ['component'];
 const CUSTOM_COMPONENT_CONTEXT_MEMBERS = ['http', 'log'];
 const CODE_WORKFLOW_CONTEXT_MEMBERS = ['component', 'connection', 'input', 'log', 'parameters'];
-const ZERO_ARGUMENT_CONTEXT_MEMBERS = new Set(['connection', 'input', 'parameters']);
+const ZERO_ARGUMENT_CONTEXT_MEMBERS = new Set(['input', 'parameters']);
+const OPEN_BRACKET_BEFORE = /\[\s*$/;
 
 function propertyItem(name: string): CompletionItemDraftType {
     return {insertAsSnippet: false, insertText: name, kind: 'property', label: name};
@@ -277,7 +280,7 @@ type ActionCallTargetType = {
 
 async function resolveActionCall(
     request: ScriptCompletionRequestI,
-    calleeText: string
+    slot: ActionCallKeySlotType | ActionCallValueSlotType
 ): Promise<ActionCallTargetType | undefined> {
     const {context, cursorOffset, source} = request;
 
@@ -285,7 +288,7 @@ async function resolveActionCall(
         return undefined;
     }
 
-    const calleePath = parseMemberPath(calleeText);
+    const calleePath = parseMemberPath(slot.calleeText);
 
     if (!calleePath || calleePath.segments.length !== 3 || calleePath.segments[0] !== 'component') {
         return undefined;
@@ -298,10 +301,15 @@ async function resolveActionCall(
     }
 
     const [, componentName, actionName] = calleePath.segments;
-    const declaredConnection = declaredConnections(request).find(
+    const componentConnections = declaredConnections(request).filter(
         (connection) => connection.componentName === componentName
     );
-    const declaredVersion = declaredConnection?.componentVersion;
+    const connectionName = findConnectionNameArgument(source, slot.argumentStart, context.language, slot.callStart);
+    const connectionKey =
+        connectionName ?? (componentConnections.length === 1 ? componentConnections[0].name : undefined);
+    const declaredVersion = (
+        componentConnections.find((connection) => connection.name === connectionKey) ?? componentConnections[0]
+    )?.componentVersion;
 
     const properties = await context.components.getOperationProperties(
         componentName,
@@ -323,7 +331,7 @@ async function resolveActionCall(
                   clusterElementNode,
                   componentName,
                   componentVersion: declaredVersion,
-                  connectionKey: declaredConnection?.name,
+                  connectionKey,
                   lookupDependsOnPaths,
                   operationKind: 'action',
                   operationName: actionName,
@@ -352,7 +360,7 @@ async function actionPropertyItems(
     request: ScriptCompletionRequestI,
     keySlot: ActionCallKeySlotType
 ): Promise<CompletionItemDraftType[] | undefined> {
-    const target = await resolveActionCall(request, keySlot.calleeText);
+    const target = await resolveActionCall(request, keySlot);
 
     if (!target) {
         return undefined;
@@ -391,7 +399,7 @@ async function actionValueItems(
     request: ScriptCompletionRequestI,
     valueSlot: ActionCallValueSlotType
 ): Promise<CompletionItemDraftType[] | undefined> {
-    const target = await resolveActionCall(request, valueSlot.calleeText);
+    const target = await resolveActionCall(request, valueSlot);
 
     if (!target) {
         return undefined;

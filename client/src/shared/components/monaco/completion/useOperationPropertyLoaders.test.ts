@@ -117,3 +117,27 @@ describe('useOperationPropertyLoaders', () => {
         expect(getWorkflowNodeComponentOperationOptionsMock).toHaveBeenCalledTimes(2);
     });
 });
+
+describe('useOperationPropertyLoaders cache', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+
+        queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        getWorkflowNodeComponentOperationOptionsMock.mockResolvedValue([]);
+    });
+
+    it('does not request again when only a value outside the lookup paths changes', async () => {
+        const {result} = renderHook(() => useOperationPropertyLoaders('workflow1', 2), {wrapper});
+
+        await result.current.loadOptions!({...request, parameters: {baseId: 'app1', note: 'a'}});
+        await result.current.loadOptions!({...request, parameters: {baseId: 'app1', note: 'b'}});
+
+        expect(getWorkflowNodeComponentOperationOptionsMock).toHaveBeenCalledTimes(1);
+        expect(getWorkflowNodeComponentOperationOptionsMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                componentOperationPropertyRequest: expect.objectContaining({parameters: {baseId: 'app1', note: 'a'}}),
+            })
+        );
+    });
+});
