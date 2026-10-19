@@ -106,17 +106,39 @@ const readToolResult = async (page: Page, chat: Omit<AiHubChatRefI, 'threadId'>,
 const expectSuccessfulToolResult = async (
     page: Page,
     chat: Omit<AiHubChatRefI, 'threadId'>,
-    toolName: string
+    toolNames: string[]
 ): Promise<string> => {
-    const toolResults = await readToolResult(page, chat, toolName);
+    const toolResults = (await Promise.all(toolNames.map((toolName) => readToolResult(page, chat, toolName)))).flat();
 
-    expect(toolResults.length, `${toolName} was not called`).toBeGreaterThan(0);
+    expect(toolResults.length, `none of ${toolNames.join(', ')} was called`).toBeGreaterThan(0);
 
     const lastToolResult = toolResults.at(-1)!;
 
-    expect(lastToolResult, `${toolName} failed`).not.toMatch(/"error"/);
+    expect(lastToolResult, `${toolNames.join(' or ')} failed`).not.toMatch(/"error"/);
 
     return lastToolResult;
+};
+
+const MAX_APPROVALS_PER_TURN = 3;
+
+const approvePendingApprovals = async (page: Page, aiHubPage: AiHubPage) => {
+    const approveButton = page.getByRole('button', {name: 'Approve'});
+
+    for (let approvalCount = 0; approvalCount < MAX_APPROVALS_PER_TURN; approvalCount++) {
+        if ((await approveButton.count()) === 0) {
+            return;
+        }
+
+        const approvedStatusCount = await page.getByText('Approved - the tool ran.').count();
+
+        await approveButton.first().click();
+
+        await expect(page.getByText('Approved - the tool ran.')).toHaveCount(approvedStatusCount + 1, {
+            timeout: 60000,
+        });
+
+        await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+    }
 };
 
 test.describe('@live AI Hub', () => {
@@ -210,7 +232,7 @@ test.describe('@live AI Hub', () => {
 
                     await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
 
-                    await expectSuccessfulToolResult(page, chat, 'saveWorkflowTestConnection');
+                    await expectSuccessfulToolResult(page, chat, ['saveWorkflowTestConnection']);
                 });
             } finally {
                 for (const slackConnectionId of slackConnectionIds) {
@@ -259,19 +281,13 @@ test.describe('@live AI Hub', () => {
                 await test.step('Publish it', async () => {
                     await liveTurn(aiHubPage, `Publish the project ${renamedProjectName}.`);
 
-                    const approveButton = page.getByRole('button', {name: 'Approve'});
-
-                    if ((await approveButton.count()) > 0) {
-                        await approveButton.click();
-
-                        await expect(page.getByText('Approved - the tool ran.')).toBeVisible({timeout: 60000});
-
-                        await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
-                    }
+                    await approvePendingApprovals(page, aiHubPage);
 
                     const project = await findProjectByName(page, workspaceId, renamedProjectName);
 
-                    await expect.poll(async () => (await readProject(page, project!.id))?.lastStatus).toBe('PUBLISHED');
+                    await expect
+                        .poll(async () => (await readProject(page, project!.id))?.lastPublishedDate ?? null)
+                        .not.toBeNull();
                 });
             } finally {
                 for (const name of [projectName, renamedProjectName]) {
@@ -295,11 +311,15 @@ test.describe('@live AI Hub', () => {
             await publishProjectThroughApi(page, projectId, 'First version');
             await publishProjectThroughApi(page, projectId, 'Second version');
 
-            const chatTurn = async (text: string, toolName: string) => {
+            const chatTurn = async (text: string, toolNames: string[]) => {
                 await liveTurn(aiHubPage, `${text} Do not ask questions.`);
 
-                return expectSuccessfulToolResult(page, currentChat(aiHubPage, workspaceId), toolName);
+                await approvePendingApprovals(page, aiHubPage);
+
+                return expectSuccessfulToolResult(page, currentChat(aiHubPage, workspaceId), toolNames);
             };
+
+            const versionChangeToolNames = ['rollbackProjectDeployment', 'updateProjectDeployment'];
 
             const developmentDeployment = async () =>
                 (await listProjectDeployments(page, {projectId, workspaceId})).find(
@@ -310,37 +330,36 @@ test.describe('@live AI Hub', () => {
                 await test.step('Create a deployment', async () => {
                     await chatTurn(
                         `Create a deployment of project ${projectId} with project version 1 in the DEVELOPMENT environment.`,
-                        'createProjectDeployment'
+                        ['createProjectDeployment']
                     );
 
                     await expect.poll(async () => (await developmentDeployment())?.projectVersion).toBe(1);
                 });
 
                 await test.step('Enable and disable it', async () => {
-                    await chatTurn('Enable that deployment.', 'toggleProjectDeployment');
+                    await chatTurn('Enable that deployment.', ['toggleProjectDeployment']);
 
                     await expect.poll(async () => (await developmentDeployment())?.enabled).toBe(true);
 
-                    await chatTurn('Now disable that deployment.', 'toggleProjectDeployment');
+                    await chatTurn('Now disable that deployment.', ['toggleProjectDeployment']);
 
                     await expect.poll(async () => (await developmentDeployment())?.enabled).toBe(false);
                 });
 
                 await test.step('Update it and roll it back', async () => {
-                    await chatTurn('Update that deployment to project version 2.', 'updateProjectDeployment');
+                    await chatTurn('Update that deployment to project version 2.', versionChangeToolNames);
 
                     await expect.poll(async () => (await developmentDeployment())?.projectVersion).toBe(2);
 
-                    await chatTurn('Roll that deployment back to project version 1.', 'rollbackProjectDeployment');
+                    await chatTurn('Roll that deployment back to project version 1.', versionChangeToolNames);
 
                     await expect.poll(async () => (await developmentDeployment())?.projectVersion).toBe(1);
                 });
 
                 await test.step('Promote a workflow', async () => {
-                    await chatTurn(
-                        `Promote project ${projectId} version 2 to the STAGING environment.`,
-                        'promoteWorkflow'
-                    );
+                    await chatTurn(`Promote project ${projectId} version 2 to the STAGING environment.`, [
+                        'promoteWorkflow',
+                    ]);
 
                     await expect
                         .poll(async () =>
@@ -495,7 +514,7 @@ test.describe('@live AI Hub', () => {
 
                     await expect(page.getByText('publishProject', {exact: true})).toBeVisible();
 
-                    expect((await readProject(page, gatedProjectId))?.lastStatus).not.toBe('PUBLISHED');
+                    expect((await readProject(page, gatedProjectId))?.lastPublishedDate ?? null).toBeNull();
 
                     await page.getByRole('button', {name: 'Reject'}).click();
 
