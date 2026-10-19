@@ -138,7 +138,7 @@ describe('DataTables', () => {
         it('should hide the New Table button without DATA_TABLE_CREATE', () => {
             hoistedScope.grantedScopes = [];
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.queryByTestId('create-dialog-trigger')).not.toBeInTheDocument();
         });
@@ -165,7 +165,7 @@ describe('DataTables', () => {
             hoistedScope.grantedScopes = [];
             hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tables: []});
 
-            render(<DataTables />);
+            renderDataTables();
 
             expect(screen.getByText('No Data Tables')).toBeInTheDocument();
             expect(screen.queryByTestId('create-dialog-trigger')).not.toBeInTheDocument();
