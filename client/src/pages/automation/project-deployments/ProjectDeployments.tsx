@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
-import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
@@ -17,10 +16,11 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {Layers3Icon, TagIcon} from 'lucide-react';
+import {TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
+import ProjectDeploymentsEmptyState from './components/ProjectDeploymentsEmptyState';
 import ProjectDeploymentDialog from './components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectDeploymentList from './components/project-deployment-list/ProjectDeploymentList';
 
@@ -120,6 +120,8 @@ const ProjectDeployments = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const isFirstRun = !isFiltered && projectDeployments?.length === 0;
+
     return (
         <LayoutContainer
             header={
@@ -145,9 +147,10 @@ const ProjectDeployments = () => {
                         (projectDeployments && projectDeployments.length > 0) || isFiltered ? (
                             <ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />
                         ) : (
-                            ''
+                            isFirstRun && 'Deployments'
                         )
                     }
+                    titleClassName={isFirstRun ? 'font-semibold' : undefined}
                 />
             }
             leftSidebarBody={
@@ -182,6 +185,7 @@ const ProjectDeployments = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Deployments" />}
+            leftSidebarOpen={isFirstRun ? false : undefined}
             leftSidebarWidth="64"
         >
             <PageLoader
@@ -225,23 +229,7 @@ const ProjectDeployments = () => {
                 ) : isFiltered ? (
                     <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
-                    <EmptyList
-                        button={
-                            <ProjectDeploymentDialog
-                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
-                                projectDeployment={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as ProjectDeployment
-                                }
-                                redirectOnSubmit={false}
-                                triggerNode={<Button>Create Deployment</Button>}
-                            />
-                        }
-                        icon={<Layers3Icon className="size-24 text-gray-300" />}
-                        message="Get started by creating a new project deployment."
-                        title="No Project Deployments"
-                    />
+                    <ProjectDeploymentsEmptyState onDeploymentCreated={setNewlyCreatedDeploymentId} />
                 )}
             </PageLoader>
         </LayoutContainer>
