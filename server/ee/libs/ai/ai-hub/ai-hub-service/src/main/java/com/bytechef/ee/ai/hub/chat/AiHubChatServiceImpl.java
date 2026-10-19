@@ -611,16 +611,19 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     public void delete(long chatId, long requesterWorkspaceId, long requesterUserId) {
         AiHubChat chat = load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage, true);
 
-        inFlightRunRegistry.cancel(chat.getThreadId());
+        String threadId = chat.getThreadId();
+
+        inFlightRunRegistry.discardReleaseActions(threadId);
+        inFlightRunRegistry.cancel(threadId);
 
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
 
-        scheduleChatMemoryDeleteAfterCommit(chat.getThreadId());
+        scheduleCleanupAfterCommit(chatId, threadId);
     }
 
-    private void scheduleChatMemoryDeleteAfterCommit(String threadId) {
+    private void scheduleCleanupAfterCommit(long chatId, String threadId) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             deleteSessionMessages(threadId);
 
@@ -632,8 +635,17 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             @Override
             public void afterCommit() {
                 deleteSessionMessages(threadId);
+                deleteLeftoverApprovals(chatId);
             }
         });
+    }
+
+    private void deleteLeftoverApprovals(long chatId) {
+        try {
+            approvalService.deleteByChat(chatId);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to delete the approvals left for deleted chat id={}", chatId, exception);
+        }
     }
 
     private void deleteSessionMessages(String threadId) {

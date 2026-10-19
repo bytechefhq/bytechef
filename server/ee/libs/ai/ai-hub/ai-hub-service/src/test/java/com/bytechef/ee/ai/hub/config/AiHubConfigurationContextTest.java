@@ -55,6 +55,7 @@ import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalRuleGraphQlController
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
@@ -246,6 +247,7 @@ class AiHubConfigurationContextTest {
                 .build())
             .withBean(PermissionService.class, () -> mock(PermissionService.class))
             .withBean(PlatformTransactionManager.class, () -> mock(PlatformTransactionManager.class))
-            .withBean(UserService.class, () -> mock(UserService.class));
+            .withBean(UserService.class, () -> mock(UserService.class))
+            .withBean("workerExecutor", Executor.class, () -> Runnable::run);
     }
 }
