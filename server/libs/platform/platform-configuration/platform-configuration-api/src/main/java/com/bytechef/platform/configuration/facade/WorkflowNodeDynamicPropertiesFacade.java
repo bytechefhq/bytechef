@@ -32,12 +32,18 @@ public interface WorkflowNodeDynamicPropertiesFacade {
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPath,
         long environmentId);
 
-    List<Property> getWorkflowNodeComponentActionDynamicProperties(
-        String workflowId, String workflowNodeName, String componentName, int componentVersion, String actionName,
-        String propertyName, @Nullable String connectionKey, Map<String, ?> parameters,
-        List<String> lookupDependsOnPaths, long environmentId);
+    List<Property> getWorkflowNodeComponentOperationDynamicProperties(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId);
 
     List<? extends BaseProperty> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId);
+
+    record ClusterElementNode(String clusterElementTypeName, String clusterElementWorkflowNodeName) {
+    }
+
+    record ComponentOperation(String componentName, int componentVersion, String operationName, boolean trigger) {
+    }
 }
