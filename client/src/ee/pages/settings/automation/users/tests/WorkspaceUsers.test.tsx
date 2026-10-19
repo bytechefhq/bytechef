@@ -293,7 +293,19 @@ describe('WorkspaceUsers', () => {
         expect(screen.getAllByText('member@example.com')).toHaveLength(1);
     });
 
-    it('offers no removal of the only environment role', async () => {
+    it('explains that removing the only environment role makes it a workspace-wide role', async () => {
+        hoisted.workspaceUsers = [developmentRole];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+
+        expect(screen.getByText(/becomes a workspace-wide role/i)).toBeInTheDocument();
+        expect(screen.getByText(/keep the Editor role in every environment/i)).toBeInTheDocument();
+    });
+
+    it('offers no removal of the only environment role without member management in every environment', async () => {
+        hoisted.scopesByEnvironment = {PRODUCTION: ['WORKSPACE_VIEW'], STAGING: ['WORKSPACE_VIEW']};
         hoisted.workspaceUsers = [developmentRole];
 
         render(<WorkspaceUsers />);
