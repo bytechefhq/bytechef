@@ -48,6 +48,8 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ClusterElementNode;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ComponentOperation;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -66,6 +68,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class WorkflowNodeDynamicPropertiesFacadeTest {
+
+    private static final ComponentOperation SHEETS_INSERT_ROW =
+        new ComponentOperation("googleSheets", 1, "insertRow", false);
 
     @Mock
     private ActionDefinitionFacade actionDefinitionFacade;
@@ -553,7 +558,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesResolvesDeclaredConnectionByKey() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesResolvesDeclaredConnectionByKey() {
         Map<String, Object> parameters = Map.of("spreadsheetId", "sheet1");
         List<Property> expectedProperties = List.of(mock(Property.class));
 
@@ -569,15 +574,16 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             "googleSheets", 1, "insertRow", "values", parameters, List.of("spreadsheetId"), "workflow1", 100L))
                 .thenReturn(expectedProperties);
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "script_1", "googleSheets", 1, "insertRow", "values", "sheets", parameters,
-            List.of("spreadsheetId"), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "script_1", null, SHEETS_INSERT_ROW, "values", "sheets", parameters,
+                List.of("spreadsheetId"), 1L);
 
         assertEquals(expectedProperties, result);
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesUsesSingleConnectionOfComponentWithoutKey() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesUsesSingleConnectionOfComponentWithoutKey() {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "googleSheets_1"))
@@ -589,21 +595,69 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             "googleSheets", 1, "insertRow", "values", Map.of(), List.of(), "workflow1", 100L))
                 .thenReturn(expectedProperties);
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "googleSheets_1", "googleSheets", 1, "insertRow", "values", null, Map.of(), List.of(), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "googleSheets_1", null, SHEETS_INSERT_ROW, "values", null, Map.of(), List.of(), 1L);
 
         assertEquals(expectedProperties, result);
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesReturnsEmptyWhenDeclaredConnectionIsNotConfigured() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesRunsTriggerDynamicProperties() {
+        List<Property> expectedProperties = List.of(mock(Property.class));
+
+        when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "trigger_1"))
+            .thenReturn(List.of(new ComponentConnection("googleSheets", 1, "trigger_1", "googleSheets", true)));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "trigger_1", 1L))
+            .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "googleSheets", "trigger_1")));
+        when(triggerDefinitionFacade.executeDynamicProperties(
+            "googleSheets", 1, "newRow", "columns", Map.of(), List.of(), 100L))
+                .thenReturn(expectedProperties);
+
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "trigger_1", null, new ComponentOperation("googleSheets", 1, "newRow", true), "columns",
+                null, Map.of(), List.of(), 1L);
+
+        assertEquals(expectedProperties, result);
+
+        verify(actionDefinitionFacade, never()).executeDynamicProperties(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyList(), anyString(), any());
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesResolvesClusterElementConnectionUnderRootNode() {
+        List<Property> expectedProperties = List.of(mock(Property.class));
+
+        when(componentConnectionFacade.getClusterElementComponentConnections(
+            "workflow1", "aiAgent_1", "tools", "script_1"))
+                .thenReturn(List.of(new ComponentConnection("googleSheets", 1, "script_1", "sheets", true)));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "aiAgent_1", 1L))
+            .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "sheets", "aiAgent_1")));
+        when(actionDefinitionFacade.executeDynamicProperties(
+            "googleSheets", 1, "insertRow", "values", Map.of(), List.of(), "workflow1", 100L))
+                .thenReturn(expectedProperties);
+
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "aiAgent_1", new ClusterElementNode("tools", "script_1"), SHEETS_INSERT_ROW, "values",
+                "sheets", Map.of(), List.of(), 1L);
+
+        assertEquals(expectedProperties, result);
+
+        verify(componentConnectionFacade, never()).getWorkflowNodeComponentConnections(anyString(), anyString());
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesReturnsEmptyWhenDeclaredConnectionIsNotConfigured() {
         when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
             .thenReturn(List.of(new ComponentConnection("googleSheets", 1, "script_1", "sheets", true)));
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "script_1", 1L))
             .thenReturn(List.of());
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "script_1", "googleSheets", 1, "insertRow", "values", "sheets", Map.of(), List.of(), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "script_1", null, SHEETS_INSERT_ROW, "values", "sheets", Map.of(), List.of(), 1L);
 
         assertTrue(result.isEmpty());
 
@@ -612,12 +666,13 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesRejectsKeyDeclaredForAnotherComponent() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesRejectsKeyDeclaredForAnotherComponent() {
         when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
             .thenReturn(List.of(new ComponentConnection("slack", 1, "script_1", "sheets", true)));
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "script_1", "googleSheets", 1, "insertRow", "values", "sheets", Map.of(), List.of(), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "script_1", null, SHEETS_INSERT_ROW, "values", "sheets", Map.of(), List.of(), 1L);
 
         assertTrue(result.isEmpty());
 
@@ -628,14 +683,15 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesReturnsEmptyWhenConnectionIsAmbiguous() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesReturnsEmptyWhenConnectionIsAmbiguous() {
         when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
             .thenReturn(List.of(
                 new ComponentConnection("googleSheets", 1, "script_1", "sheets", true),
                 new ComponentConnection("googleSheets", 1, "script_1", "otherSheets", true)));
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "script_1", "googleSheets", 1, "insertRow", "values", null, Map.of(), List.of(), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "script_1", null, SHEETS_INSERT_ROW, "values", null, Map.of(), List.of(), 1L);
 
         assertTrue(result.isEmpty());
 
@@ -644,7 +700,7 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeComponentActionDynamicPropertiesRunsWithoutConnectionWhenNoneIsDeclared() {
+    void testGetWorkflowNodeComponentOperationDynamicPropertiesRunsWithoutConnectionWhenNoneIsDeclared() {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
@@ -653,8 +709,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             "jsonHelper", 1, "parse", "schema", Map.of(), List.of(), "workflow1", null))
                 .thenReturn(expectedProperties);
 
-        List<Property> result = workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentActionDynamicProperties(
-            "workflow1", "script_1", "jsonHelper", 1, "parse", "schema", null, Map.of(), List.of(), 1L);
+        List<Property> result =
+            workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                "workflow1", "script_1", null, new ComponentOperation("jsonHelper", 1, "parse", false), "schema",
+                null, Map.of(), List.of(), 1L);
 
         assertEquals(expectedProperties, result);
     }
