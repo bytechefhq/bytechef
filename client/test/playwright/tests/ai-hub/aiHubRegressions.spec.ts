@@ -1111,10 +1111,19 @@ test.describe('AI Hub regressions', () => {
 
             await aiHubPage.goto();
 
+            let hubRunSettled: Promise<unknown> = Promise.resolve();
+
             await test.step('Stop the run after the failure', async () => {
                 await aiHubPage.send('Build a Slack workflow');
 
                 await expect(page.getByText('That did not work.')).toBeVisible();
+
+                const isHubRunRequest = (request: Request) => AI_HUB_CHAT_URL.test(request.url());
+
+                hubRunSettled = Promise.race([
+                    page.waitForEvent('requestfailed', isHubRunRequest),
+                    page.waitForEvent('requestfinished', isHubRunRequest),
+                ]).catch(() => undefined);
 
                 await aiHubPage.stopGeneratingButton.click();
 
@@ -1125,7 +1134,13 @@ test.describe('AI Hub regressions', () => {
                 runEndGate.release();
             });
 
-            await test.step('Assert no banner was shown', async () => {
+            await test.step('Assert no banner was shown once the run settled', async () => {
+                await hubRunSettled;
+
+                await page.evaluate(
+                    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+                );
+
                 await expect(page.getByText('That did not work.')).toBeVisible();
 
                 await expect(aiHubPage.retryBanner).toHaveCount(0);
