@@ -41,15 +41,22 @@ describe('A2aServerConnect', () => {
         expect(hoisted.copyToClipboard).toHaveBeenCalledWith(endpointUrl);
     });
 
-    it('explains that requests need an API key when authentication is required', () => {
+    it('shows the Authorization header a client must send when authentication is required', async () => {
         render(<A2aServerConnect a2aServer={a2aServer} />);
 
-        expect(screen.getByText(/Requests require an API key/)).toBeInTheDocument();
+        expect(screen.getByText('Authorization: Bearer YOUR_API_KEY')).toBeInTheDocument();
+        expect(screen.getByText(/workspace API key from this server's workspace and environment/)).toBeInTheDocument();
+        expect(screen.getByText(/X-ENVIRONMENT header must name this server's environment/)).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Copy Authorization header'}));
+
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('Authorization: Bearer YOUR_API_KEY');
     });
 
     it('explains that the URLs work as is without authentication', () => {
         render(<A2aServerConnect a2aServer={{...a2aServer, authenticationRequired: false}} />);
 
         expect(screen.getByText(/does not require authentication/)).toBeInTheDocument();
+        expect(screen.queryByText('Authorization: Bearer YOUR_API_KEY')).not.toBeInTheDocument();
     });
 });
