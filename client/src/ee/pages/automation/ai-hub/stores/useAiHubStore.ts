@@ -3,6 +3,7 @@ import {
     type ToolApprovalResolutionI,
     stampToolApprovalResolution,
 } from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
+import {getServerRowIndex, withServerRowIndex} from '@/ee/pages/automation/ai-hub/stores/serverRowIndex';
 import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
@@ -27,6 +28,12 @@ interface AiHubStateI {
     editUserMessage: (index: number, content: string) => void;
     markToolApprovalResolved: (approvalId: number, resolution: ToolApprovalResolutionI) => void;
     resetMessages: () => void;
+
+    /** The server transcript row index the next persisted user or assistant message will take. */
+    nextServerRowIndex: number;
+    setNextServerRowIndex: (nextServerRowIndex: number) => void;
+    /** Marks the message at `index` with the next server row index, unless it is already marked. */
+    tagServerRow: (index: number) => void;
 
     /** True while a chat switch is fetching that chat's history, so the thread shows a loading placeholder. */
     messagesLoading: boolean;
@@ -94,7 +101,24 @@ export const aiHubStore = create<AiHubStateI>()(
                 ...state,
                 messages: stampToolApprovalResolution(state.messages, approvalId, resolution),
             })),
-        resetMessages: () => set({messages: [], messagesLoading: false}),
+        resetMessages: () => set({messages: [], messagesLoading: false, nextServerRowIndex: 0}),
+
+        nextServerRowIndex: 0,
+        setNextServerRowIndex: (nextServerRowIndex) => set({nextServerRowIndex}),
+        tagServerRow: (index) =>
+            set((state) => {
+                const message = state.messages[index];
+
+                if (message == null || getServerRowIndex(message) != null) {
+                    return state;
+                }
+
+                const messages = [...state.messages];
+
+                messages[index] = withServerRowIndex(message, state.nextServerRowIndex);
+
+                return {...state, messages, nextServerRowIndex: state.nextServerRowIndex + 1};
+            }),
 
         messagesLoading: false,
         setMessagesLoading: (messagesLoading) => set({messagesLoading}),
