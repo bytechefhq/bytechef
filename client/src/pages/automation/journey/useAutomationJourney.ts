@@ -7,7 +7,6 @@ import {useMemo} from 'react';
 import {type AutomationJourneyI, getAutomationJourney} from './getAutomationJourney';
 
 interface UseAutomationJourneyI {
-    isError: boolean;
     isLoading: boolean;
     journey?: AutomationJourneyI;
 }
@@ -21,17 +20,12 @@ export const useAutomationJourney = (): UseAutomationJourneyI => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     // Unfiltered and with all fields: projectWorkflowIds is only returned when includeAllFields is true.
-    const {
-        data: projects,
-        error: projectsError,
-        isLoading: projectsIsLoading,
-    } = useGetWorkspaceProjectsQuery({id: currentWorkspaceId});
+    const {data: projects, isLoading: projectsIsLoading} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId});
 
-    const {
-        data: projectDeployments,
-        error: projectDeploymentsError,
-        isLoading: projectDeploymentsIsLoading,
-    } = useGetWorkspaceProjectDeploymentsQuery({environmentId: currentEnvironmentId, id: currentWorkspaceId});
+    const {data: projectDeployments, isLoading: projectDeploymentsIsLoading} = useGetWorkspaceProjectDeploymentsQuery({
+        environmentId: currentEnvironmentId,
+        id: currentWorkspaceId,
+    });
 
     const journey = useMemo(
         () => (projects && projectDeployments ? getAutomationJourney(projects, projectDeployments) : undefined),
@@ -39,7 +33,6 @@ export const useAutomationJourney = (): UseAutomationJourneyI => {
     );
 
     return {
-        isError: !!projectsError || !!projectDeploymentsError,
         isLoading: projectsIsLoading || projectDeploymentsIsLoading,
         journey,
     };

@@ -138,7 +138,7 @@ const Projects = () => {
         <LayoutContainer
             header={
                 isFirstRun ? (
-                    <Header position="main" title="Projects" titleClassName="font-semibold" />
+                    <Header centerTitle position="main" title="Projects" />
                 ) : (
                     projects &&
                     projects.length > 0 && (
@@ -201,7 +201,7 @@ const Projects = () => {
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
-            leftSidebarOpen={isFirstRun ? false : undefined}
+            leftSidebarHidden={isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader

@@ -17,9 +17,30 @@ const publishedProject: Project = {
     workspaceId: 1,
 };
 
-const disabledDeployment: ProjectDeployment = {enabled: false, id: 7, name: 'Order alerts', projectId: 4};
+const disabledDeployment: ProjectDeployment = {
+    enabled: false,
+    id: 7,
+    name: 'Order alerts',
+    projectDeploymentWorkflows: [{enabled: true, workflowId: 'w1'}],
+    projectId: 4,
+};
 
-const enabledDeployment: ProjectDeployment = {enabled: true, id: 8, name: 'Order alerts', projectId: 4};
+const enabledDeployment: ProjectDeployment = {
+    enabled: true,
+    id: 8,
+    name: 'Order alerts',
+    projectDeploymentWorkflows: [
+        {enabled: false, workflowId: 'w1'},
+        {enabled: true, workflowId: 'w2'},
+    ],
+    projectId: 4,
+};
+
+const enabledDeploymentWithoutEnabledWorkflows: ProjectDeployment = {
+    ...enabledDeployment,
+    id: 9,
+    projectDeploymentWorkflows: [{enabled: false, workflowId: 'w1'}],
+};
 
 describe('getAutomationJourney stage', () => {
     it.each([
@@ -39,10 +60,16 @@ describe('getAutomationJourney stage', () => {
             title: 'deployed but disabled',
         },
         {
+            deployments: [enabledDeploymentWithoutEnabledWorkflows],
+            projects: [publishedProject],
+            stage: 'enable',
+            title: 'deployed and enabled but none of its workflows enabled',
+        },
+        {
             deployments: [disabledDeployment, enabledDeployment],
             projects: [publishedProject],
             stage: 'live',
-            title: 'one deployment enabled',
+            title: 'one deployment and one of its workflows enabled',
         },
     ] as const)('is $stage with $title', ({deployments, projects, stage}) => {
         expect(getAutomationJourney([...projects], [...deployments]).stage).toBe(stage);

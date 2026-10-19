@@ -23,7 +23,7 @@ const Header = ({
     title,
     titleClassName,
 }: HeaderProps) => {
-    const {hasLeftSidebar} = useLeftSidebarToggle();
+    const {hasLeftSidebar, leftSidebarHidden} = useLeftSidebarToggle();
 
     return (
         <header className={twMerge('p-4', centerTitle ? '3xl:mx-auto 3xl:w-4/5' : '3xl:w-4/5', className)}>
@@ -42,7 +42,8 @@ const Header = ({
                         <div
                             className={twMerge(
                                 'flex h-header-height flex-col justify-center text-lg tracking-tight text-foreground',
-                                position === 'sidebar' ? 'font-semibold' : '',
+                                // A main header standing in for a hidden sidebar shows the page title as that would.
+                                position === 'sidebar' || leftSidebarHidden ? 'font-semibold' : '',
                                 titleClassName
                             )}
                         >
