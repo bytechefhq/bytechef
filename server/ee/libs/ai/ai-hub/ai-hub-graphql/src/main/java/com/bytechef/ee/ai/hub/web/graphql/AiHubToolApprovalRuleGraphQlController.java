@@ -39,11 +39,15 @@ public class AiHubToolApprovalRuleGraphQlController {
 
     @QueryMapping
     public List<AiHubToolApprovalRule> aiHubToolApprovalRules(@Argument long workspaceId) {
+        AiHubWorkspaceAccess.rejectConnectedUser();
+
         return toolApprovalRuleFacade.getRules(workspaceId);
     }
 
     @QueryMapping
     public List<String> aiHubToolApprovalDefaultToolNames() {
+        AiHubWorkspaceAccess.rejectConnectedUser();
+
         return toolApprovalRuleFacade.getDefaultToolNames();
     }
 
@@ -52,11 +56,15 @@ public class AiHubToolApprovalRuleGraphQlController {
         @Argument long workspaceId, @Argument AiHubToolApproval.ToolKind toolKind, @Argument String toolName,
         @Argument AiHubToolApprovalRule.Mode mode) {
 
+        AiHubWorkspaceAccess.rejectConnectedUser();
+
         return toolApprovalRuleFacade.createRule(workspaceId, toolKind, toolName, mode);
     }
 
     @MutationMapping
     public boolean deleteAiHubToolApprovalRule(@Argument long workspaceId, @Argument long ruleId) {
+        AiHubWorkspaceAccess.rejectConnectedUser();
+
         toolApprovalRuleFacade.deleteRule(workspaceId, ruleId);
 
         return true;
