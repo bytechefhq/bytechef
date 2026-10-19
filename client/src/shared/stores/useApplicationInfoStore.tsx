@@ -53,6 +53,10 @@ export interface ApplicationInfoI {
         projects: string | undefined;
         workflows: string | undefined;
     };
+    tenant: {
+        deletionGracePeriodDays: number;
+        mode: 'multi' | 'single';
+    };
     userGuiding: {
         containerId: string | undefined;
         enabled: boolean;
@@ -148,6 +152,10 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.socialLogin?.enabled === 'true',
                             },
                             templatesSubmissionForm: json.templatesSubmissionForm,
+                            tenant: {
+                                deletionGracePeriodDays: Number(json.tenant?.deletionGracePeriodDays) || 30,
+                                mode: json.tenant?.mode === 'multi' ? 'multi' : 'single',
+                            },
                             userGuiding: {
                                 containerId: json.userGuiding?.containerId,
                                 enabled: json.userGuiding?.enabled === 'true',
@@ -172,6 +180,10 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 templatesSubmissionForm: {
                     projects: undefined,
                     workflows: undefined,
+                },
+                tenant: {
+                    deletionGracePeriodDays: 30,
+                    mode: 'single',
                 },
                 userGuiding: {
                     containerId: undefined,
