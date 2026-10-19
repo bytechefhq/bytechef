@@ -1,4 +1,4 @@
-import {AiHubChatStatus} from '@/shared/middleware/graphql-types';
+import {AiHubChatKind, AiHubChatStatus} from '@/shared/middleware/graphql-types';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
@@ -18,14 +18,17 @@ const graphQlChat = {
     environmentId: '0',
     id: '101',
     isOwner: true,
+    kind: AiHubChatKind.Standard,
     lastPreview: null,
     messageCount: 5,
     ownerUserId: '3',
+    projectDeploymentId: null,
     status: AiHubChatStatus.Active,
     threadId: 'thread-1',
     title: 'Hello',
     updatedAt: '1716000060000',
     userId: '3',
+    workflowExecutionId: null,
     workspaceId: '7',
 };
 

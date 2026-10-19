@@ -332,15 +332,29 @@ export type AiHubChat = {
   id: Scalars['ID']['output'];
   /** Whether the current caller is this chat's owner. */
   isOwner: Scalars['Boolean']['output'];
+  /**
+   * Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
+   * binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+   * AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
+   * server-side.
+   */
+  kind: AiHubChatKind;
   lastPreview?: Maybe<Scalars['String']['output']>;
   messageCount: Scalars['Int']['output'];
   /** The chat owner's user id, resolved off the row's userId column. */
   ownerUserId: Scalars['Long']['output'];
+  /**
+   * Parent project-deployment id for the workflow execution. Used by the sidebar to group workflow chats by project.
+   * Non-null when {@code kind = WORKFLOW_CHAT}.
+   */
+  projectDeploymentId?: Maybe<Scalars['Long']['output']>;
   status: AiHubChatStatus;
   threadId: Scalars['String']['output'];
   title?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['Long']['output']>;
   userId: Scalars['Long']['output'];
+  /** Composite WorkflowExecutionId string the chat is bound to. Non-null when {@code kind = WORKFLOW_CHAT}. */
+  workflowExecutionId?: Maybe<Scalars['String']['output']>;
   workspaceId: Scalars['Long']['output'];
 };
 
@@ -400,6 +414,11 @@ export enum AiHubChatArtifactStatus {
   Irreversible = 'IRREVERSIBLE'
 }
 
+export enum AiHubChatKind {
+  Standard = 'STANDARD',
+  WorkflowChat = 'WORKFLOW_CHAT'
+}
+
 /**
  * Single chat message in a chat. {@code role} is one of {@code user}/{@code assistant}/{@code system};
  * {@code timestamp} is the message's epoch-milli arrival time.
@@ -407,6 +426,11 @@ export enum AiHubChatArtifactStatus {
 export type AiHubChatMessage = {
   __typename?: 'AiHubChatMessage';
   content: Scalars['String']['output'];
+  /**
+   * The id of the session event behind this row. A user row sent through the AI Hub keeps the AG-UI message id it
+   * was sent with, so the client addresses both loaded and live rows by the same id.
+   */
+  id: Scalars['String']['output'];
   role: Scalars['String']['output'];
   timestamp: Scalars['Long']['output'];
   /**
@@ -932,7 +956,9 @@ export type ChatWorkflow = {
   projectDeploymentId: Scalars['ID']['output'];
   projectId: Scalars['ID']['output'];
   projectName: Scalars['String']['output'];
+  projectWorkflowId: Scalars['ID']['output'];
   workflowExecutionId: Scalars['String']['output'];
+  workflowId: Scalars['ID']['output'];
   workflowLabel: Scalars['String']['output'];
 };
 
@@ -1466,7 +1492,7 @@ export type DataTableWebhook = {
   environmentId: Scalars['Long']['output'];
   id: Scalars['ID']['output'];
   type: DataTableWebhookType;
-  url: Scalars['String']['output'];
+  workflowExecutionId: Scalars['String']['output'];
 };
 
 export enum DataTableWebhookType {
@@ -2068,6 +2094,14 @@ export type KnowledgeBaseSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type KnowledgeBaseStorageUsage = {
+  __typename?: 'KnowledgeBaseStorageUsage';
+  limitBytes: Scalars['Long']['output'];
+  percentage: Scalars['Float']['output'];
+  unlimited: Scalars['Boolean']['output'];
+  usedBytes: Scalars['Long']['output'];
+};
+
 export type KnowledgeBaseTagsEntry = {
   __typename?: 'KnowledgeBaseTagsEntry';
   knowledgeBaseId: Scalars['ID']['output'];
@@ -2335,6 +2369,8 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   /** Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn. */
   appendAiHubChatAssistantMessage: Scalars['Boolean']['output'];
+  /** Archives the caller's active workflow chats in the environment. Returns the number archived. */
+  bulkArchiveWorkflowChatAiHubChats: Scalars['Int']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   /**
    * Cancels the in-flight agent run of a chat. Returns {@code true} when a live run was cancelled and
@@ -2343,6 +2379,8 @@ export type Mutation = {
    */
   cancelAiHubRun: Scalars['Boolean']['output'];
   cancelGenerationJob: Scalars['Boolean']['output'];
+  /** Stops the in-flight turn of a workflow chat. Returns true when a live turn was cancelled. */
+  cancelWorkflowChatTurn: Scalars['Boolean']['output'];
   changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
@@ -2383,6 +2421,12 @@ export type Mutation = {
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpTool?: Maybe<McpTool>;
+  /**
+   * Creates a workflow chat bound to a workflow execution id and its project deployment. Always inserts a new chat. The
+   * caller needs the workspace VIEWER role and the WORKFLOW_VIEW scope, and the workflow must be one the workspace may
+   * chat with; otherwise the call is refused as forbidden.
+   */
+  createWorkflowChatAiHubChat: AiHubChat;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
@@ -2518,10 +2562,12 @@ export type Mutation = {
   testWebSearchProvider: WebSearchProviderTestResult;
   testWorkflowNodeScript: ScriptTestExecution;
   /**
-   * Truncates the chat history, deleting the message at {@code fromMessageIndex} and every message after it.
-   * Returns the number of session events deleted; zero when the index is past the end.
+   * Truncates the chat history at the message with id {@code messageId}: every message after it is deleted, and the
+   * message itself too unless {@code keepMessage} is true. Returns the number of session events deleted, or null
+   * when the chat holds no message with that id. Fails with CONFLICT while a turn is running in the chat, before
+   * anything is deleted.
    */
-  truncateAiHubChatMessages: Scalars['Int']['output'];
+  truncateAiHubChatMessages?: Maybe<Scalars['Int']['output']>;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2618,6 +2664,12 @@ export type MutationAppendAiHubChatAssistantMessageArgs = {
 };
 
 
+export type MutationBulkArchiveWorkflowChatAiHubChatsArgs = {
+  environment: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationCancelAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2632,6 +2684,12 @@ export type MutationCancelAiHubRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCancelWorkflowChatTurnArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2881,6 +2939,15 @@ export type MutationCreateMcpProjectWorkflowArgs = {
 
 export type MutationCreateMcpToolArgs = {
   input: McpToolInput;
+};
+
+
+export type MutationCreateWorkflowChatAiHubChatArgs = {
+  environment: Scalars['Int']['input'];
+  projectDeploymentId: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+  workflowExecutionId: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3303,7 +3370,6 @@ export type MutationInsertDataTableRowArgs = {
 
 export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
   role: Scalars['String']['input'];
 };
 
@@ -3372,6 +3438,7 @@ export type MutationResolveAiHubToolApprovalArgs = {
   comment?: InputMaybe<Scalars['String']['input']>;
   workspaceId: Scalars['ID']['input'];
 };
+
 
 export type MutationRestoreAutomationProjectVersionArgs = {
   id: Scalars['ID']['input'];
@@ -3478,8 +3545,9 @@ export type MutationTestWorkflowNodeScriptArgs = {
 
 
 export type MutationTruncateAiHubChatMessagesArgs = {
-  fromMessageIndex: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
+  keepMessage: Scalars['Boolean']['input'];
+  messageId: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4347,6 +4415,7 @@ export type Query = {
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
   exportDataTableCsv: Scalars['String']['output'];
+  externalInvocationLogs: ExternalInvocationLogPageType;
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
@@ -4365,6 +4434,7 @@ export type Query = {
   knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
   knowledgeBaseEmbeddingActive: Scalars['Boolean']['output'];
+  knowledgeBaseStorageUsage: KnowledgeBaseStorageUsage;
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
@@ -4424,7 +4494,6 @@ export type Query = {
   toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
   toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
   toolEligibleWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
-  toolInvocationLogs: ToolInvocationLogPageType;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   triggerExecutionFileLogs: LogPage;
@@ -4441,10 +4510,10 @@ export type Query = {
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
+  workspaceExternalInvocationLogs: ExternalInvocationLogPageType;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
-  workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
 
 
@@ -5433,19 +5502,6 @@ export type QueryToolEligibleWorkflowPropertiesArgs = {
   workflowId: Scalars['String']['input'];
 };
 
-export type QueryToolInvocationLogsArgs = {
-  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
-  environmentId?: InputMaybe<Scalars['ID']['input']>;
-  fromDate?: InputMaybe<Scalars['Long']['input']>;
-  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
-  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
-  outcome?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
-  toDate?: InputMaybe<Scalars['Long']['input']>;
-  type: PlatformType;
-};
-
 
 export type QueryTriggerDefinitionArgs = {
   componentName: Scalars['String']['input'];
@@ -5574,21 +5630,6 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
   tagId?: InputMaybe<Scalars['ID']['input']>;
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryWorkspaceToolInvocationLogsArgs = {
-  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
-  environmentId: Scalars['ID']['input'];
-  fromDate?: InputMaybe<Scalars['Long']['input']>;
-  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
-  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
-  outcome?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
-  toDate?: InputMaybe<Scalars['Long']['input']>;
-  type: PlatformType;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -5785,40 +5826,6 @@ export type TimeProperty = Property & {
   placeholder?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
-};
-
-export type ToolInvocationLogPageType = {
-  __typename?: 'ToolInvocationLogPageType';
-  content: Array<ToolInvocationLogType>;
-  number: Scalars['Int']['output'];
-  size: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
-};
-
-export type ToolInvocationLogType = {
-  __typename?: 'ToolInvocationLogType';
-  componentName?: Maybe<Scalars['String']['output']>;
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  connectedUserId?: Maybe<Scalars['Long']['output']>;
-  connectionId?: Maybe<Scalars['Long']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  durationMs: Scalars['Int']['output'];
-  environment?: Maybe<Scalars['Int']['output']>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  errorType?: Maybe<Scalars['String']['output']>;
-  externalUserId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  integrationInstanceId?: Maybe<Scalars['Long']['output']>;
-  jobId?: Maybe<Scalars['Long']['output']>;
-  kind: Scalars['String']['output'];
-  mcpServerId?: Maybe<Scalars['Long']['output']>;
-  operationName?: Maybe<Scalars['String']['output']>;
-  outcome: Scalars['String']['output'];
-  surface: Scalars['String']['output'];
-  toolName?: Maybe<Scalars['String']['output']>;
-  workflowName?: Maybe<Scalars['String']['output']>;
-  workspaceId?: Maybe<Scalars['Long']['output']>;
 };
 
 export type TriggerDefinition = {
