@@ -17,13 +17,17 @@ const {FakeHttpAgent, agents} = vi.hoisted(() => {
     class FakeHttpAgent {
         messages: AgentMessageI[] = [];
 
+        sentMessages: AgentMessageI[][] = [];
+
         abortRun = vi.fn();
 
         addMessage = (message: AgentMessageI) => {
             this.messages = [...this.messages, message];
         };
 
-        runAgent = vi.fn(async () => {});
+        runAgent = vi.fn(async () => {
+            this.sentMessages.push(this.messages);
+        });
 
         setMessages = (messages: AgentMessageI[]) => {
             this.messages = messages;
@@ -64,6 +68,7 @@ vi.mock('sonner', () => ({
 function getRuntimeOptions() {
     return vi.mocked(useExternalStoreRuntime).mock.lastCall![0] as unknown as {
         onEdit: (message: AppendMessage) => Promise<void>;
+        onNew: (message: AppendMessage) => Promise<void>;
         onReload: (parentId: string | null) => Promise<void>;
     };
 }
@@ -72,97 +77,186 @@ function getAgent() {
     return agents[agents.length - 1];
 }
 
-const user = (content: string): ThreadMessageLike => ({content, role: 'user'});
-const assistant = (content: string): ThreadMessageLike => ({content, role: 'assistant'});
+function getStoreTexts() {
+    return useCopilotStore.getState().messages.map((message) => message.content);
+}
 
-const agentUser = (content: string): AgentMessageI => ({content, id: content, role: 'user'});
-const agentAssistant = (id: string): AgentMessageI => ({id, role: 'assistant'});
-const agentTool = (id: string): AgentMessageI => ({id, role: 'tool'});
+function getSentTexts() {
+    return getAgent()
+        .sentMessages.at(-1)!
+        .map((message) => `${message.role}: ${message.content}`);
+}
+
+function editMessage(sourceId: string, text: string) {
+    return getRuntimeOptions().onEdit({
+        content: [{text, type: 'text'}],
+        sourceId,
+    } as unknown as AppendMessage);
+}
+
+const user = (content: string, id?: string): ThreadMessageLike => ({content, id, role: 'user'});
+const assistant = (content: string, id?: string): ThreadMessageLike => ({content, id, role: 'assistant'});
+
+const fallbackId = (index: number) => `__external_store_fallback_${index}`;
 
 describe('CopilotRuntimeProvider', () => {
-    beforeEach(() => {
-        agents.length = 0;
-
-        useCopilotStore.setState({
-            conversationId: 'conversation-1',
-            messages: [
-                user('first'),
-                assistant('first reply'),
-                user('second'),
-                assistant('Looking it up.'),
-                assistant('Found it.'),
-            ],
-        });
-
-        render(<CopilotRuntimeProvider>child</CopilotRuntimeProvider>);
-
-        getAgent().messages = [
-            agentUser('first'),
-            agentAssistant('a1'),
-            agentUser('second'),
-            agentAssistant('a2'),
-            agentTool('t1'),
-            agentAssistant('a3'),
-        ];
-    });
-
     afterEach(() => {
         vi.clearAllMocks();
     });
 
-    it('regenerates the whole turn when refreshing one of its middle messages', async () => {
-        await act(async () => {
-            await getRuntimeOptions().onReload('3');
+    describe('with messages that have no id', () => {
+        beforeEach(() => {
+            agents.length = 0;
+
+            useCopilotStore.setState({
+                conversationId: 'conversation-1',
+                messages: [
+                    user('first'),
+                    assistant('first reply'),
+                    user('second'),
+                    assistant('Looking it up.'),
+                    assistant('Found it.'),
+                    user('third'),
+                    assistant('third reply'),
+                ],
+            });
+
+            render(<CopilotRuntimeProvider>child</CopilotRuntimeProvider>);
         });
 
-        expect(useCopilotStore.getState().messages).toEqual([user('first'), assistant('first reply'), user('second')]);
-        expect(getAgent().messages.map((message) => message.id)).toEqual(['first', 'a1', 'second']);
-        expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
+        it('replaces an edited middle message and drops everything after it', async () => {
+            await act(async () => {
+                await editMessage(fallbackId(2), 'second, edited');
+            });
+
+            expect(getStoreTexts()).toEqual(['first', 'first reply', 'second, edited']);
+            expect(getSentTexts()).toEqual(['user: first', 'assistant: first reply', 'user: second, edited']);
+            expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
+        });
+
+        it('regenerates the last reply for its user message', async () => {
+            await act(async () => {
+                await getRuntimeOptions().onReload(fallbackId(5));
+            });
+
+            expect(getStoreTexts()).toEqual(['first', 'first reply', 'second', 'Looking it up.', 'Found it.', 'third']);
+            expect(getSentTexts().at(-1)).toBe('user: third');
+            expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
+        });
+
+        it('regenerates the whole turn when refreshing one of its middle messages', async () => {
+            await act(async () => {
+                await getRuntimeOptions().onReload(fallbackId(3));
+            });
+
+            expect(getStoreTexts()).toEqual(['first', 'first reply', 'second']);
+            expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not refresh when the turn cannot be resolved', async () => {
+            await act(async () => {
+                await getRuntimeOptions().onReload(null);
+            });
+
+            expect(toast.error).toHaveBeenCalledWith('Could not resolve message to refresh');
+            expect(useCopilotStore.getState().messages).toHaveLength(7);
+            expect(getAgent().runAgent).not.toHaveBeenCalled();
+        });
+
+        it('does not edit a message it cannot resolve', async () => {
+            await act(async () => {
+                await editMessage(fallbackId(42), 'edited');
+            });
+
+            expect(toast.error).toHaveBeenCalledWith('Could not resolve edited message');
+            expect(useCopilotStore.getState().messages).toHaveLength(7);
+            expect(getAgent().runAgent).not.toHaveBeenCalled();
+        });
+
+        it('does not edit an assistant message', async () => {
+            await act(async () => {
+                await editMessage(fallbackId(1), 'edited');
+            });
+
+            expect(toast.error).toHaveBeenCalledWith('Could not resolve edited message');
+            expect(getAgent().runAgent).not.toHaveBeenCalled();
+        });
     });
 
-    it('does not refresh when the turn cannot be resolved', async () => {
-        await act(async () => {
-            await getRuntimeOptions().onReload(null);
+    describe('with messages that have ids', () => {
+        beforeEach(() => {
+            agents.length = 0;
+
+            useCopilotStore.setState({
+                conversationId: 'conversation-1',
+                messages: [
+                    user('first', 'user-1'),
+                    assistant('first reply', 'assistant-1'),
+                    user('second', 'user-2'),
+                    assistant('second reply', 'assistant-2'),
+                ],
+            });
+
+            render(<CopilotRuntimeProvider>child</CopilotRuntimeProvider>);
         });
 
-        expect(toast.error).toHaveBeenCalledWith('Could not resolve message to refresh');
-        expect(useCopilotStore.getState().messages).toHaveLength(5);
-        expect(getAgent().runAgent).not.toHaveBeenCalled();
-    });
+        it('replaces an edited message by its id and keeps that id', async () => {
+            await act(async () => {
+                await editMessage('user-1', 'first, edited');
+            });
 
-    it('cuts the agent transcript at the edited user message', async () => {
-        await act(async () => {
-            await getRuntimeOptions().onEdit({
-                content: [{text: 'second, edited', type: 'text'}],
-                sourceId: '2',
-            } as unknown as AppendMessage);
+            expect(useCopilotStore.getState().messages).toEqual([user('first, edited', 'user-1')]);
+            expect(getAgent().sentMessages.at(-1)).toEqual([{content: 'first, edited', id: 'user-1', role: 'user'}]);
         });
 
-        expect(useCopilotStore.getState().messages).toEqual([
-            user('first'),
-            assistant('first reply'),
-            user('second, edited'),
-        ]);
-        expect(getAgent().messages.map((message) => message.content ?? message.id)).toEqual([
-            'first',
-            'a1',
-            'second, edited',
-        ]);
-        expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
-    });
+        it('regenerates the last reply by its parent id', async () => {
+            await act(async () => {
+                await getRuntimeOptions().onReload('user-2');
+            });
 
-    it('does not edit when the agent transcript does not reach back to the message', async () => {
-        getAgent().messages = [agentUser('second'), agentAssistant('a2')];
-
-        await act(async () => {
-            await getRuntimeOptions().onEdit({
-                content: [{text: 'first, edited', type: 'text'}],
-                sourceId: '0',
-            } as unknown as AppendMessage);
+            expect(getStoreTexts()).toEqual(['first', 'first reply', 'second']);
+            expect(getAgent().runAgent).toHaveBeenCalledTimes(1);
         });
 
-        expect(toast.error).toHaveBeenCalledWith('Could not resolve edited message');
-        expect(useCopilotStore.getState().messages[0]).toEqual(user('first'));
-        expect(getAgent().runAgent).not.toHaveBeenCalled();
+        it('keeps the edited user message when the re-run fails', async () => {
+            getAgent().runAgent.mockRejectedValueOnce(new Error('network down'));
+
+            await act(async () => {
+                await editMessage('user-2', 'second, edited');
+            });
+
+            expect(useCopilotStore.getState().messages).toEqual([
+                user('first', 'user-1'),
+                assistant('first reply', 'assistant-1'),
+                user('second, edited', 'user-2'),
+            ]);
+            expect(toast.error).toHaveBeenCalledWith('Failed to update message: network down');
+        });
+
+        it('keeps the user message when a regenerated reply fails', async () => {
+            getAgent().runAgent.mockRejectedValueOnce(new Error('network down'));
+
+            await act(async () => {
+                await getRuntimeOptions().onReload('user-2');
+            });
+
+            expect(useCopilotStore.getState().messages.at(-1)).toEqual(user('second', 'user-2'));
+            expect(toast.error).toHaveBeenCalledWith('Failed to refresh response: network down');
+        });
+
+        it('sends the whole visible conversation even when the agent was rebuilt', async () => {
+            await act(async () => {
+                await getRuntimeOptions().onNew({content: [{text: 'third', type: 'text'}]} as unknown as AppendMessage);
+            });
+
+            expect(getSentTexts()).toEqual([
+                'user: first',
+                'assistant: first reply',
+                'user: second',
+                'assistant: second reply',
+                'user: third',
+            ]);
+            expect(useCopilotStore.getState().messages.at(-1)?.id).toEqual(expect.any(String));
+        });
     });
 });
