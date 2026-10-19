@@ -44,13 +44,15 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ClusterElementNode;
-import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade.ComponentOperation;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
@@ -85,6 +87,9 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     private ComponentConnectionFacade componentConnectionFacade;
 
     @Mock
+    private ConnectionService connectionService;
+
+    @Mock
     private Evaluator evaluator;
 
     @Mock
@@ -108,7 +113,9 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
     void setUp() {
         workflowNodeDynamicPropertiesFacade = new WorkflowNodeDynamicPropertiesFacadeImpl(
             actionDefinitionFacade, clusterElementDefinitionFacade, clusterElementDefinitionService,
-            componentConnectionFacade, evaluator,
+            new ComponentOperationConnectionResolver(
+                componentConnectionFacade, connectionService, workflowTestConfigurationService),
+            evaluator,
             taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowNodeOutputFacade,
             workflowTestConfigurationService);
     }
@@ -570,6 +577,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             .thenReturn(List.of(
                 new WorkflowTestConfigurationConnection(300L, "otherSheets", "script_1"),
                 new WorkflowTestConfigurationConnection(100L, "sheets", "script_1")));
+        Connection boundConnection = connectionOf("googleSheets");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
         when(actionDefinitionFacade.executeDynamicProperties(
             "googleSheets", 1, "insertRow", "values", parameters, List.of("spreadsheetId"), "workflow1", 100L))
                 .thenReturn(expectedProperties);
@@ -591,6 +602,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
             "workflow1", "googleSheets_1", 1L))
                 .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "googleSheets", "googleSheets_1")));
+        Connection boundConnection = connectionOf("googleSheets");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
         when(actionDefinitionFacade.executeDynamicProperties(
             "googleSheets", 1, "insertRow", "values", Map.of(), List.of(), "workflow1", 100L))
                 .thenReturn(expectedProperties);
@@ -610,6 +625,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             .thenReturn(List.of(new ComponentConnection("googleSheets", 1, "trigger_1", "googleSheets", true)));
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "trigger_1", 1L))
             .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "googleSheets", "trigger_1")));
+        Connection boundConnection = connectionOf("googleSheets");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
         when(triggerDefinitionFacade.executeDynamicProperties(
             "googleSheets", 1, "newRow", "columns", Map.of(), List.of(), 100L))
                 .thenReturn(expectedProperties);
@@ -634,6 +653,10 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
                 .thenReturn(List.of(new ComponentConnection("googleSheets", 1, "script_1", "sheets", true)));
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "aiAgent_1", 1L))
             .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "sheets", "aiAgent_1")));
+        Connection boundConnection = connectionOf("googleSheets");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
         when(actionDefinitionFacade.executeDynamicProperties(
             "googleSheets", 1, "insertRow", "values", Map.of(), List.of(), "workflow1", 100L))
                 .thenReturn(expectedProperties);
@@ -715,5 +738,13 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
                 null, Map.of(), List.of(), 1L);
 
         assertEquals(expectedProperties, result);
+    }
+
+    private static Connection connectionOf(String componentName) {
+        Connection connection = mock(Connection.class);
+
+        when(connection.getComponentName()).thenReturn(componentName);
+
+        return connection;
     }
 }

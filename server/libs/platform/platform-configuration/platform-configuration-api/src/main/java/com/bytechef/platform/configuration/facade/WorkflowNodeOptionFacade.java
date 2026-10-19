@@ -17,7 +17,10 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,6 +32,11 @@ public interface WorkflowNodeOptionFacade {
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId);
+
+    List<Option> getWorkflowNodeComponentOperationOptions(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId);
 
     List<Option> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,

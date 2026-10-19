@@ -23,12 +23,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ComponentOperationDynamicPropertiesRequestModel
+ * ComponentOperationPropertyRequestModel
  */
 
-@JsonTypeName("ComponentOperationDynamicPropertiesRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:46:42.503002+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class ComponentOperationDynamicPropertiesRequestModel {
+@JsonTypeName("ComponentOperationPropertyRequest")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:47:06.280758+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public class ComponentOperationPropertyRequestModel {
 
   private @Nullable String clusterElementType;
 
@@ -83,21 +83,21 @@ public class ComponentOperationDynamicPropertiesRequestModel {
 
   private Map<String, Object> parameters = new HashMap<>();
 
-  public ComponentOperationDynamicPropertiesRequestModel() {
+  public ComponentOperationPropertyRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ComponentOperationDynamicPropertiesRequestModel(String componentName, Integer componentVersion, String operationName, OperationTypeEnum operationType) {
+  public ComponentOperationPropertyRequestModel(String componentName, Integer componentVersion, String operationName, OperationTypeEnum operationType) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.operationName = operationName;
     this.operationType = operationType;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel clusterElementType(@Nullable String clusterElementType) {
+  public ComponentOperationPropertyRequestModel clusterElementType(@Nullable String clusterElementType) {
     this.clusterElementType = clusterElementType;
     return this;
   }
@@ -118,7 +118,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.clusterElementType = clusterElementType;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel clusterElementWorkflowNodeName(@Nullable String clusterElementWorkflowNodeName) {
+  public ComponentOperationPropertyRequestModel clusterElementWorkflowNodeName(@Nullable String clusterElementWorkflowNodeName) {
     this.clusterElementWorkflowNodeName = clusterElementWorkflowNodeName;
     return this;
   }
@@ -139,7 +139,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.clusterElementWorkflowNodeName = clusterElementWorkflowNodeName;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel componentName(String componentName) {
+  public ComponentOperationPropertyRequestModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -160,7 +160,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.componentName = componentName;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel componentVersion(Integer componentVersion) {
+  public ComponentOperationPropertyRequestModel componentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -181,7 +181,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.componentVersion = componentVersion;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel connectionKey(@Nullable String connectionKey) {
+  public ComponentOperationPropertyRequestModel connectionKey(@Nullable String connectionKey) {
     this.connectionKey = connectionKey;
     return this;
   }
@@ -202,12 +202,12 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.connectionKey = connectionKey;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel lookupDependsOnPaths(List<String> lookupDependsOnPaths) {
+  public ComponentOperationPropertyRequestModel lookupDependsOnPaths(List<String> lookupDependsOnPaths) {
     this.lookupDependsOnPaths = lookupDependsOnPaths;
     return this;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel addLookupDependsOnPathsItem(String lookupDependsOnPathsItem) {
+  public ComponentOperationPropertyRequestModel addLookupDependsOnPathsItem(String lookupDependsOnPathsItem) {
     if (this.lookupDependsOnPaths == null) {
       this.lookupDependsOnPaths = new ArrayList<>();
     }
@@ -231,7 +231,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.lookupDependsOnPaths = lookupDependsOnPaths;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel operationName(String operationName) {
+  public ComponentOperationPropertyRequestModel operationName(String operationName) {
     this.operationName = operationName;
     return this;
   }
@@ -252,7 +252,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.operationName = operationName;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel operationType(OperationTypeEnum operationType) {
+  public ComponentOperationPropertyRequestModel operationType(OperationTypeEnum operationType) {
     this.operationType = operationType;
     return this;
   }
@@ -273,12 +273,12 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     this.operationType = operationType;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel parameters(Map<String, Object> parameters) {
+  public ComponentOperationPropertyRequestModel parameters(Map<String, Object> parameters) {
     this.parameters = parameters;
     return this;
   }
 
-  public ComponentOperationDynamicPropertiesRequestModel putParametersItem(String key, Object parametersItem) {
+  public ComponentOperationPropertyRequestModel putParametersItem(String key, Object parametersItem) {
     if (this.parameters == null) {
       this.parameters = new HashMap<>();
     }
@@ -310,16 +310,16 @@ public class ComponentOperationDynamicPropertiesRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ComponentOperationDynamicPropertiesRequestModel componentOperationDynamicPropertiesRequest = (ComponentOperationDynamicPropertiesRequestModel) o;
-    return Objects.equals(this.clusterElementType, componentOperationDynamicPropertiesRequest.clusterElementType) &&
-        Objects.equals(this.clusterElementWorkflowNodeName, componentOperationDynamicPropertiesRequest.clusterElementWorkflowNodeName) &&
-        Objects.equals(this.componentName, componentOperationDynamicPropertiesRequest.componentName) &&
-        Objects.equals(this.componentVersion, componentOperationDynamicPropertiesRequest.componentVersion) &&
-        Objects.equals(this.connectionKey, componentOperationDynamicPropertiesRequest.connectionKey) &&
-        Objects.equals(this.lookupDependsOnPaths, componentOperationDynamicPropertiesRequest.lookupDependsOnPaths) &&
-        Objects.equals(this.operationName, componentOperationDynamicPropertiesRequest.operationName) &&
-        Objects.equals(this.operationType, componentOperationDynamicPropertiesRequest.operationType) &&
-        Objects.equals(this.parameters, componentOperationDynamicPropertiesRequest.parameters);
+    ComponentOperationPropertyRequestModel componentOperationPropertyRequest = (ComponentOperationPropertyRequestModel) o;
+    return Objects.equals(this.clusterElementType, componentOperationPropertyRequest.clusterElementType) &&
+        Objects.equals(this.clusterElementWorkflowNodeName, componentOperationPropertyRequest.clusterElementWorkflowNodeName) &&
+        Objects.equals(this.componentName, componentOperationPropertyRequest.componentName) &&
+        Objects.equals(this.componentVersion, componentOperationPropertyRequest.componentVersion) &&
+        Objects.equals(this.connectionKey, componentOperationPropertyRequest.connectionKey) &&
+        Objects.equals(this.lookupDependsOnPaths, componentOperationPropertyRequest.lookupDependsOnPaths) &&
+        Objects.equals(this.operationName, componentOperationPropertyRequest.operationName) &&
+        Objects.equals(this.operationType, componentOperationPropertyRequest.operationType) &&
+        Objects.equals(this.parameters, componentOperationPropertyRequest.parameters);
   }
 
   @Override
@@ -330,7 +330,7 @@ public class ComponentOperationDynamicPropertiesRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComponentOperationDynamicPropertiesRequestModel {\n");
+    sb.append("class ComponentOperationPropertyRequestModel {\n");
     sb.append("    clusterElementType: ").append(toIndentedString(clusterElementType)).append("\n");
     sb.append("    clusterElementWorkflowNodeName: ").append(toIndentedString(clusterElementWorkflowNodeName)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
