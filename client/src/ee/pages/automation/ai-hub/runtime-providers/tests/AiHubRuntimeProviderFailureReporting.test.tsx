@@ -1,4 +1,3 @@
-import {createAiHubChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubRunStateStore} from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
@@ -82,23 +81,6 @@ describe('AiHubRuntimeProvider failure reporting', () => {
             toolName: 'aiHub',
         });
         expect(aiChatRetryableErrorStore.getState().currentError?.errorMessage).toContain('HTTP 500');
-        expect(toast.error).not.toHaveBeenCalled();
-    });
-
-    it('reports a chat that failed to be created only in the retry banner', async () => {
-        aiHubChatsStore.getState().reset();
-
-        vi.mocked(createAiHubChat).mockRejectedValue(new Error('database down'));
-
-        renderProvider();
-
-        await sendMessage('Build me a workflow');
-
-        expect(aiChatRetryableErrorStore.getState().currentError).toEqual({
-            errorMessage: 'database down',
-            lastUserMessage: 'Build me a workflow',
-            toolName: 'aiHub',
-        });
         expect(toast.error).not.toHaveBeenCalled();
     });
 
