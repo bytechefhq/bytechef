@@ -1,7 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {act, fireEvent, render, screen} from '@/shared/util/test-utils';
+import {act, fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const renderLayout = (props: {leftSidebarBody?: boolean; leftSidebarOpen?: boolean} = {}) => {
@@ -20,6 +20,12 @@ const renderLayout = (props: {leftSidebarBody?: boolean; leftSidebarOpen?: boole
     );
 };
 
+const desktopWidth = window.innerWidth;
+
+const setViewportWidth = (width: number) => {
+    Object.defineProperty(window, 'innerWidth', {configurable: true, value: width, writable: true});
+};
+
 describe('LayoutContainer', () => {
     beforeEach(() => {
         vi.useFakeTimers();
@@ -27,6 +33,8 @@ describe('LayoutContainer', () => {
 
     afterEach(() => {
         vi.useRealTimers();
+
+        setViewportWidth(desktopWidth);
     });
 
     it('closes the left sidebar from the header toggle and reopens it', () => {
@@ -75,5 +83,27 @@ describe('LayoutContainer', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Toggle sidebar'}));
 
         expect(screen.getByText('Settings nav').closest('aside')).toHaveClass('lg:-translate-x-full');
+    });
+
+    it('opens the sidebar in a drawer when toggled on a small screen', () => {
+        setViewportWidth(800);
+
+        renderLayout();
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle sidebar'}));
+
+        expect(within(screen.getByRole('dialog')).getByText('Categories')).toBeInTheDocument();
+    });
+
+    it('does not open a drawer when toggled on a large screen', () => {
+        setViewportWidth(1280);
+
+        renderLayout();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle sidebar'}));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 });
