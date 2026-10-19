@@ -23,8 +23,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * re-drive the original tool invocation.
  *
  * <p>
- * No foreign key to {@code ai_hub_chat} — the chat's delete path deletes approvals explicitly, matching how
- * {@code ai_hub_chat_tool} rows are cleaned.
+ * No foreign key to {@code ai_hub_chat}: the chat's delete path deletes approvals explicitly.
  * </p>
  *
  * @version ee
