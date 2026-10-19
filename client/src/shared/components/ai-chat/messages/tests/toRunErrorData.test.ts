@@ -12,11 +12,25 @@ describe('toRunErrorData', () => {
         });
     });
 
-    it('explains that the user lacks the permission for the turn', () => {
-        expect(toRunErrorData({code: 'ACCESS_DENIED'})).toEqual({
-            code: 'ACCESS_DENIED',
+    it('explains that the user lacks the workspace role for the turn', () => {
+        expect(toRunErrorData({code: 'WORKSPACE_ACCESS_DENIED'})).toEqual({
+            code: 'WORKSPACE_ACCESS_DENIED',
             message:
                 "You don't have permission to do this in this workspace. Ask a workspace administrator for access.",
+        });
+    });
+
+    it('explains that the user cannot take part in the chat', () => {
+        expect(toRunErrorData({code: 'CHAT_ACCESS_DENIED'})).toEqual({
+            code: 'CHAT_ACCESS_DENIED',
+            message: "You don't have access to this chat. Start a new chat to continue.",
+        });
+    });
+
+    it('explains an access refusal without a known cause in words that fit any cause', () => {
+        expect(toRunErrorData({code: 'ACCESS_DENIED'})).toEqual({
+            code: 'ACCESS_DENIED',
+            message: "You don't have permission to do this.",
         });
     });
 
