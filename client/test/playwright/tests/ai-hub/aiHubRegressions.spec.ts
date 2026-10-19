@@ -1066,7 +1066,7 @@ test.describe('AI Hub regressions', () => {
     });
 
     test.describe('Approvals for a dropped call', () => {
-        test('approving a card whose call was dropped shows the conflict and runs nothing', async ({
+        test('approving a card whose call was dropped marks it superseded with the reason and runs nothing', async ({
             authenticatedPage: page,
         }) => {
             const conflictMessage = `Approval ${DELETE_PROJECT_APPROVAL.approvalId} no longer matches a tool call in this chat; it was edited or reloaded`;
@@ -1100,16 +1100,22 @@ test.describe('AI Hub regressions', () => {
                 await expect(page.getByText('Tool approval required')).toBeVisible();
             });
 
-            await test.step('Approve and assert the conflict', async () => {
+            await test.step('Approve and assert the card is superseded with the reason', async () => {
                 await page.getByRole('button', {name: 'Approve'}).click();
 
-                await expect(page.getByRole('alert').filter({hasText: conflictMessage})).toBeVisible();
+                await expect(
+                    aiHubPage.toolApprovalCards
+                        .getByRole('status')
+                        .filter({hasText: 'This approval no longer applies: its message was edited or reloaded.'})
+                ).toBeVisible();
 
                 expect(resolveCalls).toHaveLength(1);
 
                 await expect(page.getByText('Approved - the tool ran.')).toHaveCount(0);
 
-                await expect(page.getByRole('button', {name: 'Approve'})).toBeEnabled();
+                await expect(page.getByRole('button', {name: 'Approve'})).toHaveCount(0);
+
+                await expect(aiHubPage.composerInput).toHaveAttribute('placeholder', SEND_A_MESSAGE_PLACEHOLDER);
 
                 expect(attachRequests).toEqual([]);
             });

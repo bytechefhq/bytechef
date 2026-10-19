@@ -34,7 +34,13 @@ import {
 } from '../AiHubRuntimeProvider';
 
 import type {AgentSubscriber} from '@ag-ui/client';
-import type {RunFinishedEvent, ToolCallEndEvent, ToolCallResultEvent, ToolCallStartEvent} from '@ag-ui/core';
+import type {
+    RunFinishedEvent,
+    RunStartedEvent,
+    ToolCallEndEvent,
+    ToolCallResultEvent,
+    ToolCallStartEvent,
+} from '@ag-ui/core';
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', () => ({
     createAiHubChat: vi.fn(),
@@ -106,6 +112,17 @@ const makeRunFinishedParams = (): {
     },
     outcome: 'success',
     pendingToolCallIds: [],
+});
+
+const makeRunStartedParams = (): {event: RunStartedEvent} & SubscriberParamsBaseType => ({
+    ...baseSubscriberParams,
+    event: {
+        rawEvent: undefined,
+        runId: 'run-1',
+        threadId: 'thread-1',
+        timestamp: undefined,
+        type: EventType.RUN_STARTED,
+    },
 });
 
 type RunErrorParamsType = Parameters<NonNullable<AgentSubscriber['onRunErrorEvent']>>[0];
@@ -709,6 +726,27 @@ describe('buildAiHubSubscriber', () => {
 
             expect(addMessage).not.toHaveBeenCalled();
             expect(aiChatToolCallStore.getState().toolCalls['call-late']).toBeUndefined();
+        });
+    });
+
+    describe('onRunStartedEvent', () => {
+        it('tells the turn the server accepted it', () => {
+            const onRunStarted = vi.fn();
+
+            createSubscriber({onRunStarted}).onRunStartedEvent!(makeRunStartedParams());
+
+            expect(onRunStarted).toHaveBeenCalledOnce();
+        });
+
+        it('stays quiet for a turn whose chat is no longer shown', () => {
+            const onRunStarted = vi.fn();
+            const subscriber = createSubscriber({onRunStarted});
+
+            aiHubStore.setState({chatId: 'thread-2'});
+
+            subscriber.onRunStartedEvent!(makeRunStartedParams());
+
+            expect(onRunStarted).not.toHaveBeenCalled();
         });
     });
 
