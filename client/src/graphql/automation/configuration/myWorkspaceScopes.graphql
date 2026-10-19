@@ -1,0 +1,3 @@
+query MyWorkspaceScopes($workspaceId: ID!, $environment: EnvironmentEnum) {
+    myWorkspaceScopes(workspaceId: $workspaceId, environment: $environment)
+}
