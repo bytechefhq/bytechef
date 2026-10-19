@@ -12,6 +12,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -99,7 +100,8 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
             return delegate.call(toolInput, toolContext);
         }
 
-        Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId);
+        Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId)
+            .filter(foundChat -> foundChat.getStatus() != AiHubChatStatus.DELETED);
 
         if (chatOptional.isEmpty()) {
             log.warn("Refusing gated tool={} for thread={}: the chat no longer exists", toolName, threadId);
