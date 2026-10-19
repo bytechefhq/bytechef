@@ -90,7 +90,7 @@ async function expectRowOnAuditEventsPage(page: Page, eventType: string, workspa
     await openAuditEventsPage(page);
 
     await selectAuditEventType(page, eventType);
-    await filterAuditEvents(page, {principal: 'admin'});
+    await filterAuditEvents(page, {dataSearch: String(workspace.id), principal: 'admin'});
 
     const firstRow = auditEventRows(page).first();
 
