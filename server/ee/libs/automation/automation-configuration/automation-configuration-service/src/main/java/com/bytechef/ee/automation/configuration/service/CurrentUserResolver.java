@@ -9,8 +9,6 @@ package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
@@ -56,53 +54,52 @@ public class CurrentUserResolver {
             return OptionalLong.empty();
         }
 
-        try {
-            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
-            if (requestAttributes != null) {
-                Object cached = requestAttributes.getAttribute(
-                    UserIdCache.REQUEST_ATTRIBUTE_KEY, RequestAttributes.SCOPE_REQUEST);
+        OptionalLong userId;
 
-                UserIdCache userIdCache;
+        if (requestAttributes == null) {
+            userId = fetchUserId(login.get(), userService);
+        } else {
+            Object cached = requestAttributes.getAttribute(
+                UserIdCache.REQUEST_ATTRIBUTE_KEY, RequestAttributes.SCOPE_REQUEST);
 
-                if (cached instanceof UserIdCache existing) {
-                    userIdCache = existing;
-                } else {
-                    userIdCache = new UserIdCache();
+            UserIdCache userIdCache;
 
-                    requestAttributes.setAttribute(
-                        UserIdCache.REQUEST_ATTRIBUTE_KEY, userIdCache, RequestAttributes.SCOPE_REQUEST);
-                }
+            if (cached instanceof UserIdCache existing) {
+                userIdCache = existing;
+            } else {
+                userIdCache = new UserIdCache();
 
-                return OptionalLong.of(userIdCache.resolve(login.get(), userService));
+                requestAttributes.setAttribute(
+                    UserIdCache.REQUEST_ATTRIBUTE_KEY, userIdCache, RequestAttributes.SCOPE_REQUEST);
             }
 
-            User user = userService.getUser(login.get());
-
-            return OptionalLong.of(user.getId());
-        } catch (UserNotFoundException exception) {
-            if (log.isDebugEnabled()) {
-                log.debug(
-                    "Authenticated login '{}' has no backing platform user — fail-closed (returning empty).",
-                    login.get());
-            }
-
-            return OptionalLong.empty();
+            userId = userIdCache.resolve(login.get(), userService);
         }
+
+        if (userId.isEmpty() && log.isDebugEnabled()) {
+            log.debug(
+                "Authenticated login '{}' has no backing platform user — fail-closed (returning empty).", login.get());
+        }
+
+        return userId;
+    }
+
+    private static OptionalLong fetchUserId(String login, UserService userService) {
+        return userService.fetchUserByLogin(login)
+            .map(user -> OptionalLong.of(user.getId()))
+            .orElse(OptionalLong.empty());
     }
 
     private static final class UserIdCache {
 
         static final String REQUEST_ATTRIBUTE_KEY = "currentUserResolver.userIdCache";
 
-        private final ConcurrentHashMap<String, Long> logins = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, OptionalLong> logins = new ConcurrentHashMap<>();
 
-        long resolve(String login, UserService userService) {
-            return logins.computeIfAbsent(login, key -> {
-                User user = userService.getUser(key);
-
-                return user.getId();
-            });
+        OptionalLong resolve(String login, UserService userService) {
+            return logins.computeIfAbsent(login, key -> fetchUserId(key, userService));
         }
     }
 }
