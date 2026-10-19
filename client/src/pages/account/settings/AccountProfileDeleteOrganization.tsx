@@ -112,7 +112,7 @@ const DeleteOrganizationSection = ({deletionGracePeriodDays}: {deletionGracePeri
                 <Button
                     icon={<Trash2Icon className="size-4" />}
                     label="Delete organization"
-                    onClick={() => setShowDialog(true)}
+                    onClick={() => handleOpenChange(true)}
                     variant="destructive"
                 />
             </div>

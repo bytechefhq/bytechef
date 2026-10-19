@@ -200,4 +200,81 @@ describe('AccountProfileDeleteOrganization', () => {
 
         expect(screen.getByLabelText('Password')).toBeInTheDocument();
     });
+
+    it('still asks for the password when the linked accounts request fails', async () => {
+        fetchMock.mockImplementationOnce(() => Promise.resolve({ok: false}));
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/account/linked-accounts'));
+
+        await openDialog();
+
+        expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    });
+
+    it('still asks for the password when the linked account has no auth provider', async () => {
+        fetchMock.mockImplementationOnce(() => Promise.resolve({json: () => Promise.resolve({}), ok: true}));
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/account/linked-accounts'));
+
+        await openDialog();
+
+        expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    });
+
+    it('sends no password when an identity provider admin deletes the organization', async () => {
+        authProvider = 'github';
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/account/linked-accounts'));
+
+        await openDialog();
+
+        await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument());
+
+        await userEvent.type(screen.getByLabelText(/to confirm/), 'admin@localhost.com');
+
+        await userEvent.click(getConfirmButton());
+
+        await waitFor(() => expect(hoisted.clearAuthenticationMock).toHaveBeenCalled());
+
+        expect(JSON.parse(String(deleteRequests()[0][1]?.body))).toEqual({
+            confirmation: 'admin@localhost.com',
+            password: null,
+        });
+    });
+
+    it('asks for the login when the account has no email', async () => {
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_ADMIN'], login: 'admin'},
+        });
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await openDialog();
+
+        await userEvent.type(screen.getByLabelText(/to confirm/), 'admin');
+        await userEvent.type(screen.getByLabelText('Password'), 'secret');
+
+        expect(getConfirmButton()).toBeEnabled();
+    });
+
+    it('keeps the delete button disabled when the account has neither email nor login', async () => {
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_ADMIN']},
+        });
+
+        render(<AccountProfileDeleteOrganization />);
+
+        await openDialog();
+
+        await userEvent.type(screen.getByLabelText(/to confirm/), 'admin');
+        await userEvent.type(screen.getByLabelText('Password'), 'secret');
+
+        expect(getConfirmButton()).toBeDisabled();
+    });
 });
