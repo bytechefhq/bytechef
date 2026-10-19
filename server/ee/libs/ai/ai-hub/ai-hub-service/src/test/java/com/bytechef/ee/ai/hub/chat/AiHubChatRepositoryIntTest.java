@@ -131,8 +131,10 @@ public class AiHubChatRepositoryIntTest {
             1L, 10L, 0, AiHubChatStatus.ACTIVE.ordinal(), 100)).isEmpty();
         assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
             1L, 10L, 0, AiHubChatStatus.ARCHIVED.ordinal(), 100)).hasSize(1);
-        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(
-            1L, 10L, 0, 100)).hasSize(1);
+        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            1L, 10L, 0, AiHubChatStatus.DELETED.ordinal(), 100)).hasSize(1);
+        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            1L, 10L, 0, AiHubChatStatus.ARCHIVED.ordinal(), 100)).isEmpty();
     }
 
     @Test
@@ -153,10 +155,10 @@ public class AiHubChatRepositoryIntTest {
     public void testWorkspaceScopedQueriesIgnoreWorkspaceLessChats() {
         saveInWorkspace(buildChat(10L, "thread-orphan", AiHubChatStatus.ACTIVE), null);
 
-        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(1L, 10L, 0, 100))
-            .isEmpty();
-        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(0L, 10L, 0, 100))
-            .isEmpty();
+        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            1L, 10L, 0, AiHubChatStatus.DELETED.ordinal(), 100)).isEmpty();
+        assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            0L, 10L, 0, AiHubChatStatus.DELETED.ordinal(), 100)).isEmpty();
         assertThat(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
             1L, 10L, 0, AiHubChatStatus.ACTIVE.ordinal(), 100)).isEmpty();
     }

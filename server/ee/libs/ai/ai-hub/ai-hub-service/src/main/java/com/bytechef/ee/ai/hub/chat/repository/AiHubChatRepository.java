@@ -43,19 +43,20 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
         long workspaceId, long userId, int environment, int status, int limit);
 
     /**
-     * Same as {@link #findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc} but across ALL statuses —
-     * used when a caller (e.g. the tool-binding lookup) needs every chat regardless of active/archived state.
+     * Same as {@link #findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc} but across every status
+     * except {@code excludedStatus}, for the chat list without a status filter.
      */
     @Query("""
         SELECT cct.* FROM ai_hub_chat cct
         WHERE cct.workspace_id = :workspaceId
           AND cct.user_id = :userId
           AND cct.environment = :environment
+          AND cct.status <> :excludedStatus
         ORDER BY cct.updated_at DESC
         LIMIT :limit
         """)
-    List<AiHubChat> findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(
-        long workspaceId, long userId, int environment, int limit);
+    List<AiHubChat> findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+        long workspaceId, long userId, int environment, int excludedStatus, int limit);
 
     Optional<AiHubChat> findByThreadIdAndUserId(String threadId, long userId);
 
@@ -107,13 +108,17 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
         """)
     int updateMessageCountUnlessDeleted(long id, int messageCount, int deletedStatus, LocalDateTime updatedAt);
 
-    /** Sets {@code updated_at}, touching no other column. */
+    /**
+     * Sets {@code updated_at}, touching no other column, unless the row's current status is {@code deletedStatus}.
+     *
+     * @return the number of rows updated, {@code 0} when the chat is deleted
+     */
     @Modifying
     @Query("""
         UPDATE ai_hub_chat SET updated_at = :updatedAt
-        WHERE id = :id
+        WHERE id = :id AND status <> :deletedStatus
         """)
-    void updateUpdatedAt(long id, LocalDateTime updatedAt);
+    int updateUpdatedAtUnlessDeleted(long id, int deletedStatus, LocalDateTime updatedAt);
 
     /**
      * Sets the status ordinal, touching no other column, unless the row's current status is {@code deletedStatus}.
