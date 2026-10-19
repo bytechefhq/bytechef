@@ -4,9 +4,9 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <!--
-        Per-workspace rules that require or exempt a catalog tool or component action from the AI Hub tool
-        approval gate. A null component_name means the rule applies to every component; the COALESCE in the
-        unique index below is what makes that null collapse correctly instead of always being distinct.
+        Per-workspace rules that require or exempt a catalog tool from the AI Hub tool approval gate. Only
+        CATALOG rules are applied. The COALESCE in the unique index below makes a null component_name collapse
+        correctly instead of always being distinct.
     -->
     <changeSet id="20260902000001" author="Ivica Cardic">
         <createTable tableName="ai_hub_tool_approval_rule">
