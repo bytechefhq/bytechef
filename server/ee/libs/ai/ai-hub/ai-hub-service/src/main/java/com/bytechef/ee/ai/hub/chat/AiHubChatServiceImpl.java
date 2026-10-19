@@ -72,6 +72,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     private static final Logger log = LoggerFactory.getLogger(AiHubChatServiceImpl.class);
 
+    private static final String CHAT_DELETED_MESSAGE = "AiHubChat was deleted and can no longer change";
+
+    private static final int DELETED_STATUS_ORDINAL = AiHubChatStatus.DELETED.ordinal();
+
     private static final int LIST_LIMIT = 100;
 
     /**
@@ -329,6 +333,12 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     public AiHubChat patch(long chatId, long requesterWorkspaceId, long requesterUserId, AiHubChatPatch chatPatch) {
         AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
 
+        AiHubChatStatus status = chatPatch.status();
+
+        if (chat.getStatus() == AiHubChatStatus.DELETED && status != AiHubChatStatus.DELETED) {
+            throw new ConflictException(CHAT_DELETED_MESSAGE);
+        }
+
         LocalDateTime updatedAt = LocalDateTime.now(clock);
 
         String title = chatPatch.title();
@@ -337,7 +347,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             chat.setTitle(title);
             chat.setAutoTitled(false);
 
-            chatRepository.updateTitle(chatId, chat.getTitle(), updatedAt);
+            requireUpdated(
+                chatRepository.updateTitleUnlessDeleted(chatId, chat.getTitle(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
         String lastPreview = chatPatch.lastPreview();
@@ -345,7 +356,9 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         if (lastPreview != null) {
             chat.setLastPreview(lastPreview);
 
-            chatRepository.updateLastPreview(chatId, chat.getLastPreview(), updatedAt);
+            requireUpdated(
+                chatRepository.updateLastPreviewUnlessDeleted(
+                    chatId, chat.getLastPreview(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
         Integer messageCount = chatPatch.messageCount();
@@ -353,15 +366,20 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         if (messageCount != null) {
             chat.setMessageCount(messageCount);
 
-            chatRepository.updateMessageCount(chatId, chat.getMessageCount(), updatedAt);
+            requireUpdated(
+                chatRepository.updateMessageCountUnlessDeleted(
+                    chatId, chat.getMessageCount(), DELETED_STATUS_ORDINAL, updatedAt));
         }
-
-        AiHubChatStatus status = chatPatch.status();
 
         if (status != null) {
             chat.setStatus(status);
 
-            chatRepository.updateStatus(chatId, status.ordinal(), updatedAt);
+            int updatedRowCount = chatRepository.updateStatusUnlessDeleted(
+                chatId, status.ordinal(), DELETED_STATUS_ORDINAL, updatedAt);
+
+            if (status != AiHubChatStatus.DELETED) {
+                requireUpdated(updatedRowCount);
+            }
         }
 
         return chatRepository.findById(chatId)
@@ -692,6 +710,12 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     private AiHubChat loadParticipable(long chatId, long requesterWorkspaceId, long requesterUserId) {
         return load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canParticipate);
+    }
+
+    private static void requireUpdated(int updatedRowCount) {
+        if (updatedRowCount == 0) {
+            throw new ConflictException(CHAT_DELETED_MESSAGE);
+        }
     }
 
     private AiHubChat loadManageable(long chatId, long requesterWorkspaceId, long requesterUserId) {

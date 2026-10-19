@@ -75,6 +75,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @ExtendWith(MockitoExtension.class)
 class AiHubChatServiceTest {
 
+    private static final int DELETED_ORDINAL = AiHubChatStatus.DELETED.ordinal();
+
     private static final long WORKSPACE_ID = 1L;
     private static final long OTHER_WORKSPACE_ID = 2L;
     private static final long USER_ID = 10L;
@@ -310,6 +312,8 @@ class AiHubChatServiceTest {
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
 
+        when(chatRepository.updateTitleUnlessDeleted(anyLong(), any(), anyInt(), any())).thenReturn(1);
+
         AiHubChatPatch patch = new AiHubChatPatch("New title", null, null, null);
 
         AiHubChat result = chatService.patch(1L, WORKSPACE_ID, USER_ID, patch);
@@ -318,10 +322,11 @@ class AiHubChatServiceTest {
         assertThat(result.getMessageCount()).isEqualTo(3);
         assertThat(result.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
 
-        verify(chatRepository).updateTitle(eq(1L), eq("New title"), any(LocalDateTime.class));
-        verify(chatRepository, never()).updateLastPreview(anyLong(), any(), any());
-        verify(chatRepository, never()).updateMessageCount(anyLong(), anyInt(), any());
-        verify(chatRepository, never()).updateStatus(anyLong(), anyInt(), any());
+        verify(chatRepository).updateTitleUnlessDeleted(eq(1L), eq("New title"), eq(DELETED_ORDINAL),
+            any(LocalDateTime.class));
+        verify(chatRepository, never()).updateLastPreviewUnlessDeleted(anyLong(), any(), anyInt(), any());
+        verify(chatRepository, never()).updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
         verify(chatRepository, never()).save(any());
     }
 
@@ -332,12 +337,17 @@ class AiHubChatServiceTest {
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
 
+        when(chatRepository.updateLastPreviewUnlessDeleted(anyLong(), any(), anyInt(), any())).thenReturn(1);
+        when(chatRepository.updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any())).thenReturn(1);
+
         chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", 4, null));
 
-        verify(chatRepository).updateLastPreview(eq(1L), eq("Latest preview"), any(LocalDateTime.class));
-        verify(chatRepository).updateMessageCount(eq(1L), eq(4), any(LocalDateTime.class));
-        verify(chatRepository, never()).updateTitle(anyLong(), any(), any());
-        verify(chatRepository, never()).updateStatus(anyLong(), anyInt(), any());
+        verify(chatRepository).updateLastPreviewUnlessDeleted(
+            eq(1L), eq("Latest preview"), eq(DELETED_ORDINAL), any(LocalDateTime.class));
+        verify(chatRepository).updateMessageCountUnlessDeleted(eq(1L), eq(4), eq(DELETED_ORDINAL),
+            any(LocalDateTime.class));
+        verify(chatRepository, never()).updateTitleUnlessDeleted(anyLong(), any(), anyInt(), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
         verify(chatRepository, never()).save(any());
     }
 
@@ -352,7 +362,106 @@ class AiHubChatServiceTest {
             () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, -1, null)))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        verify(chatRepository, never()).updateMessageCount(anyLong(), anyInt(), any());
+        verify(chatRepository, never()).updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testPatchWithNoFieldsCannotBeBuilt() {
+        assertThatThrownBy(() -> new AiHubChatPatch(null, null, null, null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("at least one");
+    }
+
+    @Test
+    void testPatchTitleOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch("New title", null, null, null)))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchPreviewOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateLastPreviewUnlessDeleted(
+            eq(1L), eq("Latest preview"), eq(DELETED_ORDINAL), any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", null, null)))
+                    .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchMessageCountOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateMessageCountUnlessDeleted(
+            eq(1L), eq(7), eq(DELETED_ORDINAL), any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, 7, null)))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchOfAnAlreadyDeletedChatThrowsConflictBeforeWriting() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)))
+                    .isInstanceOf(ConflictException.class);
+
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testPatchStatusOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateStatusUnlessDeleted(
+            eq(1L), eq(AiHubChatStatus.ARCHIVED.ordinal()), eq(AiHubChatStatus.DELETED.ordinal()),
+            any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)))
+                    .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchStatusToDeletedOfAnAlreadyDeletedChatSucceeds() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateStatusUnlessDeleted(
+            eq(1L), eq(AiHubChatStatus.DELETED.ordinal()), eq(AiHubChatStatus.DELETED.ordinal()),
+            any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        AiHubChat patchedChat = chatService.patch(
+            1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED));
+
+        assertThat(patchedChat).isSameAs(chat);
     }
 
     @Test
