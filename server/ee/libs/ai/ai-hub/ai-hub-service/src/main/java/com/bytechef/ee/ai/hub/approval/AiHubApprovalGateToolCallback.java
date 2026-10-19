@@ -39,6 +39,8 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
         "{\"deferred\":true,\"reason\":\"Another tool call is awaiting approval. Retry after it is resolved.\"}";
     private static final String REFUSED_RESULT =
         "{\"error\":\"approval could not be recorded; the tool was not executed\"}";
+    private static final String CHAT_MISSING_RESULT =
+        "{\"error\":\"the chat no longer exists; the tool was not executed\"}";
 
     private final ToolCallback delegate;
     private final AiHubToolApprovalPolicy policy;
@@ -87,13 +89,6 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
             return delegate.call(toolInput, toolContext);
         }
 
-        Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId);
-
-        if (chatOptional.isEmpty()) {
-            return delegate.call(toolInput, toolContext);
-        }
-
-        AiHubChat chat = chatOptional.get();
         ToolDefinition toolDefinition = getToolDefinition();
 
         String toolName = toolDefinition.name();
@@ -103,6 +98,16 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
         if (!decision.isGated(toolName)) {
             return delegate.call(toolInput, toolContext);
         }
+
+        Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId);
+
+        if (chatOptional.isEmpty()) {
+            log.warn("Refusing gated tool={} for thread={}: the chat no longer exists", toolName, threadId);
+
+            return CHAT_MISSING_RESULT;
+        }
+
+        AiHubChat chat = chatOptional.get();
 
         Optional<AiHubToolApproval> pendingApproval = approvalService.findPending(chat.getId());
 
