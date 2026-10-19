@@ -33,8 +33,10 @@ type FirstArgumentLocationType = {
 type LiteralType = {value: unknown};
 
 type FrameType = {
+    arrayItems: unknown[];
     calleeText?: string;
     character: '(' | '[' | '{';
+    elementIndex: number;
     firstArgumentOfCall: boolean;
     keyForValue?: string;
     keys: string[];
@@ -156,6 +158,38 @@ function closeSegment(frame: FrameType): void {
     frame.valueStart = undefined;
 }
 
+function attachClosedValue(parent: FrameType | undefined, value: unknown): void {
+    if (parent?.character === '{' && parent.segmentKey !== undefined && parent.tokenCount === 3) {
+        parent.literalValue = {value};
+    } else if (parent?.character === '[' && typeof value === 'object') {
+        parent.arrayItems[parent.elementIndex] = value;
+    }
+}
+
+function nestedRootValues(frames: FrameType[], rootFrame: FrameType): Record<string, unknown> {
+    const rootValues: Record<string, unknown> = {...rootFrame.literals};
+
+    let container: Record<string | number, unknown> = rootValues;
+
+    for (let index = frames.indexOf(rootFrame) + 1; index < frames.length; index++) {
+        const frame = frames[index];
+
+        if (frame.keyForValue === undefined || frame.character === '(') {
+            break;
+        }
+
+        const value: Record<string | number, unknown> =
+            frame.character === '{'
+                ? {...frame.literals}
+                : ([...frame.arrayItems] as unknown as Record<number, unknown>);
+
+        container[frames[index - 1].character === '[' ? Number(frame.keyForValue) : frame.keyForValue] = value;
+        container = value;
+    }
+
+    return rootValues;
+}
+
 function isInterpolated(value: string, quote: string, language: ScriptLanguageType): boolean {
     if (language === 'javascript') {
         return quote === '`' && value.includes('${');
@@ -246,14 +280,16 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
             recordToken(top);
 
             frames.push({
+                arrayItems: [],
                 calleeText:
                     character === '('
                         ? (TRAILING_MEMBER_CHAIN.exec(text.slice(0, position).trimEnd())?.[0] ?? '')
                         : undefined,
                 character,
+                elementIndex: 0,
                 firstArgumentOfCall:
                     character === '{' && top?.character === '(' && previous === '(' && top.tokenCount === 0,
-                keyForValue: keyForValue ?? (top?.character === '[' ? '0' : undefined),
+                keyForValue: keyForValue ?? (top?.character === '[' ? String(top.elementIndex) : undefined),
                 keys: [],
                 literals: {},
                 segmentStart: position + 1,
@@ -272,6 +308,13 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
                 closeSegment(closedFrame);
             }
 
+            if (closedFrame && closedFrame.character !== '(') {
+                attachClosedValue(
+                    frames[frames.length - 1],
+                    closedFrame.character === '{' ? closedFrame.literals : closedFrame.arrayItems
+                );
+            }
+
             position++;
 
             continue;
@@ -281,6 +324,14 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
             closeSegment(top);
 
             top.segmentStart = position + 1;
+
+            position++;
+
+            continue;
+        }
+
+        if (top?.character === '[' && character === ',') {
+            top.elementIndex++;
 
             position++;
 
@@ -380,7 +431,7 @@ export function findActionCallKeySlot(
         prefix,
         propertyPath: location.propertyPath,
         rootKeys: location.rootFrame.keys,
-        rootValues: location.rootFrame.literals,
+        rootValues: nestedRootValues(frames, location.rootFrame),
     };
 }
 
@@ -419,6 +470,6 @@ export function findActionCallValueSlot(
         propertyPath: [...location.propertyPath, objectFrame.segmentKey],
         ...(openString && {quote: text[openString.start]}),
         rootKeys: location.rootFrame.keys,
-        rootValues: location.rootFrame.literals,
+        rootValues: nestedRootValues(frames, location.rootFrame),
     };
 }

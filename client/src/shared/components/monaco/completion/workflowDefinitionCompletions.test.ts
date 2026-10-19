@@ -438,3 +438,91 @@ describe('parameter value completions', () => {
         expect(items.map((item) => item.label)).toContain('trigger_1');
     });
 });
+
+describe('bare JSON values and inline scripts', () => {
+    const literalCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () =>
+                [
+                    {name: 'count', options: [{value: 1}, {value: 2}], type: 'INTEGER'},
+                    {name: 'enabled', type: 'BOOLEAN'},
+                    {name: 'note', options: [{value: 'a "b"'}], type: 'STRING'},
+                ] as unknown as Property[]
+        ),
+    };
+
+    it('inserts JSON literals for a bare value', async () => {
+        const source = '{"tasks": [{"type": "x/v1/y", "parameters": {"enabled": t, "note": }}]}';
+        const enabled = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf(': t') + 3,
+            source,
+        });
+        const note = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf('"note": ') + '"note": '.length,
+            source,
+        });
+
+        expect(enabled.map((item) => [item.insertText, item.replaceLength])).toEqual([
+            ['true', 1],
+            ['false', 1],
+        ]);
+        expect(note.map((item) => item.insertText)).toEqual(['"a \\"b\\""']);
+    });
+
+    it('offers the perform parameter names in an inline JavaScript script', async () => {
+        const source =
+            '{"tasks": [{"type": "script/v1/javascript", "parameters": {"script": "function perform(input, connection, context) {\\n con"}}]}';
+        const items = await getWorkflowDefinitionCompletions(request(source, '\\n con'));
+
+        expect(items.map((item) => [item.label, item.replaceLength])).toEqual([
+            ['input', 3],
+            ['connection', 3],
+            ['context', 3],
+        ]);
+    });
+
+    it('replaces only the name typed after an escape sequence in an inline Python script', async () => {
+        const source =
+            '{"tasks": [{"type": "script/v1/python", "parameters": {"script": "def perform(input, connection, context):\\n    inp"}}]}';
+        const items = await getWorkflowDefinitionCompletions(request(source, '    inp'));
+
+        expect(items.find((item) => item.label === 'input')?.replaceLength).toBe(3);
+    });
+
+    it('JSON-escapes values inserted into an inline script', async () => {
+        const source =
+            '{"tasks": [{"name": "s_1", "type": "script/v1/javascript", "connections": [{"componentName": "x", "componentVersion": 1, "name": "xc"}], "parameters": {"script": "function perform(input, connection, context) {\\n context.component.x.y({note: \\""}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf('note: \\"') + 'note: \\"'.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['a \\\\\\"b\\\\\\"']);
+    });
+
+    it('loads connection options in an inline script with the task name', async () => {
+        const loadOptions = vi.fn(async () => [{value: 'tbl1'}]);
+        const optionsCatalog: ComponentCatalogType = {
+            ...catalog,
+            getOperationProperties: vi.fn(
+                async () => [{name: 'tableId', optionsDataSource: {}, type: 'STRING'}] as unknown as Property[]
+            ),
+        };
+        const source =
+            '{"tasks": [{"name": "s_1", "type": "script/v1/javascript", "connections": [{"componentName": "x", "componentVersion": 1, "name": "xc"}], "parameters": {"script": "function perform(input, connection, context) {\\n context.component.x.y({tableId: "}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: optionsCatalog, format: 'json', loadOptions},
+            cursorOffset: source.indexOf('tableId: ') + 'tableId: '.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(["'tbl1'"]);
+        expect(loadOptions).toHaveBeenCalledWith(
+            expect.objectContaining({connectionKey: 'xc', propertyName: 'tableId', workflowNodeName: 's_1'})
+        );
+    });
+});

@@ -136,3 +136,18 @@ describe('findActionCallValueSlot', () => {
         expect(valueAt('context.component.a.b({method: f(')).toBeUndefined();
     });
 });
+
+describe('findActionCallKeySlot nested values', () => {
+    it('keeps closed nested objects and the open objects around the cursor', () => {
+        const slot = findActionCallKeySlot(
+            'context.component.a.b({body: {mode: "raw", size: 2}, items: [{type: "a"}, {type: "list", ',
+            'context.component.a.b({body: {mode: "raw", size: 2}, items: [{type: "a"}, {type: "list", '.length,
+            'javascript'
+        );
+
+        expect(slot).toMatchObject({
+            propertyPath: ['items', '1'],
+            rootValues: {body: {mode: 'raw', size: 2}, items: [{type: 'a'}, {type: 'list'}]},
+        });
+    });
+});

@@ -36,7 +36,7 @@ export type PropertyCompletionRequestType = {
 };
 
 const CONDITION_STRING = /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/g;
-const CONDITION_IDENTIFIER = /[A-Za-z_][\w]*/g;
+const CONDITION_PATH = /[A-Za-z_]\w*(?:\[(?:\d+|index)\]|\.[A-Za-z_]\w*)*/g;
 
 export function findNestedProperties(properties: Property[], path: string[]): Property[] | undefined {
     let current: Property[] | undefined = properties;
@@ -87,6 +87,37 @@ export function buildPropertyItems(properties: Property[], existingKeys: string[
         .sort((first, second) => first.sortText.localeCompare(second.sortText));
 }
 
+function omitPath(values: Record<string, unknown>, path: string[]): Record<string, unknown> {
+    const [firstSegment, ...restOfPath] = path;
+
+    if (firstSegment === undefined || !(firstSegment in values)) {
+        return values;
+    }
+
+    const {[firstSegment]: child, ...otherValues} = values;
+
+    if (restOfPath.length === 0) {
+        return otherValues;
+    }
+
+    if (Array.isArray(child)) {
+        const index = Number(restOfPath[0]);
+        const items = [...child];
+
+        if (restOfPath.length === 1) {
+            delete items[index];
+        } else if (typeof items[index] === 'object' && items[index] !== null) {
+            items[index] = omitPath(items[index] as Record<string, unknown>, restOfPath.slice(1));
+        }
+
+        return {...otherValues, [firstSegment]: items};
+    }
+
+    return typeof child === 'object' && child !== null
+        ? {...otherValues, [firstSegment]: omitPath(child as Record<string, unknown>, restOfPath)}
+        : values;
+}
+
 function detailOf(property: Property): string {
     const type = property.type === 'DYNAMIC_PROPERTIES' ? 'OBJECT' : property.type;
 
@@ -109,20 +140,76 @@ function withDefaults(
     return {...values, ...parameters};
 }
 
-function referencedNames(displayCondition: string, propertyNames: Set<string>): string[] {
-    const identifiers = displayCondition.replace(CONDITION_STRING, ' ').match(CONDITION_IDENTIFIER) ?? [];
+type ContainerType = {
+    dynamic: boolean;
+    properties: Property[];
+};
 
-    return identifiers.filter((identifier) => propertyNames.has(identifier));
+const MISSING = Symbol('missing');
+
+function indexesOf(path: string[]): string[] {
+    return path.filter((segment) => /^\d+$/.test(segment));
+}
+
+function withIndexes(displayCondition: string, indexes: string[]): string {
+    let position = 0;
+
+    return displayCondition.replace(/\[index\]/g, (placeholder) => {
+        const index = indexes[position++];
+
+        return index === undefined ? placeholder : `[${index}]`;
+    });
+}
+
+function referencedPaths(displayCondition: string): string[][] {
+    const condition = displayCondition.replace(CONDITION_STRING, ' ');
+    const paths: string[][] = [];
+
+    for (const match of condition.matchAll(CONDITION_PATH)) {
+        const following = condition.slice(match.index + match[0].length).trimStart();
+
+        if (!following.startsWith('(')) {
+            paths.push(match[0].split(/[.[\]]/).filter(Boolean));
+        }
+    }
+
+    return paths;
+}
+
+function valueAt(values: unknown, path: string[]): unknown {
+    let current = values;
+
+    for (const segment of path) {
+        if (typeof current !== 'object' || current === null || !(segment in current)) {
+            return MISSING;
+        }
+
+        current = (current as Record<string, unknown>)[segment];
+    }
+
+    return current;
+}
+
+function toOptionsPropertyPath(path: string[]): string {
+    return path.reduce(
+        (propertyPath, segment) =>
+            /^\d+$/.test(segment) ? `${propertyPath}[]` : propertyPath ? `${propertyPath}.${segment}` : segment,
+        ''
+    );
 }
 
 async function visibleProperties(
-    request: PropertyCompletionRequestType,
-    values: Record<string, unknown>
+    request: Pick<PropertyCompletionRequestType, 'loadDisplayConditions' | 'properties'>,
+    container: ContainerType,
+    values: Record<string, unknown>,
+    indexes: string[]
 ): Promise<Property[]> {
-    const {loadDisplayConditions, properties} = request;
+    const {loadDisplayConditions} = request;
+    const {properties} = container;
 
     if (
         !loadDisplayConditions ||
+        container.dynamic ||
         Object.keys(values).length === 0 ||
         !properties.some((property) => property.displayCondition)
     ) {
@@ -137,16 +224,22 @@ async function visibleProperties(
         return properties;
     }
 
-    const propertyNames = new Set(properties.map((property) => property.name ?? ''));
+    const topLevelNames = new Set(request.properties.map((property) => property.name ?? ''));
 
     return properties.filter((property) => {
-        if (!property.displayCondition || displayConditions[property.displayCondition] === true) {
+        if (!property.displayCondition) {
             return true;
         }
 
-        const referenced = referencedNames(property.displayCondition, propertyNames);
+        const displayCondition = withIndexes(property.displayCondition, indexes);
 
-        return referenced.length === 0 || referenced.some((name) => !(name in values));
+        if (displayConditions[displayCondition] === true) {
+            return true;
+        }
+
+        const referenced = referencedPaths(displayCondition).filter((path) => topLevelNames.has(path[0]));
+
+        return referenced.length === 0 || referenced.some((path) => valueAt(values, path) === MISSING);
     });
 }
 
@@ -163,33 +256,18 @@ async function dynamicPropertiesOf(
         return await request.loadDynamicProperties(
             property.name,
             property.propertiesDataSource?.propertiesLookupDependsOn ?? [],
-            values
+            omitPath(values, [property.name])
         );
     } catch {
         return [];
     }
 }
 
-export async function getPropertyCompletionItems(
-    request: PropertyCompletionRequestType
-): Promise<CompletionItemDraftType[]> {
-    const {existingKeys, parameters, presentKeys, properties, propertyPath} = request;
-    const values = withDefaults(properties, parameters, presentKeys);
-
-    if (propertyPath.length === 0) {
-        return buildPropertyItems(await visibleProperties(request, values), existingKeys);
-    }
-
-    const nestedProperties = await containerProperties(request, propertyPath, values);
-
-    return nestedProperties ? buildPropertyItems(nestedProperties, existingKeys) : [];
-}
-
-async function containerProperties(
+async function resolveContainer(
     request: Pick<PropertyCompletionRequestType, 'loadDynamicProperties' | 'properties'>,
     path: string[],
     values: Record<string, unknown>
-): Promise<Property[] | undefined> {
+): Promise<ContainerType | undefined> {
     const {properties} = request;
     const [firstSegment, ...restOfPath] = path;
     const dynamicProperty = properties.find(
@@ -197,29 +275,50 @@ async function containerProperties(
     );
 
     if (dynamicProperty) {
-        return findNestedProperties(
+        const dynamicProperties = findNestedProperties(
             await dynamicPropertiesOf(request, dynamicProperty as DynamicPropertiesProperty, values),
             restOfPath
         );
+
+        return dynamicProperties && {dynamic: true, properties: dynamicProperties};
     }
 
-    return findNestedProperties(properties, path);
+    const nestedProperties = findNestedProperties(properties, path);
+
+    return nestedProperties && {dynamic: false, properties: nestedProperties};
+}
+
+export async function getPropertyCompletionItems(
+    request: PropertyCompletionRequestType
+): Promise<CompletionItemDraftType[]> {
+    const {existingKeys, parameters, presentKeys, properties, propertyPath} = request;
+    const values = withDefaults(properties, parameters, presentKeys);
+    const container = await resolveContainer(request, propertyPath, values);
+
+    if (!container) {
+        return [];
+    }
+
+    return buildPropertyItems(
+        await visibleProperties(request, container, values, indexesOf(propertyPath)),
+        existingKeys
+    );
 }
 
 async function optionsOf(
     request: PropertyValueRequestType,
     property: OptionPropertyType,
     values: Record<string, unknown>,
-    topLevel: boolean
+    container: ContainerType
 ): Promise<Option[]> {
     if (property.options?.length) {
         return property.options;
     }
 
-    if (property.optionsDataSource && request.loadOptions && topLevel && property.name) {
+    if (property.optionsDataSource && request.loadOptions && !container.dynamic) {
         try {
             return await request.loadOptions(
-                property.name,
+                toOptionsPropertyPath(request.propertyPath),
                 property.optionsDataSource.optionsLookupDependsOn ?? [],
                 values
             );
@@ -243,23 +342,18 @@ export async function getPropertyValueItems(request: PropertyValueRequestType): 
         return [];
     }
 
-    const topLevel = propertyPath.length === 1;
-    const values = withDefaults(properties, parameters, presentKeys);
+    const values = omitPath(withDefaults(properties, parameters, presentKeys), propertyPath);
+    const container = await resolveContainer(request, propertyPath.slice(0, -1), values);
+    const property = container?.properties.find((candidate) => candidate.name === propertyName) as
+        OptionPropertyType | undefined;
 
-    if (topLevel) {
-        delete values[propertyName];
-    }
-
-    const container = await containerProperties(request, propertyPath.slice(0, -1), values);
-    const property = container?.find((candidate) => candidate.name === propertyName) as OptionPropertyType | undefined;
-
-    if (!property) {
+    if (!container || !property) {
         return [];
     }
 
     const items: CompletionItemDraftType[] = [];
 
-    for (const option of await optionsOf(request, property, values, topLevel)) {
+    for (const option of await optionsOf(request, property, values, container)) {
         const insertText = isPrimitive(option.value) ? toInsertText(option.value) : undefined;
 
         if (insertText === undefined) {
