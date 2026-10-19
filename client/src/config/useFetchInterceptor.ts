@@ -33,7 +33,7 @@ function isCsrfProtectedUrl(url: string): boolean {
 function handlesErrorInline(url: string): boolean {
     return (
         url.includes('/approval-form/') ||
-        url.includes('/component-actions/dynamic-properties/') ||
+        url.includes('/component-operations/dynamic-properties/') ||
         isInlineTestOutputUrl(url) ||
         url.includes('/ai/chat/ai_hub/status') ||
         /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url)

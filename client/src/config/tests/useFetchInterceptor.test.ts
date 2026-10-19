@@ -359,7 +359,7 @@ describe('useFetchInterceptor', () => {
             const response = createMockResponse({
                 jsonData: {detail: 'Connection failed', title: 'Internal Server Error'},
                 status: 500,
-                url: 'http://localhost/internal/workflows/w1/workflow-nodes/script_1/component-actions/dynamic-properties/fields?environmentId=1',
+                url: 'http://localhost/internal/workflows/w1/workflow-nodes/script_1/component-operations/dynamic-properties/fields?environmentId=1',
             });
 
             hoisted.registeredHandlers!.response(response);

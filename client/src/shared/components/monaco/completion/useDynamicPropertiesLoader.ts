@@ -1,4 +1,7 @@
-import {WorkflowNodeDynamicPropertiesApi} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentOperationDynamicPropertiesRequestOperationTypeEnum,
+    WorkflowNodeDynamicPropertiesApi,
+} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
@@ -18,11 +21,20 @@ export function useDynamicPropertiesLoader(
             return undefined;
         }
 
-        return ({propertyName, workflowNodeName, ...componentActionDynamicPropertiesRequest}) =>
-            queryClient.fetchQuery({
+        return ({clusterElementNode, operationKind, propertyName, workflowNodeName, ...operationRequest}) => {
+            const componentOperationDynamicPropertiesRequest = {
+                ...operationRequest,
+                ...clusterElementNode,
+                operationType:
+                    operationKind === 'trigger'
+                        ? ComponentOperationDynamicPropertiesRequestOperationTypeEnum.Trigger
+                        : ComponentOperationDynamicPropertiesRequestOperationTypeEnum.Action,
+            };
+
+            return queryClient.fetchQuery({
                 queryFn: () =>
-                    new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeComponentActionDynamicProperties({
-                        componentActionDynamicPropertiesRequest,
+                    new WorkflowNodeDynamicPropertiesApi().getWorkflowNodeComponentOperationDynamicProperties({
+                        componentOperationDynamicPropertiesRequest,
                         environmentId,
                         id: workflowId,
                         propertyName,
@@ -35,9 +47,10 @@ export function useDynamicPropertiesLoader(
                     workflowNodeName,
                     propertyName,
                     environmentId,
-                    componentActionDynamicPropertiesRequest,
+                    componentOperationDynamicPropertiesRequest,
                 ],
                 staleTime: DYNAMIC_PROPERTIES_STALE_TIME,
             });
+        };
     }, [environmentId, queryClient, workflowId]);
 }

@@ -360,11 +360,13 @@ describe('getScriptCompletions for runtime action properties', () => {
 
         expect(items.map((item) => item.label)).toEqual(['Email']);
         expect(loadDynamicProperties).toHaveBeenCalledWith({
-            actionName: 'createRecord',
+            clusterElementNode: undefined,
             componentName: 'airtable',
             componentVersion: 1,
             connectionKey: 'at',
             lookupDependsOnPaths: ['baseId'],
+            operationKind: 'action',
+            operationName: 'createRecord',
             parameters: {baseId: 'app1'},
             propertyName: 'fields',
             workflowNodeName: 'script_1',
@@ -383,6 +385,53 @@ describe('getScriptCompletions for runtime action properties', () => {
         const items = await getScriptCompletions({context, cursorOffset: source.length, source});
 
         expect(items.map((item) => item.label)).toEqual(['baseId', 'fields']);
+    });
+
+    it('passes the cluster element of a script inside a cluster root', async () => {
+        const loadDynamicProperties = vi.fn(async () => [] as Property[]);
+        const context: ScriptCompletionContextI = {
+            clusterElementNode: {clusterElementType: 'tools', clusterElementWorkflowNodeName: 'script_1'},
+            components: runtimeCatalog,
+            connections: [{componentName: 'airtable', componentVersion: 1, name: 'at'}],
+            input: {},
+            kind: 'script',
+            language: 'javascript',
+            loadDynamicProperties,
+            workflowNodeName: 'aiAgent_1',
+        };
+        const source = base + '{fields: {';
+
+        await getScriptCompletions({context, cursorOffset: source.length, source});
+
+        expect(loadDynamicProperties).toHaveBeenCalledWith(
+            expect.objectContaining({
+                clusterElementNode: {clusterElementType: 'tools', clusterElementWorkflowNodeName: 'script_1'},
+                workflowNodeName: 'aiAgent_1',
+            })
+        );
+    });
+
+    it('loads dynamic properties for the enclosing code workflow task and its declared connection', async () => {
+        const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
+        const context: CodeWorkflowCompletionContextI = {
+            components: runtimeCatalog,
+            kind: 'codeWorkflow',
+            language: 'javascript',
+            loadDynamicProperties,
+        };
+        const source =
+            '({workflows: [{name: "w", tasks: [{name: "createRow", connections: [{componentName: "airtable", componentVersion: 1, name: "at"}], perform: function (context) {\ncontext.component.airtable.createRecord({baseId: "app1", fields: {';
+        const items = await getScriptCompletions({context, cursorOffset: source.length, source});
+
+        expect(items.map((item) => item.label)).toEqual(['Email']);
+        expect(loadDynamicProperties).toHaveBeenCalledWith(
+            expect.objectContaining({
+                connectionKey: 'at',
+                parameters: {baseId: 'app1'},
+                propertyName: 'fields',
+                workflowNodeName: 'createRow',
+            })
+        );
     });
 
     it('offers no dynamic properties without a connection declared for the component', async () => {

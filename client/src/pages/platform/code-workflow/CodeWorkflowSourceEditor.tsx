@@ -3,13 +3,16 @@ import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
 import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
+import {useDynamicPropertiesLoader} from '@/shared/components/monaco/completion/useDynamicPropertiesLoader';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {Settings2Icon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
@@ -123,14 +126,23 @@ const CodeWorkflowSourceEditor = ({
 
     const monacoLanguage = MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE[language as CodeWorkflowLanguage];
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workflowId = useWorkflowDataStore((state) => state.workflow.id);
+
     const components = useComponentCatalog({embedded});
+    const loadDynamicProperties = useDynamicPropertiesLoader(workflowId, currentEnvironmentId);
 
     const completionContext = useMemo<CompletionContextType | undefined>(
         () =>
             monacoLanguage && SCRIPT_MONACO_LANGUAGES.includes(monacoLanguage)
-                ? {components, kind: 'codeWorkflow', language: monacoLanguage as ScriptLanguageType}
+                ? {
+                      components,
+                      kind: 'codeWorkflow',
+                      language: monacoLanguage as ScriptLanguageType,
+                      loadDynamicProperties,
+                  }
                 : undefined,
-        [components, monacoLanguage]
+        [components, loadDynamicProperties, monacoLanguage]
     );
 
     useCompletionContext(model, completionContext);
