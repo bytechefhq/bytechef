@@ -171,7 +171,7 @@ An agent needs a model. Connect any of the 12 LLM providers with an API key, or 
 ## Workflow Automation
 
 - **Visual editor** with JSON underneath, Git-friendly
-- **Flow controls:** `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate` · `waitForApproval`
+- **Flow controls:** `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate`, plus human approvals with the `approval` component
 - **Triggers:** static & dynamic webhooks · polling · hybrid · app-event listeners · callable, plus schedule and form components
 - **Polyglot code:** JavaScript · Python · Ruby on GraalVM
 - **Durable execution and orchestration** on the Atlas runtime: every task execution is persisted in Postgres, so a stopped, failed or approval-paused run resumes from the task it reached. Queue mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
