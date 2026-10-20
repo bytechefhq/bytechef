@@ -15,6 +15,12 @@ interface MockIntegrationI {
     name: string;
 }
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     configurationDialogProps: vi.fn(),
     configurationsSheetProps: vi.fn(),

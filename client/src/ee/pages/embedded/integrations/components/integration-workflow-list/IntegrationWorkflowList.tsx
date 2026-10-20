@@ -14,8 +14,10 @@ import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/inte
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import WorkflowListSkeleton from '@/shared/components/WorkflowListSkeleton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -39,6 +41,8 @@ const IntegrationWorkflowList = ({
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
     const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const navigate = useNavigate();
 
@@ -146,30 +150,36 @@ const IntegrationWorkflowList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
-                                <Button onClick={() => setShowWorkflowDialog(true)}>Create Workflow</Button>
+                            canCreateWorkflow && (
+                                <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
+                                    <Button onClick={() => setShowWorkflowDialog(true)}>Create Workflow</Button>
 
-                                <DropdownMenu onOpenChange={handleOpenChange}>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-label="More Workflow Creation Actions"
-                                            icon={<ChevronDownIcon />}
-                                            ref={dropdownMenuTriggerRef}
-                                        />
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenu onOpenChange={handleOpenChange}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-label="More Workflow Creation Actions"
+                                                icon={<ChevronDownIcon />}
+                                                ref={dropdownMenuTriggerRef}
+                                            />
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="start" alignOffset={alignOffset}>
-                                        <DropdownMenuItem
-                                            icon={<UploadIcon />}
-                                            label="Import Workflow"
-                                            onClick={() => hiddenFileInputRef.current?.click()}
-                                        />
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
+                                        <DropdownMenuContent align="start" alignOffset={alignOffset}>
+                                            <DropdownMenuItem
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
+                                                onClick={() => hiddenFileInputRef.current?.click()}
+                                            />
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            )
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new workflow."
+                        message={
+                            canCreateWorkflow
+                                ? 'Get started by creating a new workflow.'
+                                : 'There are no workflows yet.'
+                        }
                         title="No Workflows"
                     />
                 </div>

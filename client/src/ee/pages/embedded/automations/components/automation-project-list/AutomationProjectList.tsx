@@ -8,6 +8,7 @@ import {
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectConfigurationsQuery,
     AutomationProjectTagsQuery,
@@ -78,6 +79,8 @@ const AutomationProjectList = ({
         return new Set(projectId ? [projectId] : []);
     });
 
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+
     const handleConfigurationSaved = (projectId: string) => {
         setActiveTabs((previousActiveTabs) => ({...previousActiveTabs, [projectId]: 'configurations'}));
 
@@ -134,8 +137,8 @@ const AutomationProjectList = ({
                         <AutomationProjectListItemTabs
                             actions={
                                 (activeTabs[project.id] || 'workflows') === 'workflows'
-                                    ? !project.codeWorkflowProject &&
-                                      project.workflowTemplates.length > 0 && (
+                                    ? project.workflowTemplates.length > 0 &&
+                                      canCreateWorkflow && (
                                           <ButtonGroup aria-label="Workflow Creation Actions">
                                               <Button
                                                   aria-label="Create Workflow"

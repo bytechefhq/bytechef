@@ -15,6 +15,7 @@ import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/int
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys, useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
@@ -49,6 +50,8 @@ const Integrations = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
     const unifiedApiCategory = searchParams.get('unifiedApiCategory') ?? undefined;
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -94,6 +97,7 @@ const Integrations = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateIntegration &&
                         integrations &&
                         (integrations.length > 0 || hasActiveFilter) && (
                             <ButtonGroup>
@@ -175,7 +179,7 @@ const Integrations = () => {
                         icon={<FilterXIcon />}
                         title="No matching integrations"
                     />
-                ) : (
+                ) : canCreateIntegration ? (
                     <EmptyState
                         actions={
                             <ButtonGroup className="mx-auto">
@@ -218,6 +222,12 @@ const Integrations = () => {
                     >
                         <JourneySteps aria-label="Getting started" steps={INTEGRATION_STEPS} />
                     </EmptyState>
+                ) : (
+                    <EmptyState
+                        description="There are no integrations yet."
+                        icon={<SquareIcon />}
+                        title="No Integrations"
+                    />
                 )}
             </PageLoader>
 
