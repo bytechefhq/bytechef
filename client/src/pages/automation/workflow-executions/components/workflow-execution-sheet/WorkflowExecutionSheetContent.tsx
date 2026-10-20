@@ -18,6 +18,7 @@ import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-ex
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
@@ -30,6 +31,7 @@ import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
     dialogOpen: boolean;
+    embedded?: boolean;
     focusedExecution?: FocusedExecutionI;
     focusedTaskExecutionError?: boolean;
     handleBreadcrumbNavigate: (index: number) => void;
@@ -57,6 +59,7 @@ interface WorkflowExecutionSheetContentProps {
 const WorkflowExecutionSheetContent = ({
     activeTab,
     dialogOpen,
+    embedded = false,
     focusedExecution,
     focusedTaskExecutionError,
     handleBreadcrumbNavigate,
@@ -82,7 +85,10 @@ const WorkflowExecutionSheetContent = ({
 }: WorkflowExecutionSheetContentProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const canViewExecutionDetails = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasWorkspaceExecutionDetailsScope = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasEmbeddedExecutionDetailsScope = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
+
+    const canViewExecutionDetails = embedded ? hasEmbeddedExecutionDetailsScope : hasWorkspaceExecutionDetailsScope;
 
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 

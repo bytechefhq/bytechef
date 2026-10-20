@@ -4,7 +4,7 @@ import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 // Underline tab styling that matches the workflow node details panel — brand-colored active
 // bottom border + text, no pill background — so tabs read consistently across the app.
@@ -16,7 +16,7 @@ interface ConnectedUserSheetPanelProps {
 }
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
-    const isTenantAdmin = useIsTenantAdmin();
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
 
     return (
         <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
@@ -32,7 +32,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Integrations
                     </TabsTrigger>
 
-                    {isTenantAdmin && (
+                    {canViewMcpServers && (
                         <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
                             MCP Servers
                         </TabsTrigger>
@@ -52,7 +52,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                {isTenantAdmin && (
+                {canViewMcpServers && (
                     <TabsContent value="mcp-servers">
                         {connectedUser.id != null && (
                             <ConnectedUserSheetPanelMcpServerList

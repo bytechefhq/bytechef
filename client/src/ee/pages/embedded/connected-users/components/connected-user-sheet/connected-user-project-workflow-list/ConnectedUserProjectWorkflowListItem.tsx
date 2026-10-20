@@ -8,6 +8,7 @@ import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/autom
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectsQuery,
     ConnectedUserProjectsQuery,
@@ -50,6 +51,9 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+
     const queryClient = useQueryClient();
 
     const deleteConnectedUserProjectWorkflowMutation = useDeleteConnectedUserProjectWorkflowMutation({
@@ -215,7 +219,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                                         <Switch
                                             aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
                                             checked={connectedUserProjectWorkflow.enabled}
-                                            disabled={enableDisabled}
+                                            disabled={!canManageConnectedUser || enableDisabled}
                                             onCheckedChange={(value) => {
                                                 enableConnectedUserProjectWorkflowMutation.mutate({
                                                     enable: value,
@@ -233,7 +237,9 @@ const ConnectedUserProjectWorkflowListItem = ({
                         </div>
                     </div>
 
-                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                    {canDeleteConnectedUser && (
+                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                    )}
                 </div>
             </li>
 
