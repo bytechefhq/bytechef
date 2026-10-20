@@ -18,6 +18,7 @@ Name | Type
 `lastStatus` | [ProjectStatus](ProjectStatus.md)
 `lastProjectVersion` | number
 `uuid` | string
+`visibility` | string
 
 ## Example
 
@@ -37,6 +38,7 @@ const example = {
   "lastStatus": null,
   "lastProjectVersion": null,
   "uuid": null,
+  "visibility": null,
 } satisfies ProjectBasic
 
 console.log(example)
