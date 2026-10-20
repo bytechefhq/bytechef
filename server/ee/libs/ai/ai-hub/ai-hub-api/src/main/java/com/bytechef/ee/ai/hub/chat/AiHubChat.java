@@ -60,6 +60,15 @@ public class AiHubChat {
     @Column("environment")
     private int environment;
 
+    @Column("kind")
+    private int kind = AiHubChatKind.STANDARD.ordinal();
+
+    @Column("workflow_execution_id")
+    private String workflowExecutionId;
+
+    @Column("project_deployment_id")
+    private Long projectDeploymentId;
+
     @Column("auto_titled")
     private boolean autoTitled = true;
 
@@ -169,6 +178,32 @@ public class AiHubChat {
         if (environment != null) {
             this.environment = environment.ordinal();
         }
+    }
+
+    public AiHubChatKind getKind() {
+        return EnumOrdinals.fromOrdinal(kind, AiHubChatKind.class);
+    }
+
+    public void setKind(AiHubChatKind kind) {
+        if (kind != null) {
+            this.kind = kind.ordinal();
+        }
+    }
+
+    public String getWorkflowExecutionId() {
+        return workflowExecutionId;
+    }
+
+    public void setWorkflowExecutionId(String workflowExecutionId) {
+        this.workflowExecutionId = workflowExecutionId;
+    }
+
+    public Long getProjectDeploymentId() {
+        return projectDeploymentId;
+    }
+
+    public void setProjectDeploymentId(Long projectDeploymentId) {
+        this.projectDeploymentId = projectDeploymentId;
     }
 
     public boolean isAutoTitled() {

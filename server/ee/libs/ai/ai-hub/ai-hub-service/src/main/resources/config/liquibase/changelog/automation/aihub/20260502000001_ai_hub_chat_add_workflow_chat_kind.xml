@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260502000001-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_chat">
+            <column name="kind" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_execution_id" type="VARCHAR(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="project_deployment_id" tableName="ai_hub_chat"/>
+            <dropColumn columnName="workflow_execution_id" tableName="ai_hub_chat"/>
+            <dropColumn columnName="kind" tableName="ai_hub_chat"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
