@@ -18,7 +18,6 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.constant.MetadataConstants;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
@@ -32,6 +31,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
+import com.bytechef.atlas.coordinator.task.UnfinishedTaskExecutionCanceller;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
@@ -71,6 +71,7 @@ public class TaskCoordinator {
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
+    private final UnfinishedTaskExecutionCanceller unfinishedTaskExecutionCanceller;
 
     @SuppressFBWarnings("EI")
     public TaskCoordinator(
@@ -87,6 +88,8 @@ public class TaskCoordinator {
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
+        this.unfinishedTaskExecutionCanceller = new UnfinishedTaskExecutionCanceller(
+            taskDispatcher, taskExecutionService);
     }
 
     /**
@@ -201,30 +204,10 @@ public class TaskCoordinator {
 
         Job job = jobService.setStatusToStopped(stopJobEvent.getJobId());
 
+        unfinishedTaskExecutionCanceller.cancel(stopJobEvent.getJobId());
+
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
-
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(stopJobEvent.getJobId());
-
-        Long cancelledTaskExecutionId = null;
-
-        for (TaskExecution taskExecution : taskExecutions) {
-            TaskExecution.Status status = taskExecution.getStatus();
-
-            if (status != null && status.isTerminated()) {
-                continue;
-            }
-
-            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
-
-            if (taskExecutionService.cancelIfUnfinished(taskExecutionId) && cancelledTaskExecutionId == null) {
-                cancelledTaskExecutionId = taskExecutionId;
-            }
-        }
-
-        if (cancelledTaskExecutionId != null) {
-            taskDispatcher.dispatch(new CancelControlTask(stopJobEvent.getJobId(), cancelledTaskExecutionId));
-        }
 
         if (log.isDebugEnabled()) {
             log.debug("Job id={} stopped", stopJobEvent.getJobId());

@@ -18,6 +18,8 @@ package com.bytechef.atlas.coordinator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +29,7 @@ import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
@@ -51,6 +54,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -267,11 +271,20 @@ class TaskCoordinatorTest {
 
         TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
 
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            List.of(), List.of(), mock(ApplicationEventPublisher.class), mock(JobExecutor.class), jobService,
-            taskCompletionHandler, taskDispatcher, taskExecutionService);
+            List.of(), List.of(), eventPublisher, mock(JobExecutor.class), jobService, taskCompletionHandler,
+            taskDispatcher, taskExecutionService);
 
         taskCoordinator.onStopJobEvent(new StopJobEvent(4567L));
+
+        InOrder inOrder = inOrder(taskExecutionService, eventPublisher);
+
+        inOrder.verify(taskExecutionService)
+            .cancelIfUnfinished(4L);
+        inOrder.verify(eventPublisher)
+            .publishEvent(isA(JobStatusApplicationEvent.class));
 
         verify(taskExecutionService).cancelIfUnfinished(1L);
         verify(taskExecutionService, never()).cancelIfUnfinished(2L);
