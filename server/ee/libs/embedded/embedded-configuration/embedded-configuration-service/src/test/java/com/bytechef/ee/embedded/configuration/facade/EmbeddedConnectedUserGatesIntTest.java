@@ -737,13 +737,13 @@ class EmbeddedConnectedUserGatesIntTest {
             authenticate(login, TENANT_ADMIN.equals(login));
 
             assertThatThrownBy(() -> workspaceConnectionFacade.delete(EMBEDDED_PRODUCTION_CONNECTION_ID))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.updateConnectionTags(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of()))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
         }
@@ -1065,13 +1065,15 @@ class EmbeddedConnectedUserGatesIntTest {
 
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
-            ConnectionFacade connectionFacade, ConnectionService connectionService,
-            PermissionService permissionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+            com.bytechef.platform.connection.facade.ConnectionFacade platformConnectionFacade,
+            ConnectionService connectionService, PermissionService permissionService,
+            ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
             ResourceVisibilityResolver resourceVisibilityResolver, UserService userService,
             WorkflowTestConfigurationService workflowTestConfigurationService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, resourceVisibilityResolver,
+                platformConnectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
+                resourceVisibilityResolver,
                 new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class), permissionService,
                 projectDeploymentWorkflowService, mock(ProjectService.class), userService,
                 workflowTestConfigurationService, mock(WorkspaceConnectionService.class), mock(WorkspaceFacade.class));

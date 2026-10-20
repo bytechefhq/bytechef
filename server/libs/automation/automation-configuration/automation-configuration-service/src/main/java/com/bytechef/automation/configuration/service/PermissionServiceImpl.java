@@ -54,21 +54,21 @@ import org.springframework.stereotype.Service;
 @ConditionalOnCEVersion
 public class PermissionServiceImpl implements PermissionService {
 
+    private final CurrentUserResolver currentUserResolver;
     private final ProjectRepository projectRepository;
-    private final UserService userService;
     private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
     private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
     private final ResourceVisibilityResolver resourceVisibilityResolver;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
-        ProjectRepository projectRepository, UserService userService,
+        CurrentUserResolver currentUserResolver, ProjectRepository projectRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceVisibilityProvider> resourceVisibilityProviders,
         ResourceVisibilityResolver resourceVisibilityResolver) {
 
+        this.currentUserResolver = currentUserResolver;
         this.projectRepository = projectRepository;
-        this.userService = userService;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
         this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
@@ -239,12 +239,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
     public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
