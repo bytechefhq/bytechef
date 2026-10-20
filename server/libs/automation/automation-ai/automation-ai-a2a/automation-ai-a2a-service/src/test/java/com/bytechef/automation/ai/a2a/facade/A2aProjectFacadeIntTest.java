@@ -214,6 +214,9 @@ class A2aProjectFacadeIntTest {
         @Autowired
         private ProjectDeploymentRepository projectDeploymentRepository;
 
+        @Autowired
+        private ProjectDeploymentService systemProjectDeploymentService;
+
         @MockitoSpyBean
         private ProjectDeploymentFacade systemProjectDeploymentFacade;
 
@@ -300,12 +303,32 @@ class A2aProjectFacadeIntTest {
 
         @Test
         void testCreateA2aProjectHidesItsSystemDeploymentFromTheProjectDeploymentList() {
-            a2aProjectFacade.createA2aProject(a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId));
 
-            assertThat(projectDeploymentRepository.findAll()).hasSize(1);
+            assertThat(projectDeploymentRepository.findById(a2aProject.getProjectDeploymentId()))
+                .hasValueSatisfying(
+                    projectDeployment -> assertThat(projectDeployment.getName()).isEqualTo(a2aServer.getName()));
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(null, null, project.getId(), null, null))
                     .isEmpty();
+        }
+
+        @Test
+        void testCreateA2aProjectNamesItsDeploymentAfterTheServerAndHidesIt() {
+            ProjectDeployment plainProjectDeployment = projectDeploymentRepository.save(
+                createProjectDeployment("plain", 1));
+
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+
+            ProjectDeployment a2aProjectDeployment = systemProjectDeploymentService.getProjectDeployment(
+                a2aProject.getProjectDeploymentId());
+
+            assertThat(a2aProjectDeployment.getName()).isEqualTo(a2aServer.getName());
+            assertThat(systemProjectDeploymentService.getProjectDeployments(null, null, null, null, null))
+                .extracting(ProjectDeployment::getId)
+                .containsExactly(plainProjectDeployment.getId());
         }
 
         @Test
@@ -557,8 +580,7 @@ class A2aProjectFacadeIntTest {
             assertThat(projectDeploymentRepository.findById(a2aProject.getProjectDeploymentId()))
                 .hasValueSatisfying(projectDeployment -> {
                     assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
-                    assertThat(projectDeployment.getName()).startsWith(
-                        "__A2A_SERVER__");
+                    assertThat(projectDeployment.getName()).isEqualTo(productionA2aServer.getName());
                 });
         }
 
