@@ -23,6 +23,7 @@ import com.bytechef.ee.automation.configuration.config.EeAutomationConfiguration
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiPlatformPermissionScopeProvider;
@@ -41,6 +42,7 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -49,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +63,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -89,10 +93,16 @@ class EmbeddedUserServiceIntTest {
         ADMIN, 9300L, EMBEDDED_ADMIN, 9301L, EMBEDDED_EDITOR, 9302L, MEMBER, 9303L);
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private EmbeddedUserRepository embeddedUserRepository;
 
     @Autowired
     private EmbeddedUserService embeddedUserService;
+
+    @Autowired
+    private PermissionScopeRegistry permissionScopeRegistry;
 
     @Autowired
     private PermissionService permissionService;
@@ -102,6 +112,14 @@ class EmbeddedUserServiceIntTest {
 
     @BeforeEach
     void cleanUp() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS \"user\" (id BIGINT PRIMARY KEY)");
+
+        for (Long userId : USER_IDS_BY_LOGIN.values()) {
+            jdbcTemplate.update("INSERT INTO \"user\" (id) VALUES (?) ON CONFLICT DO NOTHING", userId);
+        }
+
         for (Long userId : USER_IDS_BY_LOGIN.values()) {
             embeddedUserRepository.deleteByUserId(userId);
         }
@@ -123,7 +141,8 @@ class EmbeddedUserServiceIntTest {
         authenticate(MEMBER, false);
 
         for (Environment environment : Environment.values()) {
-            assertThat(permissionService.getMyEmbeddedScopes(environment)).isNotEmpty();
+            assertThat(permissionService.getMyEmbeddedScopes(environment))
+                .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR, PermissionScopeSide.EMBEDDED));
         }
 
         assertThat(embeddedUserService.isEmbeddedMember(userId(MEMBER))).isTrue();
@@ -148,7 +167,7 @@ class EmbeddedUserServiceIntTest {
         assertThat(roleIn(embeddedUsers, Environment.PRODUCTION)).isEqualTo(WorkspaceRole.VIEWER);
 
         assertThatThrownBy(() -> embeddedUserService.updateEmbeddedUserRole(userId(MEMBER), WorkspaceRole.ADMIN))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
@@ -230,6 +249,66 @@ class EmbeddedUserServiceIntTest {
     }
 
     @Test
+    void testAnEmbeddedAdminCannotDemoteThemselves() {
+        authenticate(ADMIN, true);
+
+        embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(
+            () -> embeddedUserService.updateEmbeddedUserRole(userId(EMBEDDED_ADMIN), WorkspaceRole.VIEWER))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("Cannot withdraw your own ADMIN role");
+
+        assertThatThrownBy(
+            () -> embeddedUserService.setEnvironmentRole(
+                userId(EMBEDDED_ADMIN), Environment.PRODUCTION, WorkspaceRole.VIEWER))
+                    .isInstanceOf(ConfigurationException.class);
+
+        assertThat(embeddedUserService.getUserEmbeddedUsers(userId(EMBEDDED_ADMIN))).hasSize(1);
+    }
+
+    @Test
+    void testAProductionOnlyAdminCannotWidenAnotherMembersLastEnvironmentRole() {
+        authenticate(ADMIN, true);
+
+        seedProductionOnlyAdmin();
+
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
+        embeddedUserService.setEnvironmentRole(userId(MEMBER), Environment.PRODUCTION, WorkspaceRole.EDITOR);
+        embeddedUserService.removeEnvironmentRole(userId(MEMBER), Environment.DEVELOPMENT);
+        embeddedUserService.removeEnvironmentRole(userId(MEMBER), Environment.STAGING);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(() -> embeddedUserService.removeEnvironmentRole(userId(MEMBER), Environment.PRODUCTION))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessageContaining("EMBEDDED_MEMBER_MANAGE");
+
+        assertThat(embeddedUserService.getUserEmbeddedUsers(userId(MEMBER))).hasSize(1);
+    }
+
+    @Test
+    void testSettingAnEnvironmentRoleIsDeniedWhereTheCallerLacksTheGrantedScopes() {
+        authenticate(ADMIN, true);
+
+        seedProductionOnlyAdmin();
+
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(
+            () -> embeddedUserService.setEnvironmentRole(userId(MEMBER), Environment.DEVELOPMENT, WorkspaceRole.ADMIN))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThatCode(
+            () -> embeddedUserService.setEnvironmentRole(userId(MEMBER), Environment.PRODUCTION, WorkspaceRole.ADMIN))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void testARoleChangeIsVisibleImmediately() {
         authenticate(ADMIN, true);
 
@@ -249,6 +328,11 @@ class EmbeddedUserServiceIntTest {
 
         assertThat(adminScopes).containsAll(viewerScopes);
         assertThat(adminScopes.size()).isGreaterThan(viewerScopes.size());
+    }
+
+    private void seedProductionOnlyAdmin() {
+        embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.VIEWER);
+        embeddedUserService.setEnvironmentRole(userId(EMBEDDED_ADMIN), Environment.PRODUCTION, WorkspaceRole.ADMIN);
     }
 
     private static WorkspaceRole roleIn(List<EmbeddedUser> embeddedUsers, Environment environment) {
