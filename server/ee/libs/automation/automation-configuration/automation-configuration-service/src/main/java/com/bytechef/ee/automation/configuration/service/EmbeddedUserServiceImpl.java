@@ -18,6 +18,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -58,6 +59,8 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
         userService.getUser(userId);
 
+        embeddedUserRepository.lockUser(userId);
+
         validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
 
         if (embeddedUserRepository.existsByUserId(userId)) {
@@ -94,6 +97,8 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public void removeEnvironmentRole(long userId, Environment environment) {
         Assert.notNull(environment, "'environment' must not be null");
 
+        embeddedUserRepository.lockUser(userId);
+
         Optional<EmbeddedUser> environmentEmbeddedUser = embeddedUserRepository
             .findByUserIdAndEnvironment(userId, environment.ordinal());
 
@@ -106,6 +111,12 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         List<EmbeddedUser> memberRows = embeddedUserRepository.findAllByUserId(userId);
 
         if (memberRows.size() <= 1) {
+            if (!permissionService.hasEmbeddedScopeInEveryEnvironment("EMBEDDED_MEMBER_MANAGE")) {
+                throw new AccessDeniedException(
+                    "Widening a member's last environment role to an embedded-wide role requires "
+                        + "EMBEDDED_MEMBER_MANAGE in every environment");
+            }
+
             WorkspaceRole embeddedRole = removedEmbeddedUser.getEmbeddedRole();
 
             Assert.state(embeddedRole != null, "An embedded membership must hold a built-in role");
@@ -116,6 +127,10 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
             embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole));
         } else {
+            if (removedEmbeddedUser.getEmbeddedRole() == WorkspaceRole.ADMIN) {
+                validateNotSelfDemotionFromEnvironments(userId, Set.of(environment));
+            }
+
             embeddedUserRepository.delete(removedEmbeddedUser);
         }
 
@@ -124,6 +139,8 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
     @Override
     public boolean removeEmbeddedUser(long userId) {
+        embeddedUserRepository.lockUser(userId);
+
         boolean existed = embeddedUserRepository.existsByUserId(userId);
 
         embeddedUserRepository.deleteByUserId(userId);
@@ -138,6 +155,8 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         Assert.notNull(environment, "'environment' must not be null");
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        embeddedUserRepository.lockUser(userId);
+
         validateGrantWithinCallerScopes(List.of(environment), embeddedRole);
 
         if (!embeddedUserRepository.existsByUserId(userId)) {
@@ -145,6 +164,17 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         }
 
         Optional<EmbeddedUser> implicitEmbeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId);
+
+        Optional<EmbeddedUser> currentEmbeddedUser = implicitEmbeddedUser.isPresent()
+            ? implicitEmbeddedUser
+            : embeddedUserRepository.findByUserIdAndEnvironment(userId, environment.ordinal());
+
+        WorkspaceRole currentRole = currentEmbeddedUser.map(EmbeddedUser::getEmbeddedRole)
+            .orElse(null);
+
+        boolean losesAdmin = currentRole == WorkspaceRole.ADMIN && embeddedRole != WorkspaceRole.ADMIN;
+
+        validateNotSelfDemotionFromEnvironments(userId, losesAdmin ? Set.of(environment) : Set.of());
 
         if (implicitEmbeddedUser.isPresent()) {
             EmbeddedUser implicit = implicitEmbeddedUser.get();
@@ -186,10 +216,16 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        embeddedUserRepository.lockUser(userId);
+
         EmbeddedUser embeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId)
             .orElseThrow(() -> missingEmbeddedWideMembership(userId));
 
         validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
+
+        if (embeddedUser.getEmbeddedRole() == WorkspaceRole.ADMIN && embeddedRole != WorkspaceRole.ADMIN) {
+            validateNotSelfDemotionFromEnvironments(userId, EnumSet.allOf(Environment.class));
+        }
 
         embeddedUser.assignRole(embeddedRole);
 
@@ -200,11 +236,12 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         return savedEmbeddedUser;
     }
 
-    private RuntimeException missingEmbeddedWideMembership(long userId) {
+    private ConfigurationException missingEmbeddedWideMembership(long userId) {
         if (embeddedUserRepository.existsByUserId(userId)) {
-            return new IllegalStateException(
+            return new ConfigurationException(
                 "User " + userId + " holds per-environment embedded roles and so has no embedded-wide role to "
-                    + "change. Change their role in each environment instead.");
+                    + "change. Change their role in each environment instead.",
+                WorkspaceUserErrorType.EXPLICIT_MODE_MEMBERSHIP);
         }
 
         return missingMembership(userId);
@@ -224,6 +261,19 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     private ConfigurationException missingMembership(long userId) {
         return new ConfigurationException(
             "User " + userId + " is not an embedded member", WorkspaceUserErrorType.NOT_MEMBER);
+    }
+
+    private void validateNotSelfDemotionFromEnvironments(long userId, Set<Environment> lostAdminEnvironments) {
+        if (lostAdminEnvironments.isEmpty() || permissionService.isTenantAdmin()
+            || !permissionService.isCurrentUser(userId)) {
+
+            return;
+        }
+
+        throw new ConfigurationException(
+            "Cannot withdraw your own ADMIN role from " + lostAdminEnvironments
+                + " in embedded. Ask another admin to make the change.",
+            WorkspaceUserErrorType.SELF_DEMOTION_FORBIDDEN);
     }
 
     private void validateGrantWithinCallerScopes(List<Environment> environments, WorkspaceRole embeddedRole) {
