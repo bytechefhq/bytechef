@@ -4,6 +4,8 @@ import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/co
 import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationProjectsQuery, useDuplicateAutomationProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon} from 'lucide-react';
@@ -28,6 +30,10 @@ const AutomationProjectWorkflowListItem = ({
     onSelectWorkflow,
     workflow,
 }: AutomationProjectWorkflowListItemProps) => {
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+
     const queryClient = useQueryClient();
 
     const duplicateWorkflowMutation = useDuplicateAutomationProjectWorkflowMutation({
@@ -136,16 +142,18 @@ const AutomationProjectWorkflowListItem = ({
                 ) : (
                     <WorkflowListRowDropdownMenu
                         exportUrl={`/api/automation/internal/workflows/${workflow.workflowId}/export`}
-                        onDeleteClick={() => onDeleteWorkflow(workflow.workflowUuid)}
-                        onEditClick={() => onEditWorkflow(workflow)}
+                        onDeleteClick={canDeleteWorkflow ? () => onDeleteWorkflow(workflow.workflowUuid) : undefined}
+                        onEditClick={canEditWorkflow ? () => onEditWorkflow(workflow) : undefined}
                         workflowLabel={workflow.label || workflow.workflowUuid}
                         workflowUuid={workflow.workflowUuid}
                     >
-                        <DropdownMenuItem
-                            icon={<CopyIcon />}
-                            label="Duplicate"
-                            onClick={() => duplicateWorkflowMutation.mutate({workflowUuid: workflow.workflowUuid})}
-                        />
+                        {canCreateWorkflow && (
+                            <DropdownMenuItem
+                                icon={<CopyIcon />}
+                                label="Duplicate"
+                                onClick={() => duplicateWorkflowMutation.mutate({workflowUuid: workflow.workflowUuid})}
+                            />
+                        )}
                     </WorkflowListRowDropdownMenu>
                 )}
             </div>

@@ -1,4 +1,6 @@
 import {DropdownMenuItem, DropdownMenuSeparator} from '@/components/DropdownMenu/DropdownMenu';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 const IntegrationTabButtons = ({
@@ -15,37 +17,51 @@ const IntegrationTabButtons = ({
     onNewWorkflowClick: () => void;
     onShowEditIntegrationDialogClick: () => void;
     onShowIntegrationVersionHistorySheet: () => void;
-}) => (
-    <>
-        <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditIntegrationDialogClick} />
+}) => {
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
 
-        {!codeWorkflow && (
-            <>
-                <DropdownMenuSeparator />
+    return (
+        <>
+            {canEditIntegration && (
+                <>
+                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditIntegrationDialogClick} />
 
-                <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
+                    <DropdownMenuSeparator />
+                </>
+            )}
 
-                <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
-            </>
-        )}
+            {!codeWorkflow && canCreateWorkflow && (
+                <>
+                    <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
 
-        <DropdownMenuSeparator />
+                    <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
 
-        <DropdownMenuItem
-            icon={<HistoryIcon />}
-            label="Integration History"
-            onSelect={onShowIntegrationVersionHistorySheet}
-        />
+                    <DropdownMenuSeparator />
+                </>
+            )}
 
-        <DropdownMenuSeparator />
+            <DropdownMenuItem
+                icon={<HistoryIcon />}
+                label="Integration History"
+                onSelect={onShowIntegrationVersionHistorySheet}
+            />
 
-        <DropdownMenuItem
-            icon={<Trash2Icon />}
-            label="Delete"
-            onSelect={onDeleteIntegrationClick}
-            variant="destructive"
-        />
-    </>
-);
+            {canDeleteIntegration && (
+                <>
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onSelect={onDeleteIntegrationClick}
+                        variant="destructive"
+                    />
+                </>
+            )}
+        </>
+    );
+};
 
 export default IntegrationTabButtons;

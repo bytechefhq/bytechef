@@ -28,6 +28,11 @@ vi.mock('@tanstack/react-query', async (importOriginal) => ({
     useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 const handlers = {
     onDeleteWorkflow: vi.fn(),
     onEditWorkflow: vi.fn(),

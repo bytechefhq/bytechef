@@ -10,6 +10,11 @@ const hoisted = vi.hoisted(() => ({
     integrationsLoading: false,
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
     useGetIntegrationsQuery: () => ({
         data: hoisted.integrations,

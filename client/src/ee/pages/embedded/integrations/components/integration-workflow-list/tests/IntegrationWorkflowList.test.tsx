@@ -12,6 +12,11 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({captureIntegrationWorkflowCreated: vi.fn(), captureIntegrationWorkflowImported: vi.fn()}),
 }));

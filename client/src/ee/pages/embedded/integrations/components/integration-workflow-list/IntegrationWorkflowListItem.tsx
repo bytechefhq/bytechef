@@ -10,6 +10,8 @@ import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDes
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     useIntegrationWorkflowsByIntegrationIdQuery,
     useUpdateIntegrationWorkflowPermissionExpressionMutation,
@@ -54,6 +56,12 @@ const IntegrationWorkflowListItem = ({
 
     const queryClient = useQueryClient();
 
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+    const canManageIntegrationSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+
+    const permissionExpressionEditable = workflow.integrationWorkflowId != null && canManageIntegrationSettings;
+
     const integrationWorkflowsQueryVariables = {integrationId: String(integration.id)};
 
     const updateIntegrationWorkflowPermissionExpressionMutation =
@@ -67,7 +75,7 @@ const IntegrationWorkflowListItem = ({
 
     const {data: integrationWorkflowsData, isFetching: isIntegrationWorkflowsFetching} =
         useIntegrationWorkflowsByIntegrationIdQuery(integrationWorkflowsQueryVariables, {
-            enabled: showEditDialog && integration.id != null,
+            enabled: showEditDialog && permissionExpressionEditable && integration.id != null,
         });
 
     const integrationWorkflowPermissionExpression = integrationWorkflowsData?.integrationWorkflowsByIntegrationId.find(
@@ -114,6 +122,7 @@ const IntegrationWorkflowListItem = ({
     useEffect(() => {
         if (
             !showEditDialog ||
+            !permissionExpressionEditable ||
             isPermissionExpressionSeeded ||
             !integrationWorkflowsData ||
             isIntegrationWorkflowsFetching
@@ -128,6 +137,7 @@ const IntegrationWorkflowListItem = ({
         integrationWorkflowsData,
         isIntegrationWorkflowsFetching,
         isPermissionExpressionSeeded,
+        permissionExpressionEditable,
         showEditDialog,
     ]);
 
@@ -201,11 +211,15 @@ const IntegrationWorkflowListItem = ({
                 ) : (
                     <WorkflowListRowDropdownMenu
                         exportUrl={`/api/embedded/internal/workflows/${workflow.id}/export`}
-                        onDeleteClick={() => setShowDeleteDialog(true)}
-                        onEditClick={() => {
-                            setIsPermissionExpressionSeeded(false);
-                            setShowEditDialog(true);
-                        }}
+                        onDeleteClick={canDeleteWorkflow ? () => setShowDeleteDialog(true) : undefined}
+                        onEditClick={
+                            canEditWorkflow
+                                ? () => {
+                                      setIsPermissionExpressionSeeded(false);
+                                      setShowEditDialog(true);
+                                  }
+                                : undefined
+                        }
                         workflowLabel={workflow.label}
                         workflowUuid={workflow.workflowUuid}
                     />
@@ -229,7 +243,7 @@ const IntegrationWorkflowListItem = ({
             {showEditDialog && workflow && (
                 <WorkflowDialog
                     additionalContent={
-                        workflow.integrationWorkflowId != null &&
+                        permissionExpressionEditable &&
                         isPermissionExpressionSeeded && (
                             <IntegrationWorkflowPermissionExpressionField
                                 onChange={setPermissionExpression}
@@ -239,8 +253,9 @@ const IntegrationWorkflowListItem = ({
                     }
                     onClose={() => setShowEditDialog(false)}
                     onSave={() => {
-                        pendingPermissionExpressionRef.current =
-                            workflow.integrationWorkflowId != null ? permissionExpression?.trim() || null : undefined;
+                        pendingPermissionExpressionRef.current = permissionExpressionEditable
+                            ? permissionExpression?.trim() || null
+                            : undefined;
 
                         void queryClient.invalidateQueries({
                             queryKey: IntegrationWorkflowKeys.integrationWorkflow(
@@ -250,7 +265,7 @@ const IntegrationWorkflowListItem = ({
                         });
                     }}
                     parentId={integration.id}
-                    saveDisabled={workflow.integrationWorkflowId != null && !isPermissionExpressionSeeded}
+                    saveDisabled={permissionExpressionEditable && !isPermissionExpressionSeeded}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

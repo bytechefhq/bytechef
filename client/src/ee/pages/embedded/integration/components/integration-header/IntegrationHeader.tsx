@@ -11,12 +11,15 @@ import {useIntegrationHeader} from '@/ee/pages/embedded/integration/components/i
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import ConfigurationsListButton from '@/ee/pages/embedded/shared/ConfigurationsListButton';
 import ConfigureButton from '@/ee/pages/embedded/shared/ConfigureButton';
+import {useEmbeddedWorkflowViewOnlyNotice} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowViewOnlyNotice';
 import {isIntegrationConfigurable} from '@/ee/pages/embedded/shared/integrationPublication';
 import {IntegrationInstanceConfiguration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import CodeWorkflowHeaderActions, {
     CodeWorkflowSaveButton,
 } from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
@@ -24,6 +27,7 @@ import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
@@ -78,6 +82,10 @@ const IntegrationHeader = ({
 
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const {
         handleIntegrationValueChange,
         handleIntegrationWorkflowValueChange,
@@ -136,6 +144,8 @@ const IntegrationHeader = ({
                 )}
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex items-center gap-1">
@@ -146,18 +156,21 @@ const IntegrationHeader = ({
                     leadingAction={integration?.codeWorkflow ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
                 <ButtonGroup>
-                    <PublishPopover
-                        disabled={!hasUnpublishedChanges}
-                        isPending={publishIntegrationMutationIsPending}
-                        onPublishSubmit={handlePublishIntegrationSubmit}
-                        title="Publish Integration"
-                        tooltip="Publish the integration"
-                    />
+                    {canEditWorkflowOnUnion && canPublishScope && (
+                        <PublishPopover
+                            disabled={!hasUnpublishedChanges}
+                            isPending={publishIntegrationMutationIsPending}
+                            onPublishSubmit={handlePublishIntegrationSubmit}
+                            title="Publish Integration"
+                            tooltip="Publish the integration"
+                        />
+                    )}
 
                     <ConfigureButton
                         disabledReason={

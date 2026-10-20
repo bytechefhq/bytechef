@@ -20,7 +20,13 @@ import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
-import {CODE_WORKFLOW_SORT_OPTIONS, SORT_OPTIONS, SOURCE_ORDER_SORT_OPTION} from '@/shared/constants';
+import {
+    CODE_WORKFLOW_SORT_OPTIONS,
+    DEVELOPMENT_ENVIRONMENT,
+    SORT_OPTIONS,
+    SOURCE_ORDER_SORT_OPTION,
+} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIntegrationCodeWorkflowSourceQuery} from '@/shared/middleware/graphql';
 import {useQueries} from '@tanstack/react-query';
 import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
@@ -81,6 +87,9 @@ const IntegrationsLeftSidebar = ({
     const workflows = selectedIntegrationWorkflows || allIntegrationsWorkflows;
 
     const {calculateTimeDifference, getFilteredWorkflows, getWorkflowsIntegrationId} = useIntegrationsLeftSidebar();
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const targetIntegrationId = selectedIntegrationId === 0 ? integrationId : selectedIntegrationId;
 
@@ -160,18 +169,20 @@ const IntegrationsLeftSidebar = ({
                                 setSelectedIntegrationId={setSelectedIntegrationId}
                             />
 
-                            <IntegrationDialog
-                                integration={undefined}
-                                triggerNode={
-                                    <Button
-                                        aria-label="New integration"
-                                        className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                        icon={<PlusIcon />}
-                                        size="icon"
-                                        variant="outline"
-                                    />
-                                }
-                            />
+                            {canCreateIntegration && (
+                                <IntegrationDialog
+                                    integration={undefined}
+                                    triggerNode={
+                                        <Button
+                                            aria-label="New integration"
+                                            className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                            icon={<PlusIcon />}
+                                            size="icon"
+                                            variant="outline"
+                                        />
+                                    }
+                                />
+                            )}
                         </div>
                     )
                 )}
@@ -185,7 +196,7 @@ const IntegrationsLeftSidebar = ({
                     sortOptions={codeWorkflowSortShown ? CODE_WORKFLOW_SORT_OPTIONS : SORT_OPTIONS}
                 />
 
-                {!targetIntegration?.codeWorkflow && (
+                {!targetIntegration?.codeWorkflow && canCreateWorkflow && (
                     <ButtonGroup className="w-full">
                         <Button
                             className="flex-1 [&_svg]:size-5"
