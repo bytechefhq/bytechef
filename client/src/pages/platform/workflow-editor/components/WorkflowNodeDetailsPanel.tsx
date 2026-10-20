@@ -11,6 +11,7 @@ import ConnectionTab from '@/pages/platform/workflow-editor/components/node-deta
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import DeprecatedBadge from '@/shared/components/DeprecatedBadge';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
     ActionDefinition,
@@ -146,6 +147,15 @@ const WorkflowNodeDetailsPanel = ({
 
     const nodeLabel = currentNode?.label || currentWorkflowNode?.title;
 
+    const actionDeprecated =
+        !!currentActionDefinition && 'deprecated' in currentActionDefinition && !!currentActionDefinition.deprecated;
+
+    const deprecatedDefinition = actionDeprecated
+        ? currentActionDefinition
+        : currentTaskDispatcherDefinition?.deprecated
+          ? currentTaskDispatcherDefinition
+          : undefined;
+
     return (
         <div
             className={twMerge(
@@ -205,6 +215,22 @@ const WorkflowNodeDetailsPanel = ({
                                                         {currentComponentDefinition
                                                             ? currentComponentDefinition.description
                                                             : currentTaskDispatcherDefinition?.description}
+                                                    </TooltipContent>
+                                                </TooltipPortal>
+                                            </Tooltip>
+                                        )}
+
+                                        {deprecatedDefinition && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span>
+                                                        <DeprecatedBadge />
+                                                    </span>
+                                                </TooltipTrigger>
+
+                                                <TooltipPortal>
+                                                    <TooltipContent className="max-w-md" side="bottom">
+                                                        {deprecatedDefinition.description}
                                                     </TooltipContent>
                                                 </TooltipPortal>
                                             </Tooltip>
