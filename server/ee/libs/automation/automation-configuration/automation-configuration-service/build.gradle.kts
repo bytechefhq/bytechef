@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.liquibase:liquibase-core")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
@@ -73,9 +74,9 @@ dependencies {
     testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
-    testImplementation(project(":server:libs:test:test-support"))
 
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
