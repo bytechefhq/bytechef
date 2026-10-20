@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalFacade;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRuleFacade;
@@ -74,6 +75,9 @@ class AiHubGraphQlErrorShapeIntTest {
 
     @MockitoBean
     private PermissionService permissionService;
+
+    @MockitoBean
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
     private TitleGenerationService titleGenerationService;

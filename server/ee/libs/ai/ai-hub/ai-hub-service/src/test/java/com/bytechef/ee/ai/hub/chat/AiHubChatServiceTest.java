@@ -216,6 +216,71 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testCreateWorkflowChatStampsKindAndBinding() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat chat = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, "Acme — Support");
+
+        assertThat(chat.getKind()).isEqualTo(AiHubChatKind.WORKFLOW_CHAT);
+        assertThat(chat.getWorkflowExecutionId()).isEqualTo("exec-1");
+        assertThat(chat.getProjectDeploymentId()).isEqualTo(42L);
+        assertThat(chat.getTitle()).isEqualTo("Acme — Support");
+        assertThat(chat.getThreadId()).isNotBlank();
+        assertThat(chat.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+    }
+
+    @Test
+    void testCreateWorkflowChatAlwaysInsertsANewThread() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat first = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, null);
+        AiHubChat second = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, null);
+
+        assertThat(first.getThreadId()).isNotEqualTo(second.getThreadId());
+        assertThat(first.getTitle()).isNull();
+    }
+
+    @Test
+    void testCancelWorkflowChatTurnGoesThroughTheRunRegistry() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+        when(inFlightRunRegistry.cancel(THREAD_ID, null)).thenReturn(true);
+
+        assertThat(chatService.cancelWorkflowChatTurn(1L, WORKSPACE_ID, USER_ID)).isTrue();
+
+        verify(inFlightRunRegistry).cancel(THREAD_ID, null);
+    }
+
+    @Test
+    void testBulkArchiveArchivesOnlyActiveWorkflowChats() {
+        AiHubChat first = buildChat(1L, USER_ID, "thread-1", AiHubChatStatus.ACTIVE);
+        AiHubChat second = buildChat(2L, USER_ID, "thread-2", AiHubChatStatus.ACTIVE);
+        AiHubChat foreign = buildChat(3L, OTHER_USER_ID, "thread-3", AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+            eq(WORKSPACE_ID), eq(USER_ID), eq(0), eq(List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal())),
+            eq(AiHubChatStatus.ACTIVE.ordinal()), anyInt())).thenReturn(List.of(first, second, foreign));
+        when(chatRepository.updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any())).thenReturn(1);
+
+        assertThat(chatService.bulkArchiveWorkflowChatAiHubChats(WORKSPACE_ID, USER_ID, 0)).isEqualTo(2);
+
+        verify(chatRepository).updateStatusUnlessDeleted(eq(1L), eq(AiHubChatStatus.ARCHIVED.ordinal()),
+            eq(AiHubChatStatus.DELETED.ordinal()), any());
+        verify(chatRepository).updateStatusUnlessDeleted(eq(2L), eq(AiHubChatStatus.ARCHIVED.ordinal()),
+            eq(AiHubChatStatus.DELETED.ordinal()), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(eq(3L), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testBulkArchiveWithNothingActiveReturnsZero() {
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+            anyLong(), anyLong(), anyInt(), any(), anyInt(), anyInt())).thenReturn(List.of());
+
+        assertThat(chatService.bulkArchiveWorkflowChatAiHubChats(WORKSPACE_ID, USER_ID, 0)).isZero();
+    }
+
+    @Test
     void testListReturnsFilteredByStatus() {
         List<AiHubChat> activeList = List.of(
             buildChat(1L, USER_ID, "t-1", AiHubChatStatus.ACTIVE),

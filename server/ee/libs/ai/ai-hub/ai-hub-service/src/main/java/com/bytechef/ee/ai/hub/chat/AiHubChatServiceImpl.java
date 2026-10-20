@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -160,6 +161,55 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         } catch (DataIntegrityViolationException exception) {
             throw new ConflictException("AiHubChat %s already exists".formatted(threadId), exception);
         }
+    }
+
+    @Override
+    public AiHubChat createWorkflowChat(
+        long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
+        @Nullable String title) {
+
+        LocalDateTime now = LocalDateTime.now(clock);
+
+        AiHubChat chat = new AiHubChat(userId);
+
+        chat.setThreadId(UUID.randomUUID()
+            .toString());
+        chat.setStatus(AiHubChatStatus.ACTIVE);
+        chat.setMessageCount(0);
+        chat.setKind(AiHubChatKind.WORKFLOW_CHAT);
+        chat.setWorkflowExecutionId(workflowExecutionId);
+        chat.setProjectDeploymentId(projectDeploymentId);
+        chat.setEnvironment(EnumOrdinals.fromOrdinal(environment, Environment.class));
+        chat.setCreatedAt(now);
+        chat.setUpdatedAt(now);
+        chat.setWorkspaceId(workspaceId);
+
+        if (title != null && !title.isBlank()) {
+            chat.setTitle(title);
+        }
+
+        return chatRepository.save(chat);
+    }
+
+    @Override
+    public int bulkArchiveWorkflowChatAiHubChats(long workspaceId, long userId, int environment) {
+        List<AiHubChat> activeWorkflowChats = chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+            workspaceId, userId, environment, List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal()),
+            AiHubChatStatus.ACTIVE.ordinal(), LIST_LIMIT);
+
+        LocalDateTime now = LocalDateTime.now(clock);
+        int archived = 0;
+
+        for (AiHubChat chat : activeWorkflowChats) {
+            if (chat.getUserId() != userId || !workspaceOwnsChat(workspaceId, chat)) {
+                continue;
+            }
+
+            archived += chatRepository.updateStatusUnlessDeleted(
+                chat.getId(), AiHubChatStatus.ARCHIVED.ordinal(), DELETED_STATUS_ORDINAL, now);
+        }
+
+        return archived;
     }
 
     @Override
@@ -610,6 +660,11 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         }
 
         return cancelled;
+    }
+
+    @Override
+    public boolean cancelWorkflowChatTurn(long chatId, long requesterWorkspaceId, long requesterUserId) {
+        return cancelAiHubRun(chatId, requesterWorkspaceId, requesterUserId, null);
     }
 
     @Override
