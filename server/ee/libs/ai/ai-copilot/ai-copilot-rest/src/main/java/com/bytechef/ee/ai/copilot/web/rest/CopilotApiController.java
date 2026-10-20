@@ -88,6 +88,7 @@ public class CopilotApiController {
 
         stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
         stateMap.remove(CopilotConstants.STATE_AUTHENTICATION);
+        stateMap.remove(CopilotConstants.STATE_SCOPED_PROJECT_ID);
 
         authorizeWorkflowAccess(stateMap, mode);
 
