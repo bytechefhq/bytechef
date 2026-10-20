@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
+import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -36,7 +37,6 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.EvaluationException;
 
 /**
  * @author Ivica Cardic
@@ -75,11 +75,14 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
         taskExecution.putMetadata(MetadataConstants.EDITOR_ENVIRONMENT, true);
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = null;
+
         try {
             workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
                 job.getWorkflowId(), taskExecution.getName(), Environment.DEVELOPMENT.ordinal());
-        } catch (EvaluationException e) {
-            log.error("Couldn't evaluate expression with sample output", e);
+        } catch (ExpressionEvaluationException expressionEvaluationException) {
+            log.error(
+                "Couldn't evaluate the parameters of node {} with sample output, continuing without resume data",
+                taskExecution.getName(), expressionEvaluationException);
         }
 
         if (workflowNodeOutputDTO != null && workflowNodeOutputDTO.getSampleOutput() instanceof Map map &&

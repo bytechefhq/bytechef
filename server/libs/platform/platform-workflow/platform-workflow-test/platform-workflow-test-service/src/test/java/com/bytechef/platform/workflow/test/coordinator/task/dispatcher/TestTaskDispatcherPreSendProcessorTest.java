@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.ResumePerformFunction.ResumeResponse;
+import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -41,7 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.expression.EvaluationException;
 
 /**
  * @author Marko Kriskovic
@@ -103,7 +103,7 @@ class TestTaskDispatcherPreSendProcessorTest {
     }
 
     @Test
-    void processHandlesEvaluationExceptionGracefully() {
+    void processHandlesExpressionEvaluationExceptionGracefully() {
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
         when(workflowTask.getName()).thenReturn(TASK_NAME);
@@ -121,7 +121,7 @@ class TestTaskDispatcherPreSendProcessorTest {
             .thenReturn(List.of());
         when(workflowNodeOutputFacade.getWorkflowNodeOutput(
             WORKFLOW_ID, TASK_NAME, Environment.DEVELOPMENT.ordinal()))
-                .thenThrow(new EvaluationException("Couldn't evaluate expression with sample output"));
+                .thenThrow(new ExpressionEvaluationException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
 
         TaskExecution result = processor.process(taskExecution);
 
