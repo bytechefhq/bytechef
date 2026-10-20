@@ -30,6 +30,7 @@ import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -72,6 +73,13 @@ const IntegrationListItem = ({
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishIntegrationScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
+
+    const canPublishIntegration = canEditIntegration && canPublishIntegrationScope;
 
     const navigate = useNavigate();
 
@@ -250,6 +258,7 @@ const IntegrationListItem = ({
                                                 },
                                             })}
                                             id={integration.id!}
+                                            readOnly={!canEditIntegration}
                                             remainingTags={remainingTags}
                                             tags={integration.tags}
                                             updateTagsMutation={updateIntegrationTagsMutation}
@@ -311,11 +320,13 @@ const IntegrationListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => setShowEditDialog(true)}
-                                />
+                                {canEditIntegration && (
+                                    <DropdownMenuItem
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
+                                )}
 
                                 {integration?.integrationWorkflowIds &&
                                     integration?.integrationWorkflowIds.length > 0 && (
@@ -330,20 +341,26 @@ const IntegrationListItem = ({
                                         />
                                     )}
 
-                                <DropdownMenuItem
-                                    icon={<SendIcon />}
-                                    label="Publish"
-                                    onClick={() => setShowPublishIntegrationDialog(true)}
-                                />
+                                {canPublishIntegration && (
+                                    <DropdownMenuItem
+                                        icon={<SendIcon />}
+                                        label="Publish"
+                                        onClick={() => setShowPublishIntegrationDialog(true)}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteIntegration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -353,7 +370,7 @@ const IntegrationListItem = ({
             <CollapsibleContent className="mx-3 mt-1 mb-3">
                 <IntegrationListItemTabs
                     actions={
-                        activeTab === 'workflows' && workflowCount > 0 ? (
+                        activeTab === 'workflows' && workflowCount > 0 && canCreateWorkflow ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"

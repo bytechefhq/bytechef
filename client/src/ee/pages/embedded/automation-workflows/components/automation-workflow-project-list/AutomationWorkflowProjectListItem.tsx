@@ -11,6 +11,8 @@ import {
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import TagList from '@/shared/components/TagList';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
     ChevronDownIcon,
@@ -50,6 +52,14 @@ const AutomationWorkflowProjectListItem = ({
     tags,
 }: AutomationWorkflowProjectListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteProject = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
+
+    const canPublishProject = canEditWorkflowOnUnion && canPublishScope;
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -144,6 +154,7 @@ const AutomationWorkflowProjectListItem = ({
                                     <TagList
                                         getRequest={(_id, updatedTags) => updatedTags.map((tag) => tag.name)}
                                         id={0}
+                                        readOnly={!canManageSettings}
                                         remainingTags={remainingTags}
                                         tags={projectTags}
                                         updateTagsMutation={updateTagsMutation}
@@ -200,49 +211,61 @@ const AutomationWorkflowProjectListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    aria-label="Publish Project"
-                                    icon={<SendIcon />}
-                                    label="Publish"
-                                    onClick={() => onPublishProject(project.id)}
-                                />
+                                {canPublishProject && (
+                                    <DropdownMenuItem
+                                        aria-label="Publish Project"
+                                        icon={<SendIcon />}
+                                        label="Publish"
+                                        onClick={() => onPublishProject(project.id)}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canCreateWorkflow && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="New Workflow"
-                                    icon={<PlusIcon />}
-                                    label="New Workflow"
-                                    onClick={() => onCreateWorkflow(project.id)}
-                                />
+                                        <DropdownMenuItem
+                                            aria-label="New Workflow"
+                                            icon={<PlusIcon />}
+                                            label="New Workflow"
+                                            onClick={() => onCreateWorkflow(project.id)}
+                                        />
 
-                                <DropdownMenuItem
-                                    aria-label="Import Workflow"
-                                    icon={<UploadIcon />}
-                                    label="Import Workflow"
-                                    onClick={() => onImportWorkflow(project.id)}
-                                />
+                                        <DropdownMenuItem
+                                            aria-label="Import Workflow"
+                                            icon={<UploadIcon />}
+                                            label="Import Workflow"
+                                            onClick={() => onImportWorkflow(project.id)}
+                                        />
+                                    </>
+                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Edit Project"
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => onEditProject(project)}
-                                />
+                                {canManageSettings && (
+                                    <DropdownMenuItem
+                                        aria-label="Edit Project"
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => onEditProject(project)}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteProject && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Project"
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={(event: MouseEvent) => {
-                                        setShowDeleteDialog(true);
+                                        <DropdownMenuItem
+                                            aria-label="Delete Project"
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={(event: MouseEvent) => {
+                                                setShowDeleteDialog(true);
 
-                                        event.stopPropagation();
-                                    }}
-                                    variant="destructive"
-                                />
+                                                event.stopPropagation();
+                                            }}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
