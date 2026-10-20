@@ -44,6 +44,10 @@ const automationSectionNavItems: SettingsNavItemI[] = [
 
 const embeddedSectionNavItems: SettingsNavItemI[] = [
     {
+        href: `${EMBEDDED_SETTINGS_PATH}/members`,
+        title: 'Members',
+    },
+    {
         href: `${EMBEDDED_SETTINGS_PATH}/signing-keys`,
         title: 'Signing Keys',
     },
