@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -236,24 +237,26 @@ class EmbeddedUserServiceIntTest {
     }
 
     @Test
-    void testAnEmbeddedAdminCannotDemoteThemselves() {
+    void testAnEmbeddedAdminCanDemoteThemselves() {
         authenticate(ADMIN, true);
 
         embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
 
         authenticate(EMBEDDED_ADMIN, false);
 
-        assertThatThrownBy(
-            () -> embeddedUserService.updateEmbeddedUserRole(userId(EMBEDDED_ADMIN), WorkspaceRole.VIEWER))
-                .isInstanceOf(ConfigurationException.class)
-                .hasMessageContaining("Cannot withdraw your own ADMIN role");
+        embeddedUserService.updateEmbeddedUserRole(userId(EMBEDDED_ADMIN), WorkspaceRole.EDITOR);
 
-        assertThatThrownBy(
-            () -> embeddedUserService.setEnvironmentRole(
-                userId(EMBEDDED_ADMIN), Environment.PRODUCTION, WorkspaceRole.VIEWER))
-                    .isInstanceOf(ConfigurationException.class);
+        embeddedUserService.setEnvironmentRole(userId(EMBEDDED_ADMIN), Environment.PRODUCTION, WorkspaceRole.VIEWER);
 
-        assertThat(embeddedUserService.getUserEmbeddedUsers(userId(EMBEDDED_ADMIN))).hasSize(1);
+        List<EmbeddedUser> embeddedUsers = embeddedUserService.getUserEmbeddedUsers(userId(EMBEDDED_ADMIN));
+
+        Map<Environment, WorkspaceRole> rolesByEnvironment = embeddedUsers.stream()
+            .collect(Collectors.toMap(EmbeddedUser::getEnvironment, EmbeddedUser::getEmbeddedRole));
+
+        assertThat(rolesByEnvironment).containsExactlyInAnyOrderEntriesOf(
+            Map.of(
+                Environment.DEVELOPMENT, WorkspaceRole.EDITOR, Environment.STAGING, WorkspaceRole.EDITOR,
+                Environment.PRODUCTION, WorkspaceRole.VIEWER));
     }
 
     @Test
