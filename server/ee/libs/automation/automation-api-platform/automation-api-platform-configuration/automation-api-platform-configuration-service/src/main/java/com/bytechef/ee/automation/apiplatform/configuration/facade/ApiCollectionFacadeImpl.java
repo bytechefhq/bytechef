@@ -28,6 +28,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollect
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -67,6 +68,7 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional
 public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
@@ -110,7 +112,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         projectDeployment.setDescription(apiCollection.getDescription());
         projectDeployment.setEnvironment(apiCollectionDTO.environment());
-        projectDeployment.setName("__API_COLLECTION__" + apiCollectionDTO.projectId());
+        projectDeployment.setName(apiCollectionDTO.name());
         projectDeployment.setProjectId(apiCollectionDTO.projectId());
         projectDeployment.setProjectVersion(apiCollectionDTO.projectVersion());
 
