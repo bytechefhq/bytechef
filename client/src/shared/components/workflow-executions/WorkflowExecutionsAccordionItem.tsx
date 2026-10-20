@@ -161,6 +161,7 @@ const WorkflowExecutionsAccordionItem = ({
                                                 <HoverCardContent
                                                     align="start"
                                                     className="flex max-h-56 w-fit max-w-sm min-w-40 flex-col rounded-md border border-stroke-neutral-primary bg-surface-neutral-secondary p-3 text-sm"
+                                                    hideWhenDetached
                                                     side="right"
                                                 >
                                                     <span className="mb-1.5 shrink-0 text-sm font-semibold text-content-brand-primary">
