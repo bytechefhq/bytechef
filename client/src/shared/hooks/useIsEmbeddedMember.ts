@@ -18,7 +18,7 @@ export const useIsEmbeddedMember = (): EmbeddedMembershipI => {
     }
 
     return {
-        loading: unionScopeState?.status === 'loading',
+        loading: unionScopeState === undefined || unionScopeState.status === 'loading',
         member: unionScopeState?.status === 'loaded' && unionScopeState.scopes.length > 0,
     };
 };

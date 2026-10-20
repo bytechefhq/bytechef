@@ -69,6 +69,14 @@ describe('useIsEmbeddedMember', () => {
         expect(result.current).toEqual({loading: true, member: false});
     });
 
+    it('testAnUnloadedUnionIsLoadingRatherThanNonMember', () => {
+        setAccount(['ROLE_USER']);
+
+        const {result} = renderHook(() => useIsEmbeddedMember());
+
+        expect(result.current).toEqual({loading: true, member: false});
+    });
+
     it('testAnErroredUnionIsNotAMember', () => {
         setAccount(['ROLE_USER']);
         permissionStore.setState({embeddedScopeStates: {[UNION_ENVIRONMENT_ID]: {status: 'error'}}});
@@ -86,6 +94,6 @@ describe('useIsEmbeddedMember', () => {
 
         const {result} = renderHook(() => useIsEmbeddedMember());
 
-        expect(result.current).toEqual({loading: false, member: false});
+        expect(result.current).toEqual({loading: true, member: false});
     });
 });
