@@ -64,6 +64,17 @@ public interface McpServerService {
 
     String getMcpServerSecretKey(long mcpServerId);
 
+    String getEditableMcpServerSecretKey(long mcpServerId);
+
+    /**
+     * Fetches an MCP server by its id without a permission check, for the ownership and environment resolvers that the
+     * gated {@link #getMcpServer(long)} consults.
+     *
+     * @param mcpServerId the unique identifier of the MCP server
+     * @return the MCP server, or empty when none exists
+     */
+    Optional<McpServer> fetchMcpServer(long mcpServerId);
+
     Optional<McpServer> fetchMcpServer(String secretKey);
 
     /**
