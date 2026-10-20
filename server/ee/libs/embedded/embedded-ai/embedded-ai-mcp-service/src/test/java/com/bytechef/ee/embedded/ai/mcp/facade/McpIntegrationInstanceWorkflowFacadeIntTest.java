@@ -337,7 +337,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     @EnableCaching
     @EnableMethodSecurity
     @Import({
-        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
+        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class, EmbeddedMcpReader.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,

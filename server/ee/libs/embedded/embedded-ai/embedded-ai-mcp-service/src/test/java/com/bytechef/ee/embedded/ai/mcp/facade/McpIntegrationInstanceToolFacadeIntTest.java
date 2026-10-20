@@ -325,7 +325,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, automationMcpToolId, true))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("does not belong to integration instance");
+            .hasMessageContaining("MCP tool not found");
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }
@@ -390,7 +390,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
     @EnableCaching
     @EnableMethodSecurity
     @Import({
-        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
+        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class, EmbeddedMcpReader.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,

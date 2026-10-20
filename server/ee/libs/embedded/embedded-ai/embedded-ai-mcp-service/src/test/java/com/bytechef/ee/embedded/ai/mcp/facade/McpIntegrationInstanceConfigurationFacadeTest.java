@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -38,6 +39,9 @@ import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.Workflow
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,6 +94,12 @@ class McpIntegrationInstanceConfigurationFacadeTest {
     private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @Mock
+    private McpServerService mcpServerService;
+
+    @Mock
+    private PermissionService permissionService;
+
+    @Mock
     private WorkflowService workflowService;
 
     private McpIntegrationInstanceConfigurationFacade mcpIntegrationInstanceConfigurationFacade;
@@ -100,7 +110,8 @@ class McpIntegrationInstanceConfigurationFacadeTest {
             componentConnectionFacade, connectionService, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceWorkflowService, integrationService,
             integrationWorkflowService, mcpIntegrationInstanceConfigurationService,
-            mcpIntegrationInstanceConfigurationWorkflowService, workflowService);
+            mcpIntegrationInstanceConfigurationWorkflowService, mcpServerService, permissionService,
+            workflowService);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
@@ -111,6 +122,9 @@ class McpIntegrationInstanceConfigurationFacadeTest {
         when(integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
             INTEGRATION_INSTANCE_CONFIGURATION_ID))
                 .thenReturn(integrationInstanceConfiguration);
+
+        when(mcpServerService.getMcpServer(3L))
+            .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
         Integration integration = new Integration();
 
@@ -165,6 +179,28 @@ class McpIntegrationInstanceConfigurationFacadeTest {
         assertThat(integrationInstanceConfigurationWorkflow.getConnections())
             .containsExactly(new IntegrationInstanceConfigurationWorkflowConnection(90L, "slack", "slack_1"));
         assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hello"));
+    }
+
+    @Test
+    void testCreateRejectsAServerFromAnotherEnvironment() {
+        when(mcpServerService.getMcpServer(4L))
+            .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.PRODUCTION));
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                4L, INTEGRATION_INSTANCE_CONFIGURATION_ID, List.of(WORKFLOW_ID)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                4L, INTEGRATION_INSTANCE_CONFIGURATION_ID, List.of(WORKFLOW_ID), List.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
+
+        verify(mcpIntegrationInstanceConfigurationService, never()).create(any());
+        verify(integrationInstanceConfigurationWorkflowService, never())
+            .create(any(IntegrationInstanceConfigurationWorkflow.class));
     }
 
     @Test
