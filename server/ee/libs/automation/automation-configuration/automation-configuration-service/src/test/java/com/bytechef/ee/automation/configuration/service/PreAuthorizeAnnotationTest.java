@@ -516,6 +516,42 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedApiKeyGates() throws Exception {
+        Class<?> apiKeyFacade = Class.forName("com.bytechef.ee.embedded.security.facade.EmbeddedApiKeyFacadeImpl");
+
+        assertEveryPublicOverloadIsGated(
+            apiKeyFacade, "createApiKey", "hasEmbeddedScopeInEnvironment('API_KEY_CREATE', #apiKey.environment)");
+        assertEveryPublicOverloadIsGated(
+            apiKeyFacade, "deleteApiKey", "hasPermission(#id, 'ApiKey', 'API_KEY_DELETE')");
+        assertEveryPublicOverloadIsGated(apiKeyFacade, "getApiKey", "hasPermission(#id, 'ApiKey', 'API_KEY_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            apiKeyFacade, "getApiKeys", "hasEmbeddedScopeInEnvironmentId('API_KEY_VIEW', #environmentId)");
+        assertEveryPublicOverloadIsGated(
+            apiKeyFacade, "updateApiKey", "hasPermission(#apiKey.id, 'ApiKey', 'API_KEY_CREATE')");
+    }
+
+    @Test
+    void testSigningKeyGates() throws Exception {
+        Class<?> signingKeyFacade = Class.forName("com.bytechef.ee.embedded.security.facade.SigningKeyFacadeImpl");
+
+        String embeddedType = "#type == T(com.bytechef.platform.constant.PlatformType).EMBEDDED ? ";
+        String manage = "hasPermission(#id, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')";
+
+        assertEveryPublicOverloadIsGated(
+            signingKeyFacade, "create",
+            embeddedType + "hasEmbeddedScopeInEnvironment('EMBEDDED_SETTINGS_MANAGE', #signingKey.environment) "
+                + ": isTenantAdmin()");
+        assertEveryPublicOverloadIsGated(signingKeyFacade, "delete", manage);
+        assertEveryPublicOverloadIsGated(signingKeyFacade, "getSigningKey", manage);
+        assertEveryPublicOverloadIsGated(
+            signingKeyFacade, "getSigningKeys",
+            embeddedType + "hasEmbeddedScopeInEnvironmentId('EMBEDDED_SETTINGS_MANAGE', #environmentId) "
+                + ": isTenantAdmin()");
+        assertEveryPublicOverloadIsGated(
+            signingKeyFacade, "update", "hasPermission(#signingKey.id, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')");
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");
