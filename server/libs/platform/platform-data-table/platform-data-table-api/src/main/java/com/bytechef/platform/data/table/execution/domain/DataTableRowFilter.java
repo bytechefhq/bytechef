@@ -17,21 +17,81 @@
 package com.bytechef.platform.data.table.execution.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
- * A condition a row must satisfy. {@link Operation#IN} expects a collection value, {@link Operation#BETWEEN} a
- * collection of exactly two values (lower and upper bound, inclusive), and {@link Operation#EMPTY} and
- * {@link Operation#NOT_EMPTY} ignore the value.
+ * A condition a row must satisfy. {@link Operation#IN} expects a non-empty collection value, {@link Operation#BETWEEN}
+ * a collection of exactly two values (lower and upper bound, inclusive), and {@link Operation#EMPTY} and
+ * {@link Operation#NOT_EMPTY} take no value. Every other operation expects a single value. Values must not be null or
+ * blank. {@link Operation#EQUALS_IGNORE_CASE}, {@link Operation#CONTAINS}, {@link Operation#NOT_CONTAINS},
+ * {@link Operation#STARTS_WITH} and {@link Operation#ENDS_WITH} apply to text columns only.
  *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record DataTableRowFilter(String column, Operation operation, Object value) {
+public record DataTableRowFilter(String column, Operation operation, @Nullable Object value) {
 
     public DataTableRowFilter {
         Objects.requireNonNull(column, "column must not be null");
         Objects.requireNonNull(operation, "operation must not be null");
+
+        if (column.isBlank()) {
+            throw new IllegalArgumentException("column must not be blank");
+        }
+
+        switch (operation) {
+            case EMPTY, NOT_EMPTY -> value = null;
+            case IN, BETWEEN -> {
+                if (!(value instanceof Collection<?> collection)) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation %s requires a list of values".formatted(
+                            column, operation));
+                }
+
+                if (collection.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation %s requires at least one value".formatted(
+                            column, operation));
+                }
+
+                if (collection.stream()
+                    .anyMatch(DataTableRowFilter::isMissing)) {
+
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation %s requires every value to be set".formatted(
+                            column, operation));
+                }
+
+                if (operation == Operation.BETWEEN && collection.size() != 2) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation BETWEEN requires exactly two values, got %d".formatted(
+                            column, collection.size()));
+                }
+
+                value = List.copyOf(collection);
+            }
+            default -> {
+                if (isMissing(value)) {
+                    throw new IllegalArgumentException(
+                        ("Filter on column '%s' with operation %s requires a value; use Empty or Not Empty to match " +
+                            "records by whether the column has a value").formatted(column, operation));
+                }
+
+                if (value instanceof Collection<?> || value instanceof Map<?, ?>) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation %s requires a single value, not a list or an object"
+                            .formatted(column, operation));
+                }
+            }
+        }
+    }
+
+    private static boolean isMissing(@Nullable Object value) {
+        return value == null || (value instanceof String string && string.isBlank());
     }
 
     public enum Operation {
