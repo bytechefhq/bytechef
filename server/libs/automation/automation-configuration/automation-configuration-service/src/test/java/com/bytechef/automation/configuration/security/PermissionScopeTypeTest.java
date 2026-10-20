@@ -80,8 +80,6 @@ class PermissionScopeTypeTest {
         "APP_EVENT_CREATE",
         "APP_EVENT_EDIT",
         "APP_EVENT_DELETE",
-        "EMBEDDED_VIEW",
-        "EMBEDDED_MEMBER_MANAGE",
         "EMBEDDED_SETTINGS_MANAGE");
 
     /**

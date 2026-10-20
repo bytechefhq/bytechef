@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -301,9 +302,19 @@ class PermissionScopeRegistryTest {
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider(),
                 new WorkspacePermissionScopeProvider()));
 
+        private final PermissionScopeRegistry shippedEmbeddedPermissionScopeRegistry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(
+                new AppEventPermissionScopeProvider(), new ConnectedUserPermissionScopeProvider(),
+                new EmbeddedPermissionScopeProvider(), new EmbeddedSharedPermissionScopeProvider(),
+                new IntegrationInstanceConfigurationPermissionScopeProvider(),
+                new IntegrationPermissionScopeProvider()));
+
         @Test
         void testEveryScopeNamedByAGateIsRegistered() {
-            Set<String> registeredScopeNames = shippedPermissionScopeRegistry.getAllScopeNames();
+            Set<String> registeredScopeNames = new HashSet<>(shippedPermissionScopeRegistry.getAllScopeNames());
+
+            registeredScopeNames.addAll(
+                shippedEmbeddedPermissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED));
             Set<String> gatedScopeNames = readScopeNamesNamedByGates();
 
             assertThat(gatedScopeNames)

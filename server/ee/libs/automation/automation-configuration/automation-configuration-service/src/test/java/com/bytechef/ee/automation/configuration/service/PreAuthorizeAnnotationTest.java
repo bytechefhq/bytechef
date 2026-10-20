@@ -34,6 +34,7 @@ class PreAuthorizeAnnotationTest {
             "com.bytechef.automation.configuration.service.ProjectServiceImpl",
             "com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl",
             "com.bytechef.ee.automation.configuration.service.CustomRoleServiceImpl",
+            "com.bytechef.ee.automation.configuration.service.EmbeddedUserServiceImpl",
             "com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationServiceImpl",
             "com.bytechef.ee.automation.configuration.service.WorkspaceServiceImpl",
             "com.bytechef.ee.automation.configuration.service.WorkspaceUserServiceImpl"
@@ -106,6 +107,21 @@ class PreAuthorizeAnnotationTest {
             clazz, "getWorkspaceWorkspaceUsers", new Class<?>[] {
                 long.class
             }, "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')");
+    }
+
+    @Test
+    void testEmbeddedUserFacadeMembershipChangesAreProtected() throws Exception {
+        Class<?> clazz = Class.forName("com.bytechef.ee.automation.configuration.facade.EmbeddedUserFacadeImpl");
+
+        String everyEnvironment = "hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')";
+        String inEnvironment = "hasEmbeddedScopeInEnvironment('EMBEDDED_MEMBER_MANAGE', #environment)";
+
+        assertEveryPublicOverloadIsGated(clazz, "addEmbeddedUser", everyEnvironment);
+        assertEveryPublicOverloadIsGated(clazz, "getEmbeddedUsers", "hasEmbeddedScope('EMBEDDED_VIEW')");
+        assertEveryPublicOverloadIsGated(clazz, "updateEmbeddedUserRole", everyEnvironment);
+        assertEveryPublicOverloadIsGated(clazz, "removeEmbeddedUser", everyEnvironment);
+        assertEveryPublicOverloadIsGated(clazz, "setEnvironmentRole", inEnvironment);
+        assertEveryPublicOverloadIsGated(clazz, "removeEnvironmentRole", inEnvironment);
     }
 
     @Test
