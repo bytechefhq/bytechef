@@ -41,7 +41,7 @@
           }, {
             "description": null,
             "label": "False",
-            "value": true
+            "value": false
           } ],
           "placeholder": null,
           "required": false,
@@ -90,7 +90,7 @@
         }, {
           "description": null,
           "label": "False",
-          "value": true
+          "value": false
         } ],
         "placeholder": null,
         "required": false,
