@@ -206,18 +206,24 @@ public class TaskCoordinator {
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(stopJobEvent.getJobId());
 
-        if (!taskExecutions.isEmpty()) {
-            TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
+        Long cancelledTaskExecutionId = null;
 
-            currentTaskExecution.setEndDate(Instant.now());
-            currentTaskExecution.setStatus(TaskExecution.Status.CANCELLED);
+        for (TaskExecution taskExecution : taskExecutions) {
+            TaskExecution.Status status = taskExecution.getStatus();
 
-            taskExecutionService.update(currentTaskExecution);
+            if (status != null && status.isTerminated()) {
+                continue;
+            }
 
-            taskDispatcher.dispatch(
-                new CancelControlTask(
-                    Validate.notNull(currentTaskExecution.getJobId(), "jobId"),
-                    Validate.notNull(currentTaskExecution.getId(), "id")));
+            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
+            if (taskExecutionService.cancelIfUnfinished(taskExecutionId) && cancelledTaskExecutionId == null) {
+                cancelledTaskExecutionId = taskExecutionId;
+            }
+        }
+
+        if (cancelledTaskExecutionId != null) {
+            taskDispatcher.dispatch(new CancelControlTask(stopJobEvent.getJobId(), cancelledTaskExecutionId));
         }
 
         if (log.isDebugEnabled()) {

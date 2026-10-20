@@ -23,10 +23,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -236,10 +238,62 @@ class TaskCoordinatorTest {
         verify(jobRepository, never()).save(any());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void testStopJobCancelsEveryUnfinishedTaskExecution() {
+        Job job = new Job();
+
+        job.setId(4567L);
+        job.setStatus(Job.Status.STOPPED);
+
+        JobService jobService = mock(JobService.class);
+
+        when(jobService.setStatusToStopped(4567L))
+            .thenReturn(job);
+
+        TaskExecution outerLoopTaskExecution = createTaskExecution(1L, TaskExecution.Status.STARTED);
+        TaskExecution completedTaskExecution = createTaskExecution(2L, TaskExecution.Status.COMPLETED);
+        TaskExecution innerLoopTaskExecution = createTaskExecution(3L, TaskExecution.Status.STARTED);
+        TaskExecution innerTaskExecution = createTaskExecution(4L, TaskExecution.Status.CREATED);
+
+        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+
+        when(taskExecutionService.getJobTaskExecutions(4567L))
+            .thenReturn(
+                List.of(
+                    outerLoopTaskExecution, completedTaskExecution, innerLoopTaskExecution, innerTaskExecution));
+        when(taskExecutionService.cancelIfUnfinished(any(Long.class)))
+            .thenReturn(true);
+
+        TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
+
+        TaskCoordinator taskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), mock(ApplicationEventPublisher.class), mock(JobExecutor.class), jobService,
+            taskCompletionHandler, taskDispatcher, taskExecutionService);
+
+        taskCoordinator.onStopJobEvent(new StopJobEvent(4567L));
+
+        verify(taskExecutionService).cancelIfUnfinished(1L);
+        verify(taskExecutionService, never()).cancelIfUnfinished(2L);
+        verify(taskExecutionService).cancelIfUnfinished(3L);
+        verify(taskExecutionService).cancelIfUnfinished(4L);
+        verify(taskExecutionService, never()).update(any());
+
+        ArgumentCaptor<Task> taskArgumentCaptor = ArgumentCaptor.forClass(Task.class);
+
+        verify(taskDispatcher).dispatch(taskArgumentCaptor.capture());
+
+        assertThat(taskArgumentCaptor.getValue()).isInstanceOf(CancelControlTask.class);
+    }
+
     private static TaskExecution createTaskExecution(TaskExecution.Status status) {
+        return createTaskExecution(12L, status);
+    }
+
+    private static TaskExecution createTaskExecution(long id, TaskExecution.Status status) {
         TaskExecution taskExecution = new TaskExecution();
 
-        taskExecution.setId(12L);
+        taskExecution.setId(id);
         taskExecution.setJobId(4567L);
         taskExecution.setStatus(status);
 
