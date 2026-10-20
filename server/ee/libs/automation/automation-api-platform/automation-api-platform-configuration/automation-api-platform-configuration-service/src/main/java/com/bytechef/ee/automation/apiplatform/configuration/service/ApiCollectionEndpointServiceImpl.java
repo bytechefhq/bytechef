@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiEndpointRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional
 public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointService {
 

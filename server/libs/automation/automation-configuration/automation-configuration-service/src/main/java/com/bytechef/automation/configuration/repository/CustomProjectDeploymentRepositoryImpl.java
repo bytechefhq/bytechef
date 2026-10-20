@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -28,8 +29,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
  * @author Ivica Cardic
  */
 public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeploymentRepository {
-
-    private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
 
     private final JdbcClient jdbcClient;
     private final ProjectOwnershipService projectOwnershipService;
@@ -61,13 +60,8 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
         conditions.add(
             projectOwnershipService.getExcludeProjectDeploymentsCondition(
-                EnumSet.of(
-                    ProjectDeploymentOwner.API_COLLECTION, ProjectDeploymentOwner.A2A_SERVER,
-                    ProjectDeploymentOwner.MCP_SERVER),
+                EnumSet.complementOf(EnumSet.of(ProjectDeploymentOwner.EMBEDDED)),
                 "project_deployment.id"));
-
-        conditions.add(
-            "NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX));
 
         if (embedded != null) {
             if (embedded) {
@@ -78,6 +72,9 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
                 conditions.add(
                     projectOwnershipService.getExcludeProjectDeploymentsCondition(
                         EnumSet.of(ProjectDeploymentOwner.EMBEDDED), "project_deployment.id"));
+                conditions.add(
+                    projectOwnershipService.getExcludeProjectsCondition(
+                        EnumSet.allOf(ProjectOwner.class), "project_deployment.project_id"));
             }
         }
 
@@ -126,13 +123,5 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
         }
 
         return projectDeployments;
-    }
-
-    private static String startsWith(String column, String prefix) {
-        String escapedPrefix = prefix.replace("\\", "\\\\")
-            .replace("%", "\\%")
-            .replace("_", "\\_");
-
-        return column + " LIKE '" + escapedPrefix + "%' ESCAPE '\\'";
     }
 }
