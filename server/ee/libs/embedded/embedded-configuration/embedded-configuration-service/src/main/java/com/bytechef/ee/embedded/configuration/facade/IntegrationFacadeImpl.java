@@ -88,7 +88,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_CREATE')")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
@@ -111,7 +111,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'INTEGRATION_DELETE')")
     public void deleteIntegration(long id) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(id);
@@ -153,7 +153,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -162,14 +162,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public List<IntegrationVersion> getIntegrationVersions(long id) {
         return integrationService.getIntegrationVersions(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
         boolean includeAllFields) {
@@ -225,7 +225,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and "
+        + "hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')")
     public void publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -253,7 +254,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationDTO.id, 'Integration', 'WORKFLOW_EDIT')")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
