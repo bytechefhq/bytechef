@@ -14,6 +14,7 @@ import {Switch} from '@/components/ui/switch';
 import {Textarea} from '@/components/ui/textarea';
 import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
 import NameFormField from '@/shared/components/entity-form/NameFormField';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectCategoriesQuery,
     AutomationWorkflowProjectTagsQuery,
@@ -58,6 +59,8 @@ const AutomationWorkflowProjectDialog = ({
     project,
     tags,
 }: AutomationWorkflowProjectDialogProps) => {
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+
     const categoryOptions: Array<SelectOptionType> = (categories || []).map((category: EmbeddedCategoryType) => ({
         label: category.name,
         value: category.name,
@@ -177,51 +180,55 @@ const AutomationWorkflowProjectDialog = ({
                                     )}
                                 />
 
-                                <FormField
-                                    control={control}
-                                    name="permissionExpression"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Permission Expression</FormLabel>
+                                {canManageSettings && (
+                                    <FormField
+                                        control={control}
+                                        name="permissionExpression"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Permission Expression</FormLabel>
 
-                                            <FormControl>
-                                                <Textarea
-                                                    placeholder="e.g. metadata['plan'] == 'pro'"
-                                                    rows={3}
-                                                    {...field}
-                                                />
-                                            </FormControl>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder="e.g. metadata['plan'] == 'pro'"
+                                                        rows={3}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
 
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
-                                <FormField
-                                    control={control}
-                                    name="automationHubVisible"
-                                    render={({field}) => (
-                                        <FormItem className="flex items-center justify-between gap-4">
-                                            <div>
-                                                <FormLabel htmlFor="automation-hub-visible">
-                                                    Show in Automation Hub
-                                                </FormLabel>
+                                {(canManageSettings || !project) && (
+                                    <FormField
+                                        control={control}
+                                        name="automationHubVisible"
+                                        render={({field}) => (
+                                            <FormItem className="flex items-center justify-between gap-4">
+                                                <div>
+                                                    <FormLabel htmlFor="automation-hub-visible">
+                                                        Show in Automation Hub
+                                                    </FormLabel>
 
-                                                <p className="text-sm text-muted-foreground">
-                                                    Turn off for flows you only activate through the API.
-                                                </p>
-                                            </div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Turn off for flows you only activate through the API.
+                                                    </p>
+                                                </div>
 
-                                            <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    id="automation-hub-visible"
-                                                    onCheckedChange={field.onChange}
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                />
+                                                <FormControl>
+                                                    <Switch
+                                                        checked={field.value}
+                                                        id="automation-hub-visible"
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
                             </DialogBody>
 
                             <DialogFooter>

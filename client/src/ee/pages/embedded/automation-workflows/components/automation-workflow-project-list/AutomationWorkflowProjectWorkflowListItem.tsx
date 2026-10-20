@@ -8,6 +8,8 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import {useMemo} from 'react';
@@ -28,6 +30,9 @@ const AutomationWorkflowProjectWorkflowListItem = ({
     onSelectWorkflow,
     workflow,
 }: AutomationWorkflowProjectWorkflowListItemProps) => {
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+
     const filteredComponentNames = useMemo(() => {
         const componentNames = [...workflow.triggers, ...workflow.components].map((component) => component.name);
 
@@ -112,28 +117,32 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            aria-label="Edit Workflow"
-                            icon={<PencilIcon />}
-                            label="Edit"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                        {canEditWorkflow && (
+                            <DropdownMenuItem
+                                aria-label="Edit Workflow"
+                                icon={<PencilIcon />}
+                                label="Edit"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onEditWorkflow(workflow);
-                            }}
-                        />
+                                    onEditWorkflow(workflow);
+                                }}
+                            />
+                        )}
 
-                        <DropdownMenuItem
-                            aria-label="Delete Workflow"
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={(event) => {
-                                event.stopPropagation();
+                        {canDeleteWorkflow && (
+                            <DropdownMenuItem
+                                aria-label="Delete Workflow"
+                                icon={<Trash2Icon />}
+                                label="Delete"
+                                onClick={(event) => {
+                                    event.stopPropagation();
 
-                                onDeleteWorkflow(workflow.workflowUuid);
-                            }}
-                            variant="destructive"
-                        />
+                                    onDeleteWorkflow(workflow.workflowUuid);
+                                }}
+                                variant="destructive"
+                            />
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

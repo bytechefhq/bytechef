@@ -3,6 +3,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog';
 
+const hoisted = vi.hoisted(() => ({grantedScopes: ['INTEGRATION_CREATE', 'INTEGRATION_SETTINGS'] as string[]}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: (scope: string) => hoisted.grantedScopes.includes(scope),
+}));
+
 const existingProject = {
     automationHubVisible: true,
     categoryId: null,
@@ -28,6 +36,8 @@ const defaultProps = {
 };
 
 beforeEach(() => {
+    hoisted.grantedScopes = ['INTEGRATION_CREATE', 'INTEGRATION_SETTINGS'];
+
     windowResizeObserver();
 });
 
@@ -50,6 +60,33 @@ describe('AutomationWorkflowProjectDialog', () => {
 
             expect(screen.getByLabelText('Name')).toHaveValue('');
             expect(screen.getByLabelText('Description')).toHaveValue('');
+        });
+    });
+
+    describe('visibility switch and permission expression gating', () => {
+        it('shows the Automation Hub switch on create without settings but hides the permission expression', () => {
+            hoisted.grantedScopes = ['INTEGRATION_CREATE'];
+
+            render(<AutomationWorkflowProjectDialog {...defaultProps} />);
+
+            expect(screen.getByText('Show in Automation Hub')).toBeInTheDocument();
+            expect(screen.queryByText('Permission Expression')).not.toBeInTheDocument();
+        });
+
+        it('hides the Automation Hub switch on edit without settings', () => {
+            hoisted.grantedScopes = [];
+
+            render(<AutomationWorkflowProjectDialog {...defaultProps} project={existingProject} />);
+
+            expect(screen.queryByText('Show in Automation Hub')).not.toBeInTheDocument();
+            expect(screen.queryByText('Permission Expression')).not.toBeInTheDocument();
+        });
+
+        it('shows both on edit with settings', () => {
+            render(<AutomationWorkflowProjectDialog {...defaultProps} project={existingProject} />);
+
+            expect(screen.getByText('Show in Automation Hub')).toBeInTheDocument();
+            expect(screen.getByText('Permission Expression')).toBeInTheDocument();
         });
     });
 
