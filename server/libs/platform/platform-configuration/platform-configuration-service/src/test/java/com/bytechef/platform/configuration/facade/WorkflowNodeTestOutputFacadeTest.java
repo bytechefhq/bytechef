@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -39,6 +40,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -48,6 +51,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -103,6 +107,49 @@ class WorkflowNodeTestOutputFacadeTest {
             actionDefinitionFacade, clusterElementDefinitionService, List.of(), connectionService, evaluator,
             jobPrincipalAccessorRegistry, triggerDefinitionFacade, workflowNodeTestOutputService,
             workflowNodeOutputFacade, webhookTriggerTestFacade, workflowService, workflowTestConfigurationService);
+    }
+
+    @Test
+    void testSaveWorkflowNodeTestOutputKeepsOutputFunctionSchemaWhenActionReturnsNoRows() {
+        Workflow workflow = new Workflow(WORKFLOW_ID, """
+            {
+                "triggers": [
+                    {"name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": [
+                    {"name": "postgresql_1", "type": "postgresql/v1/query", "parameters": {"query": "SELECT 1"}}
+                ]
+            }
+            """, Format.JSON);
+        BaseProperty outputSchema = mock(BaseProperty.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "postgresql_1", ENVIRONMENT_ID)).thenReturn(List.of());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenAnswer(invocation -> Map.of());
+        when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, "postgresql_1", ENVIRONMENT_ID))
+            .thenAnswer(invocation -> Map.of());
+        when(evaluator.evaluate(anyMap(), anyMap(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(actionDefinitionFacade.executePerform(
+            eq("postgresql"), eq(1), eq("query"), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(), anyMap(),
+            any(), eq(ENVIRONMENT_ID), isNull(), eq(true), anyMap(), isNull(), isNull()))
+                .thenReturn(List.of());
+        when(actionDefinitionFacade.executeOutput(eq("postgresql"), eq(1), eq("query"), anyMap(), anyMap()))
+            .thenReturn(new OutputResponse(outputSchema, List.of()));
+
+        workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(WORKFLOW_ID, "postgresql_1", ENVIRONMENT_ID);
+
+        ArgumentCaptor<OutputResponse> outputResponseCaptor = ArgumentCaptor.forClass(OutputResponse.class);
+
+        verify(workflowNodeTestOutputService).save(
+            eq(WORKFLOW_ID), eq("postgresql_1"), any(), outputResponseCaptor.capture(), eq(ENVIRONMENT_ID));
+
+        OutputResponse savedOutputResponse = outputResponseCaptor.getValue();
+
+        assertEquals(outputSchema, savedOutputResponse.outputSchema());
+        assertEquals(List.of(), savedOutputResponse.sampleOutput());
     }
 
     @Test

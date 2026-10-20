@@ -74,6 +74,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
@@ -86,16 +87,25 @@ import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
+import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation.QueryResult;
 import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.platform.component.util.SqlUtils;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
@@ -144,7 +154,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .label("Parameters")
                     .description("The list of properties which should be used as query parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
-            .output()
+            .output(this::queryOutput)
             .perform(this::performQuery),
         action("insert")
             .title("Insert")
@@ -299,6 +309,8 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     private final ExecuteJdbcOperation executeJdbcOperation;
     private final InsertJdbcOperation insertJdbcOperation;
     private final String jdbcDriverClassName;
+    private static final Logger logger = LoggerFactory.getLogger(JdbcComponentHandlerImpl.class);
+
     private final QueryJdbcOperation queryJdbcOperation;
     private final UpdateJdbcOperation updateJdbcOperation;
 
@@ -357,6 +369,71 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
         try (SingleConnectionDataSource dataSource = getDataSource(connectionParameters)) {
             return queryJdbcOperation.execute(inputParameters, dataSource);
+        }
+    }
+
+    protected @Nullable OutputResponse queryOutput(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws SQLException {
+
+        String query = inputParameters.getString(QUERY);
+
+        if (query == null || query.isBlank()) {
+            return null;
+        }
+
+        try (SingleConnectionDataSource dataSource = getDataSource(connectionParameters)) {
+            QueryResult queryResult = executeInReadOnlyTransaction(
+                dataSource, () -> queryJdbcOperation.executeWithColumns(inputParameters, dataSource));
+
+            List<ValueProperty<?>> columnProperties = queryResult.columns()
+                .stream()
+                .<ValueProperty<?>>map(column -> toColumnProperty(column.name(), column.type()))
+                .toList();
+
+            return OutputResponse.of(array().items(object().properties(columnProperties)), queryResult.rows());
+        } catch (DataAccessException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Query output could not be resolved: {}", e.getMessage());
+            }
+
+            return null;
+        }
+    }
+
+    static ValueProperty<?> toColumnProperty(String name, int jdbcType) {
+        return switch (jdbcType) {
+            case Types.BIT, Types.BOOLEAN -> bool(name);
+            case Types.TINYINT, Types.SMALLINT, Types.INTEGER, Types.BIGINT -> integer(name);
+            case Types.DECIMAL, Types.NUMERIC, Types.FLOAT, Types.REAL, Types.DOUBLE -> number(name);
+            case Types.DATE -> date(name);
+            case Types.TIME, Types.TIME_WITH_TIMEZONE -> time(name);
+            case Types.TIMESTAMP, Types.TIMESTAMP_WITH_TIMEZONE -> dateTime(name);
+            case Types.ARRAY -> array(name);
+            case Types.STRUCT, Types.JAVA_OBJECT -> object(name);
+            default -> string(name);
+        };
+    }
+
+    static <T> T executeInReadOnlyTransaction(SingleConnectionDataSource dataSource, Supplier<T> supplier)
+        throws SQLException {
+
+        Connection connection = dataSource.getConnection();
+
+        boolean autoCommit = connection.getAutoCommit();
+        boolean readOnly = connection.isReadOnly();
+
+        connection.setAutoCommit(false);
+        connection.setReadOnly(true);
+
+        try {
+            return supplier.get();
+        } finally {
+            try {
+                connection.rollback();
+            } finally {
+                connection.setReadOnly(readOnly);
+                connection.setAutoCommit(autoCommit);
+            }
         }
     }
 

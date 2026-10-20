@@ -63,6 +63,8 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,6 +72,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeTestOutputFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -274,7 +278,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return executeAndSaveTestOutput(
             workflow.getId(), workflowNodeName, workflowNodeType, mergedParameters, connectionIds, extensions,
-            environmentId, this::executeActionPerform);
+            environmentId, this::executeActionPerform, this::executeActionOutput);
     }
 
     @Override
@@ -359,6 +363,16 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId,
         TestPerformFunction performFunction) {
 
+        return executeAndSaveTestOutput(
+            workflowId, workflowNodeName, workflowNodeType, inputParameters, connectionIds, extensions, environmentId,
+            performFunction, null);
+    }
+
+    private WorkflowNodeTestOutput executeAndSaveTestOutput(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId,
+        TestPerformFunction performFunction, @Nullable TestOutputFunction outputFunction) {
+
         Object value = performFunction.execute(
             workflowNodeType, inputParameters, connectionIds, extensions, environmentId);
 
@@ -371,6 +385,11 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         if (outputResponse == null) {
             return null;
+        }
+
+        if (outputFunction != null && value instanceof List<?> list && list.isEmpty()) {
+            outputResponse = withOutputFunctionSchema(
+                outputResponse, workflowNodeType, inputParameters, connectionIds, outputFunction);
         }
 
         return workflowNodeTestOutputService.save(
@@ -506,7 +525,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return executeAndSaveTestOutput(
             workflow.getId(), workflowNodeName, workflowNodeType, inputParameters, connectionIds, extensions,
-            environmentId, this::executeActionPerform);
+            environmentId, this::executeActionPerform, this::executeActionOutput);
     }
 
     private WorkflowNodeTestOutput saveTriggerWorkflowNodeTestOutput(
@@ -541,6 +560,42 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, outputResponse, environmentId);
+    }
+
+    private OutputResponse withOutputFunctionSchema(
+        OutputResponse outputResponse, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, TestOutputFunction outputFunction) {
+
+        try {
+            OutputResponse functionOutputResponse = outputFunction.execute(
+                workflowNodeType, inputParameters, connectionIds);
+
+            if (functionOutputResponse != null && functionOutputResponse.outputSchema() != null) {
+                return new OutputResponse(functionOutputResponse.outputSchema(), outputResponse.sampleOutput());
+            }
+        } catch (RuntimeException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Output schema of node {} was not resolved: {}", workflowNodeType, e.getMessage());
+            }
+        }
+
+        return outputResponse;
+    }
+
+    private @Nullable OutputResponse executeActionOutput(
+        WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+
+        return actionDefinitionFacade.executeOutput(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
+            connectionIds);
+    }
+
+    @FunctionalInterface
+    private interface TestOutputFunction {
+
+        @Nullable
+        OutputResponse execute(
+            WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters, Map<String, Long> connectionIds);
     }
 
     @FunctionalInterface
