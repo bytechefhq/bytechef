@@ -8,10 +8,12 @@
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version ee
@@ -47,5 +49,8 @@ public interface ApiCollectionFacade {
     void updateApiCollectionTags(long id, List<Tag> tags);
 
     ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO);
+
+    ApiCollectionEndpointDTO updateApiCollectionEndpointWorkflow(
+        long id, List<ProjectDeploymentWorkflowConnection> connections, Map<String, ?> inputs);
 
 }
