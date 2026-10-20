@@ -21,6 +21,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.agent.RunAgentParameters;
@@ -64,6 +68,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.session.EventFilter;
@@ -233,6 +238,43 @@ class WebhookBridgeAgentTest {
             .containsEntry("message", List.of("Hello"))
             .containsEntry("chatId", List.of(THREAD_ID))
             .containsEntry("conversationId", List.of("workflow-chat:" + THREAD_ID));
+    }
+
+    @Test
+    void testTriggerInstanceNameDoesNotLogANonChatTriggerMessage() throws AGUIException {
+        AiHubChat chat = newChat(AiHubChatKind.WORKFLOW_CHAT, "Chat");
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "uuid-123", "trigger_1");
+
+        chat.setWorkflowExecutionId(workflowExecutionId.toString());
+
+        givenChat(chat);
+
+        when(executor.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
+            .thenReturn(new WebhookTriggerFlags(false, true, false, false));
+        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "done"));
+
+        Logger bridgeLogger = (Logger) LoggerFactory.getLogger(WebhookBridgeAgent.class);
+        Level originalLevel = bridgeLogger.getLevel();
+        ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
+
+        logAppender.start();
+        bridgeLogger.addAppender(logAppender);
+        bridgeLogger.setLevel(Level.DEBUG);
+
+        try {
+            newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
+
+            assertThat(captureAssistantReply()).isEqualTo("done");
+            verify(subscriber, timeout(2000)).onRunFinalized(any());
+        } finally {
+            bridgeLogger.setLevel(originalLevel);
+            bridgeLogger.detachAppender(logAppender);
+        }
+
+        assertThat(logAppender.list)
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .noneMatch(message -> message.contains("non-chat trigger"));
     }
 
     @Test

@@ -95,12 +95,6 @@ public class WebhookBridgeAgent extends LocalAgent {
     private static final Duration RESUME_REQUEST_TIMEOUT = Duration.ofSeconds(60);
 
     /**
-     * The request body shape is calibrated for the canonical chat trigger. Turns against other triggers are logged so a
-     * misconfigured workflow chat can be spotted.
-     */
-    private static final String CHAT_TRIGGER_NAME = "newChatRequest";
-
-    /**
      * Prefix of the conversation id the workflow's own chat memory sees. It must differ from the thread id, which is
      * the hub's session id, because both memories can live in the same session store.
      */
@@ -234,14 +228,6 @@ public class WebhookBridgeAgent extends LocalAgent {
         }
 
         WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat);
-
-        String triggerName = workflowExecutionId.getTriggerName();
-
-        if (log.isDebugEnabled() && !CHAT_TRIGGER_NAME.equals(triggerName)) {
-            log.debug(
-                "Workflow chat {} runs against non-chat trigger '{}'; body shape may not match.", chat.getId(),
-                triggerName);
-        }
 
         boolean streamingPath = hasStreamingTask(workflowExecutionId) || !webhookTriggerFlags.workflowSyncExecution();
 
