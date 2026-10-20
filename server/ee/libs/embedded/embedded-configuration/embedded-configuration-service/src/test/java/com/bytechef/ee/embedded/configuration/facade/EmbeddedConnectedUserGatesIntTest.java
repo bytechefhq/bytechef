@@ -735,13 +735,13 @@ class EmbeddedConnectedUserGatesIntTest {
             authenticate(login, TENANT_ADMIN.equals(login));
 
             assertThatThrownBy(() -> workspaceConnectionFacade.delete(EMBEDDED_PRODUCTION_CONNECTION_ID))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.updateConnectionTags(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of()))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
         }

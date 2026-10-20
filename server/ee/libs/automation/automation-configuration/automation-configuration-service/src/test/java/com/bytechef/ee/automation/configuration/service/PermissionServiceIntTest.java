@@ -1768,8 +1768,11 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolver("Project", ResourceOwner.ofWorkspace(workspaceId))), List.of(),
-            permissiveResolver(), List.of(),
+            workspaceUserRepository,
+            List.of(
+                new ProjectOwnershipResolver(
+                    beanFactory.getBeanProvider(EmbeddedResourceResolver.class), projectRepository, userService)),
+            List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
