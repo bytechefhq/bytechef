@@ -38,6 +38,7 @@ public final class ActionDefinition {
     private boolean batch;
     private String componentName;
     private int componentVersion;
+    private boolean deprecated;
     private String description;
     private Help help;
     private String name;
@@ -63,6 +64,7 @@ public final class ActionDefinition {
         this.batch = actionDefinition.getBatch();
         this.componentName = Objects.requireNonNull(componentName, "componentName is required");
         this.componentVersion = Objects.requireNonNull(componentVersion, "componentVersion is required");
+        this.deprecated = actionDefinition.getDeprecated();
         this.description = getDescription(actionDefinition);
         this.help = actionDefinition.getHelp()
             .map(Help::new)
@@ -104,7 +106,7 @@ public final class ActionDefinition {
             return false;
         }
 
-        return batch == that.batch && componentVersion == that.componentVersion &&
+        return batch == that.batch && componentVersion == that.componentVersion && deprecated == that.deprecated &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(componentName, that.componentName) && Objects.equals(description, that.description) &&
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
@@ -119,7 +121,8 @@ public final class ActionDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
+            batch, componentName, componentVersion, deprecated, description, help, name, outputDefined,
+            outputFunctionDefined,
             outputResponse, outputSchemaDefined, properties, resumePerformFunctionDefined, sseStreamResponse, title,
             workflowNodeDescriptionDefined);
     }
@@ -159,6 +162,10 @@ public final class ActionDefinition {
 
     public boolean isBatch() {
         return batch;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
     }
 
     public boolean isOutputDefined() {
@@ -204,6 +211,7 @@ public final class ActionDefinition {
             ", properties=" + properties +
             ", resumePerformFunctionDefined=" + resumePerformFunctionDefined +
             ", batch=" + batch +
+            ", deprecated=" + deprecated +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +
