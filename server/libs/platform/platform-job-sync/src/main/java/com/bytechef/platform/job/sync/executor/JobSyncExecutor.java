@@ -83,6 +83,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -586,12 +587,52 @@ public class JobSyncExecutor {
         } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent) {
             long taskExecutionId = taskStartedEvent.getTaskExecutionId();
 
-            Job job = jobService.getTaskExecutionJob(taskExecutionId);
+            Job job;
+
+            try {
+                job = jobService.getTaskExecutionJob(taskExecutionId);
+            } catch (IllegalStateException | NoSuchElementException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Skipping task started event for deleted task execution: {}", taskExecutionId);
+                }
+
+                return;
+            }
 
             long jobId = Validate.notNull(job.getId(), "id");
 
             notifyTaskStartedListeners(jobId, taskStartedEvent);
         }
+    }
+
+    private boolean isJobDeletedOrStopped(TaskExecution taskExecution) {
+        Long jobId = taskExecution.getJobId();
+
+        if (jobId == null) {
+            return false;
+        }
+
+        Optional<Job> jobOptional = jobService.fetchJob(jobId);
+
+        if (jobOptional.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Dropping task completion for deleted job: {}", jobId);
+            }
+
+            return true;
+        }
+
+        Job job = jobOptional.get();
+
+        if (job.getStatus() == Job.Status.STOPPED) {
+            if (log.isDebugEnabled()) {
+                log.debug("Dropping task completion for stopped job: {}", jobId);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private void handleCoordinatorErrorEvent(
@@ -652,6 +693,10 @@ public class JobSyncExecutor {
         // not include all required fields (e.g., taskExecution.id).
         notifyTaskExecutionCompleteListeners(event);
 
+        if (isJobDeletedOrStopped(event.getTaskExecution())) {
+            return;
+        }
+
         try {
             taskCoordinator.onTaskExecutionCompleteEvent(event);
         } catch (Exception exception) {
@@ -674,7 +719,17 @@ public class JobSyncExecutor {
 
         long jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
 
-        Job job = jobService.getJob(jobId);
+        Optional<Job> jobOptional = jobService.fetchJob(jobId);
+
+        if (jobOptional.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Skipping task scheduling for deleted job: {}", jobId);
+            }
+
+            return;
+        }
+
+        Job job = jobOptional.get();
 
         if (job.getStatus() != Job.Status.STARTED) {
             if (log.isDebugEnabled()) {
