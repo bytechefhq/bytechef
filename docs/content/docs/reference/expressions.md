@@ -318,7 +318,7 @@ Implicit conversion occurs when an input value of one type is used in a context 
 
 | Function | Description |
 |---|---|
-| concat(str1, str2, ...) | Concatenates one or more strings, or one or more lists. All arguments must be strings or all must be lists. |
+| concat(value1, value2, ...) | Concatenates one or more values into a string. Numbers, booleans and other non-list values are converted to text and null values are skipped. If every argument is a list, the lists are concatenated instead; mixing lists with other values, or passing a map, is an error. |
 | contains(str, substr) | Checks if a string contains a substring. |
 | equalsIgnoreCase(str1, str2) | Compares two strings for equality, ignoring case differences. |
 | format(formatStr, args...) | Formats a string using a format string and arguments (similar to String.format). |
