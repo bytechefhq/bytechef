@@ -73,6 +73,9 @@ class McpIntegrationInstanceConfigurationFacadeTest {
     private ConnectionService connectionService;
 
     @Mock
+    private EmbeddedMcpReader embeddedMcpReader;
+
+    @Mock
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
 
     @Mock
@@ -107,7 +110,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
     @BeforeEach
     void beforeEach() {
         mcpIntegrationInstanceConfigurationFacade = new McpIntegrationInstanceConfigurationFacadeImpl(
-            componentConnectionFacade, connectionService, integrationInstanceConfigurationService,
+            componentConnectionFacade, connectionService, embeddedMcpReader, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceWorkflowService, integrationService,
             integrationWorkflowService, mcpIntegrationInstanceConfigurationService,
             mcpIntegrationInstanceConfigurationWorkflowService, mcpServerService, permissionService,
@@ -123,7 +126,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
             INTEGRATION_INSTANCE_CONFIGURATION_ID))
                 .thenReturn(integrationInstanceConfiguration);
 
-        when(mcpServerService.getMcpServer(3L))
+        when(embeddedMcpReader.getMcpServer(3L))
             .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
         Integration integration = new Integration();
@@ -183,7 +186,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
 
     @Test
     void testCreateRejectsAServerFromAnotherEnvironment() {
-        when(mcpServerService.getMcpServer(4L))
+        when(embeddedMcpReader.getMcpServer(4L))
             .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.PRODUCTION));
 
         assertThatThrownBy(
