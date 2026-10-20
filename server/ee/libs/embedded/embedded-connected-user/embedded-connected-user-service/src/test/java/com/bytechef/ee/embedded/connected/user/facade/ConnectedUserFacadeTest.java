@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -24,12 +25,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 class ConnectedUserFacadeTest {
 
     @Test
-    void testEveryFacadeMethodRequiresTenantAdmin() throws NoSuchMethodException {
+    void testEveryFacadeMethodCarriesItsEmbeddedScopeGate() throws NoSuchMethodException {
         Method[] facadeMethods = ConnectedUserFacade.class.getMethods();
 
         assertThat(facadeMethods).isNotEmpty();
 
-        List<String> ungatedMethodNames = new ArrayList<>();
+        Map<String, String> expectedExpressions = Map.of(
+            "deleteConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_DELETE')",
+            "enableConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')",
+            "getConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')",
+            "getConnectedUserDTO", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')",
+            "getConnectedUserDTOs", "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)",
+            "getConnectedUsers", "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)");
+
+        List<String> wrongGates = new ArrayList<>();
 
         for (Method facadeMethod : facadeMethods) {
             Method implementationMethod = ConnectedUserFacadeImpl.class.getDeclaredMethod(
@@ -37,13 +46,17 @@ class ConnectedUserFacadeTest {
 
             PreAuthorize preAuthorize = implementationMethod.getAnnotation(PreAuthorize.class);
 
-            if (preAuthorize == null || !"isTenantAdmin()".equals(preAuthorize.value())) {
-                ungatedMethodNames.add(implementationMethod.toGenericString());
+            String expectedExpression = expectedExpressions.get(facadeMethod.getName());
+
+            if (preAuthorize == null || !preAuthorize.value()
+                .equals(expectedExpression)) {
+
+                wrongGates.add(implementationMethod.toGenericString());
             }
         }
 
-        assertThat(ungatedMethodNames)
-            .as("ConnectedUserFacadeImpl methods without @PreAuthorize(\"isTenantAdmin()\")")
+        assertThat(wrongGates)
+            .as("ConnectedUserFacadeImpl methods without their embedded scope gate")
             .isEmpty();
     }
 

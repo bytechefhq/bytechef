@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class ConnectedUserWorkflowReferenceAdminFacadeImpl
     implements ConnectedUserWorkflowReferenceAdminFacade {
     private final ConnectedUserProjectService connectedUserProjectService;
@@ -50,6 +49,7 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScope('CONNECTED_USER_VIEW')")
     public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids) {
         List<ConnectedUserProjectWorkflow> references =
             connectedUserProjectWorkflowRepository.findAllByAutomationWorkflowUuidIn(automationWorkflowUuids);

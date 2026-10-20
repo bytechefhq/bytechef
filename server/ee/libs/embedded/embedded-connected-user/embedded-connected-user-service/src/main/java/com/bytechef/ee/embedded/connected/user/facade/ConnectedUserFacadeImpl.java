@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.connected.user.facade;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -84,7 +85,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_DELETE')")
     public void deleteConnectedUser(long id) {
         Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
 
@@ -96,7 +97,8 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
         }
 
-        connectedUserProjectFacade.deleteConnectedUserProjects(id);
+        AutomationAuthorizationContext
+            .runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
 
         for (long connectionId : connectionIds) {
             connectedUserConnectionService.deleteByConnectionId(connectionId);
@@ -108,7 +110,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);
@@ -125,7 +127,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public ConnectedUserDTO getConnectedUserDTO(long id) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(id);
 
@@ -145,14 +147,14 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public ConnectedUser getConnectedUser(long id) {
         return connectedUserService.getConnectedUser(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)")
     public Page<ConnectedUserDTO> getConnectedUserDTOs(
         Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber) {
@@ -185,7 +187,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)")
     public Page<ConnectedUser> getConnectedUsers(
         Long environmentId, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
         int pageNumber) {

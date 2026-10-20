@@ -49,6 +49,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -191,7 +192,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @MockitoBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -288,7 +289,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     void testResolveReferenceKeepsTheRowDisabledWhenAConnectionIsMissing() {
         String workflowId = createDraftWorkflow("Resolve Missing Connection", SLACK_WORKFLOW_DEFINITION);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
@@ -949,7 +950,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn(componentName);
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq(componentName), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq(componentName), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
 
         stubConnection(connectionId, componentName);

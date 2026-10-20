@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -28,6 +29,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
@@ -1163,7 +1165,8 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         private Authentication createTenantAdminAuthentication() {
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            when(permissionService.hasResourceScope(anyLong(), eq("ConnectedUser"), anyString())).thenReturn(true);
+            when(permissionService.hasEmbeddedScope(anyString())).thenReturn(true);
 
             return new UsernamePasswordAuthenticationToken(
                 "admin@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
@@ -1177,7 +1180,12 @@ class ConnectedUserConnectionFacadeIntTest {
             static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
                 @Lazy PermissionService permissionService) {
 
-                return new AutomationMethodSecurityExpressionHandler(permissionService);
+                AutomationMethodSecurityExpressionHandler handler =
+                    new AutomationMethodSecurityExpressionHandler(permissionService);
+
+                handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+                return handler;
             }
         }
     }
