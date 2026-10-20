@@ -484,10 +484,41 @@ export async function createSlackConnectionThroughApi(
     return Number(await response.text());
 }
 
-export async function deleteConnectionThroughApi(page: Page, connectionId: number): Promise<void> {
-    await page.request.delete(`${CONNECTIONS_API_PATH}/${connectionId}`, {
+export async function createAnthropicConnectionThroughApi(
+    page: Page,
+    {
+        apiKey,
+        environmentId,
+        name,
+        workspaceId,
+    }: {apiKey: string; environmentId: number; name: string; workspaceId: number}
+): Promise<number> {
+    const response = await page.request.post(CONNECTIONS_API_PATH, {
+        data: {
+            authorizationType: 'BEARER_TOKEN',
+            componentName: 'anthropic',
+            connectionVersion: 1,
+            environmentId,
+            name,
+            parameters: {token: apiKey},
+            workspaceId,
+        },
         headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
     });
+
+    await expectOk(response, `creating connection ${name}`);
+
+    return Number(await response.text());
+}
+
+export async function deleteConnectionThroughApi(page: Page, connectionId: number): Promise<void> {
+    const response = await page.request.delete(`${CONNECTIONS_API_PATH}/${connectionId}`, {
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    if (!response.ok() && response.status() !== 404) {
+        console.warn(`Failed to delete connection ${connectionId}: ${response.status()}`);
+    }
 }
 
 export interface ProjectSummaryI {
@@ -566,14 +597,76 @@ export async function listProjectDeployments(
     return deployments;
 }
 
-export async function deleteProjectDeploymentThroughApi(page: Page, projectDeploymentId: number): Promise<void> {
-    await page.request.patch(`${PROJECT_DEPLOYMENTS_API_PATH}/${projectDeploymentId}/enable/false`, {
+export interface ProjectDeploymentConnectionI {
+    connectionId: number;
+    workflowConnectionKey: string;
+    workflowNodeName: string;
+}
+
+/**
+ * Deploys one workflow of a published project version and enables both the deployment and its workflow.
+ */
+export async function createEnabledProjectDeploymentThroughApi(
+    page: Page,
+    {
+        connections,
+        environmentId,
+        name,
+        projectId,
+        projectVersion,
+        workflowId,
+    }: {
+        connections: ProjectDeploymentConnectionI[];
+        environmentId: number;
+        name: string;
+        projectId: number;
+        projectVersion: number;
+        workflowId: string;
+    }
+): Promise<number> {
+    const response = await page.request.post(PROJECT_DEPLOYMENTS_API_PATH, {
+        data: {
+            enabled: true,
+            environmentId,
+            name,
+            projectDeploymentWorkflows: [{connections, enabled: true, inputs: {}, workflowId}],
+            projectId,
+            projectVersion,
+        },
         headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
     });
 
-    await page.request.delete(`${PROJECT_DEPLOYMENTS_API_PATH}/${projectDeploymentId}`, {
+    await expectOk(response, `creating deployment ${name}`);
+
+    const projectDeploymentId = Number(await response.text());
+
+    const enableResponse = await page.request.patch(
+        `${PROJECT_DEPLOYMENTS_API_PATH}/${projectDeploymentId}/enable/true`,
+        {headers: {'X-XSRF-TOKEN': await readXsrfToken(page)}}
+    );
+
+    await expectOk(enableResponse, `enabling deployment ${projectDeploymentId}`);
+
+    return projectDeploymentId;
+}
+
+export async function deleteProjectDeploymentThroughApi(page: Page, projectDeploymentId: number): Promise<void> {
+    const disableResponse = await page.request.patch(
+        `${PROJECT_DEPLOYMENTS_API_PATH}/${projectDeploymentId}/enable/false`,
+        {headers: {'X-XSRF-TOKEN': await readXsrfToken(page)}}
+    );
+
+    if (!disableResponse.ok() && disableResponse.status() !== 404) {
+        console.warn(`Failed to disable project deployment ${projectDeploymentId}: ${disableResponse.status()}`);
+    }
+
+    const deleteResponse = await page.request.delete(`${PROJECT_DEPLOYMENTS_API_PATH}/${projectDeploymentId}`, {
         headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
     });
+
+    if (!deleteResponse.ok() && deleteResponse.status() !== 404) {
+        console.warn(`Failed to delete project deployment ${projectDeploymentId}: ${deleteResponse.status()}`);
+    }
 }
 
 export interface WorkflowComponentTypesI {
@@ -710,6 +803,18 @@ export async function createProjectThroughApi(
     await expectOk(response, `creating project ${name}`);
 
     return Number(await response.text());
+}
+
+export async function createProjectWorkflowThroughApi(
+    page: Page,
+    {definition, projectId}: {definition: object; projectId: number}
+): Promise<void> {
+    const response = await page.request.post(`${PROJECTS_API_PATH}/${projectId}/workflows`, {
+        data: {definition: JSON.stringify(definition)},
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    await expectOk(response, `adding a workflow to project ${projectId}`);
 }
 
 export async function listProjectWorkflowIds(page: Page, projectId: number): Promise<string[]> {
