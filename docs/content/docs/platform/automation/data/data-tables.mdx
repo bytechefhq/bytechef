@@ -76,17 +76,33 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 |---|---|
 | **Create Records** | Insert one or more new rows |
 | **Get Record** | Fetch a single row by its `id` |
-| **Find Records** | List rows from a table, with **Limit** and **Offset** for paging |
+| **Find Records** | List the rows that match **OR Conditions**, sorted by a column, with **Limit** and **Offset** for paging |
 | **Update Record** | Update an existing row by its `id` |
 | **Delete Records** | Delete rows |
 | **Clear Table** | Remove every row from the table |
 
 Select the table on any action and its inputs adapt to that table's columns.
 
-> **Coming soon.** Filtering and sorting on **Find Records** - conditions such as
-> `status equals qualified` or `amount between 100 and 500`, plus an order-by - are on the upcoming
-> release track. In the latest released version **Find Records** returns rows in insertion order and
-> you narrow the result with **Limit** and **Offset**, or fetch a known row with **Get Record**.
+### Finding records
+
+**Find Records** filters rows the same way the **Condition** task does. **OR Conditions** holds one or
+more **AND Condition** groups. A row is returned when it meets every condition in at least one group,
+and leaving **OR Conditions** empty returns every row. Each condition picks a **Column**, an
+**Operation** and the value to compare with:
+
+| Operation | Matches rows where the column |
+|---|---|
+| **Equals** / **Not Equals** | is, or is not, the value. **Not Equals** also matches empty cells |
+| **Equals Ignore Case** | equals the text, ignoring upper and lower case |
+| **Contains** / **Not Contains** / **Starts With** / **Ends With** | contains, does not contain, starts with or ends with the text. These comparisons are case-sensitive |
+| **Greater** / **Greater or Equals** / **Less** / **Less or Equals** | compares as a number, date or text |
+| **In** | is one of the listed **Values** |
+| **Between** | lies between **Value** and **To Value**, both included |
+| **Empty** / **Not Empty** | has no value. For text columns an empty string counts as empty |
+
+The text operations work only on text columns. Values are converted to the column's type, so `10` in
+the **Value** field compares as a number against an integer column. **Sort Column** and
+**Sort Direction** set the order of the results. Without them rows come back in insertion order.
 
 ### Triggers
 
@@ -132,11 +148,11 @@ right shape for some jobs and the wrong shape for others.
 
 | Use case | How to model it |
 |---|---|
-| **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping, looked up with **Find Records**. Needs the filtering above; until it ships, keep the mapping small enough to read in one page and match it in the workflow. |
+| **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping, looked up with **Find Records** and an **Equals** condition on the key column. |
 | **Configuration data** - regional overrides, per-tenant knobs. | One row per configuration key. |
 | **Feature flags** - turn workflow behavior on and off without republishing. | A Boolean column keyed by flag name. |
-| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. Consuming a *filtered* slice of the queue needs the filtering above. |
-| **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing. Needs the filtering above - the check is a lookup by external ID, which the latest released version cannot express. |
+| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. Add conditions to consume only a slice of the queue. |
+| **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing with **Find Records** and an **Equals** condition on the ID column. |
 | **Reference data** - data too dynamic for static configuration. | One row per record, refreshed by a workflow when the upstream changes. |
 
 ### What a Data Table is not

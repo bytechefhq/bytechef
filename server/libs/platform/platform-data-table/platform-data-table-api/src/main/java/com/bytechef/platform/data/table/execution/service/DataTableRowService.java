@@ -17,6 +17,8 @@
 package com.bytechef.platform.data.table.execution.service;
 
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +74,22 @@ public interface DataTableRowService {
      * @return list of rows with their data
      */
     List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId);
+
+    /**
+     * Lists rows of a dynamic table that satisfy the given conditions, ordered by the given sort, with pagination.
+     *
+     * @param baseName      the logical table base name
+     * @param conditions    OR groups of AND conditions: a row matches when it satisfies every filter of at least one
+     *                      group; empty groups are ignored, and no groups match every row
+     * @param sort          the sort order, or null to order by id ascending
+     * @param limit         maximum number of rows to return
+     * @param offset        number of rows to skip
+     * @param environmentId the environment ID
+     * @return list of matching rows with their data
+     */
+    List<DataTableRow> findRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, DataTableRowSort sort, int limit, int offset,
+        long environmentId);
 
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
