@@ -41,6 +41,7 @@ class WorkflowReadFacadeAuthorizationTest {
     private static final String IN_REQUESTED_ENVIRONMENT =
         "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)";
     private static final Map<Class<?>, Set<String>> GUARDED_BY_CALLERS = Map.of(
+        ComponentConnectionFacadeImpl.class, Set.of("getWorkflowComponentConnections"),
         WorkflowFacadeImpl.class, Set.of("fetchWorkflow", "getWorkflow", "update"),
         WorkflowNodeOutputFacadeImpl.class, Set.of("getPreviousWorkflowNodeOutputs", "getWorkflowNodeOutput"));
 
@@ -96,11 +97,13 @@ class WorkflowReadFacadeAuthorizationTest {
                 WorkflowNodeDynamicPropertiesFacadeImpl.class,
                 Map.of(
                     "getClusterElementDynamicProperties", IN_REQUESTED_ENVIRONMENT,
+                    "getWorkflowNodeComponentOperationDynamicProperties", IN_REQUESTED_ENVIRONMENT,
                     "getWorkflowNodeDynamicProperties", IN_REQUESTED_ENVIRONMENT)),
             Arguments.of(
                 WorkflowNodeOptionFacadeImpl.class,
                 Map.of(
                     "getClusterElementNodeOptions", IN_REQUESTED_ENVIRONMENT,
+                    "getWorkflowNodeComponentOperationOptions", IN_REQUESTED_ENVIRONMENT,
                     "getWorkflowNodeOptions", IN_REQUESTED_ENVIRONMENT)),
             Arguments.of(
                 WorkflowNodeOutputFacadeImpl.class,

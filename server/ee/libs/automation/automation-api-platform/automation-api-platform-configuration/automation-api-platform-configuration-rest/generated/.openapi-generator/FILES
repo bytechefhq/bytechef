@@ -7,9 +7,13 @@ src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiC
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiClientModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionEndpointModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionMissingConnectionModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionMissingInputModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionVersionUpdateModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/CreateApiClient200ResponseModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/HttpMethodModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/TagModel.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/UpdateApiCollectionProjectVersionRequestModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/UpdateTagsRequestModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
