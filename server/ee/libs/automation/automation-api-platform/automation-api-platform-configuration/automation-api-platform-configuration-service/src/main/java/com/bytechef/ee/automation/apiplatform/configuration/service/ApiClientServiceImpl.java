@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiClientRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional
 public class ApiClientServiceImpl implements ApiClientService {
 
