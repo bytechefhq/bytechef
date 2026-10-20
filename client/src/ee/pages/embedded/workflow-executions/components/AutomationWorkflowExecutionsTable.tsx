@@ -1,10 +1,22 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import EmbeddedWorkflowExecutionsDropdownMenu from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsDropdownMenu';
 import {getConnectedUserExternalId} from '@/ee/pages/embedded/workflow-executions/utils/getConnectedUserExternalId';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
+import {
+    EXECUTIONS_TABLE_CELL_CLASS_NAME,
+    EXECUTIONS_TABLE_HEADER_CLASS_NAME,
+    EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+    EXECUTIONS_TABLE_ROW_CLASS_NAME,
+    EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
+    PINNED_CELL_CLASS_NAME,
+    PINNED_HEAD_CLASS_NAME,
+    PINNED_STRIPED_CELL_CLASS_NAME,
+} from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {Job, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {CellContext, createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const getDuration = (info: CellContext<typeof coreTableFeatures, WorkflowExecution, Job | undefined>) => {
@@ -27,6 +39,14 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
             setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
         }))
     );
+
+    const handleRowClick = (index: number) => {
+        if (data[index].id) {
+            setWorkflowExecutionId(data[index].id!);
+
+            setWorkflowExecutionSheetOpen(true);
+        }
+    };
 
     const reactTable = useTable({
         columns: columnHelper.columns([
@@ -58,6 +78,17 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                 ),
                 header: 'Execution date',
             }),
+            columnHelper.display({
+                cell: ({row}) => (
+                    <EmbeddedWorkflowExecutionsDropdownMenu
+                        jobId={row.original.job?.id}
+                        jobStatus={row.original.job?.status}
+                        onView={() => handleRowClick(row.index)}
+                    />
+                ),
+                header: 'Actions',
+                id: 'actions',
+            }),
         ]),
         data,
         features: coreTableFeatures,
@@ -66,23 +97,18 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;
 
-    const handleRowClick = (index: number) => {
-        if (data[index].id) {
-            setWorkflowExecutionId(data[index].id!);
-
-            setWorkflowExecutionSheetOpen(true);
-        }
-    };
-
     return (
-        <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-full">
             <Table>
-                <TableHeader>
+                <TableHeader className={EXECUTIONS_TABLE_HEADER_CLASS_NAME}>
                     {headerGroups.map((headerGroup) => (
-                        <TableRow className="border-b-border/50" key={headerGroup.id}>
+                        <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header, index) => (
                                 <TableHead
-                                    className="text-xs font-semibold tracking-wide text-content-neutral-secondary uppercase"
+                                    className={twMerge(
+                                        EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+                                        header.column.id === 'actions' && PINNED_HEAD_CLASS_NAME
+                                    )}
                                     key={`${headerGroup.id}_${header.id}_${index}`}
                                 >
                                     {!header.isPlaceholder &&
@@ -96,12 +122,22 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow
-                            className="cursor-pointer border-b-border/50"
+                            className={twMerge(
+                                EXECUTIONS_TABLE_ROW_CLASS_NAME,
+                                EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME
+                            )}
                             key={row.id}
                             onClick={() => handleRowClick(row.index)}
                         >
                             {row.getAllCells().map((cell, index) => (
-                                <TableCell className="py-4 whitespace-nowrap" key={`${row.id}_${cell.id}_${index}`}>
+                                <TableCell
+                                    className={twMerge(
+                                        EXECUTIONS_TABLE_CELL_CLASS_NAME,
+                                        cell.column.id === 'actions' && PINNED_CELL_CLASS_NAME,
+                                        cell.column.id === 'actions' && PINNED_STRIPED_CELL_CLASS_NAME
+                                    )}
+                                    key={`${row.id}_${cell.id}_${index}`}
+                                >
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
