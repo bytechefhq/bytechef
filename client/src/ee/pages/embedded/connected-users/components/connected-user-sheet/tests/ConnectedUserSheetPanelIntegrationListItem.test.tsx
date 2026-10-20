@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
@@ -84,6 +85,13 @@ const openMenu = async () => {
 
     await userEvent.keyboard('{ArrowDown}');
 };
+
+beforeEach(() => {
+    authenticationStore.setState({
+        account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'} as never,
+        authenticated: true,
+    });
+});
 
 describe('ConnectedUserSheetPanelIntegrationListItem', () => {
     beforeEach(() => {
