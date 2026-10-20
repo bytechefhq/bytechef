@@ -1,5 +1,6 @@
-import {AiHubChatArtifactI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {AiHubChatArtifactI, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatArtifactsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
@@ -16,7 +17,13 @@ export default function useAiHubArtifactsCard(): AiHubArtifactsCardStateI {
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const enabled = currentChatId != null && isWorkspaceIdKnown(currentWorkspaceId) && !rightPanelOpen;
+    const currentChat = useCurrentAiHubChat();
+
+    const enabled =
+        currentChatId != null &&
+        isWorkspaceIdKnown(currentWorkspaceId) &&
+        !rightPanelOpen &&
+        !isWebhookBridgedChat(currentChat?.kind);
 
     const {data: artifacts} = useAiHubChatArtifactsQuery(currentChatId, currentWorkspaceId, enabled);
 

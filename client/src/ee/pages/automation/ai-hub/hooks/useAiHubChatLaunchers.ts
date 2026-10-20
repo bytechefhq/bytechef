@@ -44,13 +44,19 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
                 return;
             }
 
-            const result = await createWorkflowChatMutation.mutateAsync({
-                environment: currentEnvironmentId,
-                projectDeploymentId,
-                title: label,
-                workflowExecutionId,
-                workspaceId: String(currentWorkspaceId),
-            });
+            let result;
+
+            try {
+                result = await createWorkflowChatMutation.mutateAsync({
+                    environment: currentEnvironmentId,
+                    projectDeploymentId,
+                    title: label,
+                    workflowExecutionId,
+                    workspaceId: String(currentWorkspaceId),
+                });
+            } catch {
+                return;
+            }
 
             const chat = result.createWorkflowChatAiHubChat;
 

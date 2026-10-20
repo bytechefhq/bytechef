@@ -1,5 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
@@ -34,7 +36,8 @@ const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
 interface AiHubChatComposerPropsI {
     /**
      * Pre-built LLM provider/model picker rendered as the first control in the composer footer. The parent owns the
-     * selection state (per chat, or the home view's draft), so it passes the picker as a node.
+     * selection state (per chat, or the home view's draft), so it passes the picker as a node, and passes none for a
+     * workflow chat.
      */
     modelPicker?: ReactNode;
 }
@@ -53,9 +56,13 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const isRunning = useAiHubRunStateStore((state) => isChatRunning(state, chatId));
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const currentChat = useCurrentAiHubChat();
+
     const cancelAiHubRunMutation = useCancelAiHubRunMutation();
 
     const aui = useAui();
+
+    const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
 
     const handleCancelTurn = useCallback(() => {
         const runId = chatId != null ? aiHubRunStateStore.getState().runIdByChat[chatId] : undefined;
@@ -95,50 +102,53 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         }
     };
 
-    const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === '@') {
-            const textarea = event.currentTarget;
-            const caret = textarea.selectionStart;
-            const atWordBoundary = caret === 0 || /\s/.test(textarea.value.charAt(caret - 1));
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            if (event.key === '@' && !isWorkflowChat) {
+                const textarea = event.currentTarget;
+                const caret = textarea.selectionStart;
+                const atWordBoundary = caret === 0 || /\s/.test(textarea.value.charAt(caret - 1));
 
-            if (atWordBoundary) {
-                event.preventDefault();
+                if (atWordBoundary) {
+                    event.preventDefault();
 
-                atMentionTextareaRef.current = textarea;
+                    atMentionTextareaRef.current = textarea;
 
-                aiHubComposerStore.getState().setResourcePickerOpen(true);
+                    aiHubComposerStore.getState().setResourcePickerOpen(true);
 
+                    return;
+                }
+            }
+
+            if (event.key !== 'Enter' || !event.altKey || event.shiftKey) {
                 return;
             }
-        }
 
-        if (event.key !== 'Enter' || !event.altKey || event.shiftKey) {
-            return;
-        }
+            event.preventDefault();
 
-        event.preventDefault();
+            const textarea = event.currentTarget;
+            const selectionStart = textarea.selectionStart;
+            const currentValue = textarea.value;
 
-        const textarea = event.currentTarget;
-        const selectionStart = textarea.selectionStart;
-        const currentValue = textarea.value;
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLTextAreaElement.prototype,
+                'value'
+            )?.set;
 
-        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-            window.HTMLTextAreaElement.prototype,
-            'value'
-        )?.set;
+            nativeInputValueSetter?.call(
+                textarea,
+                currentValue.substring(0, selectionStart) + '\n' + currentValue.substring(textarea.selectionEnd)
+            );
 
-        nativeInputValueSetter?.call(
-            textarea,
-            currentValue.substring(0, selectionStart) + '\n' + currentValue.substring(textarea.selectionEnd)
-        );
+            textarea.dispatchEvent(new Event('input', {bubbles: true}));
 
-        textarea.dispatchEvent(new Event('input', {bubbles: true}));
-
-        requestAnimationFrame(() => {
-            textarea.selectionStart = selectionStart + 1;
-            textarea.selectionEnd = selectionStart + 1;
-        });
-    }, []);
+            requestAnimationFrame(() => {
+                textarea.selectionStart = selectionStart + 1;
+                textarea.selectionEnd = selectionStart + 1;
+            });
+        },
+        [isWorkflowChat]
+    );
 
     const isWorkspaceReady = isWorkspaceIdKnown(currentWorkspaceId);
 
@@ -216,7 +226,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     <div className="flex min-w-0 items-center gap-1">
                         {modelPicker}
 
-                        <AiHubComposer />
+                        {!isWorkflowChat && <AiHubComposer />}
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
