@@ -31,6 +31,15 @@ import org.junit.jupiter.api.Test;
 class NodeValidationIssueParserTest {
 
     @Test
+    void classifiesAnInvalidExpressionWithItsPropertyPath() {
+        List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
+            List.of("[loop_lines] Property 'items' has an invalid expression: ${range(1, ${config.linesPerRow)}"),
+            List.of());
+
+        assertIssue(issues.getFirst(), "loop_lines", "items", WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR);
+    }
+
+    @Test
     void classifiesAMissingConnectionWithoutAPropertyPath() {
         List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
             List.of("[affinity_1] Missing required connection: Affinity"), List.of());

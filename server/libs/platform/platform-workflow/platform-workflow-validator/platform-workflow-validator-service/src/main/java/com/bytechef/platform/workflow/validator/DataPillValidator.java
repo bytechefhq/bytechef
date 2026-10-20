@@ -34,6 +34,11 @@ class DataPillValidator {
     private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
     private static final Pattern LOOP_ITEM_SEGMENT_PATTERN = Pattern.compile("\\.item(?!\\w)");
 
+    private static final Pattern ACCESSOR_PATH_PATTERN = Pattern.compile(
+        "(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*" +
+            "(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|" +
+            "\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*");
+
     private DataPillValidator() {
     }
 
@@ -183,6 +188,50 @@ class DataPillValidator {
         return taskType != null && taskType.startsWith("loop/");
     }
 
+    private static boolean isDataPillOperandInFormula(String text, String dataPillExpression) {
+        String trimmedText = text.trim();
+
+        if (!trimmedText.startsWith("=")) {
+            return false;
+        }
+
+        String formula = trimmedText.substring(1)
+            .trim();
+
+        return !formula.equals("${" + dataPillExpression + "}");
+    }
+
+    private static boolean isValidExpressionSyntax(String text) {
+        boolean formula = text.trim()
+            .startsWith("=");
+
+        int index = text.indexOf("${");
+
+        while (index >= 0) {
+            int endIndex = text.indexOf('}', index + 2);
+
+            if (endIndex < 0) {
+                return false;
+            }
+
+            String content = text.substring(index + 2, endIndex);
+
+            if (content.contains("${")) {
+                return false;
+            }
+
+            if (!formula && !ACCESSOR_PATH_PATTERN.matcher(content)
+                .matches()) {
+
+                return false;
+            }
+
+            index = text.indexOf("${", endIndex + 1);
+        }
+
+        return true;
+    }
+
     private static boolean isStringWithMultipleDataPills(String text) {
         Matcher matcher = DATA_PILL_PATTERN.matcher(text);
         int count = 0;
@@ -314,6 +363,13 @@ class DataPillValidator {
         TaskValidationContext context, Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition,
         JsonNode rootParametersJsonNode) {
 
+        if (!isValidExpressionSyntax(text)) {
+            StringUtils.appendWithNewline(
+                "Property '" + fieldPath + "' has an invalid expression: " + text, errors);
+
+            return;
+        }
+
         Matcher matcher = DATA_PILL_PATTERN.matcher(text);
 
         while (matcher.find()) {
@@ -329,8 +385,8 @@ class DataPillValidator {
                     warnings, context, text, allTasksMap, taskDefinition, rootParametersJsonNode);
             } else {
                 validateTaskReference(
-                    dataPillExpression, fieldPath, taskOutput, allTasksMap, taskNameToTypeMap, errors, taskDefinition,
-                    rootParametersJsonNode);
+                    dataPillExpression, fieldPath, taskOutput, allTasksMap, taskNameToTypeMap, errors, text,
+                    taskDefinition, rootParametersJsonNode);
             }
         }
     }
@@ -353,7 +409,7 @@ class DataPillValidator {
 
         JsonNode itemsJsonNode = parametersJsonNode.get("items");
 
-        if (expectedType == null) {
+        if (expectedType == null || isDataPillOperandInFormula(text, dataPillExpression)) {
             return;
         }
 
@@ -659,7 +715,7 @@ class DataPillValidator {
 
     private static void validateTaskReference(
         String dataPillExpression, String fieldPath, Map<String, PropertyInfo> taskOutput,
-        Map<String, JsonNode> allTasksMap, Map<String, String> taskNameToTypeMap, StringBuilder errors,
+        Map<String, JsonNode> allTasksMap, Map<String, String> taskNameToTypeMap, StringBuilder errors, String text,
         List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         if (!allTasksMap.containsKey(dataPillExpression)) {
@@ -678,18 +734,18 @@ class DataPillValidator {
 
         if (outputInfo != null) {
             validateInputTypeCompatibility(
-                dataPillExpression, fieldPath, outputInfo, errors, taskDefinition, rootParametersJsonNode);
+                dataPillExpression, fieldPath, outputInfo, errors, text, taskDefinition, rootParametersJsonNode);
         }
     }
 
     private static void validateInputTypeCompatibility(
-        String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors,
+        String dataPillExpression, String fieldPath, PropertyInfo outputInfo, StringBuilder errors, String text,
         List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
 
         String actualType = outputInfo.type();
         String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition, rootParametersJsonNode);
 
-        if (expectedType == null || actualType == null) {
+        if (expectedType == null || actualType == null || isDataPillOperandInFormula(text, dataPillExpression)) {
             return;
         }
 
@@ -715,6 +771,10 @@ class DataPillValidator {
 
         if (expectedType != null && actualType != null &&
             !isTypeCompatible(expectedType, actualType)) {
+
+            if (isDataPillOperandInFormula(text, dataPillExpression)) {
+                return;
+            }
 
             if ("file_entry".equalsIgnoreCase(expectedType) && isOpenObject(actualPropertyInfo)) {
                 return;

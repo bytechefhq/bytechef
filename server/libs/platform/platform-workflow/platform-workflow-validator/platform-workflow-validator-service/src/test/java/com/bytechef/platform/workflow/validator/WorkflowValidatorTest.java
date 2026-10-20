@@ -114,7 +114,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskDataPillsMalformedDataPillFormatIgnoresGracefully() {
+    void validateTaskDataPillsMalformedDataPillFormatReportsInvalidExpressions() {
         String tasksJson = """
             [
                 {
@@ -164,7 +164,10 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals(
-                "[task2] Property 'active' has incorrect type. Expected: boolean, but got: string",
+                """
+                    [task2] Property 'active' has incorrect type. Expected: boolean, but got: string
+                    [task2] Property 'name' has an invalid expression: ${incomplete
+                    [task2] Property 'active' has an invalid expression: ${}""",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
