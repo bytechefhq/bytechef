@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
@@ -23,57 +24,78 @@ class WebhookResumeRegistryTest {
     void testConsumeReturnsNullWhenNoEntry() {
         WebhookResumeRegistry registry = newRegistry();
 
-        assertThat(registry.consume(42L)).isNull();
+        assertThat(registry.consume("thread-42")).isNull();
     }
 
     @Test
     void testRegisterThenConsumeReturnsUrl() {
         WebhookResumeRegistry registry = newRegistry();
 
-        registry.register(42L, "https://example.com/resume/abc");
+        registry.register("thread-42", "https://example.com/resume/abc");
 
-        assertThat(registry.consume(42L)).isEqualTo("https://example.com/resume/abc");
+        assertThat(registry.consume("thread-42")).isEqualTo("https://example.com/resume/abc");
     }
 
     @Test
     void testConsumeRemovesTheEntry() {
         WebhookResumeRegistry registry = newRegistry();
 
-        registry.register(42L, "https://example.com/resume/abc");
+        registry.register("thread-42", "https://example.com/resume/abc");
 
-        assertThat(registry.consume(42L)).isEqualTo("https://example.com/resume/abc");
-        assertThat(registry.consume(42L)).isNull();
+        assertThat(registry.consume("thread-42")).isEqualTo("https://example.com/resume/abc");
+        assertThat(registry.consume("thread-42")).isNull();
     }
 
     @Test
     void testRegisterOverwritesPriorEntry() {
         WebhookResumeRegistry registry = newRegistry();
 
-        registry.register(42L, "https://example.com/resume/old");
-        registry.register(42L, "https://example.com/resume/new");
+        registry.register("thread-42", "https://example.com/resume/old");
+        registry.register("thread-42", "https://example.com/resume/new");
 
-        assertThat(registry.consume(42L)).isEqualTo("https://example.com/resume/new");
+        assertThat(registry.consume("thread-42")).isEqualTo("https://example.com/resume/new");
     }
 
     @Test
-    void testRegistryIsKeyedByChatId() {
+    void testRegistryIsKeyedByThreadId() {
         WebhookResumeRegistry registry = newRegistry();
 
-        registry.register(1L, "https://example.com/resume/one");
-        registry.register(2L, "https://example.com/resume/two");
+        registry.register("thread-1", "https://example.com/resume/one");
+        registry.register("thread-2", "https://example.com/resume/two");
 
-        assertThat(registry.consume(1L)).isEqualTo("https://example.com/resume/one");
-        assertThat(registry.consume(2L)).isEqualTo("https://example.com/resume/two");
+        assertThat(registry.consume("thread-1")).isEqualTo("https://example.com/resume/one");
+        assertThat(registry.consume("thread-2")).isEqualTo("https://example.com/resume/two");
+    }
+
+    @Test
+    void testChatsWithTheSameNumericIdInDifferentTenantsDoNotShareASlot() {
+        WebhookResumeRegistry registry = newRegistry();
+        AiHubChat tenantAChat = newChat(11L, "a1b2c3d4-0000-4000-8000-00000000000a");
+        AiHubChat tenantBChat = newChat(11L, "a1b2c3d4-0000-4000-8000-00000000000b");
+
+        registry.register(tenantAChat.getThreadId(), "https://tenant-a.example.com/resume");
+
+        assertThat(registry.consume(tenantBChat.getThreadId())).isNull();
+        assertThat(registry.consume(tenantAChat.getThreadId())).isEqualTo("https://tenant-a.example.com/resume");
     }
 
     @Test
     void testClearDropsThePendingResumeUrl() {
         WebhookResumeRegistry registry = newRegistry();
 
-        registry.register(5L, "http://resume");
-        registry.clear(5L);
+        registry.register("thread-5", "http://resume");
+        registry.clear("thread-5");
 
-        assertThat(registry.consume(5L)).isNull();
+        assertThat(registry.consume("thread-5")).isNull();
+    }
+
+    private static AiHubChat newChat(long chatId, String threadId) {
+        AiHubChat chat = new AiHubChat(3L);
+
+        chat.setId(chatId);
+        chat.setThreadId(threadId);
+
+        return chat;
     }
 
     private static WebhookResumeRegistry newRegistry() {
