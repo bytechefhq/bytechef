@@ -78,16 +78,20 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 | **Get Record** | Fetch a single row by its `id` |
 | **Find Records** | List the rows that match **OR Conditions**, sorted by a column, with **Limit** and **Offset** for paging |
 | **Update Record** | Update an existing row by its `id` |
-| **Delete Records** | Delete rows |
+| **Update Records** | Update every row that matches **OR Conditions** with the same values |
+| **Delete Records** | Delete rows by their `id`s, or set **Delete By** to **Conditions** to delete every matching row |
 | **Clear Table** | Remove every row from the table |
 
 Select the table on any action and its inputs adapt to that table's columns.
 
 ### Finding records
 
-**Find Records** filters rows the same way the **Condition** task does. **OR Conditions** holds one or
+**Find Records**, **Update Records** and **Delete Records** (with **Delete By** set to **Conditions**)
+select rows the same way the **Condition** task does. **OR Conditions** holds one or
 more **AND Condition** groups. A row is returned when it meets every condition in at least one group,
-and leaving **OR Conditions** empty returns every row. Each condition picks a **Column**, an
+and **Find Records** with no conditions returns every row. **Update Records** and **Delete Records**
+require at least one condition, so an empty list never rewrites or deletes the whole table - use
+**Clear Table** for that. Each condition picks a **Column**, an
 **Operation** and the value to compare with:
 
 | Operation | Matches rows where the column |
