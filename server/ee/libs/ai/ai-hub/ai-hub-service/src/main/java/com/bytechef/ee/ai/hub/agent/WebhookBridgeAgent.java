@@ -1,0 +1,884 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.hub.agent;
+
+import com.agui.core.agent.AgentSubscriber;
+import com.agui.core.agent.AgentSubscriberParams;
+import com.agui.core.agent.RunAgentInput;
+import com.agui.core.event.RunErrorEvent;
+import com.agui.core.event.RunStartedEvent;
+import com.agui.core.exception.AGUIException;
+import com.agui.core.message.AssistantMessage;
+import com.agui.core.message.BaseMessage;
+import com.agui.core.message.Role;
+import com.agui.server.LocalAgent;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.domain.WebhookTriggerFlags;
+import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.session.Session;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import tools.jackson.databind.json.JsonMapper;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public class WebhookBridgeAgent extends LocalAgent {
+
+    private static final Logger log = LoggerFactory.getLogger(WebhookBridgeAgent.class);
+
+    private static final Duration RESUME_REQUEST_TIMEOUT = Duration.ofSeconds(60);
+
+    private static final String CHAT_TRIGGER_NAME = "newChatRequest";
+
+    /**
+     * Prefix of the conversation id the workflow's own chat memory sees. It must differ from the thread id, which is
+     * the hub's session id, because both memories can live in the same session store.
+     */
+    private static final String CONVERSATION_ID_PREFIX = "workflow-chat:";
+
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
+    private final AiHubChatService chatService;
+    private final WebhookResumeRegistry resumeRegistry;
+    private final HttpClient resumeHttpClient;
+    private final JsonMapper jsonMapper;
+    private final WorkflowChatMetrics metrics;
+    private final WorkflowChatJobRegistry jobRegistry;
+    private final AiHubSessionMemory sessionMemory;
+    private final WorkflowChatGuard guard;
+    @Nullable
+    private final JobFacade jobFacade;
+    private final InFlightAiHubRunRegistry inFlightRunRegistry;
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public WebhookBridgeAgent(
+        WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
+        WebhookResumeRegistry resumeRegistry, JsonMapper jsonMapper, WorkflowChatMetrics metrics,
+        WorkflowChatJobRegistry jobRegistry, AiHubSessionMemory sessionMemory, WorkflowChatGuard guard,
+        @Nullable JobFacade jobFacade, InFlightAiHubRunRegistry inFlightRunRegistry) throws AGUIException {
+
+        super("webhook-bridge-agent", null, null, "(unused, the webhook bridge bypasses the LLM)", List.of());
+
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
+        this.chatService = chatService;
+        this.resumeRegistry = resumeRegistry;
+        this.jsonMapper = jsonMapper;
+        this.metrics = metrics;
+        this.jobRegistry = jobRegistry;
+        this.sessionMemory = sessionMemory;
+        this.guard = guard;
+        this.jobFacade = jobFacade;
+        this.inFlightRunRegistry = inFlightRunRegistry;
+        this.resumeHttpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+    }
+
+    @Override
+    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+        AiHubAgentTenantBinder.runWithTenant(getAgentId(), input.state(), () -> runBridge(input, subscriber));
+    }
+
+    @SuppressWarnings("checkstyle:methodlength")
+    private void runBridge(RunAgentInput input, AgentSubscriber subscriber) {
+        emitRunStarted(input, subscriber);
+
+        Optional<AiHubChat> chatOptional = chatService.findByThreadId(input.threadId());
+
+        if (chatOptional.isEmpty()) {
+            emitError(input, subscriber, "AiHubChat not found for thread " + input.threadId());
+
+            return;
+        }
+
+        AiHubChat chat = chatOptional.get();
+
+        if (!chat.getKind()
+            .isWebhookBridged()) {
+
+            log.warn(
+                "WebhookBridgeAgent invoked for a chat that is not webhook-bridged: {} (kind={}). Misroute.",
+                chat.getId(), chat.getKind());
+
+            emitError(input, subscriber, "AiHubChat kind mismatch: bridge agent invoked for a non-workflow chat");
+
+            return;
+        }
+
+        String workflowExecutionIdString = chat.getWorkflowExecutionId();
+
+        if (workflowExecutionIdString == null || workflowExecutionIdString.isBlank()) {
+            emitError(input, subscriber, "Workflow chat is missing workflowExecutionId");
+
+            return;
+        }
+
+        WorkflowExecutionId workflowExecutionId;
+
+        try {
+            workflowExecutionId = WorkflowExecutionId.parse(workflowExecutionIdString);
+        } catch (RuntimeException exception) {
+            emitError(
+                input, subscriber,
+                "Failed to parse workflow execution id: " + workflowExecutionIdString + ": " + exception.getMessage());
+
+            return;
+        }
+
+        String userMessage = lastUserMessage(input.messages());
+
+        if (userMessage == null) {
+            emitError(input, subscriber, "No user message found in agent input");
+
+            return;
+        }
+
+        if (!tryAdmitOrEmitError(input, chat, subscriber)) {
+            return;
+        }
+
+        String messageId = UUID.randomUUID()
+            .toString();
+
+        WorkflowChatTurnStopper stopper = new WorkflowChatTurnStopper(chat.getId(), jobRegistry, jobFacade);
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        String pendingResumeUrl = resumeRegistry.consume(chat.getId());
+
+        if (pendingResumeUrl != null) {
+            recordTurn("resume", chat);
+
+            handleResume(input, pendingResumeUrl, userMessage, chat, subscriber, messageId, stopper, tenantId);
+
+            return;
+        }
+
+        WebhookTriggerFlags webhookTriggerFlags = lookupTriggerFlagsOrEmitError(
+            input, workflowExecutionId, workflowExecutionIdString, chat, subscriber);
+
+        if (webhookTriggerFlags == null) {
+            return;
+        }
+
+        WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat);
+
+        String threadId = chat.getThreadId();
+        AgUiStreamBridge[] bridgeReference = new AgUiStreamBridge[1];
+        boolean[] streamingPathReference = new boolean[1];
+
+        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper, tenantId);
+
+        Runnable onFinalize = () -> {
+            try {
+                stopSubscription.dispose();
+
+                AgUiStreamBridge currentBridge = bridgeReference[0];
+
+                if (currentBridge != null && streamingPathReference[0]) {
+                    persistTurnToChatMemory(threadId, userMessage, currentBridge.getAccumulatedAssistantText());
+                }
+            } finally {
+                finalizeRun(input, subscriber);
+            }
+        };
+
+        AgUiStreamBridge bridge = new AgUiStreamBridge(
+            subscriber, messageId, input.threadId(), input.runId(), chat.getId(), resumeRegistry, jobRegistry,
+            jobFacade, jobId -> runWithTenant(tenantId, () -> stopper.onJobId(jobId)), onFinalize);
+
+        bridgeReference[0] = bridge;
+
+        String triggerName = workflowExecutionId.getTriggerName();
+
+        if (log.isDebugEnabled() && !CHAT_TRIGGER_NAME.equals(triggerName)) {
+            log.debug(
+                "Workflow chat {} runs against non-chat trigger '{}'; body shape may not match.", chat.getId(),
+                triggerName);
+        }
+
+        boolean hasStreamingTask;
+
+        try {
+            hasStreamingTask = webhookWorkflowExecutor.hasStreamingTask(workflowExecutionId);
+        } catch (RuntimeException exception) {
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "hasStreamingTask lookup failed for {}; falling back to trigger flag", workflowExecutionId,
+                    exception);
+            }
+
+            hasStreamingTask = false;
+        }
+
+        if (!hasStreamingTask && webhookTriggerFlags.workflowSyncExecution()) {
+            recordTurn("sync", chat);
+
+            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage);
+
+            return;
+        }
+
+        streamingPathReference[0] = true;
+
+        recordTurn("streaming", chat);
+
+        try {
+            webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, bridge);
+        } catch (RuntimeException exception) {
+            bridge.onError(exception);
+        }
+    }
+
+    private void recordTurn(String outcome, AiHubChat chat) {
+        metrics.recordTurn(outcome);
+
+        Long workspaceId = chat.getWorkspaceId();
+
+        if (workspaceId != null) {
+            metrics.recordTurnByWorkspace(outcome, workspaceId);
+        }
+    }
+
+    private Disposable subscribeToStop(String threadId, WorkflowChatTurnStopper stopper, String tenantId) {
+        Mono<Void> stopRequested = inFlightRunRegistry.stopRequested(threadId);
+
+        return stopRequested.subscribe(
+            ignored -> runWithTenant(tenantId, stopper::onStopRequested),
+            throwable -> log.warn("Stop signal of workflow chat thread {} failed", threadId, throwable),
+            () -> runWithTenant(tenantId, stopper::onStopRequested));
+    }
+
+    private void executeSync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, AgUiStreamBridge bridge,
+        AgentSubscriber subscriber, String messageId, AiHubChat chat, String userMessageText) {
+
+        try {
+            if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Workflow chat disabled mid-turn for chat {}", chat.getId());
+                }
+
+                bridge.onError(new IllegalStateException(disabledChatErrorMessage(chat)));
+
+                return;
+            }
+
+            Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+            handleSyncOutputs(outputs, bridge, subscriber, messageId, chat, userMessageText);
+        } catch (RuntimeException exception) {
+            bridge.onError(exception);
+        }
+    }
+
+    private static String disabledChatErrorMessage(AiHubChat chat) {
+        String title = chat.getTitle();
+
+        if (title != null && !title.isBlank()) {
+            return "This workflow chat (\"" + title + "\") is currently disabled. Re-enable the workflow's "
+                + "deployment to resume the chat.";
+        }
+
+        return "This workflow chat is currently disabled. Re-enable the workflow's deployment to resume the chat.";
+    }
+
+    private static String deletedWorkflowErrorMessage(AiHubChat chat) {
+        String title = chat.getTitle();
+
+        if (title != null && !title.isBlank()) {
+            return "This workflow chat (\"" + title + "\") can no longer be reached: the underlying workflow "
+                + "has been deleted or its deployment removed. Archive this chat, or restore the workflow to resume.";
+        }
+
+        return "This workflow chat can no longer be reached: the underlying workflow has been deleted or its "
+            + "deployment removed. Archive this chat, or restore the workflow to resume.";
+    }
+
+    /**
+     * Resume path: the previous turn paused the workflow at {@code ask_user_question} and {@link AgUiStreamBridge}
+     * captured its resume URL. POSTs the user's answer to that URL and streams the response through a fresh
+     * {@link AgUiStreamBridge}, so a nested {@code ask_user_question} registers a new resume URL in the same slot.
+     *
+     * <p>
+     * An SSE response is fed through the bridge event by event; any other response is read whole and handled like a
+     * synchronous result.
+     * </p>
+     *
+     * <p>
+     * <b>Tenant on the loopback:</b> the receiving webhook controller parses the workflow execution id out of the URL
+     * path and runs under that id's tenant, so the POST needs no auth headers or tenant cookies.
+     * </p>
+     */
+    private void handleResume(
+        RunAgentInput input, String resumeUrl, String userMessage, AiHubChat chat, AgentSubscriber subscriber,
+        String messageId, WorkflowChatTurnStopper stopper, String tenantId) {
+
+        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper, tenantId);
+
+        AgUiStreamBridge bridge = new AgUiStreamBridge(
+            subscriber, messageId, input.threadId(), input.runId(), chat.getId(), resumeRegistry, jobRegistry,
+            jobFacade, jobId -> runWithTenant(tenantId, () -> stopper.onJobId(jobId)), () -> {
+                try {
+                    stopSubscription.dispose();
+                } finally {
+                    finalizeRun(input, subscriber);
+                }
+            });
+
+        try {
+            String requestBody = jsonMapper.writeValueAsString(
+                Map.of(
+                    "message", userMessage,
+                    "chatId", chat.getThreadId(),
+                    "conversationId", conversationId(chat),
+                    "attachments", List.of()));
+
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(resumeUrl))
+                .timeout(RESUME_REQUEST_TIMEOUT)
+                .header("Content-Type", "application/json")
+                .header("Accept", "text/event-stream, application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .build();
+
+            HttpResponse<Stream<String>> response = resumeHttpClient.send(
+                httpRequest, HttpResponse.BodyHandlers.ofLines());
+
+            int statusCode = response.statusCode();
+
+            if (statusCode < 200 || statusCode >= 300) {
+                metrics.recordResume("http_error");
+
+                String errorBody = collectBodyLines(response.body());
+
+                bridge.onError(
+                    new IllegalStateException("Workflow resume failed with HTTP " + statusCode + ": " + errorBody));
+
+                return;
+            }
+
+            metrics.recordResume("success");
+
+            Optional<String> contentTypeOptional = response.headers()
+                .firstValue("Content-Type");
+
+            String contentType = contentTypeOptional.orElse("");
+
+            if (contentType.startsWith("text/event-stream")) {
+                streamResumeBody(response.body(), bridge);
+
+                persistTurnToChatMemory(chat.getThreadId(), userMessage, null);
+
+                bridge.onComplete();
+
+                return;
+            }
+
+            String body = collectBodyLines(response.body());
+
+            handleSyncOutputs(parseResponseBody(body), bridge, subscriber, messageId, chat, userMessage);
+        } catch (InterruptedException interruptedException) {
+            Thread currentThread = Thread.currentThread();
+
+            currentThread.interrupt();
+
+            metrics.recordResume("transport_error");
+
+            bridge.onError(interruptedException);
+        } catch (RuntimeException | IOException exception) {
+            log.warn("Workflow resume to {} failed for chat {}", resumeUrl, chat.getId(), exception);
+
+            metrics.recordResume("transport_error");
+
+            bridge.onError(exception);
+        }
+    }
+
+    private static String collectBodyLines(Stream<String> lines) {
+        StringBuilder builder = new StringBuilder();
+
+        try (Stream<String> stream = lines) {
+            stream.forEach(line -> {
+                if (!builder.isEmpty()) {
+                    builder.append('\n');
+                }
+
+                builder.append(line);
+            });
+        }
+
+        return builder.toString();
+    }
+
+    private void streamResumeBody(Stream<String> lines, AgUiStreamBridge bridge) {
+        try (Stream<String> stream = lines) {
+            stream.forEach(line -> {
+                if (!line.startsWith("data:")) {
+                    return;
+                }
+
+                String data = line.substring("data:".length());
+
+                String payload = data.stripLeading();
+
+                if (payload.isEmpty()) {
+                    return;
+                }
+
+                Object parsed;
+
+                try {
+                    parsed = jsonMapper.readValue(payload, Map.class);
+                } catch (RuntimeException jsonException) {
+                    parsed = payload;
+                }
+
+                bridge.onEvent(parsed);
+            });
+        }
+    }
+
+    private @Nullable Object parseResponseBody(@Nullable String body) {
+        if (body == null || body.isBlank()) {
+            return null;
+        }
+
+        try {
+            return jsonMapper.readValue(body, Map.class);
+        } catch (RuntimeException exception) {
+            if (log.isDebugEnabled()) {
+                log.debug("Workflow resume response was not parseable JSON; surfacing raw body", exception);
+            }
+
+            return body;
+        }
+    }
+
+    @SuppressWarnings("checkstyle:methodlength")
+    private void handleSyncOutputs(
+        @Nullable Object outputs, AgUiStreamBridge bridge, AgentSubscriber subscriber, String messageId,
+        AiHubChat chat, String userMessageText) {
+
+        if (outputs instanceof Map<?, ?> outputMap
+            && (outputMap.containsKey("ask_user_question") || outputMap.containsKey("questions"))) {
+
+            bridge.onEvent(outputMap);
+
+            persistTurnToChatMemory(chat.getThreadId(), userMessageText, null);
+
+            bridge.onComplete();
+
+            return;
+        }
+
+        String message = extractMessage(outputs);
+
+        if (bridge.hasStarted()) {
+            persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
+
+            bridge.onComplete();
+
+            return;
+        }
+
+        if (message == null || message.isBlank()) {
+            logMissingReply(outputs, chat);
+
+            message = "This workflow finished but produced no chat reply. If you wired "
+                + "`Chat → Response to Chat Request` with `message: ${<aiTask>}`, change it to "
+                + "`${<aiTask>.text}` (or the matching scalar field on the AI task's output) so the chat "
+                + "trigger receives a string instead of the full task object.";
+        }
+
+        bridge.onEvent(message);
+
+        AssistantMessage assistantMessage = new AssistantMessage();
+
+        assistantMessage.setId(messageId);
+        assistantMessage.setContent(message);
+
+        subscriber.onNewMessage(assistantMessage);
+
+        persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
+
+        bridge.onComplete();
+    }
+
+    private void logMissingReply(@Nullable Object outputs, AiHubChat chat) {
+        if (outputs == null) {
+            log.warn(
+                "Workflow chat {} produced null outputs and no streamed text. Workflow likely has no terminal task; "
+                    + "add a streaming AI agent task or a `chat/responseToRequest` step.",
+                chat.getId());
+
+            return;
+        }
+
+        Object rawEnvelope = null;
+
+        if (outputs instanceof Map<?, ?> outputMap) {
+            rawEnvelope = outputMap.get(MetadataConstants.WEBHOOK_RESPONSE);
+        }
+
+        String envelopePreview;
+
+        try {
+            envelopePreview = rawEnvelope == null ? "(null)" : jsonMapper.writeValueAsString(rawEnvelope);
+        } catch (RuntimeException jsonException) {
+            envelopePreview = String.valueOf(rawEnvelope);
+        }
+
+        if (envelopePreview.length() > 2000) {
+            envelopePreview = envelopePreview.substring(0, 2000) + "...(truncated)";
+        }
+
+        Class<?> outputsClass = outputs.getClass();
+
+        log.warn(
+            "Workflow chat {} produced no extractable chat reply and no streamed text. outputsType={} "
+                + "topLevelKeys={} envelopeType={} envelopePreview={}. If the workflow uses chat/responseToRequest "
+                + "with `message: ${{<aiTask>}}`, change it to `${{<aiTask>.text}}` or the matching scalar field on "
+                + "the AI task's output schema.",
+            chat.getId(), outputsClass.getSimpleName(),
+            outputs instanceof Map<?, ?> outputMap ? outputMap.keySet() : "(not a Map)",
+            rawEnvelope == null ? "(null)" : rawEnvelope.getClass()
+                .getName(),
+            envelopePreview);
+    }
+
+    private void persistTurnToChatMemory(
+        String threadId, String userMessageText, @Nullable String assistantMessageText) {
+
+        try {
+            SessionRepository sessionRepository = sessionMemory.sessionRepository();
+
+            if (Optional.ofNullable(sessionRepository.findById(threadId))
+                .isEmpty()) {
+
+                sessionRepository.save(
+                    Session.builder()
+                        .id(threadId)
+                        .userId(AiHubSessionMemory.SESSION_USER_ID)
+                        .createdAt(Instant.now())
+                        .build());
+            }
+
+            sessionRepository.appendEvent(
+                SessionEvent.builder()
+                    .sessionId(threadId)
+                    .message(new UserMessage(userMessageText))
+                    .build());
+
+            if (assistantMessageText != null && !assistantMessageText.isBlank()) {
+                sessionRepository.appendEvent(
+                    SessionEvent.builder()
+                        .sessionId(threadId)
+                        .message(new org.springframework.ai.chat.messages.AssistantMessage(assistantMessageText))
+                        .build());
+            }
+        } catch (RuntimeException exception) {
+            log.warn("Failed to persist workflow-chat turn to session memory for threadId {}", threadId, exception);
+        }
+    }
+
+    /**
+     * Pulls the assistant reply out of the workflow's synchronous result. Recognised shapes:
+     * <ol>
+     * <li>The {@link MetadataConstants#WEBHOOK_RESPONSE} envelope that {@code chat/responseToRequest} produces:
+     * {@code body.message} for JSON bodies, the body itself for raw String bodies.</li>
+     * <li>A map with a top-level {@code message} field.</li>
+     * <li>A bare String.</li>
+     * </ol>
+     * Anything else returns {@code null}. The unwrap mirrors the webhook controller's {@code processWebhookResponse},
+     * so a workflow that renders through the HTTP transport renders the same here.
+     */
+    private @Nullable String extractMessage(@Nullable Object outputs) {
+        if (outputs instanceof Map<?, ?> outputMap) {
+            String fromEnvelope = extractFromEnvelope(outputMap.get(MetadataConstants.WEBHOOK_RESPONSE));
+
+            if (fromEnvelope != null) {
+                return fromEnvelope;
+            }
+
+            String coerced = coerceToText(outputMap.get("message"));
+
+            if (coerced != null) {
+                return coerced;
+            }
+        }
+
+        if (outputs instanceof String stringOutput) {
+            return stringOutput;
+        }
+
+        return null;
+    }
+
+    private @Nullable String extractFromEnvelope(@Nullable Object webhookResponseValue) {
+        if (webhookResponseValue instanceof String envelopeString) {
+            return envelopeString.isBlank() ? null : envelopeString;
+        }
+
+        if (webhookResponseValue instanceof Map<?, ?> webhookResponseMap) {
+            Object body = webhookResponseMap.get("body");
+
+            if (body instanceof Map<?, ?> bodyMap) {
+                String coerced = coerceToText(bodyMap.get("message"));
+
+                if (coerced != null) {
+                    return coerced;
+                }
+            }
+
+            if (body instanceof String bodyString) {
+                return bodyString;
+            }
+
+            String envelopeCoerced = coerceToText(webhookResponseMap.get("message"));
+
+            if (envelopeCoerced != null) {
+                return envelopeCoerced;
+            }
+
+            if (webhookResponseMap.size() == 1) {
+                Object onlyValue = webhookResponseMap.values()
+                    .iterator()
+                    .next();
+
+                if (onlyValue instanceof String onlyString && !onlyString.isBlank()) {
+                    return onlyString;
+                }
+            }
+
+            return null;
+        }
+
+        if (webhookResponseValue != null) {
+            return extractFromTypedWebhookResponse(webhookResponseValue);
+        }
+
+        return null;
+    }
+
+    private @Nullable String extractFromTypedWebhookResponse(Object webhookResponseValue) {
+        try {
+            String json = jsonMapper.writeValueAsString(webhookResponseValue);
+            Object reparsed = jsonMapper.readValue(json, Object.class);
+
+            if (reparsed instanceof Map<?, ?> reparsedMap) {
+                return extractFromEnvelope(reparsedMap);
+            }
+
+            if (reparsed instanceof String reparsedString && !reparsedString.isBlank()) {
+                return reparsedString;
+            }
+        } catch (RuntimeException jsonException) {
+            if (log.isDebugEnabled()) {
+                Class<?> valueClass = webhookResponseValue.getClass();
+
+                log.debug(
+                    "Could not re-parse __webhookResponse value of type {} for chat reply extraction",
+                    valueClass.getName(), jsonException);
+            }
+        }
+
+        return null;
+    }
+
+    private static @Nullable String coerceToText(@Nullable Object value) {
+        if (value instanceof String stringValue) {
+            return stringValue;
+        }
+
+        if (value instanceof Map<?, ?> mapValue) {
+            for (String key : List.of("content", "text", "message", "response", "answer")) {
+                if (mapValue.get(key) instanceof String candidateString && !candidateString.isBlank()) {
+                    return candidateString;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static WebhookRequest buildWebhookRequest(String userMessage, AiHubChat chat) {
+        String threadId = chat.getThreadId();
+        String conversationId = conversationId(chat);
+
+        Map<String, Object> bodyContent = new HashMap<>();
+
+        bodyContent.put("message", userMessage);
+        bodyContent.put("chatId", threadId);
+        bodyContent.put("conversationId", conversationId);
+        bodyContent.put("attachments", List.of());
+
+        Map<String, List<String>> parameters = new HashMap<>();
+
+        parameters.put("message", List.of(userMessage));
+        parameters.put("chatId", List.of(threadId));
+        parameters.put("conversationId", List.of(conversationId));
+
+        return new WebhookRequest(
+            Map.of(), parameters,
+            new WebhookRequest.WebhookBodyImpl(bodyContent, ContentType.JSON, "application/json", null),
+            WebhookMethod.POST);
+    }
+
+    private static String conversationId(AiHubChat chat) {
+        return CONVERSATION_ID_PREFIX + chat.getThreadId();
+    }
+
+    private static @Nullable String lastUserMessage(@Nullable List<BaseMessage> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+
+        for (int index = messages.size() - 1; index >= 0; index--) {
+            BaseMessage message = messages.get(index);
+
+            if (message != null && Role.user.equals(message.getRole())) {
+                return message.getContent();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifies the workflow is reachable (enabled and not deleted) before the executor and bridge are set up. Returns
+     * the {@link WebhookTriggerFlags} on success; otherwise emits a friendly RUN_ERROR and returns {@code null}. Any
+     * {@link RuntimeException} from the lookup counts as deleted, because the lookup spans several services and a
+     * deleted project deployment, workflow or trigger each fail differently.
+     */
+    private @Nullable WebhookTriggerFlags lookupTriggerFlagsOrEmitError(
+        RunAgentInput input, WorkflowExecutionId workflowExecutionId, String workflowExecutionIdString,
+        AiHubChat chat, AgentSubscriber subscriber) {
+
+        try {
+            if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+                metrics.recordUnreachable("disabled");
+
+                emitError(input, subscriber, disabledChatErrorMessage(chat));
+
+                return null;
+            }
+
+            return webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Workflow chat trigger lookup failed for chat {} (workflowExecutionId={})", chat.getId(),
+                workflowExecutionIdString, exception);
+
+            metrics.recordUnreachable("deleted");
+
+            emitError(input, subscriber, deletedWorkflowErrorMessage(chat));
+
+            return null;
+        }
+    }
+
+    private boolean tryAdmitOrEmitError(RunAgentInput input, AiHubChat chat, AgentSubscriber subscriber) {
+        WorkflowChatGuard.AdmissionResult admission = guard.tryAdmit(chat.getId());
+
+        if (admission instanceof WorkflowChatGuard.AdmissionResult.Admit) {
+            return true;
+        }
+
+        recordTurn("rate_limited", chat);
+
+        String message = admission.userFacingMessage();
+
+        emitError(input, subscriber, message != null ? message : "Workflow chat turn rejected");
+
+        return false;
+    }
+
+    /**
+     * Emits {@code RUN_STARTED}, which must be the first event the client sees, through both {@code onEvent} (which
+     * writes it to the stream) and the typed dispatch.
+     */
+    private static void emitRunStarted(RunAgentInput input, AgentSubscriber subscriber) {
+        RunStartedEvent event = new RunStartedEvent();
+
+        event.setThreadId(input.threadId());
+        event.setRunId(input.runId());
+
+        subscriber.onEvent(event);
+        subscriber.onRunStartedEvent(event);
+    }
+
+    private void emitError(RunAgentInput input, AgentSubscriber subscriber, String message) {
+        RunErrorEvent event = new RunErrorEvent();
+
+        event.setError(message);
+
+        subscriber.onEvent(event);
+        subscriber.onRunErrorEvent(event);
+
+        finalizeRun(input, subscriber);
+    }
+
+    /**
+     * Fires {@code subscriber.onRunFinalized}, which completes the turn's run in {@link InFlightAiHubRunRegistry}: it
+     * closes the client stream and releases the chat for its next turn. Every completion path goes through here.
+     */
+    private void finalizeRun(RunAgentInput input, AgentSubscriber subscriber) {
+        try {
+            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+        } catch (RuntimeException exception) {
+            log.warn(
+                "subscriber.onRunFinalized threw for thread {} (run {}); the stream may stay open", input.threadId(),
+                input.runId(), exception);
+        }
+    }
+
+    private static void runWithTenant(String tenantId, Runnable action) {
+        String previousTenantId = TenantContext.getCurrentTenantId();
+
+        TenantContext.setCurrentTenantId(tenantId);
+
+        try {
+            action.run();
+        } finally {
+            TenantContext.setCurrentTenantId(previousTenantId);
+        }
+    }
+}
