@@ -77,7 +77,7 @@ class ProjectOwnershipResolverTest {
                 .getBeanProvider(EmbeddedResourceResolver.class),
             projectRepository);
 
-        assertThat(embeddedAwareResolver.resolveOwner(3L)).isEqualTo(ResourceOwner.ofEmbedded());
+        assertThat(embeddedAwareResolver.resolveOwner(3L)).isEqualTo(ResourceOwner.ofEmbeddedProject());
         verifyNoInteractions(projectRepository);
     }
 
