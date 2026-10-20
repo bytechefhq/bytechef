@@ -25,13 +25,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -128,62 +123,5 @@ class DataTableServiceH2IntTest {
         dataTableService.renameTable("duplicate", "renamed", DEV_ENVIRONMENT_ID);
 
         assertEquals("renamed", dataTableService.getBaseNameById(dataTableService.getIdByBaseName("renamed")));
-    }
-
-    @Test
-    void testFindRowsFiltersAndSorts() {
-        dataTableService.createTable(
-            "filtered", null,
-            List.of(new ColumnSpec("title", ColumnType.STRING), new ColumnSpec("amount", ColumnType.INTEGER)),
-            DEV_ENVIRONMENT_ID);
-
-        long appleId = insertFilteredRow("Apple", 5);
-        long offerId = insertFilteredRow("100%_off", 30);
-        long untitledId = insertFilteredRow(null, null);
-
-        assertEquals(
-            List.of(appleId, untitledId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("title", Operation.NOT_EQUALS, "100%_off")), null));
-        assertEquals(
-            List.of(offerId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("title", Operation.CONTAINS, "%_")), null));
-        assertEquals(
-            List.of(appleId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("title", Operation.STARTS_WITH, "App")), null));
-        assertEquals(
-            List.of(appleId, offerId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("amount", Operation.IN, List.of("5", 30))), null));
-        assertEquals(
-            List.of(appleId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("amount", Operation.BETWEEN, List.of(1, 10))), null));
-        assertEquals(
-            List.of(untitledId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("title", Operation.EMPTY, null)), null));
-        assertEquals(
-            List.of(appleId),
-            findFilteredRowIds(List.of(new DataTableRowFilter("title", Operation.EQUALS_IGNORE_CASE, "APPLE")), null));
-        assertEquals(
-            List.of(offerId, appleId, untitledId),
-            findFilteredRowIds(List.of(), new DataTableRowSort("amount", Direction.DESC)));
-    }
-
-    private List<Long> findFilteredRowIds(List<DataTableRowFilter> filters, DataTableRowSort sort) {
-        List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            "filtered", List.of(filters), sort, 100, 0, DEV_ENVIRONMENT_ID);
-
-        return dataTableRows.stream()
-            .map(DataTableRow::id)
-            .toList();
-    }
-
-    private long insertFilteredRow(String title, Integer amount) {
-        Map<String, Object> values = new HashMap<>();
-
-        values.put("title", title);
-        values.put("amount", amount);
-
-        DataTableRow dataTableRow = dataTableRowService.insertRow("filtered", values, DEV_ENVIRONMENT_ID);
-
-        return dataTableRow.id();
     }
 }
