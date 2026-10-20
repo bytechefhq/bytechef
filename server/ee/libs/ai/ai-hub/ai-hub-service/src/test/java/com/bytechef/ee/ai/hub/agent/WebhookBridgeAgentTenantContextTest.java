@@ -8,7 +8,7 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -114,7 +114,7 @@ class WebhookBridgeAgentTenantContextTest {
     private static WebhookBridgeAgent newAgent(AiHubChatService chatService) throws AGUIException {
         WorkflowChatGuard guard = mock(WorkflowChatGuard.class);
 
-        when(guard.tryAdmit(anyLong())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
+        when(guard.tryAdmit(anyString())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
 
         return new WebhookBridgeAgent(
             mock(WebhookWorkflowExecutor.class), chatService, mock(WebhookResumeRegistry.class), JsonMapper.builder()

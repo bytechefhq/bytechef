@@ -9,7 +9,7 @@ package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -316,7 +316,7 @@ class WebhookBridgeAgentResumeTest {
     private WebhookBridgeAgent newAgent() throws AGUIException {
         WorkflowChatGuard guard = mock(WorkflowChatGuard.class);
 
-        when(guard.tryAdmit(anyLong())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
+        when(guard.tryAdmit(anyString())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
 
         return new WebhookBridgeAgent(
             webhookFacade, chatService, resumeRegistry, jsonMapper, mock(WorkflowChatMetrics.class),
