@@ -559,11 +559,13 @@ class ConnectedUserAccessDeciderIntTest {
             }
 
             @Bean
-            WorkspaceConnectionFacade workspaceConnectionFacade(ConnectionFacade connectionFacade)
+            WorkspaceConnectionFacade workspaceConnectionFacade(
+                ConnectionFacade connectionFacade, PermissionService permissionService)
                 throws ReflectiveOperationException {
 
                 return instantiate(
-                    WorkspaceConnectionFacadeImpl.class, Map.of(ConnectionFacade.class, connectionFacade));
+                    WorkspaceConnectionFacadeImpl.class,
+                    Map.of(ConnectionFacade.class, connectionFacade, PermissionService.class, permissionService));
             }
 
             private static <T> T instantiate(Class<T> type, Map<Class<?>, Object> collaborators)
