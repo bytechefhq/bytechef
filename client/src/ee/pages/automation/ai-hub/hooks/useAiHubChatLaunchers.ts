@@ -4,6 +4,8 @@ import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHu
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModelPickerWorkflowChatI} from '@/shared/components/ai/model-picker/ModelPicker';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useCreateWorkflowChatAiHubChatMutation, useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -23,6 +25,9 @@ export interface AiHubChatLaunchersI {
  * Every pick starts a new conversation and navigates away from the current one. The new chat goes into the cached
  * active chats list first, so the chat view knows it is a workflow chat before the list refetches. A failed create leaves the current
  * chat in place; the global fetch interceptor already shows the error toast.
+ *
+ * The chat workflow listing requires the WORKFLOW_VIEW workspace scope, so it only runs once the loaded workspace
+ * scopes grant it. A user without the scope gets an empty cascade instead of an access-denied toast on every mount.
  */
 export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -31,9 +36,13 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    useLoadWorkspaceScopes(currentWorkspaceId);
+
+    const canViewWorkflows = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_VIEW');
+
     const {data: chatWorkflowsData} = useWorkspaceChatWorkflowsQuery(
         {environmentId: String(currentEnvironmentId), workspaceId: String(currentWorkspaceId ?? 0)},
-        {enabled: currentWorkspaceId != null}
+        {enabled: currentWorkspaceId != null && canViewWorkflows}
     );
 
     const createWorkflowChatMutation = useCreateWorkflowChatAiHubChatMutation();
