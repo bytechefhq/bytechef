@@ -16,6 +16,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useLoadEmbeddedScopes} from '@/shared/hooks/useLoadEmbeddedScopes';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -230,6 +231,8 @@ function App() {
     useLoadWorkspaceScopes(
         authenticated && platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
     );
+
+    useLoadEmbeddedScopes(authenticated && platformMode === PlatformType.EMBEDDED);
 
     const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
