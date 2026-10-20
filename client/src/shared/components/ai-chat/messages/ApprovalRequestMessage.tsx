@@ -44,15 +44,17 @@ const ApprovalRequestMessage = ({data}: DataMessagePartProps<ApprovalRequestData
 
     const resumeId = data.resumeId;
 
+    const resolveApproval = approvalResolution?.resolveApproval;
+
     const submitHandler = useMemo(() => {
-        if (!approvalResolution || !resumeId) {
+        if (!resolveApproval || !resumeId) {
             return undefined;
         }
 
         return async (formData: Record<string, unknown>, approved: boolean) => {
-            await approvalResolution.resolveApproval(resumeId, {...formData, approved});
+            await resolveApproval(resumeId, {...formData, approved});
         };
-    }, [approvalResolution, resumeId]);
+    }, [resolveApproval, resumeId]);
 
     if (!resumeId) {
         return null;
@@ -72,8 +74,8 @@ const ApprovalRequestMessage = ({data}: DataMessagePartProps<ApprovalRequestData
         }
 
         try {
-            if (approvalResolution) {
-                await approvalResolution.resolveApproval(resumeId, payload);
+            if (resolveApproval) {
+                await resolveApproval(resumeId, payload);
             } else {
                 const {approved: approvedValue, ...restPayload} = payload;
 
