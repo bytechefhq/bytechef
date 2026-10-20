@@ -31,7 +31,8 @@ public interface ResourceOwnershipResolver {
 
     /**
      * Resource-type discriminator matching the {@code @PreAuthorize} token prefix, e.g. {@code "Connection"} for the
-     * token {@code 'Connection'}. Must be unique across all registered resolvers.
+     * token {@code 'Connection'}. Several resolvers may share a type; they are consulted in turn and the first one that
+     * knows the resource answers.
      */
     String resourceType();
 
@@ -63,12 +64,21 @@ public interface ResourceOwnershipResolver {
      * Owning coordinates of a resource. A resolver may populate {@code workspaceId} (workspace-mapped resources),
      * {@code ownerUserId} (user-owned resources), or both.
      */
-    record ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded) {
+    record ResourceOwner(
+        OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded, boolean embeddedProject) {
 
         public ResourceOwner {
             if (embedded && workspaceId.isPresent()) {
                 throw new IllegalArgumentException("An embedded resource owner cannot have a workspace");
             }
+
+            if (embeddedProject && !embedded) {
+                throw new IllegalArgumentException("An embedded project owner must be embedded");
+            }
+        }
+
+        public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded) {
+            this(workspaceId, ownerUserId, embedded, false);
         }
 
         public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
@@ -85,6 +95,10 @@ public interface ResourceOwnershipResolver {
 
         public static ResourceOwner ofEmbedded(long ownerUserId) {
             return new ResourceOwner(OptionalLong.empty(), OptionalLong.of(ownerUserId), true);
+        }
+
+        public static ResourceOwner ofEmbeddedProject() {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty(), true, true);
         }
 
         public static ResourceOwner ofWorkspace(long workspaceId) {

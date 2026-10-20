@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.function.LongPredicate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,9 +49,7 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
 
     @Override
     public boolean isEmbeddedProject(long projectId) {
-        if (automationWorkflowProjectRepository.findByProjectId(projectId)
-            .isPresent()) {
-
+        if (isHubProject(projectId)) {
             return true;
         }
 
@@ -59,21 +58,36 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
 
     @Override
     public boolean isEmbeddedProjectWorkflow(String workflowId) {
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowProjectWorkflows(
-            List.of(workflowId));
+        return anyWorkflowProject(workflowId, this::isEmbeddedProject);
+    }
 
-        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-            if (isEmbeddedProject(projectWorkflow.getProjectId())) {
-                return true;
-            }
-        }
+    @Override
+    public boolean isHubProject(long projectId) {
+        return automationWorkflowProjectRepository.findByProjectId(projectId)
+            .isPresent();
+    }
 
-        return false;
+    @Override
+    public boolean isHubProjectWorkflow(String workflowId) {
+        return anyWorkflowProject(workflowId, this::isHubProject);
     }
 
     @Override
     public boolean isIntegrationWorkflow(String workflowId) {
         return integrationWorkflowRepository.findByWorkflowId(workflowId)
             .isPresent();
+    }
+
+    private boolean anyWorkflowProject(String workflowId, LongPredicate projectPredicate) {
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowProjectWorkflows(
+            List.of(workflowId));
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            if (projectPredicate.test(projectWorkflow.getProjectId())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
