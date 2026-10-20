@@ -442,7 +442,8 @@ class WorkspaceConnectionFacadeIntTest {
     @Retention(RetentionPolicy.RUNTIME)
     @MockitoBean(types = {
         ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
-        EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class, ProjectDeploymentWorkflowService.class, ProjectRepository.class,
+        EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class,
+        ProjectDeploymentWorkflowService.class, ProjectRepository.class,
         ProjectService.class, ResourceGrantService.class, UserService.class, WorkflowTestConfigurationService.class,
         WorkspaceConnectionRepository.class, WorkspaceConnectionService.class, WorkspaceFacade.class,
         WorkspaceScopeCacheService.class, WorkspaceUserRepository.class, WorkspaceUserService.class
