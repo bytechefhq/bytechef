@@ -8,6 +8,7 @@ export const PENDING_APPROVAL_PLACEHOLDER =
     'Approve or reject the tool call above, or send a message to withdraw it...';
 
 export class AiHubPage {
+    readonly addResourcesButton: Locator;
     readonly assistantMessages: Locator;
     readonly buildModeSwitch: Locator;
     readonly chatOptionsButton: Locator;
@@ -16,9 +17,11 @@ export class AiHubPage {
     readonly composerInput: Locator;
     readonly editComposerInput: Locator;
     readonly modelPickerButton: Locator;
+    readonly modelPickerSearchInput: Locator;
     readonly newChatLink: Locator;
     readonly page: Page;
     readonly resourcePanel: Locator;
+    readonly resourcePickerSearchInput: Locator;
     readonly retryBanner: Locator;
     readonly runErrors: Locator;
     readonly runningToolCallRows: Locator;
@@ -28,9 +31,12 @@ export class AiHubPage {
     readonly toasts: Locator;
     readonly toolApprovalCards: Locator;
     readonly userMessages: Locator;
+    readonly workflowChatBadge: Locator;
+    readonly workflowChatsMenuTrigger: Locator;
 
     constructor(page: Page) {
         this.page = page;
+        this.addResourcesButton = page.getByRole('button', {name: 'Add resources'});
         this.assistantMessages = page.locator('[data-role="assistant"]');
         this.buildModeSwitch = page.getByRole('switch', {name: /^Build mode/});
         this.chatOptionsButton = page.getByRole('button', {name: 'Chat options'});
@@ -39,11 +45,13 @@ export class AiHubPage {
         this.composerInput = page.getByLabel('Message input');
         this.editComposerInput = page.locator('.aui-cc-edit-composer-input');
         this.modelPickerButton = page.getByRole('button', {name: 'Select LLM provider and model'});
+        this.modelPickerSearchInput = page.getByLabel('Search providers');
         this.newChatLink = page.getByRole('link', {name: 'New Chat'});
         this.resourcePanel = page
             .locator('div')
             .filter({has: page.getByRole('button', {name: 'Close resource panel'})})
             .last();
+        this.resourcePickerSearchInput = page.getByPlaceholder('Search resources…');
         this.retryBanner = page.getByTestId('ai-hub-retry-banner');
         this.runErrors = page.getByTestId('ai-hub-run-error');
         this.runningToolCallRows = this.assistantMessages.getByRole('status');
@@ -56,6 +64,8 @@ export class AiHubPage {
             .filter({has: page.getByText('Tool approval required', {exact: true})})
             .filter({hasNot: page.locator('[data-role]')});
         this.userMessages = page.locator('[data-role="user"]');
+        this.workflowChatBadge = page.getByText('Workflow chat', {exact: true});
+        this.workflowChatsMenuTrigger = page.getByRole('menuitem', {name: 'Workflow chats'});
     }
 
     async goto(): Promise<void> {
@@ -72,6 +82,20 @@ export class AiHubPage {
 
     chatRow(chatTitle: string): Locator {
         return this.page.getByRole('button', {exact: true, name: chatTitle});
+    }
+
+    workflowChatIcon(chatTitle: string): Locator {
+        return this.page.getByRole('button', {name: chatTitle}).getByRole('img', {name: 'Workflow chat'});
+    }
+
+    workflowChatMenuItem(label: string): Locator {
+        return this.page.getByRole('menuitem', {exact: true, name: label});
+    }
+
+    async openWorkflowChatsMenu(): Promise<void> {
+        await this.workflowChatsMenuTrigger.hover();
+
+        await expect(this.workflowChatsMenuTrigger).toHaveAttribute('data-state', 'open');
     }
 
     userMessage(text: string): Locator {
