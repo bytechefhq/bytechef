@@ -3,6 +3,12 @@ import AutomationEditorSettingsMenu from '@/ee/pages/embedded/automation/compone
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const mockHandlers = {
     onDeleteProjectClick: vi.fn(),
     onDeleteWorkflowClick: vi.fn(),

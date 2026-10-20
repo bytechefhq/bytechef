@@ -8,6 +8,8 @@ import {
 import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -37,6 +39,8 @@ const AutomationProjectWorkflowList = ({
 }: AutomationProjectWorkflowListProps) => {
     const [workflowUuidToDelete, setWorkflowUuidToDelete] = useState<string | null>(null);
 
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+
     const workflows = [...project.workflowTemplates].sort((firstWorkflow, secondWorkflow) =>
         (firstWorkflow.label || firstWorkflow.workflowUuid).localeCompare(
             secondWorkflow.label || secondWorkflow.workflowUuid
@@ -63,30 +67,36 @@ const AutomationProjectWorkflowList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <ButtonGroup aria-label="Workflow Creation Actions" className="mx-auto">
-                                <Button label="Create Workflow" onClick={() => onCreateWorkflow(project.id)} />
+                            canCreateWorkflow && (
+                                <ButtonGroup aria-label="Workflow Creation Actions" className="mx-auto">
+                                    <Button label="Create Workflow" onClick={() => onCreateWorkflow(project.id)} />
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-label="More Workflow Creation Actions"
-                                            icon={<ChevronDownIcon />}
-                                        />
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-label="More Workflow Creation Actions"
+                                                icon={<ChevronDownIcon />}
+                                            />
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                            aria-label="Import Workflow"
-                                            icon={<UploadIcon />}
-                                            label="Import Workflow"
-                                            onClick={() => onImportWorkflow(project.id)}
-                                        />
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                aria-label="Import Workflow"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
+                                                onClick={() => onImportWorkflow(project.id)}
+                                            />
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            )
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new workflow."
+                        message={
+                            canCreateWorkflow
+                                ? 'Get started by creating a new workflow.'
+                                : 'There are no workflows yet.'
+                        }
                         title="No Workflows"
                     />
                 </div>

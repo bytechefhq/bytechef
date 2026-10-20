@@ -6,6 +6,8 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -28,6 +30,9 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
     const [searchParams] = useSearchParams();
 
     const queryClient = useQueryClient();
+
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
 
     const integrationId = integration.id!;
 
@@ -101,6 +106,8 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
             }
             onDelete={() => deleteWorkflowMutation.mutate({id: workflow.id!})}
             onEditClick={() => setShowEditWorkflowDialog(true)}
+            showDeleteAction={canDeleteWorkflow}
+            showEditAction={canEditWorkflow}
             workflowLabel={workflow.label}
         >
             <DropdownMenuItem
