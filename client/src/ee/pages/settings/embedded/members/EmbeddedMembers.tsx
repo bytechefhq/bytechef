@@ -12,13 +12,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import WorkspaceUserEnvironmentRoles from '@/ee/pages/settings/automation/users/components/WorkspaceUserEnvironmentRoles';
 import {
     ENVIRONMENT_LABELS,
     ENVIRONMENT_ORDER,
     toWorkspaceMembers,
 } from '@/ee/pages/settings/automation/users/util/workspace-environment-roles';
 import EmbeddedAddMemberDialog from '@/ee/pages/settings/embedded/members/components/EmbeddedAddMemberDialog';
-import EmbeddedMemberEnvironmentRoles from '@/ee/pages/settings/embedded/members/components/EmbeddedMemberEnvironmentRoles';
 import {EmbeddedScopeType, UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -203,15 +203,23 @@ const EmbeddedMembers = () => {
                                             )}
 
                                             {!member.inherited && member.environmentRoles.length > 0 && (
-                                                <EmbeddedMemberEnvironmentRoles
+                                                <WorkspaceUserEnvironmentRoles
                                                     environmentRoles={member.environmentRoles}
                                                     manageableEnvironments={memberManageEnvironments}
                                                     onRemove={(environment) =>
                                                         handleEnvironmentRoleRemove(member.userId, environment)
                                                     }
                                                     onRoleChange={(environment, role) =>
-                                                        handleEnvironmentRoleChange(member.userId, environment, role)
+                                                        handleEnvironmentRoleChange(
+                                                            member.userId,
+                                                            environment,
+                                                            role as WorkspaceRole
+                                                        )
                                                     }
+                                                    onlyRoleRemovalDescription={(roleLabel) =>
+                                                        `This is their only environment role, so it becomes an embedded-wide role. They will keep the ${roleLabel} role in every environment.`
+                                                    }
+                                                    rolePlaceholder="Custom role"
                                                 />
                                             )}
 

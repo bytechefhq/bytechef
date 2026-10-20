@@ -6,7 +6,8 @@ import EmbeddedMembers from '../EmbeddedMembers';
 const hoisted = vi.hoisted(() => ({
     addEmbeddedUserByEmailMutate: vi.fn(),
     captureAddOnSuccess: vi.fn(),
-    captureUpdateOnSuccess: vi.fn(),
+    captureRemoveEnvironmentRoleOnSuccess: vi.fn(),
+    captureSetEnvironmentRoleOnSuccess: vi.fn(),
     embeddedUsers: [] as unknown[],
     invalidateQueries: vi.fn(),
     memberViewGranted: true,
@@ -36,14 +37,18 @@ vi.mock('@/shared/middleware/graphql', () => ({
         data: {myEmbeddedScopes: hoisted.scopesByEnvironment[variables.environment ?? ''] ?? hoisted.scopes},
         isLoading: false,
     })),
-    useRemoveEmbeddedUserEnvironmentRoleMutation: vi.fn(() => ({mutate: hoisted.removeEnvironmentRoleMutate})),
-    useRemoveEmbeddedUserMutation: vi.fn(() => ({mutate: hoisted.removeEmbeddedUserMutate})),
-    useSetEmbeddedUserEnvironmentRoleMutation: vi.fn(() => ({mutate: hoisted.setEnvironmentRoleMutate})),
-    useUpdateEmbeddedUserRoleMutation: vi.fn((options: {onSuccess: () => void}) => {
-        hoisted.captureUpdateOnSuccess(options.onSuccess);
+    useRemoveEmbeddedUserEnvironmentRoleMutation: vi.fn((options: {onSuccess: () => void}) => {
+        hoisted.captureRemoveEnvironmentRoleOnSuccess(options.onSuccess);
 
-        return {mutate: hoisted.updateEmbeddedUserRoleMutate};
+        return {mutate: hoisted.removeEnvironmentRoleMutate};
     }),
+    useRemoveEmbeddedUserMutation: vi.fn(() => ({mutate: hoisted.removeEmbeddedUserMutate})),
+    useSetEmbeddedUserEnvironmentRoleMutation: vi.fn((options: {onSuccess: () => void}) => {
+        hoisted.captureSetEnvironmentRoleOnSuccess(options.onSuccess);
+
+        return {mutate: hoisted.setEnvironmentRoleMutate};
+    }),
+    useUpdateEmbeddedUserRoleMutation: vi.fn(() => ({mutate: hoisted.updateEmbeddedUserRoleMutate})),
 }));
 
 vi.mock(import('@tanstack/react-query'), async (importOriginal) => ({
@@ -167,7 +172,29 @@ describe('EmbeddedMembers', () => {
             userId: '10',
         });
 
-        const onSuccess = hoisted.captureUpdateOnSuccess.mock.calls.at(-1)?.[0] as () => void;
+        const onSuccess = hoisted.captureSetEnvironmentRoleOnSuccess.mock.calls.at(-1)?.[0] as () => void;
+
+        act(() => onSuccess());
+
+        const invalidatedKeys = hoisted.invalidateQueries.mock.calls.map(
+            (call) => (call[0] as {queryKey: string[]}).queryKey[0]
+        );
+
+        expect(invalidatedKeys).toContain('MyEmbeddedScopes');
+        expect(invalidatedKeys).toContain('EmbeddedUsers');
+    });
+
+    it('refreshes scopes and members after an environment role is removed', async () => {
+        hoisted.embeddedUsers = [developmentRole, {...developmentRole, environment: 'PRODUCTION', id: '3'}];
+
+        render(<EmbeddedMembers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+        await userEvent.click(screen.getByRole('button', {name: 'Remove'}));
+
+        expect(hoisted.removeEnvironmentRoleMutate).toHaveBeenCalledWith({environment: 'DEVELOPMENT', userId: '10'});
+
+        const onSuccess = hoisted.captureRemoveEnvironmentRoleOnSuccess.mock.calls.at(-1)?.[0] as () => void;
 
         act(() => onSuccess());
 
