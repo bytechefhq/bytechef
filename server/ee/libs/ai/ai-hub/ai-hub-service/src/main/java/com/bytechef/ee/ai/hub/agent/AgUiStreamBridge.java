@@ -17,7 +17,6 @@ import com.agui.core.event.TextMessageEndEvent;
 import com.agui.core.event.TextMessageStartEvent;
 import com.agui.core.event.ToolCallEndEvent;
 import com.agui.core.event.ToolCallStartEvent;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,12 +46,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final String messageId;
     private final String threadId;
     private final String runId;
-    private final long chatId;
     private final WebhookResumeRegistry resumeRegistry;
-    private final WorkflowChatJobRegistry jobRegistry;
-    @Nullable
-    private final JobFacade jobFacade;
     private final LongConsumer onJobId;
+    private final Runnable onStreamError;
     private final Runnable onFinalize;
 
     private final AtomicBoolean started = new AtomicBoolean(false);
@@ -62,19 +58,16 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AgUiStreamBridge(
-        AgentSubscriber subscriber, String messageId, String threadId, String runId, long chatId,
-        WebhookResumeRegistry resumeRegistry, WorkflowChatJobRegistry jobRegistry, @Nullable JobFacade jobFacade,
-        LongConsumer onJobId, Runnable onFinalize) {
+        AgentSubscriber subscriber, String messageId, String threadId, String runId,
+        WebhookResumeRegistry resumeRegistry, LongConsumer onJobId, Runnable onStreamError, Runnable onFinalize) {
 
         this.subscriber = subscriber;
         this.messageId = messageId;
         this.threadId = threadId;
         this.runId = runId;
-        this.chatId = chatId;
         this.resumeRegistry = resumeRegistry;
-        this.jobRegistry = jobRegistry;
-        this.jobFacade = jobFacade;
         this.onJobId = onJobId;
+        this.onStreamError = onStreamError;
         this.onFinalize = onFinalize;
     }
 
@@ -135,8 +128,6 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        jobRegistry.clear(chatId);
-
         if (started.get()) {
             TextMessageEndEvent end = new TextMessageEndEvent();
 
@@ -161,20 +152,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        Long inFlightJobId = jobRegistry.get(chatId);
-
-        jobRegistry.clear(chatId);
-
-        if (inFlightJobId != null && jobFacade != null) {
-            try {
-                jobFacade.stopJob(inFlightJobId);
-            } catch (RuntimeException exception) {
-                if (log.isDebugEnabled()) {
-                    log.debug(
-                        "stopJob for jobId {} (chat {}) failed during onError handling", inFlightJobId, chatId,
-                        exception);
-                }
-            }
+        try {
+            onStreamError.run();
+        } catch (RuntimeException exception) {
+            log.warn("AgUiStreamBridge.onStreamError callback threw for thread {}", threadId, exception);
         }
 
         RunErrorEvent runErrorEvent = new RunErrorEvent();
@@ -220,10 +201,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     private void onAskUserQuestion(Map<?, ?> map) {
         if (map.get("resumeUrl") instanceof String resumeUrl && !resumeUrl.isBlank()) {
-            resumeRegistry.register(chatId, resumeUrl);
+            resumeRegistry.register(threadId, resumeUrl);
         } else {
-            log.warn("ask_user_question event without a resumeUrl for chat {}; the answer cannot resume the run",
-                chatId);
+            log.warn("ask_user_question event without a resumeUrl for thread {}; the answer cannot resume the run",
+                threadId);
         }
 
         emitCustomEvent(ASK_WORKFLOW_QUESTION_EVENT_NAME, map);
@@ -267,7 +248,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
                 : Long.parseLong(jobIdObject.toString());
         } catch (NumberFormatException exception) {
             if (log.isDebugEnabled()) {
-                log.debug("Could not parse jobId from start event for chat {}: {}", chatId, jobIdObject);
+                log.debug("Could not parse jobId from start event for thread {}: {}", threadId, jobIdObject);
             }
 
             return true;
@@ -276,8 +257,6 @@ public class AgUiStreamBridge implements SseStreamBridge {
         if (!jobIdReported.compareAndSet(false, true)) {
             return true;
         }
-
-        jobRegistry.register(chatId, jobId);
 
         onJobId.accept(jobId);
 
@@ -339,9 +318,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
             onFinalize.run();
         } catch (RuntimeException exception) {
             log.warn(
-                "AgUiStreamBridge.onFinalize callback threw for chat {}; SSE may stay open until client "
+                "AgUiStreamBridge.onFinalize callback threw for thread {}; SSE may stay open until client "
                     + "disconnects or the emitter times out",
-                chatId, exception);
+                threadId, exception);
         }
     }
 

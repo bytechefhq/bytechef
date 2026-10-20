@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,7 +26,7 @@ public class WorkflowChatTurnStopper {
     private static final Logger log = LoggerFactory.getLogger(WorkflowChatTurnStopper.class);
 
     private final long chatId;
-    private final WorkflowChatJobRegistry jobRegistry;
+    private final String tenantId;
     @Nullable
     private final JobFacade jobFacade;
 
@@ -34,9 +35,9 @@ public class WorkflowChatTurnStopper {
     private final AtomicBoolean stopped = new AtomicBoolean();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowChatTurnStopper(long chatId, WorkflowChatJobRegistry jobRegistry, @Nullable JobFacade jobFacade) {
+    public WorkflowChatTurnStopper(long chatId, String tenantId, @Nullable JobFacade jobFacade) {
         this.chatId = chatId;
-        this.jobRegistry = jobRegistry;
+        this.tenantId = tenantId;
         this.jobFacade = jobFacade;
     }
 
@@ -59,12 +60,16 @@ public class WorkflowChatTurnStopper {
             return;
         }
 
+        String previousTenantId = TenantContext.getCurrentTenantId();
+
+        TenantContext.setCurrentTenantId(tenantId);
+
         try {
             jobFacade.stopJob(jobId);
-
-            jobRegistry.clear(chatId);
         } catch (RuntimeException exception) {
             log.warn("Failed to stop job {} of workflow chat {}", jobId, chatId, exception);
+        } finally {
+            TenantContext.setCurrentTenantId(previousTenantId);
         }
     }
 }
