@@ -228,8 +228,12 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     private boolean canEditConnection(long connectionId) {
-        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT) &&
-            (permissionService.isResourceOwner(CONNECTION_TYPE, connectionId) || permissionService.isTenantAdmin());
+        if (!permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)) {
+            return false;
+        }
+
+        return NonPlatformUserAuthentication.isCurrent() ||
+            permissionService.isResourceOwner(CONNECTION_TYPE, connectionId) || permissionService.isTenantAdmin();
     }
 
     protected List<Long> getSharedConnectionIds() {
