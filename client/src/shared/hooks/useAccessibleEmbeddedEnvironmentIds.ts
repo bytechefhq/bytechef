@@ -4,11 +4,11 @@ import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {EnvironmentEnum, type MyEmbeddedScopesQuery, useMyEmbeddedScopesQuery} from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 
-export const useAccessibleEmbeddedEnvironmentIds = (): number[] | undefined => {
+export const useAccessibleEmbeddedEnvironmentIds = (active = true): number[] | undefined => {
     const eeEdition = useEeEdition();
     const tenantAdmin = useIsTenantAdmin();
 
-    const enabled = eeEdition && !tenantAdmin;
+    const enabled = active && eeEdition && !tenantAdmin;
 
     const {data: developmentScopesData} = useMyEmbeddedScopesQuery(
         {environment: EnvironmentEnum.Development},

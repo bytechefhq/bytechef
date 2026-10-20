@@ -1,6 +1,8 @@
 import App from '@/App';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
@@ -8,10 +10,17 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     analytics: {reset: vi.fn()},
+    embeddedScopes: [] as string[],
     enabledFeatureFlags: [] as string[],
     helpHub: {addRouter: vi.fn(), boot: vi.fn(), shutdown: vi.fn()},
+    isTenantAdmin: false,
     mockUseLoadWorkspaceScopes: vi.fn(),
     userGuiding: {identify: vi.fn(), shutdown: vi.fn()},
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => hoisted.isTenantAdmin || hoisted.embeddedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/hooks/useLoadWorkspaceScopes', () => ({
@@ -86,13 +95,16 @@ const renderAppAt = (path: string) =>
 
 describe('App', () => {
     beforeEach(() => {
+        hoisted.embeddedScopes = [];
         hoisted.enabledFeatureFlags = [];
+        hoisted.isTenantAdmin = false;
 
         useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
     });
 
     afterEach(() => {
         authenticationStore.setState({account: undefined, authenticated: false});
+        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
 
         vi.clearAllMocks();
     });
@@ -115,27 +127,70 @@ describe('App', () => {
         expect(hoisted.mockUseLoadWorkspaceScopes).toHaveBeenCalledWith(undefined);
     });
 
-    it('shows the embedded navigation entries to a tenant admin', () => {
+    it('testATenantAdminSeesEveryEmbeddedEntry', () => {
         hoisted.enabledFeatureFlags = ['ff-2446'];
+        hoisted.isTenantAdmin = true;
 
         authenticationStore.setState({account: {authorities: ['ROLE_ADMIN'], id: 1} as never, authenticated: true});
 
         const {getByText} = renderAppAt('/embedded/connected-users');
 
-        expect(getByText('Connected Users')).toBeInTheDocument();
-        expect(getByText('MCP Servers')).toBeInTheDocument();
+        [
+            'Integrations',
+            'Integration Configurations',
+            'App Events',
+            'Automations',
+            'MCP Servers',
+            'Connected Users',
+            'Workflow Executions',
+            'Connections',
+        ].forEach((entryName) => expect(getByText(entryName)).toBeInTheDocument());
     });
 
-    it('hides all embedded navigation entries from a user who is not a tenant admin', () => {
+    it('testANonMemberSeesNoEmbeddedNavigation', () => {
         hoisted.enabledFeatureFlags = ['ff-2446'];
 
         authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
 
         const {queryByText} = renderAppAt('/embedded/connected-users');
 
+        [
+            'Integrations',
+            'Integration Configurations',
+            'App Events',
+            'Automations',
+            'MCP Servers',
+            'Connected Users',
+            'Workflow Executions',
+            'Connections',
+        ].forEach((entryName) => expect(queryByText(entryName)).not.toBeInTheDocument());
+    });
+
+    it('testAMemberSeesOnlyPagesTheyCanView', () => {
+        hoisted.embeddedScopes = ['MCP_VIEW', 'CONNECTION_VIEW', 'WORKFLOW_VIEW'];
+
+        authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
+
+        const {getByText, queryByText} = renderAppAt('/embedded/connected-users');
+
+        expect(getByText('MCP Servers')).toBeInTheDocument();
+        expect(getByText('Connections')).toBeInTheDocument();
+        expect(getByText('Integrations')).toBeInTheDocument();
+        expect(getByText('Automations')).toBeInTheDocument();
         expect(queryByText('Connected Users')).not.toBeInTheDocument();
-        expect(queryByText('MCP Servers')).not.toBeInTheDocument();
+        expect(queryByText('Workflow Executions')).not.toBeInTheDocument();
+        expect(queryByText('App Events')).not.toBeInTheDocument();
+    });
+
+    it('hides Integrations outside Development even for a member with WORKFLOW_VIEW', () => {
+        hoisted.embeddedScopes = ['WORKFLOW_VIEW'];
+
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
+        authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
+
+        const {getByText, queryByText} = renderAppAt('/embedded/connected-users');
+
+        expect(getByText('Automations')).toBeInTheDocument();
         expect(queryByText('Integrations')).not.toBeInTheDocument();
-        expect(queryByText('Connections')).not.toBeInTheDocument();
     });
 });
