@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -117,6 +118,9 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
     @Autowired
     private JobService jobService;
 
+    @MockitoBean
+    private PermissionService permissionService;
+
     @Autowired
     private PrincipalJobService principalJobService;
 
@@ -134,6 +138,8 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
         when(componentDefinition.getTitle()).thenReturn("Title");
+        when(permissionService.hasEmbeddedScope(anyString(), any(Environment.class))).thenReturn(true);
+        when(permissionService.isTenantAdmin()).thenReturn(true);
         when(componentDefinitionService.hasComponentDefinition(anyString(), any())).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition(anyString(), any())).thenReturn(componentDefinition);
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(anyList())).thenAnswer(invocation -> {
