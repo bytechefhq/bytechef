@@ -10,6 +10,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useLoadEmbeddedScopes} from '@/shared/hooks/useLoadEmbeddedScopes';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -189,6 +190,8 @@ function App() {
     useFetchInterceptor();
 
     useLoadWorkspaceScopes(authenticated ? currentWorkspaceId : undefined);
+
+    useLoadEmbeddedScopes(authenticated && currentType === PlatformType.EMBEDDED);
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
