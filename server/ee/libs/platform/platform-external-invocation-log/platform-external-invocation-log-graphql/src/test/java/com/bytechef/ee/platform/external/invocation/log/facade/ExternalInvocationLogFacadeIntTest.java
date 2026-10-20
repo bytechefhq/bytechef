@@ -91,13 +91,14 @@ class ExternalInvocationLogFacadeIntTest {
         when(externalInvocationLogService.getExternalInvocationLogs(PlatformType.AUTOMATION, null, null, null, null,
             null, 3L,
             null,
+            null,
             null, null, 0))
                 .thenReturn(page);
 
         assertThat(
             externalInvocationLogFacade.getExternalInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, null,
                 3L,
-                null, null, null, 0))
+                null, null, null, null, 0))
                     .isEmpty();
     }
 
@@ -110,12 +111,14 @@ class ExternalInvocationLogFacadeIntTest {
             externalInvocationLogService.getExternalInvocationLogs(
                 PlatformType.AUTOMATION, 2, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
                 null,
+                null,
                 0))
                     .thenReturn(page);
 
         assertThat(
             externalInvocationLogFacade.getExternalInvocationLogs(
                 PlatformType.AUTOMATION, 2L, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
+                null,
                 null, 0))
                     .isEmpty();
     }
@@ -144,7 +147,7 @@ class ExternalInvocationLogFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(
             externalInvocationLogService.getExternalInvocationLogs(
-                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, null, 0))
                     .thenReturn(
                         new PageImpl<>(
                             List.of(
@@ -155,7 +158,7 @@ class ExternalInvocationLogFacadeIntTest {
 
         Page<ExternalInvocationLogDTO> externalInvocationLogDTOPage =
             externalInvocationLogFacade.getExternalInvocationLogs(
-                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0);
+                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(externalInvocationLogDTOPage.getContent())
             .extracting(ExternalInvocationLogDTO::externalInvocationLog, ExternalInvocationLogDTO::workflowName)
@@ -172,7 +175,7 @@ class ExternalInvocationLogFacadeIntTest {
             () -> externalInvocationLogFacade.getExternalInvocationLogs(PlatformType.AUTOMATION, null, null, null, null,
                 null,
                 null,
-                null, null, null, 0))
+                null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(externalInvocationLogService);
@@ -187,7 +190,7 @@ class ExternalInvocationLogFacadeIntTest {
         assertThatThrownBy(
             () -> callSkippingChecks(
                 () -> externalInvocationLogFacade.getExternalInvocationLogs(
-                    PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0)))
+                    PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, null, 0)))
                         .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(externalInvocationLogService);
@@ -203,12 +206,14 @@ class ExternalInvocationLogFacadeIntTest {
                 PlatformType.AUTOMATION, 7L, 2, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
                 null,
                 null,
+                null,
                 1))
                     .thenReturn(page);
 
         assertThat(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2L, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
+                null,
                 null,
                 null,
                 1))
@@ -221,7 +226,7 @@ class ExternalInvocationLogFacadeIntTest {
 
         assertThatThrownBy(
             () -> externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(externalInvocationLogService);
@@ -236,7 +241,7 @@ class ExternalInvocationLogFacadeIntTest {
         assertThatThrownBy(
             () -> callSkippingChecks(
                 () -> externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, 0)))
+                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, 0)))
                         .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(externalInvocationLogService);

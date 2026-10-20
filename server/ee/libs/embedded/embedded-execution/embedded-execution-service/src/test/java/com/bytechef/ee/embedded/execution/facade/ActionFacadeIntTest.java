@@ -209,7 +209,7 @@ class ActionFacadeIntTest {
     private List<ExternalInvocationLog> getExternalInvocationLogs(long connectedUserId) {
         return externalInvocationLogService
             .getExternalInvocationLogs(
-                PlatformType.EMBEDDED, null, null, null, null, null, connectedUserId, null, null, null, 0)
+                PlatformType.EMBEDDED, null, null, null, null, null, connectedUserId, null, null, null, null, 0)
             .getContent();
     }
 

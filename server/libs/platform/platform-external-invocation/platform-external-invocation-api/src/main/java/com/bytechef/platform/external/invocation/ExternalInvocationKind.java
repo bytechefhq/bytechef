@@ -22,5 +22,6 @@ package com.bytechef.platform.external.invocation;
 public enum ExternalInvocationKind {
 
     COMPONENT,
-    WORKFLOW
+    WORKFLOW,
+    HTTP_PROXY
 }

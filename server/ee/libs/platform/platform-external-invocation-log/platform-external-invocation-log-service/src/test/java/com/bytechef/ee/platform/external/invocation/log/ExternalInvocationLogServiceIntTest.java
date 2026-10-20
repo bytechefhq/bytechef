@@ -50,7 +50,7 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.EMBEDDED, ExternalInvocationStatus.ERROR, 20L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.EMBEDDED, null, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
+            PlatformType.EMBEDDED, null, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null, null,
             null,
             0);
 
@@ -70,7 +70,8 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.AUTOMATION, ExternalInvocationStatus.ERROR, 99L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.AUTOMATION, null, null, ExternalInvocationStatus.ERROR, 10L, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, null, null, ExternalInvocationStatus.ERROR, 10L, null, null, null, null, null,
+            null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()
@@ -85,7 +86,7 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.AUTOMATION, ExternalInvocationStatus.SUCCESS, 5L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.AUTOMATION, null, null, null, null, 5L, null, null, null, null, 0);
+            PlatformType.AUTOMATION, null, null, null, null, 5L, null, null, null, null, null, 0);
 
         assertThat(page.getContent()).singleElement()
             .satisfies(externalInvocationLog -> {
@@ -96,6 +97,26 @@ class ExternalInvocationLogServiceIntTest {
     }
 
     @Test
+    void testGetFilteredByApp() {
+        createForApp(ExternalInvocationSource.APP_ACTION, 5L);
+        createForApp(ExternalInvocationSource.APP_TOOL, 5L);
+        createForApp(ExternalInvocationSource.APP_ACTION, 6L);
+        create(PlatformType.AUTOMATION, ExternalInvocationStatus.SUCCESS, 10L, Instant.now());
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, 5L, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppId)
+            .containsOnly(5L);
+
+        Page<ExternalInvocationLog> unfilteredPage = externalInvocationLogService.getExternalInvocationLogs(
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, null, 0);
+
+        assertThat(unfilteredPage.getTotalElements()).isEqualTo(4);
+    }
+
+    @Test
     void testGetFilteredByEnvironmentExcludesRowsOfOtherEnvironments() {
         createInEnvironment(ExternalInvocationSource.MCP_SERVER, 2);
         createInEnvironment(ExternalInvocationSource.API_ACTION, 2);
@@ -103,14 +124,14 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.EMBEDDED, ExternalInvocationStatus.SUCCESS, 10L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.EMBEDDED, 2, null, null, null, null, null, null, null, null, 0);
+            PlatformType.EMBEDDED, 2, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getEnvironment)
             .containsOnly(2);
 
         Page<ExternalInvocationLog> unfilteredPage = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.EMBEDDED, null, null, null, null, null, null, null, null, null, 0);
+            PlatformType.EMBEDDED, null, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(unfilteredPage.getTotalElements()).isEqualTo(4);
     }
@@ -123,7 +144,7 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.EMBEDDED, ExternalInvocationStatus.SUCCESS, 5L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getWorkspaceId)
@@ -137,7 +158,7 @@ class ExternalInvocationLogServiceIntTest {
         createInWorkspace(8L, 2, 6L);
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, 6L, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, 6L, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isZero();
         assertThat(page.getContent()).isEmpty();
@@ -149,7 +170,7 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.EMBEDDED, ExternalInvocationStatus.SUCCESS, 20L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getType)
@@ -176,7 +197,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLogService.create(embeddedExternalInvocationLog);
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getMcpServerId)
@@ -247,6 +268,21 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setStatus(status);
         externalInvocationLog.setDurationMs(5);
         externalInvocationLog.setCreatedDate(createdDate);
+
+        externalInvocationLogService.create(externalInvocationLog);
+    }
+
+    private void createForApp(ExternalInvocationSource source, long appId) {
+        ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
+
+        externalInvocationLog.setType(PlatformType.AUTOMATION);
+        externalInvocationLog.setSource(source);
+        externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        externalInvocationLog.setInvocationName("slack_sendMessage");
+        externalInvocationLog.setAppId(appId);
+        externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
+        externalInvocationLog.setDurationMs(5);
+        externalInvocationLog.setCreatedDate(Instant.now());
 
         externalInvocationLogService.create(externalInvocationLog);
     }

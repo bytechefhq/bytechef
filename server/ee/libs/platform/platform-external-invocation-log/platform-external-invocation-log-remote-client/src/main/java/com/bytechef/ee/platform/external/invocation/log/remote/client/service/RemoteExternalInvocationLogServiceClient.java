@@ -52,7 +52,8 @@ public class RemoteExternalInvocationLogServiceClient implements ExternalInvocat
     public Page<ExternalInvocationLog> getExternalInvocationLogs(
         PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
-        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
+        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Long appId,
+        @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 
         throw new UnsupportedOperationException();
@@ -62,7 +63,8 @@ public class RemoteExternalInvocationLogServiceClient implements ExternalInvocat
     public Page<ExternalInvocationLog> getWorkspaceExternalInvocationLogs(
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
-        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
+        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Long appId,
+        @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 
         throw new UnsupportedOperationException();

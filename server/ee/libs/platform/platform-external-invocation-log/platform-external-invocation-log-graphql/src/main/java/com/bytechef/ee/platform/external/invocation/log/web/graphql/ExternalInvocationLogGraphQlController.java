@@ -47,13 +47,14 @@ public class ExternalInvocationLogGraphQlController {
         @Argument @Nullable String status,
         @Argument @Nullable Long mcpServerId, @Argument @Nullable Long a2aServerId,
         @Argument @Nullable Long connectedUserId,
-        @Argument @Nullable Long integrationInstanceId, @Argument @Nullable Long fromDate,
+        @Argument @Nullable Long integrationInstanceId, @Argument @Nullable Long appId,
+        @Argument @Nullable Long fromDate,
         @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             externalInvocationLogFacade.getExternalInvocationLogs(
                 type, environmentId, toSource(source), toStatus(status), mcpServerId, a2aServerId, connectedUserId,
-                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                integrationInstanceId, appId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     @QueryMapping(name = "workspaceExternalInvocationLogs")
@@ -62,13 +63,14 @@ public class ExternalInvocationLogGraphQlController {
         @Argument @Nullable String source,
         @Argument @Nullable String status, @Argument @Nullable Long mcpServerId, @Argument @Nullable Long a2aServerId,
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
+        @Argument @Nullable Long appId,
         @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
                 type, workspaceId, environmentId, toSource(source), toStatus(status), mcpServerId, a2aServerId,
                 connectedUserId,
-                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                integrationInstanceId, appId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     private static ExternalInvocationLogPage toPage(Page<ExternalInvocationLogDTO> externalInvocationLogPage) {
@@ -110,7 +112,7 @@ public class ExternalInvocationLogGraphQlController {
             externalInvocationLog.getWorkspaceId(), externalInvocationLog.getExternalUserId(),
             externalInvocationLog.getConnectedUserId(), externalInvocationLog.getIntegrationInstanceId(),
             externalInvocationLog.getMcpServerId(), externalInvocationLog.getA2aServerId(),
-            externalInvocationLog.getJobId(),
+            externalInvocationLog.getJobId(), externalInvocationLog.getAppId(),
             externalInvocationLogDTO.workflowName(),
             externalInvocationLog.getStatus()
                 .name(),
@@ -123,7 +125,8 @@ public class ExternalInvocationLogGraphQlController {
         Long id, String source, String kind, String invocationName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
         Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long a2aServerId, Long jobId,
-        String workflowName, String status, String errorType, String errorMessage, int durationMs, Long createdDate) {
+        Long appId, String workflowName, String status, String errorType, String errorMessage, int durationMs,
+        Long createdDate) {
     }
 
     record ExternalInvocationLogPage(

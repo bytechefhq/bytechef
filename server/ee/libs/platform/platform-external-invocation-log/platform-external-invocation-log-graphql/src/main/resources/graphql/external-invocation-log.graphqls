@@ -8,6 +8,7 @@ extend type Query {
         a2aServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
+        appId: Long
         fromDate: Long
         toDate: Long
         page: Int = 0
@@ -22,6 +23,7 @@ extend type Query {
         a2aServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
+        appId: Long
         fromDate: Long
         toDate: Long
         page: Int = 0
@@ -45,6 +47,7 @@ type ExternalInvocationLogType {
     mcpServerId: Long
     a2aServerId: Long
     jobId: Long
+    appId: Long
     workflowName: String
     status: String!
     errorType: String

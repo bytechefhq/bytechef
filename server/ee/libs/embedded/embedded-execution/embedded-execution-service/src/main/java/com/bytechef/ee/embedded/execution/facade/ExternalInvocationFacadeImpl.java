@@ -54,6 +54,7 @@ public class ExternalInvocationFacadeImpl implements ExternalInvocationFacade {
 
         return externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.EMBEDDED, environment.ordinal(), source, status, null, null, connectedUser.getId(), null,
+            null,
             startDate, endDate, pageNumber);
     }
 }

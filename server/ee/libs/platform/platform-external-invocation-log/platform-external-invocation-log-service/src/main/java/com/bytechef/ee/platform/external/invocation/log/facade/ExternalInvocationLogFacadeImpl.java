@@ -62,14 +62,14 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
         PlatformType type, @Nullable Long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId,
+        @Nullable Long integrationInstanceId, @Nullable Long appId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return toExternalInvocationLogDTOPage(
             externalInvocationLogService.getExternalInvocationLogs(
                 type, environmentId == null ? null : Math.toIntExact(environmentId), source, status, mcpServerId,
                 a2aServerId,
-                connectedUserId, integrationInstanceId, startDate, endDate, pageNumber));
+                connectedUserId, integrationInstanceId, appId, startDate, endDate, pageNumber));
     }
 
     @Override
@@ -78,14 +78,15 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
         PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
+        @Nullable Instant endDate,
         int pageNumber) {
 
         return toExternalInvocationLogDTOPage(
             externalInvocationLogService.getWorkspaceExternalInvocationLogs(
                 type, workspaceId, Math.toIntExact(environmentId), source, status, mcpServerId, a2aServerId,
                 connectedUserId,
-                integrationInstanceId, startDate, endDate, pageNumber));
+                integrationInstanceId, appId, startDate, endDate, pageNumber));
     }
 
     private Map<Long, String> getWorkflowNamesByJobId(List<Long> jobIds) {
