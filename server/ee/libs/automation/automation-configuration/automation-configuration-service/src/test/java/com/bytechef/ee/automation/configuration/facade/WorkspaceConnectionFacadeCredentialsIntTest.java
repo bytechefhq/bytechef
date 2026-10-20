@@ -354,6 +354,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
 
         Connection connection = new Connection();
 
+        connection.setCreatedBy(createdBy);
         connection.setEnvironmentId(environmentId);
         connection.setId(connectionId);
         connection.setType(PlatformType.AUTOMATION);
