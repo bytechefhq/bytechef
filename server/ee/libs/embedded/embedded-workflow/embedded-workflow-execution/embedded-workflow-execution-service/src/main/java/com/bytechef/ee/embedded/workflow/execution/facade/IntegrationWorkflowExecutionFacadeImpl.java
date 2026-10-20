@@ -29,14 +29,13 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -75,6 +74,7 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -88,17 +88,19 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkflowExecutionFacade {
 
+    private static final String EXECUTION_DETAILS_VIEW = "EXECUTION_DETAILS_VIEW";
+
     private static final Logger log = LoggerFactory.getLogger(IntegrationWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final EnvironmentService environmentService;
     private final Evaluator evaluator;
+    private final PermissionService permissionService;
     private final PrincipalJobService principalJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
-    private final IntegrationWorkflowFacade integrationWorkflowFacade;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobService jobService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -111,11 +113,12 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     @SuppressFBWarnings("EI")
     public IntegrationWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        EnvironmentService environmentService, Evaluator evaluator, PrincipalJobService principalJobService,
+        EnvironmentService environmentService, Evaluator evaluator, @Lazy PermissionService permissionService,
+        PrincipalJobService principalJobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
-        IntegrationService integrationService, IntegrationWorkflowFacade integrationWorkflowFacade,
-        IntegrationWorkflowService integrationWorkflowService, JobService jobService,
+        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
+        JobService jobService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
@@ -124,9 +127,9 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         this.contextService = contextService;
         this.environmentService = environmentService;
         this.evaluator = evaluator;
+        this.permissionService = permissionService;
         this.principalJobService = principalJobService;
         this.integrationInstanceService = integrationInstanceService;
-        this.integrationWorkflowFacade = integrationWorkflowFacade;
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobService = jobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -140,7 +143,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     @Transactional(readOnly = true)
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
@@ -152,26 +155,34 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
 
-        return new WorkflowExecutionDTO(
+        WorkflowExecutionDTO workflowExecutionDTO = new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
             integrationService.getWorkflowIntegration(jobDTO.workflowId()),
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                integrationInstance.getIntegrationInstanceConfigurationId()),
+                integrationInstance.getIntegrationInstanceConfigurationId())
+                .withoutConnectionParameters(),
             integrationInstance, jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 integrationInstanceId,
                 OptionalUtils.orElse(
                     triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
                 job));
+
+        return permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)
+            ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     @Transactional(readOnly = true)
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        if (!permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)) {
+            return toTaskExecutionDTO(taskExecution, null, false).withoutDetails();
+        }
 
         return toTaskExecutionDTO(taskExecution, null, true);
     }
@@ -196,7 +207,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId)")
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
@@ -286,7 +297,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 .collect(Collectors.toMap(
                     integrationInstanceConfiguration -> Validate.notNull(
                         integrationInstanceConfiguration.getId(), "id"),
-                    Function.identity()));
+                    IntegrationInstanceConfiguration::withoutConnectionParameters));
 
         List<TriggerExecution> triggerExecutions = triggerExecutionService.getJobTriggerExecutions(jobIds);
 
@@ -302,7 +313,37 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             jobIds, jobMap, workflows, workflowIntegrationMap, jobToPrincipalMap, integrationInstanceMap,
             integrationInstanceConfigurationMap, triggerExecutionByJobIdMap);
 
-        return new PageImpl<>(workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
+        return new PageImpl<>(
+            redactWorkflowExecutionDTOs(workflowExecutionDTOs), jobIdsPage.getPageable(),
+            jobIdsPage.getTotalElements());
+    }
+
+    private List<WorkflowExecutionDTO> redactWorkflowExecutionDTOs(List<WorkflowExecutionDTO> workflowExecutionDTOs) {
+        Map<Long, Boolean> detailsVisibleByConfigurationId = new HashMap<>();
+        Boolean[] tenantAdmin = new Boolean[1];
+        List<WorkflowExecutionDTO> redactedDTOs = new ArrayList<>();
+
+        for (WorkflowExecutionDTO workflowExecutionDTO : workflowExecutionDTOs) {
+            boolean detailsVisible;
+            IntegrationInstanceConfiguration configuration = workflowExecutionDTO.integrationInstanceConfiguration();
+
+            if (workflowExecutionDTO.isTriggerOnly() || configuration == null) {
+                if (tenantAdmin[0] == null) {
+                    tenantAdmin[0] = permissionService.isTenantAdmin();
+                }
+
+                detailsVisible = tenantAdmin[0];
+            } else {
+                detailsVisible = detailsVisibleByConfigurationId.computeIfAbsent(
+                    Validate.notNull(configuration.getId(), "id"),
+                    configurationId -> permissionService.hasEmbeddedScope(
+                        EXECUTION_DETAILS_VIEW, configuration.getEnvironment()));
+            }
+
+            redactedDTOs.add(detailsVisible ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails());
+        }
+
+        return redactedDTOs;
     }
 
     /**
@@ -329,7 +370,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 integrationWorkflowService.getIntegrationWorkflows(integrationId), IntegrationWorkflow::getWorkflowId);
         }
 
-        return CollectionUtils.map(integrationWorkflowFacade.getIntegrationWorkflows(), IntegrationWorkflowDTO::getId);
+        return CollectionUtils.map(integrationWorkflowService.getIntegrationWorkflows(),
+            IntegrationWorkflow::getWorkflowId);
     }
 
     /**
@@ -343,6 +385,20 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         List<Long> integrationInstanceConfigurationIds;
 
         if (integrationInstanceConfigurationId != null) {
+            if (environmentId != null) {
+                List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+                    integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                        List.of(integrationInstanceConfigurationId));
+                Environment environment = environmentService.getEnvironment(environmentId);
+
+                if (integrationInstanceConfigurations.isEmpty()
+                    || integrationInstanceConfigurations.getFirst()
+                        .getEnvironment() != environment) {
+
+                    return List.of();
+                }
+            }
+
             integrationInstanceConfigurationIds = List.of(integrationInstanceConfigurationId);
         } else {
             Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
