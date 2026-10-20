@@ -46,6 +46,7 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -79,12 +80,11 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.security.EmbeddedMcpServerOwnershipResolver;
@@ -250,7 +250,7 @@ class EmbeddedGatesIntTest {
         AUTOMATION_EDITOR, 9904L, AUTOMATION_VIEWER, 9905L);
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
@@ -422,7 +422,7 @@ class EmbeddedGatesIntTest {
         hubProjectId = createProject("hub");
         connectedUserProjectId = createProject("connected-user");
 
-        jdbcTemplate.update("INSERT INTO automation_workflow_project (project_id) VALUES (?)", hubProjectId);
+        jdbcTemplate.update("INSERT INTO automation_project (project_id) VALUES (?)", hubProjectId);
         jdbcTemplate.update(
             "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (?, ?)", connectedUser.getId(),
             connectedUserProjectId);
@@ -441,7 +441,7 @@ class EmbeddedGatesIntTest {
         permissionService.evictAllWorkspaceScopeCache();
 
         jdbcTemplate.update("DELETE FROM connected_user_project");
-        jdbcTemplate.update("DELETE FROM automation_workflow_project");
+        jdbcTemplate.update("DELETE FROM automation_project");
         jdbcTemplate.update("DELETE FROM project WHERE id IN (?, ?, ?)", plainProjectId, hubProjectId,
             connectedUserProjectId);
 
@@ -498,9 +498,9 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
             (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectFacade.getProjects())
+        assertThatThrownBy(() -> automationProjectFacade.getProjects())
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(integrationRepository.findAll()).hasSize(1);
@@ -527,7 +527,7 @@ class EmbeddedGatesIntTest {
             .extracting(McpServer::getId)
             .containsExactly(developmentServerId);
         assertThat(permissionService.hasResourceScopeInEnvironment(
-            hubProjectId, "AutomationWorkflowProject", "WORKFLOW_CREATE", Environment.DEVELOPMENT)).isTrue();
+            hubProjectId, "AutomationProject", "WORKFLOW_CREATE", Environment.DEVELOPMENT)).isTrue();
 
         assertThatThrownBy(
             () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
@@ -543,11 +543,11 @@ class EmbeddedGatesIntTest {
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpServer(developmentServerId))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(permissionService.hasResourceScopeInEnvironment(
-            hubProjectId, "AutomationWorkflowProject", "WORKFLOW_CREATE", Environment.PRODUCTION)).isFalse();
+            hubProjectId, "AutomationProject", "WORKFLOW_CREATE", Environment.PRODUCTION)).isFalse();
         assertThat(mcpServerRepository.findById(productionServerId)
             .orElseThrow()
             .getName()).startsWith("server-");
@@ -612,7 +612,7 @@ class EmbeddedGatesIntTest {
             (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0)
             .getContent()).isEmpty();
         assertThat(connectedUserFacade.getConnectedUser(connectedUser.getId())).isNotNull();
-        assertThat(permissionService.hasResourceScope(hubProjectId, "AutomationWorkflowProject", "WORKFLOW_VIEW"))
+        assertThat(permissionService.hasResourceScope(hubProjectId, "AutomationProject", "WORKFLOW_VIEW"))
             .isTrue();
 
         assertThatThrownBy(() -> integrationFacade.createIntegration(newIntegrationDTO()))
@@ -634,11 +634,11 @@ class EmbeddedGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectedUserFacade.deleteConnectedUser(connectedUser.getId()))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectFacade.deleteProject(hubProjectId))
+        assertThatThrownBy(() -> automationProjectFacade.deleteProject(hubProjectId))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(permissionService.hasResourceScopeInEnvironment(
-            hubProjectId, "AutomationWorkflowProject", "WORKFLOW_CREATE", Environment.DEVELOPMENT)).isFalse();
+            hubProjectId, "AutomationProject", "WORKFLOW_CREATE", Environment.DEVELOPMENT)).isFalse();
         assertThat(integrationRepository.findAll()).hasSize(1);
         assertThat(mcpServerRepository.findAll()).hasSize(2);
     }
@@ -672,7 +672,7 @@ class EmbeddedGatesIntTest {
         assertThat(permissionService.hasWorkspaceScopeForProject(hubProjectId, "PROJECT_SETTINGS")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(connectedUserProjectId, "PROJECT_SETTINGS"))
             .isTrue();
-        assertThat(permissionService.hasResourceScope(hubProjectId, "AutomationWorkflowProject", "INTEGRATION_DELETE"))
+        assertThat(permissionService.hasResourceScope(hubProjectId, "AutomationProject", "INTEGRATION_DELETE"))
             .isTrue();
 
         embeddedMcpServerFacade.deleteEmbeddedMcpServer(developmentServerId);
@@ -704,7 +704,7 @@ class EmbeddedGatesIntTest {
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
             (long) Environment.PRODUCTION.ordinal(), null, null, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> automationWorkflowProjectFacade.getProjects())
+        assertThatThrownBy(() -> automationProjectFacade.getProjects())
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -920,8 +920,8 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade() {
-            return mock(AutomationWorkflowProjectFacade.class);
+        AutomationProjectFacade automationProjectFacade() {
+            return mock(AutomationProjectFacade.class);
         }
 
         @Bean
@@ -1010,6 +1010,11 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
+        UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
         WorkspaceApiKeyRepository workspaceApiKeyRepository() {
             return mock(WorkspaceApiKeyRepository.class);
         }
@@ -1025,8 +1030,8 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
-        WorkspaceScopeCacheService workspaceScopeCacheService() {
-            return mock(WorkspaceScopeCacheService.class);
+        WorkspaceScopeCache workspaceScopeCache() {
+            return mock(WorkspaceScopeCache.class);
         }
 
         @Bean
@@ -1075,7 +1080,7 @@ class EmbeddedGatesIntTest {
         PermissionScopeRegistry.class, PermissionServiceImpl.class, ProjectOwnershipResolver.class,
         ProjectPermissionScopeProvider.class, ProjectWorkflowExecutionFacadeImpl.class,
         WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 

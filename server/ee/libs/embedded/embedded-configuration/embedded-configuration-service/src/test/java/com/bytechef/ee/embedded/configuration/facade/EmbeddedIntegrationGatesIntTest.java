@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -50,16 +51,18 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
@@ -145,7 +148,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectedUserService.class, ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, JobFacade.class, JobService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
+    McpIntegrationInstanceConfigurationWorkflowService.class, McpAutomationRowFacade.class,
+    McpIntegrationInstanceRowFacade.class,
+    McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class,
@@ -193,7 +198,7 @@ class EmbeddedIntegrationGatesIntTest {
     private PermissionService permissionService;
 
     @Autowired
-    private WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+    private com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacade embeddedWebhookTriggerTestFacade;
 
     @Autowired
     private WorkflowCrudRepository workflowCrudRepository;
@@ -376,17 +381,17 @@ class EmbeddedIntegrationGatesIntTest {
         authenticate(EDITOR_IN_DEVELOPMENT, false);
 
         assertThatThrownBy(
-            () -> webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+            () -> embeddedWebhookTriggerTestFacade.startWebhookTriggerTest(
                 workflowId, "trigger_1", Environment.PRODUCTION.ordinal()))
                     .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
-            () -> webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+            () -> embeddedWebhookTriggerTestFacade.stopWebhookTriggerTest(
                 workflowId, "trigger_1", Environment.PRODUCTION.ordinal()))
                     .isInstanceOf(AccessDeniedException.class);
 
-        webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+        embeddedWebhookTriggerTestFacade.startWebhookTriggerTest(
             workflowId, "trigger_1", Environment.DEVELOPMENT.ordinal());
-        webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+        embeddedWebhookTriggerTestFacade.stopWebhookTriggerTest(
             workflowId, "trigger_1", Environment.DEVELOPMENT.ordinal());
     }
 
@@ -426,7 +431,7 @@ class EmbeddedIntegrationGatesIntTest {
         IntegrationInstanceConfigurationPermissionScopeProvider.class, IntegrationPermissionScopeProvider.class,
         KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
         PermissionServiceImpl.class, ProjectPermissionScopeProvider.class, WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 
