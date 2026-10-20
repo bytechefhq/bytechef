@@ -15,6 +15,22 @@ type AiHubChat {
     createdAt: Long
     updatedAt: Long
     """
+    Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
+    binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+    AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
+    server-side.
+    """
+    kind: AiHubChatKind!
+    """
+    Composite WorkflowExecutionId string the chat is bound to. Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    workflowExecutionId: String
+    """
+    Parent project-deployment id for the workflow execution. Used by the sidebar to group workflow chats by project.
+    Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    projectDeploymentId: Long
+    """
     Whether the title was set automatically and remains eligible for LLM regeneration. Flips to false
     when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
     """
@@ -23,6 +39,11 @@ type AiHubChat {
     ownerUserId: Long!
     """Whether the current caller is this chat's owner."""
     isOwner: Boolean!
+}
+
+enum AiHubChatKind {
+    STANDARD
+    WORKFLOW_CHAT
 }
 
 enum AiHubChatStatus {
