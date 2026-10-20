@@ -39,7 +39,7 @@ class EmbeddedTenantAdminGateScanTest {
     private static final String PRE_AUTHORIZE_MARKER = "@PreAuthorize(";
 
     private static final Map<String, String> TENANT_LEVEL_OPERATIONS = Map.of(
-        "AutomationWorkflowProjectConfigurationAdminFacadeImpl#<class>",
+        "AutomationProjectConfigurationAdminFacadeImpl#<class>",
         "automation workflow project administration is a tenant-level facade by design",
         "ConnectedUserIntegrationFacadeImpl#getProvisionableIntegrations",
         "admin provisioning lists integrations for any connected user, which only a tenant administrator may do",

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
@@ -22,12 +23,15 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,22 +45,28 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
+    private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
+    private static final String CONNECTION_TYPE = "Connection";
+
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
+    private final PermissionService permissionService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService, TagService tagService) {
+        ConnectionService connectionService, @Lazy PermissionService permissionService,
+        TagService tagService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
+        this.permissionService = permissionService;
         this.tagService = tagService;
     }
 
@@ -98,7 +108,10 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     public ConnectionDTO getConnection(long id) {
         requireAdminConnection(id);
 
-        return connectionFacade.getConnection(id);
+        ConnectionDTO connectionDTO = connectionFacade.getConnection(id);
+
+        return permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT)
+            ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -117,9 +130,23 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         Set<Long> connectedUserOwnedConnectionIds =
             connectedUserConnectionMembership.getConnectedUserOwnedConnectionIds(connectionIds);
 
-        return connectionDTOs.stream()
-            .filter(connectionDTO -> !connectedUserOwnedConnectionIds.contains(connectionDTO.id()))
-            .toList();
+        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
+        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            if (connectedUserOwnedConnectionIds.contains(connectionDTO.id())) {
+                continue;
+            }
+
+            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
+                connectionDTO.environmentId(),
+                connectionEnvironmentId -> permissionService.hasResourceScope(
+                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+
+            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+        }
+
+        return redactedConnectionDTOs;
     }
 
     @Override
