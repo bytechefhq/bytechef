@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.web.graphql;
 
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade.ChatWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifact;
@@ -126,12 +127,19 @@ public class AiHubChatGraphQlController {
             throw new ForbiddenException("Workflows are not viewable by the current user");
         }
 
-        if (!projectDeploymentFacade.isWorkspaceChatWorkflow(workspaceId, workflowExecutionId)) {
-            throw new ForbiddenException("Workflow is not available to chat in this workspace");
+        ChatWorkflow chatWorkflow = projectDeploymentFacade.findWorkspaceChatWorkflow(workspaceId, workflowExecutionId)
+            .orElseThrow(() -> new ForbiddenException("Workflow is not available to chat in this workspace"));
+
+        long listedProjectDeploymentId = chatWorkflow.projectDeploymentId();
+
+        if (listedProjectDeploymentId != projectDeploymentId && log.isDebugEnabled()) {
+            log.debug(
+                "Replacing client-supplied projectDeploymentId {} with the listed {} for workflow chat {}",
+                projectDeploymentId, listedProjectDeploymentId, workflowExecutionId);
         }
 
         return chatService.createWorkflowChat(
-            workspaceId, currentUserId(), environment, workflowExecutionId, projectDeploymentId, title);
+            workspaceId, currentUserId(), environment, workflowExecutionId, listedProjectDeploymentId, title);
     }
 
     @MutationMapping
