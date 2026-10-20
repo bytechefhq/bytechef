@@ -16,6 +16,7 @@
 
 package com.bytechef.component.datatable.action;
 
+import static com.bytechef.component.datatable.constant.DataTableConstants.RECORDS;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
 import static com.bytechef.component.datatable.constant.DataTableConstants.VALUES;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -36,10 +37,9 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,6 @@ import java.util.Objects;
  */
 public class DataTableUpdateRecordsAction {
 
-    private static final String RECORDS = "records";
     private static final String UPDATED_COUNT = "updatedCount";
 
     private final DataTableService dataTableService;
@@ -136,21 +135,18 @@ public class DataTableUpdateRecordsAction {
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
-        List<List<DataTableRowFilter>> conditions = DataTableUtils.getConditions(inputParameters);
+        DataTableRowConditions conditions = DataTableUtils.getConditions(inputParameters);
 
-        if (conditions.isEmpty()) {
+        if (conditions.isMatchAll()) {
             throw new IllegalArgumentException("Update Records requires at least one condition");
         }
 
-        List<DataTableRow> matchingDataTableRows = dataTableRowService.findRows(
-            baseName, conditions, null, Integer.MAX_VALUE, 0, environmentId);
-
-        List<DataTableRow> updatedDataTableRows = new ArrayList<>();
-
-        for (DataTableRow matchingDataTableRow : matchingDataTableRows) {
-            updatedDataTableRows.add(
-                dataTableRowService.updateRow(baseName, matchingDataTableRow.id(), values, environmentId));
+        if (values.isEmpty()) {
+            throw new IllegalArgumentException("Update Records requires a value for at least one column");
         }
+
+        List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
+            baseName, conditions, values, environmentId);
 
         Map<String, Object> result = new HashMap<>();
 

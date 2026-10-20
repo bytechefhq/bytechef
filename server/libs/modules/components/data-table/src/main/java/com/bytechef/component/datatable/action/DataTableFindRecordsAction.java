@@ -38,7 +38,7 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
@@ -82,7 +82,8 @@ public class DataTableFindRecordsAction {
                 DataTableUtils.conditionsProperty(dataTableService)
                     .description(
                         "OR Condition array that contains AND Condition arrays. A record is returned when it meets " +
-                            "every condition of at least one AND Condition. Leave empty to return every record."),
+                            "every condition of at least one AND Condition. Leave empty to return every record, up " +
+                            "to Limit."),
                 string(SORT_COLUMN)
                     .label("Sort Column")
                     .description("Column to sort the records by. Records are sorted by id when not set.")
@@ -90,6 +91,8 @@ public class DataTableFindRecordsAction {
                     .optionsLookupDependsOn(TABLE),
                 string(SORT_DIRECTION)
                     .label("Sort Direction")
+                    .description(
+                        "Order of the Sort Column: Ascending or Descending. Has no effect when Sort Column is not set.")
                     .options(
                         option("Ascending", Direction.ASC.name()),
                         option("Descending", Direction.DESC.name()))
@@ -139,15 +142,21 @@ public class DataTableFindRecordsAction {
         int limit = inputParameters.getInteger(LIMIT, 100);
         int offset = inputParameters.getInteger(OFFSET, 0);
 
-        List<List<DataTableRowFilter>> conditions = DataTableUtils.getConditions(inputParameters);
+        if (limit < 0 || offset < 0) {
+            throw new IllegalArgumentException("Limit and Offset must not be negative");
+        }
+
+        DataTableRowConditions conditions = DataTableUtils.getConditions(inputParameters);
 
         String sortColumn = inputParameters.getString(SORT_COLUMN);
 
         DataTableRowSort sort = null;
 
         if (sortColumn != null && !sortColumn.isBlank()) {
-            sort = new DataTableRowSort(
-                sortColumn, Direction.valueOf(inputParameters.getString(SORT_DIRECTION, Direction.ASC.name())));
+            Direction direction = DataTableUtils.toEnum(
+                Direction.class, inputParameters.getString(SORT_DIRECTION), Direction.ASC, "Sort Direction");
+
+            sort = new DataTableRowSort(sortColumn, direction);
         }
 
         return DataTableUtils.flattenRows(

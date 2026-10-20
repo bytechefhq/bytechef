@@ -29,6 +29,7 @@ import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -96,8 +97,8 @@ class DataTableServiceH2IntTest {
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
-        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(
-            "rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID);
+        DataTableRow fetchedDataTableRow = Objects.requireNonNull(
+            dataTableRowService.getRow("rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));

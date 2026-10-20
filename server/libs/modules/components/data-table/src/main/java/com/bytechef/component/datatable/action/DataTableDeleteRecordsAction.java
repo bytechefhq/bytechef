@@ -16,8 +16,7 @@
 
 package com.bytechef.component.datatable.action;
 
-import static com.bytechef.component.datatable.constant.DataTableConstants.BY_CONDITIONS;
-import static com.bytechef.component.datatable.constant.DataTableConstants.BY_IDS;
+import static com.bytechef.component.datatable.constant.DataTableConstants.CONDITIONS;
 import static com.bytechef.component.datatable.constant.DataTableConstants.DELETE_BY;
 import static com.bytechef.component.datatable.constant.DataTableConstants.IDS;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
@@ -37,18 +36,21 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * Delete Record(s): Delete record(s) from a table
+ * Delete Record(s): Delete records by ID or every record that matches conditions
  *
  * @author Ivica Cardic
  */
@@ -72,7 +74,7 @@ public class DataTableDeleteRecordsAction {
     private ModifiableActionDefinition build() {
         return action("deleteRecords")
             .title("Delete Record(s)")
-            .description("Delete record(s) from a table")
+            .description("Delete records from a table by ID or by conditions")
             .properties(
                 string(TABLE)
                     .label("Table")
@@ -82,15 +84,16 @@ public class DataTableDeleteRecordsAction {
                 string(DELETE_BY)
                     .label("Delete By")
                     .description("Whether to delete the records with the given IDs or every record that matches " +
-                        "the conditions.")
+                        "the conditions. When not set, conditions are used if only OR Conditions is given, and " +
+                        "Record IDs otherwise; it must be set when both are given.")
                     .options(
-                        option("Record IDs", BY_IDS),
-                        option("Conditions", BY_CONDITIONS))
-                    .defaultValue(BY_IDS),
+                        option("Record IDs", DeleteBy.IDS.name()),
+                        option("Conditions", DeleteBy.CONDITIONS.name())),
                 array(IDS)
                     .label("Record IDs")
-                    .description("IDs of records to delete")
-                    .displayCondition("%s == '%s'".formatted(DELETE_BY, BY_IDS))
+                    .description("IDs of records to delete. Ignored when Delete By is Conditions, or when it is " +
+                        "not set and only OR Conditions is given.")
+                    .displayCondition("%s != '%s'".formatted(DELETE_BY, DeleteBy.CONDITIONS))
                     .required(true)
                     .items(integer("id")),
                 DataTableUtils.conditionsProperty(dataTableService)
@@ -98,7 +101,7 @@ public class DataTableDeleteRecordsAction {
                         "OR Condition array that contains AND Condition arrays. Every record that meets every " +
                             "condition of at least one AND Condition is deleted. Use Clear Table to delete every " +
                             "record.")
-                    .displayCondition("%s == '%s'".formatted(DELETE_BY, BY_CONDITIONS))
+                    .displayCondition("%s == '%s'".formatted(DELETE_BY, DeleteBy.CONDITIONS))
                     .required(true))
             .output(
                 outputSchema(
@@ -122,41 +125,89 @@ public class DataTableDeleteRecordsAction {
         String baseName = inputParameters.getRequiredString(TABLE);
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
-        List<Long> ids;
+        if (getDeleteBy(inputParameters) == DeleteBy.CONDITIONS) {
+            DataTableRowConditions conditions = DataTableUtils.getConditions(inputParameters);
 
-        if (BY_CONDITIONS.equals(inputParameters.getString(DELETE_BY, BY_IDS))) {
-            List<List<DataTableRowFilter>> conditions = DataTableUtils.getConditions(inputParameters);
-
-            if (conditions.isEmpty()) {
+            if (conditions.isMatchAll()) {
                 throw new IllegalArgumentException(
                     "Delete by conditions requires at least one condition; use Clear Table to delete every record");
             }
 
-            List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-                baseName, conditions, null, Integer.MAX_VALUE, 0, environmentId);
-
-            ids = dataTableRows.stream()
+            List<Long> deletedIds = dataTableRowService.deleteRows(baseName, conditions, environmentId)
+                .stream()
                 .map(DataTableRow::id)
                 .toList();
-        } else {
-            ids = Arrays.stream(inputParameters.getRequiredArray(IDS))
-                .map(id -> (id instanceof Number number) ? number.longValue() : Long.parseLong(String.valueOf(id)))
-                .toList();
+
+            return toResult(deletedIds);
         }
 
-        List<Long> deletedIds = new ArrayList<>();
+        List<Long> ids = Arrays.stream(inputParameters.getRequiredArray(IDS))
+            .map(DataTableDeleteRecordsAction::toId)
+            .distinct()
+            .toList();
 
-        for (long id : ids) {
-            if (dataTableRowService.deleteRow(baseName, id, environmentId)) {
-                deletedIds.add(id);
+        if (ids.isEmpty()) {
+            return toResult(List.of());
+        }
+
+        DataTableRowConditions conditions = DataTableRowConditions.of(
+            List.of(new DataTableRowFilter("id", Operation.IN, ids)));
+
+        List<Long> deletedIds = dataTableRowService.deleteRows(baseName, conditions, environmentId)
+            .stream()
+            .map(DataTableRow::id)
+            .toList();
+
+        return toResult(deletedIds);
+    }
+
+    private static DeleteBy getDeleteBy(Parameters inputParameters) {
+        String deleteBy = inputParameters.getString(DELETE_BY);
+
+        if (deleteBy == null || deleteBy.isBlank()) {
+            Object conditions = inputParameters.get(CONDITIONS);
+
+            boolean hasConditions = conditions != null &&
+                !(conditions instanceof Collection<?> collection && collection.isEmpty());
+            boolean hasIds = inputParameters.containsKey(IDS);
+
+            if (hasConditions && hasIds) {
+                throw new IllegalArgumentException(
+                    "Delete Records has both Record IDs and OR Conditions; set Delete By to %s or %s".formatted(
+                        DeleteBy.IDS, DeleteBy.CONDITIONS));
             }
+
+            return hasConditions ? DeleteBy.CONDITIONS : DeleteBy.IDS;
         }
 
+        return DataTableUtils.toEnum(DeleteBy.class, deleteBy, DeleteBy.IDS, "Delete By");
+    }
+
+    private static long toId(Object id) {
+        try {
+            BigDecimal bigDecimal = new BigDecimal(String.valueOf(id)
+                .trim());
+
+            return bigDecimal.longValueExact();
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Record ID '%s' is not a number".formatted(id), exception);
+        } catch (ArithmeticException exception) {
+            throw new IllegalArgumentException("Record ID '%s' is not a whole number".formatted(id), exception);
+        }
+    }
+
+    private static Map<String, Object> toResult(List<Long> deletedIds) {
         Map<String, Object> result = new HashMap<>();
 
         result.put("deletedCount", deletedIds.size());
         result.put("deletedIds", deletedIds);
 
         return result;
+    }
+
+    private enum DeleteBy {
+
+        IDS,
+        CONDITIONS
     }
 }

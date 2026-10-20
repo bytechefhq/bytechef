@@ -231,7 +231,11 @@ class DataTableRowServiceTest {
 
         assertEquals(DataTableWebhookType.RECORD_DELETED, dataTableWebhookEvent.getType());
 
-        return dataTableWebhookEvent.getPayload();
+        List<Map<String, Object>> payloads = dataTableWebhookEvent.getPayloads();
+
+        assertEquals(1, payloads.size());
+
+        return payloads.getFirst();
     }
 
     private void stubH2() throws SQLException {
