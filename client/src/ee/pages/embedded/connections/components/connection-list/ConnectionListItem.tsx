@@ -1,13 +1,6 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/DropdownMenu/DropdownMenu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
@@ -19,13 +12,14 @@ import {
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
     useGetConnectionComponentDefinitionQuery,
 } from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {ComponentIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ConnectionListItemProps {
@@ -162,28 +156,14 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                 )}
                             </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() => setShowEditDialog(true)}
-                                    />
-
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        icon={<Trash2Icon />}
-                                        label="Delete"
-                                        onClick={() => setShowDeleteDialog(true)}
-                                        variant="destructive"
-                                    />
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <ConnectionListItemDropdownMenu onEditClick={() => setShowEditDialog(true)}>
+                                <DropdownMenuItem
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                />
+                            </ConnectionListItemDropdownMenu>
                         </div>
                     </div>
                 </div>

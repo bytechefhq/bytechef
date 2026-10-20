@@ -1,16 +1,10 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/DropdownMenu/DropdownMenu';
+import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
@@ -22,7 +16,7 @@ import {
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
+import {ComponentIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -190,45 +184,31 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 )}
                             </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent align="end">
+                            <ConnectionListItemDropdownMenu onEditClick={() => setShowEditDialog(true)}>
+                                {connection.active === true && (
                                     <DropdownMenuItem
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() => setShowEditDialog(true)}
+                                        icon={<Link2OffIcon />}
+                                        label="Disconnect from all"
+                                        onClick={() => setShowDisconnectDialog(true)}
                                     />
+                                )}
 
-                                    <DropdownMenuSeparator />
-
-                                    {connection.active === true && (
-                                        <DropdownMenuItem
-                                            icon={<Link2OffIcon />}
-                                            label="Disconnect from all"
-                                            onClick={() => setShowDisconnectDialog(true)}
-                                        />
-                                    )}
-
-                                    <div
-                                        title={
-                                            connection.active === true
-                                                ? 'Disconnect from all workflows first to enable deletion'
-                                                : 'Delete the connection'
-                                        }
-                                    >
-                                        <DropdownMenuItem
-                                            disabled={connection.active}
-                                            icon={<Trash2Icon />}
-                                            label="Delete"
-                                            onClick={() => setShowDeleteDialog(true)}
-                                            variant="destructive"
-                                        />
-                                    </div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                <div
+                                    title={
+                                        connection.active === true
+                                            ? 'Disconnect from all workflows first to enable deletion'
+                                            : 'Delete the connection'
+                                    }
+                                >
+                                    <DropdownMenuItem
+                                        disabled={connection.active}
+                                        icon={<Trash2Icon />}
+                                        label="Delete"
+                                        onClick={() => setShowDeleteDialog(true)}
+                                        variant="destructive"
+                                    />
+                                </div>
+                            </ConnectionListItemDropdownMenu>
                         </div>
                     </div>
                 </div>
