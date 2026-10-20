@@ -5,6 +5,7 @@ import JsonView from '@/shared/components/JsonView';
 import ExecutionAccordionButton from '@/shared/components/workflow-executions/ExecutionAccordionButton';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import {
+    Job,
     TaskExecution,
     TaskExecutionFromJSON,
     TriggerExecution,
@@ -33,6 +34,7 @@ interface WorkflowExecutionsAccordionItemProps {
     children: ReactNode;
     defaultValue?: string[];
     execution: TaskExecution | TriggerExecution;
+    jobStatus?: Job['status'];
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     previousTaskExecutions?: TaskExecution[];
     selectedExecutionId: string;
@@ -42,6 +44,7 @@ const WorkflowExecutionsAccordionItem = ({
     children,
     defaultValue,
     execution,
+    jobStatus,
     onExecutionClick,
     previousTaskExecutions = [],
     selectedExecutionId,
@@ -193,11 +196,13 @@ const WorkflowExecutionsAccordionItem = ({
                                                         <WorkflowExecutionsAccordionItem
                                                             defaultValue={defaultValue}
                                                             execution={convertedIterationItem}
+                                                            jobStatus={jobStatus}
                                                             key={convertedIterationItem.id}
                                                             onExecutionClick={onExecutionClick}
                                                             selectedExecutionId={selectedExecutionId}
                                                         >
                                                             <WorkflowTaskExecutionItem
+                                                                jobStatus={jobStatus}
                                                                 taskExecution={convertedIterationItem}
                                                             />
                                                         </WorkflowExecutionsAccordionItem>
@@ -226,11 +231,12 @@ const WorkflowExecutionsAccordionItem = ({
                             <WorkflowExecutionsAccordionItem
                                 defaultValue={defaultValue}
                                 execution={childTaskExecution}
+                                jobStatus={jobStatus}
                                 key={childTaskExecution.id}
                                 onExecutionClick={onExecutionClick}
                                 selectedExecutionId={selectedExecutionId}
                             >
-                                <WorkflowTaskExecutionItem taskExecution={childTaskExecution} />
+                                <WorkflowTaskExecutionItem jobStatus={jobStatus} taskExecution={childTaskExecution} />
                             </WorkflowExecutionsAccordionItem>
                         ))}
                     </Accordion>
@@ -242,12 +248,14 @@ const WorkflowExecutionsAccordionItem = ({
                             <WorkflowExecutionsAccordionItem
                                 defaultValue={defaultValue}
                                 execution={previousTaskExecution}
+                                jobStatus={jobStatus}
                                 key={previousTaskExecution.id}
                                 onExecutionClick={onExecutionClick}
                                 selectedExecutionId={selectedExecutionId}
                             >
                                 <WorkflowTaskExecutionItem
                                     attemptLabel={`Attempt ${index + 1}`}
+                                    jobStatus={jobStatus}
                                     taskExecution={previousTaskExecution}
                                 />
                             </WorkflowExecutionsAccordionItem>

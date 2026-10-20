@@ -147,6 +147,7 @@ const WorkflowExecutionSheetContent = ({
                                     <WorkflowExecutionsAccordionItem
                                         defaultValue={deepestFailedExecution?.path}
                                         execution={latestTaskExecution}
+                                        jobStatus={job?.status}
                                         key={latestTaskExecution.id}
                                         onExecutionClick={handleTaskClick}
                                         previousTaskExecutions={previousTaskExecutions}
@@ -158,6 +159,7 @@ const WorkflowExecutionSheetContent = ({
                                                     ? `Attempt ${previousTaskExecutions.length + 1}`
                                                     : undefined
                                             }
+                                            jobStatus={job?.status}
                                             taskExecution={latestTaskExecution}
                                         />
                                     </WorkflowExecutionsAccordionItem>
