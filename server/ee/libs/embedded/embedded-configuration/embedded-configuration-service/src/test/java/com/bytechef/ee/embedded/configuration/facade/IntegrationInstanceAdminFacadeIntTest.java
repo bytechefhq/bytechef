@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -90,11 +91,13 @@ class IntegrationInstanceAdminFacadeIntTest {
     }
 
     @Test
-    void testNonAdminIsDenied() {
+    void testAMemberWithoutTheManageScopeIsDenied() {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(
+            permissionService.hasResourceScope(INTEGRATION_INSTANCE_ID, "IntegrationInstance", "CONNECTED_USER_MANAGE"))
+                .thenReturn(false);
 
         assertThatThrownBy(
             () -> integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(
@@ -105,12 +108,14 @@ class IntegrationInstanceAdminFacadeIntTest {
     }
 
     @Test
-    void testTenantAdminReachesTheSharedFacade() {
+    void testAMemberWithTheManageScopeReachesTheSharedFacade() {
         authenticate(
             new UsernamePasswordAuthenticationToken(
                 "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(
+            permissionService.hasResourceScope(INTEGRATION_INSTANCE_ID, "IntegrationInstance", "CONNECTED_USER_MANAGE"))
+                .thenReturn(true);
 
         integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(INTEGRATION_INSTANCE_ID, WORKFLOW_ID, true);
 
@@ -199,8 +204,12 @@ class IntegrationInstanceAdminFacadeIntTest {
             @Lazy PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }

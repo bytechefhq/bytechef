@@ -112,7 +112,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_DELETE')")
     public void deleteIntegrationInstance(long integrationInstanceId) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -127,7 +127,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public void enableIntegrationInstance(long integrationInstanceId, boolean enable) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -143,7 +143,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        "or isConnectedUser()")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         validateCurrentPrincipalIntegrationInstanceOwnership(integrationInstanceId);
 
@@ -177,7 +178,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public void enableIntegrationInstanceWorkflowTriggers(long integrationInstanceId, boolean enable) {
         List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
             .getIntegrationInstanceWorkflows(integrationInstanceId);
@@ -200,7 +201,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public long enableIntegrationInstanceWorkflowTriggers(
         long integrationInstanceId, String workflowId, boolean enable) {
 
@@ -209,7 +210,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstance', 'CONNECTED_USER_VIEW')")
     public IntegrationInstanceDTO getIntegrationInstance(long id) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
@@ -241,7 +242,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceConfigurationWorkflow.integrationInstanceConfigurationId, " +
+        "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfigurationWorkflowTriggers(
         IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
@@ -274,7 +276,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        "or isConnectedUser()")
     public void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
 

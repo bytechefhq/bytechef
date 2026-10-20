@@ -250,6 +250,81 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedInstanceGates() throws Exception {
+        String base = "com.bytechef.ee.embedded.configuration.facade.";
+        Class<?> configurationFacade = Class.forName(base + "IntegrationInstanceConfigurationFacadeImpl");
+        Class<?> instanceFacade = Class.forName(base + "IntegrationInstanceFacadeImpl");
+        Class<?> instanceAdminFacade = Class.forName(base + "IntegrationInstanceAdminFacadeImpl");
+        Class<?> appEventFacade = Class.forName(base + "AppEventFacadeImpl");
+
+        String configurationType = "'IntegrationInstanceConfiguration', ";
+        String configurationView =
+            "hasPermission(#id, " + configurationType + "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')";
+        String configurationEdit =
+            "hasPermission(#id, " + configurationType + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')";
+        String configurationIdEdit =
+            "hasPermission(#integrationInstanceConfigurationId, " + configurationType
+                + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')";
+        String instanceManage =
+            "hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')";
+
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "createIntegrationInstanceConfiguration",
+            "hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', "
+                + "#integrationInstanceConfigurationDTO.environment)");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "createIntegrationInstanceConfigurationWorkflowJob", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "deleteIntegrationInstanceConfiguration",
+            "hasPermission(#id, " + configurationType + "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "enableIntegrationInstanceConfiguration", configurationIdEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "enableIntegrationInstanceConfigurationWorkflow", configurationIdEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getIntegrationInstanceConfiguration", configurationView);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getIntegrationInstanceConfigurationTags",
+            "hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getIntegrationInstanceConfigurations",
+            "hasEmbeddedScopeInEnvironmentId('INTEGRATION_INSTANCE_CONFIGURATION_VIEW', #environmentId)");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getIntegrationInstanceConfigurationIntegrations", "isAuthenticated()");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "updateIntegrationInstanceConfiguration",
+            "hasPermission(#integrationInstanceConfigurationDTO.id, " + configurationType
+                + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "updateIntegrationInstanceConfigurationTags", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "updateIntegrationInstanceConfigurationWorkflow",
+            "hasPermission(#integrationInstanceConfigurationWorkflow.integrationInstanceConfigurationId, "
+                + configurationType + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')");
+
+        assertEveryPublicOverloadIsGated(
+            instanceFacade, "deleteIntegrationInstance",
+            "hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_DELETE')");
+        assertEveryPublicOverloadIsGated(instanceFacade, "enableIntegrationInstance", instanceManage);
+        assertEveryPublicOverloadIsGated(
+            instanceFacade, "enableIntegrationInstanceWorkflow", instanceManage + " or isConnectedUser()");
+        assertEveryPublicOverloadIsGated(instanceFacade, "enableIntegrationInstanceWorkflowTriggers", instanceManage);
+        assertEveryPublicOverloadIsGated(
+            instanceFacade, "getIntegrationInstance",
+            "hasPermission(#id, 'IntegrationInstance', 'CONNECTED_USER_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            instanceFacade, "updateIntegrationInstanceWorkflow", instanceManage + " or isConnectedUser()");
+
+        assertEveryPublicOverloadIsGated(instanceAdminFacade, "enableIntegrationInstanceWorkflow", instanceManage);
+
+        assertEveryPublicOverloadIsGated(appEventFacade, "create", "hasEmbeddedScope('APP_EVENT_CREATE')");
+        assertEveryPublicOverloadIsGated(appEventFacade, "update", "hasEmbeddedScope('APP_EVENT_EDIT')");
+        assertEveryPublicOverloadIsGated(appEventFacade, "delete", "hasEmbeddedScope('APP_EVENT_DELETE')");
+        assertEveryPublicOverloadIsGated(appEventFacade, "getAppEvent", "hasEmbeddedScope('APP_EVENT_VIEW')");
+        assertEveryPublicOverloadIsGated(appEventFacade, "getAppEvents", "hasEmbeddedScope('APP_EVENT_VIEW')");
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");
