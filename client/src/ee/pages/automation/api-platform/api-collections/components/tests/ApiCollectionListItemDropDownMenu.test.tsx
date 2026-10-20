@@ -3,7 +3,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ApiCollectionListItemDropDownMenu from '../ApiCollectionListItemDropDownMenu';
 
-const ALL_SCOPES = ['API_PLATFORM_EDIT', 'API_PLATFORM_DELETE', 'DEPLOYMENT_CREATE'];
+const ALL_SCOPES = ['API_PLATFORM_EDIT', 'API_PLATFORM_DELETE'];
 
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
@@ -14,10 +14,10 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
 
 const defaultProps = {
     apiCollectionId: 1,
-    onChangeProjectVersionClick: vi.fn(),
     onDeleteClick: vi.fn(),
     onEditClick: vi.fn(),
     onNewEndpoint: vi.fn(),
+    onUpdateProjectVersionClick: vi.fn(),
 };
 
 const openMenu = async () => {
@@ -43,29 +43,21 @@ describe('ApiCollectionListItemDropDownMenu', () => {
         await openMenu();
 
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Change Project Version'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Update Project Version'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'New Endpoint'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Download OpenAPI Spec'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     });
 
-    it('should hide Edit and New Endpoint without API_PLATFORM_EDIT', async () => {
-        hoistedScope.grantedScopes = ['API_PLATFORM_DELETE', 'DEPLOYMENT_CREATE'];
+    it('should hide Edit, Update Project Version and New Endpoint without API_PLATFORM_EDIT', async () => {
+        hoistedScope.grantedScopes = ['API_PLATFORM_DELETE'];
 
         await openMenu();
 
         expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
         expect(screen.queryByRole('menuitem', {name: 'New Endpoint'})).not.toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Change Project Version'})).toBeInTheDocument();
-    });
-
-    it('should hide Change Project Version without DEPLOYMENT_CREATE', async () => {
-        hoistedScope.grantedScopes = ['API_PLATFORM_EDIT', 'API_PLATFORM_DELETE'];
-
-        await openMenu();
-
-        expect(screen.queryByRole('menuitem', {name: 'Change Project Version'})).not.toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Update Project Version'})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     });
 
     it('should keep only Download OpenAPI Spec for a member without any scope', async () => {

@@ -9,6 +9,7 @@ All URIs are relative to */api/automation/api-platform/internal*
 | [**getApiCollection**](ApiCollectionApi.md#getapicollection) | **GET** /api-collections/{id} | Get an API collection by id |
 | [**getWorkspaceApiCollections**](ApiCollectionApi.md#getworkspaceapicollections) | **GET** /workspaces/{id}/api-collections | Get all workspace API collections |
 | [**updateApiCollection**](ApiCollectionApi.md#updateapicollection) | **PUT** /api-collections/{id} | Update an existing API collection |
+| [**updateApiCollectionProjectVersion**](ApiCollectionApi.md#updateapicollectionprojectversionoperation) | **PUT** /api-collections/{id}/project-version | Move an API collection to a newer project version |
 
 
 
@@ -355,6 +356,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The updated API collection object. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateApiCollectionProjectVersion
+
+> ApiCollectionVersionUpdate updateApiCollectionProjectVersion(id, updateApiCollectionProjectVersionRequest)
+
+Move an API collection to a newer project version
+
+Move an API collection to a newer published project version in place, keeping its collection version.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ApiCollectionApi,
+} from '';
+import type { UpdateApiCollectionProjectVersionOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ApiCollectionApi();
+
+  const body = {
+    // number | The id of an API collection.
+    id: 789,
+    // UpdateApiCollectionProjectVersionRequest
+    updateApiCollectionProjectVersionRequest: ...,
+  } satisfies UpdateApiCollectionProjectVersionOperationRequest;
+
+  try {
+    const data = await api.updateApiCollectionProjectVersion(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an API collection. | [Defaults to `undefined`] |
+| **updateApiCollectionProjectVersionRequest** | [UpdateApiCollectionProjectVersionRequest](UpdateApiCollectionProjectVersionRequest.md) |  | |
+
+### Return type
+
+[**ApiCollectionVersionUpdate**](ApiCollectionVersionUpdate.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The outcome of the project version update. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

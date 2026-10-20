@@ -1,4 +1,8 @@
-import {ApiCollection, ApiCollectionApi} from '@/ee/shared/middleware/automation/api-platform';
+import {
+    ApiCollection,
+    ApiCollectionApi,
+    ApiCollectionVersionUpdate,
+} from '@/ee/shared/middleware/automation/api-platform';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useMutation} from '@tanstack/react-query';
 
@@ -51,6 +55,34 @@ export const useUpdateApiCollectionMutation = (mutationProps?: UpdateApiCollecti
             return new ApiCollectionApi().updateApiCollection({
                 apiCollection,
                 id: apiCollection.id!,
+            });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+export interface UpdateApiCollectionProjectVersionVariablesI {
+    id: number;
+    projectVersion: number;
+    removeMissingEndpoints: boolean;
+}
+
+interface UpdateApiCollectionProjectVersionMutationProps {
+    onError?: (error: Error, variables: UpdateApiCollectionProjectVersionVariablesI) => void;
+    onSuccess?: (result: ApiCollectionVersionUpdate, variables: UpdateApiCollectionProjectVersionVariablesI) => void;
+}
+
+export const useUpdateApiCollectionProjectVersionMutation = (
+    mutationProps?: UpdateApiCollectionProjectVersionMutationProps
+) =>
+    useMutation<ApiCollectionVersionUpdate, Error, UpdateApiCollectionProjectVersionVariablesI>({
+        mutationFn: ({id, projectVersion, removeMissingEndpoints}: UpdateApiCollectionProjectVersionVariablesI) => {
+            return new ApiCollectionApi().updateApiCollectionProjectVersion({
+                id,
+                updateApiCollectionProjectVersionRequest: {
+                    projectVersion,
+                    removeMissingEndpoints,
+                },
             });
         },
         onError: mutationProps?.onError,

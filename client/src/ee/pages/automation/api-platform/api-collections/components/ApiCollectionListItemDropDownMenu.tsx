@@ -13,23 +13,22 @@ import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, RefreshCcwIcon, 
 
 interface ApiCollectionListItemDropdownMenuProps {
     apiCollectionId: number;
-    onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
     onNewEndpoint: () => void;
+    onUpdateProjectVersionClick: () => void;
 }
 
 const ApiCollectionListItemDropDownMenu = ({
     apiCollectionId,
-    onChangeProjectVersionClick,
     onDeleteClick,
     onEditClick,
     onNewEndpoint,
+    onUpdateProjectVersionClick,
 }: ApiCollectionListItemDropdownMenuProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_EDIT');
-    const canChangeProjectVersion = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
     // Delete is ADMIN-tier on the server (ApiCollectionFacadeImpl.deleteApiCollection), so offering it to a member without API_PLATFORM_DELETE means a confirm dialog
     // that ends in a 403.
     const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_DELETE');
@@ -52,9 +51,9 @@ const ApiCollectionListItemDropDownMenu = ({
                     </DropdownMenuItem>
                 )}
 
-                {canChangeProjectVersion && (
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
-                        <RefreshCcwIcon /> Change Project Version
+                {canEdit && (
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onUpdateProjectVersionClick}>
+                        <RefreshCcwIcon /> Update Project Version
                     </DropdownMenuItem>
                 )}
 
