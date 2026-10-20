@@ -211,7 +211,8 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
         }
 
-        runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
+        AutomationAuthorizationContext
+            .runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
 
         for (long connectionId : connectionIds) {
             connectedUserConnectionService.deleteByConnectionId(connectionId);
@@ -313,20 +314,6 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
         return connectedUserService.getConnectedUsers(
             environment, name, createDateFrom, createDateTo, integrationId, pageNumber);
-    }
-
-    private static void runSkippingChecks(Runnable runnable) {
-        try {
-            AutomationAuthorizationContext.callSkippingChecks(() -> {
-                runnable.run();
-
-                return null;
-            });
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
     }
 
     private ConnectedUserDTO createConnectedUserDTO(

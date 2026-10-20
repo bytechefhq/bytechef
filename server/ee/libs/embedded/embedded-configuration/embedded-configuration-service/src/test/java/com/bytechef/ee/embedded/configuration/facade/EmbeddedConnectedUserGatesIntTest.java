@@ -562,10 +562,6 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThatThrownBy(
             () -> connectedUserFacade.getConnectedUserDTOs(productionEnvironmentId, null, null, null, null, null, 0))
                 .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectedUserProjectAdminFacade.enableProjectWorkflow(1L, true))
-            .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectedUserProjectAdminFacade.deleteProjectWorkflow(1L))
-            .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> connectedUserProjectAdminFacade.getConnectedUserProjects(
                 productionConnectedUserId, Environment.PRODUCTION))

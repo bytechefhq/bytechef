@@ -104,7 +104,8 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
         "'CONNECTED_USER_DELETE')")
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
-        runSkippingChecks(() -> connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId));
+        AutomationAuthorizationContext
+            .runSkippingChecks(() -> connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId));
     }
 
     @Override
@@ -115,7 +116,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
         "'CONNECTED_USER_MANAGE')")
     public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
-        runSkippingChecks(
+        AutomationAuthorizationContext.runSkippingChecks(
             () -> connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable));
     }
 
@@ -346,19 +347,5 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         return new ProvisionableAutomationWorkflowProjectDTO.Workflow(
             template.workflowUuid(), template.label(), template.inputs(), reference != null,
             reference != null && reference.isDangling());
-    }
-
-    private static void runSkippingChecks(Runnable runnable) {
-        try {
-            AutomationAuthorizationContext.callSkippingChecks(() -> {
-                runnable.run();
-
-                return null;
-            });
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
     }
 }
