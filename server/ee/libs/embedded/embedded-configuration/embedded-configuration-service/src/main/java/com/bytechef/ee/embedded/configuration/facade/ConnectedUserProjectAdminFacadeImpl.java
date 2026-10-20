@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
-@PreAuthorize("isTenantAdmin()")
+@ConditionalOnEEVersion
 public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProjectAdminFacade {
 
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -31,16 +33,24 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_DELETE')")
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
-        connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId);
+        AutomationAuthorizationContext
+            .runSkippingChecks(() -> connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_MANAGE')")
     public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
-        connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable);
+        AutomationAuthorizationContext.runSkippingChecks(
+            () -> connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable));
     }
 
     @Override
+    @PreAuthorize("#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : " +
+        "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         return connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, environment);
     }
