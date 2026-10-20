@@ -55,6 +55,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicBoolean jobIdReported = new AtomicBoolean(false);
     private final Object dispatchLock = new Object();
+    private Long pendingJobId;
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -87,8 +88,17 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onEvent(Object payload) {
+        Long jobIdToReport;
+
         synchronized (dispatchLock) {
             dispatchEvent(payload);
+
+            jobIdToReport = pendingJobId;
+            pendingJobId = null;
+        }
+
+        if (jobIdToReport != null) {
+            onJobId.accept(jobIdToReport);
         }
     }
 
@@ -271,7 +281,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return true;
         }
 
-        onJobId.accept(jobId);
+        pendingJobId = jobId;
 
         return true;
     }
