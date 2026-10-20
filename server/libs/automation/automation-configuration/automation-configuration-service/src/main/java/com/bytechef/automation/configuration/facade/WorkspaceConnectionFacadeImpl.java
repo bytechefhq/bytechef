@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -31,7 +32,10 @@ import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentica
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -44,9 +48,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
 
+    private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
+    private static final String CONNECTION_TYPE = "Connection";
+
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
     private final ConnectionService connectionService;
+    private final PermissionService permissionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
@@ -54,13 +62,15 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ConnectionService connectionService, PermissionService permissionService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
+        this.permissionService = permissionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -101,7 +111,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     public ConnectionDTO getConnection(long connectionId) {
         requireAutomation(connectionId);
 
-        return connectionFacade.getConnection(connectionId);
+        ConnectionDTO connectionDTO = connectionFacade.getConnection(connectionId);
+
+        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)
+            ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -116,8 +129,22 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             return List.of();
         }
 
-        return connectionFacade.getConnections(
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+
+        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
+        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
+                connectionDTO.environmentId(),
+                connectionEnvironmentId -> permissionService.hasResourceScope(
+                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+
+            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+        }
+
+        return redactedConnectionDTOs;
     }
 
     @Override
