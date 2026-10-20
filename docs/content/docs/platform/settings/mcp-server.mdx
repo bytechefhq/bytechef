@@ -188,29 +188,26 @@ Tools that list, search or create things inside a workspace take a `workspaceId`
 | `createProject` | Create a new project |
 | `updateProject` | Update an existing project |
 | `deleteProject` | Delete a project |
-| `getProject` | Get project details |
-| `listProjects` | List the projects of a workspace |
-| `searchProjects` | Search projects by keyword |
+| `getProject` | Get project details, including its status, whether it is published, the last version and its deployments |
+| `listProjects` | List the projects of a workspace; pass an optional `query` to keep only projects whose name or description contains it |
 | `publishProject` | Publish a project |
-| `getProjectStatus` | Get the current status of a project |
 
 ### Workflows
 
 | Tool | Description |
 |---|---|
-| `createProjectWorkflow` | Create a new, empty workflow (manual trigger, no tasks) for `importWorkflow` to fill; `buildWorkflow` creates its own |
 | `deleteWorkflow` | Delete a workflow |
 | `getWorkflow` | Get workflow details |
-| `listWorkflows` | List the workflows of a project |
-| `searchWorkflows` | Search workflows by keyword |
+| `listWorkflows` | List the workflows of a project; pass an optional `query` to keep only workflows whose name or description contains it |
+| `searchWorkflows` | Search the workflows of one project, or of every project in a workspace, by keyword |
 | `saveWorkflowTestConnection` | Select or create the connection a workflow uses when it is tested, in the current environment |
 
 ### Workspace resources
 
 | Group | Tools |
 |---|---|
-| Skills | `getAiSkills`, `getAiSkill`, `createAiSkill`, `updateAiSkill`, `updateAiSkillContent`, `getAiSkillFilePaths`, `getAiSkillFileContent`, `createAdditionalFilesInSkill`, `removeFileInSkill` |
-| MCP servers | `listMcpServers`, `createMcpServer`, `updateMcpServer`, `createMcpProject`, `cloneMcpProject`, `listMcpProjectWorkflows` |
+| Skills (read-only; `authorSkill` creates and changes them) | `getAiSkills`, `getAiSkill`, `getAiSkillFilePaths`, `getAiSkillFileContent` |
+| MCP servers (`configureMcpServer` maps the attached workflows) | `listMcpServers`, `createMcpServer`, `updateMcpServer`, `createMcpProject` |
 | Deployments | `listProjectDeployments`, `createProjectDeployment`, `updateProjectDeployment`, `deleteProjectDeployment`, `rollbackProjectDeployment`, `toggleProjectDeployment`, `promoteWorkflow` |
 | Knowledge bases | `listKnowledgeBases`, `queryKnowledgeBase`, `createKnowledgeBase`, `addKnowledgeBaseDocument`, `deleteKnowledgeBaseDocument`, `cloneKnowledgeBase`, `deleteKnowledgeBase` |
 
@@ -221,7 +218,7 @@ Some capabilities are exposed as a single delegate tool that takes a natural-lan
 | Tool | Description |
 |---|---|
 | `buildWorkflow` | Designs, edits, debugs or explains a workflow. Give it a `projectId` to create a new workflow or a `workflowId` to change one. It looks up components, actions, triggers, task dispatchers, cluster elements and script code itself, so the server has no separate tools for them |
-| `importWorkflow` | Converts a workflow definition from another tool (n8n, Make, Zapier, Workato, …) into an existing ByteChef workflow |
+| `importWorkflow` | Converts a workflow definition from another tool (n8n, Make, Zapier, Workato, …) into a ByteChef workflow. Give it a `projectId` to create a new workflow or a `workflowId` to convert into an existing one, never both |
 | `authorSkill` | Lists, explains, creates or updates skills |
 | `debugWorkflowExecution` | Inspects or diagnoses a past workflow run and fixes the underlying workflow |
 | `configureMcpServer` | Writes the tool name, tool description and per-input `fromAi(...)` mapping of every workflow already attached to an MCP server; it never creates the server, attaches workflows or enables it |
