@@ -659,6 +659,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             projectDeploymentWorkflow.getConnections(), oldProjectDeploymentWorkflow.getWorkflowId(),
             projectDeployment.getEnvironment());
 
+        validateDeploymentConnectionEnvironments(
+            projectDeploymentWorkflow.getConnections(), projectDeployment.getEnvironment());
+
         validateConnectionsAccessible(
             List.of(projectDeploymentWorkflow), getConnectionIds(List.of(oldProjectDeploymentWorkflow)));
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
