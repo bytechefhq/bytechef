@@ -13,6 +13,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRule;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactStatus;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,6 +40,16 @@ class EnumOrdinalStabilityTest {
         expected.put("DELETED", 2);
 
         assertOrdinalsMatch(AiHubChatStatus.values(), expected);
+    }
+
+    @Test
+    void testChatKindOrdinalsAreStable() {
+        Map<String, Integer> expected = new LinkedHashMap<>();
+
+        expected.put("STANDARD", 0);
+        expected.put("WORKFLOW_CHAT", 1);
+
+        assertOrdinalsMatch(AiHubChatKind.values(), expected);
     }
 
     @Test
