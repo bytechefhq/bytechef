@@ -53,6 +53,7 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -139,6 +140,9 @@ class McpProjectFacadeIntTest {
 
     @Autowired
     private ProjectDeploymentRepository projectDeploymentRepository;
+
+    @Autowired
+    private ProjectDeploymentService projectDeploymentService;
 
     @Autowired
     private ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
@@ -244,6 +248,20 @@ class McpProjectFacadeIntTest {
         assertThat(mcpProject.getMcpServerId()).isEqualTo(mcpServer.getId());
         assertThat(mcpProject.getProjectDeploymentId()).isNotNull();
         assertThat(mcpProjectRepository.findById(mcpProject.getId())).isPresent();
+    }
+
+    @Test
+    void testCreateMcpProjectNamesItsDeploymentAfterTheServerAndHidesIt() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+        ProjectDeployment mcpProjectDeployment = projectDeploymentService.getProjectDeployment(
+            mcpProject.getProjectDeploymentId());
+
+        assertThat(mcpProjectDeployment.getName()).isEqualTo(mcpServer.getName());
+        assertThat(projectDeploymentService.getProjectDeployments(null, null, null, null, null))
+            .extracting(ProjectDeployment::getId)
+            .containsExactly(projectDeployment.getId());
     }
 
     @Test
