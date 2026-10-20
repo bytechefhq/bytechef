@@ -188,7 +188,8 @@ class PreAuthorizeAnnotationTest {
             "hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')");
         assertEveryPublicOverloadIsGated(workflowFacade, "getIntegrationVersionWorkflows", integrationView);
 
-        String webhookGate = "hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + development + ")";
+        String webhookGate =
+            "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)";
 
         assertEveryPublicOverloadIsGated(webhookFacade, "startWebhookTriggerTest", webhookGate);
         assertEveryPublicOverloadIsGated(webhookFacade, "stopWebhookTriggerTest", webhookGate);

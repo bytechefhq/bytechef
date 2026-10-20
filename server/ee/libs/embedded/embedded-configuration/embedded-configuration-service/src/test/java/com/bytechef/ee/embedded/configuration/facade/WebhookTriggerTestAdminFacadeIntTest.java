@@ -83,8 +83,9 @@ class WebhookTriggerTestAdminFacadeIntTest {
 
     @Test
     void testAMemberWithoutTheDevelopmentEditScopeIsDeniedBeforeTheSharedFacadeIsTouched() {
-        when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
-            .thenReturn(false);
+        when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .thenReturn(false);
 
         assertThatThrownBy(
             () -> webhookTriggerTestAdminFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
@@ -98,8 +99,9 @@ class WebhookTriggerTestAdminFacadeIntTest {
 
     @Test
     void testAMemberWithTheDevelopmentEditScopeReachesTheSharedFacadeTypedEmbedded() {
-        when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
-            .thenReturn(true);
+        when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .thenReturn(true);
         when(webhookTriggerTestFacade.enableTrigger(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.EMBEDDED))
             .thenReturn("https://example.org/webhook");
 

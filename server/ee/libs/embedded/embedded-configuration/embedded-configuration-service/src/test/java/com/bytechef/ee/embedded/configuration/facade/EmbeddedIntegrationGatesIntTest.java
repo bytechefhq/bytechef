@@ -191,6 +191,9 @@ class EmbeddedIntegrationGatesIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+
+    @Autowired
     private WorkflowCrudRepository workflowCrudRepository;
 
     @MockitoBean(answers = Answers.CALLS_REAL_METHODS)
@@ -337,6 +340,52 @@ class EmbeddedIntegrationGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowFacade.getIntegrationWorkflows())
             .isInstanceOf(AccessDeniedException.class);
+
+        IntegrationDTO integrationDTO = IntegrationDTO.builder()
+            .componentName("componentName")
+            .name("created-by-a-non-member")
+            .build();
+
+        assertThatThrownBy(() -> integrationFacade.createIntegration(integrationDTO))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> integrationFacade.deleteIntegration(integrationId))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> integrationWorkflowFacade.updateWorkflow("workflow-1", DEFINITION, 0))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> integrationWorkflowFacade.updatePermissionExpression(1L, "true"))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(integrationRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void testADevelopmentEditorStartsAWebhookTestOnlyInDevelopment() {
+        long integrationId = createIntegration();
+
+        authenticate(TENANT_ADMIN, true);
+
+        long integrationWorkflowId = integrationWorkflowFacade.addWorkflow(integrationId, DEFINITION);
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowRepository.findById(integrationWorkflowId)
+            .orElseThrow();
+
+        String workflowId = integrationWorkflow.getWorkflowId();
+
+        authenticate(EDITOR_IN_DEVELOPMENT, false);
+
+        assertThatThrownBy(
+            () -> webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+                workflowId, "trigger_1", Environment.PRODUCTION.ordinal()))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+                workflowId, "trigger_1", Environment.PRODUCTION.ordinal()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+            workflowId, "trigger_1", Environment.DEVELOPMENT.ordinal());
+        webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+            workflowId, "trigger_1", Environment.DEVELOPMENT.ordinal());
     }
 
     private long createIntegration() {

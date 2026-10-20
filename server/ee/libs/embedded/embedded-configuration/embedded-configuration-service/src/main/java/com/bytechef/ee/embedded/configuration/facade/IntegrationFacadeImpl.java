@@ -251,7 +251,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#id"),
         @AuditData(key = "integrationVersion", value = "#result")
     })
-    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and "
+        + "hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')")
     public int publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 

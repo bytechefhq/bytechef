@@ -24,8 +24,6 @@ import org.springframework.stereotype.Service;
 @ConditionalOnEEVersion
 public class WebhookTriggerTestAdminFacadeImpl implements WebhookTriggerTestAdminFacade {
 
-    private static final String DEVELOPMENT = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
-
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
 
     @SuppressFBWarnings("EI")
@@ -34,13 +32,13 @@ public class WebhookTriggerTestAdminFacadeImpl implements WebhookTriggerTestAdmi
     }
 
     @Override
-    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public String startWebhookTriggerTest(String workflowId, @Nullable String triggerName, long environmentId) {
         return webhookTriggerTestFacade.enableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
     }
 
     @Override
-    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public void stopWebhookTriggerTest(String workflowId, @Nullable String triggerName, long environmentId) {
         webhookTriggerTestFacade.disableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
     }
