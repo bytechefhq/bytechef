@@ -35,6 +35,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.config.AiHubAgentFixtures;
+import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.web.rest.AiHubApiController;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolverImpl;
@@ -46,16 +47,21 @@ import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.model.ChatModel;
@@ -74,16 +80,17 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Runs whole AI Hub turns through the production path: {@link AiHubApiController#chat} into {@link AiHubChatStreamer}
- * into the ASK and BUILD agents built by {@code AiHubConfiguration}, with a real {@link AiHubChatClientResolver} over
- * the real {@link CopilotChatClientResolver} and {@link CatalogChatClientResolverImpl}, and the {@code @Primary}
- * {@link CatalogChatModel} as the agents' builder-time model. The provider model at the bottom is a stub that records
- * every {@link Prompt} it is sent, so the tests check the tool definitions the LLM actually receives rather than the
- * agents' tool lists.
+ * into the {@link AiHubRoutingAgent}s over the ASK and BUILD agents built by {@code AiHubConfiguration}, with a real
+ * {@link AiHubChatClientResolver} over the real {@link CopilotChatClientResolver} and
+ * {@link CatalogChatClientResolverImpl}, and the {@code @Primary} {@link CatalogChatModel} as the agents' builder-time
+ * model. The provider model at the bottom is a stub that records every {@link Prompt} it is sent, so the tests check
+ * the tool definitions the LLM actually receives rather than the agents' tool lists.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class AiHubTurnToolDispatchTest {
 
     private static final int ENVIRONMENT = 0;
@@ -100,6 +107,7 @@ class AiHubTurnToolDispatchTest {
     private final InFlightAiHubRunRegistry inFlightRunRegistry = fixtures.inFlightRunRegistry;
     private final PromptCapturingChatModel providerChatModel = new PromptCapturingChatModel();
 
+    private List<LocalAgent> agents;
     private AiHubApiController controller;
 
     @BeforeEach
@@ -112,10 +120,6 @@ class AiHubTurnToolDispatchTest {
             new CopilotChatClientResolver(
                 new CatalogChatClientResolverImpl(catalogChatModelFactory, aiProviderFacade), ""));
 
-        List<LocalAgent> agents = List.of(
-            fixtures.askAgent(catalogChatModel, chatClientResolver),
-            fixtures.buildAgent(catalogChatModel, chatClientResolver));
-
         AiHubChat chat = new AiHubChat(USER_ID);
 
         chat.setId(CHAT_ID);
@@ -126,6 +130,14 @@ class AiHubTurnToolDispatchTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
         when(chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        agents = List.of(
+            new AiHubRoutingAgent(
+                AiHubAgentType.AI_HUB_ASK.key(), fixtures.askAgent(catalogChatModel, chatClientResolver), null,
+                chatService),
+            new AiHubRoutingAgent(
+                AiHubAgentType.AI_HUB_BUILD.key(), fixtures.buildAgent(catalogChatModel, chatClientResolver), null,
+                chatService));
 
         AiHubChatAccessPolicy accessPolicy = mock(AiHubChatAccessPolicy.class);
 
@@ -151,6 +163,15 @@ class AiHubTurnToolDispatchTest {
         controller = new AiHubApiController(
             new AiHubChatStreamer(inFlightRunRegistry, new JsonMapper()), inFlightRunRegistry, agents, chatService,
             accessPolicy, userService, permissionServiceProvider, mock(AiHubToolApprovalService.class));
+    }
+
+    @Test
+    void testTheRoutersAreTheOnlyAgentsAndTheirIdsMapOneToOne() {
+        Map<String, LocalAgent> agentMap = agents.stream()
+            .collect(Collectors.toMap(LocalAgent::getAgentId, Function.identity()));
+
+        assertThat(agentMap).containsOnlyKeys("ai_hub_ask", "ai_hub_build");
+        assertThat(agentMap.values()).allMatch(AiHubRoutingAgent.class::isInstance);
     }
 
     @Test
