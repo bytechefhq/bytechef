@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Executes each branch in parallel (list of tasks) as a separate and isolated sub-flow. Branches are executed internally in sequence.",
   "help": null,
   "icon": "path:assets/fork-join.svg",

@@ -32,6 +32,13 @@ import java.util.Optional;
 public interface TaskDispatcherDefinition {
 
     /**
+     * Tells whether the task dispatcher is deprecated and should be replaced in workflows that still use it.
+     *
+     * @return
+     */
+    Optional<Boolean> getDeprecated();
+
+    /**
      *
      * @return
      */

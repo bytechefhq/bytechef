@@ -1305,6 +1305,7 @@ public final class TaskDispatcherDsl {
 
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
 
+        private Boolean deprecated;
         private String description;
         private Help help;
         private String icon;
@@ -1319,6 +1320,12 @@ public final class TaskDispatcherDsl {
 
         private ModifiableTaskDispatcherDefinition(String name) {
             this.name = name;
+        }
+
+        public ModifiableTaskDispatcherDefinition deprecated(Boolean deprecated) {
+            this.deprecated = deprecated;
+
+            return this;
         }
 
         public ModifiableTaskDispatcherDefinition description(String description) {
@@ -1413,6 +1420,11 @@ public final class TaskDispatcherDsl {
             this.variablePropertiesFunction = variablePropertiesFunction;
 
             return this;
+        }
+
+        @Override
+        public Optional<Boolean> getDeprecated() {
+            return Optional.ofNullable(deprecated);
         }
 
         @Override
