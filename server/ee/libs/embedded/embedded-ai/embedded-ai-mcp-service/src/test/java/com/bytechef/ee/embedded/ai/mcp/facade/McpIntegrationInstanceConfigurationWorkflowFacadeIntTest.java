@@ -166,6 +166,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         private static final int INTEGRATION_VERSION = 2;
 
+        @MockitoBean
+        private EmbeddedMcpReader embeddedMcpReader;
+
         @Autowired
         private Encryption encryption;
 
@@ -343,6 +346,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
 
         @MockitoBean
+        private EmbeddedMcpReader embeddedMcpReader;
+
+        @MockitoBean
         private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
 
         @MockitoBean
@@ -378,7 +384,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
             mcpServer.setId(MCP_SERVER_ID);
 
-            when(mcpServerService.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
+            when(embeddedMcpReader.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
 
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 new IntegrationInstanceConfigurationWorkflow();
