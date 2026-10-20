@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {countTaskExecutions} from '@/shared/components/workflow-executions/util/countTaskExecutions';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {CheckIcon, LoaderCircleIcon} from 'lucide-react';
@@ -23,7 +23,7 @@ const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExec
         duration = Math.round(endTime - startTime);
     }
 
-    const taskExecutionsCount = groupTaskExecutionAttempts(job?.taskExecutions || []).length;
+    const taskExecutionsCount = countTaskExecutions(job?.taskExecutions || []);
 
     return (
         <header className="flex w-full items-center gap-x-3 px-3 py-3">
