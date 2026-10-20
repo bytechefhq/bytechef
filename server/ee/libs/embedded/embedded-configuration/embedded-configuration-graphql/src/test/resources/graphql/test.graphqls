@@ -19,3 +19,8 @@ type ConnectedUser {
 type Workflow {
     id: ID!
 }
+
+type ApiKey {
+    id: ID
+    name: String
+}

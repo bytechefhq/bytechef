@@ -31,6 +31,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.service.OwnedApiKeyCreatorImpl;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
@@ -68,7 +69,8 @@ class ApiKeyFacadeTest {
         apiKeyService = mock(ApiKeyService.class);
         userService = mock(UserService.class);
 
-        apiKeyFacade = new ApiKeyFacadeImpl(apiKeyService, userService);
+        apiKeyFacade =
+            new ApiKeyFacadeImpl(apiKeyService, new OwnedApiKeyCreatorImpl(apiKeyService, userService), userService);
 
         securityUtils = mockStatic(SecurityUtils.class);
 
@@ -240,6 +242,28 @@ class ApiKeyFacadeTest {
         // Not owner-filtered, and it must not be: the keys belong to the account being deleted, never to the caller.
         verify(apiKeyService).delete(1L);
         verify(apiKeyService).delete(2L);
+    }
+
+    @Test
+    void testRevokeAllKeepsTheEmbeddedKeysOfTheDepartingUser() {
+        ApiKey embeddedApiKey = apiKey(1L, OTHER_USER_ID);
+
+        embeddedApiKey.setType(PlatformType.EMBEDDED);
+
+        ApiKey automationApiKey = apiKey(2L, OTHER_USER_ID);
+
+        automationApiKey.setType(PlatformType.AUTOMATION);
+
+        ApiKey platformApiKey = apiKey(3L, OTHER_USER_ID);
+
+        when(apiKeyService.getUserApiKeys(OTHER_USER_ID))
+            .thenReturn(List.of(embeddedApiKey, automationApiKey, platformApiKey));
+
+        ((ApiKeyRevoker) apiKeyFacade).revokeAll(OTHER_USER_ID);
+
+        verify(apiKeyService, never()).delete(1L);
+        verify(apiKeyService).delete(2L);
+        verify(apiKeyService).delete(3L);
     }
 
     @Test

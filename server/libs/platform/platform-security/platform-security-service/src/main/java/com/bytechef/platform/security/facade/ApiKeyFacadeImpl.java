@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.service.OwnedApiKeyCreator;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.user.domain.User;
@@ -56,11 +57,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     private final ApiKeyService apiKeyService;
+    private final OwnedApiKeyCreator ownedApiKeyCreator;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyFacadeImpl(ApiKeyService apiKeyService, UserService userService) {
+    public ApiKeyFacadeImpl(
+        ApiKeyService apiKeyService, OwnedApiKeyCreator ownedApiKeyCreator, UserService userService) {
+
         this.apiKeyService = apiKeyService;
+        this.ownedApiKeyCreator = ownedApiKeyCreator;
         this.userService = userService;
     }
 
@@ -78,14 +83,14 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
 
-        return createOwnedApiKey(apiKey, type);
+        return ownedApiKeyCreator.create(apiKey, type);
     }
 
     @Override
     public ApiKey createAutomationApiKey(ApiKey apiKey) {
         checkNotConnectedUser();
 
-        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+        return ownedApiKeyCreator.create(apiKey, PlatformType.AUTOMATION);
     }
 
     @Override
@@ -137,15 +142,20 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
     }
 
     /**
-     * Revokes every key a departing user owns. Deliberately not owner-filtered: the keys belong to the account being
-     * deleted, never to the caller. Reaching it requires {@code UserManagementFacade.deleteUser}, which is
-     * {@code ADMIN}-only, and that is the whole of its authorization. The deletions are not audited.
+     * Revokes every key a departing user owns, except {@link PlatformType#EMBEDDED} ones, which are shared per
+     * environment and outlive the person who minted them. Deliberately not owner-filtered: the keys belong to the
+     * account being deleted, never to the caller. Reaching it requires {@code UserManagementFacade.deleteUser}, which
+     * is {@code ADMIN}-only, and that is the whole of its authorization. The deletions are not audited.
      */
     @Override
     public void revokeAll(long userId) {
         List<ApiKey> apiKeys = apiKeyService.getUserApiKeys(userId);
 
         for (ApiKey apiKey : apiKeys) {
+            if (apiKey.getType() == PlatformType.EMBEDDED) {
+                continue;
+            }
+
             apiKeyService.delete(apiKey.getId());
         }
     }
@@ -154,15 +164,6 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
         if (ConnectedUserAuthentications.isConnectedUser()) {
             throw new AccessDeniedException("A connected user has no platform API keys");
         }
-    }
-
-    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
-        User user = userService.getCurrentUser();
-
-        apiKey.setType(type);
-        apiKey.setUserId(user.getId());
-
-        return apiKeyService.create(apiKey);
     }
 
     private List<ApiKey> filterOwned(List<ApiKey> apiKeys) {

@@ -64,6 +64,8 @@ dependencies {
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
