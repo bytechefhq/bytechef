@@ -40,6 +40,8 @@ public interface JobService {
 
     Optional<Job> fetchLastWorkflowJob(List<String> workflowIds);
 
+    Optional<Job> fetchTaskExecutionJob(long taskExecutionId);
+
     List<Long> getChildJobIds(long parentJobId);
 
     Job getJob(long id);

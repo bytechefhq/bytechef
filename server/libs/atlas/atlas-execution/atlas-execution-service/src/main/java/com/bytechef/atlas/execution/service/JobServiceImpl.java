@@ -91,6 +91,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Optional<Job> fetchTaskExecutionJob(long taskExecutionId) {
+        return jobRepository.findByTaskExecutionId(taskExecutionId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<Long> getChildJobIds(long parentJobId) {
         return jobRepository.findAllIdsByParentJobId(parentJobId);

@@ -17,6 +17,7 @@
 package com.bytechef.platform.job.sync.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
@@ -250,6 +252,7 @@ class JobSyncExecutorTest {
         job.setId(jobId);
         job.setStatus(Job.Status.STARTED);
 
+        when(jobService.fetchTaskExecutionJob(taskExecutionId)).thenReturn(Optional.of(job));
         when(jobService.getTaskExecutionJob(taskExecutionId)).thenReturn(job);
         when(taskExecutionService.update(any(TaskExecution.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -271,6 +274,63 @@ class JobSyncExecutorTest {
             assertThat(ok).isTrue();
             assertThat(called.get()).isTrue();
         }
+    }
+
+    @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
+    void testTaskStartedEventForDeletedTaskExecutionIsSkipped() {
+        long jobId = 405L;
+        long taskExecutionId = 9002L;
+
+        when(jobService.fetchTaskExecutionJob(taskExecutionId)).thenReturn(Optional.empty());
+        when(jobService.getTaskExecutionJob(taskExecutionId))
+            .thenThrow(new IllegalArgumentException("Unable to locate job with taskExecutionId: " + taskExecutionId));
+        when(taskExecutionService.getTaskExecution(taskExecutionId))
+            .thenThrow(new IllegalStateException("TaskExecution with id '" + taskExecutionId + "' not found"));
+
+        AtomicBoolean called = new AtomicBoolean(false);
+
+        try (AutoCloseable handle = jobSyncExecutor.addTaskStartedListener(jobId, event -> called.set(true))) {
+            TaskStartedApplicationEvent taskStartedApplicationEvent = new TaskStartedApplicationEvent(taskExecutionId);
+
+            taskStartedApplicationEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+            assertThatNoException().isThrownBy(
+                () -> memoryMessageBroker.send(
+                    TaskCoordinatorMessageRoute.APPLICATION_EVENTS, taskStartedApplicationEvent));
+
+            assertThat(called.get()).isFalse();
+            verify(taskExecutionService, never()).getTaskExecution(anyLong());
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForStartedJobIsExecuted() {
+        long jobId = 605L;
+
+        Job job = new Job();
+
+        job.setId(jobId);
+        job.setStatus(Job.Status.STARTED);
+
+        when(jobService.fetchJob(jobId)).thenReturn(Optional.of(job));
+        when(jobService.fetchTaskExecutionJob(1L)).thenReturn(Optional.empty());
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+        taskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "task_1", "type", "noop/v1")));
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent);
+
+        verify(jobService).fetchTaskExecutionJob(1L);
     }
 
     @Test
@@ -305,7 +365,20 @@ class JobSyncExecutorTest {
     }
 
     @Test
-    void testTaskExecutionCompleteEventForStoppedJobIsDropped() {
+    void testTaskExecutionCompleteEventForStartedJobIsHandled() {
+        long jobId = 609L;
+        Job job = mock(Job.class);
+
+        when(job.getStatus()).thenReturn(Job.Status.STARTED);
+        when(jobService.fetchJob(jobId)).thenReturn(Optional.of(job));
+
+        sendTaskExecutionCompleteEvent(jobId);
+
+        verify(taskExecutionService).completeIfNotCancelled(2L);
+    }
+
+    @Test
+    void testTaskExecutionCompleteEventForStoppedJobIsHandled() {
         long jobId = 608L;
         Job job = mock(Job.class);
 
@@ -314,7 +387,7 @@ class JobSyncExecutorTest {
 
         sendTaskExecutionCompleteEvent(jobId);
 
-        verify(taskExecutionService, never()).completeIfNotCancelled(anyLong());
+        verify(taskExecutionService).completeIfNotCancelled(2L);
     }
 
     private void sendTaskExecutionCompleteEvent(long jobId) {
@@ -357,7 +430,7 @@ class JobSyncExecutorTest {
         failedJob.setError(new ExecutionError("Invalid expression: function perform(input) {}", List.of()));
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
@@ -387,7 +460,7 @@ class JobSyncExecutorTest {
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
         when(taskExecutionService.fetchLastJobTaskExecution(jobId))
-            .thenReturn(java.util.Optional.of(completedTaskExecution));
+            .thenReturn(Optional.of(completedTaskExecution));
         when(taskExecutionService.getJobTaskExecutions(jobId))
             .thenReturn(List.of(failedTaskExecution, completedTaskExecution));
 
@@ -406,7 +479,7 @@ class JobSyncExecutorTest {
         failedJob.setStatus(Job.Status.FAILED);
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
@@ -478,7 +551,7 @@ class JobSyncExecutorTest {
         startedJob.setStatus(Job.Status.STARTED);
 
         when(jobService.getJob(jobId)).thenReturn(startedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)
