@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -31,7 +32,10 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -45,8 +49,14 @@ class TriggerExecutionOwnershipResolverTest {
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final TriggerExecutionService triggerExecutionService = mock(TriggerExecutionService.class);
-    private final TriggerExecutionOwnershipResolver resolver = new TriggerExecutionOwnershipResolver(
-        projectDeploymentService, projectService, triggerExecutionService);
+    private TriggerExecutionOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new TriggerExecutionOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectDeploymentService,
+            projectService, triggerExecutionService);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheTriggerExecutionGuardNames() {
@@ -117,5 +127,50 @@ class TriggerExecutionOwnershipResolverTest {
         when(triggerExecutionService.getTriggerExecutions(List.of(TRIGGER_EXECUTION_ID))).thenReturn(List.of());
 
         assertThat(resolver.resolveProjectId(TRIGGER_EXECUTION_ID)).isEmpty();
+    }
+
+    @Test
+    void testAnEmbeddedProjectTriggerExecutionResolvesToEmbeddedAndKeepsItsProjectId() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, PROJECT_DEPLOYMENT_ID, "workflow-uuid", "trigger-1");
+
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .id(TRIGGER_EXECUTION_ID)
+            .workflowExecutionId(workflowExecutionId)
+            .build();
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setId(PROJECT_DEPLOYMENT_ID);
+        projectDeployment.setProjectId(PROJECT_ID);
+
+        Project project = new Project();
+
+        project.setId(PROJECT_ID);
+        project.setWorkspaceId(9L);
+
+        when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID)).thenReturn(true);
+        when(triggerExecutionService.getTriggerExecutions(List.of(TRIGGER_EXECUTION_ID)))
+            .thenReturn(List.of(triggerExecution));
+        when(projectDeploymentService.fetchProjectDeployment(PROJECT_DEPLOYMENT_ID))
+            .thenReturn(Optional.of(projectDeployment));
+        when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.of(project));
+
+        TriggerExecutionOwnershipResolver embeddedResolver = new TriggerExecutionOwnershipResolver(
+            providerOf(embeddedResourceResolver), projectDeploymentService, projectService, triggerExecutionService);
+
+        assertThat(embeddedResolver.resolveOwner(TRIGGER_EXECUTION_ID)).isEqualTo(ResourceOwner.ofEmbedded());
+        assertThat(embeddedResolver.resolveProjectId(TRIGGER_EXECUTION_ID)).hasValue(PROJECT_ID);
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver> providerOf(
+        EmbeddedResourceResolver embeddedResourceResolver) {
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }

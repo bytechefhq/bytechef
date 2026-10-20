@@ -24,6 +24,9 @@ import com.bytechef.ee.automation.configuration.security.constant.PermissionScop
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -64,6 +67,7 @@ public class PermissionServiceImpl implements PermissionService {
     private static final String WORKFLOW_EDIT = "WORKFLOW_EDIT";
 
     private final ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider;
+    private final ObjectProvider<ConnectionService> connectionServiceProvider;
     private final CurrentUserResolver currentUserResolver;
     private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final EmbeddedScopeCacheService embeddedScopeCacheService;
@@ -86,9 +90,11 @@ public class PermissionServiceImpl implements PermissionService {
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
         ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider,
         EmbeddedScopeCacheService embeddedScopeCacheService, EmbeddedUserRepository embeddedUserRepository,
-        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider) {
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        ObjectProvider<ConnectionService> connectionServiceProvider) {
 
         this.connectedUserAccessDeciderProvider = connectedUserAccessDeciderProvider;
+        this.connectionServiceProvider = connectionServiceProvider;
         this.currentUserResolver = currentUserResolver;
         this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.embeddedScopeCacheService = embeddedScopeCacheService;
@@ -627,6 +633,14 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
+        if (isIntegrationWorkflow(workflowId) || isHubProjectWorkflow(workflowId)) {
+            return canUseEmbeddedConnection(connectionId, environment);
+        }
+
+        if (isEmbeddedProjectWorkflow(workflowId)) {
+            return false;
+        }
+
         Long workspaceId = projectRepository.findByWorkflowId(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
@@ -636,6 +650,34 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return canUseConnectionInWorkspace(connectionId, workspaceId, environment);
+    }
+
+    private boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
+        ConnectionService connectionService = connectionServiceProvider.getIfAvailable();
+
+        if (connectionService == null) {
+            return false;
+        }
+
+        Optional<Connection> connectionOptional = connectionService.fetchConnection(connectionId);
+
+        if (connectionOptional.isEmpty()) {
+            return false;
+        }
+
+        Connection connection = connectionOptional.get();
+
+        if (connection.getType() != PlatformType.EMBEDDED) {
+            return false;
+        }
+
+        Environment connectionEnvironment = Environment.values()[connection.getEnvironmentId()];
+
+        if (environment != null && environment != connectionEnvironment) {
+            return false;
+        }
+
+        return hasEmbeddedScope(CONNECTION_VIEW, connectionEnvironment);
     }
 
     @Override
