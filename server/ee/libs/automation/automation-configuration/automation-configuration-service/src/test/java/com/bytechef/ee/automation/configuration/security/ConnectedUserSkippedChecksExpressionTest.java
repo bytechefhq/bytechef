@@ -25,14 +25,15 @@ import com.bytechef.automation.configuration.security.AutomationPermissionEvalua
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -66,13 +67,13 @@ class ConnectedUserSkippedChecksExpressionTest {
     private AutomationPermissionEvaluator evaluator;
     private ProjectRepository projectRepository;
     private AutomationMethodSecurityExpressionRoot root;
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
 
     @BeforeEach
     void setUp() {
         currentUserResolver = mock(CurrentUserResolver.class);
         projectRepository = mock(ProjectRepository.class);
-        workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+        workspaceScopeCache = mock(WorkspaceScopeCache.class);
 
         ConnectedUserAccessDecider decider = mock(ConnectedUserAccessDecider.class);
 
@@ -86,11 +87,12 @@ class ConnectedUserSkippedChecksExpressionTest {
             Map.of("connectedUserAccessDecider", decider));
 
         PermissionServiceImpl permissionService = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
             mock(WorkspaceUserRepository.class), List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         AutomationMethodSecurityExpressionHandler expressionHandler = new AutomationMethodSecurityExpressionHandler(
             permissionService, beanFactory.getBeanProvider(MethodSecurityExpressionContributor.class));
@@ -189,6 +191,6 @@ class ConnectedUserSkippedChecksExpressionTest {
         assertThat(AutomationAuthorizationContext.callSkippingChecks(check::getAsBoolean)).isFalse();
         assertThat(check.getAsBoolean()).isFalse();
 
-        verifyNoInteractions(currentUserResolver, projectRepository, workspaceScopeCacheService);
+        verifyNoInteractions(currentUserResolver, projectRepository, workspaceScopeCache);
     }
 }

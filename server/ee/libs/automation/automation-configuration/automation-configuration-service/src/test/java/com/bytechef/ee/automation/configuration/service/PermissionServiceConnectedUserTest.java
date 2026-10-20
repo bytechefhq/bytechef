@@ -23,9 +23,11 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.io.Serializable;
 import java.util.List;
@@ -54,7 +56,7 @@ class PermissionServiceConnectedUserTest {
     private ConnectedUserAccessDecider decider;
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
     private WorkspaceUserRepository workspaceUserRepository;
 
     @BeforeEach
@@ -62,18 +64,19 @@ class PermissionServiceConnectedUserTest {
         currentUserResolver = mock(CurrentUserResolver.class);
         decider = mock(ConnectedUserAccessDecider.class);
         projectRepository = mock(ProjectRepository.class);
-        workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+        workspaceScopeCache = mock(WorkspaceScopeCache.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
         StaticListableBeanFactory beanFactory = new StaticListableBeanFactory(
             Map.of("connectedUserAccessDecider", decider));
 
         permissionService = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     @AfterEach
@@ -96,7 +99,7 @@ class PermissionServiceConnectedUserTest {
         when(decider.decideWorkspace(1L, "WORKFLOW_VIEW")).thenReturn(Decision.NOT_GOVERNED);
         when(decider.decideWorkspace(0L, "")).thenReturn(Decision.NOT_GOVERNED);
         when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
-        when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), eq(1L))).thenReturn(Set.of("WORKFLOW_VIEW"));
+        when(workspaceScopeCache.getWorkspaceScopes(anyLong(), eq(1L))).thenReturn(Set.of("WORKFLOW_VIEW"));
 
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isTrue();
     }
@@ -109,7 +112,7 @@ class PermissionServiceConnectedUserTest {
             () -> permissionService.hasResourceScope(5L, "ProjectDeployment", "DEPLOYMENT_EDIT"));
 
         assertThat(allowed).isTrue();
-        verifyNoInteractions(currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(currentUserResolver, workspaceScopeCache);
     }
 
     @Test
@@ -117,7 +120,7 @@ class PermissionServiceConnectedUserTest {
         when(decider.decideWorkspace(1L, "WORKFLOW_VIEW")).thenReturn(Decision.DENY);
 
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
-        verifyNoInteractions(currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(currentUserResolver, workspaceScopeCache);
     }
 
     @Test
@@ -140,11 +143,12 @@ class PermissionServiceConnectedUserTest {
     @Test
     void testIsAuthorizationSkippedFollowsSkipWithoutADecider() throws Throwable {
         PermissionServiceImpl permissionServiceWithoutDecider = new PermissionServiceImpl(
-            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
+            currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         assertThat(
             AutomationAuthorizationContext.callSkippingChecks(permissionServiceWithoutDecider::isAuthorizationSkipped))
@@ -183,7 +187,7 @@ class PermissionServiceConnectedUserTest {
             return null;
         });
 
-        verifyNoInteractions(currentUserResolver, workspaceScopeCacheService, workspaceUserRepository);
+        verifyNoInteractions(currentUserResolver, workspaceScopeCache, workspaceUserRepository);
     }
 
     @Test
@@ -196,7 +200,7 @@ class PermissionServiceConnectedUserTest {
         assertThat(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
             .isTrue();
         assertThat(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT")).isTrue();
-        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCache);
     }
 
     @Test
@@ -226,7 +230,7 @@ class PermissionServiceConnectedUserTest {
         verify(decider).decideWorkspace(1L, "CONNECTION_VIEW");
         verify(decider).decide(3L, "Connection", "CONNECTION_VIEW");
         verify(decider).decideWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT");
-        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCache);
     }
 
     @Test
@@ -237,7 +241,7 @@ class PermissionServiceConnectedUserTest {
 
         assertThat(permissionService.hasWorkspaceScopeForProject(9L, "DEPLOYMENT_CREATE", Environment.DEVELOPMENT))
             .isFalse();
-        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCache);
     }
 
     @Test
@@ -249,7 +253,7 @@ class PermissionServiceConnectedUserTest {
 
         assertThat(permissionService.canUseConnectionInWorkflow(3L, WORKFLOW_ID, Environment.PRODUCTION)).isFalse();
         assertThat(permissionService.canUseConnectionInWorkflow(4L, "workflow-2", Environment.PRODUCTION)).isFalse();
-        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCacheService);
+        verifyNoInteractions(projectRepository, currentUserResolver, workspaceScopeCache);
     }
 
     private void givenAdminAuthentication() {

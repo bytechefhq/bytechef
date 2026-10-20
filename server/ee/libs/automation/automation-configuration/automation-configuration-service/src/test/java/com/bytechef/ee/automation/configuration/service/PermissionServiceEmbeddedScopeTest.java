@@ -20,10 +20,12 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ class PermissionServiceEmbeddedScopeTest {
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
     private WorkspaceUserRepository workspaceUserRepository;
 
     @BeforeEach
@@ -65,7 +67,7 @@ class PermissionServiceEmbeddedScopeTest {
         embeddedUserRepository = mock(EmbeddedUserRepository.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         projectRepository = mock(ProjectRepository.class);
-        workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+        workspaceScopeCache = mock(WorkspaceScopeCache.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
         when(decider.decideWorkspace(anyLong(), anyString())).thenReturn(Decision.NOT_GOVERNED);
@@ -76,10 +78,11 @@ class PermissionServiceEmbeddedScopeTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository,
-            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
+            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), embeddedScopeCacheService,
             embeddedUserRepository,
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     @AfterEach

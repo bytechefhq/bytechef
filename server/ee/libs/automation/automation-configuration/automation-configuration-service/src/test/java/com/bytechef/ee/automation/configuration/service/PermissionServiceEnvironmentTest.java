@@ -19,9 +19,11 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -55,7 +57,7 @@ class PermissionServiceEnvironmentTest {
     private PermissionServiceImpl permissionService;
     private ProjectRepository projectRepository;
     private UserService userService;
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
 
     private MockedStatic<SecurityUtils> securityUtilsMock;
 
@@ -67,14 +69,15 @@ class PermissionServiceEnvironmentTest {
         userService = mock(UserService.class);
 
         projectRepository = mock(ProjectRepository.class);
-        workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+        workspaceScopeCache = mock(WorkspaceScopeCache.class);
 
         permissionService = new PermissionServiceImpl(
             new CurrentUserResolver(userService), permissionScopeRegistry, projectRepository,
-            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
+            workspaceScopeCache, workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -101,7 +104,7 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testAllowsWhenTheEnvironmentRoleGrantsTheScope() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("WORKFLOW_EDIT"));
 
         assertThat(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
@@ -110,7 +113,7 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testDeniesWhenTheEnvironmentRoleDoesNotGrantTheScope() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         assertThat(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
@@ -119,7 +122,7 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testDeniesWhenTheMemberHasNoRoleInThatEnvironment() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of());
 
         assertThat(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
@@ -128,9 +131,9 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testOneMemberIsAnsweredDifferentlyPerEnvironment() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("WORKFLOW_EDIT", "WORKFLOW_VIEW"));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         assertThat(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
@@ -141,9 +144,9 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testMyScopesInAnEnvironmentAreEmptyWhereTheMemberHoldsNoRole() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("DEPLOYMENT_CREATE", "WORKFLOW_EDIT"));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of());
 
         assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID, Environment.PRODUCTION)).isEmpty();
@@ -151,9 +154,9 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testMyScopesAreAnsweredPerEnvironment() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE"));
 
         assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID, Environment.DEVELOPMENT))
@@ -169,7 +172,7 @@ class PermissionServiceEnvironmentTest {
         project.setWorkspaceId(WORKSPACE_ID);
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
 
         assertThat(permissionService.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
@@ -197,9 +200,9 @@ class PermissionServiceEnvironmentTest {
 
     @Test
     void testEveryEnvironmentCheckRefusesWhenOneEnvironmentLacksTheScope() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("WORKSPACE_MEMBER_MANAGE"));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.STAGING))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.STAGING))
             .thenReturn(Set.of());
 
         // The escalation this closes: a member who administers only Development must not be able to grant a
@@ -211,7 +214,7 @@ class PermissionServiceEnvironmentTest {
     @Test
     void testEveryEnvironmentCheckAllowsWhenAllEnvironmentsGrantTheScope() {
         for (Environment environment : Environment.values()) {
-            when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, environment))
+            when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, environment))
                 .thenReturn(Set.of("WORKSPACE_MEMBER_MANAGE"));
         }
 
@@ -223,14 +226,15 @@ class PermissionServiceEnvironmentTest {
     void testByIdCheckUsesTheResourcesOwnEnvironment() {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
-            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            workspaceScopeCache, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
 
         // The member holds DEPLOYMENT_EDIT somewhere -- the environment-unaware read unions their environments -- but
@@ -246,14 +250,15 @@ class PermissionServiceEnvironmentTest {
     void testByIdCheckFallsBackWhenNoEnvironmentCanBeResolved() {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
-            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            workspaceScopeCache, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
             List.of(deploymentEnvironmentResolver(null)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
         // A resource with no environment keeps the environment-unaware check.
@@ -278,13 +283,14 @@ class PermissionServiceEnvironmentTest {
 
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
-            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            workspaceScopeCache, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
-        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        lenient().when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
         // The member holds DEPLOYMENT_EDIT in some environment. Falling back to that union when the lookup fails would

@@ -23,9 +23,11 @@ import com.bytechef.automation.configuration.security.ProjectDeploymentWorkflowE
 import com.bytechef.automation.configuration.security.ProjectDeploymentWorkflowOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -60,14 +62,14 @@ class ProjectDeploymentWorkflowResourceScopeTest {
     private final ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository =
         mock(ProjectDeploymentWorkflowRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final WorkspaceScopeCacheService workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
+    private final WorkspaceScopeCache workspaceScopeCache = mock(WorkspaceScopeCache.class);
     private final WorkspaceUserRepository workspaceUserRepository = mock(WorkspaceUserRepository.class);
 
     @Test
     void testDeploymentWorkflowScopeIsGrantedFromTheRoleHeldInTheRowsEnvironment() {
         givenWorkflowRowInAProductionDeployment();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
         assertThat(
@@ -79,9 +81,9 @@ class ProjectDeploymentWorkflowResourceScopeTest {
     void testDeploymentWorkflowScopeIsRefusedWhenTheRoleIsHeldOnlyInAnotherEnvironment() {
         givenWorkflowRowInAProductionDeployment();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of());
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
         assertThat(
@@ -98,7 +100,7 @@ class ProjectDeploymentWorkflowResourceScopeTest {
     void testDeploymentWorkflowScopeIsRefusedForEveryoneWithoutTheOwnershipResolver() {
         givenWorkflowRowInAProductionDeployment();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
         PermissionServiceImpl serviceWithoutResolver = service(List.of(), environmentResolvers());
@@ -117,9 +119,9 @@ class ProjectDeploymentWorkflowResourceScopeTest {
     void testDeploymentWorkflowScopeIgnoresTheEnvironmentWithoutTheEnvironmentResolver() {
         givenWorkflowRowInAProductionDeployment();
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
-        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+        when(workspaceScopeCache.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of());
 
         assertThat(
@@ -168,16 +170,19 @@ class ProjectDeploymentWorkflowResourceScopeTest {
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers) {
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private List<ResourceOwnershipResolver> ownershipResolvers() {
         return List.of(
-            new ProjectDeploymentWorkflowOwnershipResolver(projectDeploymentWorkflowRepository, projectRepository));
+            new ProjectDeploymentWorkflowOwnershipResolver(
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                projectDeploymentWorkflowRepository, projectRepository));
     }
 
     private List<ResourceEnvironmentResolver> environmentResolvers() {
