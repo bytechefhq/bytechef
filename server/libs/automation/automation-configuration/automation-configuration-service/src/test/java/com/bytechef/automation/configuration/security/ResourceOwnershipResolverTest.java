@@ -76,8 +76,7 @@ class ResourceOwnershipResolverTest {
     private static final Map<String, Set<PinGrounds>> KNOWN_UNRESOLVED_TOKENS = Map.of();
 
     private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of(
-        "AutomationWorkflowProject", "AutomationWorkflowProjectWorkflow", "ConnectedUser",
-        "ConnectedUserProjectWorkflow", "IntegrationInstance", "IntegrationInstanceConfiguration",
+        "ConnectedUser", "ConnectedUserProjectWorkflow", "IntegrationInstance", "IntegrationInstanceConfiguration",
         "McpIntegrationInstanceConfiguration", "McpIntegrationInstanceConfigurationWorkflow",
         "McpIntegrationInstanceTool", "SigningKey");
 
