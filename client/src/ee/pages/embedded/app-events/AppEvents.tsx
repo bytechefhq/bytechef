@@ -7,6 +7,7 @@ import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {EMBEDDED_APP_EVENTS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -23,11 +24,15 @@ const APP_EVENT_STEPS = [
 const AppEvents = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
+    const canCreateAppEventScope = useHasEmbeddedScope('APP_EVENT_CREATE', UNION_ENVIRONMENT_ID);
+
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
 
     const initialLoadComplete = useInitialLoadComplete(appEventsIsLoading);
 
     const isFirstRun = appEvents?.length === 0;
+
+    const canCreateAppEvent = canCreateAppEventScope && !currentEnvironmentId;
 
     return (
         <PageLoader errors={[appEventsError]} loading={appEventsIsLoading}>
@@ -37,12 +42,9 @@ const AppEvents = () => {
                         centerTitle={true}
                         position="main"
                         right={
+                            canCreateAppEvent &&
                             appEvents &&
-                            appEvents.length > 0 && (
-                                <AppEventDialog
-                                    triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
-                                />
-                            )
+                            appEvents.length > 0 && <AppEventDialog triggerNode={<Button label="New App Event" />} />
                         }
                         title={
                             appEvents && appEvents.length > 0 ? (
@@ -74,12 +76,10 @@ const AppEvents = () => {
             >
                 {appEvents && appEvents.length > 0 ? (
                     <AppEventList appEvents={appEvents} />
-                ) : (
+                ) : canCreateAppEventScope ? (
                     <EmptyState
                         actions={
-                            !currentEnvironmentId && (
-                                <AppEventDialog triggerNode={<Button label="Create App Event" />} />
-                            )
+                            canCreateAppEvent && <AppEventDialog triggerNode={<Button label="Create App Event" />} />
                         }
                         description="An app event is something that happens in your product, like a new sign-up or a placed order. Declare it here with the shape of its data, then any integration workflow can start when your product fires it."
                         docsLink={{href: EMBEDDED_APP_EVENTS_DOCUMENTATION_URL, label: 'How app events work'}}
@@ -88,6 +88,12 @@ const AppEvents = () => {
                     >
                         <JourneySteps aria-label="Getting started" steps={APP_EVENT_STEPS} />
                     </EmptyState>
+                ) : (
+                    <EmptyState
+                        description="There are no app events yet."
+                        icon={<ZapIcon />}
+                        title="No App Events"
+                    />
                 )}
             </LayoutContainer>
         </PageLoader>
