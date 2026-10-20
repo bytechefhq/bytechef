@@ -75,6 +75,11 @@ class ResourceOwnershipResolverTest {
      */
     private static final Map<String, Set<PinGrounds>> KNOWN_UNRESOLVED_TOKENS = Map.of();
 
+    private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of(
+        "AutomationWorkflowProject", "AutomationWorkflowProjectWorkflow", "ConnectedUser",
+        "ConnectedUserProjectWorkflow", "Integration", "IntegrationInstance", "IntegrationInstanceConfiguration",
+        "IntegrationWorkflow");
+
     private static final Pattern OWNERSHIP_RESOLVER_DECLARATION =
         Pattern.compile("implements\\s+[^{;]*\\bResourceOwnershipResolver\\b");
     private static final Pattern ENVIRONMENT_RESOLVER_DECLARATION =
@@ -179,7 +184,8 @@ class ResourceOwnershipResolverTest {
         Set<String> unreachableResolverTypes = new TreeSet<>();
 
         for (Map.Entry<String, String> entry : ownershipResolverTypes.entrySet()) {
-            if (!tokensByGateFile.containsKey(entry.getKey())) {
+            if (!tokensByGateFile.containsKey(entry.getKey())
+                && !KNOWN_UNGATED_RESOLVER_TYPES.contains(entry.getKey())) {
                 unreachableResolverTypes.add(entry.getKey() + " (" + entry.getValue() + ")");
             }
         }
@@ -189,6 +195,28 @@ class ResourceOwnershipResolverTest {
                 "a resolver whose resourceType no @PreAuthorize names answers for a discriminator nobody asks about — "
                     + "usually a token that was renamed on the guard side only. Tokens in use: %s",
                 new TreeSet<>(tokensByGateFile.keySet()))
+            .isEmpty();
+    }
+
+    @Test
+    void testEveryPinnedUngatedResolverTypeIsStillUngated() {
+        Set<String> nowGatedResolverTypes = new TreeSet<>(KNOWN_UNGATED_RESOLVER_TYPES);
+
+        nowGatedResolverTypes.retainAll(tokensByGateFile.keySet());
+
+        assertThat(nowGatedResolverTypes)
+            .as("these resolver types are named by a gate now, so remove them from KNOWN_UNGATED_RESOLVER_TYPES")
+            .isEmpty();
+    }
+
+    @Test
+    void testEveryPinnedUngatedResolverTypeStillHasAResolver() {
+        Set<String> staleResolverTypes = new TreeSet<>(KNOWN_UNGATED_RESOLVER_TYPES);
+
+        staleResolverTypes.removeAll(ownershipResolverTypes.keySet());
+
+        assertThat(staleResolverTypes)
+            .as("these pinned types have no registered resolver, so remove them from KNOWN_UNGATED_RESOLVER_TYPES")
             .isEmpty();
     }
 
