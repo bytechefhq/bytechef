@@ -31,6 +31,6 @@ class ExternalInvocationKindTest {
         assertThat(Arrays.stream(ExternalInvocationKind.values())
             .map(Enum::name)
             .toList())
-                .containsExactly("COMPONENT", "WORKFLOW");
+                .containsExactly("COMPONENT", "WORKFLOW", "HTTP_PROXY");
     }
 }

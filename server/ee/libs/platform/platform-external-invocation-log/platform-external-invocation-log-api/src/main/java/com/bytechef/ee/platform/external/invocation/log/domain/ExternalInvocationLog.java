@@ -74,11 +74,20 @@ public class ExternalInvocationLog {
     @Column("a2a_server_id")
     private Long a2aServerId;
 
+    @Column("app_id")
+    private Long appId;
+
+    @Column("app_instance_id")
+    private Long appInstanceId;
+
     @Column("job_id")
     private Long jobId;
 
     @Column("status")
     private int status;
+
+    @Column("user_id")
+    private Long userId;
 
     @Column("error_type")
     private String errorType;
@@ -159,8 +168,20 @@ public class ExternalInvocationLog {
         return a2aServerId;
     }
 
+    public @Nullable Long getAppId() {
+        return appId;
+    }
+
+    public @Nullable Long getAppInstanceId() {
+        return appInstanceId;
+    }
+
     public @Nullable Long getJobId() {
         return jobId;
+    }
+
+    public @Nullable Long getUserId() {
+        return userId;
     }
 
     public ExternalInvocationStatus getStatus() {
@@ -247,8 +268,20 @@ public class ExternalInvocationLog {
         this.a2aServerId = a2aServerId;
     }
 
+    public void setAppId(Long appId) {
+        this.appId = appId;
+    }
+
+    public void setAppInstanceId(Long appInstanceId) {
+        this.appInstanceId = appInstanceId;
+    }
+
     public void setJobId(Long jobId) {
         this.jobId = jobId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setStatus(ExternalInvocationStatus status) {

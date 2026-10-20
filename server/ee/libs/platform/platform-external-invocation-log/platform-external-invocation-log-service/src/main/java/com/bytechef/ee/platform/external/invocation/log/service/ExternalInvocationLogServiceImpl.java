@@ -75,11 +75,12 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId,
+        @Nullable Long integrationInstanceId, @Nullable Long appId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return findPage(
             type, null, environment, source, status, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
+            appId,
             startDate,
             endDate, pageNumber);
     }
@@ -90,12 +91,13 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
+        @Nullable Instant endDate,
         int pageNumber) {
 
         return findPage(
             type, workspaceId, environment, source, status, mcpServerId, a2aServerId, connectedUserId,
-            integrationInstanceId,
+            integrationInstanceId, appId,
             startDate, endDate, pageNumber);
     }
 
@@ -104,7 +106,8 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
+        @Nullable Instant endDate,
         int pageNumber) {
 
         Integer sourceOrdinal = source == null ? null : source.ordinal();
@@ -115,12 +118,12 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         List<ExternalInvocationLog> content = externalInvocationLogRepository.findFiltered(
             type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
-            integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
+            integrationInstanceId, appId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = externalInvocationLogRepository.countFiltered(
             type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
-            integrationInstanceId, startDate, endDate);
+            integrationInstanceId, appId, startDate, endDate);
 
         return new PageImpl<>(content, pageRequest, total);
     }

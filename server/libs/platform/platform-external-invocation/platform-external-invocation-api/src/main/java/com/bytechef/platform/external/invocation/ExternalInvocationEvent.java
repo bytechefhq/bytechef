@@ -27,7 +27,8 @@ public record ExternalInvocationEvent(
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, ExternalInvocationStatus status,
+    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, @Nullable Long appId,
+    @Nullable Long appInstanceId, @Nullable Long userId, ExternalInvocationStatus status,
     @Nullable String errorType, @Nullable String errorMessage, long durationMs) {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
@@ -57,6 +58,9 @@ public record ExternalInvocationEvent(
         private @Nullable Long mcpServerId;
         private @Nullable Long a2aServerId;
         private @Nullable Long jobId;
+        private @Nullable Long appId;
+        private @Nullable Long appInstanceId;
+        private @Nullable Long userId;
         private ExternalInvocationStatus status = ExternalInvocationStatus.SUCCESS;
         private @Nullable String errorType;
         private @Nullable String errorMessage;
@@ -142,6 +146,24 @@ public record ExternalInvocationEvent(
             return this;
         }
 
+        public Builder appId(@Nullable Long appId) {
+            this.appId = appId;
+
+            return this;
+        }
+
+        public Builder appInstanceId(@Nullable Long appInstanceId) {
+            this.appInstanceId = appInstanceId;
+
+            return this;
+        }
+
+        public Builder userId(@Nullable Long userId) {
+            this.userId = userId;
+
+            return this;
+        }
+
         public Builder status(ExternalInvocationStatus status) {
             this.status = status;
 
@@ -174,7 +196,7 @@ public record ExternalInvocationEvent(
             return new ExternalInvocationEvent(
                 type, source, kind, invocationName, componentName, componentVersion, operationName, connectionId,
                 environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
-                a2aServerId, jobId, status, errorType, errorMessage, durationMs);
+                a2aServerId, jobId, appId, appInstanceId, userId, status, errorType, errorMessage, durationMs);
         }
     }
 }

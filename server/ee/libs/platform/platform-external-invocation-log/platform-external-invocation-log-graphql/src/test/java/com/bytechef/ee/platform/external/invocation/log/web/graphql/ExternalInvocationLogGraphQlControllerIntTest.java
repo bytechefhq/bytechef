@@ -71,6 +71,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                 eq(5L),
                 isNull(),
                 isNull(), isNull(),
+                isNull(),
                 isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(externalInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
@@ -115,7 +116,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             .isEqualTo(1);
 
         verify(externalInvocationLogFacade, never()).getExternalInvocationLogs(
-            any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), any(), any(), any(), any(), any(), any(), any(), isNull(), any(), any(), anyInt());
     }
 
     @Test
@@ -123,6 +124,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         when(
             externalInvocationLogFacade.getExternalInvocationLogs(
                 eq(PlatformType.EMBEDDED), isNull(), isNull(), isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(),
+                isNull(),
                 isNull(),
                 eq(0)))
                     .thenReturn(new PageImpl<>(List.of()));
@@ -141,7 +143,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             .isEqualTo(0);
 
         verify(externalInvocationLogFacade, never()).getWorkspaceExternalInvocationLogs(
-            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), isNull(), any(), any(), anyInt());
     }
 
     @Test
@@ -150,7 +152,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             externalInvocationLogFacade.getExternalInvocationLogs(
                 eq(PlatformType.AUTOMATION), eq(2L), eq(ExternalInvocationSource.MCP_SERVER), isNull(), isNull(),
                 isNull(),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
                 isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(externalInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
@@ -190,7 +192,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             externalInvocationLogFacade.getExternalInvocationLogs(
                 eq(PlatformType.AUTOMATION), isNull(), eq(ExternalInvocationSource.A2A_SERVER), isNull(), isNull(),
                 eq(4L),
-                isNull(), isNull(), isNull(), isNull(), eq(0)))
+                isNull(), isNull(), isNull(), isNull(), isNull(), eq(0)))
                     .thenReturn(
                         new PageImpl<>(
                             List.of(new ExternalInvocationLogDTO(externalInvocationLog, null)), PageRequest.of(0, 50),

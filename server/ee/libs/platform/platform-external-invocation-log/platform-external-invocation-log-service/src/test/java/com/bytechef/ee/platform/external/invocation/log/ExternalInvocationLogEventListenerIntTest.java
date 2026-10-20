@@ -85,6 +85,9 @@ class ExternalInvocationLogEventListenerIntTest {
             .mcpServerId(3L)
             .a2aServerId(4L)
             .jobId(11L)
+            .appId(5L)
+            .appInstanceId(6L)
+            .userId(12L)
             .status(ExternalInvocationStatus.ERROR)
             .errorType("IllegalStateException")
             .errorMessage("failed")
@@ -116,6 +119,9 @@ class ExternalInvocationLogEventListenerIntTest {
         assertThat(externalInvocationLog.getMcpServerId()).isEqualTo(3L);
         assertThat(externalInvocationLog.getA2aServerId()).isEqualTo(4L);
         assertThat(externalInvocationLog.getJobId()).isEqualTo(11L);
+        assertThat(externalInvocationLog.getAppId()).isEqualTo(5L);
+        assertThat(externalInvocationLog.getAppInstanceId()).isEqualTo(6L);
+        assertThat(externalInvocationLog.getUserId()).isEqualTo(12L);
         assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationLog.getErrorType()).isEqualTo("IllegalStateException");
         assertThat(externalInvocationLog.getErrorMessage()).isEqualTo("failed");
