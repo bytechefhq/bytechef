@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAdminFacade {
 
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
@@ -53,11 +52,13 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceId, workflowId, enable);
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ConnectionDTO getIntegrationInstanceConnection(long integrationInstanceId) {
         IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
 
@@ -73,11 +74,13 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         return connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId);
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
         List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
@@ -88,6 +91,7 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceCredentials(
         long integrationInstanceId, Map<String, ?> parameters, int version) {
 
