@@ -87,7 +87,7 @@ const IntegrationInstanceConfigurationListItem = ({
         const interactiveSelectors = [
             '[data-interactive]',
             '[role="menuitem"]',
-            '.dropdown-menu-item',
+            '[role="menu"]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
