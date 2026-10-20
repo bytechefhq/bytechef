@@ -1,3 +1,5 @@
+import {AiHubChatI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -45,14 +47,17 @@ vi.mock('@/shared/middleware/graphql', () => ({
 
 const {useAiHubChatLaunchers} = await import('../useAiHubChatLaunchers');
 
+let queryClient = new QueryClient();
+
 const wrapper = ({children}: {children: ReactNode}) => (
-    <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 );
 
 describe('useAiHubChatLaunchers', () => {
     beforeEach(() => {
         createMutateAsyncMock.mockReset();
         navigateMock.mockReset();
+        queryClient = new QueryClient();
         aiHubChatsStore.getState().setCurrentChatId(undefined);
     });
 
@@ -99,5 +104,55 @@ describe('useAiHubChatLaunchers', () => {
         expect(navigateMock).not.toHaveBeenCalled();
         expect(aiHubChatsStore.getState().currentChatId).toBeUndefined();
         expect(aiHubStore.getState().chatId).toBe('thread-home');
+    });
+
+    it('seeds the active chats list with the new workflow chat before navigating', async () => {
+        const existingChat = {id: 4, kind: 'STANDARD'} as AiHubChatI;
+
+        queryClient.setQueryData(AiHubChatsKeys.list(3, 2, 'ACTIVE'), [existingChat]);
+
+        createMutateAsyncMock.mockResolvedValue({
+            createWorkflowChatAiHubChat: {
+                autoTitled: true,
+                createdAt: 1760947200000,
+                environmentId: '2',
+                id: '9',
+                isOwner: true,
+                kind: 'WORKFLOW_CHAT',
+                lastPreview: null,
+                messageCount: 0,
+                ownerUserId: '1',
+                projectDeploymentId: '5',
+                status: 'ACTIVE',
+                threadId: 'thread-9',
+                title: 'Acme — Support',
+                updatedAt: 1760947200000,
+                userId: '1',
+                workflowExecutionId: 'exec-1',
+                workspaceId: '3',
+            },
+        });
+
+        let seededChatsAtNavigation: AiHubChatI[] | undefined;
+
+        navigateMock.mockImplementation(() => {
+            seededChatsAtNavigation = queryClient.getQueryData<AiHubChatI[]>(AiHubChatsKeys.list(3, 2, 'ACTIVE'));
+        });
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        await act(async () => {
+            await result.current.onSelectWorkflowChat('exec-1', '5', 'Acme — Support');
+        });
+
+        expect(seededChatsAtNavigation).toHaveLength(2);
+        expect(seededChatsAtNavigation![0]).toMatchObject({
+            id: 9,
+            kind: 'WORKFLOW_CHAT',
+            threadId: 'thread-9',
+            title: 'Acme — Support',
+            workflowExecutionId: 'exec-1',
+        });
+        expect(seededChatsAtNavigation![1]).toBe(existingChat);
     });
 });

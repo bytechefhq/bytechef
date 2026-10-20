@@ -689,6 +689,7 @@ describe('buildAiHubSubscriber', () => {
                 content: [
                     {
                         data: {
+                            answerFormat: 'plain',
                             awaitingAnswer: true,
                             kind: 'ask-user-question',
                             questions: [{...workflowQuestion, multiSelect: false}],
@@ -719,6 +720,7 @@ describe('buildAiHubSubscriber', () => {
 
             expect(addMessage.mock.calls[0]![0].content[0]).toEqual({
                 data: {
+                    answerFormat: 'plain',
                     awaitingAnswer: false,
                     kind: 'ask-user-question',
                     questions: [{...workflowQuestion, multiSelect: true}],
@@ -728,6 +730,68 @@ describe('buildAiHubSubscriber', () => {
 
             subscriber.onRunFinishedEvent!(makeRunFinishedParams());
 
+            expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
+        });
+
+        it('drops a malformed option but keeps the question and its valid options', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            subscriber.onCustomEvent!(
+                makeCustomEventParams('ask-workflow-question', {
+                    questions: [
+                        {
+                            options: [
+                                {label: 'Monthly'},
+                                {label: 42},
+                                'Yearly',
+                                null,
+                                {description: 7, label: 'Weekly'},
+                                {description: 'Pay once', label: 'Lifetime'},
+                            ],
+                            question: 'Which plan?',
+                        },
+                    ],
+                })
+            );
+
+            expect(addMessage.mock.calls[0]![0].content[0].data.questions).toEqual([
+                {
+                    header: undefined,
+                    multiSelect: false,
+                    options: [{label: 'Monthly'}, {description: 'Pay once', label: 'Lifetime'}],
+                    question: 'Which plan?',
+                },
+            ]);
+        });
+
+        it('drops a question without question text and keeps the valid ones', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            subscriber.onCustomEvent!(
+                makeCustomEventParams('ask-workflow-question', {
+                    questions: [{options: [{label: 'A'}]}, {options: [], question: 7}, 'bad', workflowQuestion],
+                })
+            );
+
+            expect(addMessage.mock.calls[0]![0].content[0].data.questions).toEqual([
+                {...workflowQuestion, multiSelect: false},
+            ]);
+        });
+
+        it('renders no card when every question is malformed', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            subscriber.onCustomEvent!(
+                makeCustomEventParams('ask-workflow-question', {
+                    questions: [{options: [{label: 'A'}]}, {question: ''}, {question: '   '}, null],
+                    resumeUrl: 'http://localhost/resume/1',
+                })
+            );
+
+            expect(addMessage).not.toHaveBeenCalled();
             expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
         });
 
@@ -765,6 +829,41 @@ describe('buildAiHubSubscriber', () => {
             expect(aiHubStore.getState().messages).toEqual([]);
             expect(aiHubChatsStore.getState().currentChatId).toBe(77);
             expect(onChatOpened).toHaveBeenCalledOnce();
+        });
+
+        it('switches to the chat named by the exact JSON the server tool returns', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-open-chat',
+                'openWorkflowChatTab',
+                '{"opened":true,"chatId":101,"threadId":"00000000-0000-0000-0000-00000000abc3","title":"Support bot"}'
+            );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiHubStore.getState().chatId).toBe('00000000-0000-0000-0000-00000000abc3');
+            expect(aiHubChatsStore.getState().currentChatId).toBe(101);
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeUndefined();
+        });
+
+        it('stays in the chat and surfaces the refusal the server tool returns for an unknown thread', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-open-chat',
+                'openWorkflowChatTab',
+                '{"error":"No workflow chat with threadId 00000000-0000-0000-0000-00000000abc3. Pass the threadId returned from createWorkflowChat."}'
+            );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiHubStore.getState().chatId).toBe('thread-1');
+            expect(aiChatRetryableErrorStore.getState().currentError).toMatchObject({
+                toolName: 'openWorkflowChatTab',
+            });
         });
 
         it('raises the retry banner when openWorkflowChatTab reports a failure, and stays in the chat', () => {
