@@ -96,7 +96,8 @@ public class AiHubChatServicePatchIntTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), mock(AiHubToolApprovalService.class),
-            sessionMemoryProvider, mock(InFlightAiHubRunRegistry.class), transactionManager);
+            sessionMemoryProvider, mock(InFlightAiHubRunRegistry.class), transactionManager,
+            mock(ObjectProvider.class));
         executorService = Executors.newFixedThreadPool(2);
         jdbcTemplate = new JdbcTemplate(dataSource);
         transactionTemplate = new TransactionTemplate(transactionManager);
@@ -340,7 +341,7 @@ public class AiHubChatServicePatchIntTest {
 
         AiHubChatServiceImpl deletingChatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), new AiHubToolApprovalServiceImpl(approvalRepository),
-            sessionMemoryProvider, new InFlightAiHubRunRegistry(), transactionManager);
+            sessionMemoryProvider, new InFlightAiHubRunRegistry(), transactionManager, mock(ObjectProvider.class));
 
         approvalRepository.save(buildApproval(chatId));
 

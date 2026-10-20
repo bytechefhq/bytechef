@@ -123,7 +123,7 @@ class AiHubTurnEndingToolResultHistoryTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, sessionMemoryProvider,
-            mock(InFlightAiHubRunRegistry.class), mock(PlatformTransactionManager.class));
+            mock(InFlightAiHubRunRegistry.class), mock(PlatformTransactionManager.class), mock(ObjectProvider.class));
     }
 
     @Test
