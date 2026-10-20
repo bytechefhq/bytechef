@@ -783,7 +783,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     @Configuration
     @EnableCaching
     @Import({
-        ConnectionServiceImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
+        ConnectionServiceImpl.class, EmbeddedMcpReader.class, IntegrationInstanceConfigurationServiceImpl.class,
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationFacadeImpl.class,
