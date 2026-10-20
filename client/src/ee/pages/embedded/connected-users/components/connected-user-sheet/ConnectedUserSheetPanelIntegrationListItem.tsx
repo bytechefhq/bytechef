@@ -32,6 +32,8 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {type MouseEvent, useMemo, useState} from 'react';
@@ -69,6 +71,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [open, setOpen] = useState(false);
+
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+    const isTenantAdmin = useIsTenantAdmin();
 
     const queryClient = useQueryClient();
 
@@ -251,6 +257,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                             <Switch
                                                 checked={connectedUserIntegrationInstance.enabled}
                                                 disabled={
+                                                    !canManageConnectedUser ||
                                                     !integrationInstance?.integrationInstanceConfiguration?.enabled
                                                 }
                                                 onCheckedChange={(value) => {
@@ -280,12 +287,16 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu
-                            changeConfigurationDisabled={!integrationConfigurations}
-                            changeConfigurationDisabledReason={changeConfigurationDisabledReason}
-                            onChangeConfigurationClick={() => setShowChangeConfigurationDialog(true)}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                        />
+                        {canDeleteConnectedUser && (
+                            <ConnectedUserSheetDeleteDropdownMenu
+                                changeConfigurationDisabled={!integrationConfigurations}
+                                changeConfigurationDisabledReason={changeConfigurationDisabledReason}
+                                onChangeConfigurationClick={
+                                    isTenantAdmin ? () => setShowChangeConfigurationDialog(true) : undefined
+                                }
+                                onDeleteClick={() => setShowDeleteDialog(true)}
+                            />
+                        )}
                     </div>
                 </div>
             )}

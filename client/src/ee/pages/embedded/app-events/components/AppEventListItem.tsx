@@ -12,6 +12,7 @@ import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDi
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
 import {AppEventKeys} from '@/ee/shared/queries/embedded/appEvents.queries';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -23,6 +24,9 @@ interface AppEventListItemProps {
 const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canDeleteAppEvent = useHasEmbeddedScope('APP_EVENT_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditAppEvent = useHasEmbeddedScope('APP_EVENT_EDIT', UNION_ENVIRONMENT_ID);
 
     const queryClient = useQueryClient();
 
@@ -64,24 +68,34 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                     </Tooltip>
                 )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                    </DropdownMenuTrigger>
+                {(canEditAppEvent || canDeleteAppEvent) && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={() => setShowEditDialog(true)} />
+                        <DropdownMenuContent align="end">
+                            {canEditAppEvent && (
+                                <DropdownMenuItem
+                                    icon={<EditIcon />}
+                                    label="Edit"
+                                    onClick={() => setShowEditDialog(true)}
+                                />
+                            )}
 
-                        <DropdownMenuSeparator />
+                            {canEditAppEvent && canDeleteAppEvent && <DropdownMenuSeparator />}
 
-                        <DropdownMenuItem
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={() => setShowDeleteDialog(true)}
-                            variant="destructive"
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            {canDeleteAppEvent && (
+                                <DropdownMenuItem
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                />
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             <AlertDialog

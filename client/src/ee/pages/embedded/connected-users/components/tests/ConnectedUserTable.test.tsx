@@ -6,6 +6,11 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectedUserTable from '../ConnectedUserTable';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     deleteConnectedUserMutate: vi.fn(),
     enableConnectedUserMutate: vi.fn(),
