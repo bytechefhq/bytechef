@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVer
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingInput;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.model.ApiCollectionEnabledInputModel;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.model.ApiCollectionInputModel;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.model.ApiCollectionMissingConnectionModel;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.model.ApiCollectionMissingInputModel;
@@ -103,6 +104,17 @@ public class ApiCollectionPublicApiController extends AbstractApiCollectionPubli
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(toModel(apiCollectionFacade.createApiCollection(apiCollectionDTO)));
+    }
+
+    @Override
+    public ResponseEntity<ApiCollectionModel> enableApiCollection(
+        Long id, ApiCollectionEnabledInputModel apiCollectionEnabledInputModel,
+        @Nullable EnvironmentModel xEnvironment) {
+
+        getApiCollectionInEnvironment(id, xEnvironment);
+
+        return ResponseEntity.ok(
+            toModel(apiCollectionFacade.enableApiCollection(id, apiCollectionEnabledInputModel.getEnabled())));
     }
 
     @Override

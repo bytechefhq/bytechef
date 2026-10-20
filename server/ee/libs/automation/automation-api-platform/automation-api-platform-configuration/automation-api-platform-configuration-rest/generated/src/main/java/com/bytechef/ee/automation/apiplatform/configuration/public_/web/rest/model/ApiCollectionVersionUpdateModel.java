@@ -28,18 +28,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollectionVersionUpdate", description = "The outcome of moving an API collection to a newer project version.")
 @JsonTypeName("ApiCollectionVersionUpdate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-21T01:43:17.216712+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-21T01:48:59.391908+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ApiCollectionVersionUpdateModel {
 
   private @Nullable ApiCollectionModel apiCollection;
 
-  private List<String> removedEndpointNames = new ArrayList<>();
+  private @Nullable List<String> removedEndpointNames;
 
-  private List<String> disabledEndpointNames = new ArrayList<>();
+  private @Nullable List<String> disabledEndpointNames;
 
-  private List<@Valid ApiCollectionMissingConnectionModel> missingConnections = new ArrayList<>();
+  private @Nullable List<@Valid ApiCollectionMissingConnectionModel> missingConnections;
 
-  private List<@Valid ApiCollectionMissingInputModel> missingInputs = new ArrayList<>();
+  private @Nullable List<@Valid ApiCollectionMissingInputModel> missingInputs;
 
   public ApiCollectionVersionUpdateModel apiCollection(@Nullable ApiCollectionModel apiCollection) {
     this.apiCollection = apiCollection;
@@ -62,7 +62,7 @@ public class ApiCollectionVersionUpdateModel {
     this.apiCollection = apiCollection;
   }
 
-  public ApiCollectionVersionUpdateModel removedEndpointNames(List<String> removedEndpointNames) {
+  public ApiCollectionVersionUpdateModel removedEndpointNames(@Nullable List<String> removedEndpointNames) {
     this.removedEndpointNames = removedEndpointNames;
     return this;
   }
@@ -82,16 +82,16 @@ public class ApiCollectionVersionUpdateModel {
   
   @Schema(name = "removedEndpointNames", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("removedEndpointNames")
-  public List<String> getRemovedEndpointNames() {
+  public @Nullable List<String> getRemovedEndpointNames() {
     return removedEndpointNames;
   }
 
   @JsonProperty("removedEndpointNames")
-  public void setRemovedEndpointNames(List<String> removedEndpointNames) {
+  public void setRemovedEndpointNames(@Nullable List<String> removedEndpointNames) {
     this.removedEndpointNames = removedEndpointNames;
   }
 
-  public ApiCollectionVersionUpdateModel disabledEndpointNames(List<String> disabledEndpointNames) {
+  public ApiCollectionVersionUpdateModel disabledEndpointNames(@Nullable List<String> disabledEndpointNames) {
     this.disabledEndpointNames = disabledEndpointNames;
     return this;
   }
@@ -111,16 +111,16 @@ public class ApiCollectionVersionUpdateModel {
   
   @Schema(name = "disabledEndpointNames", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("disabledEndpointNames")
-  public List<String> getDisabledEndpointNames() {
+  public @Nullable List<String> getDisabledEndpointNames() {
     return disabledEndpointNames;
   }
 
   @JsonProperty("disabledEndpointNames")
-  public void setDisabledEndpointNames(List<String> disabledEndpointNames) {
+  public void setDisabledEndpointNames(@Nullable List<String> disabledEndpointNames) {
     this.disabledEndpointNames = disabledEndpointNames;
   }
 
-  public ApiCollectionVersionUpdateModel missingConnections(List<@Valid ApiCollectionMissingConnectionModel> missingConnections) {
+  public ApiCollectionVersionUpdateModel missingConnections(@Nullable List<@Valid ApiCollectionMissingConnectionModel> missingConnections) {
     this.missingConnections = missingConnections;
     return this;
   }
@@ -140,16 +140,16 @@ public class ApiCollectionVersionUpdateModel {
   
   @Schema(name = "missingConnections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("missingConnections")
-  public List<@Valid ApiCollectionMissingConnectionModel> getMissingConnections() {
+  public @Nullable List<@Valid ApiCollectionMissingConnectionModel> getMissingConnections() {
     return missingConnections;
   }
 
   @JsonProperty("missingConnections")
-  public void setMissingConnections(List<@Valid ApiCollectionMissingConnectionModel> missingConnections) {
+  public void setMissingConnections(@Nullable List<@Valid ApiCollectionMissingConnectionModel> missingConnections) {
     this.missingConnections = missingConnections;
   }
 
-  public ApiCollectionVersionUpdateModel missingInputs(List<@Valid ApiCollectionMissingInputModel> missingInputs) {
+  public ApiCollectionVersionUpdateModel missingInputs(@Nullable List<@Valid ApiCollectionMissingInputModel> missingInputs) {
     this.missingInputs = missingInputs;
     return this;
   }
@@ -169,12 +169,12 @@ public class ApiCollectionVersionUpdateModel {
   
   @Schema(name = "missingInputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("missingInputs")
-  public List<@Valid ApiCollectionMissingInputModel> getMissingInputs() {
+  public @Nullable List<@Valid ApiCollectionMissingInputModel> getMissingInputs() {
     return missingInputs;
   }
 
   @JsonProperty("missingInputs")
-  public void setMissingInputs(List<@Valid ApiCollectionMissingInputModel> missingInputs) {
+  public void setMissingInputs(@Nullable List<@Valid ApiCollectionMissingInputModel> missingInputs) {
     this.missingInputs = missingInputs;
   }
 

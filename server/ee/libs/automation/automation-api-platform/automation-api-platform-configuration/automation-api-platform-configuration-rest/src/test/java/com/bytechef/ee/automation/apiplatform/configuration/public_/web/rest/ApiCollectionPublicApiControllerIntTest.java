@@ -9,6 +9,8 @@ package com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -255,6 +257,35 @@ class ApiCollectionPublicApiControllerIntTest {
             .andExpect(jsonPath("$.code").value("API_COLLECTION_NOT_FOUND"));
 
         verify(apiCollectionFacade, never()).deleteApiCollection(1L);
+    }
+
+    @Test
+    void testEnableApiCollectionReturnsTheCollection() throws Exception {
+        when(apiCollectionFacade.getApiCollection(1L)).thenReturn(apiCollection(1L, Environment.PRODUCTION));
+        when(apiCollectionFacade.enableApiCollection(1L, false)).thenReturn(apiCollection(1L, Environment.PRODUCTION));
+
+        mockMvc.perform(
+            put("/v1/api-collections/1/enabled")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"enabled\":false}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1));
+
+        verify(apiCollectionFacade).enableApiCollection(1L, false);
+    }
+
+    @Test
+    void testEnableApiCollectionOutsideEnvironmentReturns404WithoutEnabling() throws Exception {
+        when(apiCollectionFacade.getApiCollection(1L)).thenReturn(apiCollection(1L, Environment.DEVELOPMENT));
+
+        mockMvc.perform(
+            put("/v1/api-collections/1/enabled")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"enabled\":true}"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.code").value("API_COLLECTION_NOT_FOUND"));
+
+        verify(apiCollectionFacade, never()).enableApiCollection(anyLong(), anyBoolean());
     }
 
     private static ApiCollectionDTO apiCollection(long id, Environment environment) {
