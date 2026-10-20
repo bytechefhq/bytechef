@@ -42,7 +42,7 @@ public class AppEventFacadeImpl implements AppEventFacade {
         @AuditData(key = "appEventId", value = "#result?.id"),
         @AuditData(key = "name", value = "#result?.name")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_CREATE')")
     @Transactional
     public AppEvent create(AppEvent appEvent) {
         return appEventService.create(appEvent);
@@ -52,20 +52,20 @@ public class AppEventFacadeImpl implements AppEventFacade {
     @Audited(event = AppEventAuditEvents.APP_EVENT_DELETED, mapper = AppEventAuditMapper.class, data = {
         @AuditData(key = "appEventId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_DELETE')")
     @Transactional
     public boolean delete(long id) {
         return appEventService.delete(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public AppEvent getAppEvent(long id) {
         return appEventService.getAppEvent(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public List<AppEvent> getAppEvents() {
         return appEventService.getAppEvents();
     }
@@ -75,7 +75,7 @@ public class AppEventFacadeImpl implements AppEventFacade {
         @AuditData(key = "appEventId", value = "#appEvent.id"),
         @AuditData(key = "name", value = "#appEvent.name")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_EDIT')")
     @Transactional
     public AppEvent update(AppEvent appEvent) {
         return appEventService.update(appEvent);
