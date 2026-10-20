@@ -64,6 +64,7 @@ class EmbeddedResourceResolverIntTest {
         integrationWorkflowRepository.deleteAll();
         integrationRepository.deleteAll();
 
+        jdbcTemplate.update("DELETE FROM automation_workflow_project");
         jdbcTemplate.update("DELETE FROM connected_user_project");
         jdbcTemplate.update("DELETE FROM project");
         jdbcTemplate.update("DELETE FROM workspace");
@@ -120,6 +121,31 @@ class EmbeddedResourceResolverIntTest {
         assertThat(embeddedResourceResolver.isEmbeddedProject(hubProjectId)).isTrue();
         assertThat(embeddedResourceResolver.isEmbeddedProject(workspaceProjectId)).isFalse();
         assertThat(embeddedResourceResolver.isEmbeddedProject(Long.MAX_VALUE)).isFalse();
+    }
+
+    @Test
+    void testOnlyAnAutomationHubProjectAndItsWorkflowsAreHub() {
+        long workspaceId = insertWorkspace();
+        long automationHubProjectId = insertProject(workspaceId);
+        long connectedUserProjectId = insertProject(workspaceId);
+
+        jdbcTemplate.update("INSERT INTO automation_workflow_project (project_id) VALUES (?)", automationHubProjectId);
+        jdbcTemplate.update(
+            "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)",
+            connectedUserProjectId);
+
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("automation-hub-workflow")))
+            .thenReturn(List.of(new ProjectWorkflow(automationHubProjectId, 1, "automation-hub-workflow")));
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("connected-user-workflow")))
+            .thenReturn(List.of(new ProjectWorkflow(connectedUserProjectId, 1, "connected-user-workflow")));
+
+        assertThat(embeddedResourceResolver.isHubProject(automationHubProjectId)).isTrue();
+        assertThat(embeddedResourceResolver.isEmbeddedProject(automationHubProjectId)).isTrue();
+        assertThat(embeddedResourceResolver.isHubProject(connectedUserProjectId)).isFalse();
+        assertThat(embeddedResourceResolver.isHubProject(Long.MAX_VALUE)).isFalse();
+        assertThat(embeddedResourceResolver.isHubProjectWorkflow("automation-hub-workflow")).isTrue();
+        assertThat(embeddedResourceResolver.isHubProjectWorkflow("connected-user-workflow")).isFalse();
+        assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("connected-user-workflow")).isTrue();
     }
 
     private long insertWorkspace() {
