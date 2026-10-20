@@ -20,3 +20,9 @@ export const MY_WORKSPACE_SCOPES_QUERY_KEY = 'MyWorkspaceScopes';
 export const invalidateMyPermissionQueries = (queryClient: QueryClient): void => {
     void queryClient.invalidateQueries({queryKey: [MY_WORKSPACE_SCOPES_QUERY_KEY]});
 };
+
+export const MY_EMBEDDED_SCOPES_QUERY_KEY = 'MyEmbeddedScopes';
+
+export const invalidateMyEmbeddedScopeQueries = (queryClient: QueryClient): void => {
+    void queryClient.invalidateQueries({queryKey: [MY_EMBEDDED_SCOPES_QUERY_KEY]});
+};
