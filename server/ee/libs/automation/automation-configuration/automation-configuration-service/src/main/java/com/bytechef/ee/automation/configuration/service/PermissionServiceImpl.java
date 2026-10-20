@@ -323,7 +323,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
-        if (resourceOwner.embedded() && PROJECT.equals(resourceType)) {
+        if (resourceOwner.embeddedProject()) {
             return false;
         }
 
@@ -344,7 +344,15 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (resourceOwner.embedded()) {
-            return environment.isPresent() ? hasEmbeddedScope(scope, environment.get()) : hasEmbeddedScope(scope);
+            if (environment.isPresent()) {
+                return hasEmbeddedScope(scope, environment.get());
+            }
+
+            if (resourceEnvironmentResolvers.containsKey(resourceType)) {
+                return hasEmbeddedScopeInEveryEnvironment(scope);
+            }
+
+            return hasEmbeddedScope(scope);
         }
 
         if (environment.isPresent()) {
@@ -385,7 +393,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
-        if (resourceOwner.embedded() && PROJECT.equals(resourceType)) {
+        if (resourceOwner.embeddedProject()) {
             return false;
         }
 
@@ -431,6 +439,12 @@ public class PermissionServiceImpl implements PermissionService {
         EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
 
         return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProjectWorkflow(workflowId);
+    }
+
+    private boolean isHubProjectWorkflow(String workflowId) {
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        return embeddedResourceResolver != null && embeddedResourceResolver.isHubProjectWorkflow(workflowId);
     }
 
     private boolean isIntegrationWorkflow(String workflowId) {
@@ -505,7 +519,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isIntegrationWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId) || isHubProjectWorkflow(workflowId)) {
             return hasEmbeddedScope(scope);
         }
 
@@ -541,7 +555,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isIntegrationWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId) || isHubProjectWorkflow(workflowId)) {
             return hasEmbeddedScope(scope, environment);
         }
 
@@ -577,7 +591,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isIntegrationWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId) || isHubProjectWorkflow(workflowId)) {
             return hasEmbeddedScope(scope, environment);
         }
 
