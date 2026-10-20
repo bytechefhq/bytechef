@@ -127,7 +127,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectedUserWorkflowReferenceAdminFacade.class,
+    ConnectedUserWorkflowReferenceReader.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -201,7 +201,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Autowired
-    private ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+    private ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -1440,7 +1440,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
                 reference.connectedUserId(), configuration.getProjectId(), configurationId);
         }
 
-        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(references));
     }
 

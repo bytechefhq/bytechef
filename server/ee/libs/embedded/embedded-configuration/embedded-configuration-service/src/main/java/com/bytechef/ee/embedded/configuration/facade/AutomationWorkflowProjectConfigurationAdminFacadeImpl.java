@@ -114,7 +114,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
-    private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+    private final ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
     private final ConnectionService connectionService;
     private final JobService jobService;
     private final ProjectService projectService;
@@ -137,7 +137,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService,
-        ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
+        ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader,
         ConnectionService connectionService, JobService jobService,
         PlatformTransactionManager platformTransactionManager, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
@@ -156,7 +156,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
-        this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
+        this.connectedUserWorkflowReferenceReader = connectedUserWorkflowReferenceReader;
         this.connectionService = connectionService;
         this.jobService = jobService;
         this.projectService = projectService;
@@ -1200,7 +1200,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceReader.getReferences(workflowUuids)
             .stream()
             .filter(reference -> connectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))
