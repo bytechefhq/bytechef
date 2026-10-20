@@ -7,6 +7,7 @@ A task dispatcher defines a strategy for dispatching tasks to be executed.
 
 Name | Type
 ------------ | -------------
+`deprecated` | boolean
 `description` | string
 `icon` | string
 `name` | string
@@ -27,6 +28,7 @@ import type { TaskDispatcherDefinition } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "deprecated": null,
   "description": null,
   "icon": null,
   "name": null,

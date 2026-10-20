@@ -1,6 +1,7 @@
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
+import DeprecatedBadge from '@/shared/components/DeprecatedBadge';
 import {
     ActionDefinitionBasic,
     ClusterElementDefinitionBasic,
@@ -10,11 +11,15 @@ import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {Select as SelectPrimitive} from 'radix-ui';
 import {twMerge} from 'tailwind-merge';
 
+type OperationType = ActionDefinitionBasic | TriggerDefinitionBasic | ClusterElementDefinitionBasic;
+
+const isDeprecated = (operation: OperationType) => 'deprecated' in operation && !!operation.deprecated;
+
 interface CurrentOperationSelectProps {
     clusterElementLabel?: string;
     description?: string;
     handleValueChange: (value: string) => void;
-    operations: Array<ActionDefinitionBasic | TriggerDefinitionBasic | ClusterElementDefinitionBasic>;
+    operations: Array<OperationType>;
     triggerSelect?: boolean;
     value: string;
 }
@@ -67,7 +72,11 @@ const OperationSelect = ({
                         </span>
 
                         <div className="flex flex-col">
-                            <SelectPrimitive.ItemText>{operation.title || operation.name}</SelectPrimitive.ItemText>
+                            <div className="flex items-center gap-2">
+                                <SelectPrimitive.ItemText>{operation.title || operation.name}</SelectPrimitive.ItemText>
+
+                                {isDeprecated(operation) && <DeprecatedBadge />}
+                            </div>
 
                             {operation.description && (
                                 <span
@@ -112,8 +121,10 @@ const CurrentOperationSelect = ({
                     )}
                 </div>
 
-                <span className="flex flex-col overflow-hidden rounded-md bg-surface-neutral-secondary px-4 py-2 text-sm font-medium">
+                <span className="flex items-center gap-2 overflow-hidden rounded-md bg-surface-neutral-secondary px-4 py-2 text-sm font-medium">
                     {operations[0].title}
+
+                    {isDeprecated(operations[0]) && <DeprecatedBadge />}
                 </span>
             </div>
         ) : (
