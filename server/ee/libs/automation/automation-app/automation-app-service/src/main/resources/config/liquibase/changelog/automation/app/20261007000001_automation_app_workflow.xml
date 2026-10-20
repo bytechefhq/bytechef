@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261007000001-1" author="Ivica Cardic">
+        <createTable tableName="app_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_key" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_uuid" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app_workflow" columnNames="app_id, workflow_key"
+            constraintName="uk_app_workflow_app_workflow_key"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_workflow"
+            baseColumnNames="app_id"
+            constraintName="fk_app_workflow_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="app_workflow_run">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="run_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_key" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app_workflow_run" columnNames="run_id"
+            constraintName="uk_app_workflow_run_run_id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_workflow_run"
+            baseColumnNames="app_id"
+            constraintName="fk_app_workflow_run_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="app_workflow_run" indexName="idx_app_workflow_run_app">
+            <column name="app_id"/>
+        </createIndex>
+
+        <createIndex tableName="app_workflow_run" indexName="idx_app_workflow_run_created_date">
+            <column name="created_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

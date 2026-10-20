@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261016000001-1" author="Ivica Cardic">
+        <createTable tableName="app_api_collection">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="api_collection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app_api_collection" columnNames="app_id, api_collection_id"
+            constraintName="uk_app_api_collection_app_api_collection"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_api_collection"
+            baseColumnNames="app_id"
+            constraintName="fk_app_api_collection_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="app_api_collection" indexName="idx_app_api_collection_api_collection">
+            <column name="api_collection_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
