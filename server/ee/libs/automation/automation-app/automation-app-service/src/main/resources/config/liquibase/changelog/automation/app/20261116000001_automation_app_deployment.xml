@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261116000001-1" author="Ivica Cardic">
+        <createTable tableName="app_version">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="git_ref" type="VARCHAR(256)"/>
+            <column name="git_commit_sha" type="VARCHAR(64)"/>
+            <column name="description" type="TEXT"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app_version" columnNames="app_id, name"
+            constraintName="uk_app_version_app_name"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_version"
+            baseColumnNames="app_id"
+            constraintName="fk_app_version_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createTable tableName="app_deployment">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_version_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider_deployment_id" type="VARCHAR(256)"/>
+            <column name="url" type="VARCHAR(2048)"/>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="TEXT"/>
+            <column name="metadata" type="TEXT"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finished_date" type="TIMESTAMP"/>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="app_deployment"
+            baseColumnNames="app_instance_id"
+            constraintName="fk_app_deployment_app_instance"
+            referencedTableName="app_instance"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="app_deployment"
+            baseColumnNames="app_version_id"
+            constraintName="fk_app_deployment_app_version"
+            referencedTableName="app_version"
+            referencedColumnNames="id"/>
+
+        <createIndex tableName="app_deployment" indexName="idx_app_deployment_app_instance">
+            <column name="app_instance_id"/>
+        </createIndex>
+        <createIndex tableName="app_deployment" indexName="idx_app_deployment_app_version">
+            <column name="app_version_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="app_instance"
+            baseColumnNames="current_app_deployment_id"
+            constraintName="fk_app_instance_current_app_deployment"
+            referencedTableName="app_deployment"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+</databaseChangeLog>

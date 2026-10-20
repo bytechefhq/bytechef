@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261124000001-1" author="Ivica Cardic">
+        <createTable tableName="app_tag">
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="app_tag" columnNames="app_id, tag_id" constraintName="pk_app_tag"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_tag"
+            baseColumnNames="app_id"
+            constraintName="fk_app_tag_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="app_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_app_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="app_tag" indexName="idx_app_tag_tag">
+            <column name="tag_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
