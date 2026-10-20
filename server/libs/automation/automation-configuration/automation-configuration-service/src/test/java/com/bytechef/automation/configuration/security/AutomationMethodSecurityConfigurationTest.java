@@ -138,7 +138,7 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("McpProjectWorkflowGraphQlController#deleteMcpProjectWorkflow",
             "McpProjectWorkflowFacadeImpl#deleteMcpProjectWorkflow"),
         Map.entry("McpProjectWorkflowGraphQlController#updateMcpProjectWorkflow",
-            "McpProjectWorkflowServiceImpl#update"),
+            "McpProjectWorkflowFacadeImpl#updateMcpProjectWorkflow"),
         Map.entry("McpServerGraphQlController#deleteMcpServer", "McpServerFacadeImpl#deleteMcpServer"),
         Map.entry("McpServerGraphQlController#updateMcpServer", "McpServerFacadeImpl#updateMcpServer"),
         Map.entry("McpServerGraphQlController#updateMcpServerTags", "McpServerFacadeImpl#updateMcpServerTags"),
@@ -221,20 +221,20 @@ class AutomationMethodSecurityConfigurationTest {
             "WorkflowTestConfigurationFacadeImpl#saveClusterElementTestConfigurationConnection"),
         Map.entry("WorkflowTestConfigurationGraphQlController#saveWorkflowTestConfigurationConnection",
             "WorkflowTestConfigurationFacadeImpl#saveWorkflowTestConfigurationConnection"),
-        Map.entry("WorkspaceApiController#createWorkspace", "AdminWorkspaceFacadeImpl#createWorkspace"),
-        Map.entry("WorkspaceApiController#deleteWorkspace", "AdminWorkspaceFacadeImpl#deleteWorkspace"),
-        Map.entry("WorkspaceApiController#updateWorkspace", "AdminWorkspaceFacadeImpl#updateWorkspace"),
+        Map.entry("WorkspaceApiController#createWorkspace", "WorkspaceFacadeImpl#createWorkspace"),
+        Map.entry("WorkspaceApiController#deleteWorkspace", "WorkspaceFacadeImpl#deleteWorkspace"),
+        Map.entry("WorkspaceApiController#updateWorkspace", "WorkspaceFacadeImpl#updateWorkspace"),
         Map.entry("WorkspaceApiKeyGraphQlController#deleteWorkspaceApiKey", "WorkspaceApiKeyFacadeImpl#delete"),
         Map.entry("WorkspaceMcpServerGraphQlController#createWorkspaceMcpServer",
             "WorkspaceMcpServerFacadeImpl#createWorkspaceMcpServer"),
         Map.entry("WorkspaceMcpServerGraphQlController#deleteWorkspaceMcpServer",
             "WorkspaceMcpServerFacadeImpl#deleteWorkspaceMcpServer"),
-        Map.entry("embedded:ConnectionApiController#createConnection", "ConnectionAdminFacadeImpl#createConnection"),
-        Map.entry("embedded:ConnectionApiController#deleteConnection", "ConnectionAdminFacadeImpl#deleteConnection"),
-        Map.entry("embedded:ConnectionApiController#updateConnection", "ConnectionAdminFacadeImpl#updateConnection"),
+        Map.entry("embedded:ConnectionApiController#createConnection", "ConnectionFacadeImpl#createConnection"),
+        Map.entry("embedded:ConnectionApiController#deleteConnection", "ConnectionFacadeImpl#deleteConnection"),
+        Map.entry("embedded:ConnectionApiController#updateConnection", "ConnectionFacadeImpl#updateConnection"),
         Map.entry(
             "embedded:ConnectionTagApiController#updateConnectionTags",
-            "ConnectionAdminFacadeImpl#updateConnectionTags"));
+            "ConnectionFacadeImpl#updateConnectionTags"));
 
     private static final Map<String, String> AUTHORIZED_OTHERWISE = Map.ofEntries(
         Map.entry(
@@ -312,6 +312,9 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("WebhookTriggerTestController#executeWorkflow",
             "permit-all inbound webhook addressed by an execution id"),
         Map.entry("WhatsAppInteractivityController#handleInteractivity", "Meta callback, verified by its signature"),
+        Map.entry(
+            "WorkflowNodeScriptGraphQlController#stopScriptTest",
+            "WorkflowNodeScriptFacadeImpl stops only a script test the caller started"),
         Map.entry("WorkflowSchemaGeneratorApiController#generateSchema",
             "computes a schema from the request body only"),
         Map.entry("WorkspaceApiKeyGraphQlController#updateWorkspaceApiKey",
@@ -361,6 +364,9 @@ class AutomationMethodSecurityConfigurationTest {
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#enableProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#getFrontendAutomationComponentInputOptions",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#provisionFrontendWorkflowReference",
@@ -431,6 +437,18 @@ class AutomationMethodSecurityConfigurationTest {
             "embedded-v1:IntegrationInstanceWorkflowApiController#updateIntegrationInstanceWorkflow",
             EMBEDDED_PATH_SCOPED),
         Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#disableFrontendMcpAutomationWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#disableMcpAutomationWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#enableFrontendMcpAutomationWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#enableMcpAutomationWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
             "embedded-v1:McpIntegrationInstanceToolApiController#disableFrontendMcpIntegrationInstanceTool",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
@@ -474,7 +492,7 @@ class AutomationMethodSecurityConfigurationTest {
 
     private static final Set<String> READ_GATED_CONTROLLERS = Set.of(
         "ApiClientApiController", "ApiConnectorGraphQlController", "ApprovalTaskGraphQlController",
-        "embedded:AppEventApiController", "embedded:AutomationWorkflowProjectGraphQlController",
+        "embedded:AppEventApiController", "embedded:AutomationProjectGraphQlController",
         "embedded:CategoryApiController", "embedded:ConnectedUserApiController",
         "embedded:ConnectedUserGraphQlController", "embedded:ConnectedUserMcpServerGraphQlController",
         "embedded:ConnectedUserProjectGraphQlController", "embedded:ConnectionTagApiController",
@@ -713,7 +731,10 @@ class AutomationMethodSecurityConfigurationTest {
         String delegateTypeName = delegateParts[0];
         String delegateMethodName = delegateParts[1];
 
-        List<SourceType> delegateTypes = sourceTypesByName.getOrDefault(delegateTypeName, List.of());
+        List<SourceType> delegateTypes = sourceTypesByName.getOrDefault(delegateTypeName, List.of())
+            .stream()
+            .filter(sourceType -> declaresMethod(sourceType, delegateMethodName))
+            .toList();
 
         if (delegateTypes.isEmpty()) {
             return "no scanned type " + delegateTypeName + " carries a @PreAuthorize";
@@ -742,6 +763,12 @@ class AutomationMethodSecurityConfigurationTest {
         }
 
         return null;
+    }
+
+    private static boolean declaresMethod(SourceType sourceType, String methodName) {
+        return sourceType.members()
+            .stream()
+            .anyMatch(member -> methodName.equals(member.name()));
     }
 
     /**
