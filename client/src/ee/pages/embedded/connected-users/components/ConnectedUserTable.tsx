@@ -14,6 +14,7 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
@@ -39,6 +40,9 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
             setConnectedUserSheetOpen: state.setConnectedUserSheetOpen,
         }))
     );
+
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -139,22 +143,28 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                                     label="Details"
                                 />
 
-                                <DropdownMenuItem
-                                    data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
-                                    data-index={info.row.index.toString()}
-                                    icon={connectedUsers[info.row.index].enabled ? <PowerOffIcon /> : <PowerIcon />}
-                                    label={connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
-                                />
+                                {canManageConnectedUser && (
+                                    <DropdownMenuItem
+                                        data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
+                                        data-index={info.row.index.toString()}
+                                        icon={connectedUsers[info.row.index].enabled ? <PowerOffIcon /> : <PowerIcon />}
+                                        label={connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteConnectedUser && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    data-action="delete"
-                                    data-index={info.row.index.toString()}
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            data-action="delete"
+                                            data-index={info.row.index.toString()}
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ),
@@ -162,7 +172,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                     id: 'actions',
                 }),
             ]),
-        [componentDefinitions, connectedUsers]
+        [canDeleteConnectedUser, canManageConnectedUser, componentDefinitions, connectedUsers]
     );
 
     const reactTable = useTable({
