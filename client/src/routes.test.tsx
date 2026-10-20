@@ -11,7 +11,7 @@ import {MemoryRouter, Route, RouteObject, Routes, useLocation} from 'react-route
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
-    embeddedScopes: ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE'] as string[],
+    embeddedScopes: ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE', 'EMBEDDED_VIEW'] as string[],
     isTenantAdmin: false,
 }));
 
@@ -341,7 +341,7 @@ describe('settings route authorities', () => {
         ]);
     });
 
-    it.each(['signing-keys', 'api-keys'])('testEveryEmbeddedRouteAdmitsUsers settings/%s', (path) => {
+    it.each(['members', 'signing-keys', 'api-keys'])('testEveryEmbeddedRouteAdmitsUsers settings/%s', (path) => {
         const router = getRouter(new QueryClient());
 
         const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
@@ -373,7 +373,7 @@ describe('settings route authorities', () => {
 
 describe('settings navigation visibility', () => {
     beforeEach(() => {
-        hoisted.embeddedScopes = ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE'];
+        hoisted.embeddedScopes = ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE', 'EMBEDDED_VIEW'];
         hoisted.isTenantAdmin = false;
     });
 
@@ -422,10 +422,14 @@ describe('settings navigation visibility', () => {
 
     it('sends a non-admin from the settings index to the first settings entry they can see', () => {
         expect(resolveSettingsIndexRedirect('/automation/settings')).toBe('/automation/settings/workspace-users');
-        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/signing-keys');
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/members');
     });
 
     it('sends an embedded member without signing key access to the first settings entry they can see', () => {
+        hoisted.embeddedScopes = ['EMBEDDED_SETTINGS_MANAGE'];
+
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/signing-keys');
+
         hoisted.embeddedScopes = ['API_KEY_VIEW'];
 
         expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/api-keys');

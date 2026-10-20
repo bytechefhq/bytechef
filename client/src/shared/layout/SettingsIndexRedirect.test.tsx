@@ -9,7 +9,8 @@ const hoisted = vi.hoisted(() => ({
     isTenantAdmin: false,
 }));
 
-vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
     useHasEmbeddedScope: () => false,
 }));
 

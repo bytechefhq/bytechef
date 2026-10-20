@@ -1,5 +1,5 @@
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
-import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -61,10 +61,15 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
     const apiKeyViewGranted = useHasEmbeddedScope('API_KEY_VIEW');
+    const embeddedMembersViewGranted = useHasEmbeddedScope('EMBEDDED_VIEW', UNION_ENVIRONMENT_ID);
     const embeddedSettingsManageGranted = useHasEmbeddedScope('EMBEDDED_SETTINGS_MANAGE');
     const isTenantAdmin = useIsTenantAdmin();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
+        if (navItem.href === '/embedded/settings/members') {
+            return embeddedMembersViewGranted;
+        }
+
         if (navItem.href === '/embedded/settings/api-keys') {
             return apiKeyViewGranted;
         }
