@@ -49,8 +49,10 @@ import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation.Arity;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,16 +60,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Utility to construct output schemas for Data Table actions using table metadata.
+ * Shared property, option, output schema and parsing helpers for Data Table actions.
  *
  * @author Ivica Cardic
  */
 public final class DataTableUtils {
+
+    private static final List<String> CONDITION_KEYS = List.of(COLUMN, OPERATION, VALUE, VALUE_TO, VALUES);
 
     private DataTableUtils() {
     }
@@ -121,16 +127,15 @@ public final class DataTableUtils {
             }
 
             return columnNames.stream()
-                .filter(columnName -> searchText == null || columnName.toLowerCase()
-                    .contains(searchText.toLowerCase()))
+                .filter(columnName -> searchText == null || columnName.toLowerCase(Locale.ROOT)
+                    .contains(searchText.toLowerCase(Locale.ROOT)))
                 .<Option<String>>map(columnName -> option(columnName, columnName))
                 .toList();
         };
     }
 
     /**
-     * Creates the OR Conditions property shared by the actions that select records by condition. The returned property
-     * has no description, so each action can explain what an empty value means for it.
+     * Creates the OR Conditions property shared by the actions that select records by condition.
      *
      * @param dataTableService the data table service
      * @return the conditions property
@@ -178,38 +183,114 @@ public final class DataTableUtils {
                                     .label("Value")
                                     .description("The value to compare with. For Between, the lower bound.")
                                     .displayCondition(
-                                        "!contains({'%s','%s','%s'}, conditions[index][index].%s)".formatted(
-                                            Operation.IN, Operation.EMPTY, Operation.NOT_EMPTY, OPERATION)),
+                                        "!contains({%s}, conditions[index][index].%s)".formatted(
+                                            getOperationNames(Arity.LIST, Arity.NONE), OPERATION)),
                                 string(VALUE_TO)
                                     .label("To Value")
                                     .description("The upper bound. Both bounds are included.")
                                     .displayCondition(
-                                        "conditions[index][index].%s == '%s'".formatted(
-                                            OPERATION, Operation.BETWEEN)),
+                                        "contains({%s}, conditions[index][index].%s)".formatted(
+                                            getOperationNames(Arity.PAIR), OPERATION)),
                                 array(VALUES)
                                     .label("Values")
                                     .description("The values the column must be one of.")
                                     .items(string())
                                     .displayCondition(
-                                        "conditions[index][index].%s == '%s'".formatted(
-                                            OPERATION, Operation.IN)))));
+                                        "contains({%s}, conditions[index][index].%s)".formatted(
+                                            getOperationNames(Arity.LIST), OPERATION)))));
     }
 
     /**
-     * Reads the OR Conditions property as OR groups of AND conditions, dropping empty groups.
+     * Reads the OR Conditions property as OR groups of AND conditions; an empty property matches every row.
      *
      * @param inputParameters the action input parameters
-     * @return the non-empty condition groups
+     * @return the conditions
+     * @throws IllegalArgumentException if OR Conditions is not a list of AND Condition lists, an AND Condition list is
+     *                                  null or empty, or a condition is null, has an unknown key, has no column, has a
+     *                                  blank or unknown operation, or has a value that does not fit the operation; the
+     *                                  message names the condition's position
      */
-    public static List<List<DataTableRowFilter>> getConditions(Parameters inputParameters) {
-        return inputParameters
-            .getList(CONDITIONS, new TypeReference<List<Map<String, Object>>>() {}, List.of())
-            .stream()
-            .filter(andConditions -> andConditions != null && !andConditions.isEmpty())
-            .map(andConditions -> andConditions.stream()
-                .map(DataTableUtils::toDataTableRowFilter)
-                .toList())
-            .toList();
+    public static DataTableRowConditions getConditions(Parameters inputParameters) {
+        List<List<Map<String, Object>>> orConditions;
+
+        try {
+            orConditions = inputParameters.getList(
+                CONDITIONS, new TypeReference<List<Map<String, Object>>>() {}, List.of());
+        } catch (RuntimeException runtimeException) {
+            throw new IllegalArgumentException(
+                "OR Conditions must be a list of AND Condition lists, each holding condition objects",
+                runtimeException);
+        }
+
+        List<List<DataTableRowFilter>> conditions = new ArrayList<>();
+
+        for (int groupIndex = 0; groupIndex < orConditions.size(); groupIndex++) {
+            List<Map<String, Object>> andConditions = orConditions.get(groupIndex);
+
+            if (andConditions == null || andConditions.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "OR Condition %d is empty; add a condition to it or remove it".formatted(groupIndex + 1));
+            }
+
+            List<DataTableRowFilter> filters = new ArrayList<>();
+
+            for (int conditionIndex = 0; conditionIndex < andConditions.size(); conditionIndex++) {
+                Map<String, Object> condition = andConditions.get(conditionIndex);
+
+                if (condition == null) {
+                    throw new IllegalArgumentException(
+                        "Condition %d of OR Condition %d is empty".formatted(conditionIndex + 1, groupIndex + 1));
+                }
+
+                try {
+                    filters.add(toDataTableRowFilter(condition));
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    throw new IllegalArgumentException(
+                        "Condition %d of OR Condition %d: %s".formatted(
+                            conditionIndex + 1, groupIndex + 1, illegalArgumentException.getMessage()),
+                        illegalArgumentException);
+                }
+            }
+
+            conditions.add(filters);
+        }
+
+        return new DataTableRowConditions(conditions);
+    }
+
+    /**
+     * Parses an enum constant ignoring case, falling back to the default when the value is null or blank.
+     *
+     * @param enumClass    the enum type
+     * @param value        the value to parse
+     * @param defaultValue the value returned when {@code value} is null or blank
+     * @param label        the property label used in the error message
+     * @return the parsed enum constant
+     * @throws IllegalArgumentException if the value names no constant of the enum
+     */
+    public static <E extends Enum<E>> E toEnum(
+        Class<E> enumClass, @Nullable Object value, E defaultValue, String label) {
+
+        if (value == null || String.valueOf(value)
+            .isBlank()) {
+
+            return defaultValue;
+        }
+
+        String name = String.valueOf(value)
+            .trim()
+            .toUpperCase(Locale.ROOT);
+
+        try {
+            return Enum.valueOf(enumClass, name);
+        } catch (IllegalArgumentException exception) {
+            String expectedNames = Arrays.stream(enumClass.getEnumConstants())
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
+
+            throw new IllegalArgumentException(
+                "Unknown %s '%s'; expected one of %s".formatted(label, value, expectedNames), exception);
+        }
     }
 
     public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
@@ -438,20 +519,48 @@ public final class DataTableUtils {
         };
     }
 
+    private static String getOperationNames(Arity... arities) {
+        List<Arity> arityList = List.of(arities);
+
+        return Arrays.stream(Operation.values())
+            .filter(operation -> arityList.contains(operation.arity()))
+            .map(operation -> "'" + operation.name() + "'")
+            .collect(Collectors.joining(","));
+    }
+
     private static DataTableRowFilter toDataTableRowFilter(Map<String, Object> condition) {
+        List<String> unknownKeys = condition.keySet()
+            .stream()
+            .filter(key -> !CONDITION_KEYS.contains(key))
+            .sorted()
+            .toList();
+
+        if (!unknownKeys.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Unknown condition key(s) %s; expected %s".formatted(
+                    String.join(", ", unknownKeys), String.join(", ", CONDITION_KEYS)));
+        }
+
         Object column = condition.get(COLUMN);
 
         if (!(column instanceof String columnName) || columnName.isBlank()) {
-            throw new IllegalArgumentException("Every condition requires a column");
+            throw new IllegalArgumentException("Column is required");
         }
 
-        Operation operation = Operation.valueOf(
-            String.valueOf(condition.getOrDefault(OPERATION, Operation.EQUALS.name())));
+        Object operationValue = condition.get(OPERATION);
 
-        Object value = switch (operation) {
-            case IN -> condition.get(VALUES);
-            case BETWEEN -> Arrays.asList(condition.get(VALUE), condition.get(VALUE_TO));
-            default -> condition.get(VALUE);
+        if (operationValue != null && String.valueOf(operationValue)
+            .isBlank()) {
+
+            throw new IllegalArgumentException("Operation must not be blank");
+        }
+
+        Operation operation = toEnum(Operation.class, operationValue, Operation.EQUALS, "Operation");
+
+        Object value = switch (operation.arity()) {
+            case LIST -> condition.get(VALUES);
+            case PAIR -> Arrays.asList(condition.get(VALUE), condition.get(VALUE_TO));
+            case NONE, ONE -> condition.get(VALUE);
         };
 
         return new DataTableRowFilter(columnName, operation, value);

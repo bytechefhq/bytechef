@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.table.execution.service;
 
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import java.util.List;
 import java.util.Map;
@@ -46,18 +46,19 @@ public interface DataTableRowService {
     boolean deleteRow(String baseName, long id, long environmentId);
 
     /**
-     * Deletes every row that satisfies the given conditions in one transaction, publishing a deleted event per row.
+     * Deletes every row that satisfies the given conditions in one transaction. One deleted event holding every deleted
+     * row is published; webhooks are called once the transaction commits. When no row matches, nothing is deleted and
+     * an empty list is returned.
      *
      * @param baseName      the logical table base name
-     * @param conditions    OR groups of AND conditions, as in {@link #findRows}; at least one non-empty group is
-     *                      required
+     * @param conditions    the conditions selecting the rows to delete; must contain at least one condition
      * @param environmentId the environment ID
      * @return the deleted rows ordered by id
-     * @throws IllegalArgumentException if no non-empty condition group is given, a filter names an unknown column, has
-     *                                  a value that is not valid for the column type, or uses a text operation on a
+     * @throws IllegalArgumentException if the conditions contain no condition, a filter names an unknown column, has a
+     *                                  value that is not valid for the column type, or uses a text operation on a
      *                                  non-text column
      */
-    List<DataTableRow> deleteRows(String baseName, List<List<DataTableRowFilter>> conditions, long environmentId);
+    List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId);
 
     /**
      * Gets a single row by its id.
@@ -67,14 +68,15 @@ public interface DataTableRowService {
      * @param environmentId the environment ID
      * @return the row if found, null otherwise
      */
+    @Nullable
     DataTableRow getRow(String baseName, long id, long environmentId);
 
     /**
      * Inserts a row with provided values. Returns the created row including generated id.
      *
      * @param baseName      the logical table base name
-     * @param values        column name to value map; an id key is ignored and a null or blank value leaves the column
-     *                      empty
+     * @param values        column name to value map; an id key is ignored, a null value stores null and a blank value
+     *                      stores an empty string in a text column and null otherwise
      * @param environmentId the environment ID
      * @return the created row with generated id
      * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type
@@ -82,13 +84,14 @@ public interface DataTableRowService {
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
 
     /**
-     * Lists rows of a dynamic table with pagination.
+     * Lists rows of a dynamic table ordered by id ascending, with pagination.
      *
      * @param baseName      the logical table base name
-     * @param limit         maximum number of rows to return
-     * @param offset        number of rows to skip
+     * @param limit         maximum number of rows to return; must not be negative
+     * @param offset        number of rows to skip; must not be negative
      * @param environmentId the environment ID
      * @return list of rows with their data
+     * @throws IllegalArgumentException if limit or offset is negative
      */
     List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId);
 
@@ -96,19 +99,19 @@ public interface DataTableRowService {
      * Lists rows of a dynamic table that satisfy the given conditions, ordered by the given sort, with pagination.
      *
      * @param baseName      the logical table base name
-     * @param conditions    OR groups of AND conditions: a row matches when it satisfies every filter of at least one
-     *                      group; empty groups are ignored, and no groups match every row
+     * @param conditions    the conditions a row must satisfy; {@link DataTableRowConditions#matchAll()} returns every
+     *                      row
      * @param sort          the sort order, or null to order by id ascending
      * @param limit         maximum number of rows to return; must not be negative
      * @param offset        number of rows to skip; must not be negative
      * @param environmentId the environment ID
      * @return list of matching rows with their data
-     * @throws IllegalArgumentException if limit or offset is negative, or a filter names an unknown column, has a value
-     *                                  that is not valid for the column type, or uses a text operation on a non-text
-     *                                  column
+     * @throws IllegalArgumentException if limit or offset is negative, the sort names an unknown column, or a filter
+     *                                  names an unknown column, has a value that is not valid for the column type, or
+     *                                  uses a text operation on a non-text column
      */
     List<DataTableRow> findRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, @Nullable DataTableRowSort sort, int limit,
+        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
         int offset, long environmentId);
 
     /**
@@ -123,12 +126,13 @@ public interface DataTableRowService {
 
     /**
      * Imports CSV text into the table. The CSV must contain a header row with column names matching existing columns
-     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored. A cell that is not
-     * valid for its column type stops the import; rows before it stay imported.
+     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored. The import runs in one
+     * transaction: a cell that is not valid for its column type stops the import and no row is imported.
      *
      * @param baseName      the logical table base name
      * @param csv           CSV text with header row
      * @param environmentId the environment ID
+     * @throws IllegalArgumentException if a cell is not valid for its column type; the message names the CSV line
      */
     void importCsv(String baseName, String csv, long environmentId);
 
@@ -137,28 +141,31 @@ public interface DataTableRowService {
      *
      * @param baseName      the logical table base name
      * @param id            the row id
-     * @param values        column name to value map (only provided columns will be updated); an id key is ignored and a
-     *                      null or blank value clears the column
+     * @param values        column name to value map (only provided columns will be updated); an id key is ignored, a
+     *                      null value sets the column to null and a blank value clears it, leaving an empty string in a
+     *                      text column and null otherwise
      * @param environmentId the environment ID
      * @return the updated row
-     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type
+     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type, or no
+     *                                  row with that id exists
      */
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
 
     /**
-     * Updates every row that satisfies the given conditions in one transaction, publishing an updated event per row.
+     * Updates every row that satisfies the given conditions in one transaction. One updated event holding every updated
+     * row is published; webhooks are called once the transaction commits. When no row matches, nothing is updated and
+     * an empty list is returned.
      *
      * @param baseName      the logical table base name
-     * @param conditions    OR groups of AND conditions, as in {@link #findRows}; at least one non-empty group is
-     *                      required
+     * @param conditions    the conditions selecting the rows to update; must contain at least one condition
      * @param values        column name to value map; at least one column is required, and values must not be null or
      *                      blank
      * @param environmentId the environment ID
      * @return the updated rows ordered by id
-     * @throws IllegalArgumentException if no non-empty condition group or no column value is given, a filter is
+     * @throws IllegalArgumentException if the conditions contain no condition, no column value is given, a filter is
      *                                  invalid, or a value names id or an unknown column, is null or blank, or is not
      *                                  valid for the column type
      */
     List<DataTableRow> updateRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, Map<String, Object> values, long environmentId);
+        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId);
 }
