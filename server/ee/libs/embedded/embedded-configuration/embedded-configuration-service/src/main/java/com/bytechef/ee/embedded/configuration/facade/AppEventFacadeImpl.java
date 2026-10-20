@@ -34,33 +34,33 @@ public class AppEventFacadeImpl implements AppEventFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_CREATE')")
     @Transactional
     public AppEvent create(AppEvent appEvent) {
         return appEventService.create(appEvent);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_DELETE')")
     @Transactional
     public void delete(long id) {
         appEventService.delete(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public AppEvent getAppEvent(long id) {
         return appEventService.getAppEvent(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public List<AppEvent> getAppEvents() {
         return appEventService.getAppEvents();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_EDIT')")
     @Transactional
     public AppEvent update(AppEvent appEvent) {
         return appEventService.update(appEvent);
