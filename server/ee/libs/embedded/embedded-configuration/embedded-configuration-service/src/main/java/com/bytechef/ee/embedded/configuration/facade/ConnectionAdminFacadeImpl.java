@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.domain.Connection;
@@ -16,10 +17,14 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,18 +38,23 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
+    private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
+    private static final String CONNECTION_TYPE = "Connection";
+
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService) {
+        ConnectionService connectionService, @Lazy PermissionService permissionService) {
 
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -76,7 +86,10 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     public ConnectionDTO getConnection(long id) {
         requireEmbedded(id);
 
-        return connectionFacade.getConnection(id);
+        ConnectionDTO connectionDTO = connectionFacade.getConnection(id);
+
+        return permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT)
+            ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -91,8 +104,22 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
         @Nullable Long tagId) {
 
-        return connectionFacade.getConnections(
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
             componentName, connectionVersion, List.of(), tagId, environmentId, PlatformType.EMBEDDED);
+
+        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
+        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
+                connectionDTO.environmentId(),
+                connectionEnvironmentId -> permissionService.hasResourceScope(
+                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+
+            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+        }
+
+        return redactedConnectionDTOs;
     }
 
     @Override
