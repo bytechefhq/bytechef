@@ -1,0 +1,9 @@
+bytechef:
+  workflow:
+    repository:
+      jdbc:
+        enabled: true
+
+spring:
+  liquibase:
+    contexts: configuration
