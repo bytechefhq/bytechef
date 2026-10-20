@@ -11,10 +11,17 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingConnection;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingInput;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionMissingConnectionModel;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionMissingInputModel;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionVersionUpdateModel;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.UpdateApiCollectionProjectVersionRequestModel;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -117,6 +124,32 @@ public class ApiCollectionApiController implements ApiCollectionApi {
                 ApiCollectionModel.class));
     }
 
+    @Override
+    public ResponseEntity<ApiCollectionVersionUpdateModel> updateApiCollectionProjectVersion(
+        Long id, UpdateApiCollectionProjectVersionRequestModel updateApiCollectionProjectVersionRequestModel) {
+
+        ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+            apiCollectionFacade.updateApiCollectionProjectVersion(
+                id, updateApiCollectionProjectVersionRequestModel.getProjectVersion(),
+                Boolean.TRUE.equals(updateApiCollectionProjectVersionRequestModel.getRemoveMissingEndpoints()));
+
+        ApiCollectionVersionUpdateModel apiCollectionVersionUpdateModel = new ApiCollectionVersionUpdateModel();
+
+        apiCollectionVersionUpdateModel.setApiCollection(
+            conversionService.convert(apiCollectionVersionUpdateDTO.apiCollection(), ApiCollectionModel.class));
+        apiCollectionVersionUpdateModel.setDisabledEndpointNames(apiCollectionVersionUpdateDTO.disabledEndpointNames());
+        apiCollectionVersionUpdateModel.setMissingConnections(
+            CollectionUtils.map(
+                apiCollectionVersionUpdateDTO.missingConnections(),
+                ApiCollectionApiController::toMissingConnectionModel));
+        apiCollectionVersionUpdateModel.setMissingInputs(
+            CollectionUtils.map(
+                apiCollectionVersionUpdateDTO.missingInputs(), ApiCollectionApiController::toMissingInputModel));
+        apiCollectionVersionUpdateModel.setRemovedEndpointNames(apiCollectionVersionUpdateDTO.removedEndpointNames());
+
+        return ResponseEntity.ok(apiCollectionVersionUpdateModel);
+    }
+
     private String getFilename(long id) {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(id);
 
@@ -127,6 +160,27 @@ public class ApiCollectionApiController implements ApiCollectionApi {
             .trim();
 
         return "%s_openapi.json".formatted(name);
+    }
+
+    private static ApiCollectionMissingConnectionModel toMissingConnectionModel(MissingConnection missingConnection) {
+        ApiCollectionMissingConnectionModel apiCollectionMissingConnectionModel =
+            new ApiCollectionMissingConnectionModel();
+
+        apiCollectionMissingConnectionModel.setComponentName(missingConnection.componentName());
+        apiCollectionMissingConnectionModel.setEndpointName(missingConnection.endpointName());
+        apiCollectionMissingConnectionModel.setKey(missingConnection.key());
+        apiCollectionMissingConnectionModel.setWorkflowNodeName(missingConnection.workflowNodeName());
+
+        return apiCollectionMissingConnectionModel;
+    }
+
+    private static ApiCollectionMissingInputModel toMissingInputModel(MissingInput missingInput) {
+        ApiCollectionMissingInputModel apiCollectionMissingInputModel = new ApiCollectionMissingInputModel();
+
+        apiCollectionMissingInputModel.setEndpointName(missingInput.endpointName());
+        apiCollectionMissingInputModel.setInputName(missingInput.inputName());
+
+        return apiCollectionMissingInputModel;
     }
 
     private static void validate(ApiCollectionModel apiCollectionModel) {
