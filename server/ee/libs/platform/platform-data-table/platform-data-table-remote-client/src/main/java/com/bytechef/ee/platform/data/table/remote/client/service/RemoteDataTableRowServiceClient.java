@@ -9,6 +9,8 @@ package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,14 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableRowServiceClient implements DataTableRowService {
     @Override
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> findRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, DataTableRowSort sort, int limit, int offset,
+        long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
