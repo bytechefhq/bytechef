@@ -165,6 +165,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         private static final int INTEGRATION_VERSION = 2;
 
+        @MockitoBean
+        private EmbeddedMcpReader embeddedMcpReader;
+
         @Autowired
         private Encryption encryption;
 
@@ -320,8 +323,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             "bytechef.edition=ee", "bytechef.audit.enabled=true"
         })
     @MockitoBean(types = {
-        IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
-        IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class,
+        EmbeddedMcpReader.class, IntegrationInstanceConfigurationService.class,
+        IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceWorkflowService.class,
+        IntegrationWorkflowService.class,
         McpIntegrationInstanceConfigurationService.class, McpServerService.class, PermissionService.class,
         WorkflowService.class
     })
@@ -335,6 +339,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         private static final long MCP_SERVER_ID = 11L;
 
         @Autowired
+        private EmbeddedMcpReader embeddedMcpReader;
+
+        @Autowired
         private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
 
         @Autowired
@@ -345,9 +352,6 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         @Autowired
         private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
-
-        @Autowired
-        private McpServerService mcpServerService;
 
         @MockitoBean
         private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
@@ -470,7 +474,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             McpServer mcpServer = mock(McpServer.class);
 
             when(mcpServer.getEnvironment()).thenReturn(Environment.DEVELOPMENT);
-            when(mcpServerService.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
+            when(embeddedMcpReader.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
 
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 mock(IntegrationInstanceConfigurationWorkflow.class);
