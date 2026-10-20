@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import java.util.List;
@@ -65,12 +66,16 @@ class GraphQlSchemaLoadsTest {
     void testRemovedTypesAndFieldsAreAbsent() {
         GraphQLSchema schema = buildSchema();
 
-        assertThat(schema.getType("AiHubChatKind")).isNull();
+        GraphQLEnumType chatKind = (GraphQLEnumType) schema.getType("AiHubChatKind");
+
+        assertThat(chatKind.getValues()).extracting(value -> value.getName())
+            .containsExactly("STANDARD", "WORKFLOW_CHAT");
         assertThat(schema.getType("AiHubChatVisibility")).isNull();
         assertThat(schema.getType("AiHubChatParticipation")).isNull();
         assertThat(schema.getType("AiHubChatArtifactPage")).isNull();
         assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChat")))
-            .doesNotContain("kind", "visibility", "participation", "ownerName");
+            .doesNotContain("visibility", "participation", "ownerName")
+            .contains("kind", "workflowExecutionId", "projectDeploymentId");
         assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChatMessage")))
             .doesNotContain("authorName", "authorUserId");
     }

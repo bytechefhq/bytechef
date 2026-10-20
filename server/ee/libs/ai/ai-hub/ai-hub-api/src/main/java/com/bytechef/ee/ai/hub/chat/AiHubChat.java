@@ -61,6 +61,28 @@ public class AiHubChat {
     private int environment;
 
     /**
+     * INT ordinal of {@link AiHubChatKind}; discriminates standard chats (default, {@code STANDARD}) from workflow
+     * chats ({@code WORKFLOW_CHAT}). Ordinal stability enforced by {@code EnumOrdinalStabilityTest}; new kinds must be
+     * appended at the end of the enum.
+     */
+    @Column("kind")
+    private int kind = AiHubChatKind.STANDARD.ordinal();
+
+    /**
+     * Composite WorkflowExecutionId string (tenantId + UUID) the chat is bound to. Non-null for
+     * {@code kind = WORKFLOW_CHAT}; null for {@code STANDARD}.
+     */
+    @Column("workflow_execution_id")
+    private String workflowExecutionId;
+
+    /**
+     * Parent project-deployment id for the workflow execution. Surfaces sidebar grouping without forcing a JOIN at
+     * render time. Non-null for {@code kind = WORKFLOW_CHAT}; null for {@code STANDARD}.
+     */
+    @Column("project_deployment_id")
+    private Long projectDeploymentId;
+
+    /**
      * Whether the current title was set automatically (creation-time auto-label or LLM regeneration) and is therefore
      * eligible for further automatic regeneration. The semantic is "has never been authoritatively titled" — once the
      * LLM regenerates a title, this flag flips to {@code false} so the regen loop doesn't fire again per turn. A user
@@ -207,6 +229,32 @@ public class AiHubChat {
         if (environment != null) {
             this.environment = environment.ordinal();
         }
+    }
+
+    public AiHubChatKind getKind() {
+        return EnumOrdinals.fromOrdinal(kind, AiHubChatKind.class);
+    }
+
+    public void setKind(AiHubChatKind kind) {
+        if (kind != null) {
+            this.kind = kind.ordinal();
+        }
+    }
+
+    public String getWorkflowExecutionId() {
+        return workflowExecutionId;
+    }
+
+    public void setWorkflowExecutionId(String workflowExecutionId) {
+        this.workflowExecutionId = workflowExecutionId;
+    }
+
+    public Long getProjectDeploymentId() {
+        return projectDeploymentId;
+    }
+
+    public void setProjectDeploymentId(Long projectDeploymentId) {
+        this.projectDeploymentId = projectDeploymentId;
     }
 
     public boolean isAutoTitled() {
