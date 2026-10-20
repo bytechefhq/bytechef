@@ -4,6 +4,8 @@ import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHu
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ModelPickerWorkflowChatI} from '@/shared/components/ai/model-picker/ModelPicker';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useCreateWorkflowChatAiHubChatMutation, useWorkspaceChatWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -22,9 +24,13 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    useLoadWorkspaceScopes(currentWorkspaceId);
+
+    const canViewWorkflows = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_VIEW');
+
     const {data: chatWorkflowsData} = useWorkspaceChatWorkflowsQuery(
         {environmentId: String(currentEnvironmentId), workspaceId: String(currentWorkspaceId ?? 0)},
-        {enabled: currentWorkspaceId != null}
+        {enabled: currentWorkspaceId != null && canViewWorkflows}
     );
 
     const createWorkflowChatMutation = useCreateWorkflowChatAiHubChatMutation();
