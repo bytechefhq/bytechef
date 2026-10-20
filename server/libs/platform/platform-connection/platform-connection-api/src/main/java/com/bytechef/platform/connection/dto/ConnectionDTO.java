@@ -54,6 +54,13 @@ public record ConnectionDTO(
             connection.getStatus(), tags, connection.getVersion());
     }
 
+    public ConnectionDTO withoutCredentials() {
+        return new ConnectionDTO(
+            active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
+            createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, Map.of(), status,
+            tags, version);
+    }
+
     public Connection toConnection() {
         Connection connection = new Connection();
 
