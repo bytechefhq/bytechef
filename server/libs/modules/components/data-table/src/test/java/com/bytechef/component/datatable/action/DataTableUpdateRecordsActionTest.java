@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
 import java.util.List;
@@ -39,18 +40,16 @@ class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformUpdatesEveryRecordMatchingConditions() throws Exception {
-        List<List<DataTableRowFilter>> conditions = List.of(
-            List.of(new DataTableRowFilter("status", Operation.EQUALS, "BOT")),
-            List.of(new DataTableRowFilter("priority", Operation.GREATER, "3")));
+        DataTableRowConditions conditions = new DataTableRowConditions(
+            List.of(
+                List.of(new DataTableRowFilter("status", Operation.EQUALS, "BOT")),
+                List.of(new DataTableRowFilter("priority", Operation.GREATER, "3"))));
         Map<String, Object> values = Map.of("status", "HUMAN");
 
-        when(dataTableRowService.findRows("conversations", conditions, null, Integer.MAX_VALUE, 0, 1L))
+        when(dataTableRowService.updateRows("conversations", conditions, values, 1L))
             .thenReturn(
-                List.of(new DataTableRow(3, Map.of("status", "BOT")), new DataTableRow(4, Map.of("status", "BOT"))));
-        when(dataTableRowService.updateRow("conversations", 3L, values, 1L))
-            .thenReturn(new DataTableRow(3, Map.of("status", "HUMAN")));
-        when(dataTableRowService.updateRow("conversations", 4L, values, 1L))
-            .thenReturn(new DataTableRow(4, Map.of("status", "HUMAN")));
+                List.of(
+                    new DataTableRow(3, Map.of("status", "HUMAN")), new DataTableRow(4, Map.of("status", "HUMAN"))));
 
         assertEquals(
             Map.of(
@@ -68,11 +67,29 @@ class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformRejectsMissingConditions() {
-        assertThrows(
+        IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> perform(
                 actionDefinition,
                 Map.of("table", "conversations", "values", Map.of("status", "HUMAN"))));
+
+        assertEquals("Update Records requires at least one condition", illegalArgumentException.getMessage());
+
+        verifyNoInteractions(dataTableRowService);
+    }
+
+    @Test
+    void testPerformRejectsMissingValues() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> perform(
+                actionDefinition,
+                Map.of(
+                    "table", "conversations",
+                    "conditions", List.of(List.of(Map.of("column", "status", "value", "BOT"))),
+                    "values", Map.of())));
+
+        assertEquals("Update Records requires a value for at least one column", illegalArgumentException.getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }
