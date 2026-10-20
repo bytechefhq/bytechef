@@ -9,9 +9,10 @@ package com.bytechef.ee.ai.hub.agent;
 
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -42,10 +43,17 @@ public class WorkflowChatGuard {
         "com.bytechef.ee.ai.hub.agent.WorkflowChatGuard.lastTurn";
 
     private final CacheManager cacheManager;
+    private final Clock clock;
+
+    @Autowired
+    public WorkflowChatGuard(CacheManager cacheManager) {
+        this(cacheManager, Clock.systemUTC());
+    }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowChatGuard(CacheManager cacheManager) {
+    WorkflowChatGuard(CacheManager cacheManager, Clock clock) {
         this.cacheManager = cacheManager;
+        this.clock = clock;
     }
 
     /**
@@ -56,8 +64,7 @@ public class WorkflowChatGuard {
     public AdmissionResult tryAdmit(String threadId) {
         Cache lastTurn = getCache();
         Long lastTurnMillis = lastTurn.get(threadId, Long.class);
-        long now = Instant.now()
-            .toEpochMilli();
+        long now = clock.millis();
 
         if (lastTurnMillis != null) {
             long elapsed = now - lastTurnMillis;
