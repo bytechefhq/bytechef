@@ -34,6 +34,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     workflow: Workflow;
 }) => {
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+
     const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
         useGetComponentDefinitionsQuery
     );
@@ -43,8 +45,6 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
     );
-
-    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const queryClient = useQueryClient();
 

@@ -19,13 +19,13 @@ const AppEvents = () => {
 
     const canCreateAppEventScope = useHasEmbeddedScope('APP_EVENT_CREATE', UNION_ENVIRONMENT_ID);
 
-    const canCreateAppEvent = canCreateAppEventScope && !currentEnvironmentId;
-
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
 
     const initialLoadComplete = useInitialLoadComplete(appEventsIsLoading);
 
     const isFirstRun = appEvents?.length === 0;
+
+    const canCreateAppEvent = canCreateAppEventScope && !currentEnvironmentId;
 
     return (
         <PageLoader errors={[appEventsError]} loading={appEventsIsLoading}>

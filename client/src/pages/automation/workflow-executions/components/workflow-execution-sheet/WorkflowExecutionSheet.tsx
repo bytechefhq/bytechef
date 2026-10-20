@@ -11,7 +11,11 @@ import {getProjectVersion} from '../../utils/workflowExecutionsTable';
 import WorkflowExecutionDetail from './WorkflowExecutionDetail';
 import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
-const WorkflowExecutionSheet = () => {
+interface WorkflowExecutionSheetProps {
+    embedded?: boolean;
+}
+
+const WorkflowExecutionSheet = ({embedded = false}: WorkflowExecutionSheetProps) => {
     const {
         copilotEnabled,
         copilotPanelOpen,
@@ -82,6 +86,7 @@ const WorkflowExecutionSheet = () => {
                     </header>
 
                     <WorkflowExecutionDetail
+                        embedded={embedded}
                         enabled={workflowExecutionSheetOpen}
                         workflowExecutionId={workflowExecutionId}
                     />

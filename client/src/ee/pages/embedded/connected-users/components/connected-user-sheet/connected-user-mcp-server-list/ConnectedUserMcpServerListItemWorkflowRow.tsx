@@ -26,8 +26,6 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     connectedUserId: number;
     workflow: ConnectedUserMcpServerWorkflow;
 }) => {
-    const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
-
     const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
@@ -55,6 +53,8 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
             });
         },
     });
+
+    const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
 
     const integrationInstanceConfigurationId = integrationInstance?.integrationInstanceConfigurationId;
 

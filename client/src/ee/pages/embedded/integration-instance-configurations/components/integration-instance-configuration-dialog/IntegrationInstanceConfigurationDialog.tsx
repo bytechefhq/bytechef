@@ -94,8 +94,6 @@ const IntegrationInstanceConfigurationDialog = ({
     const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
     const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
 
-    const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
-
     const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
             authorizationType: integrationInstanceConfiguration?.authorizationType,
@@ -115,6 +113,8 @@ const IntegrationInstanceConfigurationDialog = ({
     });
 
     const {control, formState, getValues, handleSubmit, reset, setValue} = form;
+
+    const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,

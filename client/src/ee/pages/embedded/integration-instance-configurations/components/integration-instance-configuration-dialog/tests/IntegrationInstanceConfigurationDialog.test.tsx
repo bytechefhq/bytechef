@@ -146,6 +146,36 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         });
     });
 
+    describe('create scope', () => {
+        it('should offer Save for a new configuration only with the create scope', async () => {
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_EDIT'];
+
+            const withoutCreateRender = render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2, integrationVersion: 1, name: 'New'}}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+
+            withoutCreateRender.unmount();
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_CREATE'];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2, integrationVersion: 1, name: 'New'}}
+                    onClose={onClose}
+                />
+            );
+
+            expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument();
+        });
+    });
+
     describe('authorization', () => {
         beforeEach(() => {
             hoisted.connectionDefinition = {

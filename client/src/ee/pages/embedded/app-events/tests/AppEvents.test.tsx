@@ -120,6 +120,30 @@ describe('AppEvents', () => {
         expect(screen.queryByText('New App Event')).not.toBeInTheDocument();
     });
 
+    it('testAppEventScopesAreCheckedOnTheUnionNotTheCurrentEnvironment', async () => {
+        hoisted.grants = {
+            [PRODUCTION]: ['APP_EVENT_CREATE', 'APP_EVENT_DELETE', 'APP_EVENT_EDIT', 'APP_EVENT_VIEW'],
+            [UNION]: ['APP_EVENT_CREATE', 'APP_EVENT_DELETE', 'APP_EVENT_EDIT', 'APP_EVENT_VIEW'],
+        };
+
+        renderPage();
+
+        expect(screen.getByText('New App Event')).toBeInTheDocument();
+
+        await openRowMenu();
+
+        expect(await screen.findByText('Edit')).toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('testNoAppEventControlsWhenOnlyDevelopmentHoldsTheScopes', () => {
+        hoisted.grants = {[DEVELOPMENT]: ['APP_EVENT_CREATE', 'APP_EVENT_DELETE', 'APP_EVENT_EDIT', 'APP_EVENT_VIEW']};
+
+        renderPage();
+
+        expect(screen.queryByText('New App Event')).not.toBeInTheDocument();
+    });
+
     it('testAViewerSeesAppEventsWithoutEditOrDelete', async () => {
         grant(['APP_EVENT_EDIT', 'APP_EVENT_VIEW']);
 
