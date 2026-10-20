@@ -1,6 +1,16 @@
 import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
+import {
+    EXECUTIONS_TABLE_CELL_CLASS_NAME,
+    EXECUTIONS_TABLE_HEADER_CLASS_NAME,
+    EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+    EXECUTIONS_TABLE_ROW_CLASS_NAME,
+    EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
+    PINNED_CELL_CLASS_NAME,
+    PINNED_HEAD_CLASS_NAME,
+    PINNED_STRIPED_CELL_CLASS_NAME,
+} from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {ChevronDownIcon, ChevronUpIcon} from 'lucide-react';
 import {Fragment, ReactNode} from 'react';
@@ -25,8 +35,6 @@ interface ExecutionColumnI {
     id: string;
     pinned?: boolean;
 }
-
-const PINNED_COLUMN_CLASS_NAME = 'sticky right-0 z-10 bg-surface-main';
 
 const columns: ExecutionColumnI[] = [
     {
@@ -103,20 +111,16 @@ const columns: ExecutionColumnI[] = [
 ];
 
 const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth?: number}) => (
-    <TableHeader
-        className={twMerge(
-            'border border-stroke-neutral-secondary bg-surface-main text-content-neutral-secondary',
-            className
-        )}
-    >
+    <TableHeader className={twMerge(EXECUTIONS_TABLE_HEADER_CLASS_NAME, className)}>
         <TableRow>
             <TableHead className="w-9" />
 
             {columns.map((column) => (
                 <TableHead
                     className={twMerge(
-                        'w-4 text-sm font-medium text-inherit',
-                        column.pinned && PINNED_COLUMN_CLASS_NAME,
+                        'w-4',
+                        EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+                        column.pinned && PINNED_HEAD_CLASS_NAME,
                         column.headerClassName
                     )}
                     key={column.id}
@@ -169,8 +173,8 @@ const ExecutionRows = ({
                 <Fragment key={`${depth}_${rowKey}`}>
                     <TableRow
                         className={twMerge(
-                            'group cursor-pointer border-0 hover:bg-surface-brand-secondary',
-                            !expandable && 'even:bg-surface-neutral-secondary',
+                            EXECUTIONS_TABLE_ROW_CLASS_NAME,
+                            !expandable && EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
                             depth > 0 && 'border-b border-stroke-neutral-secondary',
                             expandable && 'border-b-0'
                         )}
@@ -201,10 +205,9 @@ const ExecutionRows = ({
                         {columns.map((column) => (
                             <TableCell
                                 className={twMerge(
-                                    'py-4 whitespace-nowrap',
-                                    column.pinned && PINNED_COLUMN_CLASS_NAME,
-                                    column.pinned && 'group-hover:bg-surface-brand-secondary',
-                                    column.pinned && !expandable && 'group-even:bg-surface-neutral-secondary',
+                                    EXECUTIONS_TABLE_CELL_CLASS_NAME,
+                                    column.pinned && PINNED_CELL_CLASS_NAME,
+                                    column.pinned && !expandable && PINNED_STRIPED_CELL_CLASS_NAME,
                                     column.cellClassName
                                 )}
                                 key={column.id}
