@@ -1,5 +1,6 @@
 import {getRouter, loadEnvironments, loadProjectWorkflowEditor} from '@/routes';
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
+import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentAccessGuard';
 import Settings, {SettingsNavItemI} from '@/shared/layout/Settings';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -10,7 +11,13 @@ import {MemoryRouter, Route, RouteObject, Routes, useLocation} from 'react-route
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    embeddedScopes: ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE'] as string[],
     isTenantAdmin: false,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => hoisted.embeddedScopes.includes(scope),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -309,17 +316,6 @@ describe('settings route authorities', () => {
         authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
     });
 
-    it('lets only a tenant admin open the embedded MCP Servers page', () => {
-        const router = getRouter(new QueryClient());
-
-        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
-
-        const routes = findRoutesByPath(embeddedRoutes, 'mcp-servers');
-
-        expect(routes).toHaveLength(1);
-        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
-    });
-
     it.each([
         'integrations',
         'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
@@ -330,7 +326,8 @@ describe('settings route authorities', () => {
         'app-events',
         'executions',
         'connections',
-    ])('lets only a tenant admin open the embedded %s page', (path) => {
+        'mcp-servers',
+    ])('testEveryEmbeddedRouteAdmitsUsers %s', (path) => {
         const router = getRouter(new QueryClient());
 
         const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
@@ -338,7 +335,32 @@ describe('settings route authorities', () => {
         const routes = findRoutesByPath(embeddedRoutes, path);
 
         expect(routes).toHaveLength(1);
-        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([
+            AUTHORITIES.ADMIN,
+            AUTHORITIES.USER,
+        ]);
+    });
+
+    it.each(['signing-keys', 'api-keys'])('testEveryEmbeddedRouteAdmitsUsers settings/%s', (path) => {
+        const router = getRouter(new QueryClient());
+
+        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        const routes = findRoutesByPath(embeddedRoutes, path);
+
+        expect(routes).toHaveLength(1);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([
+            AUTHORITIES.ADMIN,
+            AUTHORITIES.USER,
+        ]);
+    });
+
+    it('wraps the embedded routes in the environment access guard', () => {
+        const router = getRouter(new QueryClient());
+
+        const [embeddedRoute] = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        expect((embeddedRoute.element as ReactElement).type).toBe(EmbeddedEnvironmentAccessGuard);
     });
 
     it('lets only a tenant admin open the API Clients page', () => {
@@ -351,6 +373,7 @@ describe('settings route authorities', () => {
 
 describe('settings navigation visibility', () => {
     beforeEach(() => {
+        hoisted.embeddedScopes = ['API_KEY_VIEW', 'EMBEDDED_SETTINGS_MANAGE'];
         hoisted.isTenantAdmin = false;
     });
 
@@ -399,6 +422,16 @@ describe('settings navigation visibility', () => {
 
     it('sends a non-admin from the settings index to the first settings entry they can see', () => {
         expect(resolveSettingsIndexRedirect('/automation/settings')).toBe('/automation/settings/workspace-users');
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/signing-keys');
+    });
+
+    it('sends an embedded member without signing key access to the first settings entry they can see', () => {
+        hoisted.embeddedScopes = ['API_KEY_VIEW'];
+
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/api-keys');
+
+        hoisted.embeddedScopes = [];
+
         expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/mcp-server');
     });
 });
