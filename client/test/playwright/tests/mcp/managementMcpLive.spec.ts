@@ -36,8 +36,9 @@ interface ProjectInfoI {
     id: number;
 }
 
-interface ProjectWorkflowInfoI {
-    workflow_id: string;
+interface WorkflowInfoI {
+    definition: string;
+    id: string;
 }
 
 interface WorkflowDefinitionI {
@@ -82,7 +83,7 @@ test.describe('@live Management MCP', () => {
         }
     });
 
-    const createProjectWorkflow = async () => {
+    const createProject = async () => {
         const workspaces = readStructuredResult<Array<{id: number}>>(await mcpClient.callTool('listWorkspaces', {}));
 
         expect(workspaces.length).toBeGreaterThan(0);
@@ -96,57 +97,80 @@ test.describe('@live Management MCP', () => {
 
         projectIds.push(projectInfo.id);
 
-        const projectWorkflowInfo = readStructuredResult<ProjectWorkflowInfoI>(
-            await mcpClient.callTool('createProjectWorkflow', {
-                name: `mcp_workflow_${getRandomString()}`,
-                projectId: projectInfo.id,
-            })
-        );
-
-        return {projectId: projectInfo.id, workflowId: projectWorkflowInfo.workflow_id, workspaceId: workspaces[0].id};
+        return {projectId: projectInfo.id, workspaceId: workspaces[0].id};
     };
 
-    test('tools/list offers buildWorkflow but no workflow-part tools, and createProjectWorkflow takes a name, not a definition', async () => {
+    const getOnlyWorkflow = async (projectId: number) => {
+        const workflowInfos = readStructuredResult<WorkflowInfoI[]>(
+            await mcpClient.callTool('listWorkflows', {projectId})
+        );
+
+        expect(workflowInfos).toHaveLength(1);
+
+        return workflowInfos[0];
+    };
+
+    test('tools/list offers one authoring path per domain and no near-duplicate tools', async () => {
         const tools = await mcpClient.listTools();
 
         const toolNames = tools.map((tool) => tool.name);
 
-        expect(toolNames).not.toContain('updateWorkflow');
-
-        expect(toolNames).toContain('buildWorkflow');
+        expect(toolNames).toEqual(
+            expect.arrayContaining([
+                'buildWorkflow',
+                'configureMcpServer',
+                'getAiSkill',
+                'getAiSkillFileContent',
+                'getAiSkillFilePaths',
+                'getAiSkills',
+                'getProject',
+                'importWorkflow',
+                'listMcpServers',
+                'listProjects',
+                'listWorkflows',
+                'searchWorkflows',
+            ])
+        );
 
         expect(
             toolNames.filter((toolName) =>
                 [
+                    'cloneMcpProject',
                     'configureClusterElement',
+                    'createAdditionalFilesInSkill',
+                    'createAiSkill',
+                    'createProjectWorkflow',
                     'getActionDefinition',
+                    'getProjectStatus',
                     'getTaskProperties',
                     'listComponents',
+                    'listMcpProjectWorkflows',
                     'listTaskDispatchers',
+                    'removeFileInSkill',
+                    'searchProjects',
+                    'updateAiSkill',
+                    'updateAiSkillContent',
                     'updateClusterElementTask',
                     'updateScriptComponentCode',
+                    'updateWorkflow',
                     'writeScript',
                 ].includes(toolName)
             )
         ).toEqual([]);
 
-        const createProjectWorkflowTool = tools.find((tool) => tool.name === 'createProjectWorkflow');
+        for (const listToolName of ['listProjects', 'listWorkflows']) {
+            const listTool = tools.find((tool) => tool.name === listToolName);
 
-        expect(createProjectWorkflowTool).toBeDefined();
-
-        const inputProperties = Object.keys(createProjectWorkflowTool?.inputSchema?.properties ?? {});
-
-        expect(inputProperties).toContain('name');
-
-        expect(inputProperties).not.toContain('definition');
+            expect(Object.keys(listTool?.inputSchema?.properties ?? {})).toContain('query');
+        }
     });
 
-    test('createProject, createProjectWorkflow and buildWorkflow produce a workflow with a trigger and a task', async () => {
-        const {workflowId, workspaceId} = await createProjectWorkflow();
+    test('createProject and buildWorkflow with the projectId produce a workflow with a trigger and a task', async () => {
+        const {projectId, workspaceId} = await createProject();
 
         const buildResult = await mcpClient.callTool('buildWorkflow', {
             request:
-                `Update the existing workflow with workflowId ${workflowId}: every day at 9:00, fetch ` +
+                `Create a new workflow in the project with projectId ${projectId}: every day at 9:00, fetch ` +
                 'https://example.com/status.json with an HTTP GET request. Use the Schedule and HTTP Client ' +
                 'components. Do not ask questions; choose sensible defaults.',
             workspaceId,
@@ -154,9 +178,7 @@ test.describe('@live Management MCP', () => {
 
         expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
-        const workflowInfo = readStructuredResult<{definition: string}>(
-            await mcpClient.callTool('getWorkflow', {workflowId})
-        );
+        const workflowInfo = await getOnlyWorkflow(projectId);
 
         const workflowDefinition = JSON.parse(workflowInfo.definition) as WorkflowDefinitionI;
 
@@ -166,10 +188,10 @@ test.describe('@live Management MCP', () => {
     });
 
     test('an ambiguous buildWorkflow returns a numbered question and completes once answered', async () => {
-        const {workflowId, workspaceId} = await createProjectWorkflow();
+        const {projectId, workspaceId} = await createProject();
 
         const ambiguousRequest =
-            `Update the existing workflow with workflowId ${workflowId} so that, when a new lead arrives through ` +
+            `Create a new workflow in the project with projectId ${projectId} so that, when a new lead arrives through ` +
             'a webhook trigger, it sends a notification to the #leads channel. Before building, ask me which ' +
             'notification service to use.';
 
@@ -197,11 +219,12 @@ test.describe('@live Management MCP', () => {
         expect(answeredText).not.toMatch(/"error"/);
     });
 
-    test('importWorkflow with a small n8n workflow never returns a question', async () => {
-        const {workflowId, workspaceId} = await createProjectWorkflow();
+    test('importWorkflow with the projectId creates the workflow and never returns a question', async () => {
+        const {projectId, workspaceId} = await createProject();
 
         const importResult = await mcpClient.callTool('importWorkflow', {
-            request: `Import this n8n workflow into the workflow with workflowId ${workflowId}:\n${JSON.stringify(SMALL_N8N_WORKFLOW)}`,
+            projectId,
+            request: `Import this n8n workflow:\n${JSON.stringify(SMALL_N8N_WORKFLOW)}`,
             workspaceId,
         });
 
@@ -210,6 +233,64 @@ test.describe('@live Management MCP', () => {
         expect(toolResultText(importResult)).not.toContain(QUESTION_MARKER);
 
         expect(toolResultText(importResult)).not.toMatch(/"error"/);
+
+        const workflowInfo = await getOnlyWorkflow(projectId);
+
+        const workflowDefinition = JSON.parse(workflowInfo.definition) as WorkflowDefinitionI;
+
+        expect(workflowDefinition.triggers?.length ?? 0).toBeGreaterThan(0);
+    });
+
+    test('importWorkflow with the workflowId converts into the existing workflow without creating another', async () => {
+        const {projectId, workspaceId} = await createProject();
+
+        const buildResult = await mcpClient.callTool('buildWorkflow', {
+            request:
+                `Create a new workflow in the project with projectId ${projectId} with only a manual trigger and ` +
+                'no tasks. Do not ask questions.',
+            workspaceId,
+        });
+
+        expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
+
+        const existingWorkflow = await getOnlyWorkflow(projectId);
+
+        const importResult = await mcpClient.callTool('importWorkflow', {
+            request: `Import this n8n workflow:\n${JSON.stringify(SMALL_N8N_WORKFLOW)}`,
+            workflowId: existingWorkflow.id,
+            workspaceId,
+        });
+
+        expect(importResult.isError ?? false, toolResultText(importResult)).toBe(false);
+
+        expect(toolResultText(importResult)).not.toContain(QUESTION_MARKER);
+
+        const importedWorkflow = await getOnlyWorkflow(projectId);
+
+        expect(importedWorkflow.id).toBe(existingWorkflow.id);
+
+        const workflowDefinition = JSON.parse(importedWorkflow.definition) as WorkflowDefinitionI;
+
+        expect(workflowDefinition.tasks?.length ?? 0).toBeGreaterThan(0);
+    });
+
+    test('importWorkflow with both a projectId and a workflowId is a tool error and creates nothing', async () => {
+        const {projectId, workspaceId} = await createProject();
+
+        const importResult = await mcpClient.callTool('importWorkflow', {
+            projectId,
+            request: `Import this n8n workflow:\n${JSON.stringify(SMALL_N8N_WORKFLOW)}`,
+            workflowId: 'any-workflow-id',
+            workspaceId,
+        });
+
+        expect(toolResultText(importResult)).toContain('not both');
+
+        const workflowInfos = readStructuredResult<WorkflowInfoI[]>(
+            await mcpClient.callTool('listWorkflows', {projectId})
+        );
+
+        expect(workflowInfos).toEqual([]);
     });
 });
 
