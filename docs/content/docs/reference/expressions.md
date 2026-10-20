@@ -318,7 +318,7 @@ Implicit conversion occurs when an input value of one type is used in a context 
 
 | Function | Description |
 |---|---|
-| concat(str1, str2) | Concatenates two strings or two lists. |
+| concat(str1, str2, ...) | Concatenates one or more strings, or one or more lists. All arguments must be strings or all must be lists. |
 | contains(str, substr) | Checks if a string contains a substring. |
 | equalsIgnoreCase(str1, str2) | Compares two strings for equality, ignoring case differences. |
 | format(formatStr, args...) | Formats a string using a format string and arguments (similar to String.format). |
@@ -364,7 +364,7 @@ Implicit conversion occurs when an input value of one type is used in a context 
 |---|---|
 | add(list, element) | Adds an element to a list and returns a new list. |
 | addAll(list1, list2) | Adds all elements from list2 to list1 and returns a new list. |
-| concat(list1, list2) | Concatenates two lists. |
+| concat(list1, list2, ...) | Concatenates one or more lists into a single list, in order. |
 | contains(list, element) | Returns true if list contains the specified element. |
 | flatten(list) | Flattens a list of lists into a single list. |
 | range(start, end) | Creates a list of integers from start to end (inclusive). |
