@@ -35,6 +35,12 @@ final class McpServerTypeDefinitions {
             .collect(Collectors.toMap(McpServerTypeDefinition::getType, Function.identity()));
     }
 
+    boolean isSecretKeyReadableByEditors(PlatformType type) {
+        McpServerTypeDefinition mcpServerTypeDefinition = mcpServerTypeDefinitions.get(type);
+
+        return mcpServerTypeDefinition != null && mcpServerTypeDefinition.isSecretKeyReadableByEditors();
+    }
+
     String resolvePath(PlatformType type, String secretKey) {
         McpServerTypeDefinition mcpServerTypeDefinition = mcpServerTypeDefinitions.get(type);
 
