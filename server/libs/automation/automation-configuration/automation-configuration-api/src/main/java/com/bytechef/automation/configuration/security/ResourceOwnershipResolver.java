@@ -63,10 +63,22 @@ public interface ResourceOwnershipResolver {
      * Owning coordinates of a resource. A resolver may populate {@code workspaceId} (workspace-mapped resources),
      * {@code ownerUserId} (user-owned resources), or both.
      */
-    record ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
+    record ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded) {
+
+        public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
+            this(workspaceId, ownerUserId, false);
+        }
 
         public static ResourceOwner unknown() {
             return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty());
+        }
+
+        public static ResourceOwner ofEmbedded() {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty(), true);
+        }
+
+        public static ResourceOwner ofEmbedded(long ownerUserId) {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.of(ownerUserId), true);
         }
 
         public static ResourceOwner ofWorkspace(long workspaceId) {
@@ -79,6 +91,10 @@ public interface ResourceOwnershipResolver {
 
         public static ResourceOwner of(OptionalLong workspaceId, OptionalLong ownerUserId) {
             return new ResourceOwner(workspaceId, ownerUserId);
+        }
+
+        public boolean isUnknown() {
+            return workspaceId.isEmpty() && ownerUserId.isEmpty() && !embedded;
         }
     }
 }
