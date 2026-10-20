@@ -46,8 +46,25 @@ public class EmbeddedPrincipalEnvironmentResolver {
     }
 
     public Optional<Environment> fetchEnvironment(long principalId, Predicate<IntegrationWorkflow> workflowMatcher) {
-        Optional<Environment> instanceEnvironment = fetchInstanceEnvironment(principalId, workflowMatcher);
-        Optional<Environment> configurationEnvironment = fetchConfigurationEnvironment(principalId, workflowMatcher);
+        return fetchEnvironment(principalId, workflowMatcher, true);
+    }
+
+    public Optional<Environment> fetchInstanceEnvironment(
+        long principalId, Predicate<IntegrationWorkflow> workflowMatcher) {
+
+        return fetchEnvironment(principalId, workflowMatcher, false);
+    }
+
+    private Optional<Environment> fetchEnvironment(
+        long principalId, Predicate<IntegrationWorkflow> workflowMatcher, boolean includeConfiguration) {
+
+        Optional<Environment> instanceEnvironment = fetchInstanceCandidate(principalId, workflowMatcher);
+
+        if (!includeConfiguration) {
+            return instanceEnvironment;
+        }
+
+        Optional<Environment> configurationEnvironment = fetchConfigurationCandidate(principalId, workflowMatcher);
 
         if (instanceEnvironment.isPresent() && configurationEnvironment.isPresent()) {
             return instanceEnvironment.equals(configurationEnvironment) ? instanceEnvironment : Optional.empty();
@@ -56,38 +73,37 @@ public class EmbeddedPrincipalEnvironmentResolver {
         return instanceEnvironment.isPresent() ? instanceEnvironment : configurationEnvironment;
     }
 
-    private Optional<Environment> fetchInstanceEnvironment(
+    private Optional<Environment> fetchInstanceCandidate(
         long principalId, Predicate<IntegrationWorkflow> workflowMatcher) {
 
         return integrationInstanceService.getIntegrationInstances(List.of(principalId))
             .stream()
             .findFirst()
             .map(IntegrationInstance::getIntegrationInstanceConfigurationId)
-            .flatMap(configurationId -> fetchConfigurationEnvironment(configurationId, workflowMatcher));
+            .flatMap(configurationId -> fetchConfigurationCandidate(configurationId, workflowMatcher));
     }
 
-    private Optional<Environment> fetchConfigurationEnvironment(
+    private Optional<Environment> fetchConfigurationCandidate(
         long configurationId, Predicate<IntegrationWorkflow> workflowMatcher) {
 
         return integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of(configurationId))
             .stream()
             .findFirst()
-            .filter(configuration -> belongsToIntegrationVersion(configuration, workflowMatcher))
+            .filter(configuration -> belongsToIntegration(configuration, workflowMatcher))
             .map(IntegrationInstanceConfiguration::getEnvironment);
     }
 
-    private boolean belongsToIntegrationVersion(
+    private boolean belongsToIntegration(
         IntegrationInstanceConfiguration configuration, Predicate<IntegrationWorkflow> workflowMatcher) {
 
         Long integrationId = configuration.getIntegrationId();
-        Integer integrationVersion = configuration.getIntegrationVersion();
 
-        if (Objects.isNull(integrationId) || Objects.isNull(integrationVersion)) {
+        if (Objects.isNull(integrationId)) {
             return false;
         }
 
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
-            integrationId, integrationVersion);
+            integrationId);
 
         return integrationWorkflows.stream()
             .anyMatch(workflowMatcher);

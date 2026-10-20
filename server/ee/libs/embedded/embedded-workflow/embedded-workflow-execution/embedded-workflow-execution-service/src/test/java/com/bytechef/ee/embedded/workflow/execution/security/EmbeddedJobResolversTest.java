@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,7 +73,8 @@ class EmbeddedJobResolversTest {
 
     @Test
     void testARuntimeJobTakesItsInstanceConfigurationsEnvironment() {
-        givenConfiguration(20L, 1L, 3, Environment.STAGING, true);
+        givenConfiguration(20L, 1L, Environment.STAGING);
+        givenIntegrationWorkflows(1L, WORKFLOW_ID);
         givenInstance(10L, 20L);
 
         when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(10L));
@@ -83,7 +85,8 @@ class EmbeddedJobResolversTest {
 
     @Test
     void testAConfigurationTestJobTakesTheConfigurationsEnvironment() {
-        givenConfiguration(20L, 1L, 3, Environment.DEVELOPMENT, true);
+        givenConfiguration(20L, 1L, Environment.DEVELOPMENT);
+        givenIntegrationWorkflows(1L, WORKFLOW_ID);
 
         when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(20L));
 
@@ -91,9 +94,23 @@ class EmbeddedJobResolversTest {
     }
 
     @Test
-    void testAnAmbiguousPrincipalHasNoEnvironment() {
-        givenConfiguration(20L, 1L, 3, Environment.STAGING, true);
-        givenConfiguration(10L, 1L, 3, Environment.PRODUCTION, true);
+    void testAnOldRunStillTakesItsInstanceEnvironmentAfterAnUpgrade() {
+        givenConfiguration(20L, 1L, Environment.PRODUCTION);
+        givenConfiguration(10L, 2L, Environment.DEVELOPMENT);
+        givenIntegrationWorkflows(1L, WORKFLOW_ID, "wf-1-v2");
+        givenIntegrationWorkflows(2L, "unrelated");
+        givenInstance(10L, 20L);
+
+        when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(10L));
+
+        assertThat(environmentResolver.fetchEnvironment(JOB_ID)).contains(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testACollidingConfigurationOfTheSameIntegrationMakesTheEnvironmentEmpty() {
+        givenConfiguration(20L, 1L, Environment.STAGING);
+        givenConfiguration(10L, 1L, Environment.PRODUCTION);
+        givenIntegrationWorkflows(1L, WORKFLOW_ID);
         givenInstance(10L, 20L);
 
         when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(10L));
@@ -102,11 +119,33 @@ class EmbeddedJobResolversTest {
     }
 
     @Test
-    void testAJobWhoseWorkflowIsOutsideTheIntegrationVersionHasNoEnvironment() {
-        givenConfiguration(20L, 1L, 3, Environment.STAGING, false);
+    void testBothMatchingWithTheSameEnvironmentGiveThatEnvironment() {
+        givenConfiguration(20L, 1L, Environment.STAGING);
+        givenConfiguration(10L, 1L, Environment.STAGING);
+        givenIntegrationWorkflows(1L, WORKFLOW_ID);
         givenInstance(10L, 20L);
 
         when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(10L));
+
+        assertThat(environmentResolver.fetchEnvironment(JOB_ID)).contains(Environment.STAGING);
+    }
+
+    @Test
+    void testAJobWhoseWorkflowIsOutsideTheIntegrationHasNoEnvironment() {
+        givenConfiguration(20L, 1L, Environment.STAGING);
+        givenIntegrationWorkflows(1L, "other");
+        givenInstance(10L, 20L);
+
+        when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(10L));
+
+        assertThat(environmentResolver.fetchEnvironment(JOB_ID)).isEmpty();
+    }
+
+    @Test
+    void testAConfigurationWithoutAnIntegrationHasNoEnvironment() {
+        givenConfiguration(20L, null, Environment.STAGING);
+
+        when(principalJobService.fetchJobPrincipalId(JOB_ID, PlatformType.EMBEDDED)).thenReturn(Optional.of(20L));
 
         assertThat(environmentResolver.fetchEnvironment(JOB_ID)).isEmpty();
     }
@@ -119,24 +158,25 @@ class EmbeddedJobResolversTest {
         assertThat(ownershipResolver.resolveOwner(JOB_ID)).isEqualTo(ResourceOwner.unknown());
     }
 
-    private void givenConfiguration(
-        long id, long integrationId, int integrationVersion, Environment environment, boolean containsWorkflow) {
-
+    private void givenConfiguration(long id, Long integrationId, Environment environment) {
         IntegrationInstanceConfiguration configuration = new IntegrationInstanceConfiguration();
 
         configuration.setEnvironment(environment);
         configuration.setId(id);
         configuration.setIntegrationId(integrationId);
-        configuration.setIntegrationVersion(integrationVersion);
 
         when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of(id)))
             .thenReturn(List.of(configuration));
+    }
 
-        String workflowId = containsWorkflow ? WORKFLOW_ID : "other";
+    private void givenIntegrationWorkflows(long integrationId, String... workflowIds) {
+        List<IntegrationWorkflow> integrationWorkflows = new ArrayList<>();
 
-        when(integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion))
-            .thenReturn(
-                List.of(new IntegrationWorkflow(integrationId, integrationVersion, workflowId, UUID.randomUUID())));
+        for (String workflowId : workflowIds) {
+            integrationWorkflows.add(new IntegrationWorkflow(integrationId, 1, workflowId, UUID.randomUUID()));
+        }
+
+        when(integrationWorkflowService.getIntegrationWorkflows(integrationId)).thenReturn(integrationWorkflows);
     }
 
     private void givenInstance(long id, long configurationId) {

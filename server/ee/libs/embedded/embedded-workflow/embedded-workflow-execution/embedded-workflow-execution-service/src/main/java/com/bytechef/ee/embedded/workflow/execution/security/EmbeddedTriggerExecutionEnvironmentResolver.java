@@ -68,7 +68,11 @@ public class EmbeddedTriggerExecutionEnvironmentResolver implements ResourceEnvi
 
         String workflowUuid = workflowExecutionId.getWorkflowUuid();
 
-        return embeddedPrincipalEnvironmentResolver.fetchEnvironment(
+        if (workflowUuid == null) {
+            return Optional.empty();
+        }
+
+        return embeddedPrincipalEnvironmentResolver.fetchInstanceEnvironment(
             workflowExecutionId.getJobPrincipalId(),
             integrationWorkflow -> workflowUuid.equalsIgnoreCase(integrationWorkflow.getUuidAsString()));
     }

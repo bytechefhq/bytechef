@@ -67,7 +67,6 @@ class EmbeddedTriggerExecutionResolversTest {
         configuration.setEnvironment(Environment.STAGING);
         configuration.setId(20L);
         configuration.setIntegrationId(1L);
-        configuration.setIntegrationVersion(3);
 
         IntegrationInstance instance = new IntegrationInstance();
 
@@ -77,13 +76,47 @@ class EmbeddedTriggerExecutionResolversTest {
         when(integrationInstanceService.getIntegrationInstances(List.of(10L))).thenReturn(List.of(instance));
         when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of(20L)))
             .thenReturn(List.of(configuration));
-        when(integrationWorkflowService.getIntegrationWorkflows(1L, 3))
+        when(integrationWorkflowService.getIntegrationWorkflows(1L))
             .thenReturn(List.of(new IntegrationWorkflow(1L, 3, "wf-1", workflowUuid)));
 
         givenTriggerExecution(PlatformType.EMBEDDED, 10L, workflowUuid);
 
         assertThat(environmentResolver.fetchEnvironment(TRIGGER_EXECUTION_ID)).contains(Environment.STAGING);
         assertThat(ownershipResolver.resolveOwner(TRIGGER_EXECUTION_ID)).isEqualTo(ResourceOwner.ofEmbedded());
+    }
+
+    @Test
+    void testATriggerExecutionNeverUsesAConfigurationId() {
+        UUID workflowUuid = UUID.randomUUID();
+
+        IntegrationInstanceConfiguration configuration = new IntegrationInstanceConfiguration();
+
+        configuration.setEnvironment(Environment.STAGING);
+        configuration.setId(10L);
+        configuration.setIntegrationId(1L);
+
+        when(integrationInstanceService.getIntegrationInstances(List.of(10L))).thenReturn(List.of());
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of(10L)))
+            .thenReturn(List.of(configuration));
+        when(integrationWorkflowService.getIntegrationWorkflows(1L))
+            .thenReturn(List.of(new IntegrationWorkflow(1L, 3, "wf-1", workflowUuid)));
+
+        givenTriggerExecution(PlatformType.EMBEDDED, 10L, workflowUuid);
+
+        assertThat(environmentResolver.fetchEnvironment(TRIGGER_EXECUTION_ID)).isEmpty();
+    }
+
+    @Test
+    void testATriggerExecutionWithoutAWorkflowUuidHasNoEnvironment() {
+        TriggerExecution triggerExecution = mock(TriggerExecution.class);
+        WorkflowExecutionId workflowExecutionId = mock(WorkflowExecutionId.class);
+
+        when(workflowExecutionId.getType()).thenReturn(PlatformType.EMBEDDED);
+        when(triggerExecution.getWorkflowExecutionId()).thenReturn(workflowExecutionId);
+        when(triggerExecutionService.getTriggerExecutions(List.of(TRIGGER_EXECUTION_ID)))
+            .thenReturn(List.of(triggerExecution));
+
+        assertThat(environmentResolver.fetchEnvironment(TRIGGER_EXECUTION_ID)).isEmpty();
     }
 
     @Test
