@@ -1,15 +1,14 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
@@ -196,23 +195,21 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                     <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                                 </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="p-0">
+                                <DropdownMenuContent align="end">
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item"
+                                        icon={<EditIcon />}
+                                        label="Edit"
                                         onClick={() => setShowEditDialog(true)}
-                                    >
-                                        <EditIcon /> Edit
-                                    </DropdownMenuItem>
+                                    />
 
-                                    <DropdownMenuSeparator className="m-0" />
+                                    <DropdownMenuSeparator />
 
                                     {connection.active === true && (
                                         <DropdownMenuItem
-                                            className="dropdown-menu-item"
+                                            icon={<Link2OffIcon />}
+                                            label="Disconnect from all"
                                             onClick={() => setShowDisconnectDialog(true)}
-                                        >
-                                            <Link2OffIcon /> Disconnect from all
-                                        </DropdownMenuItem>
+                                        />
                                     )}
 
                                     <div
@@ -223,17 +220,12 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                         }
                                     >
                                         <DropdownMenuItem
-                                            className={
-                                                connection.active === true
-                                                    ? 'dropdown-menu-item-destructive-disabled'
-                                                    : 'dropdown-menu-item-destructive'
-                                            }
                                             disabled={connection.active}
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
                                             onClick={() => setShowDeleteDialog(true)}
                                             variant="destructive"
-                                        >
-                                            <Trash2Icon /> Delete
-                                        </DropdownMenuItem>
+                                        />
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
