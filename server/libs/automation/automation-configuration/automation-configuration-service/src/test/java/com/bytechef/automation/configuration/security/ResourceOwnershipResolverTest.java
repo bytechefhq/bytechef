@@ -77,8 +77,8 @@ class ResourceOwnershipResolverTest {
 
     private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of(
         "AutomationWorkflowProject", "AutomationWorkflowProjectWorkflow", "ConnectedUser",
-        "ConnectedUserProjectWorkflow", "Integration", "IntegrationInstance", "IntegrationInstanceConfiguration",
-        "IntegrationWorkflow", "McpIntegrationInstanceConfiguration", "McpIntegrationInstanceConfigurationWorkflow",
+        "ConnectedUserProjectWorkflow", "IntegrationInstance", "IntegrationInstanceConfiguration",
+        "McpIntegrationInstanceConfiguration", "McpIntegrationInstanceConfigurationWorkflow",
         "McpIntegrationInstanceTool", "SigningKey");
 
     private static final Pattern OWNERSHIP_RESOLVER_DECLARATION =

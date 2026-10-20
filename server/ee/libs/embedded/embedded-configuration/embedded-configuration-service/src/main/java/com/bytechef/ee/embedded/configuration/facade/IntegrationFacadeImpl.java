@@ -115,7 +115,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "name", value = "#integrationDTO.name"),
         @AuditData(key = "componentName", value = "#integrationDTO.componentName")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_CREATE')")
     public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
@@ -141,7 +141,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Audited(event = IntegrationAuditEvents.INTEGRATION_DELETED, data = {
         @AuditData(key = "integrationId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'INTEGRATION_DELETE')")
     public void deleteIntegration(long id) {
         integrationService.getIntegration(id);
 
@@ -185,7 +185,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -196,14 +196,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public List<IntegrationVersion> getIntegrationVersions(long id) {
         return integrationService.getIntegrationVersions(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<IntegrationDTO> getIntegrations(
         Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
         boolean includeAllFields) {
@@ -296,7 +296,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#id"),
         @AuditData(key = "integrationVersion", value = "#result")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and "
+        + "hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')")
     public int publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
@@ -398,7 +399,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#integrationDTO.id"),
         @AuditData(key = "name", value = "#integrationDTO.name")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationDTO.id, 'Integration', 'WORKFLOW_EDIT')")
     public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
