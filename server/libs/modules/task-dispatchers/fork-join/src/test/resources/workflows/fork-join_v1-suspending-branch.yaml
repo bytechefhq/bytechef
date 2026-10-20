@@ -1,0 +1,19 @@
+---
+label: "Fork/join with a suspending branch"
+tasks:
+- name: "forkJoin_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "requestApproval"
+        type: "suspend/v1"
+      - name: "afterApproval"
+        type: "var/v1/set"
+        parameters:
+          value: "approved"
+    - - name: "waitForSuspend"
+        type: "waitForSuspend/v1"
+      - name: "siblingAfterSuspend"
+        type: "var/v1/set"
+        parameters:
+          value: "sibling ran"

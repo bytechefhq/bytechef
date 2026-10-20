@@ -42,6 +42,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.event.JobDeletedEvent;
@@ -430,6 +431,24 @@ class JobSyncExecutorIntTest {
 
         assertThat(executedJobIds).isEmpty();
         assertThat(observedMessageBroker.getReceiverFailures()).isEmpty();
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForSuspendedJobIsExecuted() {
+        long jobId = runJobToCompletion(OUTPUT_WORKFLOW_ID);
+
+        sendWorkerTaskExecutionEvent(jobId, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+        assertThat(executedJobIds).containsExactly(jobId);
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForStoppedJobIsSkipped() {
+        long jobId = runJobToCompletion(OUTPUT_WORKFLOW_ID);
+
+        sendWorkerTaskExecutionEvent(jobId, Map.of());
+
+        assertThat(executedJobIds).isEmpty();
     }
 
     @Test
@@ -960,6 +979,33 @@ class JobSyncExecutorIntTest {
         job = jobService.update(job);
 
         return Objects.requireNonNull(job.getId());
+    }
+
+    private void sendWorkerTaskExecutionEvent(long jobId, Map<String, Object> jobMetadata) {
+        long taskExecutionId = getTaskExecutionId(jobId, "greeting");
+
+        observedMessageBroker.awaitQuiescence();
+
+        Job job = jobService.getJob(jobId);
+
+        job.setMetadata(jobMetadata);
+        job.setStatus(Job.Status.STOPPED);
+
+        jobService.update(job);
+
+        executedJobIds.clear();
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(taskExecutionId)
+            .jobId(jobId)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of("name", "greeting", "type", "test/v1/output", "parameters", Map.of("value", "hello"))))
+            .build();
+
+        send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, new TaskExecutionEvent(taskExecution));
+
+        observedMessageBroker.awaitQuiescence();
     }
 
     private Job.Status getJobStatus(long jobId) {

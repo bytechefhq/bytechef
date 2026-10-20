@@ -28,12 +28,14 @@ import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -45,14 +47,17 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     private static final Logger log = LoggerFactory.getLogger(SuspendTaskDispatcherPreSendProcessor.class);
 
     private final JobService jobService;
+    private final JobSuspender jobSuspender;
     private final TaskStateService taskStateService;
     private final @Nullable TriggerScheduler triggerScheduler;
 
     @SuppressFBWarnings("EI")
     public SuspendTaskDispatcherPreSendProcessor(
-        JobService jobService, TaskStateService taskStateService, @Nullable TriggerScheduler triggerScheduler) {
+        ApplicationEventPublisher eventPublisher, JobService jobService, TaskStateService taskStateService,
+        @Nullable TriggerScheduler triggerScheduler) {
 
         this.jobService = jobService;
+        this.jobSuspender = new JobSuspender(eventPublisher, jobService, taskStateService, triggerScheduler);
         this.taskStateService = taskStateService;
         this.triggerScheduler = triggerScheduler;
     }
@@ -61,7 +66,18 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     public boolean canProcess(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        return job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null;
+        if (job.getMetadata(MetadataConstants.JOB_RESUME_ID) == null) {
+            return false;
+        }
+
+        Object taskExecutionResumeId = job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (taskExecutionResumeId == null) {
+            return true;
+        }
+
+        return taskExecutionResumeId instanceof Number number &&
+            Objects.equals(number.longValue(), taskExecution.getId());
     }
 
     @Override
@@ -106,6 +122,8 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
         jobService.update(job);
 
         taskStateService.delete(jobResumeId);
+
+        jobSuspender.suspendOnNextQueuedSuspend(Validate.notNull(job.getId(), "id"));
 
         return taskExecution;
     }

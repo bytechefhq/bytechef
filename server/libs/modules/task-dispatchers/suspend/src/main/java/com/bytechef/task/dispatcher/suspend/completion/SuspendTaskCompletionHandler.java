@@ -16,7 +16,6 @@
 
 package com.bytechef.task.dispatcher.suspend.completion;
 
-import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
@@ -31,14 +30,17 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.JobSuspends;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
+import com.bytechef.task.dispatcher.suspend.JobSuspender;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -51,20 +53,29 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
     private static final Logger log = LoggerFactory.getLogger(SuspendTaskCompletionHandler.class);
 
     private final ContextService contextService;
-    private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
+    private final JobSuspender jobSuspender;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final TaskStateService taskStateService;
 
-    @SuppressFBWarnings("EI")
     public SuspendTaskCompletionHandler(
         ContextService contextService, ApplicationEventPublisher eventPublisher, JobService jobService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateService taskStateService) {
 
+        this(
+            contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateService, null);
+    }
+
+    @SuppressFBWarnings("EI")
+    public SuspendTaskCompletionHandler(
+        ContextService contextService, ApplicationEventPublisher eventPublisher, JobService jobService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TaskStateService taskStateService,
+        @Nullable TriggerScheduler triggerScheduler) {
+
         this.contextService = contextService;
-        this.eventPublisher = eventPublisher;
         this.jobService = jobService;
+        this.jobSuspender = new JobSuspender(eventPublisher, jobService, taskStateService, triggerScheduler);
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.taskStateService = taskStateService;
@@ -121,29 +132,7 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         taskStateService.save(jobResumeId, suspend);
 
-        Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
-
-        jobMetadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
-        jobMetadata.put(
-            MetadataConstants.APPROVAL_RESUME,
-            MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.APPROVAL_RESUME, false));
-        jobMetadata.put(
-            MetadataConstants.STREAMING_RESUME,
-            MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.STREAMING_RESUME, false));
-        jobMetadata.put(
-            MetadataConstants.SUBFLOW_RESUME,
-            MapUtils.getBoolean(suspend.continueParameters(), MetadataConstants.SUBFLOW_RESUME, false));
-        jobMetadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, taskExecution.getId());
-
-        job = jobService.getJob(jobId);
-
-        job.setMetadata(jobMetadata);
-
-        jobService.update(job);
-
-        jobService.setStatusToStopped(jobId);
-
-        eventPublisher.publishEvent(JobStatusApplicationEvent.suspended(jobId));
+        jobSuspender.suspend(jobId, Validate.notNull(taskExecution.getId(), "id"), jobResumeIdString, suspend);
 
         if (log.isDebugEnabled()) {
             log.debug("Suspend completion handler completed for job id={}", jobId);

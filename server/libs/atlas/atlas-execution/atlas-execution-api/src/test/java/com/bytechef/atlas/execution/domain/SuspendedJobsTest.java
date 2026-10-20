@@ -76,4 +76,64 @@ class SuspendedJobsTest {
 
         return job;
     }
+
+    @Test
+    void testStoppedJobWithResumeIdIsSuspended() {
+        Job job = createJob(Job.Status.STOPPED, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+        assertThat(SuspendedJobs.isSuspended(job)).isTrue();
+        assertThat(SuspendedJobs.canRunTasks(job)).isTrue();
+    }
+
+    @Test
+    void testStoppedJobWithoutResumeIdIsNotSuspended() {
+        Job job = createJob(Job.Status.STOPPED, Map.of());
+
+        assertThat(SuspendedJobs.isSuspended(job)).isFalse();
+        assertThat(SuspendedJobs.canRunTasks(job)).isFalse();
+    }
+
+    @Test
+    void testStartedJobCanRunTasks() {
+        Job job = createJob(Job.Status.STARTED, Map.of());
+
+        assertThat(SuspendedJobs.isSuspended(job)).isFalse();
+        assertThat(SuspendedJobs.canRunTasks(job)).isTrue();
+    }
+
+    @Test
+    void testEndedJobsCannotRunTasksEvenWithAResumeId() {
+        for (Job.Status status : new Job.Status[] {
+            Job.Status.CANCELLED, Job.Status.COMPLETED, Job.Status.FAILED
+        }) {
+            Job job = createJob(status, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+            assertThat(SuspendedJobs.canRunTasks(job)).isFalse();
+        }
+    }
+
+    @Test
+    void testSuspendedTaskExecutionIdIsThePendingSuspendsTaskExecution() {
+        Job job = createJob(
+            Job.Status.STARTED,
+            Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id", SuspendedJobs.TASK_EXECUTION_RESUME_ID, 7));
+
+        assertThat(SuspendedJobs.getSuspendedTaskExecutionId(job)).isEqualTo(7L);
+    }
+
+    @Test
+    void testSuspendedTaskExecutionIdIsNullOnceTheSuspendWasConsumed() {
+        Job job = createJob(Job.Status.STARTED, Map.of(SuspendedJobs.TASK_EXECUTION_RESUME_ID, 7L));
+
+        assertThat(SuspendedJobs.getSuspendedTaskExecutionId(job)).isNull();
+    }
+
+    private static Job createJob(Job.Status status, Map<String, Object> metadata) {
+        Job job = new Job();
+
+        job.setMetadata(metadata);
+        job.setStatus(status);
+
+        return job;
+    }
 }
