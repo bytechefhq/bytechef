@@ -64,6 +64,8 @@ public interface McpServerService {
 
     String getMcpServerSecretKey(long mcpServerId);
 
+    String getEditableMcpServerSecretKey(long mcpServerId);
+
     Optional<McpServer> fetchMcpServer(String secretKey);
 
     /**
