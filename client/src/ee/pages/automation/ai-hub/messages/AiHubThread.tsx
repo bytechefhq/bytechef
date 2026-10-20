@@ -73,6 +73,7 @@ const ThreadScrollToBottom: FC = () => (
 interface AiHubThreadProps {
     /** Reserves room on the right for the floating artifacts card, inside the scroll viewport. */
     contentInsetRight?: boolean;
+    /** Shows the sample-question chips on an empty thread; off for a workflow chat, whose turns run a workflow. */
     showSuggestions?: boolean;
 }
 

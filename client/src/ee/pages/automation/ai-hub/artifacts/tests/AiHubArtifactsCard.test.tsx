@@ -8,8 +8,13 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AiHubChatArtifactI} from '../../chats/api/chats.api';
 import AiHubArtifactsCard from '../AiHubArtifactsCard';
 
-const {mockUseAiHubChatArtifactsQuery} = vi.hoisted(() => ({
+const {currentChatKindRef, mockUseAiHubChatArtifactsQuery} = vi.hoisted(() => ({
+    currentChatKindRef: {current: 'STANDARD' as 'STANDARD' | 'WORKFLOW_CHAT'},
     mockUseAiHubChatArtifactsQuery: vi.fn(),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat', () => ({
+    default: () => ({id: 7, kind: currentChatKindRef.current}),
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
@@ -64,6 +69,7 @@ const renderCard = () =>
 
 describe('AiHubArtifactsCard', () => {
     beforeEach(() => {
+        currentChatKindRef.current = 'STANDARD';
         mockUseAiHubChatArtifactsQuery.mockReturnValue({data: WORKFLOW_ARTIFACTS});
 
         aiHubChatsStore.setState({currentChatId: 7});
@@ -138,5 +144,14 @@ describe('AiHubArtifactsCard', () => {
         const {container} = renderCard();
 
         expect(container).toBeEmptyDOMElement();
+    });
+
+    it('renders nothing and does not load artifacts for a workflow chat', () => {
+        currentChatKindRef.current = 'WORKFLOW_CHAT';
+
+        const {container} = renderCard();
+
+        expect(container).toBeEmptyDOMElement();
+        expect(mockUseAiHubChatArtifactsQuery).toHaveBeenLastCalledWith(7, 1, false);
     });
 });

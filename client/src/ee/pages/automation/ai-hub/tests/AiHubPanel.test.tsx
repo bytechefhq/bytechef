@@ -11,26 +11,37 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {launcherSelectMock, mockArchivedChatsDataRef, mockChatsDataRef, modelPickerPropsRef, unarchiveMutateMock} =
-    vi.hoisted(() => ({
-        launcherSelectMock: vi.fn(),
-        mockArchivedChatsDataRef: {current: [] as AiHubChatI[]},
-        mockChatsDataRef: {current: [] as AiHubChatI[]},
-        modelPickerPropsRef: {
-            current: undefined as
-                | {
-                      onSelectWorkflowChat?: unknown;
-                      selectedModel: string | null;
-                      selectedProvider: string | null;
-                      workflowChats?: unknown;
-                  }
-                | undefined,
-        },
-        unarchiveMutateMock: vi.fn(),
-    }));
+const {
+    launcherSelectMock,
+    mockArchivedChatsDataRef,
+    mockChatsDataRef,
+    modelPickerPropsRef,
+    threadPropsRef,
+    unarchiveMutateMock,
+} = vi.hoisted(() => ({
+    launcherSelectMock: vi.fn(),
+    mockArchivedChatsDataRef: {current: [] as AiHubChatI[]},
+    mockChatsDataRef: {current: [] as AiHubChatI[]},
+    modelPickerPropsRef: {
+        current: undefined as
+            | {
+                  onSelectWorkflowChat?: unknown;
+                  selectedModel: string | null;
+                  selectedProvider: string | null;
+                  workflowChats?: unknown;
+              }
+            | undefined,
+    },
+    threadPropsRef: {current: undefined as {showSuggestions?: boolean} | undefined},
+    unarchiveMutateMock: vi.fn(),
+}));
 
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubThread', () => ({
-    default: () => <div data-testid="ai-hub-thread" />,
+    default: (props: {showSuggestions?: boolean}) => {
+        threadPropsRef.current = props;
+
+        return <div data-testid="ai-hub-thread" />;
+    },
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({
@@ -203,6 +214,29 @@ describe('AiHubPanel', () => {
             onSelectWorkflowChat: launcherSelectMock,
             workflowChats: [{label: 'Acme — Support', projectDeploymentId: '5', workflowExecutionId: 'exec-1'}],
         });
+    });
+
+    it('hides the model picker and the suggestions in a workflow chat and shows the workflow badge', () => {
+        mockChatsDataRef.current = [buildChat({id: 41, kind: 'WORKFLOW_CHAT', title: 'Acme — Support'})];
+        aiHubChatsStore.getState().setCurrentChatId(41);
+        modelPickerPropsRef.current = undefined;
+
+        renderPanel();
+
+        expect(screen.getByTestId('ai-hub-composer')).toBeInTheDocument();
+        expect(screen.queryByTestId('model-picker')).toBeNull();
+        expect(screen.getByText('Workflow chat')).toBeInTheDocument();
+        expect(threadPropsRef.current?.showSuggestions).toBe(false);
+    });
+
+    it('shows no workflow badge and keeps the suggestions in a standard chat', () => {
+        mockChatsDataRef.current = [buildChat({id: 41, title: 'Some chat'})];
+        aiHubChatsStore.getState().setCurrentChatId(41);
+
+        renderPanel();
+
+        expect(screen.queryByText('Workflow chat')).toBeNull();
+        expect(threadPropsRef.current?.showSuggestions).toBe(true);
     });
 
     it('opens the resource panel from the header', async () => {

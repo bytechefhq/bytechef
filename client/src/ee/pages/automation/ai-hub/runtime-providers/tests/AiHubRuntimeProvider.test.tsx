@@ -29,6 +29,7 @@ import {
     getOptimisticTurnMarker,
     hasLivePropertyOptionPicker,
     invalidateWorkflowQueries,
+    isCachedWorkflowChat,
     isForbiddenTurnError,
     isTurnInFlightError,
     projectMessagesWithToolCalls,
@@ -46,7 +47,8 @@ import type {
     ToolCallStartEvent,
 } from '@ag-ui/core';
 
-vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', () => ({
+vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/ee/pages/automation/ai-hub/chats/api/chats.api')>()),
     createAiHubChat: vi.fn(),
     generateAiHubChatTitle: vi.fn(),
     patchChat: vi.fn(),
@@ -130,6 +132,11 @@ const makeRunStartedParams = (): {event: RunStartedEvent} & SubscriberParamsBase
 });
 
 type RunErrorParamsType = Parameters<NonNullable<AgentSubscriber['onRunErrorEvent']>>[0];
+
+type CustomEventParamsType = Parameters<NonNullable<AgentSubscriber['onCustomEvent']>>[0];
+
+const makeCustomEventParams = (name: string, value: unknown) =>
+    ({...baseSubscriberParams, event: {name, type: EventType.CUSTOM, value}}) as CustomEventParamsType;
 
 const makeRunErrorParams = (message: string) => ({event: {message}}) as RunErrorParamsType;
 
@@ -655,6 +662,128 @@ describe('buildAiHubSubscriber', () => {
             expect(onSettle).toHaveBeenCalledOnce();
             expect(aiHubRunStateStore.getState().runningByChat['thread-1']).toBe(false);
             expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
+        });
+    });
+
+    describe('ask-workflow-question', () => {
+        const workflowQuestion = {
+            header: 'Plan',
+            options: [{description: 'Monthly billing', label: 'Monthly'}, {label: 'Yearly'}],
+            question: 'Which plan?',
+        };
+
+        it('routes the question into the question card and keeps the chat paused for the answer', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            aiHubChatsStore.getState().setActivityState('thread-1', 'running');
+
+            subscriber.onCustomEvent!(
+                makeCustomEventParams('ask-workflow-question', {
+                    questions: [workflowQuestion],
+                    resumeUrl: 'http://localhost/resume/1',
+                })
+            );
+
+            expect(addMessage).toHaveBeenCalledWith({
+                content: [
+                    {
+                        data: {
+                            awaitingAnswer: true,
+                            kind: 'ask-user-question',
+                            questions: [{...workflowQuestion, multiSelect: false}],
+                        },
+                        type: 'data-ask-user-question',
+                    },
+                ],
+                role: 'assistant',
+            });
+            expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBe('paused');
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBe('paused');
+        });
+
+        it('shows a question without a resume link but does not wait for an answer', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            aiHubChatsStore.getState().setActivityState('thread-1', 'running');
+
+            subscriber.onCustomEvent!(
+                makeCustomEventParams('ask-workflow-question', {
+                    questions: [{...workflowQuestion, multiSelect: true}],
+                })
+            );
+
+            expect(addMessage.mock.calls[0]![0].content[0]).toEqual({
+                data: {
+                    awaitingAnswer: false,
+                    kind: 'ask-user-question',
+                    questions: [{...workflowQuestion, multiSelect: true}],
+                },
+                type: 'data-ask-user-question',
+            });
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
+        });
+
+        it('ignores a malformed question, another custom event, and a question for a chat no longer shown', () => {
+            const addMessage = vi.fn();
+            const subscriber = createSubscriber({addMessage});
+
+            subscriber.onCustomEvent!(makeCustomEventParams('ask-workflow-question', {questions: 'nope'}));
+            subscriber.onCustomEvent!(makeCustomEventParams('workflow-event', {questions: [workflowQuestion]}));
+
+            aiHubStore.setState({chatId: 'thread-2'});
+
+            subscriber.onCustomEvent!(makeCustomEventParams('ask-workflow-question', {questions: [workflowQuestion]}));
+
+            expect(addMessage).not.toHaveBeenCalled();
+            expect(aiHubChatsStore.getState().chatActivity['thread-1']).toBeUndefined();
+        });
+    });
+
+    describe('openWorkflowChatTab', () => {
+        it('switches to the chat named by an openWorkflowChatTab result', () => {
+            const onChatOpened = vi.fn();
+            const subscriber = createSubscriber({onChatOpened});
+
+            aiHubStore.setState({messages: [{content: 'Open the support chat', role: 'user'}]});
+
+            deliverToolResult(
+                subscriber,
+                'call-open-chat',
+                'openWorkflowChatTab',
+                JSON.stringify({chatId: 77, opened: true, threadId: 'thread-77', title: 'Acme — Support'})
+            );
+
+            expect(aiHubStore.getState().chatId).toBe('thread-77');
+            expect(aiHubStore.getState().messages).toEqual([]);
+            expect(aiHubChatsStore.getState().currentChatId).toBe(77);
+            expect(onChatOpened).toHaveBeenCalledOnce();
+        });
+
+        it('raises the retry banner when openWorkflowChatTab reports a failure, and stays in the chat', () => {
+            const subscriber = createSubscriber();
+
+            deliverToolResult(
+                subscriber,
+                'call-open-chat',
+                'openWorkflowChatTab',
+                JSON.stringify({error: 'Workflow chat not found', opened: false})
+            );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiHubStore.getState().chatId).toBe('thread-1');
+            expect(aiChatRetryableErrorStore.getState().currentError).toMatchObject({
+                errorMessage: 'Workflow chat not found',
+                toolName: 'openWorkflowChatTab',
+            });
         });
     });
 
@@ -1251,6 +1380,46 @@ describe('runPostTurnTelemetry', () => {
         });
 
         expect(toastErrorSpy).not.toHaveBeenCalled();
+    });
+});
+
+describe('runPostTurnTelemetry for a workflow chat', () => {
+    it('does not generate a title for a workflow chat', async () => {
+        mockPatchChat.mockReset();
+        mockGenerateChatTitle.mockReset();
+        mockPatchChat.mockResolvedValue(undefined as never);
+
+        runPostTurnTelemetry({
+            chatId: 5,
+            input: 'Hi',
+            invalidateChats: vi.fn(),
+            isWorkflowChat: true,
+            messageCount: 4,
+            workspaceId: 3,
+        });
+
+        await vi.waitFor(() => {
+            expect(mockPatchChat).toHaveBeenCalledWith({
+                chatId: 5,
+                patch: {lastPreview: 'Hi', messageCount: 4},
+                workspaceId: 3,
+            });
+        });
+
+        expect(mockGenerateChatTitle).not.toHaveBeenCalled();
+    });
+});
+
+describe('isCachedWorkflowChat', () => {
+    it('finds the chat kind in any cached chat list', () => {
+        const queryClient = new QueryClient();
+
+        queryClient.setQueryData(AiHubChatsKeys.list(3, 1, 'ACTIVE'), [{id: 4, kind: 'STANDARD'}]);
+        queryClient.setQueryData(AiHubChatsKeys.list(3, 1, 'ARCHIVED'), [{id: 5, kind: 'WORKFLOW_CHAT'}]);
+
+        expect(isCachedWorkflowChat(queryClient, 5)).toBe(true);
+        expect(isCachedWorkflowChat(queryClient, 4)).toBe(false);
+        expect(isCachedWorkflowChat(queryClient, 6)).toBe(false);
     });
 });
 
