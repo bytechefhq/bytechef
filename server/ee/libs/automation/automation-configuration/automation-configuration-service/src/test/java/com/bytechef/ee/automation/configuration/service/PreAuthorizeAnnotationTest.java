@@ -325,6 +325,83 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedConnectedUserAndConnectionGates() throws Exception {
+        String base = "com.bytechef.ee.embedded.configuration.facade.";
+        Class<?> connectedUserFacade =
+            Class.forName("com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacadeImpl");
+        Class<?> projectAdminFacade = Class.forName(base + "ConnectedUserProjectAdminFacadeImpl");
+        Class<?> referenceAdminFacade = Class.forName(base + "ConnectedUserWorkflowReferenceAdminFacadeImpl");
+        Class<?> connectedUserConnectionFacade = Class.forName(base + "ConnectedUserConnectionFacadeImpl");
+        Class<?> connectionAdminFacade = Class.forName(base + "ConnectionAdminFacadeImpl");
+
+        String userType = "'ConnectedUser', ";
+        String userView = "hasPermission(#id, " + userType + "'CONNECTED_USER_VIEW')";
+        String connectionUserView =
+            "hasPermission(#connectedUserId, " + userType + "'CONNECTED_USER_VIEW') "
+                + "or isCurrentConnectedUser(#connectedUserId)";
+        String connectionUserManage =
+            "hasPermission(#connectedUserId, " + userType + "'CONNECTED_USER_MANAGE') "
+                + "or isCurrentConnectedUser(#connectedUserId)";
+        String userListView = "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)";
+        String connectionView = "hasPermission(#id, 'Connection', 'CONNECTION_VIEW')";
+        String connectionEdit = "hasPermission(#id, 'Connection', 'CONNECTION_EDIT')";
+
+        assertEveryPublicOverloadIsGated(
+            connectedUserFacade, "deleteConnectedUser", "hasPermission(#id, " + userType + "'CONNECTED_USER_DELETE')");
+        assertEveryPublicOverloadIsGated(
+            connectedUserFacade, "enableConnectedUser", "hasPermission(#id, " + userType + "'CONNECTED_USER_MANAGE')");
+        assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUser", userView);
+        assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUserDTO", userView);
+        assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUsers", userListView);
+        assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUserDTOs", userListView);
+
+        assertEveryPublicOverloadIsGated(
+            projectAdminFacade, "deleteProjectWorkflow",
+            "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
+                + "'CONNECTED_USER_DELETE')");
+        assertEveryPublicOverloadIsGated(
+            projectAdminFacade, "enableProjectWorkflow",
+            "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
+                + "'CONNECTED_USER_MANAGE')");
+        assertEveryPublicOverloadIsGated(
+            projectAdminFacade, "getConnectedUserProjects",
+            "#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : "
+                + "hasPermission(#connectedUserId, " + userType + "'CONNECTED_USER_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            referenceAdminFacade, "getReferences", "hasEmbeddedScope('CONNECTED_USER_VIEW')");
+
+        assertEveryPublicOverloadIsGated(
+            connectedUserConnectionFacade, "createConnectedUserConnection", connectionUserManage);
+        assertEveryPublicOverloadIsGated(
+            connectedUserConnectionFacade, "deleteConnectedUserConnection", connectionUserManage);
+        assertEveryPublicOverloadIsGated(
+            connectedUserConnectionFacade, "reauthorizeConnectedUserConnection", connectionUserManage);
+        assertEveryPublicOverloadIsGated(
+            connectedUserConnectionFacade, "getConnectedUserConnections", connectionUserView);
+        assertEveryPublicOverloadIsGated(connectedUserConnectionFacade, "getConnections", connectionUserView);
+        assertEveryPublicOverloadIsGated(connectedUserConnectionFacade, "getOwnedConnectionIds", connectionUserView);
+        assertEveryPublicOverloadIsGated(
+            connectedUserConnectionFacade, "getSharedConnectionIds",
+            "hasEmbeddedScope('CONNECTION_VIEW') or isConnectedUser()");
+
+        assertEveryPublicOverloadIsGated(
+            connectionAdminFacade, "createConnection",
+            "hasEmbeddedScopeInEnvironmentId('CONNECTION_CREATE', #connectionDTO.environmentId)");
+        assertEveryPublicOverloadIsGated(
+            connectionAdminFacade, "deleteConnection", "hasPermission(#id, 'Connection', 'CONNECTION_DELETE')");
+        assertEveryPublicOverloadIsGated(connectionAdminFacade, "getConnection", connectionView);
+        assertEveryPublicOverloadIsGated(
+            connectionAdminFacade, "getConnectionTags", "hasEmbeddedScope('CONNECTION_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            connectionAdminFacade, "getConnections",
+            "hasEmbeddedScopeInEnvironmentId('CONNECTION_VIEW', #environmentId)");
+        assertEveryPublicOverloadIsGated(
+            connectionAdminFacade, "getSharedConnectionIds", "hasEmbeddedScope('CONNECTION_VIEW')");
+        assertEveryPublicOverloadIsGated(connectionAdminFacade, "updateConnection", connectionEdit);
+        assertEveryPublicOverloadIsGated(connectionAdminFacade, "updateConnectionTags", connectionEdit);
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");
