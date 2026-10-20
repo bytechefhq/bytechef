@@ -103,4 +103,18 @@ class EmbeddedUserRepositoryIntTest {
         assertThat(embeddedUserRepository.findAllByUserId(userId)).isEmpty();
         assertThat(embeddedUserRepository.existsByUserId(userId)).isFalse();
     }
+
+    @Test
+    void testLockEmbeddedUsersLocksOnlyTheMembersOwnRows() {
+        long userId = 9205L;
+
+        EmbeddedUser developmentRow = embeddedUserRepository.save(
+            EmbeddedUser.forRole(userId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
+        EmbeddedUser productionRow = embeddedUserRepository.save(
+            EmbeddedUser.forRole(userId, WorkspaceRole.VIEWER, Environment.PRODUCTION));
+
+        assertThat(embeddedUserRepository.lockEmbeddedUsers(userId))
+            .containsExactlyInAnyOrder(developmentRow.getId(), productionRow.getId());
+        assertThat(embeddedUserRepository.lockEmbeddedUsers(-1L)).isEmpty();
+    }
 }

@@ -51,7 +51,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -94,9 +92,6 @@ class EmbeddedUserFacadeIntTest {
         ADMIN, 9400L, EMBEDDED_ADMIN, 9401L, EMBEDDED_VIEWER, 9402L, MEMBER, 9403L, NON_MEMBER, 9404L);
 
     @Autowired
-    private DataSource dataSource;
-
-    @Autowired
     private EmbeddedUserFacade embeddedUserFacade;
 
     @Autowired
@@ -107,14 +102,6 @@ class EmbeddedUserFacadeIntTest {
 
     @BeforeEach
     void cleanUp() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS \"user\" (id BIGINT PRIMARY KEY)");
-
-        for (Long userId : USER_IDS_BY_LOGIN.values()) {
-            jdbcTemplate.update("INSERT INTO \"user\" (id) VALUES (?) ON CONFLICT DO NOTHING", userId);
-        }
-
         for (Long userId : USER_IDS_BY_LOGIN.values()) {
             embeddedUserRepository.deleteByUserId(userId);
         }
