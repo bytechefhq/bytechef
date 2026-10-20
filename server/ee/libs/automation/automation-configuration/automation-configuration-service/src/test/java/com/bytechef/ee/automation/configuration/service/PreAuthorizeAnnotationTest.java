@@ -400,7 +400,7 @@ class PreAuthorizeAnnotationTest {
 
         assertEveryPublicOverloadIsGated(
             connectionAdminFacade, "createConnection",
-            "hasEmbeddedScopeInEnvironmentId('CONNECTION_EDIT', #connectionDTO.environmentId)");
+            "hasEmbeddedScopeInEnvironmentId('CONNECTION_CREATE', #connectionDTO.environmentId)");
         assertEveryPublicOverloadIsGated(
             connectionAdminFacade, "deleteConnection", "hasPermission(#id, 'Connection', 'CONNECTION_DELETE')");
         assertEveryPublicOverloadIsGated(connectionAdminFacade, "getConnection", connectionView);

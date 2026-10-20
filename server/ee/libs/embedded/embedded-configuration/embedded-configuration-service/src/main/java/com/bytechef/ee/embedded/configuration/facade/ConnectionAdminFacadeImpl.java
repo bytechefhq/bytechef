@@ -68,7 +68,7 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
         @AuditData(key = "shared", value = "#shared")
     })
-    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTION_EDIT', #connectionDTO.environmentId)")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long createConnection(ConnectionDTO connectionDTO, boolean shared) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
