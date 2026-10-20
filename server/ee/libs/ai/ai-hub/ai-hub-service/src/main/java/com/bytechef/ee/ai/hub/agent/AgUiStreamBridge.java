@@ -54,6 +54,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicBoolean jobIdReported = new AtomicBoolean(false);
+    private final Object dispatchLock = new Object();
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -86,6 +87,12 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onEvent(Object payload) {
+        synchronized (dispatchLock) {
+            dispatchEvent(payload);
+        }
+    }
+
+    private void dispatchEvent(Object payload) {
         if (completed.get()) {
             if (log.isDebugEnabled()) {
                 log.debug("AgUiStreamBridge dropping post-complete event: {}", payload);
@@ -124,7 +131,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onComplete() {
-        if (!completed.compareAndSet(false, true)) {
+        if (!markCompleted()) {
             return;
         }
 
@@ -148,7 +155,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onError(Throwable throwable) {
-        if (!completed.compareAndSet(false, true)) {
+        if (!markCompleted()) {
             return;
         }
 
@@ -165,6 +172,12 @@ public class AgUiStreamBridge implements SseStreamBridge {
         dispatch(runErrorEvent);
 
         runFinalize();
+    }
+
+    private boolean markCompleted() {
+        synchronized (dispatchLock) {
+            return completed.compareAndSet(false, true);
+        }
     }
 
     private void onMapEvent(Map<?, ?> map) {
