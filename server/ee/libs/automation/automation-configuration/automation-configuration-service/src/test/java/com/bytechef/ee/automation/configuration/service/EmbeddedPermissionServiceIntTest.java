@@ -16,6 +16,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
@@ -116,10 +117,7 @@ class EmbeddedPermissionServiceIntTest {
     void seedMembers() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS \"user\" (id BIGINT PRIMARY KEY)");
-
         for (Long userId : USER_IDS_BY_LOGIN.values()) {
-            jdbcTemplate.update("INSERT INTO \"user\" (id) VALUES (?) ON CONFLICT DO NOTHING", userId);
             jdbcTemplate.update("DELETE FROM workspace_user WHERE user_id = ?", userId);
 
             embeddedUserRepository.deleteByUserId(userId);
@@ -243,7 +241,7 @@ class EmbeddedPermissionServiceIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCache.class
     })
     static class RealEmbeddedPermissionServiceConfiguration {
 

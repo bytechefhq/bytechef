@@ -57,9 +57,9 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
-        userService.getUser(userId);
+        embeddedUserRepository.lockEmbeddedUsers(userId);
 
-        embeddedUserRepository.lockUser(userId);
+        userService.getUser(userId);
 
         validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
 
@@ -97,7 +97,7 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public void removeEnvironmentRole(long userId, Environment environment) {
         Assert.notNull(environment, "'environment' must not be null");
 
-        embeddedUserRepository.lockUser(userId);
+        embeddedUserRepository.lockEmbeddedUsers(userId);
 
         Optional<EmbeddedUser> environmentEmbeddedUser = embeddedUserRepository
             .findByUserIdAndEnvironment(userId, environment.ordinal());
@@ -139,7 +139,7 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
     @Override
     public boolean removeEmbeddedUser(long userId) {
-        embeddedUserRepository.lockUser(userId);
+        embeddedUserRepository.lockEmbeddedUsers(userId);
 
         boolean existed = embeddedUserRepository.existsByUserId(userId);
 
@@ -155,7 +155,7 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         Assert.notNull(environment, "'environment' must not be null");
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
-        embeddedUserRepository.lockUser(userId);
+        embeddedUserRepository.lockEmbeddedUsers(userId);
 
         validateGrantWithinCallerScopes(List.of(environment), embeddedRole);
 
@@ -216,7 +216,7 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
-        embeddedUserRepository.lockUser(userId);
+        embeddedUserRepository.lockEmbeddedUsers(userId);
 
         EmbeddedUser embeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId)
             .orElseThrow(() -> missingEmbeddedWideMembership(userId));
