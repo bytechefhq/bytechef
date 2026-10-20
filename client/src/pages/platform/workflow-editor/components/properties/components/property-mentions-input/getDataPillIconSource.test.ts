@@ -134,4 +134,24 @@ describe('getDataPillIconSource', () => {
             /^data:image\/svg\+xml;charset=utf-8,/
         );
     });
+
+    it('falls back to the node name prefix when no task in the definition matches', () => {
+        const otherTasksWorkflow = {
+            tasks: [
+                {
+                    name: 'loop_1',
+                    parameters: {iteratee: [{name: 'customer', type: 'postgresql/v1/query'}]},
+                    type: 'loop/v1',
+                },
+            ],
+        } as unknown as Workflow;
+
+        expect(
+            getDataPillIconSource({
+                componentDefinitions: [{icon: 'http-client-icon', name: 'httpClient', version: 1}],
+                mentionDisplay: '${httpClient_1.body}',
+                workflow: otherTasksWorkflow,
+            })
+        ).toBe('http-client-icon');
+    });
 });
