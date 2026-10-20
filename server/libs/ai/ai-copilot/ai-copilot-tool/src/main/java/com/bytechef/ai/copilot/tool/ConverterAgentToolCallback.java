@@ -36,6 +36,7 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Hand-rolled Spring AI {@link ToolCallback} that exposes the Converter Copilot subagent to a parent BUILD agent.
@@ -51,10 +52,11 @@ public class ConverterAgentToolCallback implements ToolCallback {
         """
             Delegate a request to convert an external workflow definition (n8n, Make, Zapier, Workato,
             etc.) into a ByteChef workflow. The Converter subagent owns the canonical behaviour for this
-            domain — translating constructs, mapping integrations, and producing valid ByteChef workflow
-            JSON plus a rationale. Include the source workflow definition to convert in the request. The
-            workflow must already exist — create it with createProjectWorkflow first, then include its
-            workflowId in the request.""";
+            domain: translating constructs, mapping integrations, and producing valid ByteChef workflow
+            JSON plus a rationale. Include the source workflow definition to convert in the request. Pass
+            workflowId to convert into an EXISTING workflow, or projectId to create a BRAND-NEW workflow in
+            that project and convert into it; never both. It cannot create a project, so create or choose
+            that first.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -63,7 +65,15 @@ public class ConverterAgentToolCallback implements ToolCallback {
                 "properties": {
                     "request": {
                         "type": "string",
-                        "description": "The user request in natural language. Pass through verbatim — the subagent does its own task decomposition."
+                        "description": "The user request in natural language, including the source workflow definition. Pass through verbatim - the subagent does its own task decomposition."
+                    },
+                    "projectId": {
+                        "type": "integer",
+                        "description": "Id of the project to create a new workflow in and convert into. Give this or workflowId, never both."
+                    },
+                    "workflowId": {
+                        "type": "string",
+                        "description": "Id of an existing workflow to convert into. Give this or projectId, never both."
                     }
                 },
                 "required": ["request"]
@@ -71,13 +81,23 @@ public class ConverterAgentToolCallback implements ToolCallback {
 
     private final IntelligentToolChatClientFactory chatClientFactory;
     private final @Nullable SubAgentChatModelResolver chatModelResolver;
+    private final @Nullable TargetWorkflowManager targetWorkflowManager;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ConverterAgentToolCallback(
         IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
 
+        this(chatClientFactory, chatModelResolver, null);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public ConverterAgentToolCallback(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver,
+        @Nullable TargetWorkflowManager targetWorkflowManager) {
+
         this.chatClientFactory = chatClientFactory;
         this.chatModelResolver = chatModelResolver;
+        this.targetWorkflowManager = targetWorkflowManager;
     }
 
     @Override
@@ -105,6 +125,15 @@ public class ConverterAgentToolCallback implements ToolCallback {
                 return toolError("request is required and must not be blank");
             }
 
+            Long projectId = input.projectId();
+            String workflowId = input.workflowId();
+
+            if (projectId != null && workflowId != null && !workflowId.isBlank()) {
+                return toolError(
+                    "Give either projectId (to create a new workflow) or workflowId (to convert into an existing " +
+                        "workflow), not both");
+            }
+
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
@@ -115,22 +144,46 @@ public class ConverterAgentToolCallback implements ToolCallback {
             ChatClient converterChatClient =
                 chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
-            String result = CurrentAgentContext.callWith(
-                CopilotAgentType.IMPORT_WORKFLOW, parentAgent,
-                () -> converterChatClient.prompt(request)
-                    .toolContext(forwardedContext)
-                    .call()
-                    .content());
+            if (projectId == null) {
+                String content = callSubAgent(converterChatClient, workflowId, request, parentAgent, forwardedContext);
 
-            if (result == null) {
-                log.warn("converter subagent returned null for request='{}'", request);
-
-                return ToolErrors.toolError("converter subagent returned null");
+                return toResult(content, request, forwardedContext);
             }
 
-            String trailer = WorkflowPersistCaptureUtils.renderTrailer(forwardedContext);
+            if (targetWorkflowManager == null) {
+                return toolError(
+                    "importWorkflow cannot create a workflow here - create it first and pass its workflowId");
+            }
 
-            return trailer == null ? result : result + trailer;
+            String createdWorkflowId = targetWorkflowManager.createWorkflow(
+                projectId, new ToolContext(forwardedContext));
+
+            String content;
+
+            try {
+                content = callSubAgent(converterChatClient, createdWorkflowId, request, parentAgent, forwardedContext);
+            } catch (RuntimeException exception) {
+                deleteUnwrittenWorkflow(createdWorkflowId, forwardedContext);
+
+                throw exception;
+            }
+
+            boolean written = WorkflowPersistCaptureUtils.isUpdated(forwardedContext, createdWorkflowId);
+
+            if (!written && (content == null || isToolError(content))) {
+                deleteUnwrittenWorkflow(createdWorkflowId, forwardedContext);
+
+                return content == null ? nullResultError(request) : content;
+            }
+
+            String result = toResult(content, request, forwardedContext);
+
+            if (written) {
+                return result;
+            }
+
+            return result + "\n\nThe new workflow was created with workflowId=\"" + createdWorkflowId +
+                "\" but has no converted definition yet. Call importWorkflow again with this workflowId to continue.";
         } catch (JacksonException exception) {
             log.warn(
                 "importWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
@@ -148,10 +201,79 @@ public class ConverterAgentToolCallback implements ToolCallback {
         }
     }
 
+    private static @Nullable String callSubAgent(
+        ChatClient converterChatClient, @Nullable String workflowId, String request, @Nullable AgentType parentAgent,
+        Map<String, Object> forwardedContext) {
+
+        String subAgentRequest = workflowId == null || workflowId.isBlank()
+            ? request : "Target workflowId: " + workflowId + "\n\n" + request;
+
+        return CurrentAgentContext.callWith(
+            CopilotAgentType.IMPORT_WORKFLOW, parentAgent,
+            () -> converterChatClient.prompt(subAgentRequest)
+                .toolContext(forwardedContext)
+                .call()
+                .content());
+    }
+
+    private static String toResult(@Nullable String content, String request, Map<String, Object> forwardedContext) {
+        if (content == null) {
+            return nullResultError(request);
+        }
+
+        String trailer = WorkflowPersistCaptureUtils.renderTrailer(forwardedContext);
+
+        return trailer == null ? content : content + trailer;
+    }
+
+    private static String nullResultError(String request) {
+        log.warn("converter subagent returned null for request='{}'", request);
+
+        return ToolErrors.toolError("converter subagent returned null");
+    }
+
+    private void deleteUnwrittenWorkflow(String workflowId, Map<String, Object> forwardedContext) {
+        if (targetWorkflowManager == null || WorkflowPersistCaptureUtils.isUpdated(forwardedContext, workflowId)) {
+            return;
+        }
+
+        try {
+            targetWorkflowManager.deleteWorkflow(workflowId, new ToolContext(forwardedContext));
+        } catch (RuntimeException exception) {
+            log.warn("importWorkflow failed to delete the empty workflow {} it created", workflowId, exception);
+        }
+    }
+
+    private static boolean isToolError(String result) {
+        String trimmedResult = result.strip();
+
+        if (!trimmedResult.startsWith("{")) {
+            return false;
+        }
+
+        try {
+            JsonNode resultJsonNode = JsonUtils.readTree(trimmedResult);
+
+            JsonNode errorJsonNode = resultJsonNode.get("error");
+
+            return errorJsonNode != null && !errorJsonNode.isNull();
+        } catch (JacksonException exception) {
+            return false;
+        }
+    }
+
     private String toolError(String message) {
         return ToolErrors.toolError(message);
     }
 
-    public record ConverterAgentInput(String request) {
+    public record ConverterAgentInput(
+        @Nullable String request, @Nullable Long projectId, @Nullable String workflowId) {
+    }
+
+    public interface TargetWorkflowManager {
+
+        String createWorkflow(long projectId, ToolContext toolContext);
+
+        void deleteWorkflow(String workflowId, ToolContext toolContext);
     }
 }
