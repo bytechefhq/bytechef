@@ -23,19 +23,26 @@ import {useMemo, useState} from 'react';
 const WORKSPACE_ROLES = Object.values(WorkspaceRole);
 
 interface WorkspaceUserEnvironmentRolesProps {
-    customRoles: {id: string; name: string}[];
+    customRoles?: {id: string; name: string}[];
     environmentRoles: WorkspaceUserEnvironmentRoleI[];
     manageableEnvironments: EnvironmentEnum[];
+    onlyRoleRemovalDescription?: (roleLabel: string) => string;
     onRemove: (environment: EnvironmentEnum) => void;
     onRoleChange: (environment: EnvironmentEnum, value: string) => void;
+    rolePlaceholder?: string;
 }
 
+const DEFAULT_ONLY_ROLE_REMOVAL_DESCRIPTION = (roleLabel: string) =>
+    `This is their only environment role, so it becomes a workspace-wide role. They will keep the ${roleLabel} role in every environment.`;
+
 const WorkspaceUserEnvironmentRoles = ({
-    customRoles,
+    customRoles = [],
     environmentRoles,
     manageableEnvironments,
     onRemove,
     onRoleChange,
+    onlyRoleRemovalDescription = DEFAULT_ONLY_ROLE_REMOVAL_DESCRIPTION,
+    rolePlaceholder = 'Select a role',
 }: WorkspaceUserEnvironmentRolesProps) => {
     const [pendingRemoval, setPendingRemoval] = useState<EnvironmentEnum | null>(null);
 
@@ -74,7 +81,8 @@ const WorkspaceUserEnvironmentRoles = ({
 
         if (pendingRemovalRole.customRoleId) {
             return (
-                customRoles.find((customRole) => customRole.id === String(pendingRemovalRole.customRoleId))?.name || ''
+                customRoles.find((customRole) => customRole.id === String(pendingRemovalRole.customRoleId))?.name ||
+                'custom'
             );
         }
 
@@ -102,7 +110,7 @@ const WorkspaceUserEnvironmentRoles = ({
                             aria-label={`${ENVIRONMENT_LABELS[environmentRole.environment]} role`}
                             className="w-44"
                         >
-                            <SelectValue placeholder="Select a role" />
+                            <SelectValue placeholder={rolePlaceholder} />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -167,7 +175,7 @@ const WorkspaceUserEnvironmentRoles = ({
 
                             <AlertDialogDescription>
                                 {isLastEnvironmentRole
-                                    ? `This is their only environment role, so it becomes a workspace-wide role. They will keep the ${pendingRemovalRoleLabel} role in every environment.`
+                                    ? onlyRoleRemovalDescription(pendingRemovalRoleLabel)
                                     : `They will lose access to ${ENVIRONMENT_LABELS[pendingRemoval]}. Their roles in the other environments are unchanged.`}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
