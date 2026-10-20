@@ -7,10 +7,26 @@ import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {createMutateAsyncMock, navigateMock} = vi.hoisted(() => ({
+const {chatWorkflowsQueryMock, createMutateAsyncMock, hasWorkspaceScopeMock, navigateMock} = vi.hoisted(() => ({
+    chatWorkflowsQueryMock: vi.fn(),
     createMutateAsyncMock: vi.fn(),
+    hasWorkspaceScopeMock: vi.fn(),
     navigateMock: vi.fn(),
 }));
+
+const chatWorkflowsData = {
+    workspaceChatWorkflows: [
+        {
+            projectDeploymentId: '5',
+            projectId: '1',
+            projectName: 'Acme',
+            projectWorkflowId: '8',
+            workflowExecutionId: 'exec-1',
+            workflowId: '9',
+            workflowLabel: 'Support',
+        },
+    ],
+};
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => navigateMock,
@@ -26,23 +42,17 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         selector({currentEnvironmentId: 2}),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: hasWorkspaceScopeMock,
+}));
+
+vi.mock('@/shared/hooks/useLoadWorkspaceScopes', () => ({
+    useLoadWorkspaceScopes: () => ({error: false, loading: false}),
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
     useCreateWorkflowChatAiHubChatMutation: () => ({mutateAsync: createMutateAsyncMock}),
-    useWorkspaceChatWorkflowsQuery: () => ({
-        data: {
-            workspaceChatWorkflows: [
-                {
-                    projectDeploymentId: '5',
-                    projectId: '1',
-                    projectName: 'Acme',
-                    projectWorkflowId: '8',
-                    workflowExecutionId: 'exec-1',
-                    workflowId: '9',
-                    workflowLabel: 'Support',
-                },
-            ],
-        },
-    }),
+    useWorkspaceChatWorkflowsQuery: chatWorkflowsQueryMock,
 }));
 
 const {useAiHubChatLaunchers} = await import('../useAiHubChatLaunchers');
@@ -55,6 +65,12 @@ const wrapper = ({children}: {children: ReactNode}) => (
 
 describe('useAiHubChatLaunchers', () => {
     beforeEach(() => {
+        chatWorkflowsQueryMock.mockReset();
+        chatWorkflowsQueryMock.mockImplementation((_variables: unknown, options: {enabled?: boolean}) => ({
+            data: options.enabled ? chatWorkflowsData : undefined,
+        }));
+        hasWorkspaceScopeMock.mockReset();
+        hasWorkspaceScopeMock.mockReturnValue(true);
         createMutateAsyncMock.mockReset();
         navigateMock.mockReset();
         queryClient = new QueryClient();
@@ -67,6 +83,16 @@ describe('useAiHubChatLaunchers', () => {
         expect(result.current.workflowChats).toEqual([
             {label: 'Acme — Support', projectDeploymentId: '5', workflowExecutionId: 'exec-1'},
         ]);
+    });
+
+    it('lists no workflow chats and never runs the listing for a user without WORKFLOW_VIEW', () => {
+        hasWorkspaceScopeMock.mockReturnValue(false);
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        expect(hasWorkspaceScopeMock).toHaveBeenCalledWith(3, 'WORKFLOW_VIEW');
+        expect(chatWorkflowsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
+        expect(result.current.workflowChats).toEqual([]);
     });
 
     it('creates a chat titled with the label on select and navigates to it', async () => {
