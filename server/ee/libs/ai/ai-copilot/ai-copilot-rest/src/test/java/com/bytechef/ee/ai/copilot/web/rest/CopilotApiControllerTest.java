@@ -117,6 +117,40 @@ class CopilotApiControllerTest {
             .getState()).doesNotContainKey(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
     }
 
+    @Test
+    void testClientSuppliedScopedProjectIdIsDropped() {
+        setAuthentication(new UsernamePasswordAuthenticationToken("unknown", "", List.of()));
+
+        when(userService.fetchUserByLogin("unknown")).thenReturn(Optional.empty());
+        when(agUiService.runAgent(any(), any())).thenReturn(new SseEmitter());
+
+        AgUiParameters agUiParameters = newAgUiParameters();
+
+        agUiParameters.getState()
+            .getState()
+            .put(CopilotConstants.STATE_SCOPED_PROJECT_ID, 42L);
+
+        newCopilotApiController().chat("skills", agUiParameters);
+
+        assertThat(agUiParameters.getState()
+            .getState()).doesNotContainKey(CopilotConstants.STATE_SCOPED_PROJECT_ID);
+    }
+
+    @Test
+    void testStateWithoutScopedProjectIdIsUnchanged() {
+        setAuthentication(new UsernamePasswordAuthenticationToken("unknown", "", List.of()));
+
+        when(userService.fetchUserByLogin("unknown")).thenReturn(Optional.empty());
+        when(agUiService.runAgent(any(), any())).thenReturn(new SseEmitter());
+
+        AgUiParameters agUiParameters = newAgUiParameters();
+
+        newCopilotApiController().chat("skills", agUiParameters);
+
+        assertThat(agUiParameters.getState()
+            .getState()).containsEntry("mode", "ASK");
+    }
+
     private CopilotApiController newCopilotApiController() {
         when(localAgent.getAgentId()).thenReturn("skills_ask");
 
