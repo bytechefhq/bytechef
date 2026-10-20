@@ -21,14 +21,18 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +46,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
+    private final ConnectionService connectionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
@@ -49,12 +54,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
+        this.connectionService = connectionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -73,6 +79,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
+        requireAutomation(connectionId);
+
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
@@ -81,6 +89,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void disconnectConnection(long connectionId) {
+        rejectNonAutomation(connectionId);
+
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);
     }
@@ -89,6 +99,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_VIEW')")
     @Transactional(readOnly = true)
     public ConnectionDTO getConnection(long connectionId) {
+        requireAutomation(connectionId);
+
         return connectionFacade.getConnection(connectionId);
     }
 
@@ -130,12 +142,42 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
+        requireAutomation(connectionId);
+
         connectionFacade.update(connectionId, name, tags, version);
     }
 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void updateTags(long connectionId, List<Tag> tags) {
+        requireAutomation(connectionId);
+
         connectionFacade.update(connectionId, tags);
+    }
+
+    private void rejectNonAutomation(long connectionId) {
+        boolean nonAutomation = connectionService.fetchConnection(connectionId)
+            .map(Connection::getType)
+            .filter(type -> type != PlatformType.AUTOMATION)
+            .isPresent();
+
+        if (nonAutomation) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(connectionId));
+        }
+    }
+
+    private void requireAutomation(long connectionId) {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            return;
+        }
+
+        boolean automation = connectionService.fetchConnection(connectionId)
+            .map(Connection::getType)
+            .filter(type -> type == PlatformType.AUTOMATION)
+            .isPresent();
+
+        if (!automation) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(connectionId));
+        }
     }
 }
