@@ -38,6 +38,6 @@ public interface EmbeddedUserRepository extends ListCrudRepository<EmbeddedUser,
 
     Optional<EmbeddedUser> findByUserIdAndEnvironment(long userId, int environment);
 
-    @Query("SELECT id FROM \"user\" WHERE id = :userId FOR UPDATE")
-    Optional<Long> lockUser(long userId);
+    @Query("SELECT id FROM embedded_user WHERE user_id = :userId FOR UPDATE")
+    List<Long> lockEmbeddedUsers(long userId);
 }
