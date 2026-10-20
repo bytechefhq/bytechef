@@ -11,9 +11,6 @@ import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
 
 /**
- * API keys of the embedded side. They are shared per environment: anyone holding the embedded API key scope in that
- * environment manages them, regardless of who created them.
- *
  * @version ee
  *
  * @author Ivica Cardic

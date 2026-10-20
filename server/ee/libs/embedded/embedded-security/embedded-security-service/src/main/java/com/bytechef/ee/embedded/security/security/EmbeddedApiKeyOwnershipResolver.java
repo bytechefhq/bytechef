@@ -17,9 +17,6 @@ import java.io.Serializable;
 import org.springframework.stereotype.Component;
 
 /**
- * Answers for {@code ApiKey} rows of type {@link PlatformType#EMBEDDED} only; every other row, including a platform key
- * whose type is null, belongs to another resolver in the chain.
- *
  * @version ee
  *
  * @author Ivica Cardic

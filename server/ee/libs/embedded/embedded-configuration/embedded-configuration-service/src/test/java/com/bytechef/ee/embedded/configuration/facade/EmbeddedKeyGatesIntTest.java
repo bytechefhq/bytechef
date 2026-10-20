@@ -173,6 +173,7 @@ class EmbeddedKeyGatesIntTest {
 
     private static final String DEVELOPMENT_EDITOR = "development-editor";
     private static final String EDITOR = "editor";
+    private static final String EMBEDDED_ADMIN = "embedded-admin";
     private static final String NON_MEMBER = "non-member";
     private static final String OTHER_EDITOR = "other-editor";
     private static final String PRODUCTION_ADMIN = "production-admin";
@@ -181,7 +182,7 @@ class EmbeddedKeyGatesIntTest {
     private static final String VIEWER = "viewer";
     private static final Map<String, Long> USER_IDS_BY_LOGIN = Map.of(
         TENANT_ADMIN, 9800L, EDITOR, 9801L, OTHER_EDITOR, 9802L, PRODUCTION_EDITOR, 9803L, NON_MEMBER, 9804L,
-        PRODUCTION_ADMIN, 9805L, VIEWER, 9806L, DEVELOPMENT_EDITOR, 9807L);
+        PRODUCTION_ADMIN, 9805L, VIEWER, 9806L, DEVELOPMENT_EDITOR, 9807L, EMBEDDED_ADMIN, 9808L);
 
     @Autowired
     private ApiKeyFacadeImpl apiKeyFacade;
@@ -219,6 +220,7 @@ class EmbeddedKeyGatesIntTest {
             EmbeddedUser.forRole(userId(PRODUCTION_EDITOR), WorkspaceRole.EDITOR, Environment.PRODUCTION));
         embeddedUserRepository.save(
             EmbeddedUser.forRole(userId(DEVELOPMENT_EDITOR), WorkspaceRole.EDITOR, Environment.DEVELOPMENT));
+        embeddedUserRepository.save(EmbeddedUser.forRole(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN));
         embeddedUserRepository.save(
             EmbeddedUser.forRole(userId(PRODUCTION_ADMIN), WorkspaceRole.ADMIN, Environment.PRODUCTION));
 
@@ -426,6 +428,33 @@ class EmbeddedKeyGatesIntTest {
         assertThatThrownBy(
             () -> signingKeyFacade.getSigningKeys(PlatformType.EMBEDDED, Environment.PRODUCTION.ordinal()))
                 .isInstanceOf(AccessDeniedException.class);
+
+        ApiKey renamedApiKey = new ApiKey();
+
+        renamedApiKey.setId(apiKeyId);
+        renamedApiKey.setName("renamed");
+
+        SigningKey renamedSigningKey = new SigningKey();
+
+        renamedSigningKey.setId(signingKeyId);
+        renamedSigningKey.setName("renamed");
+
+        assertThatThrownBy(() -> embeddedApiKeyFacade.updateApiKey(renamedApiKey))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> signingKeyFacade.create(newSigningKey(Environment.PRODUCTION), PlatformType.EMBEDDED))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> signingKeyFacade.update(renamedSigningKey))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> signingKeyFacade.delete(signingKeyId))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(apiKeyRepository.findAll())
+            .singleElement()
+            .satisfies(apiKey -> assertThat(apiKey.getName()).isEqualTo(embeddedKey.getName()));
+        assertThat(signingKeyRepository.findAll())
+            .singleElement()
+            .satisfies(persistedSigningKey -> assertThat(persistedSigningKey.getName())
+                .isEqualTo(signingKey.getName()));
     }
 
     @Test
@@ -477,6 +506,23 @@ class EmbeddedKeyGatesIntTest {
 
         assertThat(signingKeyFacade.create(newSigningKey(Environment.PRODUCTION), PlatformType.AUTOMATION))
             .isNotBlank();
+
+        SigningKey automationKey = signingKeyRepository.findAll()
+            .stream()
+            .filter(signingKey -> signingKey.getType() == PlatformType.AUTOMATION)
+            .findFirst()
+            .orElseThrow();
+
+        long automationKeyId = automationKey.getId();
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(() -> signingKeyFacade.getSigningKey(automationKeyId))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> signingKeyFacade.delete(automationKeyId))
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(signingKeyRepository.findById(automationKeyId)).isPresent();
 
         authenticate(PRODUCTION_ADMIN, false);
 

@@ -21,9 +21,6 @@ import com.bytechef.platform.security.domain.ApiKey;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Creates an API key of the given type owned by the current user. It carries no authorization check: callers decide who
- * may mint which kind of key.
- *
  * @author Ivica Cardic
  */
 public interface OwnedApiKeyCreator {
