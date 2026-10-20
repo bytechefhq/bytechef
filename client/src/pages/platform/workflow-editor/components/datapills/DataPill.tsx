@@ -211,7 +211,7 @@ const DataPill = ({
 
     if (root) {
         return (
-            <div className="flex w-full items-center space-x-2">
+            <div className="flex w-full items-center gap-2">
                 <div
                     className={twMerge(
                         'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
@@ -325,7 +325,7 @@ const DataPill = ({
 
                         return (
                             <div
-                                className="flex items-center space-x-2"
+                                className="flex items-center gap-2"
                                 key={`${workflowNodeName}-${subProperty.name}-${index}`}
                             >
                                 <DataPill
