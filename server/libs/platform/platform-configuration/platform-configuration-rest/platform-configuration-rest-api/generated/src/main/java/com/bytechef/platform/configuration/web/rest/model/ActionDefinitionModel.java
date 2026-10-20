@@ -27,12 +27,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T18:23:01.108240+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-20T21:59:52.099075+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ActionDefinitionModel {
 
   private String componentName;
 
   private Integer componentVersion;
+
+  private @Nullable Boolean deprecated;
 
   private @Nullable String description;
 
@@ -113,6 +115,27 @@ public class ActionDefinitionModel {
   @JsonProperty("componentVersion")
   public void setComponentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
+  }
+
+  public ActionDefinitionModel deprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
+    return this;
+  }
+
+  /**
+   * Is the action deprecated, so workflows that still use it should replace it.
+   * @return deprecated
+   */
+  
+  @Schema(name = "deprecated", description = "Is the action deprecated, so workflows that still use it should replace it.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("deprecated")
+  public @Nullable Boolean getDeprecated() {
+    return deprecated;
+  }
+
+  @JsonProperty("deprecated")
+  public void setDeprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
   }
 
   public ActionDefinitionModel description(@Nullable String description) {
@@ -386,6 +409,7 @@ public class ActionDefinitionModel {
     ActionDefinitionModel actionDefinition = (ActionDefinitionModel) o;
     return Objects.equals(this.componentName, actionDefinition.componentName) &&
         Objects.equals(this.componentVersion, actionDefinition.componentVersion) &&
+        Objects.equals(this.deprecated, actionDefinition.deprecated) &&
         Objects.equals(this.description, actionDefinition.description) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
@@ -402,7 +426,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFileEntry, outputFunctionDefined, outputSchemaDefined, properties, resumePerformFunctionDefined, sseStreamResponse, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, deprecated, description, help, name, outputDefined, outputFileEntry, outputFunctionDefined, outputSchemaDefined, properties, resumePerformFunctionDefined, sseStreamResponse, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -411,6 +435,7 @@ public class ActionDefinitionModel {
     sb.append("class ActionDefinitionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
+    sb.append("    deprecated: ").append(toIndentedString(deprecated)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

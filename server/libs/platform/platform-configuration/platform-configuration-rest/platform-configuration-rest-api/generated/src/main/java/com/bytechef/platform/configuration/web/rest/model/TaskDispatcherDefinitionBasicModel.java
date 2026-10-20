@@ -23,8 +23,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-20T21:59:52.099075+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskDispatcherDefinitionBasicModel {
+
+  private @Nullable Boolean deprecated;
 
   private @Nullable String description;
 
@@ -57,6 +59,27 @@ public class TaskDispatcherDefinitionBasicModel {
     this.name = name;
     this.outputDefined = outputDefined;
     this.version = version;
+  }
+
+  public TaskDispatcherDefinitionBasicModel deprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
+    return this;
+  }
+
+  /**
+   * Is the task dispatcher deprecated, so workflows that still use it should replace it.
+   * @return deprecated
+   */
+  
+  @Schema(name = "deprecated", description = "Is the task dispatcher deprecated, so workflows that still use it should replace it.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("deprecated")
+  public @Nullable Boolean getDeprecated() {
+    return deprecated;
+  }
+
+  @JsonProperty("deprecated")
+  public void setDeprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
   }
 
   public TaskDispatcherDefinitionBasicModel description(@Nullable String description) {
@@ -278,7 +301,8 @@ public class TaskDispatcherDefinitionBasicModel {
       return false;
     }
     TaskDispatcherDefinitionBasicModel taskDispatcherDefinitionBasic = (TaskDispatcherDefinitionBasicModel) o;
-    return Objects.equals(this.description, taskDispatcherDefinitionBasic.description) &&
+    return Objects.equals(this.deprecated, taskDispatcherDefinitionBasic.deprecated) &&
+        Objects.equals(this.description, taskDispatcherDefinitionBasic.description) &&
         Objects.equals(this.icon, taskDispatcherDefinitionBasic.icon) &&
         Objects.equals(this.name, taskDispatcherDefinitionBasic.name) &&
         Objects.equals(this.outputDefined, taskDispatcherDefinitionBasic.outputDefined) &&
@@ -292,13 +316,14 @@ public class TaskDispatcherDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputDefined, outputFunctionDefined, outputSchemaDefined, resources, title, variablePropertiesDefined, version);
+    return Objects.hash(deprecated, description, icon, name, outputDefined, outputFunctionDefined, outputSchemaDefined, resources, title, variablePropertiesDefined, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskDispatcherDefinitionBasicModel {\n");
+    sb.append("    deprecated: ").append(toIndentedString(deprecated)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
