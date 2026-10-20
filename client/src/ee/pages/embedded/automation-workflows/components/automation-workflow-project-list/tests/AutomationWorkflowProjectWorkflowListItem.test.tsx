@@ -1,8 +1,15 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowProjectWorkflowListItem from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-list/AutomationWorkflowProjectWorkflowListItem';
+import {resetAll, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const handlers = {
+    onDeleteWorkflow: vi.fn(),
+    onEditWorkflow: vi.fn(),
+    onSelectWorkflow: vi.fn(),
+};
 
 const workflow = {
     components: [{icon: '<svg />', name: 'gmail', title: 'Gmail'}],
@@ -20,23 +27,61 @@ const renderRow = () =>
         <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
             <TooltipProvider>
                 <ul>
-                    <AutomationWorkflowProjectWorkflowListItem
-                        onDeleteWorkflow={vi.fn()}
-                        onEditWorkflow={vi.fn()}
-                        onSelectWorkflow={vi.fn()}
-                        workflow={workflow}
-                    />
+                    <AutomationWorkflowProjectWorkflowListItem {...handlers} workflow={workflow} />
                 </ul>
             </TooltipProvider>
         </QueryClientProvider>
     );
 
+const openMenu = async () => {
+    renderRow();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Workflow Actions'}));
+};
+
 describe('AutomationWorkflowProjectWorkflowListItem', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
     it('renders the label, the trigger badge, and the modified date', () => {
         renderRow();
 
         expect(screen.getByText('Mailer')).toBeInTheDocument();
         expect(screen.getByText('Manual')).toBeInTheDocument();
         expect(screen.getByText(/Modified at/)).toBeInTheDocument();
+    });
+
+    describe('menu', () => {
+        it('should render with the design-system DropdownMenu', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Edit Workflow'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete Workflow'})).toHaveClass(
+                'text-content-destructive-primary'
+            );
+        });
+
+        it('should edit the workflow when Edit is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Edit Workflow'}));
+
+            expect(handlers.onEditWorkflow).toHaveBeenCalledWith(workflow);
+        });
+
+        it('should delete the workflow when Delete is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Delete Workflow'}));
+
+            expect(handlers.onDeleteWorkflow).toHaveBeenCalledWith('wf-1');
+        });
     });
 });

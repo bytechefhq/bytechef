@@ -1,16 +1,15 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {ButtonGroup} from '@/components/ui/button-group';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
@@ -76,7 +75,7 @@ const AutomationWorkflowProjectListItem = ({
         const interactiveSelectors = [
             '[data-interactive]',
             '[role="menuitem"]',
-            '.dropdown-menu-item',
+            '[role="menu"]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
         ].join(', ');
@@ -158,18 +157,17 @@ const AutomationWorkflowProjectListItem = ({
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end" className="p-0">
+                                        <DropdownMenuContent align="end">
                                             <DropdownMenuItem
                                                 aria-label="Import Workflow"
-                                                className="dropdown-menu-item"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
                                                     onImportWorkflow(project.id);
                                                 }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
+                                            />
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </ButtonGroup>
@@ -217,55 +215,50 @@ const AutomationWorkflowProjectListItem = ({
                                 />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" className="p-0">
+                            <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                     aria-label="Publish Project"
-                                    className="dropdown-menu-item"
+                                    icon={<SendIcon />}
+                                    label="Publish"
                                     onClick={() => onPublishProject(project.id)}
-                                >
-                                    <SendIcon /> Publish
-                                </DropdownMenuItem>
+                                />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
                                     aria-label="New Workflow"
-                                    className="dropdown-menu-item"
+                                    icon={<PlusIcon />}
+                                    label="New Workflow"
                                     onClick={() => onCreateWorkflow(project.id)}
-                                >
-                                    <PlusIcon /> New Workflow
-                                </DropdownMenuItem>
+                                />
 
                                 <DropdownMenuItem
                                     aria-label="Import Workflow"
-                                    className="dropdown-menu-item"
+                                    icon={<UploadIcon />}
+                                    label="Import Workflow"
                                     onClick={() => onImportWorkflow(project.id)}
-                                >
-                                    <UploadIcon /> Import Workflow
-                                </DropdownMenuItem>
+                                />
 
                                 <DropdownMenuItem
                                     aria-label="Edit Project"
-                                    className="dropdown-menu-item"
+                                    icon={<EditIcon />}
+                                    label="Edit"
                                     onClick={() => onEditProject(project)}
-                                >
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
+                                />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
                                     aria-label="Delete Project"
-                                    className="dropdown-menu-item-destructive"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
                                     onClick={(event: MouseEvent) => {
                                         setShowDeleteDialog(true);
 
                                         event.stopPropagation();
                                     }}
                                     variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

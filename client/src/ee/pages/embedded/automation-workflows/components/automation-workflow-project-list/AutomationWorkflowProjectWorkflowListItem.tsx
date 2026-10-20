@@ -1,6 +1,10 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
@@ -107,30 +111,29 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                         />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem
                             aria-label="Edit Workflow"
+                            icon={<PencilIcon />}
+                            label="Edit"
                             onClick={(event) => {
                                 event.stopPropagation();
 
                                 onEditWorkflow(workflow);
                             }}
-                        >
-                            <PencilIcon /> Edit
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
                             aria-label="Delete Workflow"
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={(event) => {
                                 event.stopPropagation();
 
                                 onDeleteWorkflow(workflow.workflowUuid);
                             }}
                             variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
