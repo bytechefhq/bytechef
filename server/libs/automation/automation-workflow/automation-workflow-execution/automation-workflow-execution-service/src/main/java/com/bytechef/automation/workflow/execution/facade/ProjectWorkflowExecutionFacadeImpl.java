@@ -303,6 +303,20 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
+        int pageNumber) {
+
+        return getWorkflowExecutions(
+            embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, null,
+            workflowId, projectVersion, workspaceId, pageNumber);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
+    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
         long workspaceId, int pageNumber) {
 

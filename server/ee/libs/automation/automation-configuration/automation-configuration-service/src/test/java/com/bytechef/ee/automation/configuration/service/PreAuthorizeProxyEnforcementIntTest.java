@@ -12,14 +12,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
+import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacade;
@@ -27,9 +41,17 @@ import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacadeImpl;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowService;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -38,6 +60,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -92,6 +115,12 @@ class PreAuthorizeProxyEnforcementIntTest {
     private GuardedResourceOwnerReads guardedResourceOwnerReads;
 
     @Autowired
+    private ProjectFacade projectFacade;
+
+    @Autowired
+    private ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade;
+
+    @Autowired
     private WorkspaceUserFacade workspaceUserFacade;
 
     @BeforeEach
@@ -106,7 +135,7 @@ class PreAuthorizeProxyEnforcementIntTest {
         // true-stub would leak into the next denial assertion.
         // The repositories are singletons in the same cached context, so a positive control's stubbing would otherwise
         // survive into the next test's denial assertion.
-        reset(permissionService, customRoleRepository, workspaceUserRepository);
+        reset(permissionService, customRoleRepository, workspaceUserRepository, projectFacade);
 
         // Exactly the methods the production annotations route to. Stubbing anything else would be decoration: a
         // denial that rests on Mockito's default false cannot distinguish "the named check refused" from "nothing
@@ -177,6 +206,51 @@ class PreAuthorizeProxyEnforcementIntTest {
         guardedProjectMutations.getProject(1L);
 
         verify(permissionService).hasResourceScope(1L, "Project", "WORKFLOW_VIEW");
+    }
+
+    @Test
+    void testShortWorkflowExecutionsOverloadDeniesAnotherWorkspace() {
+        assertThatThrownBy(
+            () -> projectWorkflowExecutionFacade.getWorkflowExecutions(
+                false, 0L, null, null, null, null, null, null, null, 2L, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScope(2L, "EXECUTION_VIEW", Environment.values()[0]);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
+    void testShortWorkflowExecutionsOverloadAllowsAGrantedWorkspace() {
+        when(permissionService.hasWorkspaceScope(2L, "EXECUTION_VIEW", Environment.values()[0])).thenReturn(true);
+
+        projectWorkflowExecutionFacade.getWorkflowExecutions(
+            false, 0L, null, null, null, null, null, null, null, 2L, 0);
+
+        verify(projectFacade).getWorkspaceProjectWorkflows(2L);
+    }
+
+    @Test
+    void testEmbeddedOnlyMemberListsEmbeddedExecutionsWithoutTheWorkspaceGate() {
+        when(permissionService.hasEmbeddedScope(eq("EXECUTION_VIEW"), any(Environment.class))).thenReturn(true);
+
+        projectWorkflowExecutionFacade.getWorkflowExecutions(
+            true, 0L, null, null, null, null, null, null, null, 2L, 0);
+
+        verify(permissionService).hasEmbeddedScope("EXECUTION_VIEW", Environment.values()[0]);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
+    void testEmbeddedRunsAreDeniedWithoutTheEmbeddedScope() {
+        assertThatThrownBy(
+            () -> projectWorkflowExecutionFacade.getWorkflowExecutions(
+                true, 0L, null, null, null, null, null, null, null, 2L, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasEmbeddedScope("EXECUTION_VIEW", Environment.values()[0]);
+        verifyNoMoreInteractions(permissionService);
     }
 
     @Test
@@ -321,6 +395,27 @@ class PreAuthorizeProxyEnforcementIntTest {
         WorkspaceUserFacadeImpl.class, WorkspaceUserServiceImpl.class
     })
     static class Config {
+
+        @Bean
+        ProjectFacade projectFacade() {
+            return mock(ProjectFacade.class);
+        }
+
+        @Bean
+        ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade(
+            PermissionService permissionService, ProjectFacade projectFacade) {
+
+            return new ProjectWorkflowExecutionFacadeImpl(
+                mock(ComponentDefinitionService.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+                mock(ContextService.class), mock(Evaluator.class), mock(EnvironmentService.class),
+                mock(WorkflowExecutionRowService.class), mock(JobService.class), permissionService,
+                mock(PrincipalJobService.class), projectFacade, mock(ProjectDeploymentService.class),
+                mock(ProjectService.class), mock(ProjectWorkflowService.class),
+                mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),
+                mock(TaskFileStorage.class), mock(TriggerExecutionService.class), mock(TriggerFileStorage.class),
+                mock(WorkflowService.class));
+        }
 
         @Bean("permissionService")
         PermissionService permissionService() {
