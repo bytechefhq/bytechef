@@ -58,7 +58,7 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
         // Deleting the server's projects deletes their deployments, which needs DEPLOYMENT_DELETE on each; the caller
         // was already authorized to delete the server itself, so the cascade must not stop half way on a narrower
         // scope.
-        runSkippingChecks(() -> deleteMcpProjects(mcpServerId));
+        AutomationAuthorizationContext.runSkippingChecks(() -> deleteMcpProjects(mcpServerId));
     }
 
     private void deleteMcpProjects(long mcpServerId) {
@@ -67,20 +67,6 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
         for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.deleteProjectDeployment(
                 Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
-        }
-    }
-
-    private static void runSkippingChecks(Runnable runnable) {
-        try {
-            AutomationAuthorizationContext.callSkippingChecks(() -> {
-                runnable.run();
-
-                return null;
-            });
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
         }
     }
 }

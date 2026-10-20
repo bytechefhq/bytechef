@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,6 +29,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -173,8 +175,6 @@ class ConnectionFacadeIntTest {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
-
         assertEveryOperationIsDenied();
     }
 
@@ -189,7 +189,8 @@ class ConnectionFacadeIntTest {
             .name("Team Slack")
             .build();
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        grantEveryEmbeddedScope();
+
         when(platformConnectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
 
@@ -285,6 +286,13 @@ class ConnectionFacadeIntTest {
         verifyNoInteractions(platformConnectionFacade, connectionService, connectedUserConnectionService);
     }
 
+    private void grantEveryEmbeddedScope() {
+        when(permissionService.hasResourceScope(anyLong(), eq("Connection"), anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString(), any(Environment.class))).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(anyString())).thenReturn(true);
+    }
+
     private static Connection connection(long id, PlatformType type) {
         Connection connection = new Connection();
 
@@ -311,7 +319,8 @@ class ConnectionFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            grantEveryEmbeddedScope();
+
             when(connectionService.fetchConnection(AUTOMATION_CONNECTION_ID))
                 .thenReturn(Optional.of(connection(AUTOMATION_CONNECTION_ID, PlatformType.AUTOMATION)));
             when(connectionService.fetchConnection(UNKNOWN_CONNECTION_ID)).thenReturn(Optional.empty());
@@ -383,7 +392,8 @@ class ConnectionFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            grantEveryEmbeddedScope();
+
             when(connectedUserConnectionService.getConnectionIdsIn(anySet())).thenAnswer(invocation -> {
                 Set<Long> requestedConnectionIds = invocation.getArgument(0);
 
@@ -903,8 +913,12 @@ class ConnectionFacadeIntTest {
             @Lazy PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }

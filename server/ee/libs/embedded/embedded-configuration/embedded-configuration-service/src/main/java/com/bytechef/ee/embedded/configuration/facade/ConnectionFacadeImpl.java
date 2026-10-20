@@ -66,7 +66,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("com.bytechef.ee.embedded.configuration.facade.ConnectionFacade")
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
@@ -124,6 +123,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
         @AuditData(key = "shared", value = "#shared")
     })
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long createConnection(ConnectionDTO connectionDTO, boolean shared) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
@@ -139,6 +139,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, data = {
         @AuditData(key = "connectionId", value = "#id")
     })
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_DELETE')")
     public void deleteConnection(long id) {
         requireAdminConnection(id);
 
@@ -148,6 +149,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_VIEW')")
     public ConnectionDTO getConnection(long id) {
         requireAdminConnection(id);
 
@@ -155,6 +157,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTION_VIEW', #environmentId)")
     public List<ConnectionDTO> getConnections(
         @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
         @Nullable Long tagId) {
@@ -175,6 +178,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW')")
     public List<Tag> getConnectionTags() {
         List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
 
@@ -195,6 +199,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_VIEW')")
     @Transactional(readOnly = true)
     public List<IntegrationConnectionWorkflowDTO> getConnectionWorkflows(long id) {
         requireAdminConnection(id);
@@ -296,6 +301,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW')")
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
     }
@@ -307,6 +313,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         @AuditData(key = "name", value = "#name"),
         @AuditData(key = "shared", value = "#shared")
     })
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_EDIT')")
     public void updateConnection(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version) {
         requireAdminConnection(id);
 
@@ -322,6 +329,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "connectionId", value = "#id")
     })
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_EDIT')")
     public void updateConnectionCredentials(long id, Map<String, ?> parameters, int version) {
         requireAdminConnection(id);
 
@@ -330,6 +338,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional
+    @PreAuthorize("hasPermission(#id, 'Connection', 'CONNECTION_EDIT')")
     public void updateConnectionTags(long id, List<Tag> tags) {
         requireAdminConnection(id);
 

@@ -85,7 +85,8 @@ public class McpServerAfterSaveEventListener extends AbstractRelationalEventList
             return;
         }
 
-        runSkippingChecks(() -> checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled()));
+        AutomationAuthorizationContext.runSkippingChecks(
+            () -> checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled()));
     }
 
     private void checkProjectDeploymentTriggers(long mcpServerId, boolean enabled) {
@@ -93,20 +94,6 @@ public class McpServerAfterSaveEventListener extends AbstractRelationalEventList
 
         for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), enabled);
-        }
-    }
-
-    private static void runSkippingChecks(Runnable runnable) {
-        try {
-            AutomationAuthorizationContext.callSkippingChecks(() -> {
-                runnable.run();
-
-                return null;
-            });
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
         }
     }
 }
