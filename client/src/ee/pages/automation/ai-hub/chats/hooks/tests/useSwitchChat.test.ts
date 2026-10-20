@@ -2,6 +2,7 @@ import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pending
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -57,14 +58,17 @@ const buildChat = (overrides: Partial<AiHubChatI> = {}): AiHubChatI => ({
     environmentId: 0,
     id: 7,
     isOwner: true,
+    kind: 'STANDARD',
     lastPreview: null,
     messageCount: 0,
     ownerUserId: 1,
+    projectDeploymentId: null,
     status: 'ACTIVE',
     threadId: 'thread-target',
     title: 'Target',
     updatedAt: '2026-04-01T00:00:00Z',
     userId: 1,
+    workflowExecutionId: null,
     workspaceId: 99,
     ...overrides,
 });
@@ -113,6 +117,7 @@ describe('useSwitchChat', () => {
 
         aiHubStore.setState({chatId: 'thread-source', messages: []});
         aiHubChatsStore.setState({currentChatId: 1});
+        aiChatToolCallStore.setState({order: [], toolCalls: {}});
     });
 
     it('updates the hub store before the chats store and navigates to the chat', async () => {
@@ -138,6 +143,84 @@ describe('useSwitchChat', () => {
         expect(mockReportMutationError).not.toHaveBeenCalled();
 
         aiHubChatsStore.setState({setCurrentChatId: originalSetId});
+    });
+
+    it('keeps a turn started while the history was loading after the loaded history', async () => {
+        let resolveMessages: (messages: AiHubChatMessageI[]) => void = () => undefined;
+
+        mockGetChatMessages.mockReturnValue(
+            new Promise<AiHubChatMessageI[]>((resolve) => {
+                resolveMessages = resolve;
+            })
+        );
+
+        const {result} = renderHook(() => useSwitchChat());
+
+        let switchPromise: Promise<boolean> | undefined;
+
+        act(() => {
+            switchPromise = result.current(buildChat());
+        });
+
+        const newTurn = {content: 'sent while loading', id: 'new-turn', role: 'user' as const};
+
+        act(() => {
+            aiHubStore.setState({messages: [newTurn]});
+        });
+
+        await act(async () => {
+            resolveMessages([buildMessage({content: 'earlier question'})]);
+
+            await switchPromise;
+        });
+
+        const messages = aiHubStore.getState().messages;
+
+        expect(messages).toHaveLength(2);
+        expect(messages.at(-1)).toEqual(newTurn);
+        expect(aiHubStore.getState().messagesLoading).toBe(false);
+    });
+
+    it('keeps a tool call started while the history was loading on its assistant message', async () => {
+        let resolveMessages: (messages: AiHubChatMessageI[]) => void = () => undefined;
+
+        mockGetChatMessages.mockReturnValue(
+            new Promise<AiHubChatMessageI[]>((resolve) => {
+                resolveMessages = resolve;
+            })
+        );
+
+        const {result} = renderHook(() => useSwitchChat());
+
+        let switchPromise: Promise<boolean> | undefined;
+
+        act(() => {
+            switchPromise = result.current(buildChat());
+        });
+
+        act(() => {
+            aiHubStore.setState({
+                messages: [
+                    {content: 'sent while loading', id: 'user-new', role: 'user'},
+                    {content: '', id: 'assistant-new', role: 'assistant'},
+                ],
+            });
+
+            aiChatToolCallStore.getState().startToolCall('call-1', 'listProjects', 1, 'thread-target');
+        });
+
+        await act(async () => {
+            resolveMessages([
+                buildMessage({content: 'earlier question'}),
+                buildMessage({content: 'earlier answer', role: 'ASSISTANT'}),
+            ]);
+
+            await switchPromise;
+        });
+
+        const toolCallMessageIndex = aiChatToolCallStore.getState().toolCalls['call-1']?.messageIndex;
+
+        expect(aiHubStore.getState().messages[toolCallMessageIndex!]?.id).toBe('assistant-new');
     });
 
     it('maps user/assistant/system roles and filters tool', async () => {
@@ -359,6 +442,35 @@ describe('useSwitchChat', () => {
 
             expect(pickerData).toMatchObject({componentName: 'slack'});
             expect(pickerData?.pickedLabel).toBeUndefined();
+        });
+
+        it('restores an unanswered workflow question as an answerable card that sends the bare answer', async () => {
+            const questionResult = {
+                answerFormat: 'plain',
+                awaitingAnswer: true,
+                kind: 'ask-user-question',
+                questions: [{multiSelect: false, options: [{label: 'Blue'}, {label: 'Red'}], question: 'Which room?'}],
+            };
+
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({
+                    content: 'Book a room',
+                    role: 'USER',
+                    toolEventsJson: JSON.stringify([
+                        {arguments: '{}', id: 'workflow-question-1', kind: 'call', name: 'askWorkflowQuestion'},
+                        {
+                            id: 'workflow-question-1',
+                            kind: 'result',
+                            name: 'askWorkflowQuestion',
+                            response: JSON.stringify(questionResult),
+                        },
+                    ]),
+                }),
+            ]);
+
+            await switchTo(buildChat({kind: 'WORKFLOW_CHAT'}));
+
+            expect(findDataPart('data-ask-user-question')?.data).toEqual(questionResult);
         });
 
         const SLACK_PICKER = {
@@ -811,6 +923,21 @@ describe('useSwitchChat', () => {
         await switchTo(buildChat());
 
         expect(observedGenerations).toEqual([transcriptGeneration + 1]);
+    });
+
+    it('leaves the focused chat and its streaming reply alone when that chat is selected again', async () => {
+        const streamingReply = {content: 'partial answer', id: 'streaming-reply', role: 'assistant' as const};
+
+        aiHubStore.setState({chatId: 'thread-target', messages: [streamingReply], messagesLoading: false});
+        aiHubChatsStore.setState({currentChatId: 7});
+
+        const transcriptGeneration = aiHubStore.getState().transcriptGeneration;
+
+        expect(await switchTo(buildChat())).toBe(true);
+
+        expect(aiHubStore.getState().messages).toEqual([streamingReply]);
+        expect(aiHubStore.getState().transcriptGeneration).toBe(transcriptGeneration);
+        expect(mockGetChatMessages).not.toHaveBeenCalled();
     });
 
     it('returns true on success', async () => {

@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
+import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
@@ -25,6 +26,8 @@ const AiHubHomePanel = () => {
     const setDraftLlmSelection = useAiHubChatsStore((state) => state.setDraftLlmSelection);
 
     const navigate = useNavigate();
+
+    const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
         environment: String(currentEnvironmentId),
@@ -85,8 +88,10 @@ const AiHubHomePanel = () => {
                                             writeLastUsedModel(currentWorkspaceId, provider, model);
                                             setDraftLlmSelection(provider, model);
                                         }}
+                                        onSelectWorkflowChat={onSelectWorkflowChat}
                                         selectedModel={shownLlmSelection?.model ?? null}
                                         selectedProvider={shownLlmSelection?.provider ?? null}
+                                        workflowChats={workflowChats}
                                     />
                                 ) : null
                             }
