@@ -14,6 +14,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectListItemPublishMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemPublishMenuItem';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectTagsQuery,
     AutomationProjectsQuery,
@@ -73,6 +75,15 @@ const AutomationProjectListItem = ({
 }: AutomationProjectListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showUsageSheet, setShowUsageSheet] = useState(false);
+
+    const canCreateProject = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteProject = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
+
+    const canPublishProject = canEditWorkflowOnUnion && canPublishScope;
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -216,6 +227,7 @@ const AutomationProjectListItem = ({
                                     <TagList
                                         getRequest={(_id, updatedTags) => updatedTags.map((tag) => tag.name)}
                                         id={0}
+                                        readOnly={!canManageSettings}
                                         remainingTags={remainingTags}
                                         tags={projectTags}
                                         updateTagsMutation={updateTagsMutation}
@@ -289,14 +301,16 @@ const AutomationProjectListItem = ({
 
                             <DropdownMenuContent align="end">
                                 <DropdownMenuGroup aria-label="Project Actions">
-                                    <DropdownMenuItem
-                                        aria-label="Edit Project"
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() => onEditProject(project)}
-                                    />
+                                    {canManageSettings && (
+                                        <DropdownMenuItem
+                                            aria-label="Edit Project"
+                                            icon={<EditIcon />}
+                                            label="Edit"
+                                            onClick={() => onEditProject(project)}
+                                        />
+                                    )}
 
-                                    {project.codeWorkflowProject ? (
+                                    {canPublishProject && project.codeWorkflowProject && (
                                         <DropdownMenuItem
                                             aria-label="Publish Project"
                                             disabled={!project.codeWorkflowDraftPublishable}
@@ -304,19 +318,23 @@ const AutomationProjectListItem = ({
                                             label="Publish"
                                             onClick={() => onPublishProject(project.id)}
                                         />
-                                    ) : (
+                                    )}
+
+                                    {canPublishProject && !project.codeWorkflowProject && (
                                         <ProjectListItemPublishMenuItem
                                             hasWorkflows={project.workflowTemplates.length > 0}
                                             onClick={() => onPublishProject(project.id)}
                                         />
                                     )}
 
-                                    <DropdownMenuItem
-                                        aria-label="Duplicate Project"
-                                        icon={<CopyIcon />}
-                                        label="Duplicate"
-                                        onClick={() => duplicateProjectMutation.mutate({id: project.id})}
-                                    />
+                                    {canCreateProject && (
+                                        <DropdownMenuItem
+                                            aria-label="Duplicate Project"
+                                            icon={<CopyIcon />}
+                                            label="Duplicate"
+                                            onClick={() => duplicateProjectMutation.mutate({id: project.id})}
+                                        />
+                                    )}
 
                                     <DropdownMenuItem
                                         aria-label="Export Project"
@@ -348,7 +366,7 @@ const AutomationProjectListItem = ({
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuGroup aria-label="Workflow Actions">
-                                    {!project.codeWorkflowProject && (
+                                    {!project.codeWorkflowProject && canCreateWorkflow && (
                                         <>
                                             <DropdownMenuItem
                                                 aria-label="New Workflow"
@@ -398,19 +416,23 @@ const AutomationProjectListItem = ({
                                     </Tooltip>
                                 </DropdownMenuGroup>
 
-                                <DropdownMenuSeparator />
+                                {canDeleteProject && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Project"
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={(event: MouseEvent) => {
-                                        setShowDeleteDialog(true);
+                                        <DropdownMenuItem
+                                            aria-label="Delete Project"
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={(event: MouseEvent) => {
+                                                setShowDeleteDialog(true);
 
-                                        event.stopPropagation();
-                                    }}
-                                    variant="destructive"
-                                />
+                                                event.stopPropagation();
+                                            }}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
