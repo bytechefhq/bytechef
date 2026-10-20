@@ -13,7 +13,7 @@ import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiH
 import AiHubChatActionDialogs from '@/ee/pages/automation/ai-hub/chats/AiHubChatActionDialogs';
 import {getChatDisplayTitle, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
-import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
@@ -74,16 +74,13 @@ const AiHubPanel = () => {
         {enabled: currentEnvironmentId >= 0}
     );
 
-    const {data: activeChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
-    const {data: archivedChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ARCHIVED');
+    const currentChat = useCurrentAiHubChat();
 
     const chatActions = useAiHubChatActions();
 
     const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
-
-    const currentChat = [...(activeChats ?? []), ...(archivedChats ?? [])].find((chat) => chat.id === currentChatId);
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 

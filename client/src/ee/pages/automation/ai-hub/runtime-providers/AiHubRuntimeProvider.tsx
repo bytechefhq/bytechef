@@ -139,9 +139,57 @@ const validateOpenChatTabResult = (raw: unknown): OpenChatTabResultType | null =
     return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
 };
 
+const toWorkflowQuestionOption = (
+    value: unknown
+): AskUserQuestionDataI['questions'][number]['options'][number] | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const option = value as {description?: unknown; label?: unknown};
+
+    if (typeof option.label !== 'string') {
+        return null;
+    }
+
+    if (option.description === undefined) {
+        return {label: option.label};
+    }
+
+    if (typeof option.description !== 'string') {
+        return null;
+    }
+
+    return {description: option.description, label: option.label};
+};
+
+const toWorkflowQuestion = (value: unknown): AskUserQuestionDataI['questions'][number] | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const question = value as {header?: unknown; multiSelect?: unknown; options?: unknown; question?: unknown};
+
+    if (typeof question.question !== 'string' || question.question.trim().length === 0) {
+        return null;
+    }
+
+    const options = Array.isArray(question.options)
+        ? question.options.map(toWorkflowQuestionOption).filter((option) => option !== null)
+        : [];
+
+    return {
+        header: typeof question.header === 'string' ? question.header : undefined,
+        multiSelect: question.multiSelect === true,
+        options,
+        question: question.question,
+    };
+};
+
 /**
  * Turns an {@code ask-workflow-question} event value into the question card's data, or {@code null} when it carries no
- * questions. The card waits for an answer only when the workflow can be resumed with it.
+ * questions. The card sends the bare answer, which the workflow receives as the resume message, and waits for an
+ * answer only when the workflow can be resumed with it.
  */
 const toWorkflowQuestionData = (value: unknown): AskUserQuestionDataI | null => {
     if (typeof value !== 'object' || value === null) {
@@ -154,16 +202,14 @@ const toWorkflowQuestionData = (value: unknown): AskUserQuestionDataI | null => 
         return null;
     }
 
-    const questions = (record.questions as Array<Partial<AskUserQuestionDataI['questions'][number]>>).map(
-        (question) => ({
-            header: question.header,
-            multiSelect: question.multiSelect === true,
-            options: Array.isArray(question.options) ? question.options : [],
-            question: question.question ?? '',
-        })
-    );
+    const questions = record.questions.map(toWorkflowQuestion).filter((question) => question !== null);
+
+    if (questions.length === 0) {
+        return null;
+    }
 
     return {
+        answerFormat: 'plain',
         awaitingAnswer: typeof record.resumeUrl === 'string' && record.resumeUrl.length > 0,
         kind: 'ask-user-question',
         questions,
