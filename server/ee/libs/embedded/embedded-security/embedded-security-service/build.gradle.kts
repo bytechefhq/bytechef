@@ -11,6 +11,8 @@ dependencies {
     implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     runtimeOnly(libs.jjwt.impl)
