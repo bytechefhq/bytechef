@@ -42,14 +42,25 @@ The client records `WORKFLOW_REFERENCED` through `useRecordReferencedArtifacts` 
 
 `AiHubConfiguration` builds two `AiHubSpringAIAgent` beans, `ai_hub_ask` and `ai_hub_build`, with explicit tool
 lists (never a sweep of every `ToolCallback` bean). ASK is read only: `ReadProjectTools`,
-`ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`. BUILD adds `ProjectTools`,
-`ProjectWorkflowLifecycleTools`, deployment writes, write pickers, and `buildWorkflow` / `importWorkflow`.
+`ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`, `openWorkflowChatTab`. BUILD adds
+`ProjectTools`, `ProjectWorkflowLifecycleTools`, deployment writes, write pickers, the workflow chat tools
+`listChatWorkflows` and `createWorkflowChat`, and `buildWorkflow` / `importWorkflow`.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
 
 Parity contract: the Copilot, the Hub and the management MCP server (`ManagementMcpServerConfiguration`) author
 workflow content only through the same `buildWorkflow` / `importWorkflow` specialist. No door holds raw
 `ProjectWorkflowTools.updateWorkflow`; `WorkflowContentSinglePathTest` in `server-app` enforces it.
+
+Workflow chats: the `ai_hub_ask` and `ai_hub_build` beans are `AiHubRoutingAgent`s that wrap the mode's
+`AiHubSpringAIAgent`. A turn on a `WORKFLOW_CHAT` chat goes to `WebhookBridgeAgent`, which runs the chat's
+workflow through its webhook trigger instead of an LLM; every other turn goes to the LLM agent. A workflow chat
+turn needs the `WORKFLOW_VIEW` workspace scope in place of the EDITOR role, and creating one through GraphQL or
+`createWorkflowChat` also requires `ProjectDeploymentFacade.findWorkspaceChatWorkflow` to find the workflow, and the
+chat stores the project deployment id of the listing row it returns, not the one the caller sent. The workflow sees the
+conversation id `workflow-chat:<threadId>`: its own chat memory keys on that id, which differs from the thread id
+the hub session uses because both can live in the same session store. BUILD finds chat workflows
+with `listChatWorkflows`, creates a chat with `createWorkflowChat`, and opens it with `openWorkflowChatTab`.
 
 ## Model resolution
 
