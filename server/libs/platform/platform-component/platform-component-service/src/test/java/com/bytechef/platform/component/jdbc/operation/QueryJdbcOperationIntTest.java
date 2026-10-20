@@ -17,8 +17,11 @@
 package com.bytechef.platform.component.jdbc.operation;
 
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
+import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation.QueryColumn;
+import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation.QueryResult;
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -71,5 +74,38 @@ public class QueryJdbcOperationIntTest {
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
         Assertions.assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testExecuteWithColumnsReturnsColumnsWhenNoRowsMatch() throws SQLException {
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.PARAMETERS, Map.of("id", "missing"),
+            JdbcConstants.QUERY, "SELECT id, name FROM test where id=:id");
+
+        QueryResult result = new QueryJdbcOperation().executeWithColumns(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+
+        Assertions.assertEquals(
+            List.of("id", "name"), result.columns()
+                .stream()
+                .map(QueryColumn::name)
+                .toList());
+        Assertions.assertEquals(Types.VARCHAR, result.columns()
+            .getFirst()
+            .type());
+        Assertions.assertTrue(result.rows()
+            .isEmpty());
+    }
+
+    @Test
+    public void testExecuteWithColumnsReturnsRowsKeyedByColumnName() throws SQLException {
+        Map<String, ?> inputParameters = Map.of(
+            JdbcConstants.PARAMETERS, Map.of("id", "id2"),
+            JdbcConstants.QUERY, "SELECT id, name FROM test where id=:id");
+
+        QueryResult result = new QueryJdbcOperation().executeWithColumns(
+            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+
+        Assertions.assertEquals(List.of(Map.of("id", "id2", "name", "name2")), result.rows());
     }
 }

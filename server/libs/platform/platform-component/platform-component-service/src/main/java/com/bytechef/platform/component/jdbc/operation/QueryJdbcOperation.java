@@ -21,6 +21,7 @@ import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,46 @@ import javax.sql.DataSource;
  * @author Ivica Cardic
  */
 public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object>>> {
+
+    public record QueryColumn(String name, int type) {
+    }
+
+    public record QueryResult(List<QueryColumn> columns, List<Map<String, Object>> rows) {
+    }
+
+    public QueryResult executeWithColumns(Map<String, ?> inputParameters, DataSource dataSource) {
+        Map<String, ?> paramMap = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
+        String queryStatement = MapUtils.getRequiredString(inputParameters, JdbcConstants.QUERY);
+
+        return JdbcExecutor.query(
+            queryStatement, paramMap, (ResultSet rs) -> {
+                ResultSetMetaData rsMetaData = rs.getMetaData();
+
+                int columnCount = rsMetaData.getColumnCount();
+
+                List<QueryColumn> columns = new ArrayList<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    columns.add(new QueryColumn(rsMetaData.getColumnName(i), rsMetaData.getColumnType(i)));
+                }
+
+                List<Map<String, Object>> rows = new ArrayList<>();
+
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+
+                    for (int i = 1; i <= columnCount; i++) {
+                        QueryColumn column = columns.get(i - 1);
+
+                        row.put(column.name(), rs.getObject(i));
+                    }
+
+                    rows.add(row);
+                }
+
+                return new QueryResult(columns, rows);
+            }, dataSource);
+    }
 
     @Override
     public List<Map<String, Object>> execute(Map<String, ?> inputParameters, DataSource dataSource) {

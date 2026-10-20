@@ -13,7 +13,7 @@
     "metadata": null,
     "name": "query",
     "outputDefinition": {
-      "output": null,
+      "output": {},
       "outputResponse": null,
       "outputSchema": null,
       "sampleOutput": null
