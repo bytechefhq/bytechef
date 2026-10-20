@@ -7,6 +7,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationWorkflows from '../AutomationWorkflows';
 import useAutomationWorkflowExecutionsSheetStore from '../stores/useAutomationWorkflowExecutionsSheetStore';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const renderWithProviders = (ui: ReactElement) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 

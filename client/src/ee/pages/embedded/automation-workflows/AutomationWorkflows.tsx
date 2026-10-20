@@ -4,6 +4,7 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -107,6 +108,9 @@ const AutomationWorkflows = () => {
     const deleteWorkflowMutation = useDeleteAutomationWorkflowProjectWorkflowMutation();
     const publishProjectMutation = usePublishAutomationWorkflowProjectMutation();
     const updateProjectMutation = useUpdateAutomationWorkflowProjectMutation();
+    const canCreateProject = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+
     const updateWorkflowMutation = useUpdateAutomationWorkflowProjectWorkflowMutation();
     const updateWorkflowPermissionExpressionMutation =
         useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation();
@@ -151,7 +155,7 @@ const AutomationWorkflows = () => {
                     category: values.category || undefined,
                     description: values.description || undefined,
                     name: values.name,
-                    permissionExpression: values.permissionExpression,
+                    permissionExpression: canManageSettings ? values.permissionExpression : undefined,
                     tags: values.tags,
                 },
                 {
@@ -192,7 +196,11 @@ const AutomationWorkflows = () => {
         });
 
         createWorkflowMutation.mutate(
-            {definition, permissionExpression: values.permissionExpression, projectId: pendingWorkflowProjectId},
+            {
+                definition,
+                permissionExpression: canManageSettings ? values.permissionExpression : undefined,
+                projectId: pendingWorkflowProjectId,
+            },
             {
                 onSuccess: (data) => {
                     invalidateProjects();
@@ -222,6 +230,14 @@ const AutomationWorkflows = () => {
             {description: values.description, label: values.label, workflowUuid},
             {
                 onSuccess: () => {
+                    if (!canManageSettings) {
+                        invalidateProjects();
+
+                        handleWorkflowDialogClose();
+
+                        return;
+                    }
+
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid},
                         {
@@ -312,7 +328,11 @@ const AutomationWorkflows = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<Button aria-label="New Project" label="New Project" onClick={handleNewProject} />}
+                        right={
+                            canCreateProject && (
+                                <Button aria-label="New Project" label="New Project" onClick={handleNewProject} />
+                            )
+                        }
                         title={
                             <AutomationWorkflowProjectsFilterTitle
                                 categories={categories}
@@ -362,7 +382,9 @@ const AutomationWorkflows = () => {
                     />
                 ) : (
                     <EmptyState
-                        actions={<Button label="Create Project" onClick={handleNewProject} />}
+                        actions={
+                            canCreateProject ? <Button label="Create Project" onClick={handleNewProject} /> : undefined
+                        }
                         description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
                         icon={<FolderIcon />}
                         title="Create your first project"

@@ -13,6 +13,7 @@ import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/int
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -43,6 +44,8 @@ const Integrations = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
     const unifiedApiCategory = searchParams.get('unifiedApiCategory') ?? undefined;
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -86,6 +89,7 @@ const Integrations = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateIntegration &&
                         integrations &&
                         integrations.length > 0 && (
                             <Button
@@ -143,11 +147,13 @@ const Integrations = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            <Button
-                                aria-label="Create Integration"
-                                label="Create Integration"
-                                onClick={() => setShowIntegrationDialog(true)}
-                            />
+                            canCreateIntegration ? (
+                                <Button
+                                    aria-label="Create Integration"
+                                    label="Create Integration"
+                                    onClick={() => setShowIntegrationDialog(true)}
+                                />
+                            ) : undefined
                         }
                         description="An integration connects your product to a third-party app, like Slack or HubSpot. You build its workflows here, and your users turn it on from inside your product."
                         docsLink={{href: EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL, label: 'How integrations work'}}

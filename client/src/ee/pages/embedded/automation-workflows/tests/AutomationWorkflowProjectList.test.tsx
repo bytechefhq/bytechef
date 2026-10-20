@@ -19,6 +19,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
 const renderWithProviders = (ui: ReactElement, initialEntries = ['/embedded/automation-workflows']) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 

@@ -3,6 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const existingProject = {
     categoryId: null,
     configurationCount: 0,

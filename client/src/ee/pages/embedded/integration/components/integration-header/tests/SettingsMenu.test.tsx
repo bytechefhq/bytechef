@@ -6,6 +6,12 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/pages/embedded/integrations/components/IntegrationDialog', () => ({
     default: () => <div role="dialog">Edit Integration</div>,
 }));
