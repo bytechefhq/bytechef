@@ -223,15 +223,38 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     /**
-     * Hook for subclasses to choose the message a RUN_ERROR event carries to the client. Default returns the
-     * throwable's message.
+     * Hook for subclasses to choose the message a RUN_ERROR event carries to the client. Default returns the most
+     * specific message in the throwable's cause chain, so a wrapper such as Spring AI's "Stream processing failed"
+     * does not hide the provider's own error.
      *
      * @param input     the current run input
      * @param throwable the failure that ended the run
      * @return the message sent to the client
      */
     protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
-        return throwable.getMessage();
+        return mostSpecificMessage(throwable);
+    }
+
+    /**
+     * Returns the message of the deepest throwable in the cause chain that has a non-blank message, or {@code null}
+     * when none has one.
+     *
+     * @param throwable the failure to inspect
+     * @return the most specific message, or {@code null}
+     */
+    protected static String mostSpecificMessage(Throwable throwable) {
+        String message = null;
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        for (Throwable current = throwable; current != null && visited.add(current); current = current.getCause()) {
+            String currentMessage = current.getMessage();
+
+            if (currentMessage != null && !currentMessage.isBlank()) {
+                message = currentMessage;
+            }
+        }
+
+        return message;
     }
 
     /**
