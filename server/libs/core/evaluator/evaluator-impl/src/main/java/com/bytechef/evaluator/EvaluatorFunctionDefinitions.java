@@ -585,19 +585,21 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
 
     static final EvaluatorFunctionDefinition CONCAT_STRING = function(EvaluatorFunctionName.CONCAT)
         .title("Concat")
-        .description("Concatenates one or more strings into a single string.")
+        .description(
+            "Concatenates one or more values into a single string. Numbers, booleans and other non-list values are " +
+                "converted to text, and null values are skipped.")
         .category(EvaluatorFunctionCategory.STRING)
         .parameters(
             parameter("value")
-                .description("The first string")
+                .description("The first value")
                 .type(STRING)
                 .required(true),
             parameter("values")
-                .description("Any number of further strings to append, in order")
+                .description("Any number of further values to append, in order")
                 .type(STRING)
                 .required(false))
         .returnType(STRING)
-        .example("=concat('hello', ' ', 'world')")
+        .example("=concat('Order #', ${trigger_1.body.id})")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition CONCAT_LIST = function(EvaluatorFunctionName.CONCAT)
