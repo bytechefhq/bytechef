@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
+    private final PermissionService permissionService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
@@ -67,7 +70,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         IntegrationService integrationService, McpComponentService mcpComponentService,
         McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
-        McpToolService mcpToolService, TagService tagService) {
+        McpToolService mcpToolService, @Lazy PermissionService permissionService, TagService tagService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -77,11 +80,12 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
+        this.permissionService = permissionService;
         this.tagService = tagService;
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent createEmbeddedMcpComponent(
         McpComponent mcpComponent, long integrationId, List<McpTool> mcpTools) {
 
@@ -96,13 +100,13 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('MCP_CREATE', #environment)")
     public McpServer createEmbeddedMcpServer(String name, Environment environment, Boolean enabled) {
         return mcpServerService.create(name, PlatformType.EMBEDDED, environment, enabled);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public void deleteEmbeddedMcpComponent(long mcpComponentId) {
         checkEmbeddedMcpComponent(mcpComponentId);
 
@@ -110,7 +114,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteEmbeddedMcpServer(long mcpServerId) {
         getEmbeddedMcpServer(mcpServerId);
 
@@ -124,7 +128,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')")
     public void deleteEmbeddedMcpTool(long mcpToolId) {
         McpTool mcpTool = getEmbeddedMcpTool(mcpToolId);
 
@@ -132,7 +136,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
     public @Nullable Long fetchEmbeddedMcpComponentIntegrationId(long mcpComponentId) {
         checkEmbeddedMcpComponent(mcpComponentId);
 
@@ -142,7 +146,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
     public List<McpTool> getEmbeddedMcpComponentMcpTools(long mcpComponentId) {
         checkEmbeddedMcpComponent(mcpComponentId);
 
@@ -150,7 +154,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public List<McpComponent> getEmbeddedMcpServerMcpComponents(long mcpServerId) {
         getEmbeddedMcpServer(mcpServerId);
 
@@ -158,13 +162,16 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     public List<McpServer> getEmbeddedMcpServers() {
-        return mcpServerService.getMcpServers(PlatformType.EMBEDDED);
+        return mcpServerService.getMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .filter(mcpServer -> permissionService.hasEmbeddedScope("MCP_VIEW", mcpServer.getEnvironment()))
+            .toList();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     public List<Tag> getEmbeddedMcpServerTags() {
         List<Long> tagIds = mcpServerService.getMcpServers(PlatformType.EMBEDDED)
             .stream()
@@ -180,7 +187,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     public List<ComponentDefinition> getMcpComponentDefinitions() {
         List<String> componentNames = getConfiguredPublishedIntegrations()
             .stream()
@@ -197,13 +204,13 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     public List<Integration> getMcpComponentIntegrations() {
         return getConfiguredPublishedIntegrations();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
     public McpComponent updateEmbeddedMcpComponent(
         McpComponent mcpComponent, @Nullable Long integrationId, @Nullable Set<String> requiredAuthorities,
         List<McpTool> mcpTools) {
@@ -241,7 +248,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpServer updateEmbeddedMcpServer(
         long mcpServerId, String name, Boolean enabled, Boolean enforceToolAuthorization,
         Boolean authenticationRequired) {
@@ -274,7 +281,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public List<Tag> updateEmbeddedMcpServerTags(long mcpServerId, List<Tag> tags) {
         getEmbeddedMcpServer(mcpServerId);
 
@@ -286,7 +293,8 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT') and " +
+        "hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public McpTool updateEmbeddedMcpTool(McpTool mcpTool) {
         getEmbeddedMcpTool(mcpTool.getId());
         checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
@@ -301,7 +309,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         @AuditData(key = "name", value = "#result?.name"),
         @AuditData(key = "enabled", value = "#enabled")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')")
     public McpTool updateEmbeddedMcpToolEnabled(long mcpToolId, boolean enabled) {
         getEmbeddedMcpTool(mcpToolId);
 

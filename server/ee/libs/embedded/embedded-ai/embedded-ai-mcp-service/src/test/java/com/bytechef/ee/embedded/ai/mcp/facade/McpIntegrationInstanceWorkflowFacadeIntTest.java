@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.security.EmbeddedMcpReader;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
@@ -365,7 +366,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     @EnableCaching
     @EnableMethodSecurity
     @Import({
-        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
+        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class, EmbeddedMcpReader.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,

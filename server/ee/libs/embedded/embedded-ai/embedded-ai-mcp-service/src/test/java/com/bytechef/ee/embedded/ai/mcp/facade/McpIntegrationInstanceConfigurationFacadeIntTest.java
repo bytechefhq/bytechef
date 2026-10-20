@@ -51,6 +51,7 @@ import com.bytechef.platform.connection.service.ConnectionServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -432,7 +433,8 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpIntegrationInstanceConfigurationFacadeImpl.class, McpIntegrationInstanceConfigurationServiceImpl.class,
-        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
+        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpServerServiceImpl.class,
+        EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class McpIntegrationInstanceConfigurationFacadeIntTestConfiguration {
 
