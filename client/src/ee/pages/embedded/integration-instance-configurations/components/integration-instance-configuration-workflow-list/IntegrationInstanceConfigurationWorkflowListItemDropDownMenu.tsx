@@ -1,5 +1,10 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
@@ -25,10 +30,9 @@ const IntegrationInstanceConfigurationWorkflowListItemDropDownMenu = ({
             <DropdownMenuContent align="end">
                 <DropdownMenuItem
                     disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
+                    label="Edit"
                     onClick={onEditClick}
-                >
-                    Edit
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );
