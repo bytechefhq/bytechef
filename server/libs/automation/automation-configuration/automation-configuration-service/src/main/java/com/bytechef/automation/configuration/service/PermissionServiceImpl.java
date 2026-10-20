@@ -240,12 +240,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
     public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
