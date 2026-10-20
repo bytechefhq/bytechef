@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional(readOnly = true)
 public class AppEventFacadeImpl implements AppEventFacade {
 
@@ -32,33 +34,33 @@ public class AppEventFacadeImpl implements AppEventFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_CREATE')")
     @Transactional
     public AppEvent create(AppEvent appEvent) {
         return appEventService.create(appEvent);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_DELETE')")
     @Transactional
     public void delete(long id) {
         appEventService.delete(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public AppEvent getAppEvent(long id) {
         return appEventService.getAppEvent(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_VIEW')")
     public List<AppEvent> getAppEvents() {
         return appEventService.getAppEvents();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('APP_EVENT_EDIT')")
     @Transactional
     public AppEvent update(AppEvent appEvent) {
         return appEventService.update(appEvent);
