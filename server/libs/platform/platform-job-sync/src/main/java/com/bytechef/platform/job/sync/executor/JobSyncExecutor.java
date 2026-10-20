@@ -83,7 +83,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -562,6 +561,24 @@ public class JobSyncExecutor {
     private void handleCoordinatorApplicationEvent(
         Object event, JobSyncAsyncTaskExecutor jobSyncAsyncTaskExecutor, TaskCoordinator taskCoordinator) {
 
+        Job taskStartedJob = null;
+
+        if (event instanceof TaskStartedApplicationEvent taskStartedEvent) {
+            long taskExecutionId = taskStartedEvent.getTaskExecutionId();
+
+            Optional<Job> jobOptional = jobService.fetchTaskExecutionJob(taskExecutionId);
+
+            if (jobOptional.isEmpty()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Skipping task started event for deleted task execution: {}", taskExecutionId);
+                }
+
+                return;
+            }
+
+            taskStartedJob = jobOptional.get();
+        }
+
         taskCoordinator.onApplicationEvent((ApplicationEvent) event);
 
         if (event instanceof JobStatusApplicationEvent jobStatusEvent) {
@@ -584,28 +601,12 @@ public class JobSyncExecutor {
             if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
                 invalidateListeners(jobId);
             }
-        } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent) {
-            long taskExecutionId = taskStartedEvent.getTaskExecutionId();
-
-            Job job;
-
-            try {
-                job = jobService.getTaskExecutionJob(taskExecutionId);
-            } catch (IllegalStateException | NoSuchElementException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Skipping task started event for deleted task execution: {}", taskExecutionId);
-                }
-
-                return;
-            }
-
-            long jobId = Validate.notNull(job.getId(), "id");
-
-            notifyTaskStartedListeners(jobId, taskStartedEvent);
+        } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent && taskStartedJob != null) {
+            notifyTaskStartedListeners(Validate.notNull(taskStartedJob.getId(), "id"), taskStartedEvent);
         }
     }
 
-    private boolean isJobDeletedOrStopped(TaskExecution taskExecution) {
+    private boolean isJobDeleted(TaskExecution taskExecution) {
         Long jobId = taskExecution.getJobId();
 
         if (jobId == null) {
@@ -617,16 +618,6 @@ public class JobSyncExecutor {
         if (jobOptional.isEmpty()) {
             if (log.isDebugEnabled()) {
                 log.debug("Dropping task completion for deleted job: {}", jobId);
-            }
-
-            return true;
-        }
-
-        Job job = jobOptional.get();
-
-        if (job.getStatus() == Job.Status.STOPPED) {
-            if (log.isDebugEnabled()) {
-                log.debug("Dropping task completion for stopped job: {}", jobId);
             }
 
             return true;
@@ -693,7 +684,7 @@ public class JobSyncExecutor {
         // not include all required fields (e.g., taskExecution.id).
         notifyTaskExecutionCompleteListeners(event);
 
-        if (isJobDeletedOrStopped(event.getTaskExecution())) {
+        if (isJobDeleted(event.getTaskExecution())) {
             return;
         }
 

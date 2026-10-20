@@ -82,6 +82,11 @@ public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFun
     }
 
     @Override
+    public Optional<Job> fetchTaskExecutionJob(long taskExecutionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job resumeToStatusStarted(long id) {
         throw new UnsupportedOperationException();
     }

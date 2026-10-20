@@ -132,10 +132,8 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
-        TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
-            .orElseThrow(() -> new IllegalArgumentException("TaskExecution not found: " + taskExecutionId));
-
-        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId())));
+        return inMemoryTaskExecutionRepository.findById(taskExecutionId)
+            .map(taskExecution -> cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId())));
     }
 
     @Override
