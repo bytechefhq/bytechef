@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -53,6 +55,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @version ee
@@ -71,6 +74,9 @@ class McpIntegrationInstanceConfigurationFacadeTest {
 
     @Mock
     private ConnectionService connectionService;
+
+    @Mock
+    private EmbeddedMcpReader embeddedMcpReader;
 
     @Mock
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -107,7 +113,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
     @BeforeEach
     void beforeEach() {
         mcpIntegrationInstanceConfigurationFacade = new McpIntegrationInstanceConfigurationFacadeImpl(
-            componentConnectionFacade, connectionService, integrationInstanceConfigurationService,
+            componentConnectionFacade, connectionService, embeddedMcpReader, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceWorkflowService, integrationService,
             integrationWorkflowService, mcpIntegrationInstanceConfigurationService,
             mcpIntegrationInstanceConfigurationWorkflowService, mcpServerService, permissionService,
@@ -123,7 +129,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
             INTEGRATION_INSTANCE_CONFIGURATION_ID))
                 .thenReturn(integrationInstanceConfiguration);
 
-        when(mcpServerService.getMcpServer(3L))
+        when(embeddedMcpReader.getMcpServer(3L))
             .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
         Integration integration = new Integration();
@@ -158,6 +164,25 @@ class McpIntegrationInstanceConfigurationFacadeTest {
         when(
             integrationInstanceConfigurationWorkflowService.update(any(IntegrationInstanceConfigurationWorkflow.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
+    }
+
+    @Test
+    void testCreateRejectsAConnectionTheCallerMayNotUse() {
+        stubConnection(90L, "slack", Environment.DEVELOPMENT);
+
+        when(permissionService.canUseConnectionInWorkflow(90L, WORKFLOW_ID, Environment.DEVELOPMENT))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+            3L, INTEGRATION_INSTANCE_CONFIGURATION_ID, List.of(WORKFLOW_ID),
+            List.of(slackWorkflowConfiguration(90L, Map.of()))))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("Connection 90");
+
+        verify(integrationInstanceConfigurationWorkflowService, never())
+            .create(any(IntegrationInstanceConfigurationWorkflow.class));
     }
 
     @Test
@@ -183,7 +208,7 @@ class McpIntegrationInstanceConfigurationFacadeTest {
 
     @Test
     void testCreateRejectsAServerFromAnotherEnvironment() {
-        when(mcpServerService.getMcpServer(4L))
+        when(embeddedMcpReader.getMcpServer(4L))
             .thenReturn(new McpServer("server", PlatformType.EMBEDDED, Environment.PRODUCTION));
 
         assertThatThrownBy(

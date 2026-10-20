@@ -149,6 +149,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         private static final int INTEGRATION_VERSION = 2;
 
+        @MockitoBean
+        private EmbeddedMcpReader embeddedMcpReader;
+
         @Autowired
         private Encryption encryption;
 
