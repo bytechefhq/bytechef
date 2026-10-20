@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.config;
 
+import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.ApiCollectionEndpointPublicApiController;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.ApiCollectionPublicApiController;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.EnvironmentModelConverter;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -23,7 +24,8 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import({
-    JacksonConfiguration.class, ApiCollectionPublicApiController.class, EnvironmentModelConverter.class
+    ApiCollectionEndpointPublicApiController.class, ApiCollectionPublicApiController.class,
+    EnvironmentModelConverter.class, JacksonConfiguration.class
 })
 public class ApiCollectionPublicRestTestConfiguration {
 }
