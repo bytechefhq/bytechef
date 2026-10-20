@@ -1,0 +1,16 @@
+query EmbeddedUsers {
+    embeddedUsers {
+        id
+        userId
+        embeddedRole
+        customRoleId
+        inherited
+        user {
+            email
+            firstName
+            lastName
+        }
+        createdDate
+        environment
+    }
+}
