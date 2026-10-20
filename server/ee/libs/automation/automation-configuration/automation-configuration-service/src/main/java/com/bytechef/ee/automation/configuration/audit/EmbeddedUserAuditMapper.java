@@ -80,9 +80,11 @@ public class EmbeddedUserAuditMapper implements AuditMapper {
     public Map<String, String> map(AuditInvocation auditInvocation) {
         Map<String, String> data = new LinkedHashMap<>();
 
-        Object userId = auditInvocation.requireArgument("userId");
+        Object userId = resolveUserId(auditInvocation);
 
-        data.put("userId", String.valueOf(userId));
+        if (userId != null) {
+            data.put("userId", String.valueOf(userId));
+        }
 
         Object environment = auditInvocation.argument("environment");
 
@@ -109,6 +111,20 @@ public class EmbeddedUserAuditMapper implements AuditMapper {
         }
 
         return data;
+    }
+
+    private static @Nullable Object resolveUserId(AuditInvocation auditInvocation) {
+        if (auditInvocation.arguments()
+            .containsKey("userId")) {
+
+            return auditInvocation.requireArgument("userId");
+        }
+
+        if (auditInvocation.result() instanceof EmbeddedUser embeddedUser) {
+            return embeddedUser.getUserId();
+        }
+
+        return null;
     }
 
     private EnvironmentRemoval captureEnvironmentRemoval(long userId, Environment environment) {

@@ -68,6 +68,18 @@ class EmbeddedUserAuditMapperTest {
     }
 
     @Test
+    void testAddedByEmailRecordsTheResolvedUserFromTheResult() {
+        Map<String, Object> arguments = arguments("email", "jane@example.com", "embeddedRole", WorkspaceRole.EDITOR);
+
+        AuditInvocation auditInvocation = new AuditInvocation(
+            EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED, arguments, EmbeddedUser.forRole(USER_ID, WorkspaceRole.EDITOR),
+            null, AuditOutcome.SUCCESS, null);
+
+        assertThat(embeddedUserAuditMapper.map(auditInvocation))
+            .containsExactlyInAnyOrderEntriesOf(Map.of("userId", "2", "role", "EDITOR"));
+    }
+
+    @Test
     void testRoleUpdatedRecordsThePreviousRole() {
         when(embeddedUserRepository.findByUserIdAndEnvironmentIsNull(USER_ID))
             .thenReturn(Optional.of(EmbeddedUser.forRole(USER_ID, WorkspaceRole.VIEWER)));
