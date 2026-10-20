@@ -50,7 +50,7 @@ New resource type tokens, each with a resolver from Tasks 4–6:
 - Environment-less: `Integration`, `IntegrationWorkflow` (by `integration_workflow.id`), `AutomationWorkflowProject` (Hub project id), `AutomationWorkflowProjectWorkflow` (Hub workflow uuid).
 - With an environment: `IntegrationInstanceConfiguration`, `IntegrationInstance`, `ConnectedUser`, `ConnectedUserProjectWorkflow`, `SigningKey`, `McpIntegrationInstanceConfiguration`, `McpIntegrationInstanceConfigurationWorkflow`, `McpIntegrationInstanceTool`.
 
-Embedded chain members for existing tokens: `Connection`, `Job`, `TriggerExecution`, `McpServer`, `McpComponent`, `McpTool`.
+Embedded chain members for existing tokens: `Connection`, `Job`, `TriggerExecution`, `McpServer`, `McpComponent`, `McpTool`, and `ApiKey` (Task 11).
 
 ---
 
@@ -457,18 +457,51 @@ Let `U` stand for `hasPermission(#<connectedUserId or id>, 'ConnectedUser', '<S>
 
 **Files:**
 - Modify: `SigningKeyFacadeImpl`. Unpin `EMBEDDED_SETTINGS_MANAGE` in `PermissionScopeTypeTest`.
-- Create: `server/libs/platform/platform-security/platform-security-api/src/main/java/com/bytechef/platform/security/facade/EmbeddedApiKeyAuthorizer.java` (Apache header).
-- Create: `EESVC/security/EmbeddedApiKeyAuthorizerImpl.java` (`@Component @ConditionalOnEEVersion`, delegating to `PermissionService.hasEmbeddedScope(scope, environment)`).
-- Modify: `ApiKeyFacadeImpl` (it takes `ObjectProvider<EmbeddedApiKeyAuthorizer>`).
-- Test: `ApiKeyFacadeTest`, `SigningKeyFacadeIntTest`, and `EmbeddedApiKeyAuthorizerImplTest`.
+- Create: `EmbeddedApiKeyFacade` (embedded-security-api `facade/`) and `EmbeddedApiKeyFacadeImpl` (embedded-security-service `facade/`, `@Service @ConditionalOnEEVersion`). The implementation works on the unguarded `ApiKeyService` and is gated with `@PreAuthorize` on every method.
+- Create: `EmbeddedApiKeyOwnershipResolver` (embedded-security-service `security/`, `"ApiKey"`). It answers only for rows whose `type` is `PlatformType.EMBEDDED` and returns `ofEmbedded(userId)`. A row whose type is null is a platform key, so this resolver returns `unknown()` for it. The existing `ApiKeyEnvironmentResolver` already resolves environments for embedded rows.
+- Create: `embedded-api-key.graphqls` and `EmbeddedApiKeyGraphQlController` in `embedded-configuration-graphql`, a module the client codegen already reads (`@Controller @ConditionalOnCoordinator @ConditionalOnEEVersion`, delegating to the facade). Plan C points the Embedded API Keys page at it.
+- Modify: `ApiKeyFacadeImpl.revokeAll(userId)` so it skips `EMBEDDED` keys. This is a lifecycle rule, not an authorisation check. Apart from that change, the shared `ApiKeyFacadeImpl` and its GraphQL keep today's rules, including tenant-admin-only for `EMBEDDED` keys created through them.
+- Test: `PreAuthorizeAnnotationTest` (pins), `EmbeddedApiKeyFacadeIntTest`, `EmbeddedApiKeyOwnershipResolverTest`, `EmbeddedApiKeyGraphQlControllerTest`, `ApiKeyFacadeTest` (`revokeAll`) and `SigningKeyFacadeIntTest`.
 
 **Interfaces:**
 
 ```java
-public interface EmbeddedApiKeyAuthorizer {
-    boolean hasEmbeddedScope(String scope, Environment environment);
+public interface EmbeddedApiKeyFacade {
+    String createApiKey(ApiKey apiKey);            // type EMBEDDED, userId = current user; returns the secret as ApiKeyFacade.create does
+    void deleteApiKey(long id);
+    ApiKey getApiKey(long id);
+    List<ApiKey> getApiKeys(long environmentId);   // every EMBEDDED key of that environment, no owner filter
+    ApiKey updateApiKey(ApiKey apiKey);            // name only, as ApiKeyFacade.update
 }
 ```
+
+GraphQL:
+
+```graphql
+extend type Query {
+    embeddedApiKey(id: ID!): ApiKey
+    embeddedApiKeys(environmentId: ID!): [ApiKey]
+}
+extend type Mutation {
+    createEmbeddedApiKey(input: CreateApiKeyInput!): String
+    deleteEmbeddedApiKey(id: ID!): Boolean
+    updateEmbeddedApiKey(input: UpdateApiKeyInput!): ApiKey
+}
+```
+
+Reuse the `ApiKey`, `CreateApiKeyInput` and `UpdateApiKeyInput` types from the platform `api-key.graphqls`. Check their exact names and do not redeclare them. If the input types carry a `type` field, the embedded mutations ignore it.
+
+**Embedded API key gates:**
+
+| Method | Gate |
+|---|---|
+| `createApiKey(apiKey)` | `hasEmbeddedScopeInEnvironment('API_KEY_CREATE', #apiKey.environment)` (check the accessor) |
+| `getApiKeys(environmentId)` | `hasEmbeddedScopeInEnvironmentId('API_KEY_VIEW', #environmentId)` |
+| `getApiKey(id)` | `hasPermission(#id, 'ApiKey', 'API_KEY_VIEW')` |
+| `updateApiKey(apiKey)` | `hasPermission(#apiKey.id, 'ApiKey', 'API_KEY_CREATE')` (there is no edit scope for keys) |
+| `deleteApiKey(id)` | `hasPermission(#id, 'ApiKey', 'API_KEY_DELETE')` |
+
+The facade must also refuse a non-`EMBEDDED` key: `getApiKey`, `updateApiKey` and `deleteApiKey` throw the same "Api key not found" as `ApiKeyFacadeImpl` when the row is not `EMBEDDED`. A tenant admin, whose gate passes for any id, must not reach automation or platform keys this way.
 
 **Signing key gates:**
 
@@ -478,29 +511,21 @@ public interface EmbeddedApiKeyAuthorizer {
 | `delete(id)`, `getSigningKey(id)`, `update(signingKey)` | `hasPermission(#<id or signingKey.id>, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')` |
 | `getSigningKeys(type, environmentId)` | `hasEmbeddedScopeInEnvironmentId('EMBEDDED_SETTINGS_MANAGE', #environmentId)` |
 
-**Rules for `PlatformType.EMBEDDED` keys only** (automation, platform and null-type keys keep today's rules):
-- `create`: tenant admin, or `authorizer.hasEmbeddedScope("API_KEY_CREATE", apiKey env)`.
-- `getApiKeys(environmentId, EMBEDDED)`: tenant admin, or `API_KEY_VIEW` in that environment, returns every embedded key in the environment with no owner filter. Otherwise it returns today's owner-filtered result.
-- `getApiKey`, `update`, `delete` of an embedded key: tenant admin, the owner, or the scope in the key's environment.
-  - `getApiKey`: `API_KEY_VIEW`.
-  - `update`: `API_KEY_CREATE`.
-  - `delete`: `API_KEY_DELETE`.
-  - When none of these hold, throw the same "Api key not found" as today.
-- `revokeAll(userId)` skips `EMBEDDED` keys.
-- When there is no authorizer bean (CE), behaviour is exactly today's.
-
 - [ ] **Step 1: Write the failing tests:**
+  - the embedded API key and signing key gate pins in `PreAuthorizeAnnotationTest`
   - `testAnEmbeddedEditorCreatesAnEmbeddedKeyInTheirEnvironment`
   - `testAnEmbeddedViewerSeesEveryEmbeddedKeyOfTheEnvironment`
   - `testAnEmbeddedKeyIsDeletableByScopeNotOnlyByItsOwner`
+  - `testAProductionOnlyMemberCannotTouchADevelopmentKey`
+  - `testTheEmbeddedFacadeRefusesAnAutomationOrPlatformKey` (also for a tenant admin)
+  - `testANullTypeKeyIsNotClaimedByTheEmbeddedResolver`
   - `testRemovingAUserKeepsTheirEmbeddedKeys`
-  - `testAutomationAndPlatformKeysAreUnchanged`
-  - `testWithoutAnAuthorizerNothingChanges`
-  - the signing key gate pins
+  - `testATenantAdminWithoutARowStillPasses`
+  - `testANonMemberIsDenied`
   - `testASigningKeyNeedsAnAdminInItsEnvironment`
 - [ ] **Step 2: Run them and confirm they fail.**
 - [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run the full `check` on platform-security-api, platform-security-service, embedded-security-service and EECFG.**
+- [ ] **Step 4: Run the full `check` on platform-security-service, embedded-security-api, embedded-security-service, embedded-configuration-graphql and EECFG.**
 - [ ] **Step 5: Commit** `1051 Share embedded API keys per environment and gate signing keys on embedded settings`
 
 ### Task 12: Embedded executions: gates and run details
@@ -566,4 +591,4 @@ The trigger input, output and state that `getTriggerExecutionDTO` always fills a
   - Configuration-app returning a 500 instead of a deny for a missing connection id (remote `fetchConnection`).
   - Deleting a user audits their embedded removal under `WORKSPACE_MEMBERSHIPS_REMOVED`.
   - `CustomRoleServiceImpl` evicting the embedded scope cache, which is needed only once embedded custom roles exist.
-- An embedded `ApiKey` ownership resolver is not needed: no `hasPermission(..., 'ApiKey', ...)` gate names embedded keys, because decision 9 is enforced in `ApiKeyFacadeImpl`.
+- Plan C repoints the client's Embedded API Keys page from the shared `apiKeys` queries to the `embeddedApiKeys` queries and mutations from Task 11.
