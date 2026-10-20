@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -17,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -40,6 +42,7 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +67,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private final ConnectionFacade connectionFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
@@ -72,7 +76,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceService integrationInstanceService) {
+        IntegrationInstanceService integrationInstanceService, @Lazy PermissionService permissionService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionReader = connectedUserConnectionReader;
@@ -82,6 +86,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         this.connectionFacade = connectionFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -122,7 +127,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        return getConnections(connectedUserId, componentName, connectionIds);
+        return withoutCredentialsUnlessManaged(
+            connectedUserId,
+            connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds));
     }
 
     @Override
@@ -141,7 +148,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        return connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds);
+        return withoutCredentialsUnlessManaged(
+            connectedUserId,
+            connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds));
     }
 
     @Override
@@ -180,6 +189,22 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW') or isConnectedUser()")
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
+    }
+
+    private List<ConnectionDTO> withoutCredentialsUnlessManaged(
+        long connectedUserId, List<ConnectionDTO> connectionDTOs) {
+
+        boolean currentConnectedUser = ConnectedUserAuthentications.fetchCurrent()
+            .map(connectedUserAuthentication -> connectedUserAuthentication.connectedUserId() == connectedUserId)
+            .orElse(false);
+
+        if (currentConnectedUser ||
+            permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE")) {
+
+            return connectionDTOs;
+        }
+
+        return CollectionUtils.map(connectionDTOs, ConnectionDTO::withoutCredentials);
     }
 
     private ConnectionDTO requireOwned(long connectedUserId, long connectionId) {
