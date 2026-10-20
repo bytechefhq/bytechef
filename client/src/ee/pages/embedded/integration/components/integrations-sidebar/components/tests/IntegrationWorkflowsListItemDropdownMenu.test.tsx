@@ -3,6 +3,12 @@ import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from
 import {QueryClient, QueryClientProvider, QueryObserver} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     navigate: vi.fn(),

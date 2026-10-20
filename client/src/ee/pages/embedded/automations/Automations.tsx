@@ -7,6 +7,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -116,6 +117,8 @@ const Automations = () => {
     const updateProjectMutation = useUpdateAutomationProjectMutation();
     const updateWorkflowMutation = useUpdateAutomationProjectWorkflowMutation();
     const updateWorkflowPermissionExpressionMutation = useUpdateAutomationProjectWorkflowPermissionExpressionMutation();
+    const canCreateProject = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
 
     const invalidateProjects = () => {
         void queryClient.invalidateQueries({queryKey: ['automationProjectCategories']});
@@ -171,7 +174,7 @@ const Automations = () => {
                     category: values.category || undefined,
                     description: values.description || undefined,
                     name: values.name,
-                    permissionExpression: values.permissionExpression,
+                    permissionExpression: canManageSettings ? values.permissionExpression : undefined,
                     tags: values.tags,
                 },
                 {
@@ -212,7 +215,11 @@ const Automations = () => {
         });
 
         createWorkflowMutation.mutate(
-            {definition, permissionExpression: values.permissionExpression, projectId: pendingWorkflowProjectId},
+            {
+                definition,
+                permissionExpression: canManageSettings ? values.permissionExpression : undefined,
+                projectId: pendingWorkflowProjectId,
+            },
             {
                 onSuccess: (data) => {
                     invalidateProjects();
@@ -242,6 +249,14 @@ const Automations = () => {
             {description: values.description, label: values.label, workflowUuid},
             {
                 onSuccess: () => {
+                    if (!canManageSettings) {
+                        invalidateProjects();
+
+                        handleWorkflowDialogClose();
+
+                        return;
+                    }
+
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid},
                         {
@@ -325,34 +340,36 @@ const Automations = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <ButtonGroup>
-                                <Button aria-label="New Project" label="New Project" onClick={handleNewProject} />
+                            canCreateProject && (
+                                <ButtonGroup>
+                                    <Button aria-label="New Project" label="New Project" onClick={handleNewProject} />
 
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button aria-label="More project options">
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button aria-label="More project options">
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={handleNewProject}>
-                                            <PlusIcon className="mr-2 size-4" />
-                                            New Project
-                                        </DropdownMenuItem>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={handleNewProject}>
+                                                <PlusIcon className="mr-2 size-4" />
+                                                New Project
+                                            </DropdownMenuItem>
 
-                                        <DropdownMenuItem onClick={() => setShowCodeProjectDialog(true)}>
-                                            <CodeIcon className="mr-2 size-4" />
-                                            New Code Project
-                                        </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => setShowCodeProjectDialog(true)}>
+                                                <CodeIcon className="mr-2 size-4" />
+                                                New Code Project
+                                            </DropdownMenuItem>
 
-                                        <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
-                                            <FileUpIcon className="mr-2 size-4" />
-                                            Import Code Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
+                                            <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
+                                                <FileUpIcon className="mr-2 size-4" />
+                                                Import Code Project
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            )
                         }
                         title={
                             <ProjectsFilterTitle
@@ -403,7 +420,7 @@ const Automations = () => {
                         icon={<FilterXIcon />}
                         title="No matching projects"
                     />
-                ) : (
+                ) : canCreateProject ? (
                     <EmptyState
                         actions={
                             <ButtonGroup className="mx-auto">
@@ -441,6 +458,8 @@ const Automations = () => {
                     >
                         <JourneySteps aria-label="Getting started" steps={AUTOMATION_STEPS} />
                     </EmptyState>
+                ) : (
+                    <EmptyState description="There are no projects yet." icon={<FolderIcon />} title="No Projects" />
                 )}
             </PageLoader>
 
