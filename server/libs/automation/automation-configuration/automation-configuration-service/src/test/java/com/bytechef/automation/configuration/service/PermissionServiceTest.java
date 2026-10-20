@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
@@ -250,7 +251,8 @@ class PermissionServiceTest {
         @Test
         void testCePermissionServiceAcceptsTwoResolversForOneType() {
             PermissionService service = createService(
-                resolver("Connection", ResourceOwner.unknown()), resolver("Connection", ResourceOwner.ofWorkspace(42L)));
+                resolver("Connection", ResourceOwner.unknown()),
+                resolver("Connection", ResourceOwner.ofWorkspace(42L)));
 
             assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
         }
@@ -290,6 +292,53 @@ class PermissionServiceTest {
             PermissionService service = createService();
 
             assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+        }
+
+        @Test
+        void testPrivateProjectWorkflowIsDeniedToANonCreatorThroughEveryWorkflowScopeCheckInCe() {
+            PermissionService service = privateProjectWorkflowService("someone-else");
+
+            assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isFalse();
+            assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isFalse();
+            assertThat(service.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+        }
+
+        @Test
+        void testPrivateProjectWorkflowIsAllowedToItsCreatorThroughEveryWorkflowScopeCheckInCe() {
+            PermissionService service = privateProjectWorkflowService("user");
+
+            assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+            assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isTrue();
+            assertThat(service.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isTrue();
+        }
+
+        private PermissionService privateProjectWorkflowService(String createdBy) {
+            Project project = new Project();
+
+            project.setId(3L);
+
+            ProjectRepository projectRepository = mock(ProjectRepository.class);
+
+            when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+
+            ResourceVisibilityProvider projectVisibilityProvider = new ResourceVisibilityProvider() {
+
+                @Override
+                public String resourceType() {
+                    return "Project";
+                }
+
+                @Override
+                public Optional<VisibilityRecord> fetchVisibility(long id) {
+                    return Optional.of(new VisibilityRecord(id, ResourceVisibility.PRIVATE, createdBy));
+                }
+            };
+
+            return new PermissionServiceImpl(
+                projectRepository, userService, List.of(resolver("Project", ResourceOwner.ofWorkspace(42L))),
+                List.of(projectVisibilityProvider), new DefaultResourceVisibilityResolver());
         }
 
         @Test
