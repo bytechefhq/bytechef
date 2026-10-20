@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.io.Serializable;
 import java.util.List;
@@ -73,7 +74,8 @@ class PermissionServiceConnectedUserTest {
             workspaceUserRepository, List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     @AfterEach
@@ -144,7 +146,8 @@ class PermissionServiceConnectedUserTest {
             workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         assertThat(
             AutomationAuthorizationContext.callSkippingChecks(permissionServiceWithoutDecider::isAuthorizationSkipped))

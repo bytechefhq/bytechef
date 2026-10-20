@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -74,7 +75,8 @@ class PermissionServiceEnvironmentTest {
             workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -228,7 +230,8 @@ class PermissionServiceEnvironmentTest {
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
@@ -251,7 +254,8 @@ class PermissionServiceEnvironmentTest {
             List.of(deploymentEnvironmentResolver(null)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -282,7 +286,8 @@ class PermissionServiceEnvironmentTest {
             List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));

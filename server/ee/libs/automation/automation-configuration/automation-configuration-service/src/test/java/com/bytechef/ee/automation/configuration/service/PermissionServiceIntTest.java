@@ -50,6 +50,8 @@ import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -112,6 +114,7 @@ class PermissionServiceIntTest {
     private static final String CONNECTED_USER_EXTERNAL_ID = "external-user-1";
     private static final long DEPLOYMENT_OWNER_SKILL_ID = 200L;
     private static final long OTHER_USER_SKILL_ID = 100L;
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
     private static final String EMBEDDED_VIEW = "EMBEDDED_VIEW";
     private static final long USER_ID = 2L;
     private static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
@@ -1131,6 +1134,171 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testADefaultWorkspaceEditorCannotUseAConnectedUserProjectWorkflow() {
+        String workflowId = createProjectWorkflow();
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        addMember(WorkspaceRole.EDITOR);
+
+        when(embeddedResourceResolver.isEmbeddedProjectWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofWorkspace(workspaceId))),
+            List.of(environmentResolver("Connection", Optional.of(Environment.DEVELOPMENT))), embeddedResourceResolver,
+            mock(EmbeddedScopeCacheService.class), mock(ConnectionService.class));
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testADefaultWorkspaceEditorCanUseAConnectionInAnAutomationProjectWorkflow() {
+        String workflowId = createProjectWorkflow();
+
+        addMember(WorkspaceRole.EDITOR);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(resolver("Connection", ResourceOwner.ofWorkspace(workspaceId))),
+            List.of(environmentResolver("Connection", Optional.of(Environment.DEVELOPMENT))),
+            mock(EmbeddedResourceResolver.class), mock(EmbeddedScopeCacheService.class), mock(ConnectionService.class));
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedMemberUsesAnEmbeddedConnectionInAHubProjectWorkflow() {
+        String workflowId = "hub-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+        when(embeddedResourceResolver.isHubProjectWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedConnectionFromAnotherEnvironmentCannotBeBoundIntoTheRun() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any())).thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.PRODUCTION)));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testAnAbsentConnectionServiceDeniesAnIntegrationWorkflowConnection() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any())).thenReturn(Set.of(CONNECTION_VIEW));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, null);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testAnEmbeddedMemberUsesAnEmbeddedConnectionInAnIntegrationWorkflow() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedConnectionInAnotherEnvironmentIsRefused() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.PRODUCTION)).thenReturn(Set.of());
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.PRODUCTION)));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testAnAutomationConnectionIsRefusedInAnIntegrationWorkflow() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any())).thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.AUTOMATION, Environment.DEVELOPMENT)));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testAMissingConnectionIsRefusedInAnIntegrationWorkflow() {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(connectionService.fetchConnection(1L)).thenReturn(Optional.empty());
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        assertThat(connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
     void testTwoResolversForOneTypeChainUntilOneKnowsTheOwner() {
         EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
 
@@ -1480,7 +1648,8 @@ class PermissionServiceIntTest {
             List.of(connectionEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private void createCustomRole(long customRoleId) {
@@ -1501,7 +1670,29 @@ class PermissionServiceIntTest {
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+    }
+
+    private PermissionService createConnectionAwarePermissionService(
+        List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
+        EmbeddedResourceResolver embeddedResourceResolver, EmbeddedScopeCacheService embeddedScopeCacheService,
+        ConnectionService connectionService) {
+
+        StaticListableBeanFactory connectionServiceBeanFactory = connectionService == null
+            ? new StaticListableBeanFactory()
+            : new StaticListableBeanFactory(Map.of("connectionService", connectionService));
+        StaticListableBeanFactory embeddedResourceResolverBeanFactory = new StaticListableBeanFactory(
+            Map.of("embeddedResourceResolver", embeddedResourceResolver));
+
+        return new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
+            embeddedResourceResolverBeanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+            connectionServiceBeanFactory.getBeanProvider(ConnectionService.class));
     }
 
     private PermissionService createEmbeddedAwarePermissionService(
@@ -1516,7 +1707,8 @@ class PermissionServiceIntTest {
             workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
-            beanFactory.getBeanProvider(EmbeddedResourceResolver.class));
+            beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
@@ -1525,7 +1717,8 @@ class PermissionServiceIntTest {
             workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private UnattendedRun createUnattendedRun() {
@@ -1622,6 +1815,15 @@ class PermissionServiceIntTest {
         aiSkill.setCreatedBy(createdBy);
 
         return aiSkill;
+    }
+
+    private static Connection connection(PlatformType platformType, Environment environment) {
+        Connection connection = new Connection();
+
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setType(platformType);
+
+        return connection;
     }
 
     private static ResourceEnvironmentResolver environmentResolver(

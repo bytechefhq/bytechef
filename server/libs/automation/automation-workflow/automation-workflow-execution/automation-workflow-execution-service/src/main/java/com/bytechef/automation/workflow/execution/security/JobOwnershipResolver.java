@@ -19,6 +19,7 @@ package com.bytechef.automation.workflow.execution.security;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,13 +28,15 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
  * Maps an automation job (workflow-execution) id to its owning workspace by traversing job &rarr; workflowId &rarr;
  * owning {@link Project} &rarr; {@code project.workspace_id}. Reads via {@link JobService}/{@link ProjectService}
- * (neither is {@code @PreAuthorize}-guarded) to avoid recursion. Fails closed when the job is unknown or its workflow
- * is not a project workflow (e.g. a platform/embedded job).
+ * (neither is {@code @PreAuthorize}-guarded) to avoid recursion. Jobs of an integration workflow and of any embedded
+ * (Hub or connected-user) project resolve to the embedded side. Fails closed when the job is unknown or its workflow is
+ * not a project workflow.
  *
  * @author Ivica Cardic
  */
@@ -42,11 +45,16 @@ public class JobOwnershipResolver implements ResourceOwnershipResolver {
 
     private static final Logger log = LoggerFactory.getLogger(JobOwnershipResolver.class);
 
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final JobService jobService;
     private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
-    public JobOwnershipResolver(JobService jobService, ProjectService projectService) {
+    public JobOwnershipResolver(
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider, JobService jobService,
+        ProjectService projectService) {
+
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.jobService = jobService;
         this.projectService = projectService;
     }
@@ -58,10 +66,34 @@ public class JobOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return jobService.fetchJob(id)
-            .map(Job::getWorkflowId)
-            .flatMap(this::fetchProject)
-            .map(Project::getWorkspaceId)
+        Optional<String> workflowIdOptional = jobService.fetchJob(id)
+            .map(Job::getWorkflowId);
+
+        if (workflowIdOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        String workflowId = workflowIdOptional.get();
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isIntegrationWorkflow(workflowId)) {
+            return ResourceOwner.ofEmbedded();
+        }
+
+        Optional<Project> projectOptional = fetchProject(workflowId);
+
+        if (projectOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        Project project = projectOptional.get();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+            return ResourceOwner.ofEmbedded();
+        }
+
+        return Optional.ofNullable(project.getWorkspaceId())
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }

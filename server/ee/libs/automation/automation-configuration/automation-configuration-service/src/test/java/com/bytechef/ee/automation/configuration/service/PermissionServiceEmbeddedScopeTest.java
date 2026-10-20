@@ -24,6 +24,7 @@ import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepositor
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,8 @@ class PermissionServiceEmbeddedScopeTest {
             workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), embeddedScopeCacheService,
             embeddedUserRepository,
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     @AfterEach
