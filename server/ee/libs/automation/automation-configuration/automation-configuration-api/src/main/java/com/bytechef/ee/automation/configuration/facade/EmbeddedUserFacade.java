@@ -13,8 +13,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
 /**
- * Manages the embedded members of the tenant on behalf of the signed-in user. Every method is authorized here; the
- * underlying {@code EmbeddedUserService} carries no checks.
+ * Manages the embedded members of the tenant on behalf of the signed-in user. Authorization is declared on the
+ * implementation; the underlying {@code EmbeddedUserService} carries no checks.
  *
  * @version ee
  *
