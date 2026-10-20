@@ -133,6 +133,69 @@ class CopilotConfigurationTest {
     }
 
     @Test
+    void testConverterSubAgentPromptCreatesANewWorkflowFromAProjectId() {
+        assertThat(converterSubAgentSection(copilotConfiguration).replaceAll("\\s+", " "))
+            .contains("EITHER a `workflowId` (the workflow already exists) OR a `projectId`")
+            .contains(
+                "`getWorkflow(workflowId)` for its current `version`, then `updateWorkflow(workflowId, workflow, version)`")
+            .contains("ONE `createProjectWorkflow(projectId, workflow)` call carrying the whole definition")
+            .contains("If you are given both, the `workflowId` wins")
+            .contains("Given neither a `workflowId` nor a `projectId`, say so plainly");
+    }
+
+    @Test
+    void testConverterSubAgentPromptNamesOnlyToolsTheConverterHolds() {
+        String subAgentSection = converterSubAgentSection(copilotConfiguration);
+
+        Set<String> heldToolNames = specialistToolNames(false);
+
+        heldToolNames.remove(LOOKUP_PROPERTY_OPTIONS_TOOL_NAME);
+
+        Set<String> deniedToolNames = new HashSet<>();
+        StringBuilder sectionWithoutDenials = new StringBuilder();
+
+        for (String line : subAgentSection.split("\n")) {
+            if (line.startsWith(DENIED_TOOLS_PREFIX)) {
+                for (String toolName : line.substring(DENIED_TOOLS_PREFIX.length())
+                    .split("[,.]")) {
+
+                    if (!toolName.isBlank()) {
+                        deniedToolNames.add(toolName.strip());
+                    }
+                }
+            } else {
+                sectionWithoutDenials.append(line)
+                    .append('\n');
+            }
+        }
+
+        assertThat(deniedToolNames).doesNotContainAnyElementsOf(heldToolNames);
+
+        Set<String> knownToolNames = new HashSet<>(KNOWN_PICKER_AND_ASK_TOOL_NAMES);
+
+        knownToolNames.addAll(heldToolNames);
+        knownToolNames.add(LOOKUP_PROPERTY_OPTIONS_TOOL_NAME);
+        knownToolNames.add("createProject");
+
+        List<String> mentionedToolNames = knownToolNames.stream()
+            .filter(toolName -> Pattern.compile("\\b" + toolName + "\\b")
+                .matcher(sectionWithoutDenials)
+                .find())
+            .toList();
+
+        List<String> calledToolNames = Pattern.compile("`(\\w+)\\(")
+            .matcher(sectionWithoutDenials)
+            .results()
+            .map(matchResult -> matchResult.group(1))
+            .toList();
+
+        assertThat(mentionedToolNames).isNotEmpty();
+        assertThat(calledToolNames).isNotEmpty();
+        assertThat(heldToolNames).containsAll(mentionedToolNames)
+            .containsAll(calledToolNames);
+    }
+
+    @Test
     void testBuildWorkflowSubAgentPromptForbidsInventedLookupOptions() {
         String subAgentSection = buildWorkflowSubAgentSection(newPromptConfiguration(), true);
 
@@ -211,6 +274,14 @@ class CopilotConfigurationTest {
         assertThat(systemPrompt).startsWith(buildPrompt);
 
         return systemPrompt.substring(buildPrompt.length());
+    }
+
+    private static String converterSubAgentSection(CopilotConfiguration configuration) {
+        String systemPrompt = configuration.converterSubAgentSystemPrompt();
+
+        assertThat(systemPrompt).startsWith("prompt");
+
+        return systemPrompt.substring("prompt".length());
     }
 
     private static Set<String> specialistToolNames(boolean askToolAvailable) {
