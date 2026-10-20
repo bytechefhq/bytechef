@@ -103,6 +103,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
 
+    private static final String INSTANCE_CONFIGURATION_EDIT = "INTEGRATION_INSTANCE_CONFIGURATION_EDIT";
+    private static final String INSTANCE_CONFIGURATION_TYPE = "IntegrationInstanceConfiguration";
+
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
@@ -447,14 +450,40 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfiguration.getIntegrationVersion());
         List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
 
-        return integrationInstanceConfigurationDTOAssembler.toIntegrationInstanceConfigurationDTO(
-            integrationInstanceConfiguration,
-            CollectionUtils.filter(
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                    integrationInstanceConfiguration.getId()),
-                integrationInstanceConfigurationWorkflow -> workflowIds
-                    .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-            integrationWorkflows);
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            integrationInstanceConfigurationDTOAssembler.toIntegrationInstanceConfigurationDTO(
+                integrationInstanceConfiguration,
+                CollectionUtils.filter(
+                    integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                        integrationInstanceConfiguration.getId()),
+                    integrationInstanceConfigurationWorkflow -> workflowIds
+                        .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
+                integrationWorkflows);
+
+        return permissionService.hasResourceScope(id, INSTANCE_CONFIGURATION_TYPE, INSTANCE_CONFIGURATION_EDIT)
+            ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials();
+    }
+
+    private List<IntegrationInstanceConfigurationDTO> redactCredentials(
+        List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs) {
+
+        Map<Environment, Boolean> canEditByEnvironment = new HashMap<>();
+        List<IntegrationInstanceConfigurationDTO> redactedDTOs = new ArrayList<>();
+
+        for (IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTOs) {
+
+            boolean canEdit = canEditByEnvironment.computeIfAbsent(
+                integrationInstanceConfigurationDTO.environment(),
+                environment -> permissionService.hasResourceScope(
+                    integrationInstanceConfigurationDTO.id(), INSTANCE_CONFIGURATION_TYPE,
+                    INSTANCE_CONFIGURATION_EDIT));
+
+            redactedDTOs.add(
+                canEdit
+                    ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials());
+        }
+
+        return redactedDTOs;
     }
 
     @Override
@@ -550,7 +579,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             List<IntegrationWorkflow> allIntegrationWorkflows =
                 integrationWorkflowService.getIntegrationWorkflows(integrationIds);
 
-            return CollectionUtils.map(
+            return redactCredentials(CollectionUtils.map(
                 integrationInstanceConfigurations,
                 integrationInstanceConfiguration -> {
                     Integer integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
@@ -583,9 +612,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                                 workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
                         configIntegrationWorkflows,
                         tags);
-                });
+                }));
         } else {
-            return CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfigurationDTO::new);
+            return redactCredentials(
+                CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfigurationDTO::new));
         }
     }
 

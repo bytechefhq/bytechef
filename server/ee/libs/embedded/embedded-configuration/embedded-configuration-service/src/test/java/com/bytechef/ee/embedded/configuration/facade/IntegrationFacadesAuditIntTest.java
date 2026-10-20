@@ -66,6 +66,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -821,12 +822,16 @@ class IntegrationFacadesAuditIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
+            return mock(PermissionService.class, invocation -> {
+                Class<?> returnType = invocation.getMethod()
+                    .getReturnType();
 
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+                if (returnType == boolean.class || returnType == Boolean.class) {
+                    return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
+                }
 
-            return permissionService;
+                return Answers.RETURNS_DEFAULTS.answer(invocation);
+            });
         }
     }
 }
