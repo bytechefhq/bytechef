@@ -151,7 +151,7 @@ class ConnectedUserAccessDeciderTest {
         ResourceEnvironmentResolver secondDeploymentEnvironmentResolver = environmentResolver("ProjectDeployment");
 
         ConnectedUserAccessDeciderImpl chainedDecider = new ConnectedUserAccessDeciderImpl(
-            automationWorkflowProjectFacade, connectedUserConnectionService, connectedUserProjectService,
+            automationProjectFacade, connectedUserConnectionService, connectedUserProjectService,
             integrationInstanceService, projectService, projectWorkflowService,
             List.of(firstDeploymentEnvironmentResolver, secondDeploymentEnvironmentResolver),
             List.of(firstJobResolver, secondJobResolver, projectDeploymentResolver));
@@ -494,7 +494,7 @@ class ConnectedUserAccessDeciderTest {
 
         return new AutomationProjectDTO(
             projectId, "Templates", null, null, List.of(), true, lastPublishedVersion + 1, lastPublishedVersion,
-            List.of(workflowTemplate), null, false, 0, null);
+            List.of(workflowTemplate), null, false, false, 0, null);
     }
 
     private static final class TestConnectedUserAuthentication extends AbstractAuthenticationToken
