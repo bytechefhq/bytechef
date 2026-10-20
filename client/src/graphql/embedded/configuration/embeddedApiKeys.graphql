@@ -1,0 +1,12 @@
+query EmbeddedApiKeys($environmentId: ID!) {
+    embeddedApiKeys(environmentId: $environmentId) {
+        id
+        name
+        secretKey
+        lastUsedDate
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

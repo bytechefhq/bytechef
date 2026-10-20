@@ -1,0 +1,3 @@
+query MyEmbeddedScopes($environment: EnvironmentEnum) {
+    myEmbeddedScopes(environment: $environment)
+}
