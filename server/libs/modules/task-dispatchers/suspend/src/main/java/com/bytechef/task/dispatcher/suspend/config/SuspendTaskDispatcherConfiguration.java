@@ -60,9 +60,12 @@ public class SuspendTaskDispatcherConfiguration {
 
     @Bean("suspendTaskCompletionHandlerFactory")
     @Order(1)
-    TaskCompletionHandlerFactory suspendTaskCompletionHandlerFactory() {
+    TaskCompletionHandlerFactory suspendTaskCompletionHandlerFactory(
+        ObjectProvider<TriggerScheduler> triggerSchedulerProvider) {
+
         return (taskCompletionHandler, taskDispatcher) -> new SuspendTaskCompletionHandler(
-            contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateFacade);
+            contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateFacade,
+            triggerSchedulerProvider.getIfAvailable());
     }
 
     @Bean
@@ -70,6 +73,6 @@ public class SuspendTaskDispatcherConfiguration {
         ObjectProvider<TriggerScheduler> triggerSchedulerProvider) {
 
         return new SuspendTaskDispatcherPreSendProcessor(
-            jobService, taskStateFacade, triggerSchedulerProvider.getIfAvailable());
+            eventPublisher, jobService, taskStateFacade, triggerSchedulerProvider.getIfAvailable());
     }
 }
