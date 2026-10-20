@@ -431,10 +431,11 @@ class PreAuthorizeAnnotationTest {
         String componentEdit = "hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')";
         String toolEdit = "hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')";
         String configurationType = "'McpIntegrationInstanceConfiguration', ";
-        String configurationEdit =
-            "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType + "'MCP_EDIT')";
-        String configurationView =
-            "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType + "'MCP_VIEW')";
+        String configurationEdit = "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType
+            + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')";
+        String configurationView = "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType
+            + "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')";
+        String instanceConfigurationView = "hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')";
         String workflowType = "'McpIntegrationInstanceConfigurationWorkflow', ";
         String instanceManage =
             "hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') "
@@ -474,35 +475,41 @@ class PreAuthorizeAnnotationTest {
         assertEveryPublicOverloadIsGated(
             configurationFacade, "createMcpIntegrationInstanceConfiguration",
             serverEdit + " and hasPermission(#integrationInstanceConfigurationId, "
-                + "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
+                + "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_CREATE')");
         assertEveryPublicOverloadIsGated(
-            configurationFacade, "deleteMcpIntegrationInstanceConfiguration", configurationEdit);
+            configurationFacade, "deleteMcpIntegrationInstanceConfiguration",
+            "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType
+                + "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')");
         assertEveryPublicOverloadIsGated(
             configurationFacade, "updateMcpIntegrationInstanceConfiguration", configurationEdit);
         assertEveryPublicOverloadIsGated(
             configurationFacade, "updateMcpIntegrationInstanceConfigurationVersion", configurationEdit);
         assertEveryPublicOverloadIsGated(
             configurationFacade, "getMcpIntegrationInstanceConfiguration",
-            "hasPermission(#id, " + configurationType + "'MCP_VIEW')");
-        assertEveryPublicOverloadIsGated(configurationFacade, "getMcpIntegrationInstanceConfigurations", mcpView);
+            "hasPermission(#id, " + configurationType + "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
         assertEveryPublicOverloadIsGated(
-            configurationFacade, "getMcpServerMcpIntegrationInstanceConfigurations", serverView);
+            configurationFacade, "getMcpIntegrationInstanceConfigurations", instanceConfigurationView);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getMcpServerMcpIntegrationInstanceConfigurations",
+            "hasPermission(#mcpServerId, 'McpServer', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
 
         assertEveryPublicOverloadIsGated(
             workflowFacade, "deleteMcpIntegrationInstanceConfigurationWorkflow",
-            "hasPermission(#mcpIntegrationInstanceConfigurationWorkflowId, " + workflowType + "'MCP_EDIT')");
+            "hasPermission(#mcpIntegrationInstanceConfigurationWorkflowId, " + workflowType
+                + "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')");
         assertEveryPublicOverloadIsGated(
             workflowFacade, "createMcpIntegrationInstanceConfigurationWorkflow", configurationEdit);
         assertEveryPublicOverloadIsGated(
             workflowFacade, "updateMcpIntegrationInstanceConfigurationWorkflow",
-            "hasPermission(#id, " + workflowType + "'MCP_EDIT')");
+            "hasPermission(#id, " + workflowType + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')");
         assertEveryPublicOverloadIsGated(
             workflowFacade, "updateMcpIntegrationInstanceConfigurationWorkflowParameters",
-            "hasPermission(#id, " + workflowType + "'MCP_EDIT')");
+            "hasPermission(#id, " + workflowType + "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')");
         assertEveryPublicOverloadIsGated(
             workflowFacade, "getMcpIntegrationInstanceConfigurationWorkflow",
-            "hasPermission(#id, " + workflowType + "'MCP_VIEW')");
-        assertEveryPublicOverloadIsGated(workflowFacade, "getMcpIntegrationInstanceConfigurationWorkflows", mcpView);
+            "hasPermission(#id, " + workflowType + "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "getMcpIntegrationInstanceConfigurationWorkflows", instanceConfigurationView);
         assertEveryPublicOverloadIsGated(
             workflowFacade, "getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows",
             configurationView);
