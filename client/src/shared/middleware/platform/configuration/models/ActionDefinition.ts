@@ -43,6 +43,10 @@ export interface ActionDefinition {
      */
     componentVersion: number;
     /**
+     * Is the action deprecated, so workflows that still use it should replace it.
+     */
+    deprecated?: boolean;
+    /**
      * The description.
      */
     description?: string;
@@ -116,6 +120,7 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
+        'deprecated': json['deprecated'] == null ? undefined : json['deprecated'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
@@ -144,6 +149,7 @@ export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ign
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
+        'deprecated': value['deprecated'],
         'description': value['description'],
         'help': HelpToJSON(value['help']),
         'name': value['name'],

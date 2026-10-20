@@ -28,6 +28,10 @@ import {
  */
 export interface TaskDispatcherDefinitionBasic {
     /**
+     * Is the task dispatcher deprecated, so workflows that still use it should replace it.
+     */
+    deprecated?: boolean;
+    /**
      * The description.
      */
     description?: string;
@@ -89,6 +93,7 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
+        'deprecated': json['deprecated'] == null ? undefined : json['deprecated'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
@@ -113,6 +118,7 @@ export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherD
 
     return {
         
+        'deprecated': value['deprecated'],
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
