@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Collections;
@@ -95,14 +96,21 @@ public class FromAiTest {
 
     @Test
     public void testFromAiNoArguments() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
-            Map.of("param", "=fromAi()"), Collections.emptyMap()));
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("param", "=fromAi()"), Collections.emptyMap()));
+
+        assertInstanceOf(IllegalArgumentException.class, expressionEvaluationException.getCause());
+        assertEquals("fromAi requires at least a name argument.", expressionEvaluationException.getMessage());
     }
 
     @Test
     public void testFromAiWithInvalidType() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('name', 'INVALID')"), Collections.emptyMap()));
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("param", "=fromAi('name', 'INVALID')"), Collections.emptyMap()));
+
+        assertInstanceOf(IllegalArgumentException.class, expressionEvaluationException.getCause());
     }
 
     @Test
