@@ -1413,6 +1413,22 @@ export type UpdateEmbeddedAiAutoMemoryMutationVariables = Exact<{
 
 export type UpdateEmbeddedAiAutoMemoryMutation = { updateEmbeddedAiAutoMemory: { id: string, version: any } };
 
+export type AddEmbeddedUserMutationVariables = Exact<{
+  userId: string | number;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type AddEmbeddedUserMutation = { addEmbeddedUser: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
+
+export type AddEmbeddedUserByEmailMutationVariables = Exact<{
+  email: string;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type AddEmbeddedUserByEmailMutation = { addEmbeddedUserByEmail: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
+
 export type AutomationProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1717,6 +1733,13 @@ export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
 
 export type CreateAutomationProjectConfigurationMutation = { createAutomationProjectConfiguration: string };
 
+export type CreateEmbeddedApiKeyMutationVariables = Exact<{
+  input: Types.CreateEmbeddedApiKeyInput;
+}>;
+
+
+export type CreateEmbeddedApiKeyMutation = { createEmbeddedApiKey: string | null };
+
 export type CreateEmbeddedMcpComponentMutationVariables = Exact<{
   input: Types.McpComponentWithToolsInput;
   integrationId: string | number;
@@ -1767,6 +1790,13 @@ export type DeleteConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 
 export type DeleteConnectedUserProjectWorkflowMutation = { deleteConnectedUserProjectWorkflow: boolean | null };
+
+export type DeleteEmbeddedApiKeyMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteEmbeddedApiKeyMutation = { deleteEmbeddedApiKey: boolean | null };
 
 export type DeleteEmbeddedMcpComponentMutationVariables = Exact<{
   id: string | number;
@@ -1831,6 +1861,13 @@ export type DuplicateAutomationProjectWorkflowMutationVariables = Exact<{
 
 export type DuplicateAutomationProjectWorkflowMutation = { duplicateAutomationProjectWorkflow: string };
 
+export type EmbeddedApiKeysQueryVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type EmbeddedApiKeysQuery = { embeddedApiKeys: Array<{ id: string | null, name: string | null, secretKey: string | null, lastUsedDate: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any } | null> | null };
+
 export type EmbeddedGettingStartedQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1864,6 +1901,11 @@ export type EmbeddedMcpToolsByComponentIdQueryVariables = Exact<{
 
 
 export type EmbeddedMcpToolsByComponentIdQuery = { embeddedMcpToolsByComponentId: Array<{ id: string, enabled: boolean, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
+
+export type EmbeddedUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EmbeddedUsersQuery = { embeddedUsers: Array<{ id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, inherited: boolean, createdDate: string | null, environment: Types.EnvironmentEnum | null, user: { email: string, firstName: string | null, lastName: string | null } | null }> };
 
 export type EnableAutomationProjectConfigurationMutationVariables = Exact<{
   id: string | number;
@@ -2074,6 +2116,13 @@ export type MoveAutomationProjectConfigurationConnectedUsersMutationVariables = 
 
 export type MoveAutomationProjectConfigurationConnectedUsersMutation = { moveAutomationProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
+export type MyEmbeddedScopesQueryVariables = Exact<{
+  environment?: Types.EnvironmentEnum | null | undefined;
+}>;
+
+
+export type MyEmbeddedScopesQuery = { myEmbeddedScopes: Array<string> };
+
 export type ProvisionConnectedUserMcpServerMutationVariables = Exact<{
   connectedUserId: string | number;
   mcpServerId: string | number;
@@ -2104,6 +2153,21 @@ export type ProvisionableConnectedUserProjectsQueryVariables = Exact<{
 
 
 export type ProvisionableConnectedUserProjectsQuery = { provisionableConnectedUserProjects: Array<{ projectId: string, name: string, projectVersion: number, assignedConfigurationId: string | null, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }>, configurations: Array<{ id: string, name: string, projectVersion: number, selfServe: boolean, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> }> };
+
+export type RemoveEmbeddedUserMutationVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type RemoveEmbeddedUserMutation = { removeEmbeddedUser: boolean };
+
+export type RemoveEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+}>;
+
+
+export type RemoveEmbeddedUserEnvironmentRoleMutation = { removeEmbeddedUserEnvironmentRole: boolean };
 
 export type RestoreAutomationProjectVersionMutationVariables = Exact<{
   id: string | number;
@@ -2206,6 +2270,14 @@ export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery 
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
+export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -2243,6 +2315,13 @@ export type UpdateAutomationProjectConfigurationWorkflowMutationVariables = Exac
 
 
 export type UpdateAutomationProjectConfigurationWorkflowMutation = { updateAutomationProjectConfigurationWorkflow: boolean };
+
+export type UpdateEmbeddedApiKeyMutationVariables = Exact<{
+  input: Types.UpdateEmbeddedApiKeyInput;
+}>;
+
+
+export type UpdateEmbeddedApiKeyMutation = { updateEmbeddedApiKey: { id: string | null, name: string | null } | null };
 
 export type UpdateEmbeddedMcpComponentMutationVariables = Exact<{
   id: string | number;
@@ -2291,6 +2370,14 @@ export type UpdateEmbeddedMcpToolEnabledMutationVariables = Exact<{
 
 
 export type UpdateEmbeddedMcpToolEnabledMutation = { updateEmbeddedMcpToolEnabled: { id: string, enabled: boolean } | null };
+
+export type UpdateEmbeddedUserRoleMutationVariables = Exact<{
+  userId: string | number;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type UpdateEmbeddedUserRoleMutation = { updateEmbeddedUserRole: { id: string | null, embeddedRole: Types.WorkspaceRole | null } };
 
 export type UpdateIntegrationWorkflowPermissionExpressionMutationVariables = Exact<{
   integrationWorkflowId: string | number;
@@ -8033,6 +8120,22 @@ export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
 }
     `);
 
+export const AddEmbeddedUserDocument = new TypedDocumentString(`
+    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
+  addEmbeddedUser(userId: $userId, role: $role) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
+
 export const useEmbeddedAiAutoMemoriesQuery = <
       TData = EmbeddedAiAutoMemoriesQuery,
       TError = unknown
@@ -8095,6 +8198,48 @@ export const useUpdateEmbeddedAiAutoMemoryMutation = <
       {
     mutationKey: ['updateEmbeddedAiAutoMemory'],
     mutationFn: (variables?: UpdateEmbeddedAiAutoMemoryMutationVariables) => fetcher<UpdateEmbeddedAiAutoMemoryMutation, UpdateEmbeddedAiAutoMemoryMutationVariables>(UpdateEmbeddedAiAutoMemoryDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const useAddEmbeddedUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddEmbeddedUserMutation, TError, AddEmbeddedUserMutationVariables, TContext>) => {
+    
+    return useMutation<AddEmbeddedUserMutation, TError, AddEmbeddedUserMutationVariables, TContext>(
+      {
+    mutationKey: ['AddEmbeddedUser'],
+    mutationFn: (variables?: AddEmbeddedUserMutationVariables) => fetcher<AddEmbeddedUserMutation, AddEmbeddedUserMutationVariables>(AddEmbeddedUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AddEmbeddedUserByEmailDocument = new TypedDocumentString(`
+    mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole!) {
+  addEmbeddedUserByEmail(email: $email, role: $role) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
+
+export const useAddEmbeddedUserByEmailMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddEmbeddedUserByEmailMutation, TError, AddEmbeddedUserByEmailMutationVariables, TContext>) => {
+    
+    return useMutation<AddEmbeddedUserByEmailMutation, TError, AddEmbeddedUserByEmailMutationVariables, TContext>(
+      {
+    mutationKey: ['AddEmbeddedUserByEmail'],
+    mutationFn: (variables?: AddEmbeddedUserByEmailMutationVariables) => fetcher<AddEmbeddedUserByEmailMutation, AddEmbeddedUserByEmailMutationVariables>(AddEmbeddedUserByEmailDocument, variables)(),
     ...options
   }
     )};
@@ -9252,6 +9397,25 @@ export const useCreateAutomationProjectConfigurationMutation = <
   }
     )};
 
+export const CreateEmbeddedApiKeyDocument = new TypedDocumentString(`
+    mutation CreateEmbeddedApiKey($input: CreateEmbeddedApiKeyInput!) {
+  createEmbeddedApiKey(input: $input)
+}
+    `);
+
+export const useCreateEmbeddedApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateEmbeddedApiKeyMutation, TError, CreateEmbeddedApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateEmbeddedApiKeyMutation, TError, CreateEmbeddedApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['CreateEmbeddedApiKey'],
+    mutationFn: (variables?: CreateEmbeddedApiKeyMutationVariables) => fetcher<CreateEmbeddedApiKeyMutation, CreateEmbeddedApiKeyMutationVariables>(CreateEmbeddedApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CreateEmbeddedMcpComponentDocument = new TypedDocumentString(`
     mutation createEmbeddedMcpComponent($input: McpComponentWithToolsInput!, $integrationId: ID!) {
   createEmbeddedMcpComponent(input: $input, integrationId: $integrationId) {
@@ -9427,6 +9591,25 @@ export const useDeleteConnectedUserProjectWorkflowMutation = <
   }
     )};
 
+export const DeleteEmbeddedApiKeyDocument = new TypedDocumentString(`
+    mutation DeleteEmbeddedApiKey($id: ID!) {
+  deleteEmbeddedApiKey(id: $id)
+}
+    `);
+
+export const useDeleteEmbeddedApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedApiKeyMutation, TError, DeleteEmbeddedApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedApiKeyMutation, TError, DeleteEmbeddedApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['DeleteEmbeddedApiKey'],
+    mutationFn: (variables?: DeleteEmbeddedApiKeyMutationVariables) => fetcher<DeleteEmbeddedApiKeyMutation, DeleteEmbeddedApiKeyMutationVariables>(DeleteEmbeddedApiKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteEmbeddedMcpComponentDocument = new TypedDocumentString(`
     mutation deleteEmbeddedMcpComponent($id: ID!) {
   deleteEmbeddedMcpComponent(id: $id)
@@ -9594,6 +9777,37 @@ export const useDuplicateAutomationProjectWorkflowMutation = <
       {
     mutationKey: ['duplicateAutomationProjectWorkflow'],
     mutationFn: (variables?: DuplicateAutomationProjectWorkflowMutationVariables) => fetcher<DuplicateAutomationProjectWorkflowMutation, DuplicateAutomationProjectWorkflowMutationVariables>(DuplicateAutomationProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EmbeddedApiKeysDocument = new TypedDocumentString(`
+    query EmbeddedApiKeys($environmentId: ID!) {
+  embeddedApiKeys(environmentId: $environmentId) {
+    id
+    name
+    secretKey
+    lastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useEmbeddedApiKeysQuery = <
+      TData = EmbeddedApiKeysQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedApiKeysQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedApiKeysQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedApiKeysQuery, TError, TData>(
+      {
+    queryKey: ['EmbeddedApiKeys', variables],
+    queryFn: fetcher<EmbeddedApiKeysQuery, EmbeddedApiKeysQueryVariables>(EmbeddedApiKeysDocument, variables),
     ...options
   }
     )};
@@ -9808,6 +10022,41 @@ export const useEmbeddedMcpToolsByComponentIdQuery = <
       {
     queryKey: ['embeddedMcpToolsByComponentId', variables],
     queryFn: fetcher<EmbeddedMcpToolsByComponentIdQuery, EmbeddedMcpToolsByComponentIdQueryVariables>(EmbeddedMcpToolsByComponentIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const EmbeddedUsersDocument = new TypedDocumentString(`
+    query EmbeddedUsers {
+  embeddedUsers {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    inherited
+    user {
+      email
+      firstName
+      lastName
+    }
+    createdDate
+    environment
+  }
+}
+    `);
+
+export const useEmbeddedUsersQuery = <
+      TData = EmbeddedUsersQuery,
+      TError = unknown
+    >(
+      variables?: EmbeddedUsersQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedUsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedUsersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['EmbeddedUsers'] : ['EmbeddedUsers', variables],
+    queryFn: fetcher<EmbeddedUsersQuery, EmbeddedUsersQueryVariables>(EmbeddedUsersDocument, variables),
     ...options
   }
     )};
@@ -10613,6 +10862,28 @@ export const useMoveAutomationProjectConfigurationConnectedUsersMutation = <
   }
     )};
 
+export const MyEmbeddedScopesDocument = new TypedDocumentString(`
+    query MyEmbeddedScopes($environment: EnvironmentEnum) {
+  myEmbeddedScopes(environment: $environment)
+}
+    `);
+
+export const useMyEmbeddedScopesQuery = <
+      TData = MyEmbeddedScopesQuery,
+      TError = unknown
+    >(
+      variables?: MyEmbeddedScopesQueryVariables,
+      options?: Omit<UseQueryOptions<MyEmbeddedScopesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<MyEmbeddedScopesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<MyEmbeddedScopesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['MyEmbeddedScopes'] : ['MyEmbeddedScopes', variables],
+    queryFn: fetcher<MyEmbeddedScopesQuery, MyEmbeddedScopesQueryVariables>(MyEmbeddedScopesDocument, variables),
+    ...options
+  }
+    )};
+
 export const ProvisionConnectedUserMcpServerDocument = new TypedDocumentString(`
     mutation provisionConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
   provisionConnectedUserMcpServer(
@@ -10746,6 +11017,44 @@ export const useProvisionableConnectedUserProjectsQuery = <
       {
     queryKey: ['provisionableConnectedUserProjects', variables],
     queryFn: fetcher<ProvisionableConnectedUserProjectsQuery, ProvisionableConnectedUserProjectsQueryVariables>(ProvisionableConnectedUserProjectsDocument, variables),
+    ...options
+  }
+    )};
+
+export const RemoveEmbeddedUserDocument = new TypedDocumentString(`
+    mutation RemoveEmbeddedUser($userId: ID!) {
+  removeEmbeddedUser(userId: $userId)
+}
+    `);
+
+export const useRemoveEmbeddedUserMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveEmbeddedUserMutation, TError, RemoveEmbeddedUserMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveEmbeddedUserMutation, TError, RemoveEmbeddedUserMutationVariables, TContext>(
+      {
+    mutationKey: ['RemoveEmbeddedUser'],
+    mutationFn: (variables?: RemoveEmbeddedUserMutationVariables) => fetcher<RemoveEmbeddedUserMutation, RemoveEmbeddedUserMutationVariables>(RemoveEmbeddedUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation RemoveEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!) {
+  removeEmbeddedUserEnvironmentRole(userId: $userId, environment: $environment)
+}
+    `);
+
+export const useRemoveEmbeddedUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveEmbeddedUserEnvironmentRoleMutation, TError, RemoveEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveEmbeddedUserEnvironmentRoleMutation, TError, RemoveEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['RemoveEmbeddedUserEnvironmentRole'],
+    mutationFn: (variables?: RemoveEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<RemoveEmbeddedUserEnvironmentRoleMutation, RemoveEmbeddedUserEnvironmentRoleMutationVariables>(RemoveEmbeddedUserEnvironmentRoleDocument, variables)(),
     ...options
   }
     )};
@@ -10914,6 +11223,22 @@ export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocumen
         }
       }
     }
+  }
+}
+    `);
+
+export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
+  setEmbeddedUserEnvironmentRole(
+    userId: $userId
+    environment: $environment
+    role: $role
+  ) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    environment
   }
 }
     `);
@@ -11099,6 +11424,19 @@ export const useToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQu
   }
     )};
 
+export const useSetEmbeddedUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['SetEmbeddedUserEnvironmentRole'],
+    mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = new TypedDocumentString(`
     query toolEligibleIntegrationInstanceConfigurationWorkflows($integrationInstanceConfigurationId: ID!) {
   toolEligibleIntegrationInstanceConfigurationWorkflows(
@@ -11202,6 +11540,28 @@ export const useUpdateAutomationProjectConfigurationWorkflowMutation = <
       {
     mutationKey: ['updateAutomationProjectConfigurationWorkflow'],
     mutationFn: (variables?: UpdateAutomationProjectConfigurationWorkflowMutationVariables) => fetcher<UpdateAutomationProjectConfigurationWorkflowMutation, UpdateAutomationProjectConfigurationWorkflowMutationVariables>(UpdateAutomationProjectConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedApiKeyDocument = new TypedDocumentString(`
+    mutation UpdateEmbeddedApiKey($input: UpdateEmbeddedApiKeyInput!) {
+  updateEmbeddedApiKey(input: $input) {
+    id
+    name
+  }
+}
+    `);
+
+export const useUpdateEmbeddedApiKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedApiKeyMutation, TError, UpdateEmbeddedApiKeyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedApiKeyMutation, TError, UpdateEmbeddedApiKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateEmbeddedApiKey'],
+    mutationFn: (variables?: UpdateEmbeddedApiKeyMutationVariables) => fetcher<UpdateEmbeddedApiKeyMutation, UpdateEmbeddedApiKeyMutationVariables>(UpdateEmbeddedApiKeyDocument, variables)(),
     ...options
   }
     )};
@@ -11351,6 +11711,28 @@ export const useUpdateEmbeddedMcpToolEnabledMutation = <
       {
     mutationKey: ['updateEmbeddedMcpToolEnabled'],
     mutationFn: (variables?: UpdateEmbeddedMcpToolEnabledMutationVariables) => fetcher<UpdateEmbeddedMcpToolEnabledMutation, UpdateEmbeddedMcpToolEnabledMutationVariables>(UpdateEmbeddedMcpToolEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedUserRoleDocument = new TypedDocumentString(`
+    mutation UpdateEmbeddedUserRole($userId: ID!, $role: WorkspaceRole!) {
+  updateEmbeddedUserRole(userId: $userId, role: $role) {
+    id
+    embeddedRole
+  }
+}
+    `);
+
+export const useUpdateEmbeddedUserRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedUserRoleMutation, TError, UpdateEmbeddedUserRoleMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedUserRoleMutation, TError, UpdateEmbeddedUserRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateEmbeddedUserRole'],
+    mutationFn: (variables?: UpdateEmbeddedUserRoleMutationVariables) => fetcher<UpdateEmbeddedUserRoleMutation, UpdateEmbeddedUserRoleMutationVariables>(UpdateEmbeddedUserRoleDocument, variables)(),
     ...options
   }
     )};
