@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -53,12 +54,12 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -159,7 +160,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class, JobFacade.class,
     JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRowFacade.class,
+    McpAutomationRowFacade.class, McpIntegrationInstanceConfigurationWorkflowService.class,
+    McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class, McpServerService.class,
     McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
@@ -545,7 +547,8 @@ class EmbeddedHubGatesIntTest {
                 (resourceType, workspaceId, candidates) -> candidates.stream()
                     .map(VisibilityRecord::id)
                     .collect(Collectors.toSet()),
-                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
+                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService,
+                embeddedUserRepository, embeddedResourceResolverProvider,
                 connectionServiceProvider);
         }
     }

@@ -15,9 +15,9 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
-import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -513,6 +513,14 @@ public class PermissionServiceImpl implements PermissionService {
             workspaceUserRepository.existsByUserIdAndWorkspaceId(ownerUserId.getAsLong(), workspaceId.getAsLong());
     }
 
+    private boolean hasProjectWorkflowScope(String workflowId, String scope, Environment environment) {
+        return projectRepository.findByWorkflowId(workflowId)
+            .filter(project -> isResourceVisible(project.getId(), PROJECT))
+            .map(Project::getWorkspaceId)
+            .map(workspaceId -> hasWorkspaceScope(workspaceId, scope, environment))
+            .orElse(false);
+    }
+
     private boolean isEmbeddedProject(long projectId) {
         EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
 
@@ -642,15 +650,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope, environment);
+        return hasProjectWorkflowScope(workflowId, scope, environment);
     }
 
     @Override
@@ -678,15 +678,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope, environment);
+        return hasProjectWorkflowScope(workflowId, scope, environment);
     }
 
     @Override

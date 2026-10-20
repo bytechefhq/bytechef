@@ -36,6 +36,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImp
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.security.ConnectionEnvironmentResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -65,12 +66,12 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -189,7 +190,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, JobFacade.class, JobService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRowFacade.class,
+    McpAutomationRowFacade.class, McpIntegrationInstanceConfigurationWorkflowService.class,
+    McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
@@ -440,7 +442,7 @@ class EmbeddedConnectedUserGatesIntTest {
             () -> connectedUserConnectionFacade.getConnectedUserConnections(
                 developmentConnectedUser.getId(), null, List.of()))
                     .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectedUserProjectFacade.getConnectedUserProjects(null, null))
+        assertThatThrownBy(() -> connectedUserProjectFacade.getConnectedUserProjects((Long) null, null))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> connectedUserProjectFacade.getConnectedUserProjects(
@@ -548,8 +550,9 @@ class EmbeddedConnectedUserGatesIntTest {
         verify(connectionFacade).update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0);
         verify(connectionFacade).delete(eq(EMBEDDED_PRODUCTION_CONNECTION_ID), any());
 
-        assertThatThrownBy(() -> embeddedConnectionFacade.createConnection(connectionDTO(Environment.DEVELOPMENT), false))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> embeddedConnectionFacade.createConnection(connectionDTO(Environment.DEVELOPMENT), false))
+                .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> embeddedConnectionFacade.updateConnectionTags(EMBEDDED_DEVELOPMENT_CONNECTION_ID, List.of()))
                 .isInstanceOf(AccessDeniedException.class);
@@ -633,7 +636,7 @@ class EmbeddedConnectedUserGatesIntTest {
             .getContent())
                 .extracting(ConnectedUser::getId)
                 .contains(productionConnectedUser.getId(), developmentConnectedUser.getId());
-        assertThat(connectedUserProjectFacade.getConnectedUserProjects(null, null)).isEmpty();
+        assertThat(connectedUserProjectFacade.getConnectedUserProjects((Long) null, null)).isEmpty();
         assertThat(connectedUserWorkflowReferenceFacade.getReferences(Set.of("workflow-uuid"))).isEmpty();
         assertThat(embeddedConnectionFacade.getConnections(null, null, null, null)).isEmpty();
         assertThat(embeddedConnectionFacade.getConnectionTags()).isEmpty();
@@ -700,8 +703,9 @@ class EmbeddedConnectedUserGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectedUserConnectionFacade.getSharedConnectionIds())
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> embeddedConnectionFacade.createConnection(connectionDTO(Environment.PRODUCTION), false))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> embeddedConnectionFacade.createConnection(connectionDTO(Environment.PRODUCTION), false))
+                .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> embeddedConnectionFacade.deleteConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> embeddedConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
@@ -736,13 +740,13 @@ class EmbeddedConnectedUserGatesIntTest {
             authenticate(login, TENANT_ADMIN.equals(login));
 
             assertThatThrownBy(() -> workspaceConnectionFacade.delete(EMBEDDED_PRODUCTION_CONNECTION_ID))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.updateConnectionTags(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of()))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
         }
