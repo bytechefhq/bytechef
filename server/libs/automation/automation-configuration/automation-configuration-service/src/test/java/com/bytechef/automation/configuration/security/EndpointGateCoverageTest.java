@@ -274,10 +274,15 @@ class EndpointGateCoverageTest {
         Map.entry("ApiKeyGraphQlController#createApiKey", "ApiKeyFacadeImpl requires a tenant admin"),
         Map.entry("ApiKeyGraphQlController#deleteApiKey", "ApiKeyFacadeImpl checks the caller owns the key"),
         Map.entry("ApiKeyGraphQlController#updateApiKey", "ApiKeyFacadeImpl checks the caller owns the key"),
-        Map.entry("ApiPlatformHandlerController#handleDeleteMethod", "API platform runtime, authenticated by API key"),
-        Map.entry("ApiPlatformHandlerController#handlePatchMethod", "API platform runtime, authenticated by API key"),
-        Map.entry("ApiPlatformHandlerController#handlePostMethod", "API platform runtime, authenticated by API key"),
-        Map.entry("ApiPlatformHandlerController#handlePutMethod", "API platform runtime, authenticated by API key"),
+        Map.entry(
+            "ApiPlatformHandlerController#getBasePath",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "ApiPlatformHandlerController#getEnvironment",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "ApiPlatformHandlerController#getSearchableApiCollections",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
         Map.entry("ApprovalController#approve", "permit-all inbound callback addressed by an approval id"),
         Map.entry("BillingWebhookApiController#handleWebhook", "Stripe webhook, verified by its signature"),
         Map.entry("CopilotApiController#chat", "checks the workflow scope in its body"),
