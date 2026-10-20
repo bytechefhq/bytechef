@@ -19,6 +19,9 @@ package com.bytechef.platform.data.table.execution.domain;
 import java.util.Objects;
 
 /**
+ * Sorts rows by a column in the given direction. Rows whose value is null come last, and ties are ordered by id
+ * ascending.
+ *
  * @author Ivica Cardic
  */
 public record DataTableRowSort(String column, Direction direction) {
@@ -26,6 +29,10 @@ public record DataTableRowSort(String column, Direction direction) {
     public DataTableRowSort {
         Objects.requireNonNull(column, "column must not be null");
         Objects.requireNonNull(direction, "direction must not be null");
+
+        if (column.isBlank()) {
+            throw new IllegalArgumentException("column must not be blank");
+        }
     }
 
     public enum Direction {
