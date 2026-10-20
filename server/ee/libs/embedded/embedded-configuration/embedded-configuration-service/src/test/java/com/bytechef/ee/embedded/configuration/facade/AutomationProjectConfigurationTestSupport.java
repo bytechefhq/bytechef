@@ -27,7 +27,7 @@ public final class AutomationProjectConfigurationTestSupport {
         AutomationProjectFacade automationProjectFacade,
         AutomationProjectConfigurationService automationProjectConfigurationService, long projectId) {
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         int publishedVersion = automationProjectFacade.getPublishedProjects()
             .stream()

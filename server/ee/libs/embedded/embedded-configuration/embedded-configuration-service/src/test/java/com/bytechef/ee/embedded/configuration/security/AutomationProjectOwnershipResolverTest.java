@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
-import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
+import com.bytechef.ee.embedded.configuration.repository.AutomationProjectRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -22,20 +22,20 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class AutomationWorkflowProjectOwnershipResolverTest {
+class AutomationProjectOwnershipResolverTest {
 
-    private final AutomationWorkflowProjectRepository repository = mock(AutomationWorkflowProjectRepository.class);
-    private final AutomationWorkflowProjectOwnershipResolver resolver =
-        new AutomationWorkflowProjectOwnershipResolver(repository);
+    private final AutomationProjectRepository repository = mock(AutomationProjectRepository.class);
+    private final AutomationProjectOwnershipResolver resolver =
+        new AutomationProjectOwnershipResolver(repository);
 
     @Test
     void testResourceTypeMatchesTheGateToken() {
-        assertThat(resolver.resourceType()).isEqualTo("AutomationWorkflowProject");
+        assertThat(resolver.resourceType()).isEqualTo("AutomationProject");
     }
 
     @Test
     void testResolvesAnEmbeddedRow() {
-        when(repository.findByProjectId(7L)).thenReturn(Optional.of(new AutomationWorkflowProject(7L)));
+        when(repository.findByProjectId(7L)).thenReturn(Optional.of(new AutomationProject(7L)));
 
         assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.ofEmbedded());
     }

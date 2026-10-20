@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.security;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
+import com.bytechef.ee.embedded.configuration.repository.AutomationProjectRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
@@ -25,23 +25,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class AutomationWorkflowProjectWorkflowOwnershipResolver implements ResourceOwnershipResolver {
+public class AutomationProjectWorkflowOwnershipResolver implements ResourceOwnershipResolver {
 
-    private final AutomationWorkflowProjectRepository automationWorkflowProjectRepository;
+    private final AutomationProjectRepository automationProjectRepository;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectWorkflowOwnershipResolver(
-        AutomationWorkflowProjectRepository automationWorkflowProjectRepository,
+    public AutomationProjectWorkflowOwnershipResolver(
+        AutomationProjectRepository automationProjectRepository,
         ProjectWorkflowService projectWorkflowService) {
 
-        this.automationWorkflowProjectRepository = automationWorkflowProjectRepository;
+        this.automationProjectRepository = automationProjectRepository;
         this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
     public String resourceType() {
-        return "AutomationWorkflowProjectWorkflow";
+        return "AutomationProjectWorkflow";
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AutomationWorkflowProjectWorkflowOwnershipResolver implements Resou
             id.toString());
 
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-            if (automationWorkflowProjectRepository.findByProjectId(projectWorkflow.getProjectId())
+            if (automationProjectRepository.findByProjectId(projectWorkflow.getProjectId())
                 .isPresent()) {
 
                 return ResourceOwner.ofEmbedded();
