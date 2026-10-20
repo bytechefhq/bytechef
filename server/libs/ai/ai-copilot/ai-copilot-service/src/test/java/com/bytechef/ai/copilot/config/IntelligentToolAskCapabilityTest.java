@@ -24,6 +24,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContributorConfiguration;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionIntelligentToolContributorConfiguration;
 import com.bytechef.platform.ai.skill.tool.SkillsIntelligentToolContributorConfiguration;
@@ -86,7 +87,8 @@ final class IntelligentToolAskCapabilityTest {
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
-            present(mock(SubAgentChatModelResolver.class)));
+            present(mock(SubAgentChatModelResolver.class)),
+            absent());
 
         IntelligentToolContributor platformContributor = platformIntelligentToolContributor(
             present(mock(IntelligentToolChatClientFactory.class)),
@@ -112,6 +114,11 @@ final class IntelligentToolAskCapabilityTest {
         when(objectProvider.getIfAvailable()).thenReturn(value);
 
         return objectProvider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> absent() {
+        return mock(ObjectProvider.class);
     }
 
     private static IntelligentToolContributor platformIntelligentToolContributor(
@@ -147,14 +154,15 @@ final class IntelligentToolAskCapabilityTest {
         ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
 
         IntelligentToolContributor contributor1 =
             new WorkflowExecutionIntelligentToolContributorConfiguration().workflowExecutionIntelligentToolContributor(
                 workflowExecutionBuildFactoryProvider, chatModelResolverProvider);
         IntelligentToolContributor contributor2 = new WorkflowIntelligentToolContributorConfiguration()
             .workflowIntelligentToolContributor(workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider,
-                converterBuildFactoryProvider, chatModelResolverProvider);
+                converterBuildFactoryProvider, chatModelResolverProvider, projectWorkflowLifecycleToolsProvider);
 
         List<String> order = List.of("buildWorkflow", "importWorkflow", "debugWorkflowExecution");
 

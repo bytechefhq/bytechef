@@ -17,7 +17,13 @@
 package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
@@ -31,11 +37,13 @@ import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
 import com.bytechef.automation.configuration.tool.ClusterElementTools;
+import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContributorConfiguration;
+import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionAgentType;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionIntelligentToolContributorConfiguration;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
@@ -61,6 +69,7 @@ import com.bytechef.platform.workflow.tool.CodeEditorIntelligentToolContributorC
 import com.bytechef.platform.workflow.tool.PlatformWorkflowAgentType;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
 import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -70,9 +79,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ByteArrayResource;
@@ -81,6 +93,7 @@ import org.springframework.core.io.Resource;
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 final class IntelligentToolContributorConfigurationTest {
 
     private static final List<DelegateCase> DELEGATE_CASES = List.of(
@@ -122,6 +135,71 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     @Test
+    void testImportWorkflowWithAProjectIdCreatesTheWorkflowThroughProjectWorkflowTools() {
+        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+
+        stubCreateProjectWorkflowRecordingACapture(projectWorkflowTools);
+
+        ChatClient chatClient = mock(ChatClient.class, RETURNS_DEEP_STUBS);
+
+        when(chatClient.prompt(anyString())
+            .toolContext(anyMap())
+            .call()
+            .content()).thenReturn("converted");
+
+        IntelligentToolContributor contributor = workflowIntelligentToolContributor(
+            emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
+            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)));
+
+        IntelligentToolDefinition converterDefinition = definitionNamed(
+            contributor.getIntelligentToolDefinitions(), "importWorkflow");
+
+        ToolCallback toolCallback = converterDefinition.create(
+            converterDefinition.chatClientFactory(IntelligentToolVariant.BUILD));
+
+        String result = toolCallback.call("{\"request\":\"convert this n8n workflow\",\"projectId\":7}");
+
+        assertThat(result).startsWith("converted");
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(projectWorkflowTools).createProjectWorkflow(
+            eq(7L), definitionCaptor.capture(), any(ToolContext.class));
+
+        assertThat(definitionCaptor.getValue()).contains("Imported workflow");
+
+        verify(chatClient).prompt("Target workflowId: wf-new\n\nconvert this n8n workflow");
+    }
+
+    @Test
+    void testImportWorkflowDeletesTheCreatedWorkflowThroughProjectWorkflowToolsWhenTheImportFails() {
+        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+
+        stubCreateProjectWorkflowRecordingACapture(projectWorkflowTools);
+
+        ChatClient chatClient = mock(ChatClient.class, RETURNS_DEEP_STUBS);
+
+        when(chatClient.prompt(anyString())
+            .toolContext(anyMap())
+            .call()
+            .content()).thenReturn("{\"error\":\"could not map the n8n nodes\"}");
+
+        IntelligentToolContributor contributor = workflowIntelligentToolContributor(
+            emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
+            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)));
+
+        IntelligentToolDefinition converterDefinition = definitionNamed(
+            contributor.getIntelligentToolDefinitions(), "importWorkflow");
+
+        String result = converterDefinition.create(converterDefinition.chatClientFactory(IntelligentToolVariant.BUILD))
+            .call("{\"request\":\"convert this n8n workflow\",\"projectId\":7}");
+
+        assertThat(result).isEqualTo("{\"error\":\"could not map the n8n nodes\"}");
+
+        verify(projectWorkflowTools).deleteWorkflow(eq("wf-new"), any(ToolContext.class));
+    }
+
+    @Test
     void testConverterAgentHasNoAskVariantButHasBuildVariant() {
         List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
 
@@ -137,7 +215,8 @@ final class IntelligentToolContributorConfigurationTest {
             workflowIntelligentToolContributor(emptyProvider(),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
-                present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class))),
+                present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
+                emptyProvider()),
             platformIntelligentToolContributor(
                 emptyProvider(), present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
@@ -241,7 +320,8 @@ final class IntelligentToolContributorConfigurationTest {
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
-                present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class))),
+                present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
+                emptyProvider()),
             platformIntelligentToolContributor(
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
@@ -271,7 +351,8 @@ final class IntelligentToolContributorConfigurationTest {
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
             workflowIntelligentToolContributor(present(workflowEditorAsk.factory()),
                 present(workflowEditorBuild.factory()), present(converterBuild.factory()),
-                present(workflowExecutionBuild.factory()), present(mock(SubAgentChatModelResolver.class))),
+                present(workflowExecutionBuild.factory()), present(mock(SubAgentChatModelResolver.class)),
+                emptyProvider()),
             platformIntelligentToolContributor(
                 present(clusterElementAsk.factory()), present(clusterElementBuild.factory()),
                 present(codeEditorAsk.factory()), present(codeEditorBuild.factory()), present(skillsAsk.factory()),
@@ -526,6 +607,24 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     @SuppressWarnings("unchecked")
+    private static void stubCreateProjectWorkflowRecordingACapture(ProjectWorkflowTools projectWorkflowTools) {
+        when(projectWorkflowTools.createProjectWorkflow(eq(7L), anyString(), any(ToolContext.class)))
+            .thenAnswer(invocation -> {
+                ToolContext toolContext = invocation.getArgument(2);
+
+                List<Map<String, Object>> captures = (List<Map<String, Object>>) toolContext.getContext()
+                    .get("bytechef.workflowEditor.persistedWorkflows");
+
+                captures.add(
+                    Map.of(
+                        "created", true, "workflowId", "wf-new", "projectId", 7L, "projectWorkflowId", 1L, "name",
+                        "Imported workflow"));
+
+                return new ProjectWorkflowInfo(1L, 7L, 1, "wf-new", "uuid", null, null);
+            });
+    }
+
+    @SuppressWarnings("unchecked")
     private static <T> ObjectProvider<T> emptyProvider() {
         return mock(ObjectProvider.class);
     }
@@ -578,14 +677,15 @@ final class IntelligentToolContributorConfigurationTest {
         ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
 
         IntelligentToolContributor contributor1 =
             new WorkflowExecutionIntelligentToolContributorConfiguration().workflowExecutionIntelligentToolContributor(
                 workflowExecutionBuildFactoryProvider, chatModelResolverProvider);
         IntelligentToolContributor contributor2 = new WorkflowIntelligentToolContributorConfiguration()
             .workflowIntelligentToolContributor(workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider,
-                converterBuildFactoryProvider, chatModelResolverProvider);
+                converterBuildFactoryProvider, chatModelResolverProvider, projectWorkflowLifecycleToolsProvider);
 
         List<String> order = List.of("buildWorkflow", "importWorkflow", "debugWorkflowExecution");
 
