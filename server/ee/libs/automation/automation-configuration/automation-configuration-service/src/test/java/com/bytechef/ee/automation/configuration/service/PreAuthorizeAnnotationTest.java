@@ -402,6 +402,120 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedMcpGates() throws Exception {
+        String base = "com.bytechef.ee.embedded.ai.mcp.facade.";
+        Class<?> serverFacade = Class.forName(base + "EmbeddedMcpServerFacadeImpl");
+        Class<?> configurationFacade = Class.forName(base + "McpIntegrationInstanceConfigurationFacadeImpl");
+        Class<?> workflowFacade = Class.forName(base + "McpIntegrationInstanceConfigurationWorkflowFacadeImpl");
+        Class<?> toolFacade = Class.forName(base + "McpIntegrationInstanceToolFacadeImpl");
+        Class<?> instanceWorkflowFacade = Class.forName(base + "McpIntegrationInstanceWorkflowFacadeImpl");
+        Class<?> connectedUserFacade = Class.forName(base + "ConnectedUserMcpServerFacadeImpl");
+
+        String mcpView = "hasEmbeddedScope('MCP_VIEW')";
+        String serverEdit = "hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')";
+        String serverView = "hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')";
+        String componentEdit = "hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')";
+        String toolEdit = "hasPermission(#mcpToolId, 'McpTool', 'MCP_EDIT')";
+        String configurationType = "'McpIntegrationInstanceConfiguration', ";
+        String configurationEdit =
+            "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType + "'MCP_EDIT')";
+        String configurationView =
+            "hasPermission(#mcpIntegrationInstanceConfigurationId, " + configurationType + "'MCP_VIEW')";
+        String workflowType = "'McpIntegrationInstanceConfigurationWorkflow', ";
+        String instanceManage =
+            "hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') "
+                + "or isConnectedUser()";
+
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "createEmbeddedMcpComponent",
+            "hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "createEmbeddedMcpServer", "hasEmbeddedScopeInEnvironment('MCP_CREATE', #environment)");
+        assertEveryPublicOverloadIsGated(serverFacade, "deleteEmbeddedMcpComponent", componentEdit);
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "deleteEmbeddedMcpServer", "hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')");
+        assertEveryPublicOverloadIsGated(serverFacade, "deleteEmbeddedMcpTool", toolEdit);
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "getEmbeddedMcpComponentMcpTools",
+            "hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')");
+        assertEveryPublicOverloadIsGated(serverFacade, "getEmbeddedMcpServerMcpComponents", serverView);
+        assertEveryPublicOverloadIsGated(serverFacade, "getEmbeddedMcpServers", mcpView);
+        assertEveryPublicOverloadIsGated(serverFacade, "getEmbeddedMcpServerTags", mcpView);
+        assertEveryPublicOverloadIsGated(serverFacade, "getMcpComponentDefinitions", mcpView);
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "updateEmbeddedMcpComponent",
+            "hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServer", serverEdit);
+        assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServerSecretKey", "isTenantAdmin()");
+        assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServerTags", serverEdit);
+        assertEveryPublicOverloadIsGated(
+            serverFacade, "updateEmbeddedMcpTool",
+            "hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT') and "
+                + "hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpToolEnabled", toolEdit);
+
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "createMcpIntegrationInstanceConfiguration",
+            serverEdit + " and hasPermission(#integrationInstanceConfigurationId, "
+                + "'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "deleteMcpIntegrationInstanceConfiguration", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "updateMcpIntegrationInstanceConfiguration", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "updateMcpIntegrationInstanceConfigurationVersion", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getMcpIntegrationInstanceConfiguration",
+            "hasPermission(#id, " + configurationType + "'MCP_VIEW')");
+        assertEveryPublicOverloadIsGated(configurationFacade, "getMcpIntegrationInstanceConfigurations", mcpView);
+        assertEveryPublicOverloadIsGated(
+            configurationFacade, "getMcpServerMcpIntegrationInstanceConfigurations", serverView);
+
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "deleteMcpIntegrationInstanceConfigurationWorkflow",
+            "hasPermission(#mcpIntegrationInstanceConfigurationWorkflowId, " + workflowType + "'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "createMcpIntegrationInstanceConfigurationWorkflow", configurationEdit);
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "updateMcpIntegrationInstanceConfigurationWorkflow",
+            "hasPermission(#id, " + workflowType + "'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "updateMcpIntegrationInstanceConfigurationWorkflowParameters",
+            "hasPermission(#id, " + workflowType + "'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "getMcpIntegrationInstanceConfigurationWorkflow",
+            "hasPermission(#id, " + workflowType + "'MCP_VIEW')");
+        assertEveryPublicOverloadIsGated(workflowFacade, "getMcpIntegrationInstanceConfigurationWorkflows", mcpView);
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows",
+            configurationView);
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "getToolEligibleIntegrationVersionWorkflows",
+            "hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "getToolEligibleIntegrationInstanceConfigurationWorkflows",
+            "hasPermission(#integrationInstanceConfigurationId, 'IntegrationInstanceConfiguration', "
+                + "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')");
+
+        assertEveryPublicOverloadIsGated(toolFacade, "enableMcpIntegrationInstanceTool", instanceManage);
+        assertEveryPublicOverloadIsGated(instanceWorkflowFacade, "enableMcpIntegrationInstanceWorkflow",
+            instanceManage);
+        assertEveryPublicOverloadIsGated(instanceWorkflowFacade, "updateMcpIntegrationInstanceWorkflow",
+            instanceManage);
+
+        assertEveryPublicOverloadIsGated(
+            connectedUserFacade, "deleteConnectedUserMcpServer",
+            "hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')");
+        assertEveryPublicOverloadIsGated(connectedUserFacade, "enableConnectedUserMcpServer", serverEdit);
+        assertEveryPublicOverloadIsGated(
+            connectedUserFacade, "enableMcpTool",
+            "hasPermission(#mcpIntegrationInstanceToolId, 'McpIntegrationInstanceTool', 'MCP_EDIT')");
+        assertEveryPublicOverloadIsGated(
+            connectedUserFacade, "getConnectedUserMcpServers",
+            "hasPermission(#connectedUserId, 'ConnectedUser', 'MCP_VIEW')");
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");

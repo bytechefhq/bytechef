@@ -124,7 +124,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
         // Remove every per-user tool row whose underlying McpComponent points at the given server.
         // Since the read query rebuilds the (server -> tools) shape from these rows, removing them
@@ -160,7 +160,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
 
@@ -205,14 +205,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceToolId, 'McpIntegrationInstanceTool', 'MCP_EDIT')")
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'MCP_VIEW')")
     public List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUserId);
