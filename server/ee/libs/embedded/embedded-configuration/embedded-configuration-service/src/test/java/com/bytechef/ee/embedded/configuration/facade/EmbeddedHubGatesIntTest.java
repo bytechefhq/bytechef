@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -53,7 +54,6 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -545,7 +545,8 @@ class EmbeddedHubGatesIntTest {
                 (resourceType, workspaceId, candidates) -> candidates.stream()
                     .map(VisibilityRecord::id)
                     .collect(Collectors.toSet()),
-                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
+                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService,
+                embeddedUserRepository, embeddedResourceResolverProvider,
                 connectionServiceProvider);
         }
     }

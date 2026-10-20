@@ -48,7 +48,9 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +58,8 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -115,6 +119,11 @@ class WorkspaceConnectionFacadeTest {
             workspaceConnectionService, workspaceFacade);
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
     void testGetConnectionsDelegatesToVisibilityResolver() {
         WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
@@ -135,6 +144,8 @@ class WorkspaceConnectionFacadeTest {
             .thenReturn(allConnections);
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L));
+        givenCallerCanEditConnection(10L);
+        authenticateAs(CURRENT_USER);
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
@@ -166,10 +177,53 @@ class WorkspaceConnectionFacadeTest {
             .thenReturn(List.of(visibleConnection, hiddenConnection));
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L));
+        givenCallerCanEditConnection(10L);
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
-        assertThat(result).containsExactly(visibleConnection);
+        assertThat(result).extracting(ConnectionDTO::id)
+            .containsExactly(10L);
+    }
+
+    @Test
+    void testGetConnectionsHidesCredentialsPerConnectionNotPerEnvironment() {
+        WorkspaceConnection ownedWorkspaceConnection = mock(WorkspaceConnection.class);
+        WorkspaceConnection colleagueWorkspaceConnection = mock(WorkspaceConnection.class);
+
+        when(ownedWorkspaceConnection.getConnectionId()).thenReturn(10L);
+        when(colleagueWorkspaceConnection.getConnectionId()).thenReturn(11L);
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(ownedWorkspaceConnection, colleagueWorkspaceConnection));
+
+        ConnectionDTO ownedConnection = ConnectionDTO.builder()
+            .authorizationParameters(Map.of("access_token", "owned-secret"))
+            .environmentId(0)
+            .id(10L)
+            .visibility(ResourceVisibility.WORKSPACE)
+            .createdBy(CURRENT_USER)
+            .build();
+        ConnectionDTO colleagueConnection = ConnectionDTO.builder()
+            .authorizationParameters(Map.of("access_token", "colleague-secret"))
+            .environmentId(0)
+            .id(11L)
+            .visibility(ResourceVisibility.WORKSPACE)
+            .createdBy("someone@example.com")
+            .build();
+
+        when(connectionFacade.getConnections(null, null, List.of(10L, 11L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of(ownedConnection, colleagueConnection));
+        when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
+            .thenReturn(Set.of(10L, 11L));
+        when(permissionService.hasResourceScope(any(), eq("Connection"), eq("CONNECTION_EDIT"))).thenReturn(true);
+        when(permissionService.isResourceOwner("Connection", 10L)).thenReturn(true);
+        when(permissionService.isResourceOwner("Connection", 11L)).thenReturn(false);
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        authenticateAs(CURRENT_USER);
+
+        List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        assertThat(result).extracting(ConnectionDTO::authorizationParameters)
+            .containsExactly(Map.of("access_token", "owned-secret"), Map.of());
     }
 
     @Test
@@ -351,6 +405,8 @@ class WorkspaceConnectionFacadeTest {
 
     @Test
     void testDeleteLeavesRefreshCancellationToTheBeforeDeleteListener() {
+        givenAutomationConnection(10L);
+
         org.mockito.InOrder inOrder = org.mockito.Mockito.inOrder(workspaceConnectionService, connectionFacade);
 
         workspaceConnectionFacade.delete(10L);
@@ -455,6 +511,25 @@ class WorkspaceConnectionFacadeTest {
     private static final class CeGateObservedException extends RuntimeException {
     }
 
+    private void givenAutomationConnection(long connectionId) {
+        Connection connection = new Connection();
+
+        connection.setId(connectionId);
+        connection.setType(PlatformType.AUTOMATION);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+    }
+
+    private static void authenticateAs(String login) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestingAuthenticationToken(login, null));
+    }
+
+    private void givenCallerCanEditConnection(long connectionId) {
+        when(permissionService.hasResourceScope(connectionId, "Connection", "CONNECTION_EDIT")).thenReturn(true);
+        when(permissionService.isResourceOwner("Connection", connectionId)).thenReturn(true);
+    }
+
     private void stubCurrentUserIsWorkspaceMember(MockedStatic<SecurityUtils> securityUtils) {
         securityUtils.when(SecurityUtils::getCurrentUserLogin)
             .thenReturn(CURRENT_USER);
@@ -462,7 +537,7 @@ class WorkspaceConnectionFacadeTest {
         User currentUser = mock(User.class);
 
         when(currentUser.getId()).thenReturn(99L);
-        when(userService.fetchUserByLogin(CURRENT_USER)).thenReturn(java.util.Optional.of(currentUser));
+        when(userService.fetchUserByLogin(CURRENT_USER)).thenReturn(Optional.of(currentUser));
 
         Workspace workspace = mock(Workspace.class);
 
