@@ -1,16 +1,15 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {ButtonGroup} from '@/components/ui/button-group';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {ButtonGroup} from '@/components/ui/button-group';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/components/IntegrationPublishDialog';
@@ -141,7 +140,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
         const interactiveSelectors = [
             '[data-interactive]',
             '[role="menuitem"]',
-            '.dropdown-menu-item',
+            '[role="menu"]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
@@ -242,10 +241,11 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end" className="p-0">
+                                        <DropdownMenuContent align="end">
                                             <DropdownMenuItem
                                                 aria-label="Import Workflow"
-                                                className="dropdown-menu-item"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
 
@@ -253,9 +253,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                                         hiddenFileInputRef.current.click();
                                                     }
                                                 }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
+                                            />
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </ButtonGroup>
@@ -326,44 +324,40 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                 <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" className="p-0">
+                            <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item"
+                                    icon={<EditIcon />}
+                                    label="Edit"
                                     onClick={() => setShowEditDialog(true)}
-                                >
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
+                                />
 
                                 {integration?.integrationWorkflowIds &&
                                     integration?.integrationWorkflowIds.length > 0 && (
                                         <DropdownMenuItem
-                                            className="dropdown-menu-item"
+                                            icon={<WorkflowIcon />}
+                                            label="View Workflows"
                                             onClick={() =>
                                                 navigate(
                                                     `/embedded/integrations/${integration?.id}/integration-workflows/${integration.integrationWorkflowIds![0]}`
                                                 )
                                             }
-                                        >
-                                            <WorkflowIcon /> View Workflows
-                                        </DropdownMenuItem>
+                                        />
                                     )}
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item"
+                                    icon={<SendIcon />}
+                                    label="Publish"
                                     onClick={() => setShowPublishIntegrationDialog(true)}
-                                >
-                                    <SendIcon /> Publish
-                                </DropdownMenuItem>
+                                />
 
-                                <DropdownMenuSeparator className="m-0" />
+                                <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-destructive"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
                                     onClick={() => setShowDeleteDialog(true)}
                                     variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
