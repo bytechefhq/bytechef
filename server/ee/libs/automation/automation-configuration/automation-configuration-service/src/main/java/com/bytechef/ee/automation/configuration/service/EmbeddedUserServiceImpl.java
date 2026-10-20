@@ -18,7 +18,6 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -127,10 +126,6 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
             embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole));
         } else {
-            if (removedEmbeddedUser.getEmbeddedRole() == WorkspaceRole.ADMIN) {
-                validateNotSelfDemotionFromEnvironments(userId, Set.of(environment));
-            }
-
             embeddedUserRepository.delete(removedEmbeddedUser);
         }
 
@@ -164,17 +159,6 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         }
 
         Optional<EmbeddedUser> implicitEmbeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId);
-
-        Optional<EmbeddedUser> currentEmbeddedUser = implicitEmbeddedUser.isPresent()
-            ? implicitEmbeddedUser
-            : embeddedUserRepository.findByUserIdAndEnvironment(userId, environment.ordinal());
-
-        WorkspaceRole currentRole = currentEmbeddedUser.map(EmbeddedUser::getEmbeddedRole)
-            .orElse(null);
-
-        boolean losesAdmin = currentRole == WorkspaceRole.ADMIN && embeddedRole != WorkspaceRole.ADMIN;
-
-        validateNotSelfDemotionFromEnvironments(userId, losesAdmin ? Set.of(environment) : Set.of());
 
         if (implicitEmbeddedUser.isPresent()) {
             EmbeddedUser implicit = implicitEmbeddedUser.get();
@@ -223,10 +207,6 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
         validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
 
-        if (embeddedUser.getEmbeddedRole() == WorkspaceRole.ADMIN && embeddedRole != WorkspaceRole.ADMIN) {
-            validateNotSelfDemotionFromEnvironments(userId, EnumSet.allOf(Environment.class));
-        }
-
         embeddedUser.assignRole(embeddedRole);
 
         EmbeddedUser savedEmbeddedUser = embeddedUserRepository.save(embeddedUser);
@@ -261,19 +241,6 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     private ConfigurationException missingMembership(long userId) {
         return new ConfigurationException(
             "User " + userId + " is not an embedded member", WorkspaceUserErrorType.NOT_MEMBER);
-    }
-
-    private void validateNotSelfDemotionFromEnvironments(long userId, Set<Environment> lostAdminEnvironments) {
-        if (lostAdminEnvironments.isEmpty() || permissionService.isTenantAdmin()
-            || !permissionService.isCurrentUser(userId)) {
-
-            return;
-        }
-
-        throw new ConfigurationException(
-            "Cannot withdraw your own ADMIN role from " + lostAdminEnvironments
-                + " in embedded. Ask another admin to make the change.",
-            WorkspaceUserErrorType.SELF_DEMOTION_FORBIDDEN);
     }
 
     private void validateGrantWithinCallerScopes(List<Environment> environments, WorkspaceRole embeddedRole) {
