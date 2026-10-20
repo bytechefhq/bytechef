@@ -313,8 +313,11 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
-        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
+    @PreAuthorize("#connectedUserId != null ? "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : "
+        + "(#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId))")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
