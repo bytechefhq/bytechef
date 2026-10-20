@@ -585,36 +585,36 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
 
     static final EvaluatorFunctionDefinition CONCAT_STRING = function(EvaluatorFunctionName.CONCAT)
         .title("Concat")
-        .description("Concatenates two strings.")
+        .description("Concatenates one or more strings into a single string.")
         .category(EvaluatorFunctionCategory.STRING)
         .parameters(
-            parameter("value1")
+            parameter("value")
                 .description("The first string")
                 .type(STRING)
                 .required(true),
-            parameter("value2")
-                .description("The second string")
+            parameter("values")
+                .description("Any number of further strings to append, in order")
                 .type(STRING)
-                .required(true))
+                .required(false))
         .returnType(STRING)
-        .example("=concat('hello ', 'world')")
+        .example("=concat('hello', ' ', 'world')")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition CONCAT_LIST = function(EvaluatorFunctionName.CONCAT)
         .title("Concat")
-        .description("Concatenates two lists.")
+        .description("Concatenates one or more lists into a single list.")
         .category(EvaluatorFunctionCategory.STRING)
         .parameters(
-            parameter("value1")
+            parameter("value")
                 .description("The first list")
                 .type(LIST)
                 .required(true),
-            parameter("value2")
-                .description("The second list")
+            parameter("values")
+                .description("Any number of further lists to append, in order")
                 .type(LIST)
-                .required(true))
+                .required(false))
         .returnType(LIST)
-        .example("=concat(${list1}, ${list2})")
+        .example("=concat(${list1}, ${list2}, ${list3})")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition EQUALS_IGNORE_CASE = function(EvaluatorFunctionName.EQUALS_IGNORE_CASE)
