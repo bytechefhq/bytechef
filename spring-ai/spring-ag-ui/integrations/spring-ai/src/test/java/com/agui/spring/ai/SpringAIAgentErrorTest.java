@@ -283,6 +283,46 @@ class SpringAIAgentErrorTest {
         assertThat(finalized).isTrue();
     }
 
+    @Test
+    void shouldEmitTheMostSpecificCauseMessageByDefaultWhenTheChatStreamFails() throws AGUIException, InterruptedException {
+        var builder = SpringAIAgent.builder()
+            .agentId("test")
+            .chatModel(new WrappedFailingStreamChatModel())
+            .systemMessage("system")
+            .state(new State());
+
+        var agent = new SpringAIAgent(builder);
+
+        var events = new CopyOnWriteArrayList<BaseEvent>();
+        var finalized = new CountDownLatch(1);
+
+        agent.run(newInput(), new AgentSubscriber() {
+            @Override
+            public void onEvent(BaseEvent event) {
+                events.add(event);
+            }
+
+            @Override
+            public void onRunFinalized(AgentSubscriberParams params) {
+                finalized.countDown();
+            }
+        });
+
+        assertThat(finalized.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(((RunErrorEvent) events.get(2)).getError()).isEqualTo("Your credit balance is too low");
+    }
+
+    @Test
+    void shouldReturnTheDeepestNonBlankMessageInTheCauseChain() {
+        var root = new IllegalStateException("root cause");
+        var middle = new RuntimeException("  ", root);
+        var top = new RuntimeException("Stream processing failed", middle);
+
+        assertThat(SpringAIAgent.mostSpecificMessage(top)).isEqualTo("root cause");
+        assertThat(SpringAIAgent.mostSpecificMessage(new RuntimeException("only"))).isEqualTo("only");
+        assertThat(SpringAIAgent.mostSpecificMessage(new NullPointerException())).isNull();
+    }
+
     private static RunAgentInput newInput() {
         var userMessage = new UserMessage();
 
@@ -290,6 +330,20 @@ class SpringAIAgentErrorTest {
         userMessage.setContent("Build a workflow");
 
         return new RunAgentInput("thread", "run", new State(), List.of(userMessage), List.of(), new ArrayList<>(), null);
+    }
+
+    private static class WrappedFailingStreamChatModel implements ChatModel {
+
+        @Override
+        public ChatResponse call(Prompt prompt) {
+            throw new UnsupportedOperationException("The chat model must be streamed");
+        }
+
+        @Override
+        public Flux<ChatResponse> stream(Prompt prompt) {
+            return Flux.error(
+                new RuntimeException("Stream processing failed", new IllegalStateException("Your credit balance is too low")));
+        }
     }
 
     private static class FailingStreamChatModel implements ChatModel {
