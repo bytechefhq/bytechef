@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';

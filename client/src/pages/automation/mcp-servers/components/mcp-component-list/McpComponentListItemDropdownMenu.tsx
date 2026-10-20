@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
@@ -7,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {
     McpComponent,
     useDeleteEmbeddedMcpComponentMutation,
@@ -70,19 +69,16 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                        <EditIcon /> Edit
-                    </DropdownMenuItem>
+                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
                         onClick={() => setShowDeleteDialog(true)}
                         variant="destructive"
-                    >
-                        <Trash2Icon /> Delete
-                    </DropdownMenuItem>
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
 

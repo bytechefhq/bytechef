@@ -5,6 +5,18 @@ import {describe, expect, it, vi} from 'vitest';
 import McpToolActionsMenu from '../McpToolActionsMenu';
 
 describe('McpToolActionsMenu', () => {
+    it('should render with the design-system DropdownMenu', async () => {
+        const user = userEvent.setup();
+
+        render(<McpToolActionsMenu label="Lead intake" onDeleteClick={vi.fn()} onEditClick={vi.fn()} />);
+
+        await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
+
+        expect(await screen.findByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('calls the handler of each action', async () => {
         const user = userEvent.setup();
         const handleDeleteClick = vi.fn();
