@@ -1191,14 +1191,17 @@ describe('runPostTurnTelemetry', () => {
             environmentId: 0,
             id: 1,
             isOwner: true,
+            kind: 'STANDARD' as const,
             lastPreview: null,
             messageCount: 0,
             ownerUserId: 1,
+            projectDeploymentId: null,
             status: 'ACTIVE' as const,
             threadId: 'thread-1',
             title: null,
             updatedAt: '2026-01-01T00:00:00Z',
             userId: 1,
+            workflowExecutionId: null,
             workspaceId: 1,
         };
 

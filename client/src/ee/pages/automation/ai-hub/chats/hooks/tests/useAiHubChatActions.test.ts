@@ -40,14 +40,17 @@ const CHAT: AiHubChatI = {
     environmentId: 0,
     id: 7,
     isOwner: true,
+    kind: 'STANDARD',
     lastPreview: null,
     messageCount: 2,
     ownerUserId: 1,
+    projectDeploymentId: null,
     status: 'ACTIVE',
     threadId: 'thread-7',
     title: 'Old title',
     updatedAt: '2026-10-18T00:00:00Z',
     userId: 1,
+    workflowExecutionId: null,
     workspaceId: 3,
 };
 
