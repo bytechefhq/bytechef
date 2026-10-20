@@ -634,7 +634,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (isIntegrationWorkflow(workflowId) || isHubProjectWorkflow(workflowId)) {
-            return canUseEmbeddedConnection(connectionId);
+            return canUseEmbeddedConnection(connectionId, environment);
         }
 
         if (isEmbeddedProjectWorkflow(workflowId)) {
@@ -652,7 +652,7 @@ public class PermissionServiceImpl implements PermissionService {
         return canUseConnectionInWorkspace(connectionId, workspaceId, environment);
     }
 
-    private boolean canUseEmbeddedConnection(long connectionId) {
+    private boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
         ConnectionService connectionService = connectionServiceProvider.getIfAvailable();
 
         if (connectionService == null) {
@@ -672,6 +672,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         Environment connectionEnvironment = Environment.values()[connection.getEnvironmentId()];
+
+        if (environment != null && environment != connectionEnvironment) {
+            return false;
+        }
 
         return hasEmbeddedScope(CONNECTION_VIEW, connectionEnvironment);
     }

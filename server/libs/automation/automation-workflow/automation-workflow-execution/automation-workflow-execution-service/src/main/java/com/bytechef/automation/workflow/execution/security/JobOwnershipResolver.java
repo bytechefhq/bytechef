@@ -34,8 +34,9 @@ import org.springframework.stereotype.Component;
 /**
  * Maps an automation job (workflow-execution) id to its owning workspace by traversing job &rarr; workflowId &rarr;
  * owning {@link Project} &rarr; {@code project.workspace_id}. Reads via {@link JobService}/{@link ProjectService}
- * (neither is {@code @PreAuthorize}-guarded) to avoid recursion. Fails closed when the job is unknown or its workflow
- * is not a project workflow (e.g. a platform/embedded job).
+ * (neither is {@code @PreAuthorize}-guarded) to avoid recursion. Jobs of an integration workflow and of any embedded
+ * (Hub or connected-user) project resolve to the embedded side. Fails closed when the job is unknown or its workflow is
+ * not a project workflow.
  *
  * @author Ivica Cardic
  */

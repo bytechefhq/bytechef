@@ -87,11 +87,12 @@ public class ApprovalTaskOwnershipResolver implements ResourceOwnershipResolver 
 
         EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
 
-        if (projectOptional.isPresent() && embeddedResourceResolver != null
-            && embeddedResourceResolver.isEmbeddedProject(projectOptional.get()
-                .getId())) {
+        if (projectOptional.isPresent() && embeddedResourceResolver != null) {
+            Project project = projectOptional.get();
 
-            return ResourceOwner.ofEmbeddedProject();
+            if (embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+                return ResourceOwner.ofEmbeddedProject();
+            }
         }
 
         OptionalLong workspaceId = projectOptional
