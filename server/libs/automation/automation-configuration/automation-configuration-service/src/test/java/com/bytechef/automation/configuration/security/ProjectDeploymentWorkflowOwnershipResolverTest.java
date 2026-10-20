@@ -26,7 +26,10 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * The {@code 'ProjectDeploymentWorkflow'} token is only a check because this resolver is registered for it —
@@ -45,8 +48,14 @@ class ProjectDeploymentWorkflowOwnershipResolverTest {
     private final ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository =
         mock(ProjectDeploymentWorkflowRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final ProjectDeploymentWorkflowOwnershipResolver resolver =
-        new ProjectDeploymentWorkflowOwnershipResolver(projectDeploymentWorkflowRepository, projectRepository);
+    private ProjectDeploymentWorkflowOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new ProjectDeploymentWorkflowOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            projectDeploymentWorkflowRepository, projectRepository);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheDeploymentWorkflowGuardNames() {
@@ -119,5 +128,37 @@ class ProjectDeploymentWorkflowOwnershipResolverTest {
 
         when(projectDeploymentWorkflowRepository.findById(PROJECT_DEPLOYMENT_WORKFLOW_ID))
             .thenReturn(Optional.of(projectDeploymentWorkflow));
+    }
+
+    @Test
+    void testAnEmbeddedProjectsDeploymentWorkflowResolvesToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(embeddedResourceResolver.isEmbeddedProject(5L)).thenReturn(true);
+        when(embeddedResourceResolver.isHubProject(5L)).thenReturn(true);
+
+        givenRowBelongingToDeployment();
+
+        when(projectRepository.findByProjectDeploymentId(PROJECT_DEPLOYMENT_ID)).thenReturn(Optional.of(project));
+
+        ProjectDeploymentWorkflowOwnershipResolver embeddedResolver = new ProjectDeploymentWorkflowOwnershipResolver(
+            providerOf(embeddedResourceResolver), projectDeploymentWorkflowRepository, projectRepository);
+
+        assertThat(embeddedResolver.resolveOwner(PROJECT_DEPLOYMENT_WORKFLOW_ID))
+            .isEqualTo(ResourceOwner.ofEmbeddedProject());
+        assertThat(embeddedResolver.resolveProjectId(PROJECT_DEPLOYMENT_WORKFLOW_ID)).hasValue(5L);
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver>
+        providerOf(EmbeddedResourceResolver embeddedResourceResolver) {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }
