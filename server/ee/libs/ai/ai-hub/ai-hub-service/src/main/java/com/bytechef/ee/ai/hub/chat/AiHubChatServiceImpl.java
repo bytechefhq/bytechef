@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.chat;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
@@ -98,12 +99,14 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
     private final TransactionTemplate requiresNewTransactionTemplate;
+    private final ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubChatServiceImpl(
         AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
         AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
-        InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager) {
+        InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager,
+        ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider) {
 
         this.requiresNewTransactionTemplate = requiresNewTransactionTemplate(transactionManager);
         this.chatRepository = chatRepository;
@@ -112,6 +115,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         this.clock = Clock.systemUTC();
         this.aiHubSessionMemoryProvider = aiHubSessionMemoryProvider;
         this.inFlightRunRegistry = inFlightRunRegistry;
+        this.webhookResumeRegistryProvider = webhookResumeRegistryProvider;
     }
 
     @Override
@@ -677,12 +681,22 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         inFlightRunRegistry.retireThread(threadId);
 
+        clearPendingWorkflowQuestion(chatId);
+
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
 
         if (!cleanupScheduled) {
             deleteSessionMessages(threadId);
+        }
+    }
+
+    private void clearPendingWorkflowQuestion(long chatId) {
+        WebhookResumeRegistry webhookResumeRegistry = webhookResumeRegistryProvider.getIfAvailable();
+
+        if (webhookResumeRegistry != null) {
+            webhookResumeRegistry.clear(chatId);
         }
     }
 
