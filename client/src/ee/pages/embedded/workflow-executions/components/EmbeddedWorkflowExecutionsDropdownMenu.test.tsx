@@ -4,16 +4,34 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import EmbeddedWorkflowExecutionsDropdownMenu from './EmbeddedWorkflowExecutionsDropdownMenu';
 
 const hoisted = vi.hoisted(() => ({
+    invalidateQueries: vi.fn(),
     mutate: vi.fn(),
+    stopJobMutationOptions: {} as {onSuccess?: () => void},
+    toast: vi.fn(),
 }));
 
 vi.mock('@/shared/mutations/platform/jobs.mutations', () => ({
-    useStopJobMutation: () => ({mutate: hoisted.mutate}),
+    useStopJobMutation: (options: {onSuccess?: () => void}) => {
+        hoisted.stopJobMutationOptions = options;
+
+        return {mutate: hoisted.mutate};
+    },
+}));
+
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+    useQueryClient: () => ({invalidateQueries: hoisted.invalidateQueries}),
+}));
+
+vi.mock('sonner', () => ({
+    toast: hoisted.toast,
 }));
 
 describe('EmbeddedWorkflowExecutionsDropdownMenu', () => {
     beforeEach(() => {
+        hoisted.invalidateQueries.mockClear();
         hoisted.mutate.mockClear();
+        hoisted.toast.mockClear();
     });
 
     it('offers View and calls back when it is chosen', async () => {
@@ -44,5 +62,14 @@ describe('EmbeddedWorkflowExecutionsDropdownMenu', () => {
         const stopItem = await screen.findByText('Stop');
 
         expect(stopItem.closest('[role="menuitem"]')).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('announces the stop and refreshes both execution lists once the job is stopped', () => {
+        render(<EmbeddedWorkflowExecutionsDropdownMenu jobId="7" jobStatus="STARTED" onView={vi.fn()} />);
+
+        hoisted.stopJobMutationOptions.onSuccess?.();
+
+        expect(hoisted.toast).toHaveBeenCalledWith('Stopping Workflow Execution');
+        expect(hoisted.invalidateQueries).toHaveBeenCalledTimes(2);
     });
 });
