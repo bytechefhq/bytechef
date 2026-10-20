@@ -216,6 +216,21 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testShortWorkflowExecutionsOverloadCarriesTheSameGate() throws Exception {
+        Class<?> clazz = Class.forName(
+            "com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacadeImpl");
+
+        assertOverloadPreAuthorize(
+            clazz, "getWorkflowExecutions", new Class<?>[] {
+                Boolean.class, Long.class, Class.forName("com.bytechef.atlas.execution.domain.Job$Status"),
+                java.time.Instant.class, java.time.Instant.class, Long.class, Long.class, String.class,
+                Integer.class, long.class, int.class
+            },
+            "#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : " +
+                "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)");
+    }
+
+    @Test
     void testCeProjectDeploymentFacadeWorkspaceDeploymentsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl");

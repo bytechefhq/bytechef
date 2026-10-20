@@ -474,7 +474,7 @@ class AutomationMethodSecurityConfigurationTest {
 
     private static final Set<String> READ_GATED_CONTROLLERS = Set.of(
         "ApiClientApiController", "ApiConnectorGraphQlController", "ApprovalTaskGraphQlController",
-        "embedded:AppEventApiController", "embedded:AutomationWorkflowProjectGraphQlController",
+        "embedded:AppEventApiController", "embedded:AutomationProjectGraphQlController",
         "embedded:CategoryApiController", "embedded:ConnectedUserApiController",
         "embedded:ConnectedUserGraphQlController", "embedded:ConnectedUserMcpServerGraphQlController",
         "embedded:ConnectedUserProjectGraphQlController", "embedded:ConnectionTagApiController",
