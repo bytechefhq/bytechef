@@ -31,8 +31,6 @@ public class DataTableConstants {
     public static final String OFFSET = "offset";
     public static final String CONDITIONS = "conditions";
     public static final String DELETE_BY = "deleteBy";
-    public static final String BY_IDS = "IDS";
-    public static final String BY_CONDITIONS = "CONDITIONS";
     public static final String COLUMN = "column";
     public static final String OPERATION = "operation";
     public static final String VALUE = "value";

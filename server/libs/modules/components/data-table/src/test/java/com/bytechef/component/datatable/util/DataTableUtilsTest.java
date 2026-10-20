@@ -19,9 +19,15 @@ package com.bytechef.component.datatable.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,5 +95,129 @@ class DataTableUtilsTest {
         Object payload = List.of("unexpected");
 
         assertSame(payload, DataTableUtils.flattenPayload(payload));
+    }
+
+    @Test
+    void testGetConditionsDefaultsAndNormalizesOperations() {
+        Map<String, Object> conditionWithNullOperation = new HashMap<>();
+
+        conditionWithNullOperation.put("column", "status");
+        conditionWithNullOperation.put("operation", null);
+        conditionWithNullOperation.put("value", "BOT");
+
+        DataTableRowConditions conditions = DataTableUtils.getConditions(
+            MockParametersFactory.create(
+                Map.of(
+                    "conditions",
+                    List.of(
+                        List.of(
+                            conditionWithNullOperation,
+                            Map.of("column", "title", "operation", "contains", "value", "help"))))));
+
+        assertEquals(
+            DataTableRowConditions.of(
+                List.of(
+                    new DataTableRowFilter("status", Operation.EQUALS, "BOT"),
+                    new DataTableRowFilter("title", Operation.CONTAINS, "help"))),
+            conditions);
+    }
+
+    @Test
+    void testGetConditionsRejectsConditionsThatAreNotNestedLists() {
+        for (Object conditions : List.of(List.of(Map.of("column", "status", "value", "BOT")), "status = BOT")) {
+            IllegalArgumentException illegalArgumentException = assertThrows(
+                IllegalArgumentException.class,
+                () -> DataTableUtils.getConditions(MockParametersFactory.create(Map.of("conditions", conditions))));
+
+            assertEquals(
+                "OR Conditions must be a list of AND Condition lists, each holding condition objects",
+                illegalArgumentException.getMessage());
+        }
+    }
+
+    @Test
+    void testGetConditionsRejectsEmptyOrConditions() {
+        for (List<?> andConditions : Arrays.asList(List.of(), null)) {
+            IllegalArgumentException illegalArgumentException = assertThrows(
+                IllegalArgumentException.class,
+                () -> DataTableUtils.getConditions(
+                    MockParametersFactory.create(
+                        Map.of(
+                            "conditions",
+                            Arrays.asList(List.of(Map.of("column", "status", "value", "BOT")), andConditions)))));
+
+            assertEquals(
+                "OR Condition 2 is empty; add a condition to it or remove it", illegalArgumentException.getMessage());
+        }
+    }
+
+    @Test
+    void testGetConditionsRejectsInvalidConditions() {
+        IllegalArgumentException unknownOperationException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "status", "operation", "LIKE", "value", "x")))))));
+
+        assertTrue(unknownOperationException.getMessage()
+            .startsWith("Condition 1 of OR Condition 1: Unknown Operation 'LIKE'; expected one of EQUALS"));
+
+        IllegalArgumentException emptyConditionException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of("conditions", List.of(Arrays.asList(Map.of("column", "status", "value", "x"), null))))));
+
+        assertEquals("Condition 2 of OR Condition 1 is empty", emptyConditionException.getMessage());
+
+        IllegalArgumentException blankColumnException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of("conditions", List.of(List.of(Map.of("column", " ", "value", "x")))))));
+
+        assertEquals("Condition 1 of OR Condition 1: Column is required", blankColumnException.getMessage());
+
+        IllegalArgumentException blankOperationException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "status", "operation", " ", "value", "active")))))));
+
+        assertEquals(
+            "Condition 1 of OR Condition 1: Operation must not be blank", blankOperationException.getMessage());
+
+        IllegalArgumentException missingBoundException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "amount", "operation", "BETWEEN", "value", "1")))))));
+
+        assertEquals(
+            "Condition 1 of OR Condition 1: Filter on column 'amount' with operation BETWEEN requires every value to be set",
+            missingBoundException.getMessage());
+    }
+
+    @Test
+    void testGetConditionsRejectsUnknownKeys() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "status", "operator", "NOT_EQUALS", "value", "done")))))));
+
+        assertEquals(
+            "Condition 1 of OR Condition 1: Unknown condition key(s) operator; expected column, operation, value, valueTo, "
+                +
+                "values",
+            illegalArgumentException.getMessage());
     }
 }

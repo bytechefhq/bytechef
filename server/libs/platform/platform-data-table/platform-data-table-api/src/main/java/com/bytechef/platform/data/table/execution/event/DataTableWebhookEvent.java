@@ -19,31 +19,51 @@ package com.bytechef.platform.data.table.execution.event;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Application event published when a data table change should trigger webhooks.
+ * Application event published when a data table change should trigger webhooks. A bulk change publishes one event
+ * holding a payload per changed row.
  *
  * @author Ivica Cardic
  */
-public class DataTableWebhookEvent extends ApplicationEvent {
+public final class DataTableWebhookEvent extends ApplicationEvent {
 
     private final String baseName;
     private final long environmentId;
-    private final Map<String, Object> payload;
+    private final List<Map<String, Object>> payloads;
     private final DataTableWebhookType type;
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEvent(
         String baseName, DataTableWebhookType type, Map<String, Object> payload, long environmentId) {
 
-        super(baseName);
+        this(baseName, type, List.of(payload), environmentId);
+    }
+
+    @SuppressFBWarnings("EI")
+    public DataTableWebhookEvent(
+        String baseName, DataTableWebhookType type, List<Map<String, Object>> payloads, long environmentId) {
+
+        super(Objects.requireNonNull(baseName, "baseName must not be null"));
+
+        Objects.requireNonNull(payloads, "payloads must not be null");
+
+        if (payloads.isEmpty()) {
+            throw new IllegalArgumentException("payloads must not be empty");
+        }
 
         this.baseName = baseName;
         this.environmentId = environmentId;
-        this.type = type;
-        this.payload = payload;
+        this.type = Objects.requireNonNull(type, "type must not be null");
+        this.payloads = payloads.stream()
+            .map(payload -> Collections.unmodifiableMap(
+                new LinkedHashMap<>(Objects.requireNonNull(payload, "payload must not be null"))))
+            .toList();
     }
 
     public String getBaseName() {
@@ -58,8 +78,9 @@ public class DataTableWebhookEvent extends ApplicationEvent {
         return type;
     }
 
-    public Map<String, Object> getPayload() {
-        return Collections.unmodifiableMap(payload);
+    @SuppressFBWarnings("EI")
+    public List<Map<String, Object>> getPayloads() {
+        return payloads;
     }
 
     @Override
@@ -67,7 +88,7 @@ public class DataTableWebhookEvent extends ApplicationEvent {
         return "DataTableWebhookEvent{" +
             "baseName='" + baseName + '\'' +
             ", environmentId=" + environmentId +
-            ", payload=" + payload +
+            ", payloads=" + payloads +
             ", type=" + type +
             "} " + super.toString();
     }

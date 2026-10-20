@@ -29,11 +29,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = "com.bytechef.platform.data.table")
+@EnableAsync
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)

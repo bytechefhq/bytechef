@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.List;
@@ -32,7 +32,7 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
 
     @Override
     public List<DataTableRow> findRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, @Nullable DataTableRowSort sort, int limit,
+        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
         int offset,
         long environmentId) {
 
@@ -51,7 +51,7 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
 
     @Override
     public List<DataTableRow> updateRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, Map<String, Object> values, long environmentId) {
+        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
@@ -63,7 +63,7 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
 
     @Override
     public List<DataTableRow> deleteRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, long environmentId) {
+        String baseName, DataTableRowConditions conditions, long environmentId) {
 
         throw new UnsupportedOperationException();
     }

@@ -20,18 +20,28 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookTyp
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.backoff.ExponentialBackOff;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -49,21 +59,24 @@ public class DataTableWebhookEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    private static final int MAX_LOGGED_FAILED_IDS = 20;
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
+
     private final DataTableWebhookService dataTableWebhookService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = createRestTemplate();
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEventListener(DataTableWebhookService dataTableWebhookService) {
         this.dataTableWebhookService = dataTableWebhookService;
     }
 
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     @Async
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
         String baseName = event.getBaseName();
         long environmentId = event.getEnvironmentId();
         DataTableWebhookType type = event.getType();
-        Map<String, Object> payload = event.getPayload();
 
         List<DataTableWebhookService.Webhook> hooks = dataTableWebhookService.listWebhooks(baseName, environmentId)
             .stream()
@@ -77,8 +90,21 @@ public class DataTableWebhookEventListener {
         RetryTemplate retryTemplate = createRetryTemplate();
 
         for (DataTableWebhookService.Webhook hook : hooks) {
+            callWebhook(retryTemplate, hook, type, baseName, environmentId, event.getPayloads());
+        }
+    }
 
-            Map<String, Object> body = new java.util.HashMap<>();
+    private void callWebhook(
+        RetryTemplate retryTemplate, DataTableWebhookService.Webhook hook, DataTableWebhookType type, String baseName,
+        long environmentId, List<Map<String, Object>> payloads) {
+
+        List<Object> failedIds = new ArrayList<>();
+        RetryException firstRetryException = null;
+        int skippedCount = 0;
+
+        for (int index = 0; index < payloads.size(); index++) {
+            Map<String, Object> payload = payloads.get(index);
+            Map<String, Object> body = new HashMap<>();
 
             body.put("type", type.name());
             body.put("table", baseName);
@@ -88,15 +114,51 @@ public class DataTableWebhookEventListener {
             try {
                 retryTemplate.execute(() -> {
                     if (log.isDebugEnabled()) {
-                        log.debug("Calling data table webhook {} -> {}", hook.url(), body);
+                        log.debug("Calling data table webhook {} on host {} -> {}", hook.id(), getHost(hook), body);
                     }
 
                     return restTemplate.postForObject(hook.url(), body, String.class);
                 });
-            } catch (RetryException e) {
-                throw new RuntimeException(e);
+            } catch (RetryException retryException) {
+                if (failedIds.size() < MAX_LOGGED_FAILED_IDS) {
+                    failedIds.add(payload.get("id"));
+                }
+
+                if (firstRetryException == null) {
+                    firstRetryException = retryException;
+                }
+
+                Thread currentThread = Thread.currentThread();
+
+                if (currentThread.isInterrupted() || isRetryable(retryException.getCause())) {
+                    skippedCount = payloads.size() - index - 1;
+
+                    break;
+                }
             }
         }
+
+        if (firstRetryException != null) {
+            log.error(
+                "Data table webhook {} on host {} for {} on table '{}' in environment {} failed for record ids {} " +
+                    "and skipped {} of {} payloads",
+                hook.id(), getHost(hook), type, baseName, environmentId, failedIds, skippedCount, payloads.size(),
+                firstRetryException);
+        }
+    }
+
+    private static RestTemplate createRestTemplate() {
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+
+        simpleClientHttpRequestFactory.setConnectTimeout(CONNECT_TIMEOUT);
+        simpleClientHttpRequestFactory.setReadTimeout(READ_TIMEOUT);
+
+        return new RestTemplate(simpleClientHttpRequestFactory);
+    }
+
+    private static boolean isRetryable(@Nullable Throwable throwable) {
+        return throwable instanceof ResourceAccessException || throwable instanceof HttpServerErrorException
+            || throwable instanceof HttpClientErrorException.TooManyRequests;
     }
 
     private RetryTemplate createRetryTemplate() {
@@ -107,6 +169,17 @@ public class DataTableWebhookEventListener {
         return new RetryTemplate(
             RetryPolicy.builder()
                 .backOff(backOff)
+                .predicate(DataTableWebhookEventListener::isRetryable)
                 .build());
+    }
+
+    private static String getHost(DataTableWebhookService.Webhook hook) {
+        try {
+            URI uri = URI.create(hook.url());
+
+            return String.valueOf(uri.getHost());
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return "<invalid url>";
+        }
     }
 }
