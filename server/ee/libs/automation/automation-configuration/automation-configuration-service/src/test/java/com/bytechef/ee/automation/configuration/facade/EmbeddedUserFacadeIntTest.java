@@ -16,9 +16,11 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
+import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
@@ -38,14 +40,14 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.EmbeddedUserServiceImpl;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -88,6 +90,7 @@ class EmbeddedUserFacadeIntTest {
     private static final String EMBEDDED_VIEWER = "embedded-viewer";
     private static final String MEMBER = "member";
     private static final String NON_MEMBER = "non-member";
+    private static final long UNKNOWN_USER_ID = 9999L;
     private static final Map<String, Long> USER_IDS_BY_LOGIN = Map.of(
         ADMIN, 9400L, EMBEDDED_ADMIN, 9401L, EMBEDDED_VIEWER, 9402L, MEMBER, 9403L, NON_MEMBER, 9404L);
 
@@ -160,6 +163,57 @@ class EmbeddedUserFacadeIntTest {
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isTrue();
     }
 
+    @Test
+    void testAnEmbeddedAdminAddsAnExistingUserByEmail() {
+        authenticate(ADMIN, true);
+
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        EmbeddedUser embeddedUser = embeddedUserFacade.addEmbeddedUserByEmail(
+            MEMBER + "@example.com", WorkspaceRole.EDITOR);
+
+        assertThat(embeddedUser.getUserId()).isEqualTo(userId(MEMBER));
+        assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isTrue();
+    }
+
+    @Test
+    void testAnUnknownEmailIsRefusedWithTheSameErrorForEveryone() {
+        authenticate(ADMIN, true);
+
+        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER))
+            .isInstanceOf(UserNotFoundException.class)
+            .hasMessage("User not found");
+
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER))
+            .isInstanceOf(UserNotFoundException.class)
+            .hasMessage("User not found");
+
+        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUser(UNKNOWN_USER_ID, WorkspaceRole.VIEWER))
+            .isInstanceOf(UserNotFoundException.class)
+            .hasMessage("User not found");
+    }
+
+    @Test
+    void testAnEmbeddedEditorCannotAdd() {
+        authenticate(ADMIN, true);
+
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_VIEWER), WorkspaceRole.EDITOR);
+
+        authenticate(EMBEDDED_VIEWER, false);
+
+        assertThatThrownBy(
+            () -> embeddedUserFacade.addEmbeddedUserByEmail(MEMBER + "@example.com", WorkspaceRole.VIEWER))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isFalse();
+    }
+
     private static long userId(String login) {
         return USER_IDS_BY_LOGIN.get(login);
     }
@@ -188,7 +242,7 @@ class EmbeddedUserFacadeIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCache.class
     })
     static class RealEmbeddedUserFacadeConfiguration {
 
@@ -206,11 +260,15 @@ class EmbeddedUserFacadeIntTest {
 
                 user.setId(entry.getValue());
                 user.setLogin(entry.getKey());
+                user.setEmail(entry.getKey() + "@example.com");
 
+                when(userService.fetchUserByEmail(entry.getKey() + "@example.com")).thenReturn(Optional.of(user));
                 when(userService.fetchUserByLogin(entry.getKey())).thenReturn(Optional.of(user));
                 when(userService.getUser(entry.getKey())).thenReturn(user);
                 when(userService.getUser(entry.getValue())).thenReturn(user);
             }
+
+            when(userService.getUser(UNKNOWN_USER_ID)).thenThrow(new UserNotFoundException());
 
             return userService;
         }
