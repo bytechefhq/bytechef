@@ -737,6 +737,13 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
 
         @Test
+        void testEmbeddedListingDoesNotCallTheGatedWorkspaceWorkflowFacade() {
+            facade.getWorkflowExecutions(true, null, null, null, null, null, null, null, null, getId(workspace), 0);
+
+            verify(projectFacade, never()).getWorkspaceProjectWorkflows(anyLong());
+        }
+
+        @Test
         void testEmbeddedWorkflowFilterByReferenceWorkflowUuidCoversEveryCatalogVersion() {
             String catalogWorkflowV2Id = createWorkflowId(catalogProject, 2, referenceWorkflowUuid);
 
