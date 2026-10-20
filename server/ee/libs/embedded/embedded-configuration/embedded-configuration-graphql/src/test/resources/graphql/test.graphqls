@@ -91,3 +91,8 @@ type VersionWorkflowChange {
     oldDefinition: String
     newDefinition: String
 }
+
+type ApiKey {
+    id: ID
+    name: String
+}

@@ -1,0 +1,20 @@
+extend type Query {
+    embeddedApiKey(id: ID!): ApiKey
+    embeddedApiKeys(environmentId: ID!): [ApiKey]
+}
+
+extend type Mutation {
+    createEmbeddedApiKey(input: CreateEmbeddedApiKeyInput!): String
+    deleteEmbeddedApiKey(id: ID!): Boolean
+    updateEmbeddedApiKey(input: UpdateEmbeddedApiKeyInput!): ApiKey
+}
+
+input CreateEmbeddedApiKeyInput {
+    name: String!
+    environmentId: ID!
+}
+
+input UpdateEmbeddedApiKeyInput {
+    id: ID!
+    name: String!
+}

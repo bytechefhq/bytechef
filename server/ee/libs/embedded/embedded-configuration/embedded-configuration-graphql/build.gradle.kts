@@ -8,9 +8,11 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
