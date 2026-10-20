@@ -65,6 +65,9 @@ class NodeValidationIssueParser {
         new MessageTemplate(Pattern.compile("^Invalid connection: .*$"), WorkflowIssueKind.INVALID_CONNECTION),
         new MessageTemplate(
             Pattern.compile("^Property '([^']+)' is not defined in task definition$"), WorkflowIssueKind.OTHER),
+        new MessageTemplate(
+            Pattern.compile("^Property '([^']+)' has an invalid expression: .*$", Pattern.DOTALL),
+            WorkflowIssueKind.OTHER),
         new MessageTemplate(Pattern.compile("^Field '([^']+)' must .*$"), WorkflowIssueKind.TYPE_MISMATCH),
         new MessageTemplate(
             Pattern.compile("^Missing recommended field: (.+)$"), WorkflowIssueKind.MISSING_REQUIRED),
