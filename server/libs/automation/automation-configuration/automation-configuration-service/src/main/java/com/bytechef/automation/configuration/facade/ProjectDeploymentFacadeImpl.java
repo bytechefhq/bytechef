@@ -348,11 +348,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
-    public boolean isWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId) {
+    public Optional<ChatWorkflow> findWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId) {
         List<ChatWorkflow> chatWorkflows = listWorkspaceChatWorkflows(workspaceId, null);
 
         return chatWorkflows.stream()
-            .anyMatch(chatWorkflow -> Objects.equals(chatWorkflow.workflowExecutionId(), workflowExecutionId));
+            .filter(chatWorkflow -> Objects.equals(chatWorkflow.workflowExecutionId(), workflowExecutionId))
+            .findFirst();
     }
 
     @Override

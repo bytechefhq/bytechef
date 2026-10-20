@@ -43,6 +43,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRuleServiceImpl;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalServiceImpl;
 import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRepository;
 import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRuleRepository;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicyImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactServiceImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
@@ -249,6 +250,8 @@ class AiHubConfigurationContextTest {
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
             .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate)
             .withBean(AiHubChatService.class, () -> fixtures.chatService)
+            .withBean(AiHubChatAccessPolicy.class, () -> fixtures.chatAccessPolicy)
+            .withBean(ProjectDeploymentFacade.class, () -> fixtures.projectDeploymentFacade)
             .withBean(InFlightAiHubRunRegistry.class, () -> fixtures.inFlightRunRegistry)
             .withBean(JsonMapper.class, () -> JsonMapper.builder()
                 .build())

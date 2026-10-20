@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -78,14 +79,14 @@ public interface ProjectDeploymentFacade {
     void updateProjectDeploymentTags(long id, List<Tag> tags);
 
     /**
-     * Whether the given workflow execution id belongs to a hosted-chat workflow of the workspace in any environment.
-     * The id is compared as a string against the listing and is never parsed.
+     * Finds the hosted-chat workflow of the workspace, in any environment, whose workflow execution id is the given
+     * one. The id is compared as a string against the listing and is never parsed.
      *
      * @param workspaceId         the workspace
      * @param workflowExecutionId the workflow execution id to look for
-     * @return {@code true} if the listing of every environment contains the id
+     * @return the listing row carrying the id, or empty when the listing of every environment lacks it
      */
-    boolean isWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId);
+    Optional<ChatWorkflow> findWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId);
 
     void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow);
 

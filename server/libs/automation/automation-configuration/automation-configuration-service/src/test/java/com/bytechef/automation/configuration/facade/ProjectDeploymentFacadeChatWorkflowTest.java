@@ -35,6 +35,8 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.UUID;
@@ -44,9 +46,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 /**
- * Pins the shape of the {@code getWorkspaceChatWorkflows} listing and the all-environments membership check built on
- * it. The {@code WORKFLOW_VIEW} gate is the {@code @PreAuthorize} expression on the implementation; a direct call
- * cannot fire an annotation.
+ * Pins the shape of the {@code getWorkspaceChatWorkflows} listing and the all-environments lookup built on it. The
+ * {@code WORKFLOW_VIEW} gate is the {@code @PreAuthorize} expression on the implementation; a direct call cannot fire
+ * an annotation.
  *
  * @author Ivica Cardic
  */
@@ -57,6 +59,7 @@ class ProjectDeploymentFacadeChatWorkflowTest {
         "{\"label\":\"%s\",\"triggers\":[{\"name\":\"chat_1\",\"type\":\"chat/v1/newChatMessage\"}],\"tasks\":[]}";
 
     private static final long ENVIRONMENT_ID = 2L;
+    private static final long PROJECT_DEPLOYMENT_ID = 10L;
     private static final long PROJECT_WORKFLOW_ID = 1000L;
     private static final String WORKFLOW_ID = "wf-1";
     private static final long WORKSPACE_ID = 1L;
@@ -106,21 +109,42 @@ class ProjectDeploymentFacadeChatWorkflowTest {
     }
 
     @Test
-    void testIsWorkspaceChatWorkflowMatchesAcrossEnvironments() {
+    void testFindWorkspaceChatWorkflowReturnsTheMatchingListingRow() {
         stubOneChatWorkflow();
 
         ProjectDeploymentFacadeImpl facade = createProjectDeploymentFacade();
 
-        String workflowExecutionId = facade.getWorkspaceChatWorkflows(WORKSPACE_ID, null)
-            .getFirst()
-            .workflowExecutionId();
+        ChatWorkflow listedChatWorkflow = facade.getWorkspaceChatWorkflows(WORKSPACE_ID, null)
+            .getFirst();
 
-        assertThat(facade.isWorkspaceChatWorkflow(WORKSPACE_ID, workflowExecutionId)).isTrue();
-        assertThat(facade.isWorkspaceChatWorkflow(WORKSPACE_ID, "not-an-id")).isFalse();
+        assertThat(facade.findWorkspaceChatWorkflow(WORKSPACE_ID, listedChatWorkflow.workflowExecutionId()))
+            .contains(listedChatWorkflow);
+        assertThat(listedChatWorkflow.projectDeploymentId()).isEqualTo(PROJECT_DEPLOYMENT_ID);
     }
 
     @Test
-    void testIsWorkspaceChatWorkflowIsFalseForEmptyListing() {
+    void testFindWorkspaceChatWorkflowIsEmptyForAnUnknownExecutionId() {
+        stubOneChatWorkflow();
+
+        String unknownWorkflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, PROJECT_DEPLOYMENT_ID, UUID.randomUUID()
+                .toString(),
+            "chat_1")
+            .toString();
+
+        assertThat(createProjectDeploymentFacade().findWorkspaceChatWorkflow(WORKSPACE_ID, unknownWorkflowExecutionId))
+            .isEmpty();
+    }
+
+    @Test
+    void testFindWorkspaceChatWorkflowIsEmptyForANonIdString() {
+        stubOneChatWorkflow();
+
+        assertThat(createProjectDeploymentFacade().findWorkspaceChatWorkflow(WORKSPACE_ID, "not-an-id")).isEmpty();
+    }
+
+    @Test
+    void testFindWorkspaceChatWorkflowIsEmptyForEmptyListing() {
         Mockito
             .when(
                 projectDeploymentService.getProjectDeployments(
@@ -128,21 +152,21 @@ class ProjectDeploymentFacadeChatWorkflowTest {
                     ArgumentMatchers.any(), ArgumentMatchers.any()))
             .thenReturn(List.of());
 
-        assertThat(createProjectDeploymentFacade().isWorkspaceChatWorkflow(WORKSPACE_ID, "anything")).isFalse();
+        assertThat(createProjectDeploymentFacade().findWorkspaceChatWorkflow(WORKSPACE_ID, "anything")).isEmpty();
     }
 
-    private void stubOneChatWorkflow() {
+    private StubbedChatWorkflow stubOneChatWorkflow() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnabled(true);
-        projectDeployment.setId(10L);
+        projectDeployment.setId(PROJECT_DEPLOYMENT_ID);
         projectDeployment.setProjectId(1L);
 
         ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
         projectDeploymentWorkflow.setEnabled(true);
         projectDeploymentWorkflow.setId(100L);
-        projectDeploymentWorkflow.setProjectDeploymentId(10L);
+        projectDeploymentWorkflow.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
         projectDeploymentWorkflow.setWorkflowId(WORKFLOW_ID);
 
         ProjectWorkflow projectWorkflow = new ProjectWorkflow(PROJECT_WORKFLOW_ID);
@@ -187,6 +211,8 @@ class ProjectDeploymentFacadeChatWorkflowTest {
                 triggerDefinitionService.getTriggerDefinition(
                     ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyString()))
             .thenReturn(triggerDefinition);
+
+        return new StubbedChatWorkflow(projectDeployment, projectDeploymentWorkflow);
     }
 
     private ProjectDeploymentFacadeImpl createProjectDeploymentFacade() {
@@ -197,5 +223,9 @@ class ProjectDeploymentFacadeChatWorkflowTest {
             null, null, environmentService, null, null, null, null, projectDeploymentService,
             projectDeploymentWorkflowService, projectService, projectWorkflowService, null, triggerDefinitionService,
             null, null, applicationProperties, null, workflowService, List.of());
+    }
+
+    private record StubbedChatWorkflow(
+        ProjectDeployment projectDeployment, ProjectDeploymentWorkflow projectDeploymentWorkflow) {
     }
 }

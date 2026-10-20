@@ -40,6 +40,7 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
@@ -75,6 +76,7 @@ public final class AiHubAgentFixtures {
     public final AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
     public final AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
     public final AiHubChatService chatService = mock(AiHubChatService.class);
+    public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final ChatModel chatModel = mock(ChatModel.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
@@ -175,7 +177,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
+            chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider);
     }
 
@@ -187,8 +189,9 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
-            workspaceFacade, projectWorkflowFacade, artifactRecorder, securityContextRehydrator, approvalGate,
-            inFlightRunRegistryProvider(), overrideChatClientResolverProvider);
+            workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
+            artifactRecorder,
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(), overrideChatClientResolverProvider);
     }
 
     @SuppressWarnings("unchecked")
