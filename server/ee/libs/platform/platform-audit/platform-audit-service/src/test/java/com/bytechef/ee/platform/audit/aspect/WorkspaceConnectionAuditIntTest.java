@@ -23,6 +23,7 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -152,7 +153,8 @@ class WorkspaceConnectionAuditIntTest {
             ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), projectDeploymentWorkflowService,
+                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), mock(ConnectionService.class),
+                projectDeploymentWorkflowService,
                 mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
         }
     }
