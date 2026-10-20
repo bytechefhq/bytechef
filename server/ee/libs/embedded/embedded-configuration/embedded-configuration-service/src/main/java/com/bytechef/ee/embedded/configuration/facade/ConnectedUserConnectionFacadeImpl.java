@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -56,6 +57,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserConnectionFacadeImpl.class);
 
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
+    private final ConnectedUserConnectionReader connectedUserConnectionReader;
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -66,12 +68,14 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
+        ConnectedUserConnectionReader connectedUserConnectionReader,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
+        this.connectedUserConnectionReader = connectedUserConnectionReader;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserService = connectedUserService;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -87,7 +91,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "name", value = "#connectionDTO.name"),
         @AuditData(key = "componentName", value = "#connectionDTO.componentName")
     })
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
@@ -101,7 +106,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "connectedUserId", value = "#connectedUserId")
     })
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
 
@@ -111,7 +117,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
@@ -125,26 +132,16 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        return getConnections(connectedUser.getId(), componentName, connectionIds);
+        return connectedUserConnectionReader.getConnections(connectedUser.getId(), componentName, connectionIds);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
-
-        Set<Long> entitledConnectionIds = connectedUserConnectionMembership.getConnectionIds(
-            connectedUser.getId(), connectedUser.getEnvironment());
-
-        List<Long> allowedConnectionIds = entitledConnectionIds.stream()
-            .filter(connectionId -> connectionIds.isEmpty() || connectionIds.contains(connectionId))
-            .toList();
-
-        return connectionFacade.getConnections(new ArrayList<>(allowedConnectionIds), PlatformType.EMBEDDED)
-            .stream()
-            .filter(connectionDTO -> componentName == null || componentName.equals(connectionDTO.componentName()))
-            .toList();
+        return connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds);
     }
 
     @Override
@@ -152,7 +149,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "connectedUserId", value = "#connectedUserId")
     })
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
         ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);
 
@@ -161,6 +159,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public Set<Long> getOwnedConnectionIds(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -177,6 +177,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW') or isConnectedUser()")
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
     }
