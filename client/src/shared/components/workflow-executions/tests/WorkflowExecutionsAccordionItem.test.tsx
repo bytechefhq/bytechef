@@ -1,7 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {TaskExecution} from '@/shared/middleware/automation/workflow/execution';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {act, render, screen, userEvent} from '@/shared/util/test-utils';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsAccordionItem from '../WorkflowExecutionsAccordionItem';
 import WorkflowTaskExecutionItem from '../WorkflowTaskExecutionItem';
@@ -65,5 +65,75 @@ describe('WorkflowExecutionsAccordionItem', () => {
 
         expect(screen.queryByRole('region')).not.toBeInTheDocument();
         expect(screen.getByRole('button')).not.toHaveAttribute('aria-expanded');
+    });
+
+    describe('loop iterations', () => {
+        let intersectionCallbacks: Array<{callback: IntersectionObserverCallback; element: Element}>;
+
+        beforeEach(() => {
+            intersectionCallbacks = [];
+
+            vi.stubGlobal(
+                'IntersectionObserver',
+                class {
+                    constructor(private callback: IntersectionObserverCallback) {}
+
+                    disconnect() {
+                        intersectionCallbacks = intersectionCallbacks.filter(
+                            (entry) => entry.callback !== this.callback
+                        );
+                    }
+
+                    observe(element: Element) {
+                        intersectionCallbacks.push({callback: this.callback, element});
+                    }
+                }
+            );
+        });
+
+        afterEach(() => {
+            vi.unstubAllGlobals();
+        });
+
+        it('loads more iterations when the sentinel scrolls into view after the loop is expanded', async () => {
+            const loopTaskExecution = {
+                ...createTaskExecution('20', 'COMPLETED'),
+                iterations: Array.from({length: 150}, () => []),
+                title: 'Loop',
+                type: 'loop/v1',
+            } as TaskExecution;
+
+            render(
+                <Accordion type="multiple">
+                    <WorkflowExecutionsAccordionItem
+                        execution={loopTaskExecution}
+                        onExecutionClick={vi.fn()}
+                        selectedExecutionId=""
+                    >
+                        <span>Loop trigger</span>
+                    </WorkflowExecutionsAccordionItem>
+                </Accordion>
+            );
+
+            await userEvent.click(screen.getByText('Loop trigger'));
+
+            expect(screen.getByText('Loading 50 more iterations...')).toBeInTheDocument();
+            expect(screen.queryByText('Loop iteration 150')).not.toBeInTheDocument();
+
+            const sentinel = screen.getByText('Loading 50 more iterations...');
+            const observed = intersectionCallbacks.find((entry) => entry.element === sentinel);
+
+            expect(observed).toBeDefined();
+
+            act(() => {
+                observed!.callback(
+                    [{isIntersecting: true, target: sentinel} as unknown as IntersectionObserverEntry],
+                    {} as IntersectionObserver
+                );
+            });
+
+            expect(screen.getByText('Loop iteration 150')).toBeInTheDocument();
+            expect(screen.queryByText(/more iterations\.\.\./)).not.toBeInTheDocument();
+        });
     });
 });
