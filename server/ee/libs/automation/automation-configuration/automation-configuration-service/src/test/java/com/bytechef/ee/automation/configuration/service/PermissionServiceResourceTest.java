@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
@@ -57,7 +58,8 @@ class PermissionServiceResourceTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, ownershipResolvers, environmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class));
+            embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
     }
 
     private static ResourceEnvironmentResolver environmentResolver(String type, Optional<Environment> environment) {
