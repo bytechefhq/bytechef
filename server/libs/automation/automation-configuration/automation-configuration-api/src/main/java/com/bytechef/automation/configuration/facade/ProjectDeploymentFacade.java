@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +53,15 @@ public interface ProjectDeploymentFacade {
 
     List<Tag> getProjectDeploymentTags();
 
+    /**
+     * Lists the enabled hosted-chat workflows of a workspace.
+     *
+     * @param workspaceId   the workspace
+     * @param environmentId the environment to list, or {@code null} to list every environment
+     * @return one row per enabled deployment workflow that has a hosted chat trigger
+     */
+    List<ChatWorkflow> getWorkspaceChatWorkflows(long workspaceId, @Nullable Long environmentId);
+
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields);
 
@@ -67,5 +77,24 @@ public interface ProjectDeploymentFacade {
 
     void updateProjectDeploymentTags(long id, List<Tag> tags);
 
+    /**
+     * Whether the given workflow execution id belongs to a hosted-chat workflow of the workspace in any environment.
+     * The id is compared as a string against the listing and is never parsed.
+     *
+     * @param workspaceId         the workspace
+     * @param workflowExecutionId the workflow execution id to look for
+     * @return {@code true} if the listing of every environment contains the id
+     */
+    boolean isWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId);
+
     void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow);
+
+    /**
+     * One row of {@link #getWorkspaceChatWorkflows(long, Long)}: the fields a chat launcher renders plus the ids needed
+     * to open the workflow.
+     */
+    record ChatWorkflow(
+        long projectDeploymentId, long projectId, String projectName, long projectWorkflowId,
+        String workflowExecutionId, String workflowId, String workflowLabel) {
+    }
 }

@@ -45,6 +45,7 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.HostedChatTriggers;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -62,16 +63,20 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -334,6 +339,23 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<ChatWorkflow> getWorkspaceChatWorkflows(long workspaceId, @Nullable Long environmentId) {
+        return listWorkspaceChatWorkflows(workspaceId, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public boolean isWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId) {
+        List<ChatWorkflow> chatWorkflows = listWorkspaceChatWorkflows(workspaceId, null);
+
+        return chatWorkflows.stream()
+            .anyMatch(chatWorkflow -> Objects.equals(chatWorkflow.workflowExecutionId(), workflowExecutionId));
+    }
+
+    @Override
     public List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields) {
 
@@ -484,6 +506,151 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
+    }
+
+    private List<ChatWorkflow> listWorkspaceChatWorkflows(long workspaceId, @Nullable Long environmentId) {
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            false, environment, null, null, workspaceId);
+
+        if (projectDeployments.isEmpty()) {
+            return List.of();
+        }
+
+        List<ProjectDeployment> enabledProjectDeployments = projectDeployments.stream()
+            .filter(ProjectDeployment::isEnabled)
+            .toList();
+
+        if (enabledProjectDeployments.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> projectDeploymentIds = enabledProjectDeployments.stream()
+            .map(ProjectDeployment::getId)
+            .toList();
+
+        List<ProjectDeploymentWorkflow> enabledProjectDeploymentWorkflows = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeploymentIds)
+            .stream()
+            .filter(ProjectDeploymentWorkflow::isEnabled)
+            .toList();
+
+        if (enabledProjectDeploymentWorkflows.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> workflowIds = enabledProjectDeploymentWorkflows.stream()
+            .map(ProjectDeploymentWorkflow::getWorkflowId)
+            .distinct()
+            .toList();
+
+        Map<String, Workflow> workflowMap = workflowService.getWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
+        Map<String, ProjectWorkflow> projectWorkflowMap = projectWorkflowService
+            .getWorkflowProjectWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getWorkflowId, Function.identity()));
+
+        List<Project> projects = projectService.getProjects(
+            enabledProjectDeployments.stream()
+                .map(ProjectDeployment::getProjectId)
+                .distinct()
+                .toList());
+
+        Map<Long, Project> projectMap = projects.stream()
+            .collect(Collectors.toMap(project -> Objects.requireNonNull(project.getId(), "id"), Function.identity()));
+
+        Map<Long, ProjectDeployment> projectDeploymentMap = enabledProjectDeployments.stream()
+            .collect(Collectors.toMap(ProjectDeployment::getId, Function.identity()));
+
+        Map<TriggerDefinitionKey, TriggerDefinition> triggerDefinitionMap = new HashMap<>();
+
+        List<ChatWorkflow> chatWorkflows = new ArrayList<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : enabledProjectDeploymentWorkflows) {
+            Workflow workflow = workflowMap.get(projectDeploymentWorkflow.getWorkflowId());
+
+            if (workflow == null) {
+                continue;
+            }
+
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+            if (!HostedChatTriggers.hasHostedChatTrigger(workflowTriggers)) {
+                continue;
+            }
+
+            ProjectWorkflow projectWorkflow = projectWorkflowMap.get(workflow.getId());
+
+            String webhookExecutionId = resolveStaticWebhookExecutionId(
+                workflowTriggers, projectDeploymentWorkflow, projectWorkflow, triggerDefinitionMap);
+
+            if (webhookExecutionId == null) {
+                continue;
+            }
+
+            ProjectDeployment projectDeployment =
+                projectDeploymentMap.get(projectDeploymentWorkflow.getProjectDeploymentId());
+
+            if (projectDeployment == null) {
+                continue;
+            }
+
+            Project project = projectMap.get(projectDeployment.getProjectId());
+
+            if (project == null) {
+                continue;
+            }
+
+            chatWorkflows.add(
+                new ChatWorkflow(
+                    projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getProjectId(),
+                    project.getName(), projectWorkflow.getId(), webhookExecutionId, workflow.getId(),
+                    workflow.getLabel() == null ? "Untitled Workflow" : workflow.getLabel()));
+        }
+
+        return chatWorkflows;
+    }
+
+    @Nullable
+    private String resolveStaticWebhookExecutionId(
+        List<WorkflowTrigger> workflowTriggers, ProjectDeploymentWorkflow projectDeploymentWorkflow,
+        @Nullable ProjectWorkflow projectWorkflow,
+        Map<TriggerDefinitionKey, TriggerDefinition> triggerDefinitionCache) {
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            if (!HostedChatTriggers.isChatTriggerType(workflowTrigger.getType())) {
+                continue;
+            }
+
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            TriggerDefinitionKey triggerDefinitionKey = new TriggerDefinitionKey(
+                workflowNodeType.name(), workflowNodeType.version(),
+                Objects.requireNonNull(workflowNodeType.operation()));
+
+            TriggerDefinition triggerDefinition = triggerDefinitionCache.computeIfAbsent(
+                triggerDefinitionKey,
+                lookupKey -> triggerDefinitionService.getTriggerDefinition(
+                    lookupKey.name(), lookupKey.version(), lookupKey.operation()));
+
+            if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK) {
+                if (projectWorkflow == null) {
+                    return null;
+                }
+
+                WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+                    PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
+                    projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+
+                return workflowExecutionId.toString();
+            }
+        }
+
+        return null;
     }
 
     private void checkProjectDeploymentWorkflows(
@@ -965,5 +1132,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
         }
+    }
+
+    private record TriggerDefinitionKey(String name, int version, String operation) {
     }
 }
