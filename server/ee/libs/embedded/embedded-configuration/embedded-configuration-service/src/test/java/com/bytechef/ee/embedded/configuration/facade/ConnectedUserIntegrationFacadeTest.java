@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -248,7 +248,8 @@ class ConnectedUserIntegrationFacadeTest {
     private ConnectedUserIntegrationFacadeImpl createFacade() {
         return new ConnectedUserIntegrationFacadeImpl(
             clusterElementDefinitionService, mock(ComponentDefinitionService.class), connectedUserService,
-            mock(ConnectionFacade.class), mock(ConnectionService.class), mock(EmbeddedPermissionEvaluator.class),
+            mock(ConnectedUserWorkflowWebhookUrlResolver.class), mock(ConnectionFacade.class),
+            mock(ConnectionService.class), mock(EmbeddedPermissionEvaluator.class),
             mock(IntegrationInstanceConfigurationDTOAssembler.class),
             mock(IntegrationInstanceConfigurationFacade.class), integrationInstanceConfigurationService,
             mock(IntegrationInstanceConfigurationWorkflowService.class),
@@ -257,7 +258,7 @@ class ConnectedUserIntegrationFacadeTest {
             integrationInstanceService,
             mock(IntegrationService.class), mcpComponentService, mock(McpIntegrationComponentService.class),
             mock(McpIntegrationInstanceConfigurationService.class),
-            mock(McpIntegrationInstanceConfigurationWorkflowService.class), mock(McpIntegrationInstanceRows.class),
+            mock(McpIntegrationInstanceConfigurationWorkflowService.class), mock(McpIntegrationInstanceRowFacade.class),
             mcpIntegrationInstanceToolService, mock(McpIntegrationInstanceWorkflowService.class), mcpServerService,
             mcpToolService, mock(OAuth2ParametersFacade.class), mock(OAuth2Service.class),
             integrationInstanceWorkflowService, mock(IntegrationWorkflowService.class), mock(WorkflowService.class));
