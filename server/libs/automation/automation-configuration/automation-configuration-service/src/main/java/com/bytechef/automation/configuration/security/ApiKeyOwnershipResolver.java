@@ -17,8 +17,11 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.repository.WorkspaceApiKeyRepository;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
 
@@ -51,14 +54,27 @@ public class ApiKeyOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
+        Optional<ApiKey> apiKeyOptional = apiKeyService.fetchApiKey(id);
+
+        if (apiKeyOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        ApiKey apiKey = apiKeyOptional.get();
+
+        PlatformType type = apiKey.getType();
+
+        if (type != null && type != PlatformType.AUTOMATION) {
+            return ResourceOwner.unknown();
+        }
+
         OptionalLong workspaceId = workspaceApiKeyRepository.findByApiKeyId(id)
             .map(workspaceApiKey -> OptionalLong.of(workspaceApiKey.getWorkspaceId()))
             .orElse(OptionalLong.empty());
 
-        OptionalLong ownerUserId = apiKeyService.fetchApiKey(id)
-            .map(apiKey -> apiKey.getUserId())
-            .map(OptionalLong::of)
-            .orElse(OptionalLong.empty());
+        Long userId = apiKey.getUserId();
+
+        OptionalLong ownerUserId = userId == null ? OptionalLong.empty() : OptionalLong.of(userId);
 
         return ResourceOwner.of(workspaceId, ownerUserId);
     }
