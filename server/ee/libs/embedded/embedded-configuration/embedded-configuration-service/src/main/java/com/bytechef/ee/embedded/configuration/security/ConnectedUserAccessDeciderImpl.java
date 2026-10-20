@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +66,8 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
     private final IntegrationInstanceService integrationInstanceService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
-    private final Map<String, ResourceEnvironmentResolver> resourceEnvironmentResolvers;
-    private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
+    private final Map<String, List<ResourceEnvironmentResolver>> resourceEnvironmentResolvers;
+    private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserAccessDeciderImpl(
@@ -86,9 +85,9 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.resourceEnvironmentResolvers = resourceEnvironmentResolvers.stream()
-            .collect(Collectors.toMap(ResourceEnvironmentResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceEnvironmentResolver::resourceType));
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
-            .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
     }
 
     @Override
@@ -215,13 +214,7 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
             return Decision.DENY;
         }
 
-        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resourceOwnershipResolver == null) {
-            return Decision.DENY;
-        }
-
-        OptionalLong projectId = resourceOwnershipResolver.resolveProjectId(id);
+        OptionalLong projectId = resolveProjectId(resourceType, id);
 
         if (projectId.isEmpty()) {
             return Decision.DENY;
@@ -241,13 +234,7 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
     private boolean isInPrincipalEnvironment(
         ConnectedUserAuthentication connectedUser, Serializable id, String resourceType) {
 
-        ResourceEnvironmentResolver resourceEnvironmentResolver = resourceEnvironmentResolvers.get(resourceType);
-
-        if (resourceEnvironmentResolver == null) {
-            return false;
-        }
-
-        return resourceEnvironmentResolver.fetchEnvironment(id)
+        return resolveEnvironment(resourceType, id)
             .map(environment -> isPrincipalEnvironment(connectedUser, environment))
             .orElse(false);
     }
@@ -308,6 +295,34 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
             .getConnectedUserIntegrationInstances(connectedUser.connectedUserId(), toEnvironment(connectedUser))
             .stream()
             .anyMatch(integrationInstance -> integrationInstance.getConnectionId() == connectionId);
+    }
+
+    private Optional<Environment> resolveEnvironment(String resourceType, Serializable id) {
+        for (ResourceEnvironmentResolver resourceEnvironmentResolver : resourceEnvironmentResolvers
+            .getOrDefault(resourceType, List.of())) {
+
+            Optional<Environment> environment = resourceEnvironmentResolver.fetchEnvironment(id);
+
+            if (environment.isPresent()) {
+                return environment;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private OptionalLong resolveProjectId(String resourceType, Serializable id) {
+        for (ResourceOwnershipResolver resourceOwnershipResolver : resourceOwnershipResolvers
+            .getOrDefault(resourceType, List.of())) {
+
+            OptionalLong projectId = resourceOwnershipResolver.resolveProjectId(id);
+
+            if (projectId.isPresent()) {
+                return projectId;
+            }
+        }
+
+        return OptionalLong.empty();
     }
 
     private static boolean isPrincipalEnvironment(

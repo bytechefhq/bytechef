@@ -18,8 +18,8 @@ package com.bytechef.automation.configuration.security;
 
 /**
  * Tells the workspace permission checks whether a project or workflow belongs to the embedded side, so that no
- * workspace role governs it. An integration workflow is answered by embedded scopes; a Hub or connected-user project,
- * and a workflow that is embedded only through such a project, is denied until its embedded gates exist.
+ * workspace role governs it. An integration workflow and a Hub project workflow are answered by embedded scopes; a
+ * connected-user project workflow is denied until its embedded gates exist.
  *
  * @author Ivica Cardic
  */
@@ -28,6 +28,10 @@ public interface EmbeddedResourceResolver {
     boolean isEmbeddedProject(long projectId);
 
     boolean isEmbeddedProjectWorkflow(String workflowId);
+
+    boolean isHubProject(long projectId);
+
+    boolean isHubProjectWorkflow(String workflowId);
 
     boolean isIntegrationWorkflow(String workflowId);
 }

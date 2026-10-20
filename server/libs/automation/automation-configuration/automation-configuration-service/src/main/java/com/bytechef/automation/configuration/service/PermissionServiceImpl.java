@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ import org.springframework.stereotype.Service;
 public class PermissionServiceImpl implements PermissionService {
 
     private final CurrentUserResolver currentUserResolver;
-    private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
+    private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
@@ -60,7 +59,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         this.currentUserResolver = currentUserResolver;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
-            .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
     }
 
     @Override
@@ -125,13 +124,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        ResourceOwner resourceOwner = resolver.resolveOwner(id);
+        ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
@@ -250,5 +247,17 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void evictAllEmbeddedScopeCache() {
+    }
+
+    private ResourceOwner resolveOwner(String resourceType, Serializable id) {
+        for (ResourceOwnershipResolver resourceOwnershipResolver : resourceOwnershipResolvers.get(resourceType)) {
+            ResourceOwner resourceOwner = resourceOwnershipResolver.resolveOwner(id);
+
+            if (!resourceOwner.isUnknown()) {
+                return resourceOwner;
+            }
+        }
+
+        return ResourceOwner.unknown();
     }
 }
