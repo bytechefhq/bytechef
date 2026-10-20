@@ -1,6 +1,6 @@
 ---
 title: "Wait for Approval"
-description: "Allows a person to review and either approve or reject requests."
+description: "Deprecated: use the Request Approval action of the Approval component instead. Allows a person to review and either approve or reject requests."
 ---
 
 
@@ -14,3 +14,20 @@ Type: waitForApproval/v1
 
 
 
+<hr />
+
+## Additional Instructions
+
+Wait for Approval is deprecated. The workflow editor no longer offers it, and it will be removed in a future
+release. Workflows that still use it keep running until then.
+
+Use the **Request Approval** action of the [Approval](/reference/components/approval_v1) component instead. It
+pauses the run until someone approves or rejects the request, lets you collect form inputs with the decision, and
+expires a request that nobody resolves.
+
+### Migration
+
+1. Add **Approval** → **Request Approval** where the workflow waits for the decision.
+2. Replace references to the old step's output, for example `${waitForApproval_1.approved}`, with the new step's
+   output, for example `${approval_1.approved}`. Both return `approved` as a boolean.
+3. Remove the **Wait for Approval** step and the **Approval Link** step that created its links.
