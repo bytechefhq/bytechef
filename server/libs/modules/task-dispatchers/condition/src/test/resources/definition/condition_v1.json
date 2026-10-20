@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Directs a stream based on true/false results of comparisons.",
   "help": null,
   "icon": "path:assets/condition.svg",

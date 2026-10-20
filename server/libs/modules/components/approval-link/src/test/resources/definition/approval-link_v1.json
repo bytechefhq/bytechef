@@ -4,8 +4,8 @@
     "beforeResume": null,
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
-    "deprecated": null,
-    "description": "Creates approval/disapproval links.",
+    "deprecated": true,
+    "description": "Deprecated: use the Request Approval action of the Approval component instead. Creates approval/disapproval links.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/approval-link_v1#create-approval-links"
@@ -36,7 +36,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "The Approval Link component that create approval/disapproval links.",
+  "description": "Deprecated: use the Approval component instead. The Approval Link component that create approval/disapproval links.",
   "icon": "path:assets/approval-link.svg",
   "inputs": null,
   "metadata": null,

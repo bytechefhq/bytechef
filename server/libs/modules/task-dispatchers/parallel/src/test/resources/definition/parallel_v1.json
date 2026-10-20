@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Run collection of tasks in parallel, without waiting until the previous function has completed.",
   "help": null,
   "icon": "path:assets/parallel.svg",
