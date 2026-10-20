@@ -9,7 +9,7 @@ import {
     TaskExecutionFromJSON,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {type ReactNode, useEffect, useRef, useState} from 'react';
+import {type ReactNode, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ITERATIONS_PAGE_SIZE = 100;
@@ -46,9 +46,8 @@ const WorkflowExecutionsAccordionItem = ({
     previousTaskExecutions = [],
     selectedExecutionId,
 }: WorkflowExecutionsAccordionItemProps) => {
+    const [loadMoreIterationsElement, setLoadMoreIterationsElement] = useState<HTMLDivElement | null>(null);
     const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
-
-    const loadMoreIterationsRef = useRef<HTMLDivElement>(null);
 
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
@@ -62,9 +61,7 @@ const WorkflowExecutionsAccordionItem = ({
     const isSelected = selectedExecutionId === execution.id;
 
     useEffect(() => {
-        const sentinel = loadMoreIterationsRef.current;
-
-        if (!sentinel || !hasMoreIterations) {
+        if (!loadMoreIterationsElement || !hasMoreIterations) {
             return;
         }
 
@@ -77,10 +74,10 @@ const WorkflowExecutionsAccordionItem = ({
             {rootMargin: '200px'}
         );
 
-        observer.observe(sentinel);
+        observer.observe(loadMoreIterationsElement);
 
         return () => observer.disconnect();
-    }, [hasMoreIterations, visibleIterationCount]);
+    }, [hasMoreIterations, loadMoreIterationsElement, visibleIterationCount]);
 
     if (!isExpandable) {
         return (
@@ -215,7 +212,7 @@ const WorkflowExecutionsAccordionItem = ({
                         {hasMoreIterations && (
                             <div
                                 className="p-2 text-center text-sm text-content-neutral-secondary"
-                                ref={loadMoreIterationsRef}
+                                ref={setLoadMoreIterationsElement}
                             >
                                 {`Loading ${remainingIterationCount} more iterations...`}
                             </div>
