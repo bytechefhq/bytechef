@@ -116,10 +116,7 @@ class EmbeddedPermissionServiceIntTest {
     void seedMembers() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS \"user\" (id BIGINT PRIMARY KEY)");
-
         for (Long userId : USER_IDS_BY_LOGIN.values()) {
-            jdbcTemplate.update("INSERT INTO \"user\" (id) VALUES (?) ON CONFLICT DO NOTHING", userId);
             jdbcTemplate.update("DELETE FROM workspace_user WHERE user_id = ?", userId);
 
             embeddedUserRepository.deleteByUserId(userId);
