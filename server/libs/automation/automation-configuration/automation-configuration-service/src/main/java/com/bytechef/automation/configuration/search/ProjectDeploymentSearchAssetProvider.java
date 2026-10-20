@@ -18,13 +18,10 @@ package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,15 +37,12 @@ import org.springframework.stereotype.Component;
 class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
 
     private final ProjectDeploymentService projectDeploymentService;
-    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
 
     ProjectDeploymentSearchAssetProvider(
-        ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
-        ProjectService projectService) {
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
 
         this.projectDeploymentService = projectDeploymentService;
-        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
     }
 
@@ -72,15 +66,11 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .collect(Collectors.toMap(Project::getId, Function.identity()));
 
-        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
-            projectIds, EnumSet.allOf(ProjectOwner.class));
-
         return deployments.stream()
             .filter(deployment -> {
                 Project project = projectMap.get(deployment.getProjectId());
 
-                return project != null && !ownedProjectIds.contains(project.getId()) &&
-                    workspaceIds.contains(project.getWorkspaceId()) &&
+                return project != null && workspaceIds.contains(project.getWorkspaceId()) &&
                     containsIgnoreCase(project.getName(), queryLower);
             })
             .limit(limit)

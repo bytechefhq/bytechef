@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollectionRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional
 public class ApiCollectionServiceImpl implements ApiCollectionService {
 

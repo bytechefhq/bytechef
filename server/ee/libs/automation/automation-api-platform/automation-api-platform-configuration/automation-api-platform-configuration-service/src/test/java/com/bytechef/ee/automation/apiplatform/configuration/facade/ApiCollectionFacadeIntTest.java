@@ -10,10 +10,10 @@ package com.bytechef.ee.automation.apiplatform.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
-import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfiguration;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfigurationSharedMocks;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
@@ -34,10 +34,12 @@ import org.springframework.context.annotation.Import;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = ApiCollectionIntTestConfiguration.class)
+@SpringBootTest(classes = ApiCollectionIntTestConfiguration.class, properties = "bytechef.edition=ee")
 @Import(PostgreSQLContainerConfiguration.class)
 @ApiCollectionIntTestConfigurationSharedMocks
 class ApiCollectionFacadeIntTest {
+
+    private static final long DEFAULT_WORKSPACE_ID = 1049;
 
     @Autowired
     private ApiCollectionFacade apiCollectionFacade;
@@ -52,20 +54,18 @@ class ApiCollectionFacadeIntTest {
     private ProjectDeploymentRepository projectDeploymentRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectDeploymentService projectDeploymentService;
 
     @Autowired
-    private WorkspaceRepository workspaceRepository;
+    private ProjectRepository projectRepository;
 
     private Project project;
 
     @BeforeEach
     void beforeEach() {
-        Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
-
         project = Project.builder()
             .name("test-project")
-            .workspaceId(workspace.getId())
+            .workspaceId(DEFAULT_WORKSPACE_ID)
             .build();
 
         project.publish("v1");
@@ -78,7 +78,6 @@ class ApiCollectionFacadeIntTest {
         apiCollectionRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
-        workspaceRepository.deleteAll();
     }
 
     @Test
@@ -91,6 +90,29 @@ class ApiCollectionFacadeIntTest {
                 assertThat(apiCollection.getName()).isEqualTo("test-collection");
                 assertThat(apiCollection.getProjectDeploymentId()).isEqualTo(apiCollectionDTO.projectDeploymentId());
             });
+    }
+
+    @Test
+    void testCreateApiCollectionNamesItsDeploymentAfterTheCollectionAndHidesIt() {
+        ProjectDeployment plainProjectDeployment = new ProjectDeployment();
+
+        plainProjectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        plainProjectDeployment.setName("plain-deployment");
+        plainProjectDeployment.setProjectId(project.getId());
+        plainProjectDeployment.setProjectVersion(1);
+
+        plainProjectDeployment = projectDeploymentService.create(plainProjectDeployment);
+
+        ApiCollectionDTO apiCollectionDTO = apiCollectionFacade.createApiCollection(
+            getApiCollectionDTO("test-collection"));
+
+        ProjectDeployment apiCollectionProjectDeployment = projectDeploymentService.getProjectDeployment(
+            apiCollectionDTO.projectDeploymentId());
+
+        assertThat(apiCollectionProjectDeployment.getName()).isEqualTo("test-collection");
+        assertThat(projectDeploymentService.getProjectDeployments(null, null, null, null, null))
+            .extracting(ProjectDeployment::getId)
+            .containsExactly(plainProjectDeployment.getId());
     }
 
     private ApiCollectionDTO getApiCollectionDTO(String name) {
