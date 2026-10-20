@@ -10,9 +10,12 @@ package com.bytechef.ee.ai.hub.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +27,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
@@ -37,11 +41,14 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +61,7 @@ import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import reactor.core.publisher.Sinks;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -89,6 +97,8 @@ class WebhookBridgeAgentResumeTest {
     private JsonMapper jsonMapper;
     private AgentSubscriber subscriber;
     private SessionRepository sessionRepository;
+    private JobFacade jobFacade;
+    private InFlightAiHubRunRegistry inFlightRunRegistry;
 
     private HttpServer httpServer;
     private String baseUrl;
@@ -104,6 +114,8 @@ class WebhookBridgeAgentResumeTest {
         subscriber = mock(AgentSubscriber.class);
         sessionRepository = InMemorySessionRepository.builder()
             .build();
+        jobFacade = mock(JobFacade.class);
+        inFlightRunRegistry = new InFlightAiHubRunRegistry();
 
         InetAddress loopback = InetAddress.getLoopbackAddress();
 
@@ -352,6 +364,122 @@ class WebhookBridgeAgentResumeTest {
             .isNull();
     }
 
+    @Test
+    void testResumeRequestIsSentOverHttp11WithoutAnUpgradeHeader() throws AGUIException {
+        AtomicReference<String> upgradeHeader = new AtomicReference<>();
+
+        httpServer.createContext("/resume", exchange -> {
+            upgradeHeader.set(
+                exchange.getRequestHeaders()
+                    .getFirst("Upgrade"));
+
+            byte[] response = "{\"message\":\"done\"}".getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody()
+                .write(response);
+            exchange.close();
+        });
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(newWorkflowChat()));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        newAgent().runAgent(parametersOf(buildInput("hello")), subscriber);
+
+        verify(subscriber, timeout(5000)).onRunFinalized(any());
+        assertThat(upgradeHeader.get()).isNull();
+    }
+
+    @Test
+    void testStopBeforeTheResumedJobIdArrivesStopsTheJobOnce() throws AGUIException {
+        Sinks.Empty<Void> stopSink = givenStopSink();
+
+        stopSink.tryEmitEmpty();
+
+        CountDownLatch streamReleaseLatch = new CountDownLatch(1);
+
+        createStreamingResumeContext(streamReleaseLatch);
+
+        streamReleaseLatch.countDown();
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(newWorkflowChat()));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        newAgent().runAgent(parametersOf(buildInput("ping")), subscriber);
+
+        verify(subscriber, timeout(5000)).onRunFinalized(any());
+        verify(jobFacade, times(1)).stopJob(77L);
+    }
+
+    @Test
+    void testStopAfterTheResumedJobIdArrivedStopsTheJobOnce() throws AGUIException {
+        Sinks.Empty<Void> stopSink = givenStopSink();
+        CountDownLatch streamReleaseLatch = new CountDownLatch(1);
+
+        createStreamingResumeContext(streamReleaseLatch);
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(newWorkflowChat()));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        newAgent().runAgent(parametersOf(buildInput("ping")), subscriber);
+
+        verify(subscriber, timeout(5000)).onTextMessageContentEvent(any(TextMessageContentEvent.class));
+        verify(jobFacade, never()).stopJob(anyLong());
+
+        stopSink.tryEmitEmpty();
+
+        verify(jobFacade).stopJob(77L);
+
+        streamReleaseLatch.countDown();
+
+        verify(subscriber, timeout(5000)).onRunFinalized(any());
+        verify(jobFacade, times(1)).stopJob(77L);
+    }
+
+    private Sinks.Empty<Void> givenStopSink() {
+        Sinks.Empty<Void> stopSink = Sinks.empty();
+
+        inFlightRunRegistry = mock(InFlightAiHubRunRegistry.class);
+
+        when(inFlightRunRegistry.stopRequested(THREAD_ID)).thenReturn(stopSink.asMono());
+
+        return stopSink;
+    }
+
+    /**
+     * Serves an SSE resume response that reports job 77 and a first chunk, then holds the stream open until
+     * {@code streamReleaseLatch} opens.
+     */
+    private void createStreamingResumeContext(CountDownLatch streamReleaseLatch) {
+        httpServer.createContext("/resume", exchange -> {
+            exchange.getResponseHeaders()
+                .set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, 0);
+
+            try (OutputStream outputStream = exchange.getResponseBody()) {
+                outputStream.write(
+                    "data: {\"event\":\"start\",\"payload\":{\"jobId\":77}}\n\ndata: First chunk\n\n"
+                        .getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
+
+                if (!streamReleaseLatch.await(5, TimeUnit.SECONDS)) {
+                    throw new IOException("Stream release latch timed out");
+                }
+
+                outputStream.write("data: Last chunk\n\n".getBytes(StandardCharsets.UTF_8));
+            } catch (InterruptedException interruptedException) {
+                Thread currentThread = Thread.currentThread();
+
+                currentThread.interrupt();
+            }
+        });
+    }
+
     private static String readBody(HttpExchange exchange) throws IOException {
         try (InputStream inputStream = exchange.getRequestBody()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -366,7 +494,7 @@ class WebhookBridgeAgentResumeTest {
         return new WebhookBridgeAgent(
             webhookFacade, chatService, resumeRegistry, jsonMapper, mock(WorkflowChatMetrics.class),
             new AiHubSessionMemory(sessionRepository, null),
-            guard, null, new InFlightAiHubRunRegistry());
+            guard, jobFacade, inFlightRunRegistry);
     }
 
     private static AiHubChat newWorkflowChat() {
