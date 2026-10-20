@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -113,11 +114,13 @@ class ProjectResourceScopeTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, resourceOwnershipResolvers, List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class));
+            mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
     }
 
     private List<ResourceOwnershipResolver> ownershipResolvers() {
-        return List.of(new ProjectOwnershipResolver(projectRepository));
+        return List.of(new ProjectOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository));
     }
 
 }
