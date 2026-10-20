@@ -219,8 +219,9 @@ class WorkspaceConnectionAuditIntTest {
 
             return new WorkspaceConnectionFacadeImpl(
                 mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), connectionService,
-                mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, mock(ProjectService.class),
-                mock(ProjectWorkflowService.class), mock(TagService.class), mock(WorkflowService.class),
+                mock(PermissionService.class), mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+                mock(ProjectService.class), mock(ProjectWorkflowService.class), mock(TagService.class),
+                mock(WorkflowService.class),
                 mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
         }
     }

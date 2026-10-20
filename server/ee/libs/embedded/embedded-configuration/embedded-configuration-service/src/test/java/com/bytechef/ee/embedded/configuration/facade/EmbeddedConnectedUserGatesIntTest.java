@@ -120,6 +120,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -928,12 +929,13 @@ class EmbeddedConnectedUserGatesIntTest {
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ConnectionFacade connectionFacade, ConnectionService connectionService,
-            ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+            PermissionService permissionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
             WorkflowTestConfigurationService workflowTestConfigurationService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
-                projectDeploymentWorkflowService, workflowTestConfigurationService,
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, permissionService,
+                projectDeploymentWorkflowService, mock(TagService.class),
+                workflowTestConfigurationService,
                 mock(WorkspaceConnectionService.class));
         }
 

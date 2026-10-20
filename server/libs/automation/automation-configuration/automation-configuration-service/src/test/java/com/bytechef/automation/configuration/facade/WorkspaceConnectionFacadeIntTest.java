@@ -536,7 +536,9 @@ public class WorkspaceConnectionFacadeIntTest {
         when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
         when(connectionFacade.getConnection(1L)).thenReturn(connectionDTO);
 
-        assertThat(workspaceConnectionFacade.getConnection(1L)).isSameAs(connectionDTO);
+        ConnectionDTO resultConnectionDTO = workspaceConnectionFacade.getConnection(1L);
+
+        assertThat(resultConnectionDTO.id()).isEqualTo(1L);
     }
 
     @Test
