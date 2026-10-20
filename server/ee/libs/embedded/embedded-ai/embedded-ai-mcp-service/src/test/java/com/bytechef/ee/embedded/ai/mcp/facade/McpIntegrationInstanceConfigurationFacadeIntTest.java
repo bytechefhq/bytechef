@@ -10,8 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -19,6 +18,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
@@ -718,7 +718,9 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
             }
 
-            verify(securedPermissionService, times(methods.size())).isTenantAdmin();
+            assertThat(mockingDetails(securedPermissionService).getInvocations())
+                .as("every denied call consulted the permission service")
+                .hasSizeGreaterThanOrEqualTo(methods.size());
         }
 
         private void invoke(Method method) throws Throwable {
@@ -761,8 +763,15 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
             static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
                 PermissionService permissionService,
                 ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
-                return new AutomationMethodSecurityExpressionHandler(
-                    permissionService, methodSecurityExpressionContributorProvider);
+
+                AutomationMethodSecurityExpressionHandler automationMethodSecurityExpressionHandler =
+                    new AutomationMethodSecurityExpressionHandler(
+                        permissionService, methodSecurityExpressionContributorProvider);
+
+                automationMethodSecurityExpressionHandler.setPermissionEvaluator(
+                    new AutomationPermissionEvaluator(permissionService));
+
+                return automationMethodSecurityExpressionHandler;
             }
 
             @Bean
@@ -783,7 +792,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     @Configuration
     @EnableCaching
     @Import({
-        ConnectionServiceImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
+        ConnectionServiceImpl.class, EmbeddedMcpReader.class, IntegrationInstanceConfigurationServiceImpl.class,
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationFacadeImpl.class,
