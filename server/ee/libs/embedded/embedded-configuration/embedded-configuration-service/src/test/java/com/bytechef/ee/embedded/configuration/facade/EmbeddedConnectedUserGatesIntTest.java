@@ -30,6 +30,8 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.security.ConnectionEnvironmentResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -38,6 +40,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -119,6 +122,7 @@ import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -262,6 +266,9 @@ class EmbeddedConnectedUserGatesIntTest {
     @Autowired
     private PermissionService permissionService;
 
+    @Autowired
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
+
     private ConnectedUser developmentConnectedUser;
     private String externalUserId;
     private ConnectedUser productionConnectedUser;
@@ -283,6 +290,13 @@ class EmbeddedConnectedUserGatesIntTest {
             .thenReturn(
                 Optional.of(
                     connection(EMBEDDED_PRODUCTION_CONNECTION_ID, PlatformType.EMBEDDED, Environment.PRODUCTION)));
+        when(connectionService.getConnection(anyLong()))
+            .thenAnswer(invocation -> {
+                long connectionId = invocation.getArgument(0);
+
+                return connectionService.fetchConnection(connectionId)
+                    .orElseThrow();
+            });
         when(connectionService.getConnections(anyList()))
             .thenAnswer(invocation -> {
                 List<Long> connectionIds = invocation.getArgument(0);
@@ -640,15 +654,46 @@ class EmbeddedConnectedUserGatesIntTest {
     }
 
     @Test
+    void testTheAutomationConnectionEndpointsRefuseAnEmbeddedConnection() {
+        for (String login : List.of(EMBEDDED_ADMIN, TENANT_ADMIN)) {
+            authenticate(login, TENANT_ADMIN.equals(login));
+
+            assertThatThrownBy(() -> workspaceConnectionFacade.delete(EMBEDDED_PRODUCTION_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(
+                () -> workspaceConnectionFacade.update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0))
+                    .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionTags(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of()))
+                .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+        }
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
+            .isInstanceOf(NoSuchElementException.class);
+
+        verify(connectionFacade, never()).delete(anyLong());
+        verify(connectionFacade, never()).update(anyLong(), anyList());
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
+        verify(connectionFacade, never()).getConnection(anyLong());
+
+        workspaceConnectionFacade.updateConnectionTags(AUTOMATION_CONNECTION_ID, List.of());
+        workspaceConnectionFacade.delete(AUTOMATION_CONNECTION_ID);
+
+        verify(connectionFacade).update(AUTOMATION_CONNECTION_ID, List.of());
+        verify(connectionFacade).delete(AUTOMATION_CONNECTION_ID);
+    }
+
+    @Test
     void testWorkflowReferencesShowOnlyConnectedUsersOfViewableEnvironments() {
-        String automationWorkflowUuid = UUID.randomUUID()
+        String automationUuid = UUID.randomUUID()
             .toString();
 
         referenceProjectId = jdbcTemplate.queryForObject(
             "INSERT INTO project (name, workspace_id, uuid, created_date, created_by, last_modified_date, "
                 + "last_modified_by, version) VALUES (?, ?, gen_random_uuid(), now(), 'system', now(), 'system', 0) "
                 + "RETURNING id",
-            Long.class, "reference-" + automationWorkflowUuid, Workspace.DEFAULT_WORKSPACE_ID);
+            Long.class, "reference-" + automationUuid, Workspace.DEFAULT_WORKSPACE_ID);
 
         for (ConnectedUser connectedUser : List.of(productionConnectedUser, developmentConnectedUser)) {
             Long connectedUserProjectId = jdbcTemplate.queryForObject(
@@ -658,26 +703,26 @@ class EmbeddedConnectedUserGatesIntTest {
             jdbcTemplate.update(
                 "INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_uuid) "
                     + "VALUES (?, ?)",
-                connectedUserProjectId, automationWorkflowUuid);
+                connectedUserProjectId, automationUuid);
         }
 
-        Set<String> automationWorkflowUuids = Set.of(automationWorkflowUuid);
+        Set<String> automationUuids = Set.of(automationUuid);
 
         authenticate(VIEWER_IN_PRODUCTION, false);
 
-        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationWorkflowUuids))
+        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationUuids))
             .extracting(ConnectedUserWorkflowReferenceDTO::environment)
             .containsExactly(Environment.PRODUCTION.name());
 
         authenticate(EDITOR_IN_DEVELOPMENT, false);
 
-        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationWorkflowUuids))
+        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationUuids))
             .extracting(ConnectedUserWorkflowReferenceDTO::environment)
             .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
 
         authenticate(TENANT_ADMIN, true);
 
-        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationWorkflowUuids))
+        assertThat(connectedUserWorkflowReferenceFacade.getReferences(automationUuids))
             .extracting(ConnectedUserWorkflowReferenceDTO::environment)
             .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
     }
@@ -879,6 +924,18 @@ class EmbeddedConnectedUserGatesIntTest {
         WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
     })
     static class RealPermissionConfiguration {
+
+        @Bean
+        WorkspaceConnectionFacade workspaceConnectionFacade(
+            ConnectionFacade connectionFacade, ConnectionService connectionService,
+            ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+            WorkflowTestConfigurationService workflowTestConfigurationService) {
+
+            return new WorkspaceConnectionFacadeImpl(
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
+                projectDeploymentWorkflowService, workflowTestConfigurationService,
+                mock(WorkspaceConnectionService.class));
+        }
 
         @Bean
         UserService userService() {
