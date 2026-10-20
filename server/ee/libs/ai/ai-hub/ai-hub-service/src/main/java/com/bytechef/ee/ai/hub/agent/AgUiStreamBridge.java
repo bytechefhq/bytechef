@@ -96,6 +96,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicBoolean jobIdReported = new AtomicBoolean(false);
     private final Object dispatchLock = new Object();
+    private Long pendingJobId;
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 
     /**
@@ -142,8 +143,17 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onEvent(Object payload) {
+        Long jobIdToReport;
+
         synchronized (dispatchLock) {
             dispatchEvent(payload);
+
+            jobIdToReport = pendingJobId;
+            pendingJobId = null;
+        }
+
+        if (jobIdToReport != null) {
+            onJobId.accept(jobIdToReport);
         }
     }
 
@@ -303,7 +313,8 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     /**
      * Reports the {@code jobId} of a {@code {event=start, payload.jobId=...}} event to {@code onJobId}, at most once
-     * per bridge. Returns {@code true} when the event was a start event (handled, not surfaced to the client),
+     * per bridge. The id is captured under {@link #dispatchLock} and handed to {@code onJobId} after the lock is
+     * released. Returns {@code true} when the event was a start event (handled, not surfaced to the client),
      * {@code false} otherwise.
      */
     private boolean registerJobIdFromStartEvent(Map<?, ?> map) {
@@ -335,7 +346,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return true;
         }
 
-        onJobId.accept(jobId);
+        pendingJobId = jobId;
 
         return true;
     }
