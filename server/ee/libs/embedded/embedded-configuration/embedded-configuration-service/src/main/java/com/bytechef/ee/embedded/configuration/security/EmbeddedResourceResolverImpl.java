@@ -58,13 +58,7 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
     }
 
     @Override
-    public boolean isEmbeddedWorkflow(String workflowId) {
-        if (integrationWorkflowRepository.findByWorkflowId(workflowId)
-            .isPresent()) {
-
-            return true;
-        }
-
+    public boolean isEmbeddedProjectWorkflow(String workflowId) {
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowProjectWorkflows(
             List.of(workflowId));
 
@@ -75,5 +69,11 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isIntegrationWorkflow(String workflowId) {
+        return integrationWorkflowRepository.findByWorkflowId(workflowId)
+            .isPresent();
     }
 }

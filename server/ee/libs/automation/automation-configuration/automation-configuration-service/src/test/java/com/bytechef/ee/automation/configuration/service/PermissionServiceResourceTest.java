@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -20,12 +21,15 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
@@ -306,5 +310,38 @@ class PermissionServiceResourceTest {
             List.of(environmentResolver("Connection", Optional.of(Environment.PRODUCTION))));
 
         assertThat(service.canUseConnectionInWorkspace(1L, 42L, Environment.PRODUCTION)).isFalse();
+    }
+
+    @Test
+    void testAnEmbeddedProjectIsDeniedEvenWithTheEmbeddedScope() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+        lenient().when(embeddedScopeCacheService.getEmbeddedScopes(7L))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+        lenient().when(embeddedScopeCacheService.getEmbeddedScopes(7L, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+
+        PermissionServiceImpl service = service(
+            List.of(resolver("Project", ResourceOwner.ofEmbedded())),
+            List.of(environmentResolver("Project", Optional.of(Environment.DEVELOPMENT))));
+
+        assertThat(service.hasResourceScope(1L, "Project", "WORKFLOW_VIEW")).isFalse();
+        assertThat(service.hasResourceScopeInEnvironment(1L, "Project", "WORKFLOW_VIEW", Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testATenantAdminIsAllowedOnAnEmbeddedProject() {
+        try (MockedStatic<SecurityUtils> securityUtilsMock = mockStatic(SecurityUtils.class)) {
+            securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+                .thenReturn(true);
+
+            PermissionServiceImpl service = service(resolver("Project", ResourceOwner.ofEmbedded()));
+
+            assertThat(service.hasResourceScope(1L, "Project", "WORKFLOW_VIEW")).isTrue();
+            assertThat(
+                service.hasResourceScopeInEnvironment(1L, "Project", "WORKFLOW_VIEW", Environment.DEVELOPMENT))
+                    .isTrue();
+        }
     }
 }
