@@ -56,6 +56,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
+import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -261,6 +262,26 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         assertThat(getMcpIntegrationInstanceConfigurationWorkflows(mcpIntegrationInstanceConfiguration.getId()))
             .extracting(McpIntegrationInstanceConfigurationWorkflow::getIntegrationInstanceConfigurationWorkflowId)
             .containsExactly(integrationInstanceConfigurationWorkflow.getId());
+    }
+
+    @Test
+    void testCreateRejectsAServerFromAnotherEnvironment() {
+        McpServer productionMcpServer = mcpServerRepository.save(
+            new McpServer("Production", PlatformType.EMBEDDED, Environment.PRODUCTION));
+
+        long productionMcpServerId = productionMcpServer.getId();
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionMcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionMcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("environment");
     }
 
     @Test
@@ -767,7 +788,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationFacadeImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
-        McpServerMembership.class,
+        McpServerMembership.class, McpServerServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class McpIntegrationInstanceConfigurationFacadeIntTestConfiguration {
