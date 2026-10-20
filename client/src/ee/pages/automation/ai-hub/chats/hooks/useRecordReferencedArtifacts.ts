@@ -17,8 +17,15 @@ import {AiHubChatsKeys} from './useChats';
  * <p>Skips the home view, skips until the workspace store holds a real workspace id, and skips while the tabs store
  * still mirrors another chat: on a switch this hook sees the new {@code chatId} before the tabs store has swapped in
  * that chat's tabs, and recording then would file the previous chat's tabs under the new one.</p>
+ *
+ * <p>Records nothing while {@code enabled} is false, which the page passes for a workflow chat: its turns run a
+ * workflow, not the hub agent, so a tab open beside it is not one of its artifacts.</p>
  */
-export default function useRecordReferencedArtifacts(chatId: number | undefined, workspaceId: number | undefined) {
+export default function useRecordReferencedArtifacts(
+    chatId: number | undefined,
+    workspaceId: number | undefined,
+    enabled = true
+) {
     const seenRef = useRef<Set<string>>(new Set());
     const previousChatIdRef = useRef<number | undefined>(chatId);
 
@@ -39,7 +46,7 @@ export default function useRecordReferencedArtifacts(chatId: number | undefined,
             previousChatIdRef.current = chatId;
         }
 
-        if (chatId == null || tabsActiveChatId !== chatId || !isWorkspaceIdKnown(workspaceId)) {
+        if (!enabled || chatId == null || tabsActiveChatId !== chatId || !isWorkspaceIdKnown(workspaceId)) {
             return;
         }
 
@@ -64,7 +71,7 @@ export default function useRecordReferencedArtifacts(chatId: number | undefined,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [openTabs, chatId, tabsActiveChatId, workspaceId]);
+    }, [enabled, openTabs, chatId, tabsActiveChatId, workspaceId]);
 }
 
 function toWorkflowMetadata(tab: AiHubTabType): {projectId: string; projectWorkflowId: number} {
