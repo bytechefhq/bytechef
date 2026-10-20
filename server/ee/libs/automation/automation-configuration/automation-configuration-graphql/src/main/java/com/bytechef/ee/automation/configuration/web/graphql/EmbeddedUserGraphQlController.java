@@ -88,6 +88,11 @@ public class EmbeddedUserGraphQlController {
     }
 
     @MutationMapping
+    public EmbeddedUserView addEmbeddedUserByEmail(@Argument String email, @Argument WorkspaceRole role) {
+        return EmbeddedUserView.stored(embeddedUserFacade.addEmbeddedUserByEmail(email, role));
+    }
+
+    @MutationMapping
     public EmbeddedUserView updateEmbeddedUserRole(@Argument long userId, @Argument WorkspaceRole role) {
         return EmbeddedUserView.stored(embeddedUserFacade.updateEmbeddedUserRole(userId, role));
     }

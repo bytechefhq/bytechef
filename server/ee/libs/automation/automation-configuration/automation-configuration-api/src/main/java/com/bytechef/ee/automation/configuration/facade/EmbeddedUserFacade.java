@@ -24,6 +24,8 @@ public interface EmbeddedUserFacade {
 
     EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole);
 
+    EmbeddedUser addEmbeddedUserByEmail(String email, WorkspaceRole embeddedRole);
+
     List<EmbeddedUser> getEmbeddedUsers();
 
     void removeEnvironmentRole(long userId, Environment environment);
