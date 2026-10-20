@@ -17,7 +17,6 @@ import com.agui.core.event.TextMessageEndEvent;
 import com.agui.core.event.TextMessageStartEvent;
 import com.agui.core.event.ToolCallEndEvent;
 import com.agui.core.event.ToolCallStartEvent;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,8 +39,8 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li><b>{@code onEvent(String chunk)}</b>: emit {@link TextMessageContentEvent} (delta). The first chunk also fires
  * {@link TextMessageStartEvent} so the client knows a new message is starting.</li>
- * <li><b>{@code onEvent(Map {event=start})}</b>: capture the job id into the {@link WorkflowChatJobRegistry} and report
- * it to the {@code onJobId} callback, for the first start event only. Not surfaced to the client.</li>
+ * <li><b>{@code onEvent(Map {event=start})}</b>: report the job id to the {@code onJobId} callback, for the first start
+ * event only. Not surfaced to the client.</li>
  * <li><b>{@code onEvent(Map {event=task_started})}</b>: emit a tool-call start/end pair labelled with the task name so
  * the chat shows live step progress.</li>
  * <li><b>{@code onEvent(Map {event=result})}</b>: render the final reply when nothing was streamed before it.</li>
@@ -53,14 +52,14 @@ import org.slf4j.LoggerFactory;
  * <li><b>{@code onEvent(Map other)}</b>: forward as a generic {@code CustomEvent("workflow-event", map)}.</li>
  * <li><b>{@code onComplete()}</b>: emit {@link TextMessageEndEvent} (when a message was started) followed by
  * {@link RunFinishedEvent}.</li>
- * <li><b>{@code onError(Throwable)}</b>: stop the in-flight job, then emit {@link RunErrorEvent} with the throwable's
- * message.</li>
+ * <li><b>{@code onError(Throwable)}</b>: run the {@code onStreamError} callback, which stops this turn's own job, then
+ * emit {@link RunErrorEvent} with the throwable's message.</li>
  * </ul>
  *
  * <p>
  * <b>Idempotency:</b> {@code onComplete()} and {@code onError(...)} both flip an internal {@code completed} flag and
  * skip duplicate emissions, because the webhook executor can deliver both a stream-level and a future-level terminal
- * signal under some failure modes. Both clear the job registry and run {@code onFinalize} last, exactly once.
+ * signal under some failure modes. Both run {@code onFinalize} last, exactly once.
  * </p>
  *
  * @version ee
@@ -86,12 +85,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final String messageId;
     private final String threadId;
     private final String runId;
-    private final long chatId;
     private final WebhookResumeRegistry resumeRegistry;
-    private final WorkflowChatJobRegistry jobRegistry;
-    @Nullable
-    private final JobFacade jobFacade;
     private final LongConsumer onJobId;
+    private final Runnable onStreamError;
     private final Runnable onFinalize;
 
     private final AtomicBoolean started = new AtomicBoolean(false);
@@ -100,28 +96,24 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 
     /**
-     * @param chatId         the {@code ai_hub_chat.id} of the workflow chat, used as the registry key
+     * @param threadId       the chat's thread id, also the {@link WebhookResumeRegistry} key
      * @param resumeRegistry where {@code ask_user_question} resume URLs land
-     * @param jobRegistry    where the job id of the running turn lands, cleared on terminal events
-     * @param jobFacade      optional, used by {@link #onError} to stop the in-flight job
-     * @param onJobId        called once with the job id from the {@code start} event, right after it is registered
+     * @param onJobId        called once with the job id from the {@code start} event
+     * @param onStreamError  called by {@link #onError} before the error is emitted, to stop this turn's own job
      * @param onFinalize     called as the last step of {@link #onComplete} / {@link #onError}, exactly once
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AgUiStreamBridge(
-        AgentSubscriber subscriber, String messageId, String threadId, String runId, long chatId,
-        WebhookResumeRegistry resumeRegistry, WorkflowChatJobRegistry jobRegistry, @Nullable JobFacade jobFacade,
-        LongConsumer onJobId, Runnable onFinalize) {
+        AgentSubscriber subscriber, String messageId, String threadId, String runId,
+        WebhookResumeRegistry resumeRegistry, LongConsumer onJobId, Runnable onStreamError, Runnable onFinalize) {
 
         this.subscriber = subscriber;
         this.messageId = messageId;
         this.threadId = threadId;
         this.runId = runId;
-        this.chatId = chatId;
         this.resumeRegistry = resumeRegistry;
-        this.jobRegistry = jobRegistry;
-        this.jobFacade = jobFacade;
         this.onJobId = onJobId;
+        this.onStreamError = onStreamError;
         this.onFinalize = onFinalize;
     }
 
@@ -189,8 +181,6 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        jobRegistry.clear(chatId);
-
         if (started.get()) {
             TextMessageEndEvent end = new TextMessageEndEvent();
 
@@ -215,20 +205,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        Long inFlightJobId = jobRegistry.get(chatId);
-
-        jobRegistry.clear(chatId);
-
-        if (inFlightJobId != null && jobFacade != null) {
-            try {
-                jobFacade.stopJob(inFlightJobId);
-            } catch (RuntimeException exception) {
-                if (log.isDebugEnabled()) {
-                    log.debug(
-                        "stopJob for jobId {} (chat {}) failed during onError handling", inFlightJobId, chatId,
-                        exception);
-                }
-            }
+        try {
+            onStreamError.run();
+        } catch (RuntimeException exception) {
+            log.warn("AgUiStreamBridge.onStreamError callback threw for thread {}", threadId, exception);
         }
 
         RunErrorEvent runErrorEvent = new RunErrorEvent();
@@ -274,10 +254,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     private void onAskUserQuestion(Map<?, ?> map) {
         if (map.get("resumeUrl") instanceof String resumeUrl && !resumeUrl.isBlank()) {
-            resumeRegistry.register(chatId, resumeUrl);
+            resumeRegistry.register(threadId, resumeUrl);
         } else {
-            log.warn("ask_user_question event without a resumeUrl for chat {}; the answer cannot resume the run",
-                chatId);
+            log.warn("ask_user_question event without a resumeUrl for thread {}; the answer cannot resume the run",
+                threadId);
         }
 
         emitCustomEvent(ASK_WORKFLOW_QUESTION_EVENT_NAME, map);
@@ -303,9 +283,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
     }
 
     /**
-     * Captures the {@code jobId} from a {@code {event=start, payload.jobId=...}} event into the job registry and
-     * reports it to {@code onJobId}, at most once per bridge. Returns {@code true} when the event was a start event
-     * (handled, not surfaced to the client), {@code false} otherwise.
+     * Reports the {@code jobId} of a {@code {event=start, payload.jobId=...}} event to {@code onJobId}, at most once
+     * per bridge. Returns {@code true} when the event was a start event (handled, not surfaced to the client),
+     * {@code false} otherwise.
      */
     private boolean registerJobIdFromStartEvent(Map<?, ?> map) {
         if (!("start".equals(map.get("event")) && map.get("payload") instanceof Map<?, ?> payloadMap)) {
@@ -326,7 +306,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
                 : Long.parseLong(jobIdObject.toString());
         } catch (NumberFormatException exception) {
             if (log.isDebugEnabled()) {
-                log.debug("Could not parse jobId from start event for chat {}: {}", chatId, jobIdObject);
+                log.debug("Could not parse jobId from start event for thread {}: {}", threadId, jobIdObject);
             }
 
             return true;
@@ -335,8 +315,6 @@ public class AgUiStreamBridge implements SseStreamBridge {
         if (!jobIdReported.compareAndSet(false, true)) {
             return true;
         }
-
-        jobRegistry.register(chatId, jobId);
 
         onJobId.accept(jobId);
 
@@ -413,9 +391,9 @@ public class AgUiStreamBridge implements SseStreamBridge {
             onFinalize.run();
         } catch (RuntimeException exception) {
             log.warn(
-                "AgUiStreamBridge.onFinalize callback threw for chat {}; SSE may stay open until client "
+                "AgUiStreamBridge.onFinalize callback threw for thread {}; SSE may stay open until client "
                     + "disconnects or the emitter times out",
-                chatId, exception);
+                threadId, exception);
         }
     }
 

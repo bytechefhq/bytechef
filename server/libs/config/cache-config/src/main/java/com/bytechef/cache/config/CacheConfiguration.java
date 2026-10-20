@@ -40,9 +40,6 @@ public class CacheConfiguration implements CachingConfigurer {
     private static final String WEBHOOK_RESUME_URL_CACHE =
         "com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry.resumeUrls";
 
-    private static final String WORKFLOW_CHAT_JOB_CACHE =
-        "com.bytechef.ee.ai.hub.agent.WorkflowChatJobRegistry.jobIds";
-
     private static final String WORKFLOW_CHAT_LAST_TURN_CACHE =
         "com.bytechef.ee.ai.hub.agent.WorkflowChatGuard.lastTurn";
 
@@ -64,13 +61,6 @@ public class CacheConfiguration implements CachingConfigurer {
 
         caffeineCacheManager.registerCustomCache(
             WEBHOOK_RESUME_URL_CACHE,
-            Caffeine.newBuilder()
-                .expireAfterWrite(30, TimeUnit.MINUTES)
-                .recordStats()
-                .build());
-
-        caffeineCacheManager.registerCustomCache(
-            WORKFLOW_CHAT_JOB_CACHE,
             Caffeine.newBuilder()
                 .expireAfterWrite(30, TimeUnit.MINUTES)
                 .recordStats()
