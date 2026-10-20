@@ -538,7 +538,8 @@ class EmbeddedHubGatesIntTest {
                 (resourceType, workspaceId, candidates) -> candidates.stream()
                     .map(VisibilityRecord::id)
                     .collect(Collectors.toSet()),
-                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
+                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService,
+                embeddedUserRepository, embeddedResourceResolverProvider,
                 connectionServiceProvider);
         }
     }
