@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -36,4 +37,7 @@ public interface EmbeddedUserRepository extends ListCrudRepository<EmbeddedUser,
     Optional<EmbeddedUser> findByUserIdAndEnvironmentIsNull(long userId);
 
     Optional<EmbeddedUser> findByUserIdAndEnvironment(long userId, int environment);
+
+    @Query("SELECT id FROM \"user\" WHERE id = :userId FOR UPDATE")
+    Optional<Long> lockUser(long userId);
 }
