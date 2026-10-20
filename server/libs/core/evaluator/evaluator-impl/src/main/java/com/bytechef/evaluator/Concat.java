@@ -18,8 +18,9 @@
 
 package com.bytechef.evaluator;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -33,15 +34,28 @@ class Concat implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        if (arguments[0] instanceof String s1 && arguments[1] instanceof String s2) {
-            return new TypedValue(s1.concat(s2));
-        } else if (arguments[0] instanceof List<?> l1 && arguments[1] instanceof List<?> l2) {
-            return new TypedValue(
-                Stream.concat(l1.stream(), l2.stream())
-                    .toList());
-        } else {
+        if (arguments.length == 0) {
             throw new IllegalArgumentException(
-                "Invalid arguments for String.concat. Expected 2 String or 2 List, got " + arguments.length);
+                "Invalid number of arguments for concat. Expected at least 1, got " + arguments.length);
         }
+
+        if (Arrays.stream(arguments)
+            .allMatch(argument -> argument instanceof String)) {
+            return new TypedValue(
+                Arrays.stream(arguments)
+                    .map(argument -> (String) argument)
+                    .collect(Collectors.joining()));
+        }
+
+        if (Arrays.stream(arguments)
+            .allMatch(argument -> argument instanceof List<?>)) {
+            return new TypedValue(
+                Arrays.stream(arguments)
+                    .flatMap(argument -> ((List<?>) argument).stream())
+                    .toList());
+        }
+
+        throw new IllegalArgumentException(
+            "Invalid arguments for concat. Expected all arguments to be strings or all to be lists.");
     }
 }

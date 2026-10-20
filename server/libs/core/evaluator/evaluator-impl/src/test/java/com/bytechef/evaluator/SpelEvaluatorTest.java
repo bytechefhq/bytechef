@@ -517,6 +517,59 @@ public class SpelEvaluatorTest {
     }
 
     @Test
+    public void testConcatJoinsAllStringArguments() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "fullName", "=concat(${firstName}, ' ', ${lastName})",
+                "letters", "=concat('a', 'b', 'c', 'd')"),
+            Map.of("firstName", "John", "lastName", "Doe"));
+
+        assertEquals("John Doe", MapUtils.get(map, "fullName"));
+        assertEquals("abcd", MapUtils.get(map, "letters"));
+    }
+
+    @Test
+    public void testConcatJoinsAllListArguments() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("concatenated", "=concat(${list1}, ${list2}, ${list3})"),
+            Map.of("list1", List.of("a", "b"), "list2", List.of(), "list3", List.of(1, 2)));
+
+        assertEquals(List.of("a", "b", 1, 2), MapUtils.get(map, "concatenated"));
+    }
+
+    @Test
+    public void testConcatReturnsSingleArgumentUnchanged() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("string", "=concat('abc')", "list", "=concat({'a','b'})"), Collections.emptyMap());
+
+        assertEquals("abc", MapUtils.get(map, "string"));
+        assertEquals(List.of("a", "b"), MapUtils.get(map, "list"));
+    }
+
+    @Test
+    public void testConcatRejectsMixedStringsAndLists() {
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("concatenated", "=concat('a', 'b', {'c'})"), Collections.emptyMap()));
+
+        assertEquals(
+            "Invalid arguments for concat. Expected all arguments to be strings or all to be lists.",
+            expressionEvaluationException.getMessage());
+    }
+
+    @Test
+    public void testConcatRejectsNoArguments() {
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("concatenated", "=concat()"), Collections.emptyMap()));
+
+        assertEquals(
+            "Invalid number of arguments for concat. Expected at least 1, got 0",
+            expressionEvaluationException.getMessage());
+    }
+
+    @Test
     public void testIncompleteFormulaThrowsInStrictMode() {
         assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=222+"), Collections.emptyMap()));
