@@ -453,8 +453,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         automationProjectConfigurationService.create(
             automationProjectId, Environment.PRODUCTION.ordinal(), "Newest", null, 2, true, true);
@@ -670,7 +670,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationProjectId, externalUserId, Environment.PRODUCTION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         assertThat(connectedUserReferenceDeploymentManager.getReleasedVersion(
             connectedUserId, automationProjectId)).isEqualTo(1);

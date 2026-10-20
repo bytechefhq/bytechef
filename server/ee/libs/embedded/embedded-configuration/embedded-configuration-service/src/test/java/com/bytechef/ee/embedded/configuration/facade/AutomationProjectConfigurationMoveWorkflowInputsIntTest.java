@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfigurat
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -113,7 +114,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
-    ClusterElementDefinitionService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class,
+    ClusterElementDefinitionService.class, ComponentConnectionFacade.class, ConnectedUserConnectionFacade.class,
+    ComponentDefinitionService.class,
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
     ConnectionService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class,
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
@@ -183,7 +185,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @MockitoBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -230,7 +232,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -248,7 +250,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -268,7 +270,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -286,7 +288,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -310,7 +312,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -328,7 +330,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_TYPED_INPUTS_DEFINITION, draftWorkflow.getVersion());
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -353,7 +355,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -378,7 +380,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -440,7 +442,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
 
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn("slack");
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))

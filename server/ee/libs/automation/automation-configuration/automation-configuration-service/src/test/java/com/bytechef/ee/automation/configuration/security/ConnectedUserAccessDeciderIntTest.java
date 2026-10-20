@@ -54,6 +54,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreatorImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
@@ -107,6 +109,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Constructor;
@@ -911,7 +914,12 @@ class ConnectedUserAccessDeciderIntTest {
                         EnvironmentService.class, environmentService,
                         ProjectDeploymentService.class, projectDeploymentService,
                         ProjectDeploymentWorkflowService.class, projectDeploymentWorkflowService,
-                        ProjectService.class, projectService, ProjectWorkflowService.class, projectWorkflowService,
+                        ProjectService.class, projectService,
+                        ProjectWorkflowCreator.class,
+                        new ProjectWorkflowCreatorImpl(
+                            projectService, projectWorkflowService, workflowService,
+                            mock(WorkflowValidatorFacade.class)),
+                        ProjectWorkflowService.class, projectWorkflowService,
                         WorkflowFacade.class, workflowFacade, WorkflowService.class, workflowService));
             }
 

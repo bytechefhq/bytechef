@@ -941,7 +941,7 @@ class ConnectedUserProjectFacadeIntTest {
         String secondWorkflowTemplateUuid = addAutomation(
             automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configurationA = automationProjectConfigurationService.create(
             automationProjectId, Environment.PRODUCTION.ordinal(), "A", null, 1, true, true);
@@ -958,7 +958,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         automationProjectFacade.updateProjectWorkflow(secondWorkflowTemplateUuid, "Version two", "");
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         automationProjectConfigurationService.create(
             automationProjectId, Environment.PRODUCTION.ordinal(), "B", null, 2, true, true);
@@ -1590,7 +1590,7 @@ class ConnectedUserProjectFacadeIntTest {
 
             long unconfiguredProjectId = createProjectWithWorkflows("Provisionable Unconfigured", 1);
 
-            automationProjectFacade.publishProject(unconfiguredProjectId);
+            automationProjectFacade.publishProject(unconfiguredProjectId, null);
 
             long configuredProjectId = createProjectWithWorkflows("Provisionable Configured", 1);
 

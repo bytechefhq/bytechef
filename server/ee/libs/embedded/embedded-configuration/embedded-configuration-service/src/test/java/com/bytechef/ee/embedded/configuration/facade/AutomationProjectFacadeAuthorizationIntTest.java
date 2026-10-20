@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
@@ -75,8 +76,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     CategoryService.class, ConnectedUserReferenceDeploymentManager.class, ConnectedUserReferenceRolloutManager.class,
     ConnectedUserService.class, EmbeddedPermissionEvaluator.class, IntegrationInstanceConfigurationService.class,
     IntegrationService.class, ProjectCodeWorkflowFacade.class, ProjectCodeWorkflowService.class,
-    ProjectWorkflowFacade.class,
-    ProjectWorkflowService.class, TagService.class,
+    ProjectWorkflowCreator.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class, TagService.class,
     WorkflowComponentResolver.class, WorkflowNodeTestOutputService.class, WorkflowPreDeleteListener.class,
     WorkflowService.class, WorkflowTestConfigurationService.class
 })
