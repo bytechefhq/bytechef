@@ -7,13 +7,17 @@ import PublishPopover from '@/ee/pages/embedded/integration/components/integrati
 import SettingsMenu from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu';
 import {useIntegrationHeader} from '@/ee/pages/embedded/integration/components/integration-header/hooks/useIntegrationHeader';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
+import {useEmbeddedWorkflowViewOnlyNotice} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowViewOnlyNotice';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
 import {RefObject, useSyncExternalStore} from 'react';
@@ -64,6 +68,10 @@ const IntegrationHeader = ({
 
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const {
         handleIntegrationWorkflowValueChange,
         handlePublishIntegrationSubmit,
@@ -112,6 +120,8 @@ const IntegrationHeader = ({
                 )}
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex items-center gap-1">
@@ -119,14 +129,17 @@ const IntegrationHeader = ({
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <PublishPopover
-                    isPending={publishIntegrationMutationIsPending}
-                    onPublishIntegrationSubmit={handlePublishIntegrationSubmit}
-                />
+                {canEditWorkflowOnUnion && canPublishScope && (
+                    <PublishPopover
+                        isPending={publishIntegrationMutationIsPending}
+                        onPublishIntegrationSubmit={handlePublishIntegrationSubmit}
+                    />
+                )}
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 

@@ -7,6 +7,12 @@ import AutomationWorkflowProjectList from '../AutomationWorkflowProjectList';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/shared/queries/platform/environments.queries', () => ({
     useGetEnvironmentsQuery: () => ({data: [{id: 1, name: 'Development'}]}),
 }));
