@@ -33,7 +33,9 @@ public class ApprovalLinkComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("approvalLink")
         .title("Approval Link")
-        .description("The Approval Link component that create approval/disapproval links.")
+        .description(
+            "Deprecated: use the Approval component instead. The Approval Link component that create " +
+                "approval/disapproval links.")
         .icon("path:assets/approval-link.svg")
         .categories(ComponentCategory.DEVELOPER_TOOLS, ComponentCategory.FILE_STORAGE)
         .actions(ApprovalLinkCreateApprovalLinksAction.ACTION_DEFINITION);
