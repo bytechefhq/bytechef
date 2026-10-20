@@ -652,8 +652,11 @@ class PreAuthorizeAnnotationTest {
                 java.time.Instant.class, java.time.Instant.class, Long.class, Long.class, Long.class, String.class,
                 Integer.class, long.class, int.class
             },
-            "#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : " +
-                "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)");
+            "#connectedUserId != null ? " +
+                "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and " +
+                "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : " +
+                "(#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : " +
+                "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId))");
     }
 
     @Test
