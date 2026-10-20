@@ -159,11 +159,15 @@ const WorkflowExecutionsTestOutput = ({
                                                     <WorkflowExecutionsAccordionItem
                                                         defaultValue={deepestFailedExecution?.path}
                                                         execution={taskExecution}
+                                                        jobStatus={job?.status}
                                                         key={taskExecution.id}
                                                         onExecutionClick={handleExecutionClick}
                                                         selectedExecutionId={selectedExecution?.id || ''}
                                                     >
-                                                        <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                                        <WorkflowTaskExecutionItem
+                                                            jobStatus={job?.status}
+                                                            taskExecution={taskExecution}
+                                                        />
                                                     </WorkflowExecutionsAccordionItem>
                                                 ))}
                                             </Accordion>

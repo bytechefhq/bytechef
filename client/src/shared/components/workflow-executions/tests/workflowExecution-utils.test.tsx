@@ -2,7 +2,12 @@ import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execu
 import {render} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
-import {ExecutionStatusType, getExecutionStatusIcon, getWorkflowStatusType} from '../util/workflowExecution-utils';
+import {
+    ExecutionStatusType,
+    getExecutionStatusIcon,
+    getTaskExecutionDisplayStatus,
+    getWorkflowStatusType,
+} from '../util/workflowExecution-utils';
 
 function createJob(overrides: Partial<Job> = {}): Job {
     return {
@@ -248,6 +253,33 @@ describe('workflowExecution-utils', () => {
 
                 expect(isWorkflowRunning(job, trigger)).toBe(false);
             });
+        });
+    });
+
+    describe('getTaskExecutionDisplayStatus', () => {
+        it.each(['COMPLETED', 'FAILED', 'STOPPED'] as const)(
+            'should show an unfinished task as cancelled when the job is %s',
+            (jobStatus) => {
+                expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('CANCELLED');
+                expect(getTaskExecutionDisplayStatus('CREATED', jobStatus)).toBe('CANCELLED');
+            }
+        );
+
+        it.each(['CREATED', 'STARTED'] as const)(
+            'should keep an unfinished task running while the job is %s',
+            (jobStatus) => {
+                expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('STARTED');
+                expect(getTaskExecutionDisplayStatus('CREATED', jobStatus)).toBe('CREATED');
+            }
+        );
+
+        it('should keep the task status when the job status is unknown', () => {
+            expect(getTaskExecutionDisplayStatus('STARTED')).toBe('STARTED');
+        });
+
+        it('should keep a finished task status when the job is stopped', () => {
+            expect(getTaskExecutionDisplayStatus('COMPLETED', 'STOPPED')).toBe('COMPLETED');
+            expect(getTaskExecutionDisplayStatus('FAILED', 'STOPPED')).toBe('FAILED');
         });
     });
 });

@@ -136,4 +136,31 @@ describe('WorkflowExecutionsAccordionItem', () => {
             expect(screen.queryByText(/more iterations\.\.\./)).not.toBeInTheDocument();
         });
     });
+
+    it('shows no spinner for an unfinished task inside a loop iteration of a stopped job', async () => {
+        const loopTaskExecution = {
+            ...createTaskExecution('21', 'STARTED'),
+            iterations: [[{id: '22', jobId: '7', priority: 0, status: 'STARTED', title: 'Row task'}]],
+            title: 'Loop',
+        } as TaskExecution;
+
+        const {container} = render(
+            <Accordion type="multiple">
+                <WorkflowExecutionsAccordionItem
+                    execution={loopTaskExecution}
+                    jobStatus="STOPPED"
+                    onExecutionClick={vi.fn()}
+                    selectedExecutionId=""
+                >
+                    <WorkflowTaskExecutionItem jobStatus="STOPPED" taskExecution={loopTaskExecution} />
+                </WorkflowExecutionsAccordionItem>
+            </Accordion>
+        );
+
+        await userEvent.click(screen.getByText('Condition'));
+        await userEvent.click(screen.getByText('Loop iteration 1'));
+
+        expect(screen.getByText('Row task')).toBeInTheDocument();
+        expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+    });
 });
