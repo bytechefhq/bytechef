@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest;
 
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest.model.EnvironmentModel;
@@ -53,6 +54,31 @@ final class ApiCollectionEnvironmentScope {
         requireEnvironment(apiCollectionDTO, resolveEnvironment(environmentService, xEnvironment));
 
         return apiCollectionDTO;
+    }
+
+    /**
+     * Reads the endpoint through the facade's guarded {@link ApiCollectionFacade#getApiCollectionEndpoint(long)} and
+     * requires its API collection to belong to the request's environment.
+     *
+     * @throws ConfigurationException with {@code API_COLLECTION_NOT_FOUND} when the endpoint's API collection belongs
+     *                                to another environment
+     */
+    static ApiCollectionEndpointDTO getApiCollectionEndpoint(
+        ApiCollectionFacade apiCollectionFacade, EnvironmentService environmentService, long id,
+        @Nullable EnvironmentModel xEnvironment) {
+
+        ApiCollectionEndpointDTO apiCollectionEndpointDTO;
+
+        try {
+            apiCollectionEndpointDTO = apiCollectionFacade.getApiCollectionEndpoint(id);
+        } catch (AccessDeniedException accessDeniedException) {
+            throw notFound(id);
+        }
+
+        getApiCollection(apiCollectionFacade, environmentService, apiCollectionEndpointDTO.apiCollectionId(),
+            xEnvironment);
+
+        return apiCollectionEndpointDTO;
     }
 
     static Environment resolveEnvironment(

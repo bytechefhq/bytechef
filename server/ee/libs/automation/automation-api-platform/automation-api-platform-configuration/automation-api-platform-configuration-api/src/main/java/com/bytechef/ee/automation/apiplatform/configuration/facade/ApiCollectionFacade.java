@@ -27,6 +27,14 @@ public interface ApiCollectionFacade {
 
     ApiCollectionEndpointDTO createApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpoint);
 
+    /**
+     * Creates the endpoint and applies the connections and inputs to its workflow in the same call. A {@code null}
+     * argument leaves that part of the workflow as it is.
+     */
+    ApiCollectionEndpointDTO createApiCollectionEndpoint(
+        ApiCollectionEndpointDTO apiCollectionEndpoint, List<ProjectDeploymentWorkflowConnection> connections,
+        Map<String, ?> inputs);
+
     void deleteApiCollection(long id);
 
     void deleteApiCollectionEndpoint(long id);
@@ -60,6 +68,14 @@ public interface ApiCollectionFacade {
     void updateApiCollectionTags(long id, List<Tag> tags);
 
     ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO);
+
+    /**
+     * Updates the endpoint and applies the connections and inputs to its workflow in the same call. A {@code null}
+     * argument leaves that part of the workflow as it is.
+     */
+    ApiCollectionEndpointDTO updateApiCollectionEndpoint(
+        ApiCollectionEndpointDTO apiCollectionEndpointDTO, List<ProjectDeploymentWorkflowConnection> connections,
+        Map<String, ?> inputs);
 
     ApiCollectionEndpointDTO updateApiCollectionEndpointWorkflow(
         long id, List<ProjectDeploymentWorkflowConnection> connections, Map<String, ?> inputs);
