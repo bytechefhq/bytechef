@@ -41,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.dto.CallableAutomationDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -168,6 +169,9 @@ class ConnectedUserMcpAutomationResolverIntTest {
     @MockitoBean
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
+    @MockitoBean
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
+
     @Autowired
     private ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver;
 
@@ -217,7 +221,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -226,7 +230,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
         ConnectedUserProjectWorkflow reference = provisionWithInputs(
             externalUserId, workflowUuid, Map.of("channel", "#a"));
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         String deployedWorkflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             automationProjectId, 1, workflowUuid);
@@ -361,13 +365,15 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
         String externalUserId = createAssignedConnectedUser(automationProjectId, configuration);
 
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of());
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -389,7 +395,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -499,7 +505,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, definition);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -541,6 +547,8 @@ class ConnectedUserMcpAutomationResolverIntTest {
         when(connectionDTO.id()).thenReturn(SLACK_CONNECTION_ID);
         when(connectionDTO.componentName()).thenReturn("slack");
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of(connectionDTO));
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))

@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
@@ -139,8 +141,6 @@ class ConnectionFacadeIntTest {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
-
         assertEveryOperationIsDenied();
     }
 
@@ -155,8 +155,9 @@ class ConnectionFacadeIntTest {
             .name("Team Slack")
             .build();
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
-        when(platformConnectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
+        grantEveryEmbeddedScope();
+
+        when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
 
         assertThat(connectionFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
@@ -173,7 +174,6 @@ class ConnectionFacadeIntTest {
         verify(connectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
         verify(connectionFacade).delete(7L);
         verify(connectionFacade).getConnection(7L);
-        verify(connectionFacade).getConnectionTags(PlatformType.EMBEDDED);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(connectionFacade).update(7L, "name", List.of(), 0);
         verify(connectionFacade).update(7L, List.of());
@@ -252,6 +252,13 @@ class ConnectionFacadeIntTest {
         verifyNoInteractions(platformConnectionFacade, connectionService, connectedUserConnectionService);
     }
 
+    private void grantEveryEmbeddedScope() {
+        when(permissionService.hasResourceScope(anyLong(), eq("Connection"), anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString(), any(Environment.class))).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(anyString())).thenReturn(true);
+    }
+
     private static Connection connection(long id, PlatformType type) {
         Connection connection = new Connection();
 
@@ -278,7 +285,8 @@ class ConnectionFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            grantEveryEmbeddedScope();
+
             when(connectionService.fetchConnection(AUTOMATION_CONNECTION_ID))
                 .thenReturn(Optional.of(connection(AUTOMATION_CONNECTION_ID, PlatformType.AUTOMATION)));
             when(connectionService.fetchConnection(UNKNOWN_CONNECTION_ID)).thenReturn(Optional.empty());
@@ -350,7 +358,8 @@ class ConnectionFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            grantEveryEmbeddedScope();
+
             when(connectedUserConnectionService.getConnectionIdsIn(anySet())).thenAnswer(invocation -> {
                 Set<Long> requestedConnectionIds = invocation.getArgument(0);
 
@@ -551,8 +560,12 @@ class ConnectionFacadeIntTest {
             @Lazy PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }

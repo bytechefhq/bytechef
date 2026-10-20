@@ -75,6 +75,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
@@ -279,7 +280,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @MockitoBean
     private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
@@ -617,7 +618,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -644,7 +645,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
@@ -674,7 +675,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -700,7 +701,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         connectedUserReferenceRolloutManager.rollOutAndApply(automationProjectId, PRODUCTION_ENVIRONMENT_ID);
@@ -726,7 +727,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         connectedUserReferenceRolloutManager.rollOutAndApply(automationProjectId, PRODUCTION_ENVIRONMENT_ID);
@@ -1247,7 +1248,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 case "createIssue1" -> List.of(new ComponentConnection("jira", 1, "createIssue1", "jira", true));
                 default -> List.of();
             });
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
 
         publishAndPinProject(automationProjectId);
 
@@ -1506,7 +1507,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatCode(
@@ -1557,10 +1558,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException(
                 "Failed to execute DbAction", new OptimisticLockingFailureException("Row was updated concurrently")));
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
@@ -2079,7 +2080,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Toggle", null, 1, true, true);
@@ -2121,7 +2122,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -2523,7 +2524,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
@@ -4152,7 +4153,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     private void stubNoEntitledSlackConnection() {
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
     }
 
@@ -4167,7 +4168,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String workflowUuid = addWorkflow(
             automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
@@ -4190,7 +4191,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
@@ -4344,7 +4345,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn("slack");
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))

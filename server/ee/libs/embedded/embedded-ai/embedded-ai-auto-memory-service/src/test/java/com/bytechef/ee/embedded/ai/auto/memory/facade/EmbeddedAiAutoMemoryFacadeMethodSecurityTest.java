@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.ai.auto.memory.facade;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -100,10 +103,10 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemoryConnectedUsers(
                 Environment.DEVELOPMENT));
-        assertThatExceptionOfType(AccessDeniedException.class)
+        assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
                 Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L, 1L, PATCH));
-        assertThatExceptionOfType(AccessDeniedException.class)
+        assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(
                 Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L));
     }
@@ -124,10 +127,16 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(
                 Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L));
+        assertThatExceptionOfType(AccessDeniedException.class)
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 1L, 1L, 1L, PATCH));
+        assertThatExceptionOfType(AccessDeniedException.class)
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 1L, 1L));
     }
 
     @Test
-    void testTenantAdminCanList() {
+    void testEmbeddedConnectedUserViewerCanList() {
         authenticate(AuthorityConstants.ADMIN, AuthorityConstants.USER);
 
         assertThatCode(() -> embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(Environment.DEVELOPMENT, null, null))
@@ -158,7 +167,7 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
         PermissionService permissionService() {
             PermissionService permissionService = mock(PermissionService.class);
 
-            when(permissionService.isTenantAdmin())
+            when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class)))
                 .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
 
             return permissionService;

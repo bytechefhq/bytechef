@@ -53,10 +53,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
- * Embedded memories all live in the default workspace: integration instances are stored there, and so is every Embedded
- * automation project and connected user project. Workspace membership therefore cannot isolate them, and every method
- * is limited to tenant admins.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -102,7 +98,10 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
         @AuditData(key = "principalType", value = "#principalType"),
         @AuditData(key = "principalId", value = "#principalId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#principalType == " +
+        "T(com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType).INTEGRATION_INSTANCE " +
+        "? hasPermission(#principalId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        ": hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     public void deleteEmbeddedAiAutoMemory(
         Environment environment, AiAutoMemoryPrincipalType principalType, long principalId, long id) {
 
@@ -110,7 +109,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment)")
     public List<EmbeddedAiAutoMemory> getEmbeddedAiAutoMemories(
         Environment environment, @Nullable Long connectedUserId, @Nullable AiAutoMemoryType memoryType) {
 
@@ -124,7 +123,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment)")
     public List<EmbeddedAiAutoMemoryConnectedUser> getEmbeddedAiAutoMemoryConnectedUsers(Environment environment) {
         List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = toEmbeddedAiAutoMemories(
             listEmbeddedMemories(environment, null));
@@ -160,7 +159,10 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
         @AuditData(key = "principalType", value = "#principalType"),
         @AuditData(key = "principalId", value = "#principalId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#principalType == " +
+        "T(com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType).INTEGRATION_INSTANCE " +
+        "? hasPermission(#principalId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        ": hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     public EmbeddedAiAutoMemory updateEmbeddedAiAutoMemory(
         Environment environment, AiAutoMemoryPrincipalType principalType, long principalId, long id,
         long expectedVersion, AiAutoMemoryPatch patch) {

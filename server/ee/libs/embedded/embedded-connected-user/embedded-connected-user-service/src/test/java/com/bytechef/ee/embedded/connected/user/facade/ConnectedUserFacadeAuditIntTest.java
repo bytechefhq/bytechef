@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.connected.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -44,6 +43,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -296,12 +298,21 @@ class ConnectedUserFacadeAuditIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
+            return mock(PermissionService.class, AuditConfiguration::answerAsTenantAdmin);
+        }
 
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+        private static Object answerAsTenantAdmin(InvocationOnMock invocation) throws Throwable {
+            Method method = invocation.getMethod();
 
-            return permissionService;
+            if (method.getReturnType() != boolean.class) {
+                return Answers.RETURNS_DEFAULTS.answer(invocation);
+            }
+
+            if ("isAuthorizationSkipped".equals(method.getName())) {
+                return false;
+            }
+
+            return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
         }
     }
 }

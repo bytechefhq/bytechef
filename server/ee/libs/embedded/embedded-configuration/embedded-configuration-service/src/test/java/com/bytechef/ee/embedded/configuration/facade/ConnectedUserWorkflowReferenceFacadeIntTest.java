@@ -42,6 +42,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -65,6 +66,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -128,6 +130,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -271,6 +274,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private McpAutomationRowFacade mcpAutomationRowFacade;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private PlatformTransactionManager platformTransactionManager;
 
     @Autowired
@@ -287,6 +293,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private WorkflowService workflowService;
+
+    @AfterEach
+    void afterEach() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(false);
+    }
 
     @BeforeEach
     void setUp() {
@@ -1510,6 +1521,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetReferencesJoinsBackToTheOwningConnectedUserInBatch() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
+
         long automationProjectId = createAutomationProject("References");
 
         String firstWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -1597,6 +1610,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetReferencesListsOnlyTheReferencesOfConnectedUsersInTheEnvironment() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
+
         long automationProjectId = createAutomationProject("Environment References");
 
         String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -1800,13 +1815,15 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Nested
-    @MockitoBean(types = ConnectedUserConnectionFacade.class)
     class ProvisionInputs {
 
         private static final String SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
             {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
              "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
             """;
+
+        @MockitoBean
+        private ConnectedUserConnectionReader connectedUserConnectionReader;
 
         private String externalUserId;
 
@@ -1933,7 +1950,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
             when(connectionDTO.id()).thenReturn(connectionId);
             when(connectionDTO.componentName()).thenReturn("slack");
-            when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
                 .thenReturn(List.of(connectionDTO));
             when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
             when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))
