@@ -125,6 +125,20 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedExecutionGates() throws Exception {
+        Class<?> executionFacade = Class.forName(
+            "com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacadeImpl");
+
+        String jobView = "hasPermission(#id, 'Job', 'EXECUTION_VIEW')";
+
+        assertEveryPublicOverloadIsGated(executionFacade, "getWorkflowExecution", jobView);
+        assertEveryPublicOverloadIsGated(executionFacade, "getWorkflowExecutionTaskExecution", jobView);
+        assertEveryPublicOverloadIsGated(
+            executionFacade, "getWorkflowExecutions",
+            "hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId)");
+    }
+
+    @Test
     void testEmbeddedIntegrationGates() throws Exception {
         String base = "com.bytechef.ee.embedded.configuration.facade.";
         Class<?> integrationFacade = Class.forName(base + "IntegrationFacadeImpl");

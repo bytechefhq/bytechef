@@ -142,8 +142,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         @Test
-        void testNonAdminIsDeniedEveryAdminReadBeforeAnyLookup() {
-            when(permissionService.isTenantAdmin()).thenReturn(false);
+        void testCallerWithoutExecutionViewIsDeniedEveryRunReadBeforeAnyLookup() {
+            when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(false);
+            when(permissionService.hasEmbeddedScopeInEveryEnvironment("EXECUTION_VIEW")).thenReturn(false);
 
             assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
                 .isInstanceOf(AccessDeniedException.class);
@@ -163,13 +164,28 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         @Test
-        void testTenantAdminPassesTheGate() {
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+        void testCallerWithExecutionViewPassesTheGate() {
+            when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(true);
 
             assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
                 .isNotInstanceOf(AccessDeniedException.class);
 
             verify(jobService).getJob(1L);
+        }
+
+        @Test
+        void testRunListGateRequiresExecutionViewInTheRequestedEnvironment() {
+            when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.PRODUCTION)).thenReturn(true);
+            when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.DEVELOPMENT)).thenReturn(false);
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                    Environment.DEVELOPMENT.ordinal() + 0L, null, null, null, null, null, null, null, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+            assertThat(
+                integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                    Environment.PRODUCTION.ordinal() + 0L, null, null, null, null, null, null, null, 0)
+                    .getContent()).isEmpty();
         }
 
         @SpringBootConfiguration
@@ -229,6 +245,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         @MockitoBean
         private IntegrationWorkflowFacade integrationWorkflowFacade;
 
+        @MockitoBean
+        private PermissionService permissionService;
+
         @Autowired
         private IntegrationWorkflowRepository integrationWorkflowRepository;
 
@@ -255,6 +274,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
         @BeforeEach
         void beforeEach() {
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+            when(permissionService.hasEmbeddedScope(anyString(), any())).thenReturn(true);
+
             ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
             when(componentDefinition.getTitle()).thenReturn("Title");

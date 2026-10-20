@@ -39,4 +39,15 @@ public record WorkflowExecutionDTO(
             id, integration, integrationInstanceConfiguration, integrationInstance, job, workflow, triggerExecution,
             null, null);
     }
+
+    public WorkflowExecutionDTO withoutDetails() {
+        return new WorkflowExecutionDTO(
+            id, integration, integrationInstanceConfiguration, integrationInstance,
+            job == null ? null : job.withoutDetails(), workflow,
+            triggerExecution == null ? null : triggerExecution.withoutDetails(), focusPath, taskExecutionCount);
+    }
+
+    public boolean isTriggerOnly() {
+        return job == null;
+    }
 }
