@@ -9,7 +9,7 @@ import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected
 import ConnectedUserMcpServerListItemWorkflowRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemWorkflowRow';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     ConnectedUserMcpServer,
     useDeleteConnectedUserMcpServerMutation,
@@ -30,7 +30,8 @@ const ConnectedUserMcpServerListItem = ({
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const isTenantAdmin = useIsTenantAdmin();
+    const canDeleteMcpServer = useHasEmbeddedScope('MCP_DELETE');
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -107,7 +108,7 @@ const ConnectedUserMcpServerListItem = ({
 
                                 <Switch
                                     checked={mcpServer.enabled}
-                                    disabled={!isTenantAdmin}
+                                    disabled={!canEditMcpServer}
                                     onCheckedChange={(value) => {
                                         enableConnectedUserMcpServerMutation.mutate({
                                             connectedUserId: connectedUserId.toString(),
@@ -132,7 +133,7 @@ const ConnectedUserMcpServerListItem = ({
                         {workflowCount > 0 ? (
                             <div aria-hidden="true" className="size-9 shrink-0" />
                         ) : (
-                            isTenantAdmin && (
+                            canDeleteMcpServer && (
                                 <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
                             )
                         )}

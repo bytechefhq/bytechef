@@ -4,6 +4,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 
@@ -14,7 +15,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     connectedUserId: number;
     workflow: ConnectedUserMcpServerWorkflow;
 }) => {
-    const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const queryClient = useQueryClient();
 
@@ -27,6 +28,8 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
             });
         },
     });
+
+    const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
 
     return (
         <li className="flex items-center gap-2 py-0.5">
@@ -55,6 +58,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 
                 <Switch
                     checked={workflow.enabled}
+                    disabled={!canManageConnectedUser}
                     onCheckedChange={(value) => {
                         enableIntegrationInstanceWorkflowMutation.mutate({
                             enable: value,

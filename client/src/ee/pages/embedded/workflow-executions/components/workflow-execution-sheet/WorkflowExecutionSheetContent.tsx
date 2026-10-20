@@ -8,6 +8,7 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {useCallback, useState} from 'react';
@@ -17,6 +18,8 @@ import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionShe
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
     const workflowExecutionId = useWorkflowExecutionSheetStore(useShallow((state) => state.workflowExecutionId));
+
+    const canViewExecutionDetails = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
 
     const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
     const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
@@ -45,7 +48,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
             {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
-            isTaskSelected,
+            isTaskSelected && canViewExecutionDetails,
             false
         );
 
@@ -106,6 +109,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                     <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={60} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
+                            detailsHidden={!canViewExecutionDetails}
                             dialogOpen={dialogOpen}
                             job={job}
                             selectedItem={selectedItem}

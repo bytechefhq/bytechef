@@ -10,12 +10,16 @@ import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/compo
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon, PowerIcon, PowerOffIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUser}) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const queryClient = useQueryClient();
 
@@ -26,6 +30,10 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
             });
         },
     });
+
+    if (!canManageConnectedUser && !canDeleteConnectedUser) {
+        return null;
+    }
 
     return (
         <>
@@ -39,25 +47,29 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                        icon={connectedUser.enabled ? <PowerOffIcon /> : <PowerIcon />}
-                        label={connectedUser.enabled ? 'Disable' : 'Enable'}
-                        onClick={() =>
-                            enableConnectedUserMutation.mutate({
-                                enable: !connectedUser.enabled,
-                                id: connectedUser.id!,
-                            })
-                        }
-                    />
+                    {canManageConnectedUser && (
+                        <DropdownMenuItem
+                            icon={connectedUser.enabled ? <PowerOffIcon /> : <PowerIcon />}
+                            label={connectedUser.enabled ? 'Disable' : 'Enable'}
+                            onClick={() =>
+                                enableConnectedUserMutation.mutate({
+                                    enable: !connectedUser.enabled,
+                                    id: connectedUser.id!,
+                                })
+                            }
+                        />
+                    )}
 
-                    <DropdownMenuSeparator />
+                    {canManageConnectedUser && canDeleteConnectedUser && <DropdownMenuSeparator />}
 
-                    <DropdownMenuItem
-                        icon={<Trash2Icon />}
-                        label="Delete"
-                        onClick={() => setShowDeleteDialog(true)}
-                        variant="destructive"
-                    />
+                    {canDeleteConnectedUser && (
+                        <DropdownMenuItem
+                            icon={<Trash2Icon />}
+                            label="Delete"
+                            onClick={() => setShowDeleteDialog(true)}
+                            variant="destructive"
+                        />
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 
