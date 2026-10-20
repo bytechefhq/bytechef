@@ -461,7 +461,8 @@ class AgentSubflowLauncherIntTest {
                     new ControlTaskDispatcher(eventPublisher),
                     new DefaultTaskDispatcher(
                         eventPublisher,
-                        List.of(new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, null)))));
+                        List.of(new SuspendTaskDispatcherPreSendProcessor(eventPublisher, jobService, taskStateFacade,
+                            null)))));
 
             JobExecutor jobExecutor = new JobExecutor(
                 contextService, SpelEvaluator.create(), eventPublisher, jobService, taskDispatcherChain,

@@ -16,12 +16,16 @@
 
 package com.bytechef.atlas.execution.domain;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Ivica Cardic
  */
 public final class SuspendedJobs {
 
     public static final String JOB_RESUME_ID = "jobResumeId";
+
+    public static final String TASK_EXECUTION_RESUME_ID = "taskExecutionResumeId";
 
     public static final String WAIT_FOR_APPROVAL = "waitForApproval";
 
@@ -35,5 +39,17 @@ public final class SuspendedJobs {
     public static boolean isStoppedByUser(Job job) {
         return job.getStatus() == Job.Status.STOPPED && !isSuspended(job) &&
             !Boolean.TRUE.equals(job.getMetadata(WAIT_FOR_APPROVAL));
+    }
+
+    public static boolean canRunTasks(Job job) {
+        return job.getStatus() == Job.Status.STARTED || isSuspended(job);
+    }
+
+    public static @Nullable Long getSuspendedTaskExecutionId(Job job) {
+        if (job.getMetadata(JOB_RESUME_ID) == null) {
+            return null;
+        }
+
+        return job.getMetadata(TASK_EXECUTION_RESUME_ID) instanceof Number number ? number.longValue() : null;
     }
 }
