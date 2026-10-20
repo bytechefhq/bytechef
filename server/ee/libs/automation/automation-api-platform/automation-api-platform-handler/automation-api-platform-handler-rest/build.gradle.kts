@@ -21,4 +21,6 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
     testImplementation("org.mockito:mockito-core")
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation(project(":server:libs:test:test-support"))
 }
