@@ -35,6 +35,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
@@ -370,7 +371,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testEnableIntegrationInstanceWorkflowAllowsTenantAdminOnAnyInstance() {
+    void testEnableIntegrationInstanceWorkflowAllowsAMemberWithTheManageScopeOnAnyInstance() {
         authenticate(createTenantAdminAuthentication());
 
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceBId, workflowId, true);
@@ -381,7 +382,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testEnableIntegrationInstanceWorkflowDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+    void testEnableIntegrationInstanceWorkflowDeniesCallerWhoIsNeitherAMemberNorConnectedUser() {
         authenticate(
             new UsernamePasswordAuthenticationToken(
                 "user@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
@@ -585,7 +586,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testUpdateIntegrationInstanceWorkflowAllowsTenantAdminOnAnyInstance() {
+    void testUpdateIntegrationInstanceWorkflowAllowsAMemberWithTheManageScopeOnAnyInstance() {
         authenticate(createTenantAdminAuthentication());
 
         integrationInstanceFacade.updateIntegrationInstanceWorkflow(
@@ -806,7 +807,10 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     private Authentication createTenantAdminAuthentication() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.hasResourceScope(any(), eq("IntegrationInstance"), anyString()))
+            .thenReturn(true);
+        when(permissionService.hasResourceScope(any(), eq("ConnectedUser"), anyString()))
+            .thenReturn(true);
 
         return new UsernamePasswordAuthenticationToken(
             "admin@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
@@ -834,7 +838,7 @@ class IntegrationInstanceFacadeIntTest {
         private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
         @Test
-        void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
+        void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndMembersWithoutTheManageScope() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
             assertThatThrownBy(
@@ -861,7 +865,19 @@ class IntegrationInstanceFacadeIntTest {
         }
 
         @Test
-        void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndNonAdmins() {
+        void testProvisionIntegrationInstanceDelegatesForAMemberWithTheManageScope() {
+            authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_MANAGE")).thenReturn(true);
+
+            integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
+
+            verify(connectedUserIntegrationFacade).provisionIntegrationInstance(
+                1L, 2L, Map.of("key", "v"), List.of(), "user");
+        }
+
+        @Test
+        void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndMembersWithoutTheViewScope() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
             assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(1L))
@@ -878,6 +894,17 @@ class IntegrationInstanceFacadeIntTest {
         @Test
         void testGetProvisionableIntegrationsDelegatesForTenantAdmin() {
             authenticate(createTenantAdminAuthentication());
+
+            integrationInstanceFacade.getProvisionableIntegrations(1L);
+
+            verify(connectedUserIntegrationFacade).getProvisionableIntegrations(1L);
+        }
+
+        @Test
+        void testGetProvisionableIntegrationsDelegatesForAMemberWithTheViewScope() {
+            authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_VIEW")).thenReturn(true);
 
             integrationInstanceFacade.getProvisionableIntegrations(1L);
 
@@ -1301,8 +1328,12 @@ class IntegrationInstanceFacadeIntTest {
             @Lazy PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }
