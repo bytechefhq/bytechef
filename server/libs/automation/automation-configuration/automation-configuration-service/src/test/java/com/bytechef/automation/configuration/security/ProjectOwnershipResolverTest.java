@@ -18,13 +18,17 @@ package com.bytechef.automation.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * {@code 'Project'} is the most-used token in the tree, and it is only a check because this resolver is registered for
@@ -38,7 +42,13 @@ import org.junit.jupiter.api.Test;
 class ProjectOwnershipResolverTest {
 
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final ProjectOwnershipResolver resolver = new ProjectOwnershipResolver(projectRepository);
+    private ProjectOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new ProjectOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheProjectGuardsName() {
@@ -54,6 +64,21 @@ class ProjectOwnershipResolverTest {
         when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
 
         assertThat(resolver.resolveOwner(3L)).isEqualTo(ResourceOwner.ofWorkspace(9L));
+    }
+
+    @Test
+    void testResolveOwnerOfAnEmbeddedProjectIsEmbedded() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isEmbeddedProject(3L)).thenReturn(true);
+
+        ProjectOwnershipResolver embeddedAwareResolver = new ProjectOwnershipResolver(
+            new StaticListableBeanFactory(Map.of("embeddedResourceResolver", embeddedResourceResolver))
+                .getBeanProvider(EmbeddedResourceResolver.class),
+            projectRepository);
+
+        assertThat(embeddedAwareResolver.resolveOwner(3L)).isEqualTo(ResourceOwner.ofEmbedded());
+        verifyNoInteractions(projectRepository);
     }
 
     @Test

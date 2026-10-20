@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,10 +35,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectOwnershipResolver implements ResourceOwnershipResolver {
 
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final ProjectRepository projectRepository;
 
     @SuppressFBWarnings("EI")
-    public ProjectOwnershipResolver(ProjectRepository projectRepository) {
+    public ProjectOwnershipResolver(
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        ProjectRepository projectRepository) {
+
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.projectRepository = projectRepository;
     }
 
@@ -48,6 +54,12 @@ public class ProjectOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(id)) {
+            return ResourceOwner.ofEmbedded();
+        }
+
         return fetchProject(id)
             .map(Project::getWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
