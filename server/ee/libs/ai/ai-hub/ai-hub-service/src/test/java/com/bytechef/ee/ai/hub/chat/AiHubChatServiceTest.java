@@ -27,6 +27,7 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
@@ -64,6 +65,7 @@ import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.compaction.CompactionPlan;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -104,6 +106,9 @@ class AiHubChatServiceTest {
     private ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
 
     @Mock
+    private ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider;
+
+    @Mock
     private AiHubSessionMemory aiHubSessionMemory;
 
     @Mock
@@ -125,7 +130,7 @@ class AiHubChatServiceTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry, mock(PlatformTransactionManager.class));
+            inFlightRunRegistry, mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
     }
 
     @AfterEach
@@ -618,6 +623,37 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testDeleteClearsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(1L, "https://example.com/resume");
+
+        when(webhookResumeRegistryProvider.getIfAvailable()).thenReturn(webhookResumeRegistry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        assertThat(webhookResumeRegistry.consume(1L)).isNull();
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testDeleteWithoutAResumeRegistryStillDeletes() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(webhookResumeRegistryProvider).getIfAvailable();
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
     void testDeleteRemovesTheChatsToolApprovals() {
         AiHubChat chat =
             buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
@@ -634,7 +670,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -799,7 +835,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         givenActiveEvents();
 
@@ -972,7 +1008,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1011,7 +1047,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1040,7 +1076,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1072,7 +1108,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1101,7 +1137,7 @@ class AiHubChatServiceTest {
         PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
         AiHubChatServiceImpl serviceWithTransactionManager = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry, transactionManager);
+            inFlightRunRegistry, transactionManager, webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
