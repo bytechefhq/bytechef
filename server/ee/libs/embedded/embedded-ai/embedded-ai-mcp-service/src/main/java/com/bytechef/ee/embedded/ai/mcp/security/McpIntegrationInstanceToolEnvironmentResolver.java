@@ -10,16 +10,15 @@ package com.bytechef.ee.embedded.ai.mcp.security;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.repository.McpIntegrationInstanceToolRepository;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.repository.McpComponentRepository;
-import com.bytechef.platform.mcp.repository.McpServerRepository;
-import com.bytechef.platform.mcp.repository.McpToolRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -32,20 +31,18 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class McpIntegrationInstanceToolEnvironmentResolver implements ResourceEnvironmentResolver {
 
-    private final McpComponentRepository mcpComponentRepository;
-    private final McpServerRepository mcpServerRepository;
-    private final McpToolRepository mcpToolRepository;
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationInstanceService integrationInstanceService;
     private final McpIntegrationInstanceToolRepository mcpIntegrationInstanceToolRepository;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceToolEnvironmentResolver(
-        McpComponentRepository mcpComponentRepository, McpServerRepository mcpServerRepository,
-        McpToolRepository mcpToolRepository,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceService integrationInstanceService,
         McpIntegrationInstanceToolRepository mcpIntegrationInstanceToolRepository) {
 
-        this.mcpComponentRepository = mcpComponentRepository;
-        this.mcpServerRepository = mcpServerRepository;
-        this.mcpToolRepository = mcpToolRepository;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationInstanceService = integrationInstanceService;
         this.mcpIntegrationInstanceToolRepository = mcpIntegrationInstanceToolRepository;
     }
 
@@ -61,12 +58,16 @@ public class McpIntegrationInstanceToolEnvironmentResolver implements ResourceEn
         }
 
         return mcpIntegrationInstanceToolRepository.findById(number.longValue())
-            .map(McpIntegrationInstanceTool::getMcpToolId)
-            .flatMap(mcpToolRepository::findById)
-            .map(McpTool::getMcpComponentId)
-            .flatMap(mcpComponentRepository::findById)
-            .map(McpComponent::getMcpServerId)
-            .flatMap(mcpServerRepository::findById)
-            .map(McpServer::getEnvironment);
+            .map(McpIntegrationInstanceTool::getIntegrationInstanceId)
+            .flatMap(integrationInstanceId -> integrationInstanceService
+                .getIntegrationInstances(List.of(integrationInstanceId))
+                .stream()
+                .findFirst())
+            .map(IntegrationInstance::getIntegrationInstanceConfigurationId)
+            .flatMap(configurationId -> integrationInstanceConfigurationService
+                .getIntegrationInstanceConfigurations(List.of(configurationId))
+                .stream()
+                .findFirst())
+            .map(IntegrationInstanceConfiguration::getEnvironment);
     }
 }

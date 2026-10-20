@@ -10,11 +10,9 @@ package com.bytechef.ee.embedded.ai.mcp.security;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
-import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,15 +38,10 @@ public class EmbeddedMcpServerOwnershipResolver implements ResourceOwnershipReso
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        Optional<McpServer> mcpServer = mcpServerRepository.findById(id);
-
-        if (mcpServer.isPresent() && mcpServer.get()
-            .getType() == PlatformType.EMBEDDED) {
-
-            return ResourceOwner.ofEmbedded();
-        }
-
-        return ResourceOwner.unknown();
+        return mcpServerRepository.findById(id)
+            .filter(mcpServer -> mcpServer.getType() == PlatformType.EMBEDDED)
+            .map(mcpServer -> ResourceOwner.ofEmbedded())
+            .orElseGet(ResourceOwner::unknown);
     }
 
     @Override
