@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
@@ -57,7 +58,6 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Service
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProjectAdminFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserProjectAdminFacadeImpl.class);
@@ -101,8 +101,10 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_DELETED, data = {
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId")
     })
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_DELETE')")
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
-        connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId);
+        runSkippingChecks(() -> connectedUserProjectFacade.deleteProjectWorkflow(connectedUserProjectWorkflowId));
     }
 
     @Override
@@ -110,11 +112,15 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
+    @PreAuthorize("hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', " +
+        "'CONNECTED_USER_MANAGE')")
     public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
-        connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable);
+        runSkippingChecks(
+            () -> connectedUserProjectFacade.enableProjectWorkflow(connectedUserProjectWorkflowId, enable));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(
         long connectedUserId) {
 
@@ -126,11 +132,14 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
+    @PreAuthorize("#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : " +
+        "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         return connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, environment);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableAutomationWorkflowProjectDTO> getProvisionableProjects(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -161,6 +170,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED, data = {
         @AuditData(key = "connectedUserId", value = "#connectedUserId"),
         @AuditData(key = "configurationId", value = "#configurationId"),
@@ -336,5 +346,19 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         return new ProvisionableAutomationWorkflowProjectDTO.Workflow(
             template.workflowUuid(), template.label(), template.inputs(), reference != null,
             reference != null && reference.isDangling());
+    }
+
+    private static void runSkippingChecks(Runnable runnable) {
+        try {
+            AutomationAuthorizationContext.callSkippingChecks(() -> {
+                runnable.run();
+
+                return null;
+            });
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
     }
 }

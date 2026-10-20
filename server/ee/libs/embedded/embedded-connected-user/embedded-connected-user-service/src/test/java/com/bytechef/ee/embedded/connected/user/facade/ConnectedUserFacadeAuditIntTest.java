@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.connected.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -52,6 +51,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -296,12 +296,16 @@ class ConnectedUserFacadeAuditIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
+            return mock(PermissionService.class, invocation -> {
+                Class<?> returnType = invocation.getMethod()
+                    .getReturnType();
 
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+                if (returnType == boolean.class || returnType == Boolean.class) {
+                    return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
+                }
 
-            return permissionService;
+                return Answers.RETURNS_DEFAULTS.answer(invocation);
+            });
         }
     }
 }
