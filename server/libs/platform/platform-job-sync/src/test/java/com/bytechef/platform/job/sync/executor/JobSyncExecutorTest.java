@@ -19,8 +19,10 @@ package com.bytechef.platform.job.sync.executor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +39,8 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.ConvertUtils;
@@ -57,6 +61,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -266,6 +271,64 @@ class JobSyncExecutorTest {
             assertThat(ok).isTrue();
             assertThat(called.get()).isTrue();
         }
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForDeletedJobIsSkipped() {
+        long jobId = 606L;
+
+        when(jobService.fetchJob(jobId)).thenReturn(Optional.empty());
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent);
+
+        verify(jobService, never()).getJob(anyLong());
+    }
+
+    @Test
+    void testTaskExecutionCompleteEventForDeletedJobIsDropped() {
+        long jobId = 607L;
+
+        when(jobService.fetchJob(jobId)).thenReturn(Optional.empty());
+
+        sendTaskExecutionCompleteEvent(jobId);
+
+        verify(taskExecutionService, never()).completeIfNotCancelled(anyLong());
+    }
+
+    @Test
+    void testTaskExecutionCompleteEventForStoppedJobIsDropped() {
+        long jobId = 608L;
+        Job job = mock(Job.class);
+
+        when(job.getStatus()).thenReturn(Job.Status.STOPPED);
+        when(jobService.fetchJob(jobId)).thenReturn(Optional.of(job));
+
+        sendTaskExecutionCompleteEvent(jobId);
+
+        verify(taskExecutionService, never()).completeIfNotCancelled(anyLong());
+    }
+
+    private void sendTaskExecutionCompleteEvent(long jobId) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(2L);
+        taskExecution.setJobId(jobId);
+        taskExecution.setRetryDelay("1S");
+
+        TaskExecutionCompleteEvent taskExecutionCompleteEvent = new TaskExecutionCompleteEvent(taskExecution);
+
+        taskExecutionCompleteEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        memoryMessageBroker.send(taskExecutionCompleteEvent.getRoute(), taskExecutionCompleteEvent);
     }
 
     @Test
