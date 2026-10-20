@@ -1,0 +1,3 @@
+mutation RemoveEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!) {
+    removeEmbeddedUserEnvironmentRole(userId: $userId, environment: $environment)
+}

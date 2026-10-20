@@ -1132,6 +1132,11 @@ export type CreateDataTableInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
+export type CreateEmbeddedApiKeyInput = {
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+};
+
 export type CreateEmbeddedMcpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
@@ -1486,6 +1491,24 @@ export type EmbeddedGettingStartedFailedCall = {
   createdDate: Scalars['Long']['output'];
   errorMessage?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
+};
+
+export type EmbeddedUser = {
+  __typename?: 'EmbeddedUser';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  /** Custom role ID, null if using a built-in role */
+  customRoleId?: Maybe<Scalars['ID']['output']>;
+  /** Built-in embedded role, null if using a custom role */
+  embeddedRole?: Maybe<WorkspaceRole>;
+  /** The environment this role applies to, or null when it applies to every environment */
+  environment?: Maybe<EnvironmentEnum>;
+  /** Membership row id, or null for an inherited entry which has no row */
+  id?: Maybe<Scalars['ID']['output']>;
+  /** True when the entry is a tenant admin, who administers the embedded side and has no row */
+  inherited: Scalars['Boolean']['output'];
+  /** The person behind the membership, or null when no account answers to `userId` */
+  user?: Maybe<WorkspaceUserInfo>;
+  userId: Scalars['ID']['output'];
 };
 
 export type EndpointDefinitionInput = {
@@ -2150,6 +2173,10 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  /** Add a user as an embedded member with a built-in role. */
+  addEmbeddedUser: EmbeddedUser;
+  /** Add an existing user, found by email, as an embedded member with a built-in role. */
+  addEmbeddedUserByEmail: EmbeddedUser;
   /**
    * Add a user to a workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of the
    * workspace, so a member holding it in only some of them is denied. Supply exactly one of `role` or
@@ -2185,6 +2212,7 @@ export type Mutation = {
   /** Create a tenant-global custom role, assignable in every workspace. Requires tenant admin. */
   createCustomRole: CustomRole;
   createDataTable: Scalars['Boolean']['output'];
+  createEmbeddedApiKey?: Maybe<Scalars['String']['output']>;
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
@@ -2227,11 +2255,7 @@ export type Mutation = {
   /** Delete a custom role. Fails if it is still assigned to any member. Requires tenant admin. */
   deleteCustomRole: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
-  /**
-   * Deletes an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment or is not
-   * an Embedded owner. Admin only.
-   */
-  deleteEmbeddedAiAutoMemory: Scalars['Boolean']['output'];
+  deleteEmbeddedApiKey?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpTool?: Maybe<Scalars['Boolean']['output']>;
@@ -2297,6 +2321,10 @@ export type Mutation = {
   publishAutomationProject: Scalars['Boolean']['output'];
   publishCustomComponent: CustomComponent;
   removeDataTableColumn: Scalars['Boolean']['output'];
+  /** Remove a user from the embedded members. */
+  removeEmbeddedUser: Scalars['Boolean']['output'];
+  /** Remove an embedded member's role in one environment. */
+  removeEmbeddedUserEnvironmentRole: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   /**
    * Remove a user from a workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of
@@ -2320,6 +2348,8 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  /** Give an embedded member a role in one environment. */
+  setEmbeddedUserEnvironmentRole: EmbeddedUser;
   /**
    * Give a member a role in one environment. The first such call switches the member from a
    * single workspace-wide role to per-environment roles, deleting their workspace-wide row.
@@ -2376,17 +2406,15 @@ export type Mutation = {
   updateCustomRole: CustomRole;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
-  /**
-   * Partial update of an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment
-   * or is not an Embedded owner, and with CONFLICT when it changed since expectedVersion. Admin only.
-   */
-  updateEmbeddedAiAutoMemory: EmbeddedAiAutoMemory;
+  updateEmbeddedApiKey?: Maybe<ApiKey>;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
   updateEmbeddedMcpServer?: Maybe<McpServer>;
   updateEmbeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateEmbeddedMcpServerUrl?: Maybe<McpServer>;
   updateEmbeddedMcpTool?: Maybe<McpTool>;
   updateEmbeddedMcpToolEnabled?: Maybe<McpTool>;
+  /** Update an embedded member's role. */
+  updateEmbeddedUserRole: EmbeddedUser;
   updateIdentityProvider: IdentityProviderType;
   updateIntegrationCodeWorkflowSource: Scalars['Boolean']['output'];
   updateIntegrationWorkflowPermissionExpression?: Maybe<IntegrationWorkflow>;
@@ -2421,6 +2449,18 @@ export type Mutation = {
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
+};
+
+
+export type MutationAddEmbeddedUserArgs = {
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationAddEmbeddedUserByEmailArgs = {
+  email: Scalars['String']['input'];
+  role: WorkspaceRole;
 };
 
 
@@ -2586,6 +2626,11 @@ export type MutationCreateCustomRoleArgs = {
 
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
+};
+
+
+export type MutationCreateEmbeddedApiKeyArgs = {
+  input: CreateEmbeddedApiKeyInput;
 };
 
 
@@ -2779,11 +2824,8 @@ export type MutationDeleteDataTableRowArgs = {
 };
 
 
-export type MutationDeleteEmbeddedAiAutoMemoryArgs = {
-  environment: Scalars['Int']['input'];
+export type MutationDeleteEmbeddedApiKeyArgs = {
   id: Scalars['ID']['input'];
-  principalId: Scalars['ID']['input'];
-  principalType: AiAutoMemoryPrincipalType;
 };
 
 
@@ -3093,6 +3135,17 @@ export type MutationRemoveDataTableColumnArgs = {
 };
 
 
+export type MutationRemoveEmbeddedUserArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveEmbeddedUserEnvironmentRoleArgs = {
+  environment: EnvironmentEnum;
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveFileInSkillArgs = {
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
@@ -3166,6 +3219,13 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetEmbeddedUserEnvironmentRoleArgs = {
+  environment: EnvironmentEnum;
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -3413,8 +3473,8 @@ export type MutationUpdateDataTableTagsArgs = {
 };
 
 
-export type MutationUpdateEmbeddedAiAutoMemoryArgs = {
-  input: UpdateEmbeddedAiAutoMemoryInput;
+export type MutationUpdateEmbeddedApiKeyArgs = {
+  input: UpdateEmbeddedApiKeyInput;
 };
 
 
@@ -3451,6 +3511,12 @@ export type MutationUpdateEmbeddedMcpToolArgs = {
 export type MutationUpdateEmbeddedMcpToolEnabledArgs = {
   enabled: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateEmbeddedUserRoleArgs = {
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -4070,19 +4136,16 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
-  /**
-   * Lists the memories of every Embedded integration instance and automation deployment in the environment (the Environment ordinal: 0
-   * DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
-   */
-  embeddedAiAutoMemories: Array<EmbeddedAiAutoMemory>;
-  /** The connected users holding at least one memory in the environment. Admin only. */
-  embeddedAiAutoMemoryConnectedUsers: Array<EmbeddedAiAutoMemoryConnectedUser>;
+  embeddedApiKey?: Maybe<ApiKey>;
+  embeddedApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   embeddedGettingStarted: EmbeddedGettingStarted;
   embeddedGettingStartedCompleted: Scalars['Boolean']['output'];
   embeddedMcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  /** List the embedded members of the tenant. Requires the embedded member view scope. */
+  embeddedUsers: Array<EmbeddedUser>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
@@ -4137,6 +4200,11 @@ export type Query = {
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  /**
+   * Returns the embedded scope names the current user holds. With `environment`, only the scopes held in that
+   * environment. Without it, the scopes held in at least one environment.
+   */
+  myEmbeddedScopes: Array<Scalars['String']['output']>;
   /** Returns the workspace role name for the current user in the given workspace */
   myWorkspaceRole?: Maybe<Scalars['String']['output']>;
   /**
@@ -4722,15 +4790,13 @@ export type QueryEditorTaskExecutionFileLogsArgs = {
 };
 
 
-export type QueryEmbeddedAiAutoMemoriesArgs = {
-  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
-  environment: Scalars['Int']['input'];
-  memoryType?: InputMaybe<AiAutoMemoryType>;
+export type QueryEmbeddedApiKeyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
-export type QueryEmbeddedAiAutoMemoryConnectedUsersArgs = {
-  environment: Scalars['Int']['input'];
+export type QueryEmbeddedApiKeysArgs = {
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -4971,6 +5037,11 @@ export type QueryMcpToolArgs = {
 
 export type QueryMcpToolsByComponentIdArgs = {
   mcpComponentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMyEmbeddedScopesArgs = {
+  environment?: InputMaybe<EnvironmentEnum>;
 };
 
 
@@ -5522,22 +5593,9 @@ export type UpdateDataTableTagsInput = {
   tags?: InputMaybe<Array<TagInput>>;
 };
 
-/**
- * A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
- * content is rejected.
- */
-export type UpdateEmbeddedAiAutoMemoryInput = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  environment: Scalars['Int']['input'];
-  expectedVersion: Scalars['Long']['input'];
+export type UpdateEmbeddedApiKeyInput = {
   id: Scalars['ID']['input'];
-  memoryType?: InputMaybe<AiAutoMemoryType>;
-  /** The memory's principalId. */
-  principalId: Scalars['ID']['input'];
-  /** The memory's principalType. */
-  principalType: AiAutoMemoryPrincipalType;
-  title?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export type UpdateKnowledgeBaseDocumentTagsInput = {
