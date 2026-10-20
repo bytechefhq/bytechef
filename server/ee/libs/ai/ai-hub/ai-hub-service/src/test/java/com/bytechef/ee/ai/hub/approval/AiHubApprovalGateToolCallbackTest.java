@@ -150,7 +150,7 @@ class AiHubApprovalGateToolCallbackTest {
         @SuppressWarnings("unchecked")
         AiHubChatService notDeletedChatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, mock(ObjectProvider.class), registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), mock(ObjectProvider.class));
 
         AiHubChat chat = new AiHubChat(USER_ID);
 
