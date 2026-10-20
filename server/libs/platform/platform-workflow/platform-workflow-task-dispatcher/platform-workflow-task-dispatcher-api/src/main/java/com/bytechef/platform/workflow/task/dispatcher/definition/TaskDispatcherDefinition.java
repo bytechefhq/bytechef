@@ -34,6 +34,15 @@ public interface TaskDispatcherDefinition {
     int VERSION_1 = 1;
 
     /**
+     * Tells whether the task dispatcher is deprecated and should be replaced in workflows that still use it.
+     *
+     * @return {@code true} if the task dispatcher is deprecated, {@code false} otherwise
+     */
+    default boolean getDeprecated() {
+        return false;
+    }
+
+    /**
      * Returns the human-readable description of the task dispatcher, explaining what it does.
      *
      * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise

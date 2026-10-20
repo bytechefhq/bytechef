@@ -36,7 +36,10 @@ public class WaitForApprovalTaskDispatcherDefinitionFactory implements TaskDispa
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher("waitForApproval")
         .title("Wait for Approval")
-        .description("Allows a person to review and either approve or reject requests.")
+        .deprecated(true)
+        .description(
+            "Deprecated: use the Request Approval action of the Approval component instead. Allows a person to " +
+                "review and either approve or reject requests.")
         .icon("path:assets/wait-for-approval.svg")
         .output(
             outputSchema(object().properties(bool("approved"))), sampleOutput(Map.of("approved", true)));
