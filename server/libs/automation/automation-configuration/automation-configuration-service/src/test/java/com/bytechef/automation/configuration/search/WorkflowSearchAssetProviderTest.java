@@ -62,6 +62,31 @@ class WorkflowSearchAssetProviderTest {
             .containsExactly(3L);
     }
 
+    @Test
+    void testWorkflowSearchSkipsEmbeddedProjects() {
+        ProjectService projectService = mock(ProjectService.class);
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+        WorkflowService workflowService = mock(WorkflowService.class);
+
+        when(projectService.getWorkspaceProjectIds(10L)).thenReturn(List.of(200L));
+
+        List<ProjectWorkflow> projectWorkflows = List.of(
+            createProjectWorkflow(1L, 200L, "w1"), createProjectWorkflow(2L, 300L, "w2"),
+            createProjectWorkflow(3L, 400L, "w3"));
+        List<Workflow> workflows = List.of(createWorkflow("w1", "Order own"));
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(projectWorkflows);
+        when(workflowService.getWorkflows(List.of("w1"))).thenReturn(workflows);
+
+        WorkflowSearchAssetProvider workflowSearchAssetProvider = new WorkflowSearchAssetProvider(
+            projectService, projectWorkflowService, workflowService);
+
+        List<WorkflowSearchResult> results = workflowSearchAssetProvider.search("order", 10, Set.of(10L));
+
+        assertThat(results).extracting(WorkflowSearchResult::id)
+            .containsExactly(1L);
+    }
+
     private static ProjectWorkflow createProjectWorkflow(long id, long projectId, String workflowId) {
         ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
 
