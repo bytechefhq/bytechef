@@ -1,0 +1,39 @@
+extend type Query {
+    "List the embedded members of the tenant. Requires the embedded member view scope."
+    embeddedUsers: [EmbeddedUser!]!
+    """
+    Returns the embedded scope names the current user holds. With `environment`, only the scopes held in that
+    environment. Without it, the scopes held in at least one environment.
+    """
+    myEmbeddedScopes(environment: EnvironmentEnum): [String!]!
+}
+
+extend type Mutation {
+    "Add a user as an embedded member with a built-in role."
+    addEmbeddedUser(userId: ID!, role: WorkspaceRole!): EmbeddedUser!
+    "Update an embedded member's role."
+    updateEmbeddedUserRole(userId: ID!, role: WorkspaceRole!): EmbeddedUser!
+    "Remove a user from the embedded members."
+    removeEmbeddedUser(userId: ID!): Boolean!
+    "Give an embedded member a role in one environment."
+    setEmbeddedUserEnvironmentRole(userId: ID!, environment: EnvironmentEnum!, role: WorkspaceRole!): EmbeddedUser!
+    "Remove an embedded member's role in one environment."
+    removeEmbeddedUserEnvironmentRole(userId: ID!, environment: EnvironmentEnum!): Boolean!
+}
+
+type EmbeddedUser {
+    "Membership row id, or null for an inherited entry which has no row"
+    id: ID
+    userId: ID!
+    "Built-in embedded role, null if using a custom role"
+    embeddedRole: WorkspaceRole
+    "Custom role ID, null if using a built-in role"
+    customRoleId: ID
+    "True when the entry is a tenant admin, who administers the embedded side and has no row"
+    inherited: Boolean!
+    "The person behind the membership, or null when no account answers to `userId`"
+    user: WorkspaceUserInfo
+    createdDate: String
+    "The environment this role applies to, or null when it applies to every environment"
+    environment: EnvironmentEnum
+}
