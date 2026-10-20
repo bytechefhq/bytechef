@@ -321,21 +321,24 @@ public class WorkspaceConnectionFacadeIntTest {
         workspaceConnectionRepository.save(new WorkspaceConnection(10L, workspace.getId()));
         workspaceConnectionRepository.save(new WorkspaceConnection(20L, otherWorkspace.getId()));
 
-        Connection connection = createConnection(ConnectionStatus.ACTIVE, 0);
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(10L)
+            .tags(List.of(workspaceTag))
+            .build();
+        ConnectionDTO otherConnectionDTO = ConnectionDTO.builder()
+            .id(20L)
+            .tags(List.of(otherWorkspaceTag))
+            .build();
 
-        connection.setTags(List.of(workspaceTag));
+        when(connectionFacade.getConnections(null, null, List.of(10L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections(null, null, List.of(20L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of(otherConnectionDTO));
 
-        Connection otherConnection = createConnection(ConnectionStatus.ACTIVE, 0);
-
-        otherConnection.setTags(List.of(otherWorkspaceTag));
-
-        when(connectionService.getConnections(List.of(10L))).thenReturn(List.of(connection));
-        when(connectionService.getConnections(List.of(20L))).thenReturn(List.of(otherConnection));
-
-        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId()))
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId(), null))
             .extracting(Tag::getName)
             .containsExactly("workspace-connection-tag");
-        assertThat(workspaceConnectionFacade.getConnectionTags(otherWorkspace.getId()))
+        assertThat(workspaceConnectionFacade.getConnectionTags(otherWorkspace.getId(), null))
             .extracting(Tag::getName)
             .containsExactly("other-workspace-connection-tag");
     }
@@ -346,13 +349,20 @@ public class WorkspaceConnectionFacadeIntTest {
 
         workspaceConnectionRepository.save(new WorkspaceConnection(30L, workspace.getId()));
 
-        Connection embeddedConnection = createEmbeddedConnection();
+        ConnectionDTO embeddedConnectionDTO = ConnectionDTO.builder()
+            .id(30L)
+            .tags(List.of(embeddedTag))
+            .build();
 
-        embeddedConnection.setTags(List.of(embeddedTag));
+        when(connectionFacade.getConnections(null, null, List.of(30L), null, null, PlatformType.EMBEDDED))
+            .thenReturn(List.of(embeddedConnectionDTO));
+        when(connectionFacade.getConnections(null, null, List.of(30L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of());
 
-        when(connectionService.getConnections(List.of(30L))).thenReturn(List.of(embeddedConnection));
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId(), null)).isEmpty();
 
-        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId())).isEmpty();
+        verify(connectionFacade).getConnections(null, null, List.of(30L), null, null, PlatformType.AUTOMATION);
+        verify(connectionFacade, never()).getConnections(null, null, List.of(30L), null, null, PlatformType.EMBEDDED);
     }
 
     @Test
@@ -391,7 +401,9 @@ public class WorkspaceConnectionFacadeIntTest {
         when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
         when(connectionFacade.getConnection(1L)).thenReturn(connectionDTO);
 
-        assertThat(workspaceConnectionFacade.getConnection(1L)).isSameAs(connectionDTO);
+        ConnectionDTO resultConnectionDTO = workspaceConnectionFacade.getConnection(1L);
+
+        assertThat(resultConnectionDTO.id()).isEqualTo(1L);
     }
 
     @Test
