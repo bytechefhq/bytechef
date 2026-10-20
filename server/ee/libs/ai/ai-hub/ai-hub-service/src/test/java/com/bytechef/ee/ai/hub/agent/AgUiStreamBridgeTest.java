@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongConsumer;
@@ -440,6 +441,45 @@ class AgUiStreamBridgeTest {
         assertThat(emittedEventTypes).containsExactly(
             TextMessageStartEvent.class, TextMessageContentEvent.class, TextMessageEndEvent.class,
             RunFinishedEvent.class);
+        assertThat(finalizeCount.get()).isEqualTo(1);
+    }
+
+    @Test
+    void testJobIdCallbackRunsWithoutHoldingTheDispatchLock() throws InterruptedException {
+        CountDownLatch callbackEnteredLatch = new CountDownLatch(1);
+        CountDownLatch completeFinishedLatch = new CountDownLatch(1);
+        AtomicBoolean completedWhileCallbackRunning = new AtomicBoolean();
+
+        AgUiStreamBridge lockProbeBridge = newBridge(jobId -> {
+            callbackEnteredLatch.countDown();
+
+            try {
+                completedWhileCallbackRunning.set(completeFinishedLatch.await(2, TimeUnit.SECONDS));
+            } catch (InterruptedException exception) {
+                Thread.currentThread()
+                    .interrupt();
+            }
+        });
+
+        Thread streamThread = new Thread(
+            () -> lockProbeBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", "5"))));
+
+        streamThread.start();
+
+        assertThat(callbackEnteredLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+        Thread listenerThread = new Thread(() -> {
+            lockProbeBridge.onComplete();
+
+            completeFinishedLatch.countDown();
+        });
+
+        listenerThread.start();
+
+        streamThread.join(5000);
+        listenerThread.join(5000);
+
+        assertThat(completedWhileCallbackRunning.get()).isTrue();
         assertThat(finalizeCount.get()).isEqualTo(1);
     }
 
