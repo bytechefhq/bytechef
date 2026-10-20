@@ -68,6 +68,14 @@ beforeEach(() => {
 });
 
 describe('useRecordReferencedArtifacts', () => {
+    it('records nothing while disabled, as for a workflow chat', () => {
+        aiHubTabsStore.setState({activeChatId: 10, openTabs: [workflowTab]});
+
+        renderHook(() => useRecordReferencedArtifacts(10, 1, false), {wrapper: wrap(new QueryClient())});
+
+        expect(mutateSpy).not.toHaveBeenCalled();
+    });
+
     it('records an open workflow tab as WORKFLOW_REFERENCED with its project metadata', () => {
         aiHubTabsStore.setState({activeChatId: 10, openTabs: [workflowTab]});
 
