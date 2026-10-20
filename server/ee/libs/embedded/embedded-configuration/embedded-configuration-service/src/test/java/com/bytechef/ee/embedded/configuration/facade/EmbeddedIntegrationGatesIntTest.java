@@ -56,10 +56,12 @@ import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheServic
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
@@ -144,7 +146,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectedUserService.class, ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, JobFacade.class, JobService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
+    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class,

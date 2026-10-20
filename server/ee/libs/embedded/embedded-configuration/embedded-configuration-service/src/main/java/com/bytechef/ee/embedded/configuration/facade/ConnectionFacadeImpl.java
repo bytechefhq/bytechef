@@ -11,6 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -55,6 +56,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +70,9 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
+    private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
+    private static final String CONNECTION_TYPE = "Connection";
+
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectedUserProjectService connectedUserProjectService;
@@ -78,6 +83,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final PermissionService permissionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -94,6 +100,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
+        @Lazy PermissionService permissionService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -108,6 +115,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.permissionService = permissionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -153,7 +161,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public ConnectionDTO getConnection(long id) {
         requireAdminConnection(id);
 
-        return connectionFacade.getConnection(id);
+        ConnectionDTO connectionDTO = connectionFacade.getConnection(id);
+
+        return permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT)
+            ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -172,9 +183,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Set<Long> connectedUserOwnedConnectionIds =
             connectedUserConnectionMembership.getConnectedUserOwnedConnectionIds(connectionIds);
 
-        return connectionDTOs.stream()
-            .filter(connectionDTO -> !connectedUserOwnedConnectionIds.contains(connectionDTO.id()))
-            .toList();
+        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
+        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            if (connectedUserOwnedConnectionIds.contains(connectionDTO.id())) {
+                continue;
+            }
+
+            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
+                connectionDTO.environmentId(),
+                connectionEnvironmentId -> permissionService.hasResourceScope(
+                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+
+            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+        }
+
+        return redactedConnectionDTOs;
     }
 
     @Override

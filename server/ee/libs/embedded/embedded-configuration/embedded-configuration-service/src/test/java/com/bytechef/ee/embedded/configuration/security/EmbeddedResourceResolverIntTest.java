@@ -64,7 +64,7 @@ class EmbeddedResourceResolverIntTest {
         integrationWorkflowRepository.deleteAll();
         integrationRepository.deleteAll();
 
-        jdbcTemplate.update("DELETE FROM automation_workflow_project");
+        jdbcTemplate.update("DELETE FROM automation_project");
         jdbcTemplate.update("DELETE FROM connected_user_project");
         jdbcTemplate.update("DELETE FROM project");
         jdbcTemplate.update("DELETE FROM workspace");
@@ -129,7 +129,7 @@ class EmbeddedResourceResolverIntTest {
         long automationHubProjectId = insertProject(workspaceId);
         long connectedUserProjectId = insertProject(workspaceId);
 
-        jdbcTemplate.update("INSERT INTO automation_workflow_project (project_id) VALUES (?)", automationHubProjectId);
+        jdbcTemplate.update("INSERT INTO automation_project (project_id) VALUES (?)", automationHubProjectId);
         jdbcTemplate.update(
             "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)",
             connectedUserProjectId);
