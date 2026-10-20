@@ -25,6 +25,7 @@ import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -111,6 +112,73 @@ class WorkflowExecutionDTOTest {
         assertThat(redactedTriggerExecutionDTO.input()).isNull();
         assertThat(redactedTriggerExecutionDTO.output()).isNull();
         assertThat(redactedTriggerExecutionDTO.state()).isNull();
+    }
+
+    @Test
+    void testWithoutDetailsClearsChildrenAndIterations() {
+        WorkflowTask onErrorWorkflowTask = new WorkflowTask(
+            Map.of(
+                "name", "onError", "type", "on-error/v1",
+                "parameters", Map.of(
+                    "main-branch", List.of(Map.of("name", "mainTask", "type", "test/v1")),
+                    "on-error-branch", List.of(Map.of("name", "errorTask", "type", "test/v1")))));
+        WorkflowTask plainWorkflowTask = new WorkflowTask(Map.of("name", "plain", "type", "test/v1"));
+
+        List<TaskExecutionDTO> flatTaskExecutionDTOs = List.of(
+            taskExecutionDTO(1L, null, onErrorWorkflowTask),
+            taskExecutionDTO(2L, 1L, new WorkflowTask(Map.of("name", "mainTask", "type", "test/v1"))),
+            taskExecutionDTO(3L, 1L, new WorkflowTask(Map.of("name", "errorTask", "type", "test/v1"))),
+            taskExecutionDTO(4L, null, plainWorkflowTask),
+            taskExecutionDTO(5L, 4L, new WorkflowTask(Map.of("name", "nested", "type", "test/v1"))));
+
+        List<TaskExecutionDTO> hierarchy = TaskExecutionDTO.buildHierarchy(flatTaskExecutionDTOs);
+
+        assertThat(hierarchy.stream()
+            .anyMatch(taskExecutionDTO -> !taskExecutionDTO.iterations()
+                .isEmpty())).isTrue();
+        assertThat(hierarchy.stream()
+            .anyMatch(taskExecutionDTO -> !taskExecutionDTO.children()
+                .isEmpty())).isTrue();
+
+        WorkflowExecutionDTO workflowExecutionDTO = new WorkflowExecutionDTO(
+            7L, mock(Integration.class), null, null,
+            new JobDTO(new Job(7L), Map.of("secret", "job-output"), hierarchy), mock(Workflow.class), null);
+
+        JobDTO redactedJobDTO = Objects.requireNonNull(
+            workflowExecutionDTO.withoutDetails()
+                .job());
+
+        for (TaskExecutionDTO taskExecutionDTO : redactedJobDTO.taskExecutions()) {
+            assertNestedTaskExecutionIsRedacted(taskExecutionDTO);
+        }
+    }
+
+    private static void assertNestedTaskExecutionIsRedacted(TaskExecutionDTO taskExecutionDTO) {
+        assertThat(taskExecutionDTO.input()).isNull();
+        assertThat(taskExecutionDTO.output()).isNull();
+        assertThat(taskExecutionDTO.error()).isNull();
+
+        for (TaskExecutionDTO child : taskExecutionDTO.children()) {
+            assertNestedTaskExecutionIsRedacted(child);
+        }
+
+        for (List<TaskExecutionDTO> iteration : taskExecutionDTO.iterations()) {
+            for (TaskExecutionDTO iterationTaskExecutionDTO : iteration) {
+                assertNestedTaskExecutionIsRedacted(iterationTaskExecutionDTO);
+            }
+        }
+    }
+
+    private static TaskExecutionDTO taskExecutionDTO(long id, Long parentId, WorkflowTask workflowTask) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(id)
+            .jobId(7L)
+            .parentId(parentId)
+            .error(new ExecutionError("failed", List.of()))
+            .workflowTask(workflowTask)
+            .build();
+
+        return new TaskExecutionDTO(taskExecution, "Task", "icon", Map.of("secret", "input"), "output", null);
     }
 
     @Test

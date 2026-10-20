@@ -190,7 +190,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                integrationInstance.getIntegrationInstanceConfigurationId());
+                integrationInstance.getIntegrationInstanceConfigurationId())
+                .withoutConnectionParameters();
 
         if (rootJobId != id &&
             !Objects.equals(integrationInstanceConfiguration.getIntegrationId(), integration.getId())) {
@@ -396,7 +397,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 .collect(Collectors.toMap(
                     integrationInstanceConfiguration -> Validate.notNull(
                         integrationInstanceConfiguration.getId(), "id"),
-                    Function.identity()));
+                    IntegrationInstanceConfiguration::withoutConnectionParameters));
 
         List<TriggerExecution> triggerExecutions = triggerExecutionService.getJobTriggerExecutions(jobIds);
 
@@ -426,10 +427,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             boolean detailsVisible;
             IntegrationInstanceConfiguration configuration = workflowExecutionDTO.integrationInstanceConfiguration();
 
-            if (workflowExecutionDTO.isTriggerOnly()) {
-                detailsVisible = permissionService.hasResourceScope(
-                    workflowExecutionDTO.id(), "Job", EXECUTION_DETAILS_VIEW);
-            } else if (configuration == null) {
+            if (workflowExecutionDTO.isTriggerOnly() || configuration == null) {
                 if (tenantAdmin[0] == null) {
                     tenantAdmin[0] = permissionService.isTenantAdmin();
                 }
@@ -488,12 +486,14 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
         if (integrationInstanceConfigurationId != null) {
             if (environmentId != null) {
-                IntegrationInstanceConfiguration integrationInstanceConfiguration =
-                    integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                        integrationInstanceConfigurationId);
+                List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+                    integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                        List.of(integrationInstanceConfigurationId));
+                Environment environment = environmentService.getEnvironment(environmentId);
 
-                if (integrationInstanceConfiguration.getEnvironment() != environmentService.getEnvironment(
-                    environmentId)) {
+                if (integrationInstanceConfigurations.isEmpty()
+                    || integrationInstanceConfigurations.getFirst()
+                        .getEnvironment() != environment) {
 
                     return List.of();
                 }

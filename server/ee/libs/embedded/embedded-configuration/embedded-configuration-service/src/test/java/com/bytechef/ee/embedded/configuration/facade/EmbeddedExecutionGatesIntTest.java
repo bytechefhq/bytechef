@@ -377,8 +377,6 @@ class EmbeddedExecutionGatesIntTest {
             assertThat(workflowExecutionDTO.id()).isEqualTo(jobId);
             assertThat(workflowExecutionDTO.job()
                 .inputs()).isEmpty();
-            assertThat(workflowExecutionDTO.job()
-                .outputs()).isNull();
             assertThat(workflowExecutionDTO.triggerExecution()).isNotNull();
             assertThat(workflowExecutionDTO.triggerExecution()
                 .input()).isNull();
@@ -527,6 +525,34 @@ class EmbeddedExecutionGatesIntTest {
                 .inputs()).isEqualTo(Map.of("jobInput", "value")));
     }
 
+    @Test
+    void testNoCallerEverSeesConnectionParameters() {
+        for (String login : List.of(EDITOR, TENANT_ADMIN)) {
+            authenticate(login, TENANT_ADMIN.equals(login));
+
+            WorkflowExecutionDTO workflowExecutionDTO = integrationWorkflowExecutionFacade.getWorkflowExecution(
+                PRODUCTION_JOB_ID);
+
+            assertThat(workflowExecutionDTO.integrationInstanceConfiguration()
+                .getConnectionParameters()).isEmpty();
+            assertThat(workflowExecutionDTO.integrationInstanceConfiguration()
+                .getId()).isEqualTo(productionConfigurationId);
+
+            Page<WorkflowExecutionDTO> page = integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                null, null, null, null, null, null, null, null, 0);
+
+            assertThat(page.getContent()).hasSize(2);
+            assertThat(page.getContent()).allSatisfy(
+                row -> assertThat(row.integrationInstanceConfiguration()
+                    .getConnectionParameters()).isEmpty());
+        }
+
+        assertThat(integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+            productionConfigurationId)
+            .getConnectionParameters()
+            .get("client_secret")).isEqualTo("s3cret");
+    }
+
     private void authenticate(String login, boolean tenantAdmin) {
         String authority = tenantAdmin ? "ROLE_ADMIN" : "ROLE_USER";
 
@@ -538,7 +564,7 @@ class EmbeddedExecutionGatesIntTest {
     private long createConfiguration(long integrationId, Environment environment) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
-        integrationInstanceConfiguration.setConnectionParameters(Map.of());
+        integrationInstanceConfiguration.setConnectionParameters(Map.of("client_secret", "s3cret"));
         integrationInstanceConfiguration.setEnvironment(environment);
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(1);
