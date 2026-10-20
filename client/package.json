@@ -136,7 +136,7 @@
         "recharts": "^3.10.1",
         "remark-gfm": "^4.0.1",
         "requireindex": "^1.2.0",
-        "sanitize-html": "^2.17.7",
+        "sanitize-html": "^2.18.0",
         "sonner": "^2.0.8",
         "tailwind-merge": "^3.7.0",
         "tippy.js": "^6.3.7",
