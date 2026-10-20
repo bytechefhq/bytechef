@@ -26,8 +26,11 @@ import com.agui.core.event.TextMessageStartEvent;
 import com.agui.core.event.ToolCallEndEvent;
 import com.agui.core.event.ToolCallStartEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongConsumer;
@@ -390,6 +393,70 @@ class AgUiStreamBridgeTest {
         bridge.onEvent(Map.of("event", "result", "result", Map.of("message", "streamed text")));
 
         verify(subscriber, times(1)).onTextMessageContentEvent(any());
+    }
+
+    @Test
+    void testChunkRacingCompletionIsNeverEmittedAfterRunFinished() throws InterruptedException {
+        List<BaseEvent> emittedEvents = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch chunkDispatchEnteredLatch = new CountDownLatch(1);
+        CountDownLatch chunkDispatchReleaseLatch = new CountDownLatch(1);
+
+        doAnswer(invocation -> {
+            BaseEvent event = invocation.getArgument(0);
+
+            if (event instanceof TextMessageStartEvent) {
+                chunkDispatchEnteredLatch.countDown();
+
+                assertThat(chunkDispatchReleaseLatch.await(5, TimeUnit.SECONDS)).isTrue();
+            }
+
+            emittedEvents.add(event);
+
+            return null;
+        }).when(subscriber)
+            .onEvent(any(BaseEvent.class));
+
+        Thread streamThread = new Thread(() -> bridge.onEvent("late chunk"));
+
+        streamThread.start();
+
+        assertThat(chunkDispatchEnteredLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+        Thread listenerThread = new Thread(bridge::onComplete);
+
+        listenerThread.start();
+
+        awaitBlockedOrTerminated(listenerThread);
+
+        chunkDispatchReleaseLatch.countDown();
+
+        streamThread.join(5000);
+        listenerThread.join(5000);
+
+        List<Class<?>> emittedEventTypes = emittedEvents.stream()
+            .<Class<?>>map(Object::getClass)
+            .toList();
+
+        assertThat(emittedEventTypes).containsExactly(
+            TextMessageStartEvent.class, TextMessageContentEvent.class, TextMessageEndEvent.class,
+            RunFinishedEvent.class);
+        assertThat(finalizeCount.get()).isEqualTo(1);
+    }
+
+    private static void awaitBlockedOrTerminated(Thread thread) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+
+        while (System.nanoTime() < deadline) {
+            Thread.State state = thread.getState();
+
+            if (state == Thread.State.BLOCKED || state == Thread.State.WAITING || state == Thread.State.TERMINATED) {
+                return;
+            }
+
+            Thread.sleep(5);
+        }
+
+        throw new AssertionError("Thread " + thread.getName() + " neither blocked nor terminated");
     }
 
     private AgUiStreamBridge newBridge(LongConsumer onJobId) {

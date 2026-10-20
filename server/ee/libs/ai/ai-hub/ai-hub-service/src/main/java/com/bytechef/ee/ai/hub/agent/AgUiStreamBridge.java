@@ -59,7 +59,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>Idempotency:</b> {@code onComplete()} and {@code onError(...)} both flip an internal {@code completed} flag and
  * skip duplicate emissions, because the webhook executor can deliver both a stream-level and a future-level terminal
- * signal under some failure modes. Both run {@code onFinalize} last, exactly once.
+ * signal under some failure modes. Both run {@code onFinalize} last, exactly once. Event dispatch and the terminal
+ * transition share one lock, so a chunk arriving on the stream thread is either emitted before the terminal event or
+ * dropped, never emitted after it.
  * </p>
  *
  * @version ee
@@ -93,6 +95,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final AtomicBoolean completed = new AtomicBoolean(false);
     private final AtomicBoolean jobIdReported = new AtomicBoolean(false);
+    private final Object dispatchLock = new Object();
     private final StringBuilder assistantTextBuilder = new StringBuilder();
 
     /**
@@ -139,6 +142,12 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onEvent(Object payload) {
+        synchronized (dispatchLock) {
+            dispatchEvent(payload);
+        }
+    }
+
+    private void dispatchEvent(Object payload) {
         if (completed.get()) {
             if (log.isDebugEnabled()) {
                 log.debug("AgUiStreamBridge dropping post-complete event: {}", payload);
@@ -177,7 +186,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onComplete() {
-        if (!completed.compareAndSet(false, true)) {
+        if (!markCompleted()) {
             return;
         }
 
@@ -201,7 +210,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
     @Override
     public void onError(Throwable throwable) {
-        if (!completed.compareAndSet(false, true)) {
+        if (!markCompleted()) {
             return;
         }
 
@@ -218,6 +227,16 @@ public class AgUiStreamBridge implements SseStreamBridge {
         dispatch(runErrorEvent);
 
         runFinalize();
+    }
+
+    /**
+     * Flips the bridge to completed under {@link #dispatchLock}, so it waits for an event dispatch in progress and no
+     * event dispatch starts after it. Returns {@code false} when the bridge was already completed.
+     */
+    private boolean markCompleted() {
+        synchronized (dispatchLock) {
+            return completed.compareAndSet(false, true);
+        }
     }
 
     private void onMapEvent(Map<?, ?> map) {
