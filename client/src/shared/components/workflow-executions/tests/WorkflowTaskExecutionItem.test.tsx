@@ -43,6 +43,29 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
         });
 
+        it('should not render a spinner for a started task of a stopped job', () => {
+            const taskExecution = createTaskExecution({
+                endDate: undefined,
+                status: 'STARTED',
+            });
+
+            const {container} = render(<WorkflowTaskExecutionItem jobStatus="STOPPED" taskExecution={taskExecution} />);
+
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+            expect(container.querySelector('.text-destructive')).toBeInTheDocument();
+        });
+
+        it('should render a spinner for a started task of a running job', () => {
+            const taskExecution = createTaskExecution({
+                endDate: undefined,
+                status: 'STARTED',
+            });
+
+            const {container} = render(<WorkflowTaskExecutionItem jobStatus="STARTED" taskExecution={taskExecution} />);
+
+            expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
+        });
+
         it('should render status icon from utility for failed task', () => {
             const taskExecution = createTaskExecution({
                 endDate: new Date('2024-01-01T10:00:05'),

@@ -19,6 +19,16 @@ export function getExecutionStatusIcon(status: ExecutionStatusType) {
     }
 }
 
+export function getTaskExecutionDisplayStatus(
+    status: ExecutionStatusType,
+    jobStatus?: Job['status']
+): ExecutionStatusType {
+    const taskUnfinished = status === 'STARTED' || status === 'CREATED';
+    const jobFinished = jobStatus !== undefined && jobStatus !== 'STARTED' && jobStatus !== 'CREATED';
+
+    return taskUnfinished && jobFinished ? 'CANCELLED' : status;
+}
+
 export function getWorkflowStatusType(job?: Job, triggerExecution?: TriggerExecution): WorkflowStatusType {
     const jobStatus = job?.status;
     const triggerStatus = triggerExecution?.status;

@@ -1,17 +1,21 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {getExecutionStatusIcon} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {
+    getExecutionStatusIcon,
+    getTaskExecutionDisplayStatus,
+} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {Job, TaskExecution} from '@/shared/middleware/platform/workflow/execution';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
+    jobStatus?: Job['status'];
     taskExecution: TaskExecution;
 }
 
-const WorkflowTaskExecutionItem = ({attemptLabel, taskExecution}: WorkflowTaskExecutionItemProps) => {
+const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: WorkflowTaskExecutionItemProps) => {
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
-    const statusIcon = getExecutionStatusIcon(status);
+    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus));
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">

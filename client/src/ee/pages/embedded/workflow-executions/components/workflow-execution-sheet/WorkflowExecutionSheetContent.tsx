@@ -86,11 +86,15 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                                 {taskExecutions.map((taskExecution) => (
                                     <WorkflowExecutionsAccordionItem
                                         execution={taskExecution}
+                                        jobStatus={job.status}
                                         key={taskExecution.id}
                                         onExecutionClick={onTaskClick}
                                         selectedExecutionId={selectedItem?.id || ''}
                                     >
-                                        <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                        <WorkflowTaskExecutionItem
+                                            jobStatus={job.status}
+                                            taskExecution={taskExecution}
+                                        />
                                     </WorkflowExecutionsAccordionItem>
                                 ))}
                             </Accordion>
