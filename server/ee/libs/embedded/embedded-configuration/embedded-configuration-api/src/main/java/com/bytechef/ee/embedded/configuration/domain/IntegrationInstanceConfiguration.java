@@ -112,6 +112,27 @@ public class IntegrationInstanceConfiguration {
         return getClass().hashCode();
     }
 
+    public IntegrationInstanceConfiguration withoutConnectionParameters() {
+        IntegrationInstanceConfiguration copy = new IntegrationInstanceConfiguration();
+
+        copy.authorizationType = authorizationType;
+        copy.createdBy = createdBy;
+        copy.createdDate = createdDate;
+        copy.description = description;
+        copy.enabled = enabled;
+        copy.environment = environment;
+        copy.id = id;
+        copy.integrationId = integrationId;
+        copy.integrationInstanceConfigurationTags = new HashSet<>(integrationInstanceConfigurationTags);
+        copy.integrationVersion = integrationVersion;
+        copy.lastModifiedBy = lastModifiedBy;
+        copy.lastModifiedDate = lastModifiedDate;
+        copy.name = name;
+        copy.version = version;
+
+        return copy;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }

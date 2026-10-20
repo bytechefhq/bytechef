@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -23,5 +24,17 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
     long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution) {
+    IntegrationInstance integrationInstance, @Nullable JobDTO job, Workflow workflow,
+    @Nullable TriggerExecutionDTO triggerExecution) {
+
+    public WorkflowExecutionDTO withoutDetails() {
+        return new WorkflowExecutionDTO(
+            id, integration, integrationInstanceConfiguration, integrationInstance,
+            job == null ? null : job.withoutDetails(), workflow,
+            triggerExecution == null ? null : triggerExecution.withoutDetails());
+    }
+
+    public boolean isTriggerOnly() {
+        return job == null;
+    }
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.workflow.execution.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -28,6 +29,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -98,8 +100,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
     }
 
     @Test
-    void testNonAdminIsDeniedEveryAdminReadBeforeAnyLookup() {
-        when(permissionService.isTenantAdmin()).thenReturn(false);
+    void testCallerWithoutExecutionViewIsDeniedEveryRunReadBeforeAnyLookup() {
+        when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(false);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment("EXECUTION_VIEW")).thenReturn(false);
 
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
             .isInstanceOf(AccessDeniedException.class);
@@ -114,13 +117,28 @@ class IntegrationWorkflowExecutionFacadeIntTest {
     }
 
     @Test
-    void testTenantAdminPassesTheGate() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+    void testCallerWithExecutionViewPassesTheGate() {
+        when(permissionService.hasResourceScope(1L, "Job", "EXECUTION_VIEW")).thenReturn(true);
 
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
             .isNotInstanceOf(AccessDeniedException.class);
 
         verify(jobService).getJob(1L);
+    }
+
+    @Test
+    void testRunListGateRequiresExecutionViewInTheRequestedEnvironment() {
+        when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.PRODUCTION)).thenReturn(true);
+        when(permissionService.hasEmbeddedScope("EXECUTION_VIEW", Environment.DEVELOPMENT)).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                Environment.DEVELOPMENT.ordinal() + 0L, null, null, null, null, null, null, null, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThat(
+            integrationWorkflowExecutionFacade.getWorkflowExecutions(
+                Environment.PRODUCTION.ordinal() + 0L, null, null, null, null, null, null, null, 0)
+                .getContent()).isEmpty();
     }
 
     @SpringBootConfiguration
