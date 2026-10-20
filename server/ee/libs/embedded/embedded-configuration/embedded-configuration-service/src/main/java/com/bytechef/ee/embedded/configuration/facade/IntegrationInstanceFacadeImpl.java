@@ -163,7 +163,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         @AuditData(key = "workflowId", value = "#workflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        "or isConnectedUser()")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         validateCurrentPrincipalIntegrationInstanceOwnership(integrationInstanceId);
 
@@ -295,7 +296,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') " +
+        "or isConnectedUser()")
     public void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
 

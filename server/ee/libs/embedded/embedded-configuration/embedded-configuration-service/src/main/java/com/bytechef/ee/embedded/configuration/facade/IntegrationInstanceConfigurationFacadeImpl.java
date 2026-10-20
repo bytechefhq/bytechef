@@ -11,6 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
@@ -81,6 +82,7 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -123,6 +125,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final TriggerExecutionService triggerExecutionService;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
@@ -140,7 +143,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         OAuth2Service oAuth2Service,
         TagService tagService,
         TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, @Lazy PermissionService permissionService) {
 
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
@@ -169,6 +172,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
         this.requiresNewTransactionTemplate = transactionTemplate;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -269,6 +273,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     public void deleteIntegrationInstanceConfiguration(long id) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);
+
+        ConfigurationDeletionGuard.assertMayDelete(
+            List.of(integrationInstanceConfiguration), integrationInstanceService, permissionService);
 
         if (integrationInstanceConfiguration.isEnabled()) {
             enableIntegrationInstanceConfiguration(integrationInstanceConfiguration.getId(), false);

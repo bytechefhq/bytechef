@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -189,10 +190,11 @@ class EmbeddedInstanceGatesIntTest {
     private static final String EMBEDDED_ADMIN = "embedded-admin";
     private static final String EMBEDDED_VIEWER = "embedded-viewer";
     private static final String NON_MEMBER = "non-member";
+    private static final String PRODUCTION_ADMIN = "production-admin";
     private static final String TENANT_ADMIN = "tenant-admin";
     private static final Map<String, Long> USER_IDS_BY_LOGIN = Map.of(
         TENANT_ADMIN, 9600L, EMBEDDED_VIEWER, 9601L, EDITOR_IN_PRODUCTION, 9602L, EMBEDDED_ADMIN, 9603L,
-        NON_MEMBER, 9604L);
+        NON_MEMBER, 9604L, PRODUCTION_ADMIN, 9605L);
 
     @Autowired
     private AppEventFacade appEventFacade;
@@ -208,6 +210,18 @@ class EmbeddedInstanceGatesIntTest {
 
     @Autowired
     private EnvironmentService environmentService;
+
+    @Autowired
+    private IntegrationFacade integrationFacade;
+
+    @Autowired
+    private JobFacade jobFacade;
+
+    @Autowired
+    private PrincipalJobService principalJobService;
+
+    @Autowired
+    private TriggerLifecycleFacade triggerLifecycleFacade;
 
     @Autowired
     private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
@@ -271,6 +285,7 @@ class EmbeddedInstanceGatesIntTest {
 
     private ConnectedUser connectedUser;
     private long developmentConfigurationId;
+    private long integrationId;
     private String externalUserId;
     private long integrationInstanceId;
     private long productionConfigurationId;
@@ -290,6 +305,9 @@ class EmbeddedInstanceGatesIntTest {
             EmbeddedUser.forRole(userId(EDITOR_IN_PRODUCTION), WorkspaceRole.EDITOR, Environment.PRODUCTION));
         embeddedUserRepository.save(EmbeddedUser.forRole(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN));
 
+        embeddedUserRepository.save(
+            EmbeddedUser.forRole(userId(PRODUCTION_ADMIN), WorkspaceRole.ADMIN, Environment.PRODUCTION));
+
         permissionService.evictAllEmbeddedScopeCache();
 
         externalUserId = "external-user-" + UUID.randomUUID();
@@ -301,11 +319,12 @@ class EmbeddedInstanceGatesIntTest {
         Workflow workflow = workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         workflowId = workflow.getId();
+        integrationId = integration.getId();
 
         integrationWorkflowService.addWorkflow(integration.getId(), 1, workflowId);
 
-        productionConfigurationId = createConfiguration(integration.getId(), Environment.PRODUCTION);
-        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT);
+        productionConfigurationId = createConfiguration(integration.getId(), Environment.PRODUCTION, 1);
+        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT, 2);
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
@@ -322,6 +341,8 @@ class EmbeddedInstanceGatesIntTest {
         integrationInstanceId = integrationInstance.getId();
 
         integrationInstanceService.updateEnabled(integrationInstanceId, true);
+        integrationInstanceConfigurationService.updateEnabled(productionConfigurationId, true);
+        integrationInstanceConfigurationService.updateEnabled(developmentConfigurationId, true);
     }
 
     @AfterEach
@@ -398,6 +419,72 @@ class EmbeddedInstanceGatesIntTest {
         assertThat(integrationInstanceConfigurationRepository.findById(productionConfigurationId)).isEmpty();
         assertThat(integrationInstanceRepository.findById(integrationInstanceId)).isEmpty();
         assertThat(integrationInstanceConfigurationRepository.findById(developmentConfigurationId)).isPresent();
+    }
+
+    @Test
+    void testAProductionEditorCreatesConfigurationsOnlyInProduction() {
+        Integration integration = createPublishedIntegration();
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        assertThat(
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), Environment.PRODUCTION)))
+                    .isPositive();
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), Environment.DEVELOPMENT)))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(integrationInstanceConfigurationRepository.findAll()).hasSize(3);
+    }
+
+    @Test
+    void testAProductionEditorUpdatesOnlyProductionConfigurations() {
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
+            new IntegrationInstanceConfigurationDTO(
+                integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                    productionConfigurationId)));
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
+                new IntegrationInstanceConfigurationDTO(
+                    integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                        developmentConfigurationId))))
+                            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testAProductionAdminCannotDeleteAnIntegrationThatHasADevelopmentConfiguration() {
+        authenticate(PRODUCTION_ADMIN, false);
+
+        assertThatThrownBy(() -> integrationFacade.deleteIntegration(integrationId))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.deleteIntegrationInstanceConfiguration(
+                developmentConfigurationId))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(jobFacade, principalJobService, triggerLifecycleFacade);
+
+        assertThat(integrationInstanceConfigurationRepository.findAll()).hasSize(2);
+        assertThat(integrationInstanceRepository.findAll()).hasSize(1);
+        assertThat(integrationInstanceConfigurationRepository.findById(productionConfigurationId))
+            .hasValueSatisfying(configuration -> assertThat(configuration.isEnabled()).isTrue());
+    }
+
+    @Test
+    void testAnAdminInEveryEnvironmentDeletesAnIntegrationWithAllItsConfigurations() {
+        authenticate(EMBEDDED_ADMIN, false);
+
+        integrationFacade.deleteIntegration(integrationId);
+
+        assertThat(integrationInstanceConfigurationRepository.findAll()).isEmpty();
+        assertThat(integrationInstanceRepository.findAll()).isEmpty();
+        assertThat(integrationRepository.findById(integrationId)).isEmpty();
     }
 
     @Test
@@ -555,13 +642,13 @@ class EmbeddedInstanceGatesIntTest {
                     new org.springframework.security.core.userdetails.User(externalUserId, "", List.of()), false));
     }
 
-    private long createConfiguration(long integrationId, Environment environment) {
+    private long createConfiguration(long integrationId, Environment environment, int integrationVersion) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setConnectionParameters(Map.of());
         integrationInstanceConfiguration.setEnvironment(environment);
         integrationInstanceConfiguration.setIntegrationId(integrationId);
-        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
         integrationInstanceConfiguration.setName("configuration-" + UUID.randomUUID());
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
