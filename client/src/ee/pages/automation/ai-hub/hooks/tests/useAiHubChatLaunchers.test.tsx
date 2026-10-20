@@ -7,12 +7,15 @@ import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {chatWorkflowsQueryMock, createMutateAsyncMock, hasWorkspaceScopeMock, navigateMock} = vi.hoisted(() => ({
-    chatWorkflowsQueryMock: vi.fn(),
-    createMutateAsyncMock: vi.fn(),
-    hasWorkspaceScopeMock: vi.fn(),
-    navigateMock: vi.fn(),
-}));
+const {chatWorkflowsQueryMock, createMutateAsyncMock, hasWorkspaceScopeMock, navigateMock, workspaceRef} = vi.hoisted(
+    () => ({
+        chatWorkflowsQueryMock: vi.fn(),
+        createMutateAsyncMock: vi.fn(),
+        hasWorkspaceScopeMock: vi.fn(),
+        navigateMock: vi.fn(),
+        workspaceRef: {currentWorkspaceId: 3 as number | null},
+    })
+);
 
 const chatWorkflowsData = {
     workspaceChatWorkflows: [
@@ -33,8 +36,8 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
-    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
-        selector({currentWorkspaceId: 3}),
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number | null}) => unknown) =>
+        selector({currentWorkspaceId: workspaceRef.currentWorkspaceId}),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -73,6 +76,7 @@ describe('useAiHubChatLaunchers', () => {
         hasWorkspaceScopeMock.mockReturnValue(true);
         createMutateAsyncMock.mockReset();
         navigateMock.mockReset();
+        workspaceRef.currentWorkspaceId = 3;
         queryClient = new QueryClient();
         aiHubChatsStore.getState().setCurrentChatId(undefined);
     });
@@ -98,6 +102,8 @@ describe('useAiHubChatLaunchers', () => {
     it('creates a chat titled with the label on select and navigates to it', async () => {
         createMutateAsyncMock.mockResolvedValue({createWorkflowChatAiHubChat: {id: '9', threadId: 'thread-9'}});
 
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
         const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
 
         await act(async () => {
@@ -112,6 +118,7 @@ describe('useAiHubChatLaunchers', () => {
             workspaceId: '3',
         });
         expect(navigateMock).toHaveBeenCalledWith('/automation/ai-hub/chats/9');
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: [...AiHubChatsKeys.all, 'list', 3]});
         expect(aiHubChatsStore.getState().currentChatId).toBe(9);
         expect(aiHubStore.getState().chatId).toBe('thread-9');
     });
@@ -129,6 +136,25 @@ describe('useAiHubChatLaunchers', () => {
 
         expect(navigateMock).not.toHaveBeenCalled();
         expect(aiHubChatsStore.getState().currentChatId).toBeUndefined();
+        expect(aiHubStore.getState().chatId).toBe('thread-home');
+    });
+
+    it('does nothing on select while no workspace is chosen', async () => {
+        workspaceRef.currentWorkspaceId = null;
+
+        aiHubStore.setState({chatId: 'thread-home'});
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        await act(async () => {
+            await result.current.onSelectWorkflowChat('exec-1', '5', 'Acme — Support');
+        });
+
+        expect(createMutateAsyncMock).not.toHaveBeenCalled();
+        expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+        expect(navigateMock).not.toHaveBeenCalled();
         expect(aiHubStore.getState().chatId).toBe('thread-home');
     });
 
