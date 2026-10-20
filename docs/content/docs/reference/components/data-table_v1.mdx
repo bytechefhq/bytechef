@@ -61,7 +61,9 @@ Name: deleteRecords
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
+| deleteBy | Delete By | STRING <details> <summary> Options </summary> <span>IDS</span>, <span>CONDITIONS</span> </details> | Whether to delete the records with the given IDs or every record that matches the conditions. | false |
 | ids | Record IDs | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | IDs of records to delete | true |
+| conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. Every record that meets every condition of at least one AND Condition is deleted. Use Clear Table to delete every record. | true |
 
 #### Example JSON Structure
 ```json
@@ -70,7 +72,15 @@ Name: deleteRecords
   "name" : "deleteRecords",
   "parameters" : {
     "table" : "",
-    "ids" : [ 1 ]
+    "deleteBy" : "",
+    "ids" : [ 1 ],
+    "conditions" : [ [ {
+      "column" : "",
+      "operation" : "",
+      "value" : "",
+      "valueTo" : "",
+      "values" : [ "" ]
+    } ] ]
   },
   "type" : "dataTable/v1/deleteRecords"
 }
@@ -128,6 +138,48 @@ Name: updateRecord
     "values" : { }
   },
   "type" : "dataTable/v1/updateRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Update Records
+Name: updateRecords
+
+`Update values in every record that matches conditions`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. Every record that meets every condition of at least one AND Condition is updated. | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Records",
+  "name" : "updateRecords",
+  "parameters" : {
+    "table" : "",
+    "conditions" : [ [ {
+      "column" : "",
+      "operation" : "",
+      "value" : "",
+      "valueTo" : "",
+      "values" : [ "" ]
+    } ] ],
+    "values" : { }
+  },
+  "type" : "dataTable/v1/updateRecords"
 }
 ```
 

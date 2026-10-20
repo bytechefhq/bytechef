@@ -27,6 +27,7 @@ import com.bytechef.component.datatable.action.DataTableDeleteRecordsAction;
 import com.bytechef.component.datatable.action.DataTableFindRecordsAction;
 import com.bytechef.component.datatable.action.DataTableGetRecordAction;
 import com.bytechef.component.datatable.action.DataTableUpdateRecordAction;
+import com.bytechef.component.datatable.action.DataTableUpdateRecordsAction;
 import com.bytechef.component.datatable.trigger.DataTableRecordCreatedTrigger;
 import com.bytechef.component.datatable.trigger.DataTableRecordDeletedTrigger;
 import com.bytechef.component.datatable.trigger.DataTableRecordUpdatedTrigger;
@@ -80,6 +81,8 @@ public class DataTableComponentHandler implements ComponentHandler {
             ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
                 dataTableService, dataTableRowService);
             ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(dataTableService, dataTableRowService);
+            ActionDefinition updateRecordsAction = DataTableUpdateRecordsAction.of(
+                dataTableService, dataTableRowService);
             ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);
             ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(dataTableService, dataTableRowService);
             ActionDefinition clearTableAction = DataTableClearTableAction.of(dataTableService, dataTableRowService);
@@ -93,6 +96,7 @@ public class DataTableComponentHandler implements ComponentHandler {
                     createRecordsAction,
                     deleteRecordsAction,
                     updateRecordAction,
+                    updateRecordsAction,
                     getRecordAction,
                     findRecordsAction,
                     clearTableAction)
@@ -100,6 +104,7 @@ public class DataTableComponentHandler implements ComponentHandler {
                     tool(createRecordsAction),
                     tool(deleteRecordsAction),
                     tool(updateRecordAction),
+                    tool(updateRecordsAction),
                     tool(getRecordAction),
                     tool(findRecordsAction),
                     tool(clearTableAction))
