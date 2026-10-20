@@ -49,6 +49,20 @@ public final class AutomationAuthorizationContext {
         }
     }
 
+    public static void runSkippingChecks(Runnable runnable) {
+        try {
+            callSkippingChecks(() -> {
+                runnable.run();
+
+                return null;
+            });
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
+    }
+
     @FunctionalInterface
     public interface SkippableCall<V> {
 

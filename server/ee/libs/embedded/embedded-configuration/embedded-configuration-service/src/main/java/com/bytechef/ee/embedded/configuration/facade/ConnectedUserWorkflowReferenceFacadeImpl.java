@@ -338,7 +338,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('CONNECTED_USER_VIEW')")
     @Transactional(readOnly = true)
     public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids) {
         List<ConnectedUserProjectWorkflow> references =
