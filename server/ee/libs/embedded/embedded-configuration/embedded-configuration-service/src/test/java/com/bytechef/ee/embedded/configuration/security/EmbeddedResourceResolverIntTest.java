@@ -8,7 +8,10 @@
 package com.bytechef.ee.embedded.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -16,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -52,6 +56,9 @@ class EmbeddedResourceResolverIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private ProjectWorkflowService projectWorkflowService;
+
     @AfterEach
     void afterEach() {
         integrationWorkflowRepository.deleteAll();
@@ -63,7 +70,7 @@ class EmbeddedResourceResolverIntTest {
     }
 
     @Test
-    void testAnIntegrationWorkflowIsEmbeddedAndAnUnknownWorkflowIsNot() {
+    void testAnIntegrationWorkflowIsAnIntegrationWorkflowAndAnUnknownWorkflowIsNot() {
         Integration integration = integrationRepository.save(
             Integration.builder()
                 .componentName("componentName")
@@ -74,8 +81,31 @@ class EmbeddedResourceResolverIntTest {
             Validate.notNull(integration.getId(), "id"),
             Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"), "integration-workflow");
 
-        assertThat(embeddedResourceResolver.isEmbeddedWorkflow("integration-workflow")).isTrue();
-        assertThat(embeddedResourceResolver.isEmbeddedWorkflow(UUID.randomUUID() + "")).isFalse();
+        String unknownWorkflowId = UUID.randomUUID() + "";
+
+        assertThat(embeddedResourceResolver.isIntegrationWorkflow("integration-workflow")).isTrue();
+        assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("integration-workflow")).isFalse();
+        assertThat(embeddedResourceResolver.isIntegrationWorkflow(unknownWorkflowId)).isFalse();
+        assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow(unknownWorkflowId)).isFalse();
+    }
+
+    @Test
+    void testAWorkflowOfAHubProjectIsEmbeddedThroughItsProjectButIsNoIntegrationWorkflow() {
+        long workspaceId = insertWorkspace();
+        long hubProjectId = insertProject(workspaceId);
+        long workspaceProjectId = insertProject(workspaceId);
+
+        jdbcTemplate.update(
+            "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)", hubProjectId);
+
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("hub-workflow")))
+            .thenReturn(List.of(new ProjectWorkflow(hubProjectId, 1, "hub-workflow")));
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("workspace-workflow")))
+            .thenReturn(List.of(new ProjectWorkflow(workspaceProjectId, 1, "workspace-workflow")));
+
+        assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("hub-workflow")).isTrue();
+        assertThat(embeddedResourceResolver.isIntegrationWorkflow("hub-workflow")).isFalse();
+        assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("workspace-workflow")).isFalse();
     }
 
     @Test
