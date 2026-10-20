@@ -78,7 +78,8 @@ class ResourceOwnershipResolverTest {
     private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of(
         "AutomationWorkflowProject", "AutomationWorkflowProjectWorkflow", "ConnectedUser",
         "ConnectedUserProjectWorkflow", "Integration", "IntegrationInstance", "IntegrationInstanceConfiguration",
-        "IntegrationWorkflow");
+        "IntegrationWorkflow", "McpIntegrationInstanceConfiguration", "McpIntegrationInstanceConfigurationWorkflow",
+        "McpIntegrationInstanceTool", "SigningKey");
 
     private static final Pattern OWNERSHIP_RESOLVER_DECLARATION =
         Pattern.compile("implements\\s+[^{;]*\\bResourceOwnershipResolver\\b");
