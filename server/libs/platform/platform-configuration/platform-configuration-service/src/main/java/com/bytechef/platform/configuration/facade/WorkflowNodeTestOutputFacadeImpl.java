@@ -73,7 +73,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeTestOutputFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowNodeTestOutputFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -574,8 +574,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 return new OutputResponse(functionOutputResponse.outputSchema(), outputResponse.sampleOutput());
             }
         } catch (RuntimeException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Output schema of node {} was not resolved: {}", workflowNodeType, e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Output schema of node {} was not resolved: {}", workflowNodeType, e.getMessage());
             }
         }
 
