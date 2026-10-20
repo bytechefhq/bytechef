@@ -6,6 +6,11 @@ import EmbeddedIndexRedirect from './EmbeddedIndexRedirect';
 
 const hoisted = vi.hoisted(() => ({
     isTenantAdmin: false,
+    viewablePageHrefs: [] as string[],
+}));
+
+vi.mock('@/shared/hooks/useViewableEmbeddedPageHrefs', () => ({
+    useViewableEmbeddedPageHrefs: () => hoisted.viewablePageHrefs,
 }));
 
 vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
@@ -33,6 +38,7 @@ const renderEmbeddedIndexRedirect = () =>
 describe('EmbeddedIndexRedirect', () => {
     beforeEach(() => {
         hoisted.isTenantAdmin = false;
+        hoisted.viewablePageHrefs = [];
     });
 
     it('sends a tenant admin to the tenant admin page', () => {
@@ -43,7 +49,15 @@ describe('EmbeddedIndexRedirect', () => {
         expect(screen.getByTestId('pathname')).toHaveTextContent('/embedded/integrations');
     });
 
-    it('sends a non-admin to the fallback account page', () => {
+    it('testTheIndexRedirectsToTheFirstViewablePage', () => {
+        hoisted.viewablePageHrefs = ['/embedded/mcp-servers', '/embedded/connections'];
+
+        renderEmbeddedIndexRedirect();
+
+        expect(screen.getByTestId('pathname')).toHaveTextContent('/embedded/mcp-servers');
+    });
+
+    it('sends a non-admin who can view no page to the fallback account page', () => {
         renderEmbeddedIndexRedirect();
 
         expect(screen.getByTestId('pathname')).toHaveTextContent('/embedded/account');

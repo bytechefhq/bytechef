@@ -7,8 +7,14 @@ import Settings, {SettingsNavItemI, isNavItemCurrent} from './Settings';
 
 const hoisted = vi.hoisted(() => ({
     billingEnabled: false,
+    embeddedScopes: [] as string[],
     enabledFeatureFlags: [] as string[],
     isTenantAdmin: true,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => hoisted.isTenantAdmin || hoisted.embeddedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
@@ -46,6 +52,11 @@ const aiNavGroup: SettingsNavItemI = {
     title: 'AI',
 };
 
+const embeddedNavItems: SettingsNavItemI[] = [
+    {href: '/embedded/settings/signing-keys', title: 'Signing Keys'},
+    {href: '/embedded/settings/api-keys', title: 'Embedded API Keys'},
+];
+
 const tenantAdminNavItems: SettingsNavItemI[] = [
     {href: '/automation/settings/workspaces', title: 'Workspaces'},
     {href: 'git-configuration', title: 'Git Configuration'},
@@ -57,13 +68,12 @@ const tenantAdminNavItems: SettingsNavItemI[] = [
     {href: 'notifications', title: 'Notifications'},
     {href: 'identity-providers', title: 'Identity Providers'},
     {href: 'audit-events', title: 'Audit Events'},
-    {href: '/embedded/settings/signing-keys', title: 'Signing Keys'},
-    {href: '/embedded/settings/api-keys', title: 'Embedded API Keys'},
 ];
 
 describe('Settings', () => {
     beforeEach(() => {
         hoisted.billingEnabled = false;
+        hoisted.embeddedScopes = [];
         hoisted.enabledFeatureFlags = [];
         hoisted.isTenantAdmin = true;
     });
@@ -86,6 +96,32 @@ describe('Settings', () => {
 
         tenantAdminNavItems.forEach((navItem) => expect(screen.queryByText(navItem.title)).not.toBeInTheDocument());
         expect(screen.getByText('Workspace Users')).toBeInTheDocument();
+    });
+
+    it('shows the embedded entries to a tenant admin', () => {
+        renderSettings(embeddedNavItems);
+
+        embeddedNavItems.forEach((navItem) => expect(screen.getByText(navItem.title)).toBeInTheDocument());
+    });
+
+    it('testSigningKeysNeedEmbeddedSettingsManage', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['API_KEY_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.queryByText('Signing Keys')).not.toBeInTheDocument();
+        expect(screen.getByText('Embedded API Keys')).toBeInTheDocument();
+    });
+
+    it('shows Signing Keys to a member holding EMBEDDED_SETTINGS_MANAGE and hides API Keys without API_KEY_VIEW', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['EMBEDDED_SETTINGS_MANAGE'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.getByText('Signing Keys')).toBeInTheDocument();
+        expect(screen.queryByText('Embedded API Keys')).not.toBeInTheDocument();
     });
 
     it('shows the MCP Server entry to a tenant admin', () => {
