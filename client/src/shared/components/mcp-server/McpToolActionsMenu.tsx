@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -6,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface McpToolActionsMenuProps {
@@ -30,17 +29,13 @@ const McpToolActionsMenu = ({label, onDeleteClick, onEditClick}: McpToolActionsM
         <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
             {onEditClick && (
                 <>
-                    <DropdownMenuItem className="dropdown-menu-item" onSelect={onEditClick}>
-                        <EditIcon /> Edit
-                    </DropdownMenuItem>
+                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onEditClick} />
 
                     <DropdownMenuSeparator />
                 </>
             )}
 
-            <DropdownMenuItem className="dropdown-menu-item-destructive" onSelect={onDeleteClick} variant="destructive">
-                <Trash2Icon /> Delete
-            </DropdownMenuItem>
+            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onSelect={onDeleteClick} variant="destructive" />
         </DropdownMenuContent>
     </DropdownMenu>
 );

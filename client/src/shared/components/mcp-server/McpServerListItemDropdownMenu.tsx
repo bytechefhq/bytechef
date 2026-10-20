@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -6,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {McpServer} from '@/shared/middleware/graphql';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
@@ -24,19 +23,11 @@ const McpServerListItemDropdownMenu = ({onDeleteClick, onEditClick}: McpServerLi
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                    <EditIcon /> Edit
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
-                    onClick={onDeleteClick}
-                    variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -64,6 +64,27 @@ afterEach(() => {
 });
 
 describe('McpComponentListItemDropdownMenu', () => {
+    it('should render with the design-system DropdownMenu', async () => {
+        render(<McpComponentListItemDropdownMenu mcpComponent={mcpComponent} onEditClick={vi.fn()} />);
+
+        await userEvent.click(screen.getByRole('button'));
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
+    it('calls onEditClick when Edit is clicked', async () => {
+        const onEditClick = vi.fn();
+
+        render(<McpComponentListItemDropdownMenu mcpComponent={mcpComponent} onEditClick={onEditClick} />);
+
+        await userEvent.click(screen.getByRole('button'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(onEditClick).toHaveBeenCalledTimes(1);
+    });
+
     it('deletes an automation component through the shared mutation', async () => {
         render(<McpComponentListItemDropdownMenu mcpComponent={mcpComponent} onEditClick={vi.fn()} />);
 
