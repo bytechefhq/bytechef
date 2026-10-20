@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -166,7 +167,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectedUserWorkflowReferenceFacade.class,
+    ConnectedUserWorkflowReferenceReader.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -291,7 +292,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Autowired
-    private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
+    private ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -356,14 +357,18 @@ class AutomationProjectConfigurationFacadeIntTest {
     void testCreateConfigurationWithAnUnknownEnvironmentIdThrows() {
         long projectId = createPublishedProject("Unknown Environment", 1);
 
-        assertThatThrownBy(
-            () -> automationProjectConfigurationFacade.createConfiguration(
-                projectId, Environment.values().length, CONFIGURATION_NAME, null, 1, true, true))
-                    .isInstanceOf(ConfigurationException.class);
-        assertThatThrownBy(
-            () -> automationProjectConfigurationFacade.createConfiguration(
-                projectId, -1, CONFIGURATION_NAME, null, 1, true, true))
-                    .isInstanceOf(ConfigurationException.class);
+        for (long unknownEnvironmentId : List.of((long) Environment.values().length, -1L)) {
+            assertThatThrownBy(
+                () -> automationProjectConfigurationFacade.createConfiguration(
+                    projectId, unknownEnvironmentId, CONFIGURATION_NAME, null, 1, true, true))
+                        .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(
+                () -> AutomationAuthorizationContext.runSkippingChecks(
+                    () -> automationProjectConfigurationFacade.createConfiguration(
+                        projectId, unknownEnvironmentId, CONFIGURATION_NAME, null, 1, true, true)))
+                            .isInstanceOf(ConfigurationException.class);
+        }
+
         assertThat(automationProjectConfigurationFacade.getConfigurations(projectId)).isEmpty();
     }
 
@@ -2085,7 +2090,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(
                 new ConnectedUserWorkflowReferenceDTO(
                     fixture.secondWorkflowUuid(), connectedUserId, "user-" + connectedUserId,
@@ -2505,7 +2510,7 @@ class AutomationProjectConfigurationFacadeIntTest {
                 reference.connectedUserId(), configuration.getProjectId(), configurationId);
         }
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(references));
     }
 
