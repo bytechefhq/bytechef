@@ -1,6 +1,10 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {EditIcon, EllipsisVerticalIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
 
@@ -21,19 +25,20 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
                 <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="p-0">
+            <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                    className="dropdown-menu-item"
                     disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
+                    icon={<EditIcon />}
+                    label="Edit"
                     onClick={onEditClick}
-                >
-                    <EditIcon /> Edit
-                </DropdownMenuItem>
+                />
 
                 {onOpenInProjectClick && (
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={onOpenInProjectClick}>
-                        <SquareArrowOutUpRightIcon /> Open in Project
-                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        icon={<SquareArrowOutUpRightIcon />}
+                        label="Open in Project"
+                        onClick={onOpenInProjectClick}
+                    />
                 )}
             </DropdownMenuContent>
         </DropdownMenu>

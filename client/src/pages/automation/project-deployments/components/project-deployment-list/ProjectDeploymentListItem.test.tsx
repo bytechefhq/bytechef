@@ -42,12 +42,24 @@ vi.mock('@/components/ui/tooltip', () => ({
     TooltipTrigger: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
 }));
 
-vi.mock('@/components/ui/dropdown-menu', () => ({
+vi.mock('@/components/DropdownMenu/DropdownMenu', () => ({
     DropdownMenu: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     DropdownMenuContent: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
-    DropdownMenuItem: ({children, onClick}: {children: React.ReactNode; onClick?: () => void}) => (
+    DropdownMenuItem: ({
+        children,
+        icon,
+        label,
+        onClick,
+    }: {
+        children?: React.ReactNode;
+        icon?: React.ReactNode;
+        label?: string;
+        onClick?: () => void;
+    }) => (
         <button onClick={onClick} type="button">
-            {children}
+            {icon}
+
+            {label ?? children}
         </button>
     ),
     DropdownMenuSeparator: () => <hr />,
