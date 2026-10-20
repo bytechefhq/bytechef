@@ -396,7 +396,7 @@ public final class TaskDispatcherDsl {
 
         private final List<Option<Boolean>> options = List.of(
             option("True", true),
-            option("False", true));
+            option("False", false));
 
         private ModifiableBooleanProperty() {
             this(null);
