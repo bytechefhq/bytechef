@@ -119,7 +119,7 @@ class WebhookBridgeAgentTenantContextTest {
         return new WebhookBridgeAgent(
             mock(WebhookWorkflowExecutor.class), chatService, mock(WebhookResumeRegistry.class), JsonMapper.builder()
                 .build(),
-            mock(WorkflowChatMetrics.class), mock(WorkflowChatJobRegistry.class), new AiHubSessionMemory(
+            mock(WorkflowChatMetrics.class), new AiHubSessionMemory(
                 InMemorySessionRepository.builder()
                     .build(),
                 null),

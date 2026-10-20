@@ -9,11 +9,9 @@ package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -27,14 +25,12 @@ import com.agui.core.event.TextMessageEndEvent;
 import com.agui.core.event.TextMessageStartEvent;
 import com.agui.core.event.ToolCallEndEvent;
 import com.agui.core.event.ToolCallStartEvent;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongConsumer;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,11 +50,10 @@ class AgUiStreamBridgeTest {
     private static final String MESSAGE_ID = "msg-1";
     private static final String THREAD_ID = "thread-1";
     private static final String RUN_ID = "run-1";
-    private static final long CHAT_ID = 42L;
 
     private AgentSubscriber subscriber;
     private WebhookResumeRegistry registry;
-    private WorkflowChatJobRegistry jobRegistry;
+    private AtomicInteger streamErrorCount;
     private AtomicInteger finalizeCount;
     private AgUiStreamBridge bridge;
 
@@ -66,8 +61,7 @@ class AgUiStreamBridgeTest {
     void setUp() {
         subscriber = mock(AgentSubscriber.class);
         registry = new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
-        jobRegistry = spy(
-            new WorkflowChatJobRegistry(new ConcurrentMapCacheManager(WorkflowChatJobRegistry.CACHE_NAME)));
+        streamErrorCount = new AtomicInteger();
         finalizeCount = new AtomicInteger();
 
         bridge = newBridge(jobId -> {});
@@ -106,7 +100,6 @@ class AgUiStreamBridgeTest {
         bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", "77")));
 
         assertThat(seen.get()).isEqualTo(77L);
-        verify(jobRegistry).register(CHAT_ID, 77L);
         verify(subscriber, never()).onEvent(any());
     }
 
@@ -119,8 +112,6 @@ class AgUiStreamBridgeTest {
         bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 12L)));
 
         assertThat(seenJobIds).containsExactly(11L);
-        verify(jobRegistry, times(1)).register(anyLong(), anyLong());
-        assertThat(jobRegistry.get(CHAT_ID)).isEqualTo(11L);
     }
 
     @Test
@@ -131,7 +122,6 @@ class AgUiStreamBridgeTest {
         bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", "not-a-number")));
 
         assertThat(calls.get()).isZero();
-        verify(jobRegistry, never()).register(anyLong(), anyLong());
     }
 
     @Test
@@ -143,7 +133,7 @@ class AgUiStreamBridgeTest {
 
         bridge.onEvent(payload);
 
-        assertThat(registry.consume(CHAT_ID)).isEqualTo("https://example.com/resume/abc");
+        assertThat(registry.consume(THREAD_ID)).isEqualTo("https://example.com/resume/abc");
 
         ArgumentCaptor<CustomEvent> eventCaptor = ArgumentCaptor.forClass(CustomEvent.class);
 
@@ -159,9 +149,6 @@ class AgUiStreamBridgeTest {
 
     @Test
     void testAskUserQuestionWithoutResumeUrlShowsTheQuestionAndRegistersNoResume() {
-        JobFacade jobFacade = mock(JobFacade.class);
-        AgUiStreamBridge bridge = newBridge(jobFacade, jobId -> {});
-
         bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 9L)));
         bridge.onEvent(
             Map.of("__eventType", "ask_user_question", "questions", List.of(Map.of("question", "Which account?"))));
@@ -173,15 +160,15 @@ class AgUiStreamBridgeTest {
         CustomEvent customEvent = eventCaptor.getValue();
 
         assertThat(customEvent.getName()).isEqualTo(AgUiStreamBridge.ASK_WORKFLOW_QUESTION_EVENT_NAME);
-        assertThat(registry.consume(CHAT_ID)).isNull();
+        assertThat(registry.consume(THREAD_ID)).isNull();
         verify(subscriber, never()).onRunErrorEvent(any());
-        verify(jobFacade, never()).stopJob(anyLong());
+        assertThat(streamErrorCount.get()).isZero();
         assertThat(finalizeCount.get()).isZero();
 
         bridge.onComplete();
 
         verify(subscriber).onRunFinishedEvent(any());
-        verify(jobFacade, never()).stopJob(anyLong());
+        assertThat(streamErrorCount.get()).isZero();
         assertThat(finalizeCount.get()).isEqualTo(1);
     }
 
@@ -238,13 +225,13 @@ class AgUiStreamBridgeTest {
     }
 
     @Test
-    void testOnCompleteClearsTheJobRegistryAndFinalizesOnce() {
+    void testOnCompleteFinalizesOnceWithoutStoppingTheJob() {
         bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 5L)));
         bridge.onComplete();
         bridge.onComplete();
 
         verify(subscriber, times(1)).onRunFinishedEvent(any());
-        assertThat(jobRegistry.get(CHAT_ID)).isNull();
+        assertThat(streamErrorCount.get()).isZero();
         assertThat(finalizeCount.get()).isEqualTo(1);
     }
 
@@ -255,8 +242,6 @@ class AgUiStreamBridgeTest {
         bridge.onComplete();
 
         verify(subscriber, times(1)).onRunFinishedEvent(any());
-        verify(jobRegistry).clear(CHAT_ID);
-        assertThat(jobRegistry.get(CHAT_ID)).isNull();
         assertThat(finalizeCount.get()).isEqualTo(1);
     }
 
@@ -272,6 +257,7 @@ class AgUiStreamBridgeTest {
         RunErrorEvent runErrorEvent = errorCaptor.getValue();
 
         assertThat(runErrorEvent.getError()).isEqualTo("workflow failed");
+        assertThat(streamErrorCount.get()).isEqualTo(1);
         assertThat(finalizeCount.get()).isEqualTo(1);
     }
 
@@ -287,7 +273,7 @@ class AgUiStreamBridgeTest {
     @Test
     void testThrowingFinalizerDoesNotEscape() {
         AgUiStreamBridge bridge = new AgUiStreamBridge(
-            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, registry, jobRegistry, null, jobId -> {},
+            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, registry, jobId -> {}, streamErrorCount::incrementAndGet,
             () -> {
                 throw new IllegalStateException("finalize failed");
             });
@@ -307,41 +293,34 @@ class AgUiStreamBridgeTest {
     }
 
     @Test
-    void testOnErrorFiresJobFacadeStopJobWhenJobIdRegistered() {
-        JobFacade jobFacade = mock(JobFacade.class);
-        AgUiStreamBridge bridge = newBridge(jobFacade, jobId -> {});
+    void testOnErrorRunsTheStreamErrorCallbackOnceBeforeTheRunError() {
+        List<String> calls = new ArrayList<>();
 
-        bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 7777L)));
+        doAnswer(invocation -> calls.add("runError"))
+            .when(subscriber)
+            .onRunErrorEvent(any());
+
+        AgUiStreamBridge bridge = new AgUiStreamBridge(
+            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, registry, jobId -> {}, () -> calls.add("streamError"),
+            () -> {});
+
         bridge.onError(new RuntimeException("workflow failed"));
+        bridge.onError(new RuntimeException("again"));
 
-        verify(jobFacade, times(1)).stopJob(7777L);
-        assertThat(jobRegistry.get(CHAT_ID)).isNull();
+        assertThat(calls).containsExactly("streamError", "runError");
     }
 
     @Test
-    void testOnErrorSwallowsStopJobExceptionsSoRunErrorStillFires() {
-        JobFacade jobFacade = mock(JobFacade.class);
+    void testThrowingStreamErrorCallbackDoesNotSuppressTheRunError() {
+        AgUiStreamBridge bridge = new AgUiStreamBridge(
+            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, registry, jobId -> {}, () -> {
+                throw new IllegalStateException("coordinator down");
+            }, finalizeCount::incrementAndGet);
 
-        doThrow(new RuntimeException("coordinator down")).when(jobFacade)
-            .stopJob(anyLong());
-
-        AgUiStreamBridge bridge = newBridge(jobFacade, jobId -> {});
-
-        bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 8888L)));
         bridge.onError(new RuntimeException("workflow failed"));
 
         verify(subscriber).onRunErrorEvent(any(RunErrorEvent.class));
         assertThat(finalizeCount.get()).isEqualTo(1);
-    }
-
-    @Test
-    void testOnErrorSkipsStopJobWhenNoJobIdRegistered() {
-        JobFacade jobFacade = mock(JobFacade.class);
-        AgUiStreamBridge bridge = newBridge(jobFacade, jobId -> {});
-
-        bridge.onError(new RuntimeException("workflow failed"));
-
-        verify(jobFacade, never()).stopJob(anyLong());
     }
 
     @Test
@@ -414,12 +393,8 @@ class AgUiStreamBridgeTest {
     }
 
     private AgUiStreamBridge newBridge(LongConsumer onJobId) {
-        return newBridge(null, onJobId);
-    }
-
-    private AgUiStreamBridge newBridge(@Nullable JobFacade jobFacade, LongConsumer onJobId) {
         return new AgUiStreamBridge(
-            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, CHAT_ID, registry, jobRegistry, jobFacade, onJobId,
+            subscriber, MESSAGE_ID, THREAD_ID, RUN_ID, registry, onJobId, streamErrorCount::incrementAndGet,
             finalizeCount::incrementAndGet);
     }
 }

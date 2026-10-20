@@ -112,7 +112,6 @@ public class WebhookBridgeAgent extends LocalAgent {
     private final HttpClient resumeHttpClient;
     private final JsonMapper jsonMapper;
     private final WorkflowChatMetrics metrics;
-    private final WorkflowChatJobRegistry jobRegistry;
     private final AiHubSessionMemory sessionMemory;
     private final WorkflowChatGuard guard;
     @Nullable
@@ -123,7 +122,7 @@ public class WebhookBridgeAgent extends LocalAgent {
     public WebhookBridgeAgent(
         WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
         WebhookResumeRegistry resumeRegistry, JsonMapper jsonMapper, WorkflowChatMetrics metrics,
-        WorkflowChatJobRegistry jobRegistry, AiHubSessionMemory sessionMemory, WorkflowChatGuard guard,
+        AiHubSessionMemory sessionMemory, WorkflowChatGuard guard,
         @Nullable JobFacade jobFacade, InFlightAiHubRunRegistry inFlightRunRegistry) throws AGUIException {
 
         super("webhook-bridge-agent", null, null, "(unused, the webhook bridge bypasses the LLM)", List.of());
@@ -133,7 +132,6 @@ public class WebhookBridgeAgent extends LocalAgent {
         this.resumeRegistry = resumeRegistry;
         this.jsonMapper = jsonMapper;
         this.metrics = metrics;
-        this.jobRegistry = jobRegistry;
         this.sessionMemory = sessionMemory;
         this.guard = guard;
         this.jobFacade = jobFacade;
@@ -214,15 +212,15 @@ public class WebhookBridgeAgent extends LocalAgent {
         String messageId = UUID.randomUUID()
             .toString();
 
-        WorkflowChatTurnStopper stopper = new WorkflowChatTurnStopper(chat.getId(), jobRegistry, jobFacade);
-        String tenantId = TenantContext.getCurrentTenantId();
+        WorkflowChatTurnStopper stopper = new WorkflowChatTurnStopper(
+            chat.getId(), TenantContext.getCurrentTenantId(), jobFacade);
 
-        String pendingResumeUrl = resumeRegistry.consume(chat.getId());
+        String pendingResumeUrl = resumeRegistry.consume(chat.getThreadId());
 
         if (pendingResumeUrl != null) {
             recordTurn("resume", chat);
 
-            handleResume(input, pendingResumeUrl, userMessage, chat, subscriber, messageId, stopper, tenantId);
+            handleResume(input, pendingResumeUrl, userMessage, chat, subscriber, messageId, stopper);
 
             return;
         }
@@ -236,32 +234,6 @@ public class WebhookBridgeAgent extends LocalAgent {
 
         WebhookRequest webhookRequest = buildWebhookRequest(userMessage, chat);
 
-        String threadId = chat.getThreadId();
-        AgUiStreamBridge[] bridgeReference = new AgUiStreamBridge[1];
-        boolean[] streamingPathReference = new boolean[1];
-
-        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper, tenantId);
-
-        Runnable onFinalize = () -> {
-            try {
-                stopSubscription.dispose();
-
-                AgUiStreamBridge currentBridge = bridgeReference[0];
-
-                if (currentBridge != null && streamingPathReference[0]) {
-                    persistTurnToChatMemory(threadId, userMessage, currentBridge.getAccumulatedAssistantText());
-                }
-            } finally {
-                finalizeRun(input, subscriber);
-            }
-        };
-
-        AgUiStreamBridge bridge = new AgUiStreamBridge(
-            subscriber, messageId, input.threadId(), input.runId(), chat.getId(), resumeRegistry, jobRegistry,
-            jobFacade, jobId -> runWithTenant(tenantId, () -> stopper.onJobId(jobId)), onFinalize);
-
-        bridgeReference[0] = bridge;
-
         String triggerName = workflowExecutionId.getTriggerName();
 
         if (log.isDebugEnabled() && !CHAT_TRIGGER_NAME.equals(triggerName)) {
@@ -270,10 +242,51 @@ public class WebhookBridgeAgent extends LocalAgent {
                 triggerName);
         }
 
-        boolean hasStreamingTask;
+        boolean streamingPath = hasStreamingTask(workflowExecutionId) || !webhookTriggerFlags.workflowSyncExecution();
+
+        recordTurn(streamingPath ? "streaming" : "sync", chat);
+
+        String threadId = chat.getThreadId();
+        AgUiStreamBridge[] bridgeReference = new AgUiStreamBridge[1];
+
+        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper);
+
+        Runnable onFinalize = () -> {
+            try {
+                stopSubscription.dispose();
+
+                AgUiStreamBridge currentBridge = bridgeReference[0];
+
+                if (currentBridge != null && streamingPath) {
+                    persistTurnToChatMemory(threadId, userMessage, currentBridge.getAccumulatedAssistantText());
+                }
+            } finally {
+                finalizeRun(input, subscriber);
+            }
+        };
+
+        AgUiStreamBridge bridge = new AgUiStreamBridge(
+            subscriber, messageId, input.threadId(), input.runId(), resumeRegistry, stopper::onJobId,
+            stopper::onStopRequested, onFinalize);
+
+        bridgeReference[0] = bridge;
+
+        if (!streamingPath) {
+            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage);
+
+            return;
+        }
 
         try {
-            hasStreamingTask = webhookWorkflowExecutor.hasStreamingTask(workflowExecutionId);
+            webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, bridge);
+        } catch (RuntimeException exception) {
+            bridge.onError(exception);
+        }
+    }
+
+    private boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId) {
+        try {
+            return webhookWorkflowExecutor.hasStreamingTask(workflowExecutionId);
         } catch (RuntimeException exception) {
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -281,25 +294,7 @@ public class WebhookBridgeAgent extends LocalAgent {
                     exception);
             }
 
-            hasStreamingTask = false;
-        }
-
-        if (!hasStreamingTask && webhookTriggerFlags.workflowSyncExecution()) {
-            recordTurn("sync", chat);
-
-            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage);
-
-            return;
-        }
-
-        streamingPathReference[0] = true;
-
-        recordTurn("streaming", chat);
-
-        try {
-            webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, bridge);
-        } catch (RuntimeException exception) {
-            bridge.onError(exception);
+            return false;
         }
     }
 
@@ -317,16 +312,15 @@ public class WebhookBridgeAgent extends LocalAgent {
     }
 
     /**
-     * Subscribes {@code stopper} to the run's Stop signal, under the turn's tenant because the signal is delivered on
-     * whichever thread called {@link InFlightAiHubRunRegistry#cancel}.
+     * Subscribes {@code stopper} to the run's Stop signal. Callers subscribe only after everything that can throw
+     * before the bridge exists, because the subscription is disposed by the bridge's finalize callback.
      */
-    private Disposable subscribeToStop(String threadId, WorkflowChatTurnStopper stopper, String tenantId) {
+    private Disposable subscribeToStop(String threadId, WorkflowChatTurnStopper stopper) {
         Mono<Void> stopRequested = inFlightRunRegistry.stopRequested(threadId);
 
         return stopRequested.subscribe(
-            ignored -> runWithTenant(tenantId, stopper::onStopRequested),
-            throwable -> log.warn("Stop signal of workflow chat thread {} failed", threadId, throwable),
-            () -> runWithTenant(tenantId, stopper::onStopRequested));
+            null, throwable -> log.warn("Stop signal of workflow chat thread {} failed", threadId, throwable),
+            stopper::onStopRequested);
     }
 
     private void executeSync(
@@ -401,13 +395,13 @@ public class WebhookBridgeAgent extends LocalAgent {
      */
     private void handleResume(
         RunAgentInput input, String resumeUrl, String userMessage, AiHubChat chat, AgentSubscriber subscriber,
-        String messageId, WorkflowChatTurnStopper stopper, String tenantId) {
+        String messageId, WorkflowChatTurnStopper stopper) {
 
-        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper, tenantId);
+        Disposable stopSubscription = subscribeToStop(input.threadId(), stopper);
 
         AgUiStreamBridge bridge = new AgUiStreamBridge(
-            subscriber, messageId, input.threadId(), input.runId(), chat.getId(), resumeRegistry, jobRegistry,
-            jobFacade, jobId -> runWithTenant(tenantId, () -> stopper.onJobId(jobId)), () -> {
+            subscriber, messageId, input.threadId(), input.runId(), resumeRegistry, stopper::onJobId,
+            stopper::onStopRequested, () -> {
                 try {
                     stopSubscription.dispose();
                 } finally {
@@ -552,7 +546,6 @@ public class WebhookBridgeAgent extends LocalAgent {
         }
     }
 
-    @SuppressWarnings("checkstyle:methodlength")
     private void handleSyncOutputs(
         @Nullable Object outputs, AgUiStreamBridge bridge, AgentSubscriber subscriber, String messageId,
         AiHubChat chat, String userMessageText) {
@@ -958,18 +951,6 @@ public class WebhookBridgeAgent extends LocalAgent {
             log.warn(
                 "subscriber.onRunFinalized threw for thread {} (run {}); the stream may stay open", input.threadId(),
                 input.runId(), exception);
-        }
-    }
-
-    private static void runWithTenant(String tenantId, Runnable action) {
-        String previousTenantId = TenantContext.getCurrentTenantId();
-
-        TenantContext.setCurrentTenantId(tenantId);
-
-        try {
-            action.run();
-        } finally {
-            TenantContext.setCurrentTenantId(previousTenantId);
         }
     }
 }

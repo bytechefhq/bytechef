@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,10 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stops the workflow job of one workflow chat turn when the user stops the turn. The two inputs arrive independently
- * and in either order: the Stop (from {@link InFlightAiHubRunRegistry#stopRequested}) and the job id (from the
- * workflow's {@code start} event). {@link JobFacade#stopJob} runs exactly once, as soon as both have happened, and the
- * chat's entry in {@link WorkflowChatJobRegistry} is cleared after it. Both methods are idempotent and never throw, so
+ * Stops the workflow job of one workflow chat turn when the turn is stopped, either by the user (from
+ * {@link InFlightAiHubRunRegistry#stopRequested}) or by a stream error. The two inputs arrive independently and in
+ * either order: the stop and the job id (from the workflow's {@code start} event). {@link JobFacade#stopJob} runs
+ * exactly once, as soon as both have happened, only for the job id this turn was handed, and under the turn's tenant,
+ * because both inputs are delivered on threads that do not carry it. Both methods are idempotent and never throw, so
  * they are safe to call from the workflow's event stream. Without a {@link JobFacade} both are no-ops.
  *
  * @version ee
@@ -31,7 +33,7 @@ public class WorkflowChatTurnStopper {
     private static final Logger log = LoggerFactory.getLogger(WorkflowChatTurnStopper.class);
 
     private final long chatId;
-    private final WorkflowChatJobRegistry jobRegistry;
+    private final String tenantId;
     @Nullable
     private final JobFacade jobFacade;
 
@@ -40,14 +42,14 @@ public class WorkflowChatTurnStopper {
     private final AtomicBoolean stopped = new AtomicBoolean();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowChatTurnStopper(long chatId, WorkflowChatJobRegistry jobRegistry, @Nullable JobFacade jobFacade) {
+    public WorkflowChatTurnStopper(long chatId, String tenantId, @Nullable JobFacade jobFacade) {
         this.chatId = chatId;
-        this.jobRegistry = jobRegistry;
+        this.tenantId = tenantId;
         this.jobFacade = jobFacade;
     }
 
     /**
-     * Records that the user stopped the turn, and stops the job when its id is already known.
+     * Records that the turn was stopped, and stops the job when its id is already known.
      */
     public void onStopRequested() {
         stopRequested.set(true);
@@ -56,7 +58,7 @@ public class WorkflowChatTurnStopper {
     }
 
     /**
-     * Records the turn's job id (the first one wins), and stops the job when the user already stopped the turn.
+     * Records the turn's job id (the first one wins), and stops the job when the turn was already stopped.
      */
     public void onJobId(long jobId) {
         jobIdReference.compareAndSet(null, jobId);
@@ -71,12 +73,16 @@ public class WorkflowChatTurnStopper {
             return;
         }
 
+        String previousTenantId = TenantContext.getCurrentTenantId();
+
+        TenantContext.setCurrentTenantId(tenantId);
+
         try {
             jobFacade.stopJob(jobId);
-
-            jobRegistry.clear(chatId);
         } catch (RuntimeException exception) {
             log.warn("Failed to stop job {} of workflow chat {}", jobId, chatId, exception);
+        } finally {
+            TenantContext.setCurrentTenantId(previousTenantId);
         }
     }
 }

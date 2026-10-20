@@ -134,7 +134,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -168,7 +168,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -201,7 +201,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -232,7 +232,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -268,7 +268,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -294,7 +294,7 @@ class WebhookBridgeAgentResumeTest {
 
         when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
 
-        resumeRegistry.register(CHAT_ID, baseUrl + "/resume");
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
 
         WebhookBridgeAgent agent = newAgent();
 
@@ -302,7 +302,7 @@ class WebhookBridgeAgentResumeTest {
 
         verify(subscriber, timeout(5000)).onTextMessageContentEvent(any(TextMessageContentEvent.class));
 
-        assertThat(resumeRegistry.consume(CHAT_ID))
+        assertThat(resumeRegistry.consume(THREAD_ID))
             .as("Resume URL must be consumed before the HTTP call so duplicates start fresh executions")
             .isNull();
     }
@@ -320,7 +320,7 @@ class WebhookBridgeAgentResumeTest {
 
         return new WebhookBridgeAgent(
             webhookFacade, chatService, resumeRegistry, jsonMapper, mock(WorkflowChatMetrics.class),
-            mock(WorkflowChatJobRegistry.class), new AiHubSessionMemory(
+            new AiHubSessionMemory(
                 InMemorySessionRepository.builder()
                     .build(),
                 null),

@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.longThat;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
@@ -36,6 +38,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -43,6 +46,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.tenant.TenantContext;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -82,7 +87,6 @@ class WebhookBridgeAgentTest {
     private WebhookWorkflowExecutor executor;
     private AiHubChatService chatService;
     private WebhookResumeRegistry resumeRegistry;
-    private WorkflowChatJobRegistry jobRegistry;
     private WorkflowChatGuard guard;
     private WorkflowChatMetrics metrics;
     private JobFacade jobFacade;
@@ -95,7 +99,6 @@ class WebhookBridgeAgentTest {
         executor = mock(WebhookWorkflowExecutor.class);
         chatService = mock(AiHubChatService.class);
         resumeRegistry = new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
-        jobRegistry = mock(WorkflowChatJobRegistry.class);
         guard = mock(WorkflowChatGuard.class);
         metrics = mock(WorkflowChatMetrics.class);
         jobFacade = mock(JobFacade.class);
@@ -140,7 +143,7 @@ class WebhookBridgeAgentTest {
             .contains("My Helpful Bot")
             .contains("Re-enable");
         verify(subscriber, timeout(2000)).onRunFinalized(any());
-        verify(jobRegistry, never()).register(anyLong(), anyLong());
+        verifyNoInteractions(jobFacade);
         verify(executor, never()).executeSync(any(), any());
         verify(executor, never()).stream(any(), any(), any());
         verify(metrics).recordUnreachable("disabled");
@@ -174,7 +177,7 @@ class WebhookBridgeAgentTest {
 
         assertThat(captureRunError()).contains("Failed to parse workflow execution id");
         verify(subscriber, timeout(2000)).onRunFinalized(any());
-        verifyNoInteractions(executor, jobRegistry, guard);
+        verifyNoInteractions(executor, jobFacade, guard);
         verify(subscriber, never()).onNewMessage(any());
         verify(subscriber, never()).onRunFinishedEvent(any());
     }
@@ -382,7 +385,102 @@ class WebhookBridgeAgentTest {
         stopSink.tryEmitEmpty();
 
         verify(jobFacade).stopJob(77L);
-        verify(jobRegistry).register(CHAT_ID, 77L);
+    }
+
+    @Test
+    void testStopSignalStopsTheJobUnderTheTurnsTenant() throws AGUIException {
+        inFlightRunRegistry = mock(InFlightAiHubRunRegistry.class);
+
+        Sinks.One<Void> stopSink = Sinks.one();
+
+        when(inFlightRunRegistry.stopRequested(THREAD_ID)).thenReturn(stopSink.asMono());
+
+        AtomicReference<String> stopJobTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            stopJobTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(jobFacade)
+            .stopJob(77L);
+
+        givenStreamingChat();
+
+        ArgumentCaptor<SseStreamBridge> bridgeCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
+
+        State state = new State();
+
+        state.set(AiHubStateKeys.VERIFIED_TENANT_ID, "acme");
+
+        newAgent().runAgent(parametersOf(buildInput("hi"), state), subscriber);
+
+        verify(executor, timeout(2000)).stream(any(), any(), bridgeCaptor.capture());
+
+        SseStreamBridge bridge = bridgeCaptor.getValue();
+
+        TenantContext.resetCurrentTenantId();
+
+        bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 77L)));
+        stopSink.tryEmitEmpty();
+
+        verify(jobFacade).stopJob(77L);
+        assertThat(stopJobTenantId.get()).isEqualTo("acme");
+        assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
+    }
+
+    @Test
+    void testStreamErrorStopsOnlyTheTurnsOwnJob() throws AGUIException {
+        givenStreamingChat();
+
+        ArgumentCaptor<SseStreamBridge> bridgeCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
+
+        newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
+
+        verify(executor, timeout(2000)).stream(any(), any(), bridgeCaptor.capture());
+
+        SseStreamBridge bridge = bridgeCaptor.getValue();
+
+        bridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", 77L)));
+        bridge.onError(new IllegalStateException("workflow failed"));
+
+        verify(jobFacade).stopJob(77L);
+        verify(jobFacade, never()).stopJob(longThat(jobId -> jobId != 77L));
+        assertThat(captureRunError()).isEqualTo("workflow failed");
+    }
+
+    @Test
+    void testStreamErrorBeforeAnyJobIdStopsNothing() throws AGUIException {
+        givenStreamingChat();
+
+        ArgumentCaptor<SseStreamBridge> bridgeCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
+
+        newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
+
+        verify(executor, timeout(2000)).stream(any(), any(), bridgeCaptor.capture());
+
+        SseStreamBridge bridge = bridgeCaptor.getValue();
+
+        bridge.onError(new IllegalStateException("workflow failed"));
+
+        verifyNoInteractions(jobFacade);
+    }
+
+    @Test
+    void testResumeLinkOfAnotherTenantsChatWithTheSameIdIsNotConsumed() throws AGUIException {
+        givenSyncChat();
+
+        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "fresh run"));
+
+        String otherTenantThreadId = "a1b2c3d4-0000-4000-8000-0000000000ff";
+
+        resumeRegistry.register(otherTenantThreadId, "https://tenant-a.example.com/resume");
+
+        newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
+
+        assertThat(captureAssistantReply()).isEqualTo("fresh run");
+        verify(executor).executeSync(any(), any());
+        verify(metrics, never()).recordTurn("resume");
+        assertThat(resumeRegistry.consume(otherTenantThreadId)).isEqualTo("https://tenant-a.example.com/resume");
     }
 
     @Test
@@ -438,7 +536,7 @@ class WebhookBridgeAgentTest {
         return new WebhookBridgeAgent(
             executor, chatService, resumeRegistry, JsonMapper.builder()
                 .build(),
-            metrics, jobRegistry, new AiHubSessionMemory(sessionRepository, null), guard, jobFacade,
+            metrics, new AiHubSessionMemory(sessionRepository, null), guard, jobFacade,
             inFlightRunRegistry);
     }
 
@@ -532,8 +630,13 @@ class WebhookBridgeAgentTest {
     }
 
     private static RunAgentParameters parametersOf(RunAgentInput input) {
+        return parametersOf(input, new State());
+    }
+
+    private static RunAgentParameters parametersOf(RunAgentInput input, State state) {
         return RunAgentParameters.builder()
             .threadId(input.threadId())
+            .state(state)
             .runId(input.runId())
             .messages(input.messages())
             .forwardedProps(input.forwardedProps())

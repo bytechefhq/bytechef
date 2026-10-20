@@ -247,6 +247,15 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testCreateWorkflowChatLeavesABlankTitleUnset() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat chat = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, "   ");
+
+        assertThat(chat.getTitle()).isNull();
+    }
+
+    @Test
     void testCancelWorkflowChatTurnGoesThroughTheRunRegistry() {
         when(chatRepository.findById(1L))
             .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
@@ -629,7 +638,7 @@ class AiHubChatServiceTest {
         WebhookResumeRegistry webhookResumeRegistry =
             new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
 
-        webhookResumeRegistry.register(1L, "https://example.com/resume");
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
 
         when(webhookResumeRegistryProvider.getIfAvailable()).thenReturn(webhookResumeRegistry);
 
@@ -639,8 +648,64 @@ class AiHubChatServiceTest {
 
         chatService.delete(1L, WORKSPACE_ID, USER_ID);
 
-        assertThat(webhookResumeRegistry.consume(1L)).isNull();
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
         verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testARolledBackDeleteKeepsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        lenient().when(webhookResumeRegistryProvider.getIfAvailable())
+            .thenReturn(webhookResumeRegistry);
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
+    void testACommittedDeleteClearsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        when(webhookResumeRegistryProvider.getIfAvailable()).thenReturn(webhookResumeRegistry);
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            for (TransactionSynchronization synchronization : TransactionSynchronizationManager
+                .getSynchronizations()) {
+
+                synchronization.afterCommit();
+                synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+            }
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
     }
 
     @Test
@@ -806,6 +871,53 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testTruncateMessagesClearsThePendingWorkflowQuestionOfTheDroppedExchange() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+
+        chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
+    }
+
+    @Test
+    void testTruncateMessagesThatDropsNothingKeepsThePendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-300", true);
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
+    void testARolledBackTruncationKeepsThePendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
     void testTruncateMessagesIsEmptyForAMessageTheChatDoesNotHold() {
         givenActiveEvents();
 
@@ -862,6 +974,18 @@ class AiHubChatServiceTest {
 
         assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, OTHER_USER_ID, "event-100", false))
             .isInstanceOf(NotFoundException.class);
+    }
+
+    private WebhookResumeRegistry givenPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        lenient().when(webhookResumeRegistryProvider.getIfAvailable())
+            .thenReturn(webhookResumeRegistry);
+
+        return webhookResumeRegistry;
     }
 
     private List<SessionEvent> givenActiveEvents() {
