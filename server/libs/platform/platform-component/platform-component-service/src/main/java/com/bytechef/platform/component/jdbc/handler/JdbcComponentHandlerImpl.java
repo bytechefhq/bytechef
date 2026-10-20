@@ -377,7 +377,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
         String query = inputParameters.getString(QUERY);
 
-        if (query == null || query.isBlank()) {
+        if (query == null || query.isBlank() || !hasConnectionParameters(connectionParameters)) {
             return null;
         }
 
@@ -412,6 +412,13 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             case Types.STRUCT, Types.JAVA_OBJECT -> object(name);
             default -> string(name);
         };
+    }
+
+    static boolean hasConnectionParameters(Parameters connectionParameters) {
+        String host = connectionParameters.getString(HOST);
+        String database = connectionParameters.getString(DATABASE);
+
+        return host != null && !host.isBlank() && database != null && !database.isBlank();
     }
 
     static <T> T executeInReadOnlyTransaction(SingleConnectionDataSource dataSource, Supplier<T> supplier)
