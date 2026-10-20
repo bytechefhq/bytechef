@@ -295,6 +295,87 @@ class WorkflowNodeOutputFacadeTest {
     }
 
     @Test
+    void testLoopWhoseItemsCannotBeEvaluatedDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        WorkflowTask loopTask = new WorkflowTask(
+            Map.of(
+                "name", "loop1", "type", "loop/v1",
+                "parameters", Map.of("items", "${range(1, ${config.linesPerRow)}", "iteratee", List.of())));
+        WorkflowTask task2 = new WorkflowTask(
+            Map.of("name", "action2", "type", "component/v1/action2"));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("action2"))).thenReturn(List.of(loopTask, task2));
+        when(workflow.getTasks(eq("loop1"))).thenReturn(List.of(loopTask));
+
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+        OutputResponse loopOutputResponse = mock(OutputResponse.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "loop1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("loop", 1)).thenReturn(true);
+        when(taskDispatcherDefinition.getOutputResponse()).thenReturn(loopOutputResponse);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenThrow(new IllegalArgumentException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "action2", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("loop1", result.getFirst()
+                .workflowNodeName());
+            assertNotNull(result.getFirst()
+                .taskDispatcherDefinition());
+
+            assertEquals(
+                Map.of(),
+                workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, "action2", ENVIRONMENT_ID));
+        }
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputOfLoopThrowsEvaluationExceptionOnItemsEvaluationFailure() {
+        WorkflowTask loopTask = new WorkflowTask(
+            Map.of(
+                "name", "loop1", "type", "loop/v1",
+                "parameters", Map.of("items", "${range(1, ${config.linesPerRow)}", "iteratee", List.of())));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(loopTask));
+        when(workflow.getTasks(eq("loop1"))).thenReturn(List.of(loopTask));
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "loop1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("loop", 1)).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenThrow(new IllegalArgumentException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            assertThrows(
+                EvaluationException.class,
+                () -> workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "loop1", ENVIRONMENT_ID));
+        }
+    }
+
+    @Test
     void testTriggerWhoseDynamicOutputFailsDoesNotBreakTheOutputsOfTheNodesAfterIt() {
         WorkflowTrigger workflowTrigger = new WorkflowTrigger(
             Map.of("name", "trigger_1", "type", "dataTable/v1/recordUpdated"));
