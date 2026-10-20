@@ -96,14 +96,21 @@ public class FromAiTest {
 
     @Test
     public void testFromAiNoArguments() {
-        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
-            Map.of("param", "=fromAi()"), Collections.emptyMap()));
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("param", "=fromAi()"), Collections.emptyMap()));
+
+        assertInstanceOf(IllegalArgumentException.class, expressionEvaluationException.getCause());
+        assertEquals("fromAi requires at least a name argument.", expressionEvaluationException.getMessage());
     }
 
     @Test
     public void testFromAiWithInvalidType() {
-        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
-            Map.of("param", "=fromAi('name', 'INVALID')"), Collections.emptyMap()));
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(Map.of("param", "=fromAi('name', 'INVALID')"), Collections.emptyMap()));
+
+        assertInstanceOf(IllegalArgumentException.class, expressionEvaluationException.getCause());
     }
 
     @Test
