@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,14 +46,14 @@ class ConnectionEnvironmentResolverTest {
 
         connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
 
-        when(connectionService.getConnections(List.of(CONNECTION_ID))).thenReturn(List.of(connection));
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
 
         assertThat(resolver.fetchEnvironment(CONNECTION_ID)).contains(Environment.PRODUCTION);
     }
 
     @Test
     void testAnUnknownConnectionHasNoEnvironment() {
-        when(connectionService.getConnections(List.of(CONNECTION_ID))).thenReturn(List.of());
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.empty());
 
         assertThat(resolver.fetchEnvironment(CONNECTION_ID)).isEmpty();
     }
@@ -64,7 +64,7 @@ class ConnectionEnvironmentResolverTest {
 
         connection.setEnvironmentId(99);
 
-        when(connectionService.getConnections(List.of(CONNECTION_ID))).thenReturn(List.of(connection));
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
 
         assertThatThrownBy(() -> resolver.fetchEnvironment(CONNECTION_ID))
             .isInstanceOf(IllegalStateException.class);
@@ -72,7 +72,7 @@ class ConnectionEnvironmentResolverTest {
 
     @Test
     void testALookupFailurePropagates() {
-        when(connectionService.getConnections(List.of(CONNECTION_ID)))
+        when(connectionService.fetchConnection(CONNECTION_ID))
             .thenThrow(new IllegalStateException("database unavailable"));
 
         assertThatThrownBy(() -> resolver.fetchEnvironment(CONNECTION_ID))
