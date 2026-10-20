@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard.AdmissionResult;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,14 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  */
 class WorkflowChatGuardTest {
 
+    private static final String OTHER_THREAD_ID = "00000000-0000-0000-0000-000000000002";
+    private static final String THREAD_ID = "00000000-0000-0000-0000-000000000001";
+
     @Test
     void testFirstTurnIsAdmitted() {
         WorkflowChatGuard guard = newGuard();
 
-        AdmissionResult result = guard.tryAdmit(1L);
+        AdmissionResult result = guard.tryAdmit(THREAD_ID);
 
         assertThat(result).isInstanceOf(AdmissionResult.Admit.class);
     }
@@ -37,11 +41,11 @@ class WorkflowChatGuardTest {
     void testSecondTurnAfterCooldownElapsedIsAdmitted() throws InterruptedException {
         WorkflowChatGuard guard = newGuard();
 
-        guard.tryAdmit(1L);
+        guard.tryAdmit(THREAD_ID);
 
         Thread.sleep(WorkflowChatGuard.RATE_LIMIT_MIN_INTERVAL_MS + 100);
 
-        AdmissionResult result = guard.tryAdmit(1L);
+        AdmissionResult result = guard.tryAdmit(THREAD_ID);
 
         assertThat(result).isInstanceOf(AdmissionResult.Admit.class);
     }
@@ -50,9 +54,9 @@ class WorkflowChatGuardTest {
     void testSecondTurnDuringCooldownIsRateLimited() {
         WorkflowChatGuard guard = newGuard();
 
-        guard.tryAdmit(1L);
+        guard.tryAdmit(THREAD_ID);
 
-        AdmissionResult result = guard.tryAdmit(1L);
+        AdmissionResult result = guard.tryAdmit(THREAD_ID);
 
         assertThat(result).isInstanceOf(AdmissionResult.RateLimited.class);
 
@@ -67,20 +71,35 @@ class WorkflowChatGuardTest {
     void testIndependentChatsDoNotInterfere() {
         WorkflowChatGuard guard = newGuard();
 
-        guard.tryAdmit(1L);
+        guard.tryAdmit(THREAD_ID);
 
-        AdmissionResult result = guard.tryAdmit(2L);
+        AdmissionResult result = guard.tryAdmit(OTHER_THREAD_ID);
 
         assertThat(result).isInstanceOf(AdmissionResult.Admit.class);
+    }
+
+    @Test
+    void testChatsSharingANumericIdAcrossTenantsDoNotShareACooldown() {
+        WorkflowChatGuard guard = newGuard();
+
+        AiHubChat tenantOneChat = newChat(1L, THREAD_ID);
+        AiHubChat tenantTwoChat = newChat(1L, OTHER_THREAD_ID);
+
+        guard.tryAdmit(tenantOneChat.getThreadId());
+
+        AdmissionResult result = guard.tryAdmit(tenantTwoChat.getThreadId());
+
+        assertThat(result).isInstanceOf(AdmissionResult.Admit.class);
+        assertThat(guard.tryAdmit(tenantOneChat.getThreadId())).isInstanceOf(AdmissionResult.RateLimited.class);
     }
 
     @Test
     void testRateLimitedUserFacingMessageIncludesCountdown() {
         WorkflowChatGuard guard = newGuard();
 
-        guard.tryAdmit(1L);
+        guard.tryAdmit(THREAD_ID);
 
-        AdmissionResult.RateLimited rateLimited = (AdmissionResult.RateLimited) guard.tryAdmit(1L);
+        AdmissionResult.RateLimited rateLimited = (AdmissionResult.RateLimited) guard.tryAdmit(THREAD_ID);
 
         assertThat(rateLimited.userFacingMessage()).contains("Wait");
         assertThat(rateLimited.userFacingMessage()).contains("seconds");
@@ -97,6 +116,15 @@ class WorkflowChatGuardTest {
         assertThat(WorkflowChatGuard.class.getDeclaredFields())
             .extracting(Field::getName)
             .doesNotContain("IN_FLIGHT_CACHE_NAME");
+    }
+
+    private static AiHubChat newChat(long chatId, String threadId) {
+        AiHubChat chat = new AiHubChat(1L);
+
+        chat.setId(chatId);
+        chat.setThreadId(threadId);
+
+        return chat;
     }
 
     private static WorkflowChatGuard newGuard() {

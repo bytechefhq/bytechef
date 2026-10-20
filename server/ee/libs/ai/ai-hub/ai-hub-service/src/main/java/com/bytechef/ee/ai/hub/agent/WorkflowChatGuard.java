@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
  * Per-chat rate limit for workflow-chat turns: at most one turn per {@value #RATE_LIMIT_MIN_INTERVAL_MS} milliseconds
  * on a given chat. A user who spams Enter or a client that retries on every keystroke cannot fire dozens of workflow
  * executions per second, which would otherwise be a denial-of-wallet vector for workflows that call paid APIs. The
- * cooldown is per chat rather than per user so parallel workflow chats stay independently usable.
+ * cooldown is per chat rather than per user so parallel workflow chats stay independently usable. It is keyed by the
+ * chat's thread id, a UUID, because numeric chat ids repeat across tenants in schema-per-tenant mode.
  *
  * <p>
  * Backed by Spring's {@link CacheManager} so multi-instance deployments share state. The check returns a typed result
@@ -52,9 +53,9 @@ public class WorkflowChatGuard {
      * milliseconds ago. An admitted turn records its start time so the cooldown is measured against the start of the
      * previous turn, not its end.
      */
-    public AdmissionResult tryAdmit(long chatId) {
+    public AdmissionResult tryAdmit(String threadId) {
         Cache lastTurn = getCache();
-        Long lastTurnMillis = lastTurn.get(chatId, Long.class);
+        Long lastTurnMillis = lastTurn.get(threadId, Long.class);
         long now = Instant.now()
             .toEpochMilli();
 
@@ -66,7 +67,7 @@ public class WorkflowChatGuard {
             }
         }
 
-        lastTurn.put(chatId, now);
+        lastTurn.put(threadId, now);
 
         return AdmissionResult.admit();
     }

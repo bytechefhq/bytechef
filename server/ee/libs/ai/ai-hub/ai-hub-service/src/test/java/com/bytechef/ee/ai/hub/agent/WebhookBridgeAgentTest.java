@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -107,7 +108,7 @@ class WebhookBridgeAgentTest {
             .build();
         subscriber = mock(AgentSubscriber.class);
 
-        when(guard.tryAdmit(anyLong())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
+        when(guard.tryAdmit(anyString())).thenReturn(WorkflowChatGuard.AdmissionResult.admit());
     }
 
     @Test
@@ -186,7 +187,7 @@ class WebhookBridgeAgentTest {
     void testRateLimitedTurnEndsWithTheGuardsMessage() throws AGUIException {
         givenChat(newChat(AiHubChatKind.WORKFLOW_CHAT, "Chat"));
 
-        when(guard.tryAdmit(CHAT_ID))
+        when(guard.tryAdmit(THREAD_ID))
             .thenReturn(WorkflowChatGuard.AdmissionResult.rateLimited(Duration.ofMillis(500)));
 
         newAgent().runAgent(parametersOf(buildInput("hello")), subscriber);

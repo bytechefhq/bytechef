@@ -897,7 +897,7 @@ public class WebhookBridgeAgent extends LocalAgent {
      * emits a RUN_ERROR with the guard's user-facing message and returns {@code false}.
      */
     private boolean tryAdmitOrEmitError(RunAgentInput input, AiHubChat chat, AgentSubscriber subscriber) {
-        WorkflowChatGuard.AdmissionResult admission = guard.tryAdmit(chat.getId());
+        WorkflowChatGuard.AdmissionResult admission = guard.tryAdmit(chat.getThreadId());
 
         if (admission instanceof WorkflowChatGuard.AdmissionResult.Admit) {
             return true;
