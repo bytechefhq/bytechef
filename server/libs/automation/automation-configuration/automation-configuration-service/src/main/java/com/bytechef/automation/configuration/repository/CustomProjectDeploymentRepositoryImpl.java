@@ -31,7 +31,6 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
     private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
     private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
-    private static final String MCP_SERVER_NAME_PREFIX = "__MCP_SERVER__";
 
     private final JdbcClient jdbcClient;
     private final ProjectOwnershipService projectOwnershipService;
@@ -70,7 +69,6 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
         conditions.add(
             "(NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
-                startsWith("project_deployment.name", MCP_SERVER_NAME_PREFIX) + " AND NOT " +
                 startsWith("project_deployment.name", A2A_SERVER_NAME_PREFIX) + ")");
 
         if (embedded != null) {
