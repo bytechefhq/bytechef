@@ -58,6 +58,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade {
 
+    private static final String DEVELOPMENT = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
+
     private final EnvironmentService environmentService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -103,7 +105,8 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
             @AuditData(key = "integrationId", value = "#integrationId"),
             @AuditData(key = "integrationWorkflowId", value = "#result")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasResourceScopeInEnvironment(#integrationId, 'Integration', 'WORKFLOW_CREATE', " + DEVELOPMENT
+        + ")")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
         workflowValidatorFacade.validateNoReservedInputNames(definition);
@@ -123,7 +126,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     @Audited(event = WorkflowAuditEvents.INTEGRATION_WORKFLOW_DELETED, data = {
         @AuditData(key = "workflowId", value = "#workflowId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_DELETE', " + DEVELOPMENT + ")")
     public void deleteWorkflow(String workflowId) {
         Integration integration = integrationService.getWorkflowIntegration(workflowId);
 
@@ -168,14 +171,14 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         @AuditData(key = "integrationWorkflowId", value = "#integrationWorkflowId"),
         @AuditData(key = "permissionExpression", value = "#permissionExpression")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationWorkflowId, 'IntegrationWorkflow', 'INTEGRATION_SETTINGS')")
     public void updatePermissionExpression(long integrationWorkflowId, String permissionExpression) {
         integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, permissionExpression);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
 
@@ -184,7 +187,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationWorkflowId, 'IntegrationWorkflow', 'WORKFLOW_VIEW')")
     public IntegrationWorkflowDTO getIntegrationWorkflow(long integrationWorkflowId) {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getIntegrationWorkflow(
             integrationWorkflowId);
@@ -195,7 +198,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('WORKFLOW_VIEW')")
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
         return integrationWorkflowService.getIntegrationWorkflows()
             .stream()
@@ -208,7 +211,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')")
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long integrationId) {
         Integration integration = integrationService.getIntegration(integrationId);
 
@@ -228,7 +231,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')")
     public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
         long id, int integrationVersion, boolean includeAllFields) {
 
@@ -250,7 +253,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')")
     public VersionWorkflowChange getIntegrationVersionWorkflowChange(
         long integrationId, int integrationVersion, String workflowUuid) {
 
@@ -265,7 +268,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')")
     public VersionWorkflowChanges getIntegrationVersionWorkflowChanges(long integrationId, int integrationVersion) {
         Integer baseVersion = getBaseVersion(integrationId, integrationVersion);
 
@@ -275,7 +278,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowValidatorFacade.validateNoReservedInputNames(definition);
         workflowValidatorFacade.validateNoReservedNodeNames(definition);
