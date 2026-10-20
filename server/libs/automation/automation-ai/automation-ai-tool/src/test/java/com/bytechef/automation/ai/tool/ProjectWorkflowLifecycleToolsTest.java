@@ -70,6 +70,39 @@ class ProjectWorkflowLifecycleToolsTest {
     }
 
     @Test
+    void testListWorkflowsPassesTheQueryThrough() {
+        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+        ToolContext toolContext = new ToolContext(Map.of());
+
+        new ProjectWorkflowLifecycleTools(projectWorkflowTools).listWorkflows(7L, "email", toolContext);
+
+        verify(projectWorkflowTools).listWorkflows(7L, "email", toolContext);
+    }
+
+    @Test
+    void testListWorkflowsTakesAnOptionalQuery() {
+        ToolCallback[] toolCallbacks = ToolCallbacks.from(new ProjectWorkflowLifecycleTools(
+            mock(ProjectWorkflowTools.class)));
+
+        String listInputSchema = Arrays.stream(toolCallbacks)
+            .filter(toolCallback -> "listWorkflows".equals(toolCallback.getToolDefinition()
+                .name()))
+            .findFirst()
+            .orElseThrow()
+            .getToolDefinition()
+            .inputSchema();
+
+        Map<String, ?> inputSchema = JsonUtils.readMap(listInputSchema);
+
+        assertThat(inputSchema).extractingByKey("properties")
+            .asInstanceOf(InstanceOfAssertFactories.MAP)
+            .containsKeys("projectId", "query");
+        assertThat(inputSchema).extractingByKey("required")
+            .asInstanceOf(InstanceOfAssertFactories.LIST)
+            .containsExactly("projectId");
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void testCreateProjectWorkflowDelegatesWithAnEmptyDefinition() {
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);

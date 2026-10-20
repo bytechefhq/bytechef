@@ -81,10 +81,13 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. Pass a query to return only the projects whose name or description contains it. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> listProjects(
         @ToolParam(
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against project names and descriptions, case-insensitively. Omit it to list every project.") @Nullable String query,
         ToolContext toolContext) {
 
         Long scopedProjectId = scopedProjectGuard.fetchScopedProjectId(toolContext);
@@ -92,17 +95,15 @@ public class ProjectTools {
             ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.LIST_PROJECTS) : null;
 
         try {
-            List<ProjectInfo> projectInfos = getAccessibleProjects(scopedProjectId, resolvedWorkspaceId).stream()
-                .map(ProjectTools::getProjectInfo)
-                .toList();
+            List<ProjectInfo> projectInfos = getMatchingProjects(scopedProjectId, resolvedWorkspaceId, query);
 
             if (log.isDebugEnabled()) {
-                log.debug("listProjects(): Found {} projects", projectInfos.size());
+                log.debug("listProjects({}): Found {} projects", query, projectInfos.size());
             }
 
             return projectInfos;
         } catch (Exception e) {
-            log.error("listProjects(): Failed to list projects", e);
+            log.error("listProjects({}): Failed to list projects", query, e);
 
             throw new ExecutionException(
                 "Failed to list projects: " + e.getMessage(), e, ProjectErrorType.LIST_PROJECTS);
@@ -110,7 +111,7 @@ public class ProjectTools {
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
+        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, whether it is published, the last version number, the last published date, versions, its deployments with their environments and enabled state, and metadata.")
     public ProjectDetailInfo getProject(
         @ToolParam(description = "The ID of the project to retrieve") long projectId, ToolContext toolContext) {
 
@@ -141,9 +142,10 @@ public class ProjectTools {
 
             return new ProjectDetailInfo(
                 projectDTO.id(), projectDTO.name(), projectDTO.description(), getLastStatusName(projectDTO),
+                projectDTO.lastPublishedDate() != null, projectDTO.lastProjectVersion(),
                 category == null ? null : category.getId(), projectDTO.workspaceId(), getTagIds(projectDTO.tags()),
-                projectVersionInfos, projectDTO.createdDate(), projectDTO.lastModifiedDate(),
-                projectDTO.lastPublishedDate());
+                projectVersionInfos, getProjectDeploymentStatusInfos(projectDTO), projectDTO.createdDate(),
+                projectDTO.lastModifiedDate(), projectDTO.lastPublishedDate());
         } catch (Exception e) {
             log.error("getProject({}): Failed to get project {}", projectId, projectId, e);
 
@@ -165,14 +167,7 @@ public class ProjectTools {
             ? requireWorkspaceId(workspaceId, toolContext, ProjectErrorType.SEARCH_PROJECTS) : null;
 
         try {
-            String lowerQuery = query.toLowerCase()
-                .trim();
-
-            List<ProjectInfo> matchingProjects = getAccessibleProjects(scopedProjectId, resolvedWorkspaceId).stream()
-                .filter(projectDTO -> contains(projectDTO.name(), lowerQuery) ||
-                    contains(projectDTO.description(), lowerQuery))
-                .map(ProjectTools::getProjectInfo)
-                .toList();
+            List<ProjectInfo> matchingProjects = getMatchingProjects(scopedProjectId, resolvedWorkspaceId, query);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -199,12 +194,7 @@ public class ProjectTools {
         try {
             ProjectDTO projectDTO = projectFacade.getProject(projectId);
 
-            List<ProjectDeploymentStatusInfo> deploymentStatuses = projectDeploymentFacade
-                .getWorkspaceProjectDeployments(
-                    Objects.requireNonNull(projectDTO.workspaceId()), null, projectId, null, false)
-                .stream()
-                .map(ProjectTools::getProjectDeploymentStatusInfo)
-                .toList();
+            List<ProjectDeploymentStatusInfo> deploymentStatuses = getProjectDeploymentStatusInfos(projectDTO);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -427,6 +417,28 @@ public class ProjectTools {
         }
 
         return tags;
+    }
+
+    private List<ProjectDeploymentStatusInfo> getProjectDeploymentStatusInfos(ProjectDTO projectDTO) {
+        List<ProjectDeploymentDTO> projectDeploymentDTOs = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            Objects.requireNonNull(projectDTO.workspaceId()), null, projectDTO.id(), null, false);
+
+        return projectDeploymentDTOs.stream()
+            .map(ProjectTools::getProjectDeploymentStatusInfo)
+            .toList();
+    }
+
+    private List<ProjectInfo> getMatchingProjects(
+        @Nullable Long scopedProjectId, @Nullable Long workspaceId, @Nullable String query) {
+
+        String lowerQuery = query == null ? "" : query.toLowerCase()
+            .trim();
+
+        return getAccessibleProjects(scopedProjectId, workspaceId).stream()
+            .filter(projectDTO -> lowerQuery.isEmpty() || contains(projectDTO.name(), lowerQuery) ||
+                contains(projectDTO.description(), lowerQuery))
+            .map(ProjectTools::getProjectInfo)
+            .toList();
     }
 
     private List<ProjectDTO> getAccessibleProjects(@Nullable Long scopedProjectId, @Nullable Long workspaceId) {
