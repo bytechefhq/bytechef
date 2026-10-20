@@ -134,6 +134,8 @@ import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -302,6 +304,9 @@ class EmbeddedMcpGatesIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private TagService tagService;
+
+    @Autowired
     private WorkflowCrudRepository workflowCrudRepository;
 
     @Autowired
@@ -319,11 +324,13 @@ class EmbeddedMcpGatesIntTest {
     private ConnectedUser connectedUser;
     private long developmentConfigurationId;
     private long developmentIntegrationInstanceConfigurationWorkflowId;
+    private long developmentMcpComponentId;
     private long developmentMcpConfigurationId;
     private long developmentMcpWorkflowId;
     private long developmentServerId;
     private String externalUserId;
     private long integrationInstanceId;
+    private long developmentMcpToolId;
     private long mcpToolId;
     private long productionConfigurationId;
     private long productionIntegrationInstanceConfigurationWorkflowId;
@@ -403,6 +410,13 @@ class EmbeddedMcpGatesIntTest {
         McpTool mcpTool = mcpToolRepository.save(new McpTool("tool", Map.of(), productionMcpComponentId));
 
         mcpToolId = mcpTool.getId();
+
+        McpComponent developmentMcpComponent = mcpComponentRepository.save(
+            new McpComponent("componentName", 1, developmentServerId, null));
+
+        developmentMcpComponentId = developmentMcpComponent.getId();
+        developmentMcpToolId = mcpToolRepository.save(new McpTool("tool", Map.of(), developmentMcpComponentId))
+            .getId();
 
         productionMcpConfigurationId = createMcpConfiguration(productionServerId, productionConfigurationId);
         developmentMcpConfigurationId = createMcpConfiguration(developmentServerId, developmentConfigurationId);
@@ -551,6 +565,77 @@ class EmbeddedMcpGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(mcpServerRepository.findById(developmentServerId)).isPresent();
+    }
+
+    @Test
+    void testTheServerTagsShowOnlyEnvironmentsTheMemberCanView() {
+        Tag productionTag = tagService.save(List.of(new Tag("production-tag")))
+            .getFirst();
+        Tag developmentTag = tagService.save(List.of(new Tag("development-tag")))
+            .getFirst();
+
+        McpServer productionServer = mcpServerRepository.findById(productionServerId)
+            .orElseThrow();
+        McpServer developmentServer = mcpServerRepository.findById(developmentServerId)
+            .orElseThrow();
+
+        productionServer.setTagIds(List.of(productionTag.getId()));
+        developmentServer.setTagIds(List.of(developmentTag.getId()));
+
+        mcpServerRepository.save(productionServer);
+        mcpServerRepository.save(developmentServer);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        assertThat(embeddedMcpServerFacade.getEmbeddedMcpServerTags())
+            .extracting(Tag::getName)
+            .containsExactly("production-tag");
+
+        authenticate(EMBEDDED_VIEWER, false);
+
+        assertThat(embeddedMcpServerFacade.getEmbeddedMcpServerTags())
+            .extracting(Tag::getName)
+            .containsExactlyInAnyOrder("production-tag", "development-tag");
+
+        authenticate(TENANT_ADMIN, true);
+
+        assertThat(embeddedMcpServerFacade.getEmbeddedMcpServerTags())
+            .extracting(Tag::getName)
+            .containsExactlyInAnyOrder("production-tag", "development-tag");
+    }
+
+    @Test
+    void testAnEditorEditsToolsAndComponentsOnlyInTheirEnvironment() {
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        McpTool productionMcpTool = mcpToolRepository.findById(mcpToolId)
+            .orElseThrow();
+        McpTool developmentMcpTool = mcpToolRepository.findById(developmentMcpToolId)
+            .orElseThrow();
+
+        embeddedMcpServerFacade.updateEmbeddedMcpTool(productionMcpTool);
+
+        assertThatThrownBy(() -> embeddedMcpServerFacade.updateEmbeddedMcpTool(developmentMcpTool))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> embeddedMcpServerFacade.deleteEmbeddedMcpTool(developmentMcpToolId))
+            .isInstanceOf(AccessDeniedException.class);
+
+        McpComponent productionMcpComponent = mcpComponentRepository.findById(productionMcpComponentId)
+            .orElseThrow();
+        McpComponent developmentMcpComponent = mcpComponentRepository.findById(developmentMcpComponentId)
+            .orElseThrow();
+
+        assertThatThrownBy(
+            () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(developmentMcpComponent, null, null, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpToolRepository.findById(developmentMcpToolId)).isPresent();
+
+        embeddedMcpServerFacade.deleteEmbeddedMcpTool(mcpToolId);
+
+        assertThat(mcpToolRepository.findById(mcpToolId)).isEmpty();
+
+        embeddedMcpServerFacade.updateEmbeddedMcpComponent(productionMcpComponent, null, null, List.of());
     }
 
     @Test

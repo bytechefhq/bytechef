@@ -175,6 +175,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     public List<Tag> getEmbeddedMcpServerTags() {
         List<Long> tagIds = mcpServerService.getMcpServers(PlatformType.EMBEDDED)
             .stream()
+            .filter(mcpServer -> permissionService.hasEmbeddedScope("MCP_VIEW", mcpServer.getEnvironment()))
             .flatMap(mcpServer -> CollectionUtils.stream(mcpServer.getTagIds()))
             .distinct()
             .toList();

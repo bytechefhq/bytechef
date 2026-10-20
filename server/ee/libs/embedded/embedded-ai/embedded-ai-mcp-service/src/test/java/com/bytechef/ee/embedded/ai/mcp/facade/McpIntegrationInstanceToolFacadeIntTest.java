@@ -22,7 +22,6 @@ import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
-import com.bytechef.ee.embedded.ai.mcp.security.EmbeddedMcpReader;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -387,7 +386,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, automationMcpToolId, true))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("does not belong to integration instance");
+            .hasMessageContaining("MCP tool not found");
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }
