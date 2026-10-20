@@ -356,9 +356,14 @@ configured. The hub's turns never reach a model:
   (`prepareAiHub`). It creates and deletes chats, workflows and projects through the API, builds the
   `openWorkflowTab` and approval results the server's tools return, serves the approval continuation on the attach
   endpoint (`stubAiHubAttach`), and records every toast (`recordToasts`).
-- **`fixtures/aiHubChats.ts`** (`aiHubChatsTest`) deletes the chats a test's page created.
+- **`fixtures/aiHubChats.ts`** (`aiHubChatsTest`) deletes the chats a test's page created. Its `stubWorkflowChats`
+  serves workflow chats without a deployed chat workflow: it lists the given chat workflows in the picker and turns a
+  real chat, created beforehand, into the workflow chat the picker opens.
 - **`pages/aiHubPage.ts`** is the hub page object (composer, Build switch, messages, edit and refresh, chats sidebar,
   workflow tabs, toasts).
+
+`aiHubWorkflowChats.spec.ts` covers workflow chats: the "Workflow chats" cascade and its search, creating a workflow
+chat and the composer without the model picker, resources and `@` mentions, and Stop sending one cancel.
 
 Specs that need a workflow tab use real projects and workflows from the project fixtures; the stubbed tool results
 point at them, so the embedded editor loads real data. No spec depends on an id already in the database.
@@ -371,11 +376,22 @@ point at them, so the embedded editor loads real data. No spec depends on an id 
 `PLAYWRIGHT_MCP_BEARER_TOKEN` when the MCP requires one). The approval tests skip when the workspace already holds a
 rule for the tool they gate.
 
-Section 9 needs a server restart per setting, so the configuration test asserts the state of the run it is given:
+The "Workflow chats" describe also needs `PLAYWRIGHT_ANTHROPIC_API_KEY`. It creates an Anthropic connection with that
+key, imports `tests/ai-hub/fixtures/workflow-chat-memory.json` (a hosted chat trigger and an AI Agent with an
+Anthropic model, the built-in Chat Memory keyed by `${trigger_1.conversationId}` and the ask-user-question tool) into
+a new project, publishes it and deploys it enabled in the hub's environment with the connection bound to the model.
+It then picks the workflow from the cascade, checks the workflow's memory across two turns, answers its question,
+stops a long turn and sends again, and deletes the chat, deployment, project and connection afterwards. Always run the
+live suite with `--retries=0`: the config records a trace on the first retry, and a trace of this describe would
+hold the key in the connection request.
 
-| Variable                | Purpose                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PLAYWRIGHT_HUB_CONFIG` | `on` (hub and Copilot on), `hub-off` (hub off, Copilot on) or `copilot-off` (hub on, Copilot off). Runs the `@live AI Hub configuration` test, which checks the reported flags, the navigation, the `/automation` redirect, the hub endpoint, the Copilot button and the management MCP tools for that setting |
+Section 9 needs a server restart per setting, so the configuration test asserts the state of the run it is given.
+The live variables beyond `PLAYWRIGHT_LIVE`:
+
+| Variable                       | Purpose                                                                                                                                                                                                                                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PLAYWRIGHT_HUB_CONFIG`        | `on` (hub and Copilot on), `hub-off` (hub off, Copilot on) or `copilot-off` (hub on, Copilot off). Runs the `@live AI Hub configuration` test, which checks the reported flags, the navigation, the `/automation` redirect, the hub endpoint, the Copilot button and the management MCP tools for that setting |
+| `PLAYWRIGHT_ANTHROPIC_API_KEY` | An Anthropic API key. Runs the "Workflow chats" describe, which stores it only in the Anthropic connection it creates for the deployed workflow and deletes afterwards                                                                                                                                         |
 
 ```bash
 cd client
@@ -385,7 +401,7 @@ PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 npx playwright test tests/ai-hub
 
 # Live, once, without retries
 PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 PLAYWRIGHT_LIVE=1 PLAYWRIGHT_MCP_SECRET_KEY=<secret> \
-  npx playwright test tests/ai-hub/aiHubLive.spec.ts --workers=1 --retries=0
+  PLAYWRIGHT_ANTHROPIC_API_KEY=<key> npx playwright test tests/ai-hub/aiHubLive.spec.ts --workers=1 --retries=0
 
 # Configuration, once per server setting
 PLAYWRIGHT_BASE_URL=http://127.0.0.1:5174 PLAYWRIGHT_LIVE=1 PLAYWRIGHT_HUB_CONFIG=hub-off \

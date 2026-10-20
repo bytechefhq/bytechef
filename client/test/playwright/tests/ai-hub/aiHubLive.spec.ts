@@ -10,9 +10,13 @@ import {
     TURN_IN_FLIGHT_TOAST,
     type WorkflowComponentTypesI,
     calledToolNames,
+    createAnthropicConnectionThroughApi,
+    createEnabledProjectDeploymentThroughApi,
     createProjectThroughApi,
+    createProjectWorkflowThroughApi,
     createSlackConnectionThroughApi,
     createToolApprovalRuleThroughApi,
+    deleteAiHubChatThroughApi,
     deleteConnectionThroughApi,
     deleteProjectDeploymentThroughApi,
     deleteProjectThroughApi,
@@ -33,9 +37,14 @@ import {
     recordToasts,
     waitForHubWorkspaceId,
 } from '../../utils/aiHubUtils';
-import {enableCopilotInApplicationInfo, hideReactQueryDevtools} from '../../utils/copilotUtils';
+import {
+    enableCopilotInApplicationInfo,
+    hideReactQueryDevtools,
+    readGraphQlOperationName,
+} from '../../utils/copilotUtils';
 import getRandomString from '../../utils/getRandomString';
 import {McpClient, type McpToolCallResultI, toolResultText} from '../../utils/mcpClient';
+import workflowChatMemory from './fixtures/workflow-chat-memory.json';
 
 export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflowTest);
 
@@ -46,6 +55,12 @@ const MCP_SECRET_KEY = process.env.PLAYWRIGHT_MCP_SECRET_KEY ?? '';
 const HUB_CONFIG = process.env.PLAYWRIGHT_HUB_CONFIG ?? '';
 
 const READ_ONLY_TOOL_NAME_PATTERN = /^(list|get|search|read|find|openWorkflowTab$|select|ask)/;
+
+const ANTHROPIC_API_KEY = process.env.PLAYWRIGHT_ANTHROPIC_API_KEY ?? '';
+
+const WORKFLOW_CHAT_AGENT_NODE_NAME = 'aiAgent_1';
+
+const WORKFLOW_CHAT_MODEL_NODE_NAME = 'anthropic_1';
 
 const shortName = (prefix: string) => `${prefix}_${getRandomString().slice(0, 8)}`;
 
@@ -74,6 +89,54 @@ async function openLiveHub(page: Page): Promise<LiveHubI> {
 }
 
 const liveTurn = (aiHubPage: AiHubPage, text: string) => aiHubPage.sendAndWaitForTurnEnd(text, LIVE_TURN_TIMEOUT);
+
+const WORKFLOW_CHAT_SEND_INTERVAL = 2500;
+
+/**
+ * Returns a function to await before every send in one workflow chat. It waits until WORKFLOW_CHAT_SEND_INTERVAL ms
+ * have passed since the previous send, because the workflow chat guard refuses a turn that starts within 2 s of the
+ * previous one.
+ */
+const createWorkflowChatSendPacer = (page: Page) => {
+    let lastSendTime: number | undefined;
+
+    return async () => {
+        if (lastSendTime !== undefined) {
+            const remainingInterval = lastSendTime + WORKFLOW_CHAT_SEND_INTERVAL - Date.now();
+
+            if (remainingInterval > 0) {
+                await page.waitForTimeout(remainingInterval);
+            }
+        }
+
+        lastSendTime = Date.now();
+    };
+};
+
+const expectWorkflowReply = async (
+    aiHubPage: AiHubPage,
+    paceWorkflowChatSend: () => Promise<void>,
+    text: string,
+    expectedText?: string
+) => {
+    const assistantMessageCount = await aiHubPage.assistantMessages.count();
+
+    await paceWorkflowChatSend();
+
+    await liveTurn(aiHubPage, text);
+
+    await expect(aiHubPage.runErrors).toHaveCount(0);
+
+    await expect.poll(() => aiHubPage.assistantMessages.count()).toBeGreaterThan(assistantMessageCount);
+
+    const lastAssistantMessage = aiHubPage.assistantMessages.last();
+
+    await expect(lastAssistantMessage).not.toBeEmpty();
+
+    if (expectedText) {
+        await expect(lastAssistantMessage).toContainText(expectedText);
+    }
+};
 
 const currentChat = (aiHubPage: AiHubPage, workspaceId: number): Omit<AiHubChatRefI, 'threadId'> => ({
     id: aiHubPage.currentChatId(),
@@ -372,6 +435,238 @@ test.describe('@live AI Hub', () => {
             } finally {
                 for (const deployment of await listProjectDeployments(page, {projectId, workspaceId})) {
                     await deleteProjectDeploymentThroughApi(page, deployment.id);
+                }
+            }
+        });
+    });
+
+    test.describe('Workflow chats', () => {
+        test.skip(!ANTHROPIC_API_KEY, 'Set PLAYWRIGHT_ANTHROPIC_API_KEY for the deployed workflow model');
+
+        test('a deployed chat workflow remembers across turns, asks a question, resumes and stops', async ({
+            authenticatedPage: page,
+        }) => {
+            const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+
+            const projectName = shortName('hub_live_wf_chat');
+
+            const paceWorkflowChatSend = createWorkflowChatSendPacer(page);
+
+            let connectionId: number | undefined;
+            let projectId: number | undefined;
+            let workflowChat: Omit<AiHubChatRefI, 'threadId'> | undefined;
+
+            try {
+                await test.step('Deploy the chat workflow', async () => {
+                    connectionId = await createAnthropicConnectionThroughApi(page, {
+                        apiKey: ANTHROPIC_API_KEY,
+                        environmentId,
+                        name: shortName('anthropic_live'),
+                        workspaceId,
+                    });
+
+                    projectId = await createProjectThroughApi(page, {name: projectName, workspaceId});
+
+                    await createProjectWorkflowThroughApi(page, {definition: workflowChatMemory, projectId});
+
+                    const [workflowId] = await listProjectWorkflowIds(page, projectId);
+
+                    await publishProjectThroughApi(page, projectId, 'Workflow chat');
+
+                    await createEnabledProjectDeploymentThroughApi(page, {
+                        connections: [
+                            {
+                                connectionId,
+                                workflowConnectionKey: WORKFLOW_CHAT_MODEL_NODE_NAME,
+                                workflowNodeName: WORKFLOW_CHAT_AGENT_NODE_NAME,
+                            },
+                        ],
+                        environmentId,
+                        name: projectName,
+                        projectId,
+                        projectVersion: 1,
+                        workflowId,
+                    });
+                });
+
+                await test.step('Pick the workflow from the Workflow chats cascade', async () => {
+                    await aiHubPage.goto();
+
+                    await aiHubPage.modelPickerButton.click();
+
+                    await aiHubPage.openWorkflowChatsMenu();
+
+                    const createWorkflowChatResponse = page.waitForResponse(
+                        (response) =>
+                            response.request().method() === 'POST' &&
+                            response.url().endsWith('/graphql') &&
+                            readGraphQlOperationName(response.request()) === 'createWorkflowChatAiHubChat'
+                    );
+
+                    await aiHubPage.workflowChatMenuItem(`${projectName} — ${workflowChatMemory.label}`).click();
+
+                    const createWorkflowChatBody = (await (await createWorkflowChatResponse).json()) as {
+                        data?: {createWorkflowChatAiHubChat?: {id: string} | null};
+                    };
+
+                    const createdChatId = createWorkflowChatBody.data?.createWorkflowChatAiHubChat?.id;
+
+                    if (createdChatId) {
+                        workflowChat = {id: Number(createdChatId), workspaceId};
+                    }
+
+                    await page.waitForURL(/\/automation\/ai-hub\/chats\/\d+$/);
+
+                    workflowChat = currentChat(aiHubPage, workspaceId);
+
+                    expect(String(workflowChat.id)).toBe(createdChatId);
+
+                    await expect(aiHubPage.workflowChatBadge).toBeVisible();
+                });
+
+                await test.step('The workflow memory carries the name across turns', async () => {
+                    await expectWorkflowReply(aiHubPage, paceWorkflowChatSend, 'My name is Mira.');
+
+                    await expectWorkflowReply(aiHubPage, paceWorkflowChatSend, 'What is my name?', 'Mira');
+                });
+
+                await test.step('The workflow asks which city and the answer resumes it', async () => {
+                    await paceWorkflowChatSend();
+
+                    await liveTurn(aiHubPage, 'Plan my trip.');
+
+                    const lisbonOption = page.getByRole('button', {exact: true, name: 'Lisbon'});
+                    const otherOption = page.getByRole('button', {name: /^Other\b/i});
+
+                    await expect(lisbonOption.or(otherOption).first()).toBeVisible();
+
+                    if ((await lisbonOption.count()) > 0) {
+                        await paceWorkflowChatSend();
+
+                        await lisbonOption.click();
+                    } else {
+                        await otherOption.first().click();
+
+                        const answerInput = page.getByPlaceholder('Type your answer…');
+
+                        await answerInput.fill('Lisbon');
+
+                        await paceWorkflowChatSend();
+
+                        await answerInput.press('Enter');
+                    }
+
+                    await expect(aiHubPage.userMessage('Lisbon')).toBeVisible();
+
+                    await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+                    await expect(aiHubPage.runErrors).toHaveCount(0);
+
+                    await expect(aiHubPage.assistantMessages.last()).toContainText('Lisbon');
+                });
+
+                await test.step('Stop ends a long turn and the chat accepts a new message', async () => {
+                    const assistantMessageCountBeforeLongTurn = await aiHubPage.assistantMessages.count();
+
+                    await paceWorkflowChatSend();
+
+                    await aiHubPage.send(
+                        'Write a detailed day-by-day itinerary for a three-week trip through Portugal, with at ' +
+                            'least ten sentences for every day.'
+                    );
+
+                    await expect
+                        .poll(() => aiHubPage.assistantMessages.count(), {timeout: LIVE_TURN_TIMEOUT})
+                        .toBeGreaterThan(assistantMessageCountBeforeLongTurn);
+
+                    await expect
+                        .poll(async () => ((await aiHubPage.assistantMessages.last().textContent()) ?? '').trim(), {
+                            timeout: LIVE_TURN_TIMEOUT,
+                        })
+                        .not.toBe('');
+
+                    await expect(aiHubPage.stopGeneratingButton.or(aiHubPage.sendButton)).toBeVisible({
+                        timeout: LIVE_TURN_TIMEOUT,
+                    });
+
+                    let stopClicked = false;
+
+                    if (await aiHubPage.stopGeneratingButton.isVisible()) {
+                        try {
+                            await aiHubPage.stopGeneratingButton.click({timeout: 5000});
+
+                            stopClicked = true;
+                        } catch (error) {
+                            if (await aiHubPage.stopGeneratingButton.isVisible()) {
+                                throw error;
+                            }
+                        }
+                    }
+
+                    test.info().annotations.push({
+                        description: stopClicked ? 'clicked' : 'turn finished first',
+                        type: 'stop',
+                    });
+
+                    await aiHubPage.waitForTurnEnd();
+
+                    const assistantMessageCount = await aiHubPage.assistantMessages.count();
+
+                    let attempt = 0;
+
+                    await expect(async () => {
+                        attempt++;
+
+                        await paceWorkflowChatSend();
+
+                        await liveTurn(aiHubPage, `Reply with the single word OK. (attempt ${attempt})`);
+
+                        await expect(aiHubPage.runErrors).toHaveCount(0);
+
+                        expect(await aiHubPage.assistantMessages.count()).toBeGreaterThan(assistantMessageCount);
+                    }).toPass({intervals: [10000], timeout: 180000});
+                });
+            } finally {
+                const runCleanup = async (description: string, cleanup: () => Promise<void>) => {
+                    try {
+                        await cleanup();
+                    } catch (error) {
+                        console.warn(`Failed to ${description}:`, error);
+                    }
+                };
+
+                if (workflowChat) {
+                    const workflowChatToDelete = workflowChat;
+
+                    await runCleanup('delete the workflow chat', () =>
+                        deleteAiHubChatThroughApi(page, workflowChatToDelete)
+                    );
+                }
+
+                if (projectId !== undefined) {
+                    const projectIdToDelete = projectId;
+
+                    let deployments: Awaited<ReturnType<typeof listProjectDeployments>> = [];
+
+                    await runCleanup('list the project deployments', async () => {
+                        deployments = await listProjectDeployments(page, {projectId: projectIdToDelete, workspaceId});
+                    });
+
+                    for (const deployment of deployments) {
+                        await runCleanup(`delete the project deployment ${deployment.id}`, () =>
+                            deleteProjectDeploymentThroughApi(page, deployment.id)
+                        );
+                    }
+
+                    await runCleanup('delete the project', () => deleteProjectThroughApi(page, projectIdToDelete));
+                }
+
+                if (connectionId !== undefined) {
+                    const connectionIdToDelete = connectionId;
+
+                    await runCleanup('delete the connection', () =>
+                        deleteConnectionThroughApi(page, connectionIdToDelete)
+                    );
                 }
             }
         });
