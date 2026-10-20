@@ -109,6 +109,21 @@ extend type Mutation {
     createAiHubChat(workspaceId: ID!, environment: Int!, threadId: String!): AiHubChat!
 
     """
+    Creates a workflow chat bound to a workflow execution id and its project deployment. Always inserts a new chat. The
+    caller needs the workspace VIEWER role and the WORKFLOW_VIEW scope, and the workflow must be one the workspace may
+    chat with; otherwise the call is refused as forbidden.
+    """
+    createWorkflowChatAiHubChat(
+        workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!, title: String
+    ): AiHubChat!
+
+    "Archives the caller's active workflow chats in the environment. Returns the number archived."
+    bulkArchiveWorkflowChatAiHubChats(workspaceId: ID!, environment: Int!): Int!
+
+    "Stops the in-flight turn of a workflow chat. Returns true when a live turn was cancelled."
+    cancelWorkflowChatTurn(workspaceId: ID!, id: ID!): Boolean!
+
+    """
     Partial update of a chat by primary key. At least one of {@code title}, {@code lastPreview},
     {@code messageCount}, {@code status} must be non-null; an all-null patch is rejected with BAD_REQUEST.
     """

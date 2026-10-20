@@ -7,16 +7,19 @@
 
 package com.bytechef.ee.ai.hub.web.graphql;
 
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifact;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.chat.TitleGenerationService;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
@@ -60,18 +63,20 @@ public class AiHubChatGraphQlController {
     private final AiHubChatArtifactService chatArtifactService;
     private final AiHubChatService chatService;
     private final PermissionService permissionService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final TitleGenerationService titleGenerationService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     public AiHubChatGraphQlController(
         AiHubChatArtifactService chatArtifactService, AiHubChatService chatService,
-        PermissionService permissionService, TitleGenerationService titleGenerationService,
-        UserService userService) {
+        PermissionService permissionService, ProjectDeploymentFacade projectDeploymentFacade,
+        TitleGenerationService titleGenerationService, UserService userService) {
 
         this.chatArtifactService = chatArtifactService;
         this.chatService = chatService;
         this.permissionService = permissionService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.titleGenerationService = titleGenerationService;
         this.userService = userService;
     }
@@ -111,6 +116,39 @@ public class AiHubChatGraphQlController {
     }
 
     @MutationMapping
+    public AiHubChat createWorkflowChatAiHubChat(
+        @Argument long workspaceId, @Argument int environment, @Argument String workflowExecutionId,
+        @Argument long projectDeploymentId, @Argument @Nullable String title) {
+
+        AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
+
+        if (!permissionService.hasWorkspaceScope(workspaceId, "WORKFLOW_VIEW")) {
+            throw new ForbiddenException("Workflows are not viewable by the current user");
+        }
+
+        if (!projectDeploymentFacade.isWorkspaceChatWorkflow(workspaceId, workflowExecutionId)) {
+            throw new ForbiddenException("Workflow is not available to chat in this workspace");
+        }
+
+        return chatService.createWorkflowChat(
+            workspaceId, currentUserId(), environment, workflowExecutionId, projectDeploymentId, title);
+    }
+
+    @MutationMapping
+    public int bulkArchiveWorkflowChatAiHubChats(@Argument long workspaceId, @Argument int environment) {
+        AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
+
+        return chatService.bulkArchiveWorkflowChatAiHubChats(workspaceId, currentUserId(), environment);
+    }
+
+    @MutationMapping
+    public boolean cancelWorkflowChatTurn(@Argument long workspaceId, @Argument long id) {
+        AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
+
+        return chatService.cancelWorkflowChatTurn(id, workspaceId, currentUserId());
+    }
+
+    @MutationMapping
     public AiHubChat updateAiHubChat(@Argument AiHubChatPatchInput input) {
         AiHubWorkspaceAccess.verifyViewer(permissionService, input.workspaceId());
 
@@ -128,7 +166,9 @@ public class AiHubChatGraphQlController {
 
         AiHubChat existing = chatService.getById(id, workspaceId, userId);
 
-        if (!existing.isAutoTitled()) {
+        AiHubChatKind kind = existing.getKind();
+
+        if (!existing.isAutoTitled() || (kind != null && kind.isWebhookBridged())) {
             return existing;
         }
 
