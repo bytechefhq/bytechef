@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,13 +36,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectWorkflowOwnershipResolver implements ResourceOwnershipResolver {
 
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final ProjectRepository projectRepository;
     private final ProjectWorkflowRepository projectWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowOwnershipResolver(
-        ProjectRepository projectRepository, ProjectWorkflowRepository projectWorkflowRepository) {
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider, ProjectRepository projectRepository,
+        ProjectWorkflowRepository projectWorkflowRepository) {
 
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.projectRepository = projectRepository;
         this.projectWorkflowRepository = projectWorkflowRepository;
     }
@@ -53,8 +57,22 @@ public class ProjectWorkflowOwnershipResolver implements ResourceOwnershipResolv
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return fetchProject(id)
-            .map(Project::getWorkspaceId)
+        Optional<Project> projectOptional = fetchProject(id);
+
+        if (projectOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        Project project = projectOptional.get();
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+            return embeddedResourceResolver.isHubProject(project.getId())
+                ? ResourceOwner.ofEmbedded() : ResourceOwner.ofEmbeddedProject();
+        }
+
+        return Optional.ofNullable(project.getWorkspaceId())
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }

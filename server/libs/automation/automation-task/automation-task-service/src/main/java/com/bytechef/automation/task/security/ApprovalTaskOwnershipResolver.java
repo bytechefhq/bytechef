@@ -18,6 +18,7 @@ package com.bytechef.automation.task.security;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -29,6 +30,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,16 +45,20 @@ import org.springframework.stereotype.Component;
 public class ApprovalTaskOwnershipResolver implements ResourceOwnershipResolver {
 
     private final ApprovalTaskRepository approvalTaskRepository;
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
     public ApprovalTaskOwnershipResolver(
-        ApprovalTaskRepository approvalTaskRepository, PrincipalJobService principalJobService,
-        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
+        ApprovalTaskRepository approvalTaskRepository,
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        PrincipalJobService principalJobService, ProjectDeploymentService projectDeploymentService,
+        ProjectService projectService) {
 
         this.approvalTaskRepository = approvalTaskRepository;
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.principalJobService = principalJobService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
@@ -73,11 +79,23 @@ public class ApprovalTaskOwnershipResolver implements ResourceOwnershipResolver 
 
         ApprovalTask approvalTask = approvalTaskOptional.get();
 
-        OptionalLong workspaceId = fetchJobId(approvalTask.getJobResumeId())
+        Optional<Project> projectOptional = fetchJobId(approvalTask.getJobResumeId())
             .flatMap(jobId -> principalJobService.fetchJobPrincipalId(jobId, PlatformType.AUTOMATION))
             .flatMap(projectDeploymentService::fetchProjectDeployment)
             .map(ProjectDeployment::getProjectId)
-            .flatMap(projectService::fetchProject)
+            .flatMap(projectService::fetchProject);
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (projectOptional.isPresent() && embeddedResourceResolver != null) {
+            Project project = projectOptional.get();
+
+            if (embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+                return ResourceOwner.ofEmbeddedProject();
+            }
+        }
+
+        OptionalLong workspaceId = projectOptional
             .map(Project::getWorkspaceId)
             .map(OptionalLong::of)
             .orElseGet(OptionalLong::empty);
