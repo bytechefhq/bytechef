@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.tool.model.ProjectInfo;
 import com.bytechef.automation.ai.tool.model.ProjectStatusInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -42,17 +43,20 @@ public class ReadProjectTools {
     }
 
     @Tool(
-        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
+        description = "List the projects of a workspace. Returns a list of projects with their basic information including id, name, description, and status. Pass a query to return only the projects whose name or description contains it. In an embedded chat confined to one project, returns only that project and ignores workspaceId.")
     public List<ProjectInfo> listProjects(
         @ToolParam(
             required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against project names and descriptions, case-insensitively. Omit it to list every project.") @Nullable String query,
         ToolContext toolContext) {
 
-        return delegate.listProjects(workspaceId, toolContext);
+        return delegate.listProjects(workspaceId, query, toolContext);
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, versions, and metadata.")
+        description = "Get comprehensive information about a specific project. Returns detailed project information including id, name, description, status, whether it is published, the last version number, the last published date, versions, its deployments with their environments and enabled state, and metadata.")
     public ProjectDetailInfo getProject(
         @ToolParam(description = "The ID of the project to retrieve") long projectId, ToolContext toolContext) {
 
