@@ -64,8 +64,7 @@ class PermissionScopeTypeTest {
      * <p>
      * Removing an entry is the whole cost of enforcing one: write the gate, delete the line.
      */
-    private static final Set<String> KNOWN_UNENFORCED_SCOPES = Set.of(
-        "EMBEDDED_SETTINGS_MANAGE");
+    private static final Set<String> KNOWN_UNENFORCED_SCOPES = Set.of();
 
     /**
      * Every SpEL function a {@code @PreAuthorize} in this tree calls. Pinned because the scope patterns below read
