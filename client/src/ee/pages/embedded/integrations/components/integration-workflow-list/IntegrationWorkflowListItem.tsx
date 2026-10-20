@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -6,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationWorkflowPermissionExpressionField from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowPermissionExpressionField';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
@@ -169,37 +168,34 @@ const IntegrationWorkflowListItem = ({
                         <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<EditIcon />}
+                            label="Edit"
                             onClick={() => {
                                 setIsPermissionExpressionSeeded(false);
                                 setShowEditDialog(true);
                             }}
-                        >
-                            <EditIcon /> Edit
-                        </DropdownMenuItem>
+                        />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item"
+                            icon={<DownloadIcon />}
+                            label="Export"
                             onClick={() =>
                                 (window.location.href = `/api/embedded/internal/workflows/${workflow.id}/export`)
                             }
-                        >
-                            <DownloadIcon /> Export
-                        </DropdownMenuItem>
+                        />
 
-                        <DropdownMenuSeparator className="m-0" />
+                        <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={() => {
                                 setShowDeleteDialog(true);
                             }}
                             variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

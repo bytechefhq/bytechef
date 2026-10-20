@@ -140,11 +140,68 @@ const openEditDialog = async () => {
     await userEvent.click(await screen.findByText('Edit'));
 };
 
+const openMenu = async () => {
+    const menuTrigger = screen.getAllByRole('button').find((button) => button.getAttribute('aria-haspopup') === 'menu');
+
+    await userEvent.click(menuTrigger!);
+};
+
 describe('IntegrationWorkflowListItem', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
         hoisted.integrationWorkflowsQueryResult = {data: null, isFetching: false};
+    });
+
+    describe('menu', () => {
+        it('should render with the design-system DropdownMenu', async () => {
+            renderItem({id: '5'});
+
+            await openMenu();
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Export'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+        });
+
+        it('should open the edit dialog when Edit is clicked', async () => {
+            renderItem({id: '5'});
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+            expect(screen.getByTestId('workflow-dialog')).toBeInTheDocument();
+        });
+
+        it('should open the delete dialog when Delete is clicked', async () => {
+            renderItem({id: '5'});
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+            expect(screen.getByTestId('delete-workflow-dialog')).toBeInTheDocument();
+        });
+
+        it('should navigate to the export endpoint when Export is clicked', async () => {
+            const originalLocation = window.location;
+
+            const location = {href: ''} as Location;
+
+            Object.defineProperty(window, 'location', {configurable: true, value: location});
+
+            renderItem({id: '5'});
+
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Export'}));
+
+            expect(location.href).toBe('/api/embedded/internal/workflows/5/export');
+
+            Object.defineProperty(window, 'location', {configurable: true, value: originalLocation});
+        });
     });
 
     it('shows the trigger as its own chip, matching the projects list', () => {
