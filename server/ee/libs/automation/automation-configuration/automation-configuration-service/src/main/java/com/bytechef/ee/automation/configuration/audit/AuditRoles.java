@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.audit;
 
+import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -58,6 +59,30 @@ final class AuditRoles {
         return workspaceUsers.stream()
             .map(AuditRoles::describeWithEnvironment)
             .collect(Collectors.joining(","));
+    }
+
+    static String describe(EmbeddedUser embeddedUser) {
+        Long customRoleId = embeddedUser.getCustomRoleId();
+
+        if (customRoleId != null) {
+            return CUSTOM_ROLE_PREFIX + customRoleId;
+        }
+
+        WorkspaceRole embeddedRole = embeddedUser.getEmbeddedRole();
+
+        return embeddedRole == null ? "UNKNOWN" : embeddedRole.name();
+    }
+
+    static String describeAllEmbedded(List<EmbeddedUser> embeddedUsers) {
+        return embeddedUsers.stream()
+            .map(AuditRoles::describeWithEnvironment)
+            .collect(Collectors.joining(","));
+    }
+
+    private static String describeWithEnvironment(EmbeddedUser embeddedUser) {
+        Environment environment = embeddedUser.getEnvironment();
+
+        return environment == null ? describe(embeddedUser) : environment.name() + ":" + describe(embeddedUser);
     }
 
     private static String describeWithEnvironment(WorkspaceUser workspaceUser) {
