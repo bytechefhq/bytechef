@@ -18,6 +18,16 @@ import {
     ApiCollectionFromJSON,
     ApiCollectionToJSON,
 } from '../models/ApiCollection';
+import {
+    type ApiCollectionVersionUpdate,
+    ApiCollectionVersionUpdateFromJSON,
+    ApiCollectionVersionUpdateToJSON,
+} from '../models/ApiCollectionVersionUpdate';
+import {
+    type UpdateApiCollectionProjectVersionRequest,
+    UpdateApiCollectionProjectVersionRequestFromJSON,
+    UpdateApiCollectionProjectVersionRequestToJSON,
+} from '../models/UpdateApiCollectionProjectVersionRequest';
 
 export interface CreateApiCollectionRequest {
     /**
@@ -68,6 +78,17 @@ export interface UpdateApiCollectionRequest {
      * 
      */
     apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
+}
+
+export interface UpdateApiCollectionProjectVersionOperationRequest {
+    /**
+     * The id of an API collection.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateApiCollectionProjectVersionRequest: UpdateApiCollectionProjectVersionRequest;
 }
 
 /**
@@ -330,6 +351,63 @@ export class ApiCollectionApi extends runtime.BaseAPI {
      */
     async updateApiCollection(requestParameters: UpdateApiCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiCollection> {
         const response = await this.updateApiCollectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateApiCollectionProjectVersion without sending the request
+     */
+    async updateApiCollectionProjectVersionRequestOpts(requestParameters: UpdateApiCollectionProjectVersionOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateApiCollectionProjectVersion().'
+            );
+        }
+
+        if (requestParameters['updateApiCollectionProjectVersionRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateApiCollectionProjectVersionRequest',
+                'Required parameter "updateApiCollectionProjectVersionRequest" was null or undefined when calling updateApiCollectionProjectVersion().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api-collections/{id}/project-version`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateApiCollectionProjectVersionRequestToJSON(requestParameters['updateApiCollectionProjectVersionRequest']),
+        };
+    }
+
+    /**
+     * Move an API collection to a newer published project version in place, keeping its collection version.
+     * Move an API collection to a newer project version
+     */
+    async updateApiCollectionProjectVersionRaw(requestParameters: UpdateApiCollectionProjectVersionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiCollectionVersionUpdate>> {
+        const requestOptions = await this.updateApiCollectionProjectVersionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ApiCollectionVersionUpdateFromJSON(jsonValue));
+    }
+
+    /**
+     * Move an API collection to a newer published project version in place, keeping its collection version.
+     * Move an API collection to a newer project version
+     */
+    async updateApiCollectionProjectVersion(requestParameters: UpdateApiCollectionProjectVersionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiCollectionVersionUpdate> {
+        const response = await this.updateApiCollectionProjectVersionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
