@@ -18,12 +18,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
@@ -104,8 +106,9 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
             categoryService, codeWorkflowContainerService, componentDefinitionService,
             integrationCodeWorkflowFacadeProvider, integrationCodeWorkflowService, integrationService,
             mock(IntegrationVersionWorkflowChangeFacade.class), integrationWorkflowService,
-            integrationInstanceConfigurationFacade, integrationInstanceConfigurationService, tagService,
-            workflowService, workflowTestConfigurationService, workflowNodeTestOutputService, List.of());
+            integrationInstanceConfigurationFacade, integrationInstanceConfigurationService,
+            mock(IntegrationInstanceService.class), mock(PermissionService.class), tagService, workflowService,
+            workflowTestConfigurationService, workflowNodeTestOutputService, List.of());
 
         integration = Integration.builder()
             .id(INTEGRATION_ID)
