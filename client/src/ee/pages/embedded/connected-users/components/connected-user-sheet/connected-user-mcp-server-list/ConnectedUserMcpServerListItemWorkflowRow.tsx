@@ -14,6 +14,7 @@ import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/Workfl
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
@@ -26,6 +27,8 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     workflow: ConnectedUserMcpServerWorkflow;
 }) => {
     const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
+
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
@@ -121,6 +124,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 
                 <Switch
                     checked={workflow.enabled}
+                    disabled={!canManageConnectedUser}
                     onCheckedChange={(value) => {
                         enableIntegrationInstanceWorkflowMutation.mutate({
                             enable: value,

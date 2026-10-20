@@ -13,6 +13,7 @@ import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
@@ -41,6 +42,8 @@ const IntegrationInstanceConfigurations = () => {
         id: integrationId ? parseInt(integrationId) : tagId ? parseInt(tagId) : undefined,
         type: tagId ? Type.Tag : Type.Integration,
     };
+
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -121,6 +124,7 @@ const IntegrationInstanceConfigurations = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateConfiguration &&
                         integrationInstanceConfigurations &&
                         integrationInstanceConfigurations?.length > 0 && (
                             <IntegrationInstanceConfigurationDialog

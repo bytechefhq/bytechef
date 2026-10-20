@@ -15,6 +15,8 @@ const openMenu = async (moveUsersDisabledReason?: string) => {
     render(
         <TooltipProvider>
             <IntegrationInstanceConfigurationListItemDropdownMenu
+                canDelete
+                canEdit
                 {...handlers}
                 moveUsersDisabledReason={moveUsersDisabledReason}
             />

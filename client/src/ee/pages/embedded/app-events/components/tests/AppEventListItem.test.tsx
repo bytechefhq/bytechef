@@ -8,6 +8,12 @@ const hoisted = vi.hoisted(() => ({
     deleteAppEventMutate: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/pages/embedded/app-events/components/AppEventDialog', () => ({
     default: ({onClose}: {onClose: () => void}) => (
         <div data-testid="app-event-dialog">

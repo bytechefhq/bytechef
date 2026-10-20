@@ -6,9 +6,17 @@ import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfig
 const hoisted = vi.hoisted(() => ({
     connectionDefinition: undefined as {authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
+    grantedScopes: undefined as string[] | undefined,
     integration: undefined as {componentName: string} | undefined,
     updateMutate: vi.fn(),
     workflows: [] as {id: string; workflowUuid: string}[],
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: (scope: string) =>
+        hoisted.grantedScopes === undefined || hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -117,6 +125,7 @@ afterEach(() => {
     vi.clearAllMocks();
 
     hoisted.connectionDefinition = undefined;
+    hoisted.grantedScopes = undefined;
     hoisted.integration = undefined;
     hoisted.workflows = [];
 });
@@ -264,6 +273,34 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(screen.getByRole('heading', {name: /Edit Instance Configuration/})).toBeInTheDocument();
+        });
+
+        it('should offer Save only with the edit scope', () => {
+            const existingConfiguration = {id: 1, integrationId: 2, integrationVersion: 1, name: 'Existing'};
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_CREATE'];
+
+            const withoutEditRender = render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+
+            withoutEditRender.unmount();
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_EDIT'];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
 
         it('should keep the stored authorization type when saving', async () => {

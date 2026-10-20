@@ -7,6 +7,7 @@ import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppE
 import {EMBEDDED_APP_EVENTS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -15,6 +16,10 @@ import {ZapIcon} from 'lucide-react';
 
 const AppEvents = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const canCreateAppEventScope = useHasEmbeddedScope('APP_EVENT_CREATE', UNION_ENVIRONMENT_ID);
+
+    const canCreateAppEvent = canCreateAppEventScope && !currentEnvironmentId;
 
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
 
@@ -30,12 +35,9 @@ const AppEvents = () => {
                         centerTitle={true}
                         position="main"
                         right={
+                            canCreateAppEvent &&
                             appEvents &&
-                            appEvents.length > 0 && (
-                                <AppEventDialog
-                                    triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
-                                />
-                            )
+                            appEvents.length > 0 && <AppEventDialog triggerNode={<Button label="New App Event" />} />
                         }
                         title={
                             appEvents && appEvents.length > 0 ? (
@@ -70,9 +72,9 @@ const AppEvents = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            !currentEnvironmentId && (
+                            canCreateAppEvent ? (
                                 <AppEventDialog triggerNode={<Button label="Create App Event" />} />
-                            )
+                            ) : undefined
                         }
                         description="An app event is something that happens in your product, like a new sign-up or a placed order. Declare it here with the shape of its data, then any integration workflow can start when your product fires it."
                         docsLink={{href: EMBEDDED_APP_EVENTS_DOCUMENTATION_URL, label: 'How app events work'}}

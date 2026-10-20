@@ -6,6 +6,7 @@ import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integrat
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Settings2Icon} from 'lucide-react';
 import {useMemo} from 'react';
@@ -20,6 +21,8 @@ const getStepStatus = (complete: boolean, current: boolean): JourneyStepStatusTy
  */
 const IntegrationInstanceConfigurationsEmptyState = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
 
     const navigate = useNavigate();
 
@@ -59,25 +62,26 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
                 status: publishVersionStatus,
             },
             {
-                ...(createConfigurationStatus === 'current' && {
-                    action: (
-                        <IntegrationInstanceConfigurationDialog
-                            integrationInstanceConfiguration={
-                                {
-                                    environmentId: currentEnvironmentId,
-                                } as IntegrationInstanceConfiguration
-                            }
-                            triggerNode={<Button label="Create Instance Configuration" size="sm" />}
-                        />
-                    ),
-                    description: 'Pick a published version and set it up for this environment.',
-                }),
+                ...(createConfigurationStatus === 'current' &&
+                    canCreateConfiguration && {
+                        action: (
+                            <IntegrationInstanceConfigurationDialog
+                                integrationInstanceConfiguration={
+                                    {
+                                        environmentId: currentEnvironmentId,
+                                    } as IntegrationInstanceConfiguration
+                                }
+                                triggerNode={<Button label="Create Instance Configuration" size="sm" />}
+                            />
+                        ),
+                        description: 'Pick a published version and set it up for this environment.',
+                    }),
                 id: 'createInstanceConfiguration',
                 label: 'Create an instance configuration',
                 status: createConfigurationStatus,
             },
         ];
-    }, [currentEnvironmentId, hasIntegration, hasPublishedIntegration, navigate]);
+    }, [canCreateConfiguration, currentEnvironmentId, hasIntegration, hasPublishedIntegration, navigate]);
 
     return (
         <EmptyState

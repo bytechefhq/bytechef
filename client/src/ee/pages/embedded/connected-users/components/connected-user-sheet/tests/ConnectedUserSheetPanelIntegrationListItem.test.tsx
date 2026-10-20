@@ -14,6 +14,12 @@ const hoisted = vi.hoisted(() => ({
     moveMutateAsyncMock: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
     IntegrationInstanceConfigurationKeys: {integrationInstanceConfigurations: ['integrationInstanceConfigurations']},
     useGetIntegrationInstanceConfigurationConnectedUsersQuery: () => ({data: undefined}),

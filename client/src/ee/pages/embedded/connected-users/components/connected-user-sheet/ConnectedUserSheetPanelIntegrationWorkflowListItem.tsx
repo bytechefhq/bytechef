@@ -17,6 +17,7 @@ import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/Workfl
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
@@ -42,6 +43,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
     );
+
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const queryClient = useQueryClient();
 
@@ -109,7 +112,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                     <Switch
                         checked={integrationInstanceWorkflow?.enabled}
-                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                        disabled={!canManageConnectedUser || !integrationInstanceConfigurationWorkflow?.enabled}
                         onCheckedChange={(value) => {
                             enableIntegrationInstanceWorkflowMutation.mutate({
                                 enable: value,

@@ -10,6 +10,12 @@ const hoisted = vi.hoisted(() => ({
     content: [] as object[],
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/shared/queries/embedded/connectedUsers.queries', () => ({
     ConnectedUserKeys: {connectedUsers: ['connectedUsers']},
     useGetConnectedUsersQuery: () => ({

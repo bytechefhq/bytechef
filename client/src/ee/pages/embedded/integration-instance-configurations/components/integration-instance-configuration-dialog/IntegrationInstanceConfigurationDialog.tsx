@@ -31,6 +31,7 @@ import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embed
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -89,6 +90,11 @@ const IntegrationInstanceConfigurationDialog = ({
     );
 
     const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
+
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+
+    const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
 
     const form = useForm<IntegrationInstanceConfiguration>({
         defaultValues: {
@@ -510,20 +516,21 @@ const IntegrationInstanceConfigurationDialog = ({
                                             />
                                         )}
 
-                                    {((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
-                                        (!integrationInstanceConfiguration?.id &&
-                                            !updateIntegrationVersion &&
-                                            connectionDefinition &&
-                                            !oAuth2Authorization &&
-                                            workflows !== undefined &&
-                                            workflows.length === 0)) && (
-                                        <Button
-                                            disabled={isSaving || authorizationTypePending}
-                                            icon={isSaving ? <LoadingIcon /> : undefined}
-                                            label="Save"
-                                            onClick={handleSubmit(handleSaveClick)}
-                                        />
-                                    )}
+                                    {canSave &&
+                                        ((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
+                                            (!integrationInstanceConfiguration?.id &&
+                                                !updateIntegrationVersion &&
+                                                connectionDefinition &&
+                                                !oAuth2Authorization &&
+                                                workflows !== undefined &&
+                                                workflows.length === 0)) && (
+                                            <Button
+                                                disabled={isSaving || authorizationTypePending}
+                                                icon={isSaving ? <LoadingIcon /> : undefined}
+                                                label="Save"
+                                                onClick={handleSubmit(handleSaveClick)}
+                                            />
+                                        )}
                                 </>
                             )}
 
@@ -539,15 +546,16 @@ const IntegrationInstanceConfigurationDialog = ({
                                         <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                     )}
 
-                                    {!workflows ||
-                                        (workflows?.length === 0 && (
-                                            <Button
-                                                disabled={isSaving}
-                                                icon={isSaving ? <LoadingIcon /> : undefined}
-                                                label="Save"
-                                                onClick={handleSubmit(handleSaveClick)}
-                                            />
-                                        ))}
+                                    {canSave &&
+                                        (!workflows ||
+                                            (workflows?.length === 0 && (
+                                                <Button
+                                                    disabled={isSaving}
+                                                    icon={isSaving ? <LoadingIcon /> : undefined}
+                                                    label="Save"
+                                                    onClick={handleSubmit(handleSaveClick)}
+                                                />
+                                            )))}
                                 </>
                             )}
 
@@ -561,12 +569,14 @@ const IntegrationInstanceConfigurationDialog = ({
                                         variant="outline"
                                     />
 
-                                    <Button
-                                        disabled={isSaving || isWorkflowsPending}
-                                        icon={isSaving ? <LoadingIcon /> : undefined}
-                                        label="Save"
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    />
+                                    {canSave && (
+                                        <Button
+                                            disabled={isSaving || isWorkflowsPending}
+                                            icon={isSaving ? <LoadingIcon /> : undefined}
+                                            label="Save"
+                                            onClick={handleSubmit(handleSaveClick)}
+                                        />
+                                    )}
                                 </>
                             )}
                         </DialogFooter>

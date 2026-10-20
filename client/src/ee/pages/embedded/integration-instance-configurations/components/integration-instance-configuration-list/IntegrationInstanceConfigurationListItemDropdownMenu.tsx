@@ -10,6 +10,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationListItemDropdownMenuProps {
+    canDelete: boolean;
+    canEdit: boolean;
     onDeleteClick: () => void;
     onEditClick: () => void;
     moveUsersDisabled?: boolean;
@@ -19,6 +21,8 @@ interface IntegrationInstanceConfigurationListItemDropdownMenuProps {
 }
 
 const IntegrationInstanceConfigurationListItemDropdownMenu = ({
+    canDelete,
+    canEdit,
     moveUsersDisabled,
     moveUsersDisabledReason,
     onDeleteClick,
@@ -26,6 +30,10 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
     onMoveUsersClick,
     onUpdateIntegrationVersionClick,
 }: IntegrationInstanceConfigurationListItemDropdownMenuProps) => {
+    if (!canEdit && !canDelete) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -33,33 +41,46 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+                {canEdit && (
+                    <>
+                        <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
-                <DropdownMenuItem
-                    icon={<RefreshCcwIcon />}
-                    label="Update Integration Version"
-                    onClick={onUpdateIntegrationVersionClick}
-                />
+                        <DropdownMenuItem
+                            icon={<RefreshCcwIcon />}
+                            label="Update Integration Version"
+                            onClick={onUpdateIntegrationVersionClick}
+                        />
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <span className="block">
-                            <DropdownMenuItem
-                                aria-label="Move Users"
-                                disabled={moveUsersDisabled || !!moveUsersDisabledReason}
-                                icon={<UsersIcon />}
-                                label="Move Users…"
-                                onClick={onMoveUsersClick}
-                            />
-                        </span>
-                    </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span className="block">
+                                    <DropdownMenuItem
+                                        aria-label="Move Users"
+                                        disabled={moveUsersDisabled || !!moveUsersDisabledReason}
+                                        icon={<UsersIcon />}
+                                        label="Move Users…"
+                                        onClick={onMoveUsersClick}
+                                    />
+                                </span>
+                            </TooltipTrigger>
 
-                    {moveUsersDisabledReason && <TooltipContent side="left">{moveUsersDisabledReason}</TooltipContent>}
-                </Tooltip>
+                            {moveUsersDisabledReason && (
+                                <TooltipContent side="left">{moveUsersDisabledReason}</TooltipContent>
+                            )}
+                        </Tooltip>
+                    </>
+                )}
 
-                <DropdownMenuSeparator />
+                {canEdit && canDelete && <DropdownMenuSeparator />}
 
-                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+                {canDelete && (
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={onDeleteClick}
+                        variant="destructive"
+                    />
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
