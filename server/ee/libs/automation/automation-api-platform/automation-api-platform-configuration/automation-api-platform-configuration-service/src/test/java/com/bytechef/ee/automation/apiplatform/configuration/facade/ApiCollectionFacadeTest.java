@@ -9,22 +9,31 @@ package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
@@ -34,24 +43,34 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
-import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingConnection;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingInput;
+import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -114,7 +133,8 @@ class ApiCollectionFacadeTest {
 
         apiCollectionFacade = secure(
             new ApiCollectionFacadeImpl(
-                apiCollectionService, apiCollectionEndpointService, environmentService,
+                apiCollectionService, apiCollectionEndpointService, mock(ComponentConnectionFacade.class),
+                environmentService,
                 mock(ProjectDeploymentFacade.class), projectDeploymentService,
                 mock(ProjectDeploymentWorkflowService.class), mock(ProjectService.class),
                 mock(ProjectWorkflowService.class), mock(TagService.class), mock(WorkflowService.class)));
@@ -286,6 +306,18 @@ class ApiCollectionFacadeTest {
     }
 
     @Test
+    void testUpdateApiCollectionProjectVersionDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheCollection() {
+        assertResourceGuard(() -> apiCollectionFacade.updateApiCollectionProjectVersion(API_COLLECTION_ID, 2, false),
+            API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", false);
+    }
+
+    @Test
+    void testUpdateApiCollectionProjectVersionAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheCollection() {
+        assertResourceGuard(() -> apiCollectionFacade.updateApiCollectionProjectVersion(API_COLLECTION_ID, 2, false),
+            API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
     void testGetOpenApiSpecificationDeniesWhenTheApiPlatformViewScopeIsRefused() {
         assertResourceGuard(() -> apiCollectionFacade.getOpenApiSpecification(API_COLLECTION_ID), API_COLLECTION_ID,
             API_COLLECTION_TYPE, "API_PLATFORM_VIEW", false);
@@ -347,8 +379,9 @@ class ApiCollectionFacadeTest {
         private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
         private final ApiCollectionFacade apiCollectionFacade = new ApiCollectionFacadeImpl(
-            mock(ApiCollectionService.class), apiCollectionEndpointService, mock(EnvironmentService.class),
-            projectDeploymentFacade, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+            mock(ApiCollectionService.class), apiCollectionEndpointService, mock(ComponentConnectionFacade.class),
+            mock(EnvironmentService.class), projectDeploymentFacade, mock(ProjectDeploymentService.class),
+            projectDeploymentWorkflowService,
             mock(ProjectService.class), projectWorkflowService, mock(TagService.class), mock(WorkflowService.class));
 
         @Test
@@ -379,7 +412,8 @@ class ApiCollectionFacadeTest {
             }).when(projectDeploymentFacade)
                 .enableProjectDeploymentWorkflow(200L, "workflow-1", true);
 
-            ApiCollectionEndpointDTO apiCollectionEndpointDTO = apiCollectionFacade.enableApiCollectionEndpoint(7L, true);
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO =
+                apiCollectionFacade.enableApiCollectionEndpoint(7L, true);
 
             verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(200L, "workflow-1", true);
 
@@ -466,7 +500,8 @@ class ApiCollectionFacadeTest {
 
             ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
-            projectDeploymentWorkflow.setConnections(List.of(new ProjectDeploymentWorkflowConnection(61L, "key", "node")));
+            projectDeploymentWorkflow
+                .setConnections(List.of(new ProjectDeploymentWorkflowConnection(61L, "key", "node")));
             projectDeploymentWorkflow.setEnabled(enabled);
             projectDeploymentWorkflow.setId(901L);
             projectDeploymentWorkflow.setInputs(Map.of("region", "eu"));
@@ -504,7 +539,8 @@ class ApiCollectionFacadeTest {
                     .thenReturn("uuid-" + projectDeploymentWorkflowId);
             }
 
-            List<ApiCollectionEndpointDTO> apiCollectionEndpointDTOs = apiCollectionFacade.getApiCollectionEndpoints(100L);
+            List<ApiCollectionEndpointDTO> apiCollectionEndpointDTOs =
+                apiCollectionFacade.getApiCollectionEndpoints(100L);
 
             assertThat(apiCollectionEndpointDTOs).extracting(ApiCollectionEndpointDTO::id)
                 .containsExactly(3L, 1L, 2L);
@@ -512,19 +548,380 @@ class ApiCollectionFacadeTest {
                 .containsExactly("uuid-903", "uuid-901", "uuid-902");
         }
 
-        private static ApiCollectionEndpoint createEndpoint(
-            long id, String path, HttpMethod httpMethod, long projectDeploymentWorkflowId) {
+    }
 
-            ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+    @Nested
+    class UpdateApiCollectionProjectVersion {
 
-            apiCollectionEndpoint.setApiCollectionId(100L);
-            apiCollectionEndpoint.setHttpMethod(httpMethod);
-            apiCollectionEndpoint.setId(id);
-            apiCollectionEndpoint.setName(path);
-            apiCollectionEndpoint.setPath(path);
-            apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+        private final ApiCollectionEndpointService apiCollectionEndpointService =
+            mock(ApiCollectionEndpointService.class);
+        private final ApiCollectionService apiCollectionService = mock(ApiCollectionService.class);
+        private final ComponentConnectionFacade componentConnectionFacade = mock(ComponentConnectionFacade.class);
+        private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+        private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
+        private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
+            mock(ProjectDeploymentWorkflowService.class);
+        private final ProjectService projectService = mock(ProjectService.class);
+        private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+        private final WorkflowService workflowService = mock(WorkflowService.class);
 
-            return apiCollectionEndpoint;
+        private final ApiCollectionFacade apiCollectionFacade = new ApiCollectionFacadeImpl(
+            apiCollectionService, apiCollectionEndpointService, componentConnectionFacade,
+            mock(EnvironmentService.class), projectDeploymentFacade, projectDeploymentService,
+            projectDeploymentWorkflowService, projectService, projectWorkflowService, mock(TagService.class),
+            workflowService);
+
+        private static final UUID WORKFLOW_A_UUID = UUID.fromString("00000000-0000-0000-0000-00000000000a");
+        private static final UUID WORKFLOW_B_UUID = UUID.fromString("00000000-0000-0000-0000-00000000000b");
+
+        private final ProjectDeployment projectDeployment = new ProjectDeployment();
+        private final ProjectDeploymentWorkflowConnection workflowAConnection =
+            new ProjectDeploymentWorkflowConnection(61L, "slack", "postMessage");
+
+        private ApiCollectionEndpoint listOrdersEndpoint;
+        private ApiCollectionEndpoint createOrderEndpoint;
+
+        @BeforeEach
+        void beforeEach() {
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setCollectionVersion(1);
+            apiCollection.setContextPath("orders");
+            apiCollection.setId(100L);
+            apiCollection.setName("orders");
+            apiCollection.setProjectDeploymentId(200L);
+
+            lenient().when(apiCollectionService.getApiCollection(100L))
+                .thenReturn(apiCollection);
+
+            projectDeployment.setEnvironment(Environment.STAGING);
+            projectDeployment.setId(200L);
+            projectDeployment.setProjectId(42L);
+            projectDeployment.setProjectVersion(2);
+
+            lenient().when(projectDeploymentService.getProjectDeployment(200L))
+                .thenReturn(projectDeployment);
+
+            Project project = new Project();
+
+            project.setId(42L);
+            project.setProjectVersions(
+                List.of(
+                    publishedProjectVersion(1), publishedProjectVersion(2), publishedProjectVersion(3),
+                    new ProjectVersion(4)));
+            project.setWorkspaceId(5L);
+
+            lenient().when(projectService.getProject(42L))
+                .thenReturn(project);
+
+            lenient().when(projectWorkflowService.getProjectWorkflows(42L, 2))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(42L, 2, "wf-a-2", WORKFLOW_A_UUID),
+                        new ProjectWorkflow(42L, 2, "wf-b-2", WORKFLOW_B_UUID)));
+
+            ProjectDeploymentWorkflow workflowARow = createProjectDeploymentWorkflow(
+                901L, "wf-a-2", true, List.of(workflowAConnection), Map.of("region", "eu"));
+            ProjectDeploymentWorkflow workflowBRow = createProjectDeploymentWorkflow(
+                902L, "wf-b-2", false, List.of(), Map.of("limit", 10));
+
+            lenient().when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(200L))
+                .thenReturn(List.of(workflowARow, workflowBRow));
+
+            listOrdersEndpoint = createEndpoint(501L, "orders", HttpMethod.GET, 901L);
+
+            listOrdersEndpoint.setName("listOrders");
+
+            createOrderEndpoint = createEndpoint(502L, "orders", HttpMethod.POST, 902L);
+
+            createOrderEndpoint.setName("createOrder");
+
+            lenient().when(apiCollectionEndpointService.getApiEndpoints(100L))
+                .thenReturn(List.of(listOrdersEndpoint, createOrderEndpoint));
+            lenient().when(apiCollectionEndpointService.getOpenApiEndpoint(501L))
+                .thenReturn(listOrdersEndpoint);
+            lenient().when(apiCollectionEndpointService.getOpenApiEndpoint(502L))
+                .thenReturn(createOrderEndpoint);
+            lenient().when(apiCollectionEndpointService.update(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            lenient().when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, WORKFLOW_A_UUID.toString()))
+                .thenReturn(Optional.of("wf-a-3"));
+            lenient().when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, WORKFLOW_B_UUID.toString()))
+                .thenReturn(Optional.of("wf-b-3"));
+            ProjectDeploymentWorkflow workflowAVersionThreeRow = createProjectDeploymentWorkflow(
+                901L, "wf-a-3", true, List.of(), Map.of());
+            ProjectDeploymentWorkflow workflowBVersionThreeRow = createProjectDeploymentWorkflow(
+                902L, "wf-b-3", false, List.of(), Map.of());
+
+            lenient().when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "wf-a-3"))
+                .thenReturn(Optional.of(workflowAVersionThreeRow));
+            lenient().when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "wf-b-3"))
+                .thenReturn(Optional.of(workflowBVersionThreeRow));
+            lenient().when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(workflowAVersionThreeRow);
+            lenient().when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(902L))
+                .thenReturn(workflowBVersionThreeRow);
+
+            lenient().when(componentConnectionFacade.getWorkflowComponentConnections("wf-a-2"))
+                .thenReturn(List.of(slackSlot("slack")));
+            lenient().when(componentConnectionFacade.getWorkflowComponentConnections("wf-a-3"))
+                .thenReturn(List.of(slackSlot("slack")));
+
+            Workflow workflowWithoutInputs = mock(Workflow.class);
+
+            lenient().when(workflowWithoutInputs.getInputs())
+                .thenReturn(List.of());
+            lenient().when(workflowService.getWorkflow(any()))
+                .thenReturn(workflowWithoutInputs);
+            lenient().when(projectWorkflowService.getProjectWorkflowUuid(eq(200L), any()))
+                .thenReturn(WORKFLOW_A_UUID.toString());
+        }
+
+        @Test
+        void testUpdateProjectVersionRepointsEndpointsByWorkflowUuid() {
+            stubVersionThreeWorkflows(true);
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false);
+
+            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = capturedProjectDeploymentWorkflows();
+
+            assertThat(projectDeployment.getProjectVersion()).isEqualTo(3);
+            assertThat(projectDeploymentWorkflows).extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                .containsExactly("wf-a-3", "wf-b-3");
+
+            ProjectDeploymentWorkflow workflowARow = projectDeploymentWorkflows.get(0);
+
+            assertThat(workflowARow.getConnections()).containsExactly(workflowAConnection);
+            assertThat(workflowARow.getInputs()).isEqualTo(Map.of("region", "eu"));
+            assertThat(workflowARow.isEnabled()).isTrue();
+            assertThat(workflowARow.getProjectDeploymentId()).isEqualTo(200L);
+
+            ProjectDeploymentWorkflow workflowBRow = projectDeploymentWorkflows.get(1);
+
+            assertThat(workflowBRow.getConnections()).isEmpty();
+            assertThat(workflowBRow.getInputs()).isEqualTo(Map.of("limit", 10));
+            assertThat(workflowBRow.isEnabled()).isFalse();
+
+            ArgumentCaptor<ApiCollectionEndpoint> apiCollectionEndpointCaptor =
+                ArgumentCaptor.forClass(ApiCollectionEndpoint.class);
+
+            verify(apiCollectionEndpointService, times(2))
+                .update(apiCollectionEndpointCaptor.capture());
+
+            assertThat(apiCollectionEndpointCaptor.getAllValues())
+                .extracting(ApiCollectionEndpoint::getId, ApiCollectionEndpoint::getProjectDeploymentWorkflowId)
+                .containsExactly(
+                    tuple(501L, 901L), tuple(502L, 902L));
+
+            verify(apiCollectionService, never()).update(any(ApiCollection.class));
+
+            assertThat(apiCollectionVersionUpdateDTO.apiCollection()
+                .collectionVersion()).isEqualTo(1);
+            assertThat(apiCollectionVersionUpdateDTO.removedEndpointNames()).isEmpty();
+            assertThat(apiCollectionVersionUpdateDTO.missingConnections()).isEmpty();
+            assertThat(apiCollectionVersionUpdateDTO.disabledEndpointNames()).isEmpty();
+        }
+
+        @Test
+        void testUpdateProjectVersionRefusesWhenWorkflowRemoved() {
+            stubVersionThreeWorkflows(false);
+
+            assertThatThrownBy(() -> apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("createOrder")
+                .satisfies(exception -> {
+                    ConfigurationException configurationException = (ConfigurationException) exception;
+
+                    assertThat(configurationException.getErrorKey())
+                        .isEqualTo(ApiCollectionErrorType.ENDPOINT_WORKFLOW_REMOVED.getErrorKey());
+                    Map<String, ?> inputParameters = configurationException.getInputParameters();
+
+                    assertThat(inputParameters.get("endpointNames")).isEqualTo(List.of("createOrder"));
+                });
+
+            verify(projectDeploymentFacade, never()).updateProjectDeployment(any(), any(), any());
+            verify(apiCollectionEndpointService, never()).delete(any(Long.class));
+            verify(apiCollectionEndpointService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateProjectVersionRemovesEndpointWhenConfirmed() {
+            stubVersionThreeWorkflows(false);
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, true);
+
+            InOrder deleteBeforeMove = inOrder(apiCollectionEndpointService, projectDeploymentFacade);
+
+            deleteBeforeMove.verify(apiCollectionEndpointService)
+                .delete(502L);
+            deleteBeforeMove.verify(projectDeploymentFacade)
+                .updateProjectDeployment(any(), any(), any());
+
+            verify(apiCollectionEndpointService, never()).delete(501L);
+
+            assertThat(capturedProjectDeploymentWorkflows()).extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                .containsExactly("wf-a-3");
+            assertThat(apiCollectionVersionUpdateDTO.removedEndpointNames()).containsExactly("createOrder");
+        }
+
+        @Test
+        void testUpdateProjectVersionRefusesSameOrOlderVersion() {
+            for (int projectVersion : List.of(1, 2)) {
+                assertThatThrownBy(
+                    () -> apiCollectionFacade.updateApiCollectionProjectVersion(100L, projectVersion, false))
+                        .isInstanceOf(ConfigurationException.class)
+                        .extracting(exception -> ((ConfigurationException) exception).getErrorKey())
+                        .isEqualTo(ApiCollectionErrorType.PROJECT_VERSION_INVALID.getErrorKey());
+            }
+
+            verify(projectDeploymentFacade, never()).updateProjectDeployment(any(), any(), any());
+            verify(apiCollectionEndpointService, never()).delete(any(Long.class));
+            verify(apiCollectionEndpointService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateProjectVersionRefusesUnpublishedVersion() {
+            for (int projectVersion : List.of(4, 9)) {
+                assertThatThrownBy(
+                    () -> apiCollectionFacade.updateApiCollectionProjectVersion(100L, projectVersion, false))
+                        .isInstanceOf(ConfigurationException.class)
+                        .extracting(exception -> ((ConfigurationException) exception).getErrorKey())
+                        .isEqualTo(ApiCollectionErrorType.PROJECT_VERSION_INVALID.getErrorKey());
+            }
+
+            verify(projectDeploymentFacade, never()).updateProjectDeployment(any(), any(), any());
+            verify(apiCollectionEndpointService, never()).delete(any(Long.class));
+            verify(apiCollectionEndpointService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateProjectVersionReportsMissingConnections() {
+            stubVersionThreeWorkflows(true);
+
+            when(componentConnectionFacade.getWorkflowComponentConnections("wf-a-3"))
+                .thenReturn(
+                    List.of(
+                        slackSlot("slack"), new ComponentConnection("gmail", 1, "sendEmail", "gmail", true),
+                        new ComponentConnection("jira", 1, "createIssue", "jira", false)));
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false);
+
+            assertThat(apiCollectionVersionUpdateDTO.missingConnections())
+                .containsExactly(new MissingConnection("listOrders", "sendEmail", "gmail", "gmail"));
+            assertThat(apiCollectionVersionUpdateDTO.disabledEndpointNames()).containsExactly("listOrders");
+            assertThat(capturedProjectDeploymentWorkflows().get(0)
+                .isEnabled()).isFalse();
+        }
+
+        @Test
+        void testUpdateProjectVersionDropsConnectionWhoseSlotWasRemoved() {
+            stubVersionThreeWorkflows(true);
+
+            when(componentConnectionFacade.getWorkflowComponentConnections("wf-a-3")).thenReturn(List.of());
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false);
+
+            ProjectDeploymentWorkflow workflowARow = capturedProjectDeploymentWorkflows().get(0);
+
+            assertThat(workflowARow.getConnections()).isEmpty();
+            assertThat(workflowARow.isEnabled()).isTrue();
+            assertThat(apiCollectionVersionUpdateDTO.missingConnections()).isEmpty();
+            assertThat(apiCollectionVersionUpdateDTO.disabledEndpointNames()).isEmpty();
+        }
+
+        @Test
+        void testUpdateProjectVersionDropsConnectionWhoseSlotChangedComponent() {
+            stubVersionThreeWorkflows(true);
+
+            when(componentConnectionFacade.getWorkflowComponentConnections("wf-a-3"))
+                .thenReturn(List.of(slackSlot("discord")));
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false);
+
+            ProjectDeploymentWorkflow workflowARow = capturedProjectDeploymentWorkflows().get(0);
+
+            assertThat(workflowARow.getConnections()).isEmpty();
+            assertThat(workflowARow.isEnabled()).isFalse();
+            assertThat(apiCollectionVersionUpdateDTO.missingConnections())
+                .containsExactly(new MissingConnection("listOrders", "postMessage", "slack", "discord"));
+            assertThat(apiCollectionVersionUpdateDTO.disabledEndpointNames()).containsExactly("listOrders");
+        }
+
+        @Test
+        void testUpdateProjectVersionDisablesWorkflowMissingARequiredInput() {
+            stubVersionThreeWorkflows(true);
+
+            Workflow workflowWithRequiredInput = mock(Workflow.class);
+
+            when(workflowWithRequiredInput.getInputs())
+                .thenReturn(
+                    List.of(
+                        new Workflow.Input("region", "Region", "string", true, Map.of()),
+                        new Workflow.Input("tenant", "Tenant", "string", true, Map.of()),
+                        new Workflow.Input("locale", "Locale", "string", false, Map.of())));
+            when(workflowService.getWorkflow("wf-a-3")).thenReturn(workflowWithRequiredInput);
+
+            ApiCollectionVersionUpdateDTO apiCollectionVersionUpdateDTO =
+                apiCollectionFacade.updateApiCollectionProjectVersion(100L, 3, false);
+
+            ProjectDeploymentWorkflow workflowARow = capturedProjectDeploymentWorkflows().get(0);
+
+            assertThat(workflowARow.isEnabled()).isFalse();
+            assertThat(workflowARow.getInputs()).isEqualTo(Map.of("region", "eu"));
+            assertThat(apiCollectionVersionUpdateDTO.missingInputs())
+                .containsExactly(new MissingInput("listOrders", "tenant"));
+            assertThat(apiCollectionVersionUpdateDTO.disabledEndpointNames()).containsExactly("listOrders");
+        }
+
+        private List<ProjectDeploymentWorkflow> capturedProjectDeploymentWorkflows() {
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<List<ProjectDeploymentWorkflow>> projectDeploymentWorkflowsCaptor =
+                ArgumentCaptor.forClass(List.class);
+
+            verify(projectDeploymentFacade).updateProjectDeployment(
+                eq(projectDeployment), projectDeploymentWorkflowsCaptor.capture(), eq(List.of()));
+
+            return projectDeploymentWorkflowsCaptor.getValue();
+        }
+
+        private void stubVersionThreeWorkflows(boolean includeWorkflowB) {
+            List<ProjectWorkflow> projectWorkflows = includeWorkflowB
+                ? List.of(
+                    new ProjectWorkflow(42L, 3, "wf-a-3", WORKFLOW_A_UUID),
+                    new ProjectWorkflow(42L, 3, "wf-b-3", WORKFLOW_B_UUID))
+                : List.of(new ProjectWorkflow(42L, 3, "wf-a-3", WORKFLOW_A_UUID));
+
+            when(projectWorkflowService.getProjectWorkflows(42L, 3)).thenReturn(projectWorkflows);
+        }
+
+        private static ProjectDeploymentWorkflow createProjectDeploymentWorkflow(
+            long id, String workflowId, boolean enabled, List<ProjectDeploymentWorkflowConnection> connections,
+            Map<String, ?> inputs) {
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(connections);
+            projectDeploymentWorkflow.setEnabled(enabled);
+            projectDeploymentWorkflow.setId(id);
+            projectDeploymentWorkflow.setInputs(inputs);
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+            return projectDeploymentWorkflow;
+        }
+
+        private static ComponentConnection slackSlot(String componentName) {
+            return new ComponentConnection(componentName, 1, "postMessage", "slack", true);
+        }
+
+        private static ProjectVersion publishedProjectVersion(int version) {
+            return new ProjectVersion(version, ProjectVersion.Status.PUBLISHED.ordinal(), null, null);
         }
     }
 
@@ -609,5 +1006,20 @@ class ApiCollectionFacadeTest {
             API_COLLECTION_ID, null, null, false, HttpMethod.GET, API_COLLECTION_ENDPOINT_ID, null, null, "name",
             "path",
             PROJECT_DEPLOYMENT_WORKFLOW_ID, 0, "workflowUuid");
+    }
+
+    private static ApiCollectionEndpoint createEndpoint(
+        long id, String path, HttpMethod httpMethod, long projectDeploymentWorkflowId) {
+
+        ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+        apiCollectionEndpoint.setApiCollectionId(100L);
+        apiCollectionEndpoint.setHttpMethod(httpMethod);
+        apiCollectionEndpoint.setId(id);
+        apiCollectionEndpoint.setName(path);
+        apiCollectionEndpoint.setPath(path);
+        apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+
+        return apiCollectionEndpoint;
     }
 }

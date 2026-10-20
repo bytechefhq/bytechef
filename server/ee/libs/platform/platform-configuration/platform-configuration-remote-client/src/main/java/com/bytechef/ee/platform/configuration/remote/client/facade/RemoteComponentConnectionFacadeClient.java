@@ -77,6 +77,11 @@ public class RemoteComponentConnectionFacadeClient implements ComponentConnectio
     }
 
     @Override
+    public List<ComponentConnection> getWorkflowComponentConnections(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ComponentConnection> getWorkflowNodeComponentConnections(String workflowId, String workflowNodeName) {
         throw new UnsupportedOperationException();
     }

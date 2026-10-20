@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
+import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,14 @@ public interface ApiCollectionFacade {
     List<Project> getWorkspaceProjects(long workspaceId);
 
     ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO);
+
+    /**
+     * Moves the collection's backing deployment to a newer published project version in place, keeping its
+     * {@code collectionVersion}. Endpoints whose workflow the new version lacks are refused unless
+     * {@code removeMissingEndpoints} is set, in which case they are deleted.
+     */
+    ApiCollectionVersionUpdateDTO updateApiCollectionProjectVersion(
+        long id, int projectVersion, boolean removeMissingEndpoints);
 
     void updateApiCollectionTags(long id, List<Tag> tags);
 

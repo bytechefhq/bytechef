@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -150,6 +151,25 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     public List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger) {
         return getComponentConnections(
             workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions());
+    }
+
+    /**
+     * Callers authorize: deliberately unguarded, unlike {@link #getWorkflowNodeComponentConnections(String, String)},
+     * because every caller already sits behind its own gate on the project, deployment or API collection.
+     */
+    @Override
+    public List<ComponentConnection> getWorkflowComponentConnections(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return CollectionUtils.concat(
+            WorkflowTrigger.of(workflow)
+                .stream()
+                .flatMap(workflowTrigger -> CollectionUtils.stream(getComponentConnections(workflowTrigger)))
+                .toList(),
+            workflow.getTasks(true)
+                .stream()
+                .flatMap(workflowTask -> CollectionUtils.stream(getComponentConnections(workflowTask)))
+                .toList());
     }
 
     @Override
