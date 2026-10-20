@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -58,12 +59,11 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
@@ -71,7 +71,7 @@ import com.bytechef.ee.embedded.ai.mcp.facade.ConnectedUserMcpServerFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationWorkflowFacade;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -288,7 +288,7 @@ class EmbeddedMcpGatesIntTest {
     private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @Autowired
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @Autowired
     private McpIntegrationInstanceToolFacade mcpIntegrationInstanceToolFacade;
@@ -733,7 +733,7 @@ class EmbeddedMcpGatesIntTest {
             developmentMcpConfigurationId)).isNotNull();
         assertThat(mcpIntegrationInstanceConfigurationFacade.getMcpServerMcpIntegrationInstanceConfigurations(
             developmentServerId)).hasSize(1);
-        mcpIntegrationInstanceRows.provisionMcpServer(connectedUser.getId(), productionServerId);
+        mcpIntegrationInstanceRowFacade.provisionMcpServer(connectedUser.getId(), productionServerId);
 
         assertThat(connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUser.getId())).hasSize(1);
 
@@ -904,6 +904,82 @@ class EmbeddedMcpGatesIntTest {
     }
 
     @Test
+    void testMcpInstanceConfigurationsFollowTheInstanceConfigurationScopes() {
+        long integrationId = integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+            productionConfigurationId)
+            .getIntegrationId();
+        long otherProductionConfigurationId = createConfiguration(integrationId, Environment.PRODUCTION, 1);
+
+        authenticate(EMBEDDED_VIEWER, false);
+
+        assertThat(mcpIntegrationInstanceConfigurationFacade.getMcpIntegrationInstanceConfiguration(
+            productionMcpConfigurationId)).isNotNull();
+        assertThat(mcpIntegrationInstanceConfigurationFacade.getMcpServerMcpIntegrationInstanceConfigurations(
+            productionServerId)).hasSize(1);
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowFacade.getMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isNotNull();
+        assertThat(
+            mcpIntegrationInstanceConfigurationWorkflowFacade
+                .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                    productionMcpConfigurationId)).hasSize(1);
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionServerId, otherProductionConfigurationId, List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                .updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+                    productionMcpWorkflowId, Map.of("key", "value")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        McpIntegrationInstanceConfiguration createdMcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionServerId, otherProductionConfigurationId, List.of());
+
+        mcpIntegrationInstanceConfigurationWorkflowFacade.updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+            productionMcpWorkflowId, Map.of("key", "value"));
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(
+                productionMcpWorkflowId))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+                productionMcpConfigurationId))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                .updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+                    developmentMcpWorkflowId, Map.of("key", "value")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isPresent();
+        assertThat(mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+            productionMcpConfigurationId)).isPresent();
+
+        authenticate(PRODUCTION_ADMIN, false);
+
+        mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId);
+        mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+            createdMcpIntegrationInstanceConfiguration.getId());
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+                developmentMcpConfigurationId))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isEmpty();
+        assertThat(mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+            createdMcpIntegrationInstanceConfiguration.getId())).isEmpty();
+    }
+
+    @Test
     void testOnlyAnEditorOfAnEmbeddedServerReadsItsSecretKey() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
@@ -1047,7 +1123,7 @@ class EmbeddedMcpGatesIntTest {
         IntegrationInstanceConfigurationPermissionScopeProvider.class, IntegrationPermissionScopeProvider.class,
         KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
         PermissionServiceImpl.class, ProjectPermissionScopeProvider.class, WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 
