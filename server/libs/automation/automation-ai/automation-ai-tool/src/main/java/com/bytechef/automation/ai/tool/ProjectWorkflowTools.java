@@ -133,32 +133,28 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
+        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description. Pass a query to return only the workflows whose name or description contains it.")
     public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId, ToolContext toolContext) {
+        @ToolParam(description = "The ID of the project") long projectId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against workflow names and descriptions, case-insensitively. Omit it to list every workflow of the project.") @Nullable String query,
+        ToolContext toolContext) {
 
         scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_VIEW, toolContext,
             ProjectWorkflowErrorType.LIST_WORKFLOWS);
 
         try {
-            List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(projectId);
-
-            List<WorkflowInfo> workflowInfos = workflows.stream()
-                .map(workflow -> new WorkflowInfo(workflow.getId(),
-                    workflow.getProjectWorkflowId(),
-                    workflow.getWorkflowUuid(),
-                    workflow.getLabel(), workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
-                .toList();
+            List<WorkflowInfo> workflowInfos = getMatchingWorkflows(
+                projectWorkflowFacade.getProjectWorkflows(projectId), query);
 
             if (log.isDebugEnabled()) {
-                log.debug("listWorkflows({}): Found {} workflows", projectId, workflowInfos.size());
+                log.debug("listWorkflows({}, {}): Found {} workflows", projectId, query, workflowInfos.size());
             }
 
             return workflowInfos;
         } catch (Exception e) {
-            log.error("listWorkflows({}): Failed to list project workflows", projectId, e);
+            log.error("listWorkflows({}, {}): Failed to list project workflows", projectId, query, e);
 
             throw new ExecutionException(
                 "Failed to list project workflows: " + e.getMessage(), e, ProjectWorkflowErrorType.LIST_WORKFLOWS);
@@ -209,26 +205,7 @@ public class ProjectWorkflowTools {
                 ? projectFacade.getWorkspaceProjectWorkflows(resolvedWorkspaceId)
                 : projectWorkflowFacade.getProjectWorkflows(projectId);
 
-            String lowerQuery = StringUtils.trim(query.toLowerCase());
-
-            List<WorkflowInfo> matchingWorkflow = allWorkflows.stream()
-                .filter(workflow -> {
-                    String name = workflow.getLabel();
-
-                    name = name != null ? name.toLowerCase() : "";
-
-                    String description = workflow.getDescription();
-
-                    description = description != null ? description.toLowerCase() : "";
-
-                    return name.contains(lowerQuery) || description.contains(lowerQuery);
-                })
-                .map(workflow -> new WorkflowInfo(
-                    workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
-                    workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(),
-                    workflow.getCreatedDate() != null ? workflow.getCreatedDate() : null,
-                    workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
-                .toList();
+            List<WorkflowInfo> matchingWorkflow = getMatchingWorkflows(allWorkflows, query);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -475,6 +452,26 @@ public class ProjectWorkflowTools {
             throw new IllegalArgumentException(
                 "Connection " + connectionId + " not found in the workflow's workspace and current environment");
         }
+    }
+
+    private static List<WorkflowInfo> getMatchingWorkflows(
+        List<ProjectWorkflowDTO> projectWorkflowDTOs, @Nullable String query) {
+
+        String lowerQuery = query == null ? "" : StringUtils.trim(query.toLowerCase());
+
+        return projectWorkflowDTOs.stream()
+            .filter(workflow -> lowerQuery.isEmpty() || containsIgnoringCase(workflow.getLabel(), lowerQuery) ||
+                containsIgnoringCase(workflow.getDescription(), lowerQuery))
+            .map(workflow -> new WorkflowInfo(
+                workflow.getId(), workflow.getProjectWorkflowId(), workflow.getWorkflowUuid(), workflow.getLabel(),
+                workflow.getDescription(), workflow.getDefinition(), workflow.getVersion(), workflow.getCreatedDate(),
+                workflow.getLastModifiedDate()))
+            .toList();
+    }
+
+    private static boolean containsIgnoringCase(@Nullable String value, String lowerQuery) {
+        return value != null && value.toLowerCase()
+            .contains(lowerQuery);
     }
 
     private static @Nullable Long resolveEnvironmentId(@Nullable ToolContext toolContext) {

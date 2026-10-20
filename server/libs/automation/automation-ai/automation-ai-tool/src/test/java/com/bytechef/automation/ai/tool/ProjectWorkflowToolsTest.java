@@ -47,6 +47,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -60,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -361,7 +363,7 @@ class ProjectWorkflowToolsTest {
 
             assertThat(tools.getWorkflow(OWN_WORKFLOW_ID, scopedToolContext())
                 .version()).isEqualTo(1);
-            assertThat(tools.listWorkflows(OWN_PROJECT_ID, scopedToolContext())).hasSize(1);
+            assertThat(tools.listWorkflows(OWN_PROJECT_ID, null, scopedToolContext())).hasSize(1);
 
             tools.deleteWorkflow(OWN_WORKFLOW_ID, scopedToolContext());
 
@@ -384,7 +386,7 @@ class ProjectWorkflowToolsTest {
         void testScopedRunCannotListOrCreateInAnotherProject() {
             ProjectWorkflowTools tools = newTools();
 
-            assertThatCode(() -> tools.listWorkflows(VENDOR_PROJECT_ID, scopedToolContext()))
+            assertThatCode(() -> tools.listWorkflows(VENDOR_PROJECT_ID, null, scopedToolContext()))
                 .isInstanceOf(ExecutionException.class)
                 .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
             assertThatCode(() -> tools.createProjectWorkflow(VENDOR_PROJECT_ID, DEFINITION, scopedToolContext()))
@@ -693,6 +695,42 @@ class ProjectWorkflowToolsTest {
     }
 
     @Nested
+    class ListWorkflowsTest {
+
+        @Test
+        void testListWorkflowsWithoutAQueryListsEveryWorkflowOfTheProject() {
+            when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(
+                List.of(buildDto("wf-1", "Send welcome email", null), buildDto("wf-2", "Sync contacts", null)));
+
+            List<WorkflowInfo> result = newTools().listWorkflows(10L, null, toolContext);
+
+            assertThat(result).extracting(WorkflowInfo::name)
+                .containsExactly("Send welcome email", "Sync contacts");
+        }
+
+        @Test
+        void testListWorkflowsWithAQueryReturnsOnlyWorkflowsMatchingNameOrDescription() {
+            when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(
+                List.of(
+                    buildDto("wf-1", "Send welcome email", null), buildDto("wf-2", "Sync contacts", null),
+                    buildDto("wf-3", "Nightly job", "Emails the daily digest")));
+
+            List<WorkflowInfo> result = newTools().listWorkflows(10L, " EMAIL ", toolContext);
+
+            assertThat(result).extracting(WorkflowInfo::name)
+                .containsExactly("Send welcome email", "Nightly job");
+        }
+
+        @Test
+        void testListWorkflowsWithABlankQueryListsEveryWorkflowOfTheProject() {
+            when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(
+                List.of(buildDto("wf-1", "Send welcome email", null), buildDto("wf-2", "Sync contacts", null)));
+
+            assertThat(newTools().listWorkflows(10L, "  ", toolContext)).hasSize(2);
+        }
+    }
+
+    @Nested
     class SearchWorkflowsTest {
 
         @Test
@@ -877,6 +915,21 @@ class ProjectWorkflowToolsTest {
         ReflectionTestUtils.setField(projectWorkflow, "id", id);
 
         return projectWorkflow;
+    }
+
+    private static ProjectWorkflowDTO buildDto(String workflowUuid, String label, @Nullable String description) {
+        Map<String, Object> definition = new HashMap<>();
+
+        definition.put("label", label);
+        definition.put("tasks", List.of());
+
+        if (description != null) {
+            definition.put("description", description);
+        }
+
+        Workflow workflow = new Workflow(workflowUuid, JsonUtils.write(definition), Workflow.Format.JSON);
+
+        return new ProjectWorkflowDTO(workflow, new ProjectWorkflow(1L), false);
     }
 
     private static ProjectWorkflowDTO buildDto(String workflowUuid, long projectWorkflowId, int version) {

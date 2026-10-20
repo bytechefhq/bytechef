@@ -36,11 +36,11 @@ class ReadProjectWorkflowToolsTest {
     @Test
     void testEveryToolPassesTheToolContextThrough() {
         readProjectWorkflowTools.getWorkflow("wf-1", toolContext);
-        readProjectWorkflowTools.listWorkflows(7L, toolContext);
+        readProjectWorkflowTools.listWorkflows(7L, "send", toolContext);
         readProjectWorkflowTools.searchWorkflows("standup", 7L, 1L, toolContext);
 
         verify(projectWorkflowTools).getWorkflow("wf-1", toolContext);
-        verify(projectWorkflowTools).listWorkflows(7L, toolContext);
+        verify(projectWorkflowTools).listWorkflows(7L, "send", toolContext);
         verify(projectWorkflowTools).searchWorkflows("standup", 7L, 1L, toolContext);
     }
 }
