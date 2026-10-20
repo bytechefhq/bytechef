@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -70,6 +71,7 @@ public class TriggerExecutionEnvironmentResolver implements ResourceEnvironmentR
         TriggerExecution triggerExecution = triggerExecutions.getFirst();
 
         return Optional.ofNullable(triggerExecution.getWorkflowExecutionId())
+            .filter(workflowExecutionId -> workflowExecutionId.getType() == PlatformType.AUTOMATION)
             .map(WorkflowExecutionId::getJobPrincipalId)
             .flatMap(projectDeploymentService::fetchProjectDeployment)
             .map(ProjectDeployment::getEnvironment);
