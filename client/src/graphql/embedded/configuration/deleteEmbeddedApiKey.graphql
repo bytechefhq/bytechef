@@ -1,0 +1,3 @@
+mutation DeleteEmbeddedApiKey($id: ID!) {
+    deleteEmbeddedApiKey(id: $id)
+}

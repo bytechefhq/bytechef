@@ -1,0 +1,13 @@
+mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole!) {
+    addEmbeddedUserByEmail(email: $email, role: $role) {
+        id
+        userId
+        embeddedRole
+        customRoleId
+        user {
+            email
+            firstName
+            lastName
+        }
+    }
+}
