@@ -32,6 +32,10 @@ vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({
     default: ({modelPicker}: {modelPicker?: ReactNode}) => <div data-testid="ai-hub-composer">{modelPicker}</div>,
 }));
 
+vi.mock('@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers', () => ({
+    default: () => ({onSelectWorkflowChat: vi.fn(), workflowChats: []}),
+}));
+
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips', () => ({
     default: () => <div data-testid="suggestion-chips" />,
 }));

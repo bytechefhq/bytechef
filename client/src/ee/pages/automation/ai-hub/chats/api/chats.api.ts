@@ -75,6 +75,16 @@ export interface AiHubChatArtifactI {
     status: AiHubArtifactStatusType;
 }
 
+export type ChatKindType = 'STANDARD' | 'WORKFLOW_CHAT';
+
+/**
+ * Whether a chat is served by a workflow's webhook rather than by the LLM. Use this instead of comparing kinds so
+ * an LLM-only affordance is never offered in a chat with no LLM behind it.
+ */
+export function isWebhookBridgedChat(kind: ChatKindType | undefined): boolean {
+    return kind === 'WORKFLOW_CHAT';
+}
+
 export interface AiHubChatI {
     /**
      * Whether the title was set automatically and is still eligible for LLM regeneration. Flips to false once the
@@ -86,14 +96,18 @@ export interface AiHubChatI {
     id: number;
     /** Whether the current caller is this chat's owner. */
     isOwner: boolean;
+    /** STANDARD talks to the LLM; WORKFLOW_CHAT is bound to a workflow execution and served by its webhook. */
+    kind: ChatKindType;
     lastPreview: string | null;
     messageCount: number;
     ownerUserId: number;
+    projectDeploymentId: string | null;
     status: ChatStatusType;
     threadId: string;
     title: string | null;
     updatedAt: string;
     userId: number;
+    workflowExecutionId: string | null;
     workspaceId: number;
 }
 
@@ -154,14 +168,17 @@ export function toChat(chat: GraphQlChatType): AiHubChatI {
         environmentId: Number(chat.environmentId),
         id: Number(chat.id),
         isOwner: chat.isOwner,
+        kind: chat.kind === 'WORKFLOW_CHAT' ? 'WORKFLOW_CHAT' : 'STANDARD',
         lastPreview: chat.lastPreview ?? null,
         messageCount: chat.messageCount,
         ownerUserId: Number(chat.ownerUserId),
+        projectDeploymentId: chat.projectDeploymentId != null ? String(chat.projectDeploymentId) : null,
         status: chat.status as ChatStatusType,
         threadId: chat.threadId,
         title: chat.title ?? null,
         updatedAt: toIsoString(chat.updatedAt),
         userId: Number(chat.userId),
+        workflowExecutionId: chat.workflowExecutionId ?? null,
         workspaceId: Number(chat.workspaceId),
     };
 }
