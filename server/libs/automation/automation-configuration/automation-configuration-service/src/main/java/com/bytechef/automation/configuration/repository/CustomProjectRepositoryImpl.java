@@ -60,7 +60,8 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
             query += "JOIN project_tag ON project.id = project_tag.project_id ";
         }
 
-        query += "WHERE project.name NOT LIKE '__EMBEDDED__%' ";
+        query += "WHERE project.name NOT LIKE '\\_\\_EMBEDDED\\_\\_%' ESCAPE '\\' " +
+            "AND project.name NOT LIKE '\\_\\_EMBEDDED\\_AUTOMATION\\_\\_%' ESCAPE '\\' ";
 
         if (apiCollections != null) {
             if (apiCollections) {

@@ -92,6 +92,33 @@ public class ProjectRepositoryIntTest {
     }
 
     @Test
+    public void testWorkspaceProjectIdsExcludeHubAndConnectedUserProjects() {
+        Project visibleProject = projectRepository.save(getProject("name"));
+        Project lookalikeProject = projectRepository.save(getProject("aEMBEDDEDb"));
+        Project wildcardLookalikeProject = projectRepository.save(getProject("aaEMBEDDEDbb"));
+
+        projectRepository.save(getProject("__EMBEDDED_AUTOMATION__x"));
+        projectRepository.save(getProject("__EMBEDDED__ext"));
+
+        assertThat(projectRepository.findProjectIdsByWorkspaceId(workspace.getId()))
+            .containsExactlyInAnyOrder(
+                visibleProject.getId(), lookalikeProject.getId(), wildcardLookalikeProject.getId());
+    }
+
+    @Test
+    public void testFindAllProjectsExcludeHubAndConnectedUserProjectsButKeepLookalikes() {
+        projectRepository.save(getProject("name"));
+        projectRepository.save(getProject("aEMBEDDEDb"));
+        projectRepository.save(getProject("aaEMBEDDEDbb"));
+        projectRepository.save(getProject("__EMBEDDED_AUTOMATION__x"));
+        projectRepository.save(getProject("__EMBEDDED__ext"));
+
+        assertThat(projectRepository.findAllProjects(null, null, null, null, null, workspace.getId()))
+            .extracting(Project::getName)
+            .containsExactlyInAnyOrder("name", "aEMBEDDEDb", "aaEMBEDDEDbb");
+    }
+
+    @Test
     public void testUpdate() {
         Project project = projectRepository.save(getProject());
 
@@ -104,9 +131,13 @@ public class ProjectRepositoryIntTest {
     }
 
     private Project getProject() {
+        return getProject("name");
+    }
+
+    private Project getProject(String name) {
         return Project.builder()
             .description("description")
-            .name("name")
+            .name(name)
             .workspaceId(workspace.getId())
             .build();
     }
