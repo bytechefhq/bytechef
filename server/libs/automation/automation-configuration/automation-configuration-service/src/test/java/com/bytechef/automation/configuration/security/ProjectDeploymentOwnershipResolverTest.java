@@ -24,7 +24,10 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * The {@code 'ProjectDeployment'} token is only a check because this resolver is registered for it —
@@ -37,8 +40,13 @@ import org.junit.jupiter.api.Test;
 class ProjectDeploymentOwnershipResolverTest {
 
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final ProjectDeploymentOwnershipResolver resolver =
-        new ProjectDeploymentOwnershipResolver(projectRepository);
+    private ProjectDeploymentOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new ProjectDeploymentOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheDeploymentGuardsName() {
@@ -85,5 +93,50 @@ class ProjectDeploymentOwnershipResolverTest {
         when(projectRepository.findByProjectDeploymentId(11L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveProjectId(11L)).isEmpty();
+    }
+
+    @Test
+    void testAHubDeploymentResolvesToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setWorkspaceId(9L);
+
+        when(embeddedResourceResolver.isEmbeddedProject(5L)).thenReturn(true);
+        when(embeddedResourceResolver.isHubProject(5L)).thenReturn(true);
+        when(projectRepository.findByProjectDeploymentId(11L)).thenReturn(Optional.of(project));
+
+        ProjectDeploymentOwnershipResolver embeddedResolver =
+            new ProjectDeploymentOwnershipResolver(providerOf(embeddedResourceResolver), projectRepository);
+
+        assertThat(embeddedResolver.resolveOwner(11L)).isEqualTo(ResourceOwner.ofEmbeddedProject());
+        assertThat(embeddedResolver.resolveProjectId(11L)).hasValue(5L);
+    }
+
+    @Test
+    void testAConnectedUserDeploymentResolvesToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setWorkspaceId(9L);
+
+        when(embeddedResourceResolver.isEmbeddedProject(5L)).thenReturn(true);
+        when(projectRepository.findByProjectDeploymentId(11L)).thenReturn(Optional.of(project));
+
+        ProjectDeploymentOwnershipResolver embeddedResolver =
+            new ProjectDeploymentOwnershipResolver(providerOf(embeddedResourceResolver), projectRepository);
+
+        assertThat(embeddedResolver.resolveOwner(11L)).isEqualTo(ResourceOwner.ofEmbeddedProject());
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver>
+        providerOf(EmbeddedResourceResolver embeddedResourceResolver) {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }

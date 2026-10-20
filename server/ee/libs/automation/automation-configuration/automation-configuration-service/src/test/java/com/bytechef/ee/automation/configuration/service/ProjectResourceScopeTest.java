@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -115,7 +116,8 @@ class ProjectResourceScopeTest {
             workspaceUserRepository, resourceOwnershipResolvers, List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private List<ResourceOwnershipResolver> ownershipResolvers() {

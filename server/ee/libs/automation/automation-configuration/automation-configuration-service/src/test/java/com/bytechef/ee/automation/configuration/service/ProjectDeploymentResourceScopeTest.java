@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -114,7 +115,9 @@ class ProjectDeploymentResourceScopeTest {
 
     private PermissionServiceImpl service() {
         return service(
-            List.of(new ProjectDeploymentOwnershipResolver(projectRepository)), environmentResolvers());
+            List.of(new ProjectDeploymentOwnershipResolver(
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository)),
+            environmentResolvers());
     }
 
     private PermissionServiceImpl service(
@@ -126,7 +129,8 @@ class ProjectDeploymentResourceScopeTest {
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private List<ResourceEnvironmentResolver> environmentResolvers() {

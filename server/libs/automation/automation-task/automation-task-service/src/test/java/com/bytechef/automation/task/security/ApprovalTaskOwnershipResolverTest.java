@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -33,7 +34,10 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -51,8 +55,14 @@ class ApprovalTaskOwnershipResolverTest {
     private final PrincipalJobService principalJobService = mock(PrincipalJobService.class);
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectService projectService = mock(ProjectService.class);
-    private final ApprovalTaskOwnershipResolver resolver = new ApprovalTaskOwnershipResolver(
-        approvalTaskRepository, principalJobService, projectDeploymentService, projectService);
+    private ApprovalTaskOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new ApprovalTaskOwnershipResolver(
+            approvalTaskRepository, new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            principalJobService, projectDeploymentService, projectService);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheApprovalTaskGuardsName() {
@@ -135,6 +145,7 @@ class ApprovalTaskOwnershipResolverTest {
         ProjectDeployment projectDeployment = mock(ProjectDeployment.class);
         Project project = new Project();
 
+        project.setId(PROJECT_ID);
         project.setWorkspaceId(WORKSPACE_ID);
 
         when(approvalTaskRepository.findById(APPROVAL_TASK_ID)).thenReturn(Optional.of(approvalTask));
@@ -144,5 +155,34 @@ class ApprovalTaskOwnershipResolverTest {
             .thenReturn(Optional.of(projectDeployment));
         when(projectDeployment.getProjectId()).thenReturn(PROJECT_ID);
         when(projectService.fetchProject(PROJECT_ID)).thenReturn(Optional.of(project));
+    }
+
+    @Test
+    void testAnApprovalTaskOfAnEmbeddedProjectResolvesToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        ApprovalTask approvalTask = ApprovalTask.builder()
+            .jobResumeId(String.valueOf(JobResumeId.of(JOB_ID)))
+            .assigneeId(ASSIGNEE_ID)
+            .build();
+
+        stubJobChain(approvalTask);
+
+        when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID)).thenReturn(true);
+
+        ApprovalTaskOwnershipResolver embeddedResolver = new ApprovalTaskOwnershipResolver(
+            approvalTaskRepository, providerOf(embeddedResourceResolver), principalJobService,
+            projectDeploymentService, projectService);
+
+        assertThat(embeddedResolver.resolveOwner(APPROVAL_TASK_ID)).isEqualTo(ResourceOwner.ofEmbeddedProject());
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver> providerOf(
+        EmbeddedResourceResolver embeddedResourceResolver) {
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }
