@@ -20,11 +20,11 @@ export const useAutomationJourney = (): UseAutomationJourneyI => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     // Unfiltered and with all fields: projectWorkflowIds is only returned when includeAllFields is true.
-    const {data: projects, isLoading: projectsIsLoading} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId});
+    const {data: projects, isLoading: projectsIsLoading} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!});
 
     const {data: projectDeployments, isLoading: projectDeploymentsIsLoading} = useGetWorkspaceProjectDeploymentsQuery({
         environmentId: currentEnvironmentId,
-        id: currentWorkspaceId,
+        id: currentWorkspaceId!,
     });
 
     const journey = useMemo(
