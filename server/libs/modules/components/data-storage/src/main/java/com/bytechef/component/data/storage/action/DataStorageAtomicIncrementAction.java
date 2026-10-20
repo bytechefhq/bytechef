@@ -67,47 +67,38 @@ public class DataStorageAtomicIncrementAction {
         .perform(DataStorageAtomicIncrementAction::perform);
 
     protected static Integer perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws InterruptedException {
 
-        Integer number = null;
+        if (!LOCK.tryLock(10, TimeUnit.SECONDS)) {
+            throw new IllegalStateException("Timed out waiting to increment the value");
+        }
 
         try {
-            if (LOCK.tryLock(10, TimeUnit.SECONDS)) {
-                Integer value = getValue(inputParameters, context);
+            Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
+            String key = inputParameters.getRequiredString(KEY);
 
-                if (value != null) {
-                    context.data(
-                        data -> data.put(
-                            Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                            inputParameters.getRequiredString(KEY), value));
+            int value = getValue(scope, key, context) + inputParameters.getRequiredInteger(VALUE_TO_ADD);
 
-                    number = value;
-                }
-            }
-        } catch (InterruptedException e) {
-            context.log(log -> log.error(e.getMessage(), e));
+            context.data(data -> data.put(scope, key, value));
+
+            return value;
         } finally {
             LOCK.unlock();
         }
-
-        return number;
     }
 
-    private static Integer getValue(Parameters inputParameters, ActionContext context) {
-        int number;
+    private static int getValue(Scope scope, String key, ActionContext context) {
+        Optional<Object> optionalValue = context.data(data -> data.fetch(scope, key));
 
-        Optional<Object> optionalList = context.data(
-            data -> data.fetch(
-                Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
-        if (optionalList.isPresent() && optionalList.get() instanceof Number cuNumber) {
-            number = (Integer) cuNumber;
-        } else {
-            return null;
+        if (optionalValue.isEmpty()) {
+            return 0;
         }
 
-        number += inputParameters.getRequiredInteger(VALUE_TO_ADD);
+        if (optionalValue.get() instanceof Number number) {
+            return number.intValue();
+        }
 
-        return number;
+        throw new IllegalArgumentException("The value stored under key '%s' is not a number".formatted(key));
     }
 }
