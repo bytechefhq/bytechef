@@ -42,6 +42,26 @@ public final class WorkflowPersistCaptureUtils {
         return context;
     }
 
+    public static boolean isUpdated(Map<String, Object> context, String workflowId) {
+        Object holder = context.get(PERSISTED_WORKFLOW_CAPTURE_KEY);
+
+        if (!(holder instanceof List<?> captures)) {
+            return false;
+        }
+
+        synchronized (captures) {
+            for (Object capture : captures) {
+                if (capture instanceof Map<?, ?> entry && workflowId.equals(entry.get("workflowId")) &&
+                    Boolean.FALSE.equals(entry.get("created"))) {
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @SuppressFBWarnings(
         value = "VA_FORMAT_STRING_USES_NEWLINE",
         justification = "The trailer is LLM-facing content that must use a literal \\n, not the platform-dependent %n line separator.")

@@ -85,7 +85,8 @@ final class IntelligentToolAskCapabilityTest {
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
-                present(mock(SubAgentChatModelResolver.class)));
+                present(mock(SubAgentChatModelResolver.class)),
+                absent());
 
         return contributor.getIntelligentToolDefinitions();
     }
@@ -97,5 +98,10 @@ final class IntelligentToolAskCapabilityTest {
         when(objectProvider.getIfAvailable()).thenReturn(value);
 
         return objectProvider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> absent() {
+        return mock(ObjectProvider.class);
     }
 }
