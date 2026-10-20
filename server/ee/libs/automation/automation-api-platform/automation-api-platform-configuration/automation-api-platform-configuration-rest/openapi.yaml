@@ -229,6 +229,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiCollection"
+  /api-collections/{id}/project-version:
+    put:
+      description: "Move an API collection to a newer published project version in place, keeping its collection version."
+      summary: "Move an API collection to a newer project version"
+      tags:
+        - "api-collection"
+      operationId: "updateApiCollectionProjectVersion"
+      parameters:
+        - name: "id"
+          description: "The id of an API collection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateApiCollectionProjectVersionRequest"
+        required: true
+      responses:
+        "200":
+          description: "The outcome of the project version update."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionVersionUpdate"
   /api-collections/{id}/tags:
     put:
       description: "Updates tags of an existing API collection."
@@ -577,6 +605,56 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    ApiCollectionMissingConnection:
+      description: "A connection slot of the new project version that no carried connection binds."
+      type: "object"
+      properties:
+        componentName:
+          description: "The name of the component the slot needs a connection for."
+          type: "string"
+        endpointName:
+          description: "The name of the endpoint whose workflow has the slot."
+          type: "string"
+        key:
+          description: "The connection key of the slot."
+          type: "string"
+        workflowNodeName:
+          description: "The workflow node name of the slot."
+          type: "string"
+    ApiCollectionMissingInput:
+      description: "A required input of the new project version that carries no value."
+      type: "object"
+      properties:
+        endpointName:
+          description: "The name of the endpoint whose workflow needs the input."
+          type: "string"
+        inputName:
+          description: "The name of the input."
+          type: "string"
+    ApiCollectionVersionUpdate:
+      description: "The outcome of moving an API collection to a newer project version."
+      type: "object"
+      properties:
+        apiCollection:
+          $ref: "#/components/schemas/ApiCollection"
+        disabledEndpointNames:
+          description: "The names of the endpoints carried disabled because the new version needs a connection or input they do not have."
+          type: "array"
+          items:
+            type: "string"
+        missingConnections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ApiCollectionMissingConnection"
+        missingInputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ApiCollectionMissingInput"
+        removedEndpointNames:
+          description: "The names of the endpoints removed because their workflow is absent from the new version."
+          type: "array"
+          items:
+            type: "string"
     HttpMethod:
       description: "The endpoint HTTP method."
       type: "string"
@@ -588,6 +666,20 @@ components:
         - "PUT"
     Tag:
       $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
+    UpdateApiCollectionProjectVersionRequest:
+      description: "The request object that names the project version to move an API collection to."
+      type: "object"
+      required:
+        - "projectVersion"
+      properties:
+        projectVersion:
+          description: "The published project version to move to."
+          type: "integer"
+          format: "int32"
+        removeMissingEndpoints:
+          description: "Whether to delete the endpoints whose workflow is absent from the new version."
+          type: "boolean"
+          default: false
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"
