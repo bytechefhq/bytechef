@@ -309,7 +309,7 @@ class AutomationWorkflowProjectFacadeAuditIntTest {
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
             projectId, 0L, CONFIGURATION_NAME, null, 1, true, false);

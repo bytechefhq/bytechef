@@ -392,7 +392,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         long projectId = createPublishedProject("Pinned Version", 1);
 
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
@@ -667,7 +667,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         givenReferences(configurationId,
             newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
@@ -1412,7 +1412,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     private void publish(long projectId) {
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
     }
 
     private void redefineDraftWorkflow(String workflowUuid, String definition) {
@@ -1426,7 +1426,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             projectId, "{\"label\": \"" + label + "\", \"description\": \"\", \"tasks\": []}", null);
 
-        automationWorkflowProjectFacade.publishProject(projectId);
+        automationWorkflowProjectFacade.publishProject(projectId, null);
 
         return workflowUuid;
     }
@@ -1483,7 +1483,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
 
         for (int i = 0; i < publishedVersionCount; i++) {
-            automationWorkflowProjectFacade.publishProject(projectId);
+            automationWorkflowProjectFacade.publishProject(projectId, null);
         }
 
         return projectId;

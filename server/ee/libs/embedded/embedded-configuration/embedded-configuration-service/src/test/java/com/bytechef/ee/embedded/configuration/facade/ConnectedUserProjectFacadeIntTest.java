@@ -734,7 +734,7 @@ class ConnectedUserProjectFacadeIntTest {
         String secondWorkflowTemplateUuid = addAutomationWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         AutomationWorkflowProjectConfiguration configurationA = automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "A", null, 1, true, true);
@@ -751,7 +751,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         automationWorkflowProjectFacade.updateProjectWorkflow(secondWorkflowTemplateUuid, "Version two", "");
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "B", null, 2, true, true);

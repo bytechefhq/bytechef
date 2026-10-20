@@ -1232,7 +1232,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         automationWorkflowProjectConfigurationService.create(
             automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'", 1,
@@ -1265,7 +1265,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         String newerWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1290,7 +1290,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId, null);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 

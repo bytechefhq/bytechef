@@ -253,7 +253,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
 
         long unconfiguredProjectId = createProjectWithWorkflows("Provisionable Unconfigured", 1);
 
-        automationWorkflowProjectFacade.publishProject(unconfiguredProjectId);
+        automationWorkflowProjectFacade.publishProject(unconfiguredProjectId, null);
 
         long configuredProjectId = createProjectWithWorkflows("Provisionable Configured", 1);
 
