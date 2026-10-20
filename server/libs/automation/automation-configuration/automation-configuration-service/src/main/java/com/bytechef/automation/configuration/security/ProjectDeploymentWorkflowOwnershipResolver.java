@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,13 +43,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectDeploymentWorkflowOwnershipResolver implements ResourceOwnershipResolver {
 
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
     private final ProjectRepository projectRepository;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentWorkflowOwnershipResolver(
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
         ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository, ProjectRepository projectRepository) {
 
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.projectDeploymentWorkflowRepository = projectDeploymentWorkflowRepository;
         this.projectRepository = projectRepository;
     }
@@ -60,8 +64,21 @@ public class ProjectDeploymentWorkflowOwnershipResolver implements ResourceOwner
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return fetchProject(id)
-            .map(Project::getWorkspaceId)
+        Optional<Project> projectOptional = fetchProject(id);
+
+        if (projectOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        Project project = projectOptional.get();
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+            return ResourceOwner.ofEmbeddedProject();
+        }
+
+        return Optional.ofNullable(project.getWorkspaceId())
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }

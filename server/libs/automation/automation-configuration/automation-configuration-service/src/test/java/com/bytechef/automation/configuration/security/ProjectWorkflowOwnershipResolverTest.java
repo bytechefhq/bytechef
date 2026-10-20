@@ -26,7 +26,10 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -39,8 +42,14 @@ class ProjectWorkflowOwnershipResolverTest {
 
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
     private final ProjectWorkflowRepository projectWorkflowRepository = mock(ProjectWorkflowRepository.class);
-    private final ProjectWorkflowOwnershipResolver resolver =
-        new ProjectWorkflowOwnershipResolver(projectRepository, projectWorkflowRepository);
+    private ProjectWorkflowOwnershipResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new ProjectWorkflowOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectRepository,
+            projectWorkflowRepository);
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheProjectWorkflowGuardNames() {
@@ -101,5 +110,69 @@ class ProjectWorkflowOwnershipResolverTest {
         ProjectWorkflow projectWorkflow = new ProjectWorkflow(PROJECT_ID, 1, "workflow-1");
 
         when(projectWorkflowRepository.findById(PROJECT_WORKFLOW_ID)).thenReturn(Optional.of(projectWorkflow));
+    }
+
+    @Test
+    void testAConnectedUserProjectWorkflowResolvesToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID)).thenReturn(true);
+
+        givenProjectWithId();
+        givenRowBelongingToProject();
+
+        ProjectWorkflowOwnershipResolver embeddedResolver = new ProjectWorkflowOwnershipResolver(
+            providerOf(embeddedResourceResolver), projectRepository, projectWorkflowRepository);
+
+        assertThat(embeddedResolver.resolveOwner(PROJECT_WORKFLOW_ID)).isEqualTo(ResourceOwner.ofEmbeddedProject());
+        assertThat(embeddedResolver.resolveProjectId(PROJECT_WORKFLOW_ID)).hasValue(PROJECT_ID);
+    }
+
+    @Test
+    void testAHubProjectWorkflowResolvesToEmbedded() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID)).thenReturn(true);
+        when(embeddedResourceResolver.isHubProject(PROJECT_ID)).thenReturn(true);
+
+        givenProjectWithId();
+        givenRowBelongingToProject();
+
+        ProjectWorkflowOwnershipResolver embeddedResolver = new ProjectWorkflowOwnershipResolver(
+            providerOf(embeddedResourceResolver), projectRepository, projectWorkflowRepository);
+
+        assertThat(embeddedResolver.resolveOwner(PROJECT_WORKFLOW_ID)).isEqualTo(ResourceOwner.ofEmbedded());
+    }
+
+    @Test
+    void testAnAutomationProjectWorkflowStaysInItsWorkspaceWhenAnEmbeddedResolverIsPresent() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        givenProjectWithId();
+        givenRowBelongingToProject();
+
+        ProjectWorkflowOwnershipResolver embeddedResolver = new ProjectWorkflowOwnershipResolver(
+            providerOf(embeddedResourceResolver), projectRepository, projectWorkflowRepository);
+
+        assertThat(embeddedResolver.resolveOwner(PROJECT_WORKFLOW_ID))
+            .isEqualTo(ResourceOwner.ofWorkspace(WORKSPACE_ID));
+    }
+
+    private void givenProjectWithId() {
+        Project project = new Project();
+
+        project.setId(PROJECT_ID);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver>
+        providerOf(EmbeddedResourceResolver embeddedResourceResolver) {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }

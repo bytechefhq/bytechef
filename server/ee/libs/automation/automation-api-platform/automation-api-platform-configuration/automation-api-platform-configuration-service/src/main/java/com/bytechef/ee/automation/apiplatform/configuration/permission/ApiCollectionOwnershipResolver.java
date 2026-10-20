@@ -9,12 +9,15 @@ package com.bytechef.ee.automation.apiplatform.configuration.permission;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,15 +46,18 @@ import org.springframework.stereotype.Component;
 public class ApiCollectionOwnershipResolver implements ResourceOwnershipResolver {
 
     private final ApiCollectionService apiCollectionService;
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
     public ApiCollectionOwnershipResolver(
-        ApiCollectionService apiCollectionService, ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService) {
+        ApiCollectionService apiCollectionService,
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService) {
 
         this.apiCollectionService = apiCollectionService;
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
     }
@@ -63,12 +69,25 @@ public class ApiCollectionOwnershipResolver implements ResourceOwnershipResolver
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return apiCollectionService.fetchApiCollection(id)
+        Optional<Project> projectOptional = apiCollectionService.fetchApiCollection(id)
             .map(ApiCollection::getProjectDeploymentId)
             .flatMap(projectDeploymentService::fetchProjectDeployment)
             .map(ProjectDeployment::getProjectId)
-            .flatMap(projectService::fetchProject)
-            .map(Project::getWorkspaceId)
+            .flatMap(projectService::fetchProject);
+
+        if (projectOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        Project project = projectOptional.get();
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+            return ResourceOwner.ofEmbeddedProject();
+        }
+
+        return Optional.ofNullable(project.getWorkspaceId())
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }
