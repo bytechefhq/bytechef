@@ -892,6 +892,82 @@ class EmbeddedMcpGatesIntTest {
     }
 
     @Test
+    void testMcpInstanceConfigurationsFollowTheInstanceConfigurationScopes() {
+        long integrationId = integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+            productionConfigurationId)
+            .getIntegrationId();
+        long otherProductionConfigurationId = createConfiguration(integrationId, Environment.PRODUCTION, 1);
+
+        authenticate(EMBEDDED_VIEWER, false);
+
+        assertThat(mcpIntegrationInstanceConfigurationFacade.getMcpIntegrationInstanceConfiguration(
+            productionMcpConfigurationId)).isNotNull();
+        assertThat(mcpIntegrationInstanceConfigurationFacade.getMcpServerMcpIntegrationInstanceConfigurations(
+            productionServerId)).hasSize(1);
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowFacade.getMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isNotNull();
+        assertThat(
+            mcpIntegrationInstanceConfigurationWorkflowFacade
+                .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                    productionMcpConfigurationId)).hasSize(1);
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionServerId, otherProductionConfigurationId, List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                .updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+                    productionMcpWorkflowId, Map.of("key", "value")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        McpIntegrationInstanceConfiguration createdMcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                productionServerId, otherProductionConfigurationId, List.of());
+
+        mcpIntegrationInstanceConfigurationWorkflowFacade.updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+            productionMcpWorkflowId, Map.of("key", "value"));
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(
+                productionMcpWorkflowId))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+                productionMcpConfigurationId))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                .updateMcpIntegrationInstanceConfigurationWorkflowParameters(
+                    developmentMcpWorkflowId, Map.of("key", "value")))
+                        .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isPresent();
+        assertThat(mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+            productionMcpConfigurationId)).isPresent();
+
+        authenticate(PRODUCTION_ADMIN, false);
+
+        mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId);
+        mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+            createdMcpIntegrationInstanceConfiguration.getId());
+
+        assertThatThrownBy(
+            () -> mcpIntegrationInstanceConfigurationFacade.deleteMcpIntegrationInstanceConfiguration(
+                developmentMcpConfigurationId))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+            productionMcpWorkflowId)).isEmpty();
+        assertThat(mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+            createdMcpIntegrationInstanceConfiguration.getId())).isEmpty();
+    }
+
+    @Test
     void testOnlyAnEditorOfAnEmbeddedServerReadsItsSecretKey() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
