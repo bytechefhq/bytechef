@@ -1,0 +1,6 @@
+mutation UpdateEmbeddedApiKey($input: UpdateEmbeddedApiKeyInput!) {
+    updateEmbeddedApiKey(input: $input) {
+        id
+        name
+    }
+}
