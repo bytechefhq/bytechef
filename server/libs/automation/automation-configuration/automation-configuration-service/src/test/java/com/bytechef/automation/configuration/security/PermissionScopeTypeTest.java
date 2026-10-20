@@ -282,6 +282,13 @@ class PermissionScopeTypeTest {
      * exemption would then hide the gate being deleted again later.
      */
     @Test
+    void testNoEmbeddedScopeIsPinnedAsUnenforced() {
+        assertThat(KNOWN_UNENFORCED_SCOPES)
+            .as("every embedded scope is gated now, so no scope may be pinned as unenforced")
+            .isEmpty();
+    }
+
+    @Test
     void testEveryPinnedUnenforcedScopeIsStillUnenforced() {
         Map<String, Set<String>> stalePins = new TreeMap<>();
 

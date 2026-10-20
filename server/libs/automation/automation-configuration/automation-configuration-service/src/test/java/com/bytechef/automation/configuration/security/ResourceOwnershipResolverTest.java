@@ -196,6 +196,13 @@ class ResourceOwnershipResolverTest {
     }
 
     @Test
+    void testNoResolverTypeIsPinnedAsUngated() {
+        assertThat(KNOWN_UNGATED_RESOLVER_TYPES)
+            .as("every registered resolver type is named by a gate now, so none may be pinned as ungated")
+            .isEmpty();
+    }
+
+    @Test
     void testEveryPinnedUngatedResolverTypeIsStillUngated() {
         Set<String> nowGatedResolverTypes = new TreeSet<>(KNOWN_UNGATED_RESOLVER_TYPES);
 
