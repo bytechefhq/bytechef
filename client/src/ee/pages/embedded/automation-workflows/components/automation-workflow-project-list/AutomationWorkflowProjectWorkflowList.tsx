@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -27,6 +29,8 @@ const AutomationWorkflowProjectWorkflowList = ({
     project,
 }: AutomationWorkflowProjectWorkflowListProps) => {
     const [workflowUuidToDelete, setWorkflowUuidToDelete] = useState<string | null>(null);
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const workflows = [...project.workflowTemplates].sort((firstWorkflow, secondWorkflow) =>
         (firstWorkflow.label || firstWorkflow.workflowUuid).localeCompare(
@@ -56,17 +60,23 @@ const AutomationWorkflowProjectWorkflowList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <Button
-                                label="Create Workflow"
-                                onClick={(event) => {
-                                    event.stopPropagation();
+                            canCreateWorkflow && (
+                                <Button
+                                    label="Create Workflow"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
 
-                                    onCreateWorkflow(project.id);
-                                }}
-                            />
+                                        onCreateWorkflow(project.id);
+                                    }}
+                                />
+                            )
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new workflow."
+                        message={
+                            canCreateWorkflow
+                                ? 'Get started by creating a new workflow.'
+                                : 'There are no workflows yet.'
+                        }
                         title="No Workflows"
                     />
                 </div>

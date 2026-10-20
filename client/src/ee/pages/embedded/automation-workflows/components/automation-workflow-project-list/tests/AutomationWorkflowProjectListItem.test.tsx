@@ -5,6 +5,11 @@ import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
 const handlers = {

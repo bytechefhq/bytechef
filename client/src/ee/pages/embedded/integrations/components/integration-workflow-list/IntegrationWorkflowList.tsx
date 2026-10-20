@@ -6,7 +6,9 @@ import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowIcon} from 'lucide-react';
@@ -22,6 +24,8 @@ const IntegrationWorkflowList = ({
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     const {captureIntegrationWorkflowCreated} = useAnalytics();
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const navigate = useNavigate();
 
@@ -121,15 +125,21 @@ const IntegrationWorkflowList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <WorkflowDialog
-                                createWorkflowMutation={createIntegrationWorkflowMutation}
-                                parentId={integration.id}
-                                triggerNode={<Button label="Create Workflow" />}
-                                useGetWorkflowQuery={useGetWorkflowQuery}
-                            />
+                            canCreateWorkflow && (
+                                <WorkflowDialog
+                                    createWorkflowMutation={createIntegrationWorkflowMutation}
+                                    parentId={integration.id}
+                                    triggerNode={<Button label="Create Workflow" />}
+                                    useGetWorkflowQuery={useGetWorkflowQuery}
+                                />
+                            )
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new workflow."
+                        message={
+                            canCreateWorkflow
+                                ? 'Get started by creating a new workflow.'
+                                : 'There are no workflows yet.'
+                        }
                         title="No Workflows"
                     />
                 </div>

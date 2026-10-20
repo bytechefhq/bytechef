@@ -1,10 +1,28 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflows from '../AutomationWorkflows';
+
+const scopeHoisted = vi.hoisted(() => ({
+    grants: undefined as Record<number, string[]> | undefined,
+    useRealScopeHook: false,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>();
+
+    return {
+        ...actual,
+        useHasEmbeddedScope: (scope: string, environmentId?: number) =>
+            scopeHoisted.useRealScopeHook
+                ? actual.useHasEmbeddedScope(scope as never, environmentId)
+                : scopeHoisted.grants === undefined || (scopeHoisted.grants[environmentId ?? 0] ?? []).includes(scope),
+    };
+});
 
 const renderWithProviders = (ui: ReactElement) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
@@ -118,6 +136,11 @@ vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
 // ---------------------------------------------------------------------------
 
 beforeEach(() => {
+    scopeHoisted.grants = undefined;
+    scopeHoisted.useRealScopeHook = false;
+
+    authenticationStore.setState({account: undefined, authenticated: false});
+
     hoisted.categories = [];
     hoisted.createProjectMutate.mockReset();
     hoisted.createWorkflowMutate.mockReset();
@@ -429,5 +452,80 @@ describe('AutomationWorkflows', () => {
             expect.anything()
         );
         expect(screen.queryByRole('textbox', {name: /label/i})).not.toBeInTheDocument();
+    });
+});
+
+describe('AutomationWorkflows gating', () => {
+    const project = {
+        categoryId: null,
+        description: null,
+        id: 'project-1',
+        lastPublishedVersion: null,
+        name: 'Gated Project',
+        published: false,
+        tagIds: [],
+        workflowTemplates: [{components: [], description: null, label: 'Flow', triggers: [], workflowUuid: 'flow-1'}],
+    };
+
+    const openProjectMenu = async () => {
+        await userEvent.click(screen.getByTestId('project-1-moreProjectActionsButton'));
+    };
+
+    it('testAViewerSeesNoCreateEditPublishOrDeleteOnTheHubPage', async () => {
+        hoisted.projects = [project];
+        scopeHoisted.grants = {[-1]: ['WORKFLOW_EDIT', 'WORKFLOW_VIEW'], 0: ['WORKFLOW_VIEW']};
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        expect(screen.queryByRole('button', {name: 'New Project'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Workflow'})).not.toBeInTheDocument();
+
+        await openProjectMenu();
+
+        expect(screen.queryByRole('menuitem', {name: /publish/i})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'New Workflow'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit Project'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete Project'})).not.toBeInTheDocument();
+    });
+
+    it('testAnEditorBuildsWorkflowsButCannotDeleteOrConfigureTheProject', async () => {
+        hoisted.projects = [project];
+        scopeHoisted.grants = {
+            [-1]: ['INTEGRATION_PUBLISH', 'WORKFLOW_CREATE', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW'],
+            0: ['WORKFLOW_CREATE', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW'],
+        };
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        expect(screen.getByRole('button', {name: 'Create Workflow'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Project'})).not.toBeInTheDocument();
+
+        await openProjectMenu();
+
+        expect(await screen.findByRole('menuitem', {name: /publish/i})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'New Workflow'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit Project'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete Project'})).not.toBeInTheDocument();
+    });
+
+    it('testATenantAdminSeesEveryHubControl', async () => {
+        hoisted.projects = [project];
+        scopeHoisted.useRealScopeHook = true;
+
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_ADMIN'], login: 'admin'} as never,
+            authenticated: true,
+        });
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        expect(screen.getByRole('button', {name: 'New Project'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Workflow'})).toBeInTheDocument();
+
+        await openProjectMenu();
+
+        expect(await screen.findByRole('menuitem', {name: /publish/i})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit Project'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete Project'})).toBeInTheDocument();
     });
 });

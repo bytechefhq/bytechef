@@ -2,11 +2,13 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import AutomationWorkflowEditorHeader from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/AutomationWorkflowEditorHeader';
 import AutomationWorkflowEditorLeftSidebar from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/AutomationWorkflowEditorLeftSidebar';
 import {useAutomationWorkflowEditorSidebarStore} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/stores/useAutomationWorkflowEditorSidebarStore';
+import {useEmbeddedWorkflowReadOnly} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowReadOnly';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
+import WorkflowEditorReadOnlyProvider from '@/pages/platform/workflow-editor/providers/WorkflowEditorReadOnlyProvider';
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -86,6 +88,8 @@ const AutomationWorkflow = () => {
 
     const {runDisabled} = useRun();
 
+    const readOnly = useEmbeddedWorkflowReadOnly();
+
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) =>
@@ -146,86 +150,88 @@ const AutomationWorkflow = () => {
     }, [setWorkflow]);
 
     return (
-        <div className="flex w-full">
-            <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
+        <WorkflowEditorReadOnlyProvider readOnly={readOnly}>
+            <div className="flex w-full">
+                <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
-            <div className="h-full shrink-0 overflow-hidden">
-                <div
-                    className={twMerge(
-                        'h-full w-[355px] transition-[margin-left,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]',
-                        leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
-                    )}
-                >
-                    <AutomationWorkflowEditorLeftSidebar currentWorkflowId={workflowUuid!} />
+                <div className="h-full shrink-0 overflow-hidden">
+                    <div
+                        className={twMerge(
+                            'h-full w-[355px] transition-[margin-left,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]',
+                            leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
+                        )}
+                    >
+                        <AutomationWorkflowEditorLeftSidebar currentWorkflowId={workflowUuid!} />
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex w-full flex-col">
-                <AutomationWorkflowEditorHeader
-                    bottomResizablePanelRef={bottomResizablePanelRef}
-                    chatTrigger={
-                        workflow.triggers &&
-                        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                    }
-                    currentWorkflowId={workflowUuid!}
-                    projectId={projectId}
-                    runDisabled={runDisabled}
-                    updateWorkflowMutation={updateWorkflowEditorMutation}
-                />
+                <div className="flex w-full flex-col">
+                    <AutomationWorkflowEditorHeader
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        chatTrigger={
+                            workflow.triggers &&
+                            workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                        }
+                        currentWorkflowId={workflowUuid!}
+                        projectId={projectId}
+                        runDisabled={runDisabled}
+                        updateWorkflowMutation={updateWorkflowEditorMutation}
+                    />
 
-                <div className="flex flex-1">
-                    <ResizablePanelGroup className="flex-1 bg-surface-main" orientation="vertical">
-                        <ResizablePanel className="relative flex" defaultSize={650}>
-                            <WorkflowEditorProvider
-                                value={{
-                                    ConnectionKeys: ConnectionKeys,
-                                    cancelWorkflowQueries,
-                                    deleteClusterElementParameterMutation,
-                                    deleteWorkflowNodeParameterMutation,
-                                    invalidateWorkflowQueries,
-                                    platformType: PlatformType.Embedded,
-                                    updateClusterElementParameterMutation,
-                                    updateWorkflowMutation: updateWorkflowEditorMutation,
-                                    updateWorkflowNodeParameterMutation,
-                                    useCreateConnectionMutation: useCreateConnectionMutation,
-                                    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                    useGetConnectionTagsQuery: () => connectionTagsQueryResult,
-                                    useGetConnectionsQuery,
-                                    webhookTriggerTestApi: new WebhookTriggerTestApi(),
-                                }}
-                            >
-                                {workflow.id && (
-                                    <WorkflowEditorLayout
-                                        internalOnlyVisible={true}
-                                        leftSidebarOpen={leftSidebarOpen}
-                                        runDisabled={runDisabled}
-                                        showWorkflowInputs={true}
-                                    />
+                    <div className="flex flex-1">
+                        <ResizablePanelGroup className="flex-1 bg-surface-main" orientation="vertical">
+                            <ResizablePanel className="relative flex" defaultSize={650}>
+                                <WorkflowEditorProvider
+                                    value={{
+                                        ConnectionKeys: ConnectionKeys,
+                                        cancelWorkflowQueries,
+                                        deleteClusterElementParameterMutation,
+                                        deleteWorkflowNodeParameterMutation,
+                                        invalidateWorkflowQueries,
+                                        platformType: PlatformType.Embedded,
+                                        updateClusterElementParameterMutation,
+                                        updateWorkflowMutation: updateWorkflowEditorMutation,
+                                        updateWorkflowNodeParameterMutation,
+                                        useCreateConnectionMutation: useCreateConnectionMutation,
+                                        useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
+                                        useGetConnectionTagsQuery: () => connectionTagsQueryResult,
+                                        useGetConnectionsQuery,
+                                        webhookTriggerTestApi: new WebhookTriggerTestApi(),
+                                    }}
+                                >
+                                    {workflow.id && (
+                                        <WorkflowEditorLayout
+                                            internalOnlyVisible={true}
+                                            leftSidebarOpen={leftSidebarOpen}
+                                            runDisabled={runDisabled}
+                                            showWorkflowInputs={true}
+                                        />
+                                    )}
+                                </WorkflowEditorProvider>
+                            </ResizablePanel>
+
+                            <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:-top-1.5 aria-[orientation=horizontal]:h-0" />
+
+                            <ResizablePanel
+                                className={twMerge(
+                                    'bg-surface-main px-3 pb-3',
+                                    leftSidebarOpen && 'pl-0',
+                                    copilotLayoutShifted && 'pr-0'
                                 )}
-                            </WorkflowEditorProvider>
-                        </ResizablePanel>
-
-                        <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:-top-1.5 aria-[orientation=horizontal]:h-0" />
-
-                        <ResizablePanel
-                            className={twMerge(
-                                'bg-surface-main px-3 pb-3',
-                                leftSidebarOpen && 'pl-0',
-                                copilotLayoutShifted && 'pr-0'
-                            )}
-                            defaultSize={0}
-                            panelRef={bottomResizablePanelRef}
-                        >
-                            <WorkflowExecutionsTestOutput
-                                onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                                workflowIsRunning={workflowIsRunning}
-                                workflowTestExecution={workflowTestExecution}
-                            />
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
+                                defaultSize={0}
+                                panelRef={bottomResizablePanelRef}
+                            >
+                                <WorkflowExecutionsTestOutput
+                                    onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                    workflowIsRunning={workflowIsRunning}
+                                    workflowTestExecution={workflowTestExecution}
+                                />
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
+                    </div>
                 </div>
             </div>
-        </div>
+        </WorkflowEditorReadOnlyProvider>
     );
 };
 
