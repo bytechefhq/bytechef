@@ -18,6 +18,7 @@ import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatfor
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useAccessibleEmbeddedEnvironmentIds} from '@/shared/hooks/useAccessibleEmbeddedEnvironmentIds';
 import {useAccessibleEnvironmentIds} from '@/shared/hooks/useAccessibleEnvironmentIds';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon, PanelLeftIcon} from 'lucide-react';
@@ -65,9 +66,13 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const currentType = usePlatformTypeStore((platformTypeState) => platformTypeState.currentType);
     const currentWorkspaceId = useWorkspaceStore((workspaceState) => workspaceState.currentWorkspaceId);
 
-    const accessibleEnvironmentIds = useAccessibleEnvironmentIds(
+    const accessibleAutomationEnvironmentIds = useAccessibleEnvironmentIds(
         currentType === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
     );
+    const accessibleEmbeddedEnvironmentIds = useAccessibleEmbeddedEnvironmentIds(currentType === PlatformType.EMBEDDED);
+
+    const accessibleEnvironmentIds =
+        currentType === PlatformType.EMBEDDED ? accessibleEmbeddedEnvironmentIds : accessibleAutomationEnvironmentIds;
 
     const collapsed = state === 'collapsed' && !isMobile;
 

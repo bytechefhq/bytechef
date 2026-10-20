@@ -1,4 +1,6 @@
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {AUTHORITIES} from '@/shared/constants';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {render, screen} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
@@ -14,7 +16,8 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
     default: ({leftSidebarBody}: {leftSidebarBody: ReactNode}) => <div>{leftSidebarBody}</div>,
 }));
 
-vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+vi.mock('@/shared/stores/useApplicationInfoStore', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/stores/useApplicationInfoStore')>()),
     useApplicationInfoStore: () => false,
 }));
 
@@ -31,6 +34,10 @@ const renderAt = (pathname: string) =>
 
 describe('SettingsLayout', () => {
     beforeEach(() => {
+        authenticationStore.setState({
+            account: {authorities: [AUTHORITIES.ADMIN], login: 'admin'} as never,
+            authenticated: true,
+        });
         usePlatformTypeStore.setState({currentType: undefined});
     });
 
