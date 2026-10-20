@@ -75,9 +75,7 @@ class ResourceOwnershipResolverTest {
      */
     private static final Map<String, Set<PinGrounds>> KNOWN_UNRESOLVED_TOKENS = Map.of();
 
-    private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of(
-        "McpIntegrationInstanceConfiguration", "McpIntegrationInstanceConfigurationWorkflow",
-        "McpIntegrationInstanceTool", "SigningKey");
+    private static final Set<String> KNOWN_UNGATED_RESOLVER_TYPES = Set.of("SigningKey");
 
     private static final Pattern OWNERSHIP_RESOLVER_DECLARATION =
         Pattern.compile("implements\\s+[^{;]*\\bResourceOwnershipResolver\\b");
