@@ -153,7 +153,7 @@ const DataPillPanelBodyPropertiesItem = ({
 
                                 return (
                                     <div
-                                        className="flex items-center space-x-3"
+                                        className="flex items-center gap-3"
                                         key={`${property.name}-${workflowNodeName}-${index}`}
                                     >
                                         <DataPill
