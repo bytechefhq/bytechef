@@ -16,11 +16,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
@@ -45,6 +48,7 @@ class AiHubChatGraphQlControllerTest {
     private AiHubChatService chatService;
     private AiHubChatGraphQlController controller;
     private PermissionService permissionService;
+    private ProjectDeploymentFacade projectDeploymentFacade;
     private TitleGenerationService titleGenerationService;
 
     @BeforeEach
@@ -52,6 +56,7 @@ class AiHubChatGraphQlControllerTest {
         artifactService = mock(AiHubChatArtifactService.class);
         chatService = mock(AiHubChatService.class);
         permissionService = mock(PermissionService.class);
+        projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
         titleGenerationService = mock(TitleGenerationService.class);
 
         UserService userService = mock(UserService.class);
@@ -62,7 +67,63 @@ class AiHubChatGraphQlControllerTest {
         when(permissionService.hasWorkspaceRole(7L, "VIEWER")).thenReturn(true);
 
         controller = new AiHubChatGraphQlController(
-            artifactService, chatService, permissionService, titleGenerationService, userService);
+            artifactService, chatService, permissionService, projectDeploymentFacade, titleGenerationService,
+            userService);
+    }
+
+    @Test
+    void testCreateWorkflowChatRefusesAnIdOutsideTheWorkspaceListing() {
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
+        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-x")).thenReturn(false);
+
+        assertThatThrownBy(() -> controller.createWorkflowChatAiHubChat(7L, 0, "exec-x", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService);
+    }
+
+    @Test
+    void testCreateWorkflowChatRequiresTheWorkflowViewScope() {
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(false);
+        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-1")).thenReturn(true);
+
+        assertThatThrownBy(() -> controller.createWorkflowChatAiHubChat(7L, 0, "exec-1", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService);
+    }
+
+    @Test
+    void testCreateWorkflowChatRequiresWorkspaceMembership() {
+        assertThatThrownBy(() -> controller.createWorkflowChatAiHubChat(8L, 0, "exec-1", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService);
+    }
+
+    @Test
+    void testCreateWorkflowChatDelegatesForAListedWorkflow() {
+        AiHubChat created = mock(AiHubChat.class);
+
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
+        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-1")).thenReturn(true);
+        when(chatService.createWorkflowChat(7L, 10L, 0, "exec-1", 42L, "Title")).thenReturn(created);
+
+        assertThat(controller.createWorkflowChatAiHubChat(7L, 0, "exec-1", 42L, "Title")).isSameAs(created);
+    }
+
+    @Test
+    void testBulkArchiveWorkflowChatsDelegatesForAMember() {
+        when(chatService.bulkArchiveWorkflowChatAiHubChats(7L, 10L, 0)).thenReturn(3);
+
+        assertThat(controller.bulkArchiveWorkflowChatAiHubChats(7L, 0)).isEqualTo(3);
+    }
+
+    @Test
+    void testCancelWorkflowChatTurnDelegatesForAMember() {
+        when(chatService.cancelWorkflowChatTurn(42L, 7L, 10L)).thenReturn(true);
+
+        assertThat(controller.cancelWorkflowChatTurn(7L, 42L)).isTrue();
     }
 
     @Test
@@ -75,6 +136,22 @@ class AiHubChatGraphQlControllerTest {
         AiHubChat result = controller.generateAiHubChatTitle(7L, 42L);
 
         assertThat(result).isSameAs(existing);
+        verify(titleGenerationService, never()).generateTitle(any());
+        verify(chatService, never()).patch(anyLong(), anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testGenerateTitleNeverRetitlesAWorkflowChat() {
+        AiHubChat existing = mock(AiHubChat.class);
+
+        when(existing.isAutoTitled()).thenReturn(true);
+        when(existing.getKind()).thenReturn(AiHubChatKind.WORKFLOW_CHAT);
+        when(chatService.getById(42L, 7L, 10L)).thenReturn(existing);
+
+        AiHubChat result = controller.generateAiHubChatTitle(7L, 42L);
+
+        assertThat(result).isSameAs(existing);
+        verify(chatService, never()).loadMessages(anyLong(), anyLong(), anyLong());
         verify(titleGenerationService, never()).generateTitle(any());
         verify(chatService, never()).patch(anyLong(), anyLong(), anyLong(), any());
     }
