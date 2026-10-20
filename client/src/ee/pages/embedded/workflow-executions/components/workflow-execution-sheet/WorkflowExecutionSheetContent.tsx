@@ -67,7 +67,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                     >
                         <ScrollArea className="mb-4 h-full pr-4">
                             <Accordion
-                                className="ml-2 space-y-2"
+                                className="ml-2 space-y-2 pb-4"
                                 defaultValue={
                                     isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || '']
                                 }
