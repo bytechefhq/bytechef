@@ -438,7 +438,7 @@ public class WebhookBridgeAgent extends LocalAgent {
             if (contentType.startsWith("text/event-stream")) {
                 streamResumeBody(response.body(), bridge);
 
-                persistTurnToChatMemory(chat.getThreadId(), userMessage, null);
+                persistTurnToChatMemory(chat.getThreadId(), userMessage, bridge.getAccumulatedAssistantText());
 
                 bridge.onComplete();
 

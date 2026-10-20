@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -46,7 +47,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -82,6 +88,7 @@ class WebhookBridgeAgentResumeTest {
     private WebhookResumeRegistry resumeRegistry;
     private JsonMapper jsonMapper;
     private AgentSubscriber subscriber;
+    private SessionRepository sessionRepository;
 
     private HttpServer httpServer;
     private String baseUrl;
@@ -95,6 +102,8 @@ class WebhookBridgeAgentResumeTest {
         jsonMapper = JsonMapper.builder()
             .build();
         subscriber = mock(AgentSubscriber.class);
+        sessionRepository = InMemorySessionRepository.builder()
+            .build();
 
         InetAddress loopback = InetAddress.getLoopbackAddress();
 
@@ -251,6 +260,42 @@ class WebhookBridgeAgentResumeTest {
     }
 
     @Test
+    void testStreamingResumeReplyIsPersistedWithTheUserMessage() throws AGUIException {
+        httpServer.createContext("/resume", exchange -> {
+            byte[] response = "data: First chunk\n\ndata: Second chunk\n\n".getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody()
+                .write(response);
+            exchange.close();
+        });
+
+        AiHubChat chat = newWorkflowChat();
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        WebhookBridgeAgent agent = newAgent();
+
+        agent.runAgent(parametersOf(buildInput("My answer is 42")), subscriber);
+
+        verify(subscriber, timeout(5000)).onRunFinalized(any());
+
+        List<Message> sessionMessages = sessionRepository.findEvents(THREAD_ID, EventFilter.all())
+            .stream()
+            .map(SessionEvent::getMessage)
+            .toList();
+
+        assertThat(sessionMessages)
+            .extracting(Message::getMessageType, Message::getText)
+            .containsExactly(
+                tuple(MessageType.USER, "My answer is 42"), tuple(MessageType.ASSISTANT, "First chunkSecond chunk"));
+    }
+
+    @Test
     void testStreamingResumeWithJsonDataParsesAsMapEvent() throws AGUIException {
         httpServer.createContext("/resume", exchange -> {
             byte[] response = "data: {\"event-type\":\"thinking\",\"text\":\"hmm\"}\n\n"
@@ -320,10 +365,7 @@ class WebhookBridgeAgentResumeTest {
 
         return new WebhookBridgeAgent(
             webhookFacade, chatService, resumeRegistry, jsonMapper, mock(WorkflowChatMetrics.class),
-            new AiHubSessionMemory(
-                InMemorySessionRepository.builder()
-                    .build(),
-                null),
+            new AiHubSessionMemory(sessionRepository, null),
             guard, null, new InFlightAiHubRunRegistry());
     }
 
