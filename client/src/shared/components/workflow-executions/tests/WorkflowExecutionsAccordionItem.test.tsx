@@ -137,30 +137,65 @@ describe('WorkflowExecutionsAccordionItem', () => {
         });
     });
 
-    it('shows no spinner for an unfinished task inside a loop iteration of a stopped job', async () => {
-        const loopTaskExecution = {
-            ...createTaskExecution('21', 'STARTED'),
-            iterations: [[{id: '22', jobId: '7', priority: 0, status: 'STARTED', title: 'Row task'}]],
-            title: 'Loop',
-        } as TaskExecution;
+    describe('when the job has failed', () => {
+        const loopWorkflowTask = {label: 'Loop over rows', name: 'loop_1', type: 'loop/v1'};
 
-        const {container} = render(
-            <Accordion type="multiple">
-                <WorkflowExecutionsAccordionItem
-                    execution={loopTaskExecution}
-                    jobStatus="STOPPED"
-                    onExecutionClick={vi.fn()}
-                    selectedExecutionId=""
-                >
-                    <WorkflowTaskExecutionItem jobStatus="STOPPED" taskExecution={loopTaskExecution} />
-                </WorkflowExecutionsAccordionItem>
-            </Accordion>
-        );
+        const renderFailedJobItem = (execution: TaskExecution, previousTaskExecutions?: TaskExecution[]) =>
+            render(
+                <Accordion type="multiple">
+                    <WorkflowExecutionsAccordionItem
+                        execution={execution}
+                        jobStatus="FAILED"
+                        onExecutionClick={vi.fn()}
+                        previousTaskExecutions={previousTaskExecutions}
+                        selectedExecutionId=""
+                    >
+                        <WorkflowTaskExecutionItem jobStatus="FAILED" taskExecution={execution} />
+                    </WorkflowExecutionsAccordionItem>
+                </Accordion>
+            );
 
-        await userEvent.click(screen.getByText('Condition'));
-        await userEvent.click(screen.getByText('Loop iteration 1'));
+        it('shows no spinner for an unfinished task inside a loop iteration', async () => {
+            const loopTaskExecution = {
+                ...createTaskExecution('21', 'STARTED'),
+                iterations: [[{id: '22', jobId: '7', priority: 0, status: 'STARTED', title: 'Row task'}]],
+                title: 'Loop',
+                workflowTask: loopWorkflowTask,
+            } as TaskExecution;
 
-        expect(screen.getByText('Row task')).toBeInTheDocument();
-        expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+            const {container} = renderFailedJobItem(loopTaskExecution);
+
+            await userEvent.click(screen.getByText('Loop over rows'));
+            await userEvent.click(screen.getByText('Loop iteration 1'));
+
+            expect(screen.getByText('Row task')).toBeInTheDocument();
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+        });
+
+        it('shows no spinner for an unfinished child task', async () => {
+            const parentTaskExecution = {
+                ...createTaskExecution('31', 'STARTED'),
+                children: [{...createTaskExecution('32', 'STARTED'), title: 'Child task', workflowTask: undefined}],
+                workflowTask: loopWorkflowTask,
+            } as TaskExecution;
+
+            const {container} = renderFailedJobItem(parentTaskExecution);
+
+            await userEvent.click(screen.getByText('Loop over rows'));
+
+            expect(screen.getByText('Child task')).toBeInTheDocument();
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+        });
+
+        it('shows no spinner for an unfinished earlier attempt', async () => {
+            const startedAttempt = createTaskExecution('41', 'STARTED');
+
+            const {container} = renderFailedJobItem(createTaskExecution('42', 'FAILED'), [startedAttempt]);
+
+            await userEvent.click(screen.getByText('Condition'));
+
+            expect(screen.getByText('Attempt 1')).toBeInTheDocument();
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+        });
     });
 });

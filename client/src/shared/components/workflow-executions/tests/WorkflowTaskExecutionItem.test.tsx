@@ -43,7 +43,19 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
         });
 
-        it('should not render a spinner for a started task of a stopped job', () => {
+        it('should not render a spinner for a started task of a failed job', () => {
+            const taskExecution = createTaskExecution({
+                endDate: undefined,
+                status: 'STARTED',
+            });
+
+            const {container} = render(<WorkflowTaskExecutionItem jobStatus="FAILED" taskExecution={taskExecution} />);
+
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+            expect(container.querySelector('.text-destructive')).toBeInTheDocument();
+        });
+
+        it('should render a spinner for a started task of a stopped job, which may be suspended', () => {
             const taskExecution = createTaskExecution({
                 endDate: undefined,
                 status: 'STARTED',
@@ -51,8 +63,7 @@ describe('WorkflowTaskExecutionItem', () => {
 
             const {container} = render(<WorkflowTaskExecutionItem jobStatus="STOPPED" taskExecution={taskExecution} />);
 
-            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
-            expect(container.querySelector('.text-destructive')).toBeInTheDocument();
+            expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
         });
 
         it('should render a spinner for a started task of a running job', () => {

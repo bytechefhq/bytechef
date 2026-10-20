@@ -257,7 +257,7 @@ describe('workflowExecution-utils', () => {
     });
 
     describe('getTaskExecutionDisplayStatus', () => {
-        it.each(['COMPLETED', 'FAILED', 'STOPPED'] as const)(
+        it.each(['COMPLETED', 'FAILED'] as const)(
             'should show an unfinished task as cancelled when the job is %s',
             (jobStatus) => {
                 expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('CANCELLED');
@@ -265,7 +265,7 @@ describe('workflowExecution-utils', () => {
             }
         );
 
-        it.each(['CREATED', 'STARTED'] as const)(
+        it.each(['CREATED', 'STARTED', 'STOPPED'] as const)(
             'should keep an unfinished task running while the job is %s',
             (jobStatus) => {
                 expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('STARTED');
@@ -277,9 +277,9 @@ describe('workflowExecution-utils', () => {
             expect(getTaskExecutionDisplayStatus('STARTED')).toBe('STARTED');
         });
 
-        it('should keep a finished task status when the job is stopped', () => {
-            expect(getTaskExecutionDisplayStatus('COMPLETED', 'STOPPED')).toBe('COMPLETED');
-            expect(getTaskExecutionDisplayStatus('FAILED', 'STOPPED')).toBe('FAILED');
+        it('should keep a finished task status when the job has failed', () => {
+            expect(getTaskExecutionDisplayStatus('COMPLETED', 'FAILED')).toBe('COMPLETED');
+            expect(getTaskExecutionDisplayStatus('FAILED', 'FAILED')).toBe('FAILED');
         });
     });
 });
