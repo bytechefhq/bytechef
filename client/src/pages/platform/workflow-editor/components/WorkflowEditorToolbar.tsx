@@ -127,7 +127,7 @@ const WorkflowEditorToolbar = ({
 
     return (
         <>
-            <Panel className="m-2" position="top-left">
+            <Panel className="m-2 flex items-center gap-2" position="top-left">
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <span tabIndex={!elkLayoutSupported ? 0 : undefined}>
