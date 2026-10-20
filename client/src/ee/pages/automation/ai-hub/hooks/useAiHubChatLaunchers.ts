@@ -1,3 +1,4 @@
+import {AiHubChatI, toChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
@@ -58,14 +59,19 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
                 return;
             }
 
-            const chat = result.createWorkflowChatAiHubChat;
+            const chat = toChat(result.createWorkflowChatAiHubChat);
+
+            queryClient.setQueryData<AiHubChatI[]>(
+                AiHubChatsKeys.list(currentWorkspaceId, currentEnvironmentId, 'ACTIVE'),
+                (cachedChats) => [chat, ...(cachedChats ?? []).filter((cachedChat) => cachedChat.id !== chat.id)]
+            );
 
             aiHubStore.setState({
                 chatId: chat.threadId,
                 messages: [],
             });
 
-            aiHubChatsStore.getState().setCurrentChatId(Number(chat.id));
+            aiHubChatsStore.getState().setCurrentChatId(chat.id);
 
             queryClient.invalidateQueries({
                 queryKey: [...AiHubChatsKeys.all, 'list', currentWorkspaceId],
