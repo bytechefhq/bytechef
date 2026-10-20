@@ -200,7 +200,7 @@ public class SpelEvaluator implements Evaluator {
 
             Class<? extends Expression> subExpressionClass = subExpression.getClass();
 
-            throw new IllegalArgumentException("unknown expression type: " + subExpressionClass.getName());
+            throw new ExpressionEvaluationException("Unknown expression type: " + subExpressionClass.getName());
         }
 
         return sb.toString();
@@ -275,8 +275,20 @@ public class SpelEvaluator implements Evaluator {
                         throw new ExpressionEvaluationException("Invalid expression: " + string);
                     }
 
-                    expression = expressionParser.parseExpression(
-                        string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
+                    try {
+                        expression = expressionParser.parseExpression(
+                            string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
+                    } catch (ParseException parseException) {
+                        if (lenient) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Unparseable expression: {}", string, parseException);
+                            }
+
+                            return value;
+                        }
+
+                        throw new ExpressionEvaluationException("Unparseable expression: " + string, parseException);
+                    }
                 }
 
                 if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
