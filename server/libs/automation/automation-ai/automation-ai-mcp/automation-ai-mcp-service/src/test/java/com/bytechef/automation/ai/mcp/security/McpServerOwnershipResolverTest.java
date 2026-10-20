@@ -17,17 +17,31 @@
 package com.bytechef.automation.ai.mcp.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class McpServerOwnershipResolverTest {
 
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
-    private final McpServerOwnershipResolver resolver = new McpServerOwnershipResolver(workspaceMcpServerService);
+    private final McpServerRepository mcpServerRepository = mock(McpServerRepository.class);
+    private final McpServerOwnershipResolver resolver =
+        new McpServerOwnershipResolver(mcpServerRepository, workspaceMcpServerService);
+
+    private void stubMcpServer(long id, PlatformType type) {
+        McpServer mcpServer = new McpServer();
+
+        mcpServer.setType(type);
+
+        when(mcpServerRepository.findById(id)).thenReturn(Optional.of(mcpServer));
+    }
 
     @Test
     void testResourceType() {
@@ -36,6 +50,7 @@ class McpServerOwnershipResolverTest {
 
     @Test
     void testResolvesWorkspace() {
+        stubMcpServer(1L, PlatformType.AUTOMATION);
         when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L)).thenReturn(Optional.of(42L));
 
         assertThat(resolver.resolveOwner(1L)
@@ -44,9 +59,28 @@ class McpServerOwnershipResolverTest {
 
     @Test
     void testUnknownIsUnknown() {
+        stubMcpServer(99L, PlatformType.AUTOMATION);
         when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(99L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveOwner(99L)
             .workspaceId()).isEmpty();
+    }
+
+    @Test
+    void testAutomationMcpServerResolverIgnoresEmbeddedRows() {
+        stubMcpServer(1L, PlatformType.EMBEDDED);
+        lenient().when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(1L))
+            .thenReturn(Optional.of(42L));
+
+        assertThat(resolver.resolveOwner(1L)
+            .isUnknown()).isTrue();
+    }
+
+    @Test
+    void testAMissingServerIsUnknown() {
+        when(mcpServerRepository.findById(5L)).thenReturn(Optional.empty());
+
+        assertThat(resolver.resolveOwner(5L)
+            .isUnknown()).isTrue();
     }
 }

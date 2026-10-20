@@ -17,12 +17,16 @@
 package com.bytechef.automation.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +37,17 @@ class ConnectionOwnershipResolverTest {
 
     private final WorkspaceConnectionRepository workspaceConnectionRepository =
         mock(WorkspaceConnectionRepository.class);
+    private final ConnectionService connectionService = mock(ConnectionService.class);
     private final ConnectionOwnershipResolver resolver =
-        new ConnectionOwnershipResolver(workspaceConnectionRepository);
+        new ConnectionOwnershipResolver(connectionService, workspaceConnectionRepository);
+
+    private void stubConnection(PlatformType type) {
+        Connection connection = new Connection();
+
+        connection.setType(type);
+
+        when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection));
+    }
 
     @Test
     void testResourceTypeMatchesTheTokenTheConnectionGuardsName() {
@@ -43,6 +56,7 @@ class ConnectionOwnershipResolverTest {
 
     @Test
     void testResolveOwnerReturnsTheWorkspaceTheConnectionIsAssignedTo() {
+        stubConnection(PlatformType.AUTOMATION);
         when(workspaceConnectionRepository.findByConnectionId(7L))
             .thenReturn(Optional.of(new WorkspaceConnection(7L, 42L)));
 
@@ -51,7 +65,24 @@ class ConnectionOwnershipResolverTest {
 
     @Test
     void testResolveOwnerFailsClosedWhenTheConnectionIsAssignedToNoWorkspace() {
+        stubConnection(PlatformType.AUTOMATION);
         when(workspaceConnectionRepository.findByConnectionId(7L)).thenReturn(Optional.empty());
+
+        assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.unknown());
+    }
+
+    @Test
+    void testAutomationConnectionResolverIgnoresEmbeddedRows() {
+        stubConnection(PlatformType.EMBEDDED);
+        lenient().when(workspaceConnectionRepository.findByConnectionId(7L))
+            .thenReturn(Optional.of(new WorkspaceConnection(7L, 42L)));
+
+        assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.unknown());
+    }
+
+    @Test
+    void testResolveOwnerFailsClosedWhenTheConnectionDoesNotExist() {
+        when(connectionService.fetchConnection(7L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.unknown());
     }
