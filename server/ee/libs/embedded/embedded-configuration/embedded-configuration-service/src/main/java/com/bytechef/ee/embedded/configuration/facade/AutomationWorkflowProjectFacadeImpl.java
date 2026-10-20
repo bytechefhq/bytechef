@@ -15,6 +15,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
@@ -91,6 +92,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
     private final ProjectService projectService;
+    private final ProjectWorkflowCreator projectWorkflowCreator;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -109,7 +111,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectService projectService,
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        ProjectWorkflowCreator projectWorkflowCreator, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
@@ -124,6 +127,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
         this.projectService = projectService;
+        this.projectWorkflowCreator = projectWorkflowCreator;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -157,7 +161,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public String createProjectWorkflow(long projectId, String definition, String permissionExpression) {
         getProjectOfAutomationWorkflowProject(projectId);
 
-        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowCreator.addWorkflow(
             projectId, StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
 
         String normalized = normalizePermissionExpression(permissionExpression);
@@ -237,7 +241,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         String newDefinition = JsonUtils.writeWithDefaultPrettyPrinter(definitionMap);
 
-        ProjectWorkflow newProjectWorkflow = projectWorkflowFacade.addWorkflow(projectId, newDefinition);
+        ProjectWorkflow newProjectWorkflow = projectWorkflowCreator.addWorkflow(projectId, newDefinition);
 
         workflowTestConfigurationService.copyWorkflowTestConfigurations(
             workflowId, newProjectWorkflow.getWorkflowId());
@@ -271,7 +275,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         for (ProjectWorkflow sourceProjectWorkflow : sourceProjectWorkflows) {
             Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
 
-            projectWorkflowFacade.addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
+            projectWorkflowCreator.addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
         }
 
         return newProject.getId();
@@ -496,7 +500,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         return integrationIdsByComponentName;
     }
-
 
     private AutomationWorkflowProjectDTO filterWorkflowTemplates(
         AutomationWorkflowProjectDTO project, ConnectedUser connectedUser,

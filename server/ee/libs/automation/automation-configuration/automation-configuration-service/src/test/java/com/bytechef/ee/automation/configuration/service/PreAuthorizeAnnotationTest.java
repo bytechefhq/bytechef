@@ -196,6 +196,60 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedHubGates() throws Exception {
+        Class<?> hubFacade = Class.forName(
+            "com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacadeImpl");
+
+        String development = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
+        String workflowView = "hasEmbeddedScope('WORKFLOW_VIEW')";
+        String permissionExpressionUnset = "#permissionExpression == null or #permissionExpression.isBlank()";
+        String projectType = "'AutomationWorkflowProject'";
+        String workflowType = "'AutomationWorkflowProjectWorkflow'";
+
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "createProject",
+            "hasEmbeddedScope('INTEGRATION_CREATE') and (" + permissionExpressionUnset
+                + " or hasEmbeddedScope('INTEGRATION_SETTINGS'))");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "createProjectWorkflow",
+            "hasResourceScopeInEnvironment(#projectId, " + projectType + ", 'WORKFLOW_CREATE', " + development
+                + ") and (" + permissionExpressionUnset + " or hasPermission(#projectId, " + projectType
+                + ", 'INTEGRATION_SETTINGS'))");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "deleteProject", "hasPermission(#projectId, " + projectType + ", 'INTEGRATION_DELETE')");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "deleteProjectWorkflow",
+            "hasResourceScopeInEnvironment(#workflowUuid, " + workflowType + ", 'WORKFLOW_DELETE', " + development
+                + ")");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "duplicateProject",
+            "hasPermission(#projectId, " + projectType
+                + ", 'WORKFLOW_VIEW') and hasEmbeddedScope('INTEGRATION_CREATE')");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "duplicateProjectWorkflow",
+            "hasResourceScopeInEnvironment(#workflowUuid, " + workflowType + ", 'WORKFLOW_CREATE', " + development
+                + ")");
+        assertEveryPublicOverloadIsGated(hubFacade, "getCategories", workflowView);
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "getProjectVersions", "hasPermission(#projectId, " + projectType + ", 'WORKFLOW_VIEW')");
+        assertEveryPublicOverloadIsGated(hubFacade, "getProjects", workflowView);
+        assertEveryPublicOverloadIsGated(hubFacade, "getTags", workflowView);
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "publishProject",
+            "hasPermission(#projectId, " + projectType + ", 'WORKFLOW_EDIT') and hasPermission(#projectId, "
+                + projectType + ", 'INTEGRATION_PUBLISH')");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "updateProject", "hasPermission(#projectId, " + projectType + ", 'INTEGRATION_SETTINGS')");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "updateProjectWorkflow",
+            "hasResourceScopeInEnvironment(#workflowUuid, " + workflowType + ", 'WORKFLOW_EDIT', " + development
+                + ")");
+        assertEveryPublicOverloadIsGated(
+            hubFacade, "updateProjectWorkflowPermissionExpression",
+            "hasPermission(#workflowUuid, " + workflowType + ", 'INTEGRATION_SETTINGS')");
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");
