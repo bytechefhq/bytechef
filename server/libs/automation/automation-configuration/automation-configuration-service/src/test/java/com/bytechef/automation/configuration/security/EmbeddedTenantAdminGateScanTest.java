@@ -39,7 +39,7 @@ class EmbeddedTenantAdminGateScanTest {
     private static final String PRE_AUTHORIZE_MARKER = "@PreAuthorize(";
 
     private static final Map<String, String> TENANT_LEVEL_OPERATIONS = Map.of(
-        "AutomationWorkflowProjectConfigurationAdminFacadeImpl#<class>",
+        "AutomationProjectConfigurationFacadeImpl#<class>",
         "automation workflow project administration is a tenant-level facade by design",
         "ConnectedUserIntegrationFacadeImpl#getProvisionableIntegrations",
         "admin provisioning lists integrations for any connected user, which only a tenant administrator may do",
@@ -54,9 +54,9 @@ class EmbeddedTenantAdminGateScanTest {
         "EmbeddedMcpServerFacadeImpl#updateEmbeddedMcpServerSecretKey",
         "automation's rotateSecretKey is tenant-only, so the embedded rotation of the same server secret keeps the same "
             + "tenant-level rule",
-        "IntegrationInstanceAdminFacadeImpl#getProvisionableIntegrations",
+        "IntegrationInstanceFacadeImpl#getProvisionableIntegrations",
         "the admin provisioning facade is the tenant administrator's entry point to provisioning",
-        "IntegrationInstanceAdminFacadeImpl#provisionIntegrationInstance",
+        "IntegrationInstanceFacadeImpl#provisionIntegrationInstance",
         "the admin provisioning facade is the tenant administrator's entry point to provisioning");
 
     private static Map<String, String> tenantAdminOnlyGates;
