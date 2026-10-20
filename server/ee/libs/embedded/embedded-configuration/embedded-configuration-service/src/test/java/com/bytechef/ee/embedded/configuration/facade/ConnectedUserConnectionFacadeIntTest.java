@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -579,7 +580,9 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactlyInAnyOrder(83001L, 83002L, 83003L);
-        assertThat(connectionDTOs).containsExactlyInAnyOrder(slackConnection, hubspotConnection, githubConnection);
+        assertThat(connectionDTOs)
+            .extracting(ConnectionDTO::id, ConnectionDTO::componentName)
+            .containsExactlyInAnyOrder(tuple(83001L, "slack"), tuple(83002L, "hubspot"), tuple(83003L, "github"));
     }
 
     @Test
@@ -655,8 +658,22 @@ class ConnectedUserConnectionFacadeIntTest {
 
         stubConnectionsWithCredentials();
 
-        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
-            connectedUserId, null, List.of());
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.PRODUCTION.ordinal(), connectedUserId,
+                    new User(connectedUser.getExternalId(), "", List.of()), false));
+
+        List<ConnectionDTO> connectionDTOs;
+
+        try {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
+                connectedUserId, null, List.of());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
 
         assertThat(connectionDTOs).hasSize(1);
 
