@@ -252,5 +252,24 @@ describe('WorkflowExecutionsHeader', () => {
 
             expect(screen.getByText('2 tasks executed')).toBeInTheDocument();
         });
+
+        it('includes the tasks executed in loop iterations', () => {
+            const job = createJob({
+                taskExecutions: [
+                    {
+                        id: '1',
+                        iterations: [
+                            [{id: '2', workflowTask: {name: 'logger_1', type: 'logger/v1/info'}}],
+                            [{id: '3', workflowTask: {name: 'logger_1', type: 'logger/v1/info'}}],
+                        ],
+                        workflowTask: {name: 'loop_1', type: 'loop/v1'},
+                    } as never,
+                ],
+            });
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('3 tasks executed')).toBeInTheDocument();
+        });
     });
 });
