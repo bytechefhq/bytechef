@@ -255,7 +255,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (isEmbeddedProject(projectId)) {
-            return hasEmbeddedScope(scope);
+            return false;
         }
 
         Long workspaceId = projectRepository.findById(projectId)
@@ -287,7 +287,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (isEmbeddedProject(projectId)) {
-            return hasEmbeddedScope(scope, environment);
+            return false;
         }
 
         Long workspaceId = projectRepository.findById(projectId)
@@ -323,6 +323,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         ResourceOwner resourceOwner = resolveOwner(resourceType, id);
+
+        if (resourceOwner.embedded() && PROJECT.equals(resourceType)) {
+            return false;
+        }
 
         OptionalLong workspaceId = resourceOwner.workspaceId();
 
@@ -382,6 +386,10 @@ public class PermissionServiceImpl implements PermissionService {
 
         ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
+        if (resourceOwner.embedded() && PROJECT.equals(resourceType)) {
+            return false;
+        }
+
         if (resourceOwner.embedded()) {
             return hasEmbeddedScope(scope, environment);
         }
@@ -420,10 +428,16 @@ public class PermissionServiceImpl implements PermissionService {
         return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(projectId);
     }
 
-    private boolean isEmbeddedWorkflow(String workflowId) {
+    private boolean isEmbeddedProjectWorkflow(String workflowId) {
         EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
 
-        return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedWorkflow(workflowId);
+        return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProjectWorkflow(workflowId);
+    }
+
+    private boolean isIntegrationWorkflow(String workflowId) {
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        return embeddedResourceResolver != null && embeddedResourceResolver.isIntegrationWorkflow(workflowId);
     }
 
     private ResourceOwner resolveOwner(String resourceType, Serializable id) {
@@ -492,8 +506,12 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isEmbeddedWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId)) {
             return hasEmbeddedScope(scope);
+        }
+
+        if (isEmbeddedProjectWorkflow(workflowId)) {
+            return false;
         }
 
         Long workspaceId = projectRepository.findByWorkflowId(workflowId)
@@ -524,8 +542,12 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isEmbeddedWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId)) {
             return hasEmbeddedScope(scope, environment);
+        }
+
+        if (isEmbeddedProjectWorkflow(workflowId)) {
+            return false;
         }
 
         Long workspaceId = projectRepository.findByWorkflowId(workflowId)
@@ -556,8 +578,12 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        if (isEmbeddedWorkflow(workflowId)) {
+        if (isIntegrationWorkflow(workflowId)) {
             return hasEmbeddedScope(scope, environment);
+        }
+
+        if (isEmbeddedProjectWorkflow(workflowId)) {
+            return false;
         }
 
         Long workspaceId = projectRepository.findByWorkflowId(workflowId)
