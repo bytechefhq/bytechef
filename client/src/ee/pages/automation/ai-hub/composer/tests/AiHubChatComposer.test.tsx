@@ -10,13 +10,15 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubChatComposer from '../AiHubChatComposer';
 
-const {cancelAiHubRunMock, cancelRunMock, composerTextRef, currentWorkspaceIdRef, setTextMock} = vi.hoisted(() => ({
-    cancelAiHubRunMock: vi.fn(),
-    cancelRunMock: vi.fn(),
-    composerTextRef: {current: ''},
-    currentWorkspaceIdRef: {current: 3 as number | undefined},
-    setTextMock: vi.fn(),
-}));
+const {cancelAiHubRunMock, cancelRunMock, composerTextRef, currentChatKindRef, currentWorkspaceIdRef, setTextMock} =
+    vi.hoisted(() => ({
+        cancelAiHubRunMock: vi.fn(),
+        cancelRunMock: vi.fn(),
+        composerTextRef: {current: ''},
+        currentChatKindRef: {current: 'STANDARD' as 'STANDARD' | 'WORKFLOW_CHAT'},
+        currentWorkspaceIdRef: {current: 3 as number | undefined},
+        setTextMock: vi.fn(),
+    }));
 
 vi.mock('@assistant-ui/react', () => ({
     ComposerPrimitive: {
@@ -43,6 +45,10 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useCancelAiHubRunMutation: () => ({mutate: cancelAiHubRunMock}),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat', () => ({
+    default: () => ({id: 7, kind: currentChatKindRef.current}),
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -74,6 +80,7 @@ describe('AiHubChatComposer', () => {
         vi.clearAllMocks();
 
         composerTextRef.current = '';
+        currentChatKindRef.current = 'STANDARD';
         currentWorkspaceIdRef.current = 3;
 
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
@@ -321,6 +328,36 @@ describe('AiHubChatComposer', () => {
             });
 
             expect(aiHubComposerStore.getState().referencedResources).toEqual([]);
+        });
+    });
+
+    describe('workflow chat', () => {
+        beforeEach(() => {
+            currentChatKindRef.current = 'WORKFLOW_CHAT';
+        });
+
+        it('hides the resource picker and ignores @ mentions, but keeps the mode switch', () => {
+            renderComposer();
+
+            expect(screen.queryByRole('button', {name: 'Add resources'})).toBeNull();
+            expect(screen.queryByTestId('resource-picker-menu')).toBeNull();
+            expect(screen.getByRole('switch', {name: 'Build mode on'})).toBeInTheDocument();
+
+            fireEvent.keyDown(screen.getByRole('textbox', {name: 'Message input'}), {key: '@'});
+
+            expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(false);
+        });
+
+        it('sends one cancelAiHubRun on Stop', () => {
+            aiHubRunStateStore.setState({runIdByChat: {'thread-7': 'run-1'}, runningByChat: {'thread-7': true}});
+
+            renderComposer();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Stop generating'}));
+
+            expect(cancelRunMock).toHaveBeenCalledTimes(1);
+            expect(cancelAiHubRunMock).toHaveBeenCalledTimes(1);
+            expect(cancelAiHubRunMock).toHaveBeenCalledWith({id: '7', runId: 'run-1', workspaceId: '3'});
         });
     });
 });
