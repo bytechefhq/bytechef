@@ -15,6 +15,9 @@ import com.bytechef.ee.automation.configuration.service.EmbeddedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.exception.UserNotFoundException;
+import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,10 +38,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmbeddedUserFacadeImpl implements EmbeddedUserFacade {
 
     private final EmbeddedUserService embeddedUserService;
+    private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public EmbeddedUserFacadeImpl(EmbeddedUserService embeddedUserService) {
+    public EmbeddedUserFacadeImpl(EmbeddedUserService embeddedUserService, UserService userService) {
         this.embeddedUserService = embeddedUserService;
+        this.userService = userService;
     }
 
     @Override
@@ -46,6 +51,16 @@ public class EmbeddedUserFacadeImpl implements EmbeddedUserFacade {
     @PreAuthorize("hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')")
     public EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole) {
         return embeddedUserService.addEmbeddedUser(userId, embeddedRole);
+    }
+
+    @Override
+    @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED, mapper = EmbeddedUserAuditMapper.class)
+    @PreAuthorize("hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')")
+    public EmbeddedUser addEmbeddedUserByEmail(String email, WorkspaceRole embeddedRole) {
+        User user = userService.fetchUserByEmail(email)
+            .orElseThrow(UserNotFoundException::new);
+
+        return embeddedUserService.addEmbeddedUser(user.getId(), embeddedRole);
     }
 
     @Override
