@@ -19,6 +19,7 @@ package com.bytechef.component.data.storage.action;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,10 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -87,5 +92,51 @@ class DataStorageAtomicIncrementActionTest {
             () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
 
         verify(mockedData, never()).put(any(), any(), any());
+    }
+
+    @Test
+    void testPerformRejectsStoredValueOutsideIntegerRange() {
+        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of((long) Integer.MAX_VALUE + 1));
+
+        assertThatThrownBy(
+            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("'counter'");
+
+        verify(mockedData, never()).put(any(), any(), any());
+    }
+
+    @Test
+    void testPerformRejectsIncrementThatOverflows() {
+        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of(Integer.MAX_VALUE));
+
+        assertThatThrownBy(
+            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("'counter'");
+
+        verify(mockedData, never()).put(any(), any(), any());
+    }
+
+    @Test
+    void testPerformReleasesTheLockWhenItFails() throws Exception {
+        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.of("text"));
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
+
+        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenReturn(Optional.empty());
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<Integer> future = executorService.submit(
+                () -> DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext));
+
+            assertEquals(5, future.get(2, TimeUnit.SECONDS));
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 }

@@ -70,15 +70,24 @@ public class DataStorageAtomicIncrementAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws InterruptedException {
 
+        Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
+        String key = inputParameters.getRequiredString(KEY);
+
         if (!LOCK.tryLock(10, TimeUnit.SECONDS)) {
-            throw new IllegalStateException("Timed out waiting to increment the value");
+            throw new IllegalStateException("Timed out waiting to increment the value stored under key '%s'"
+                .formatted(key));
         }
 
         try {
-            Scope scope = Scope.valueOf(inputParameters.getRequiredString(SCOPE));
-            String key = inputParameters.getRequiredString(KEY);
+            int value;
 
-            int value = getValue(scope, key, context) + inputParameters.getRequiredInteger(VALUE_TO_ADD);
+            try {
+                value = Math.addExact(getValue(scope, key, context), inputParameters.getRequiredInteger(VALUE_TO_ADD));
+            } catch (ArithmeticException arithmeticException) {
+                throw new IllegalArgumentException(
+                    "Incrementing the value stored under key '%s' overflows an integer".formatted(key),
+                    arithmeticException);
+            }
 
             context.data(data -> data.put(scope, key, value));
 
@@ -96,7 +105,13 @@ public class DataStorageAtomicIncrementAction {
         }
 
         if (optionalValue.get() instanceof Number number) {
-            return number.intValue();
+            try {
+                return Math.toIntExact(number.longValue());
+            } catch (ArithmeticException arithmeticException) {
+                throw new IllegalArgumentException(
+                    "The value stored under key '%s' is outside the integer range".formatted(key),
+                    arithmeticException);
+            }
         }
 
         throw new IllegalArgumentException("The value stored under key '%s' is not a number".formatted(key));
