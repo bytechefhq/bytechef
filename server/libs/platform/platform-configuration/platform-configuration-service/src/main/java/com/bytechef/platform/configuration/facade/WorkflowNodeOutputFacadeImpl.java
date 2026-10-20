@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -470,13 +471,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 try {
                     workflowTaskDispatcherDynamicOutputResponse = getWorkflowTaskDispatcherDynamicOutputResponse(
                         workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache);
-                } catch (RuntimeException e) {
+                } catch (ExpressionEvaluationException expressionEvaluationException) {
                     if (!previousNode) {
-                        throw e;
+                        throw expressionEvaluationException;
                     }
 
-                    log.debug(
-                        "Dynamic output of node {} was not resolved: {}", workflowTask.getName(), e.getMessage());
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                            "Dynamic output of node {} was not resolved: {}", workflowTask.getName(),
+                            expressionEvaluationException.getMessage());
+                    }
                 }
 
                 if (workflowTaskDispatcherDynamicOutputResponse == null) {
