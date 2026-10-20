@@ -256,16 +256,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             requireResourceScope(projectId, "Project", "EXECUTION_VIEW");
 
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
+        } else if (embeddedProjectDeployments != null) {
+            workflowIds.addAll(new LinkedHashSet<>(getProjectDeploymentWorkflowIds(embeddedProjectDeployments)));
         } else {
-            Set<String> workspaceWorkflowIds = new LinkedHashSet<>(
-                CollectionUtils.map(
-                    projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
-
-            if (embeddedProjectDeployments != null) {
-                workspaceWorkflowIds.addAll(getProjectDeploymentWorkflowIds(embeddedProjectDeployments));
-            }
-
-            workflowIds.addAll(workspaceWorkflowIds);
+            workflowIds.addAll(
+                new LinkedHashSet<>(
+                    CollectionUtils.map(
+                        projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId)));
         }
 
         return workflowIds;
@@ -302,7 +299,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
+    @PreAuthorize("#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,

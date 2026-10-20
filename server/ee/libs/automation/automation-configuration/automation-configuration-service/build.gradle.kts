@@ -26,6 +26,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
+    testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))

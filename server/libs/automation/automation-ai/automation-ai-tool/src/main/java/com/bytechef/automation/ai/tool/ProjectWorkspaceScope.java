@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ErrorType;
@@ -59,7 +60,8 @@ final class ProjectWorkspaceScope {
         Project project = projectService.fetchProject(projectId)
             .orElse(null);
 
-        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId)) {
+        if (project == null || SystemProjects.isSystemProject(project) ||
+            !Objects.equals(project.getWorkspaceId(), workspaceId)) {
             throw new ExecutionException(
                 "Project " + projectId + " not found in workspace " + workspaceId, errorType);
         }
@@ -88,7 +90,8 @@ final class ProjectWorkspaceScope {
         Project project = projectService.fetchProject(projectWorkflow.getProjectId())
             .orElse(null);
 
-        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId)) {
+        if (project == null || SystemProjects.isSystemProject(project) ||
+            !Objects.equals(project.getWorkspaceId(), workspaceId)) {
             throw new ExecutionException("Workflow " + workflowId + " not found in workspace " + workspaceId,
                 errorType);
         }

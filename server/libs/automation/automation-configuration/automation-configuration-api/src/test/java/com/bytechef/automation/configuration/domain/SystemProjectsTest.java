@@ -39,7 +39,22 @@ class SystemProjectsTest {
     }
 
     @Test
+    void testConnectedUserPrefixedNamesAreRecognized() {
+        assertTrue(SystemProjects.isSystemProjectName(SystemProjects.EMBEDDED_CONNECTED_USER_NAME_PREFIX + "ext-1"));
+    }
+
+    @Test
+    void testConnectedUserPrefixFollowsTheSharedNameShape() {
+        String namePrefix = SystemProjects.EMBEDDED_CONNECTED_USER_NAME_PREFIX;
+
+        assertTrue(namePrefix.matches("__[A-Z][A-Z_]*[A-Z]__"), namePrefix + " must be __SCREAMING_SNAKE_CASE__");
+    }
+
+    @Test
     void testUserProjectsAreNotSystemProjects() {
+        assertFalse(SystemProjects.isSystemProjectName("aEMBEDDEDb"));
+        assertFalse(SystemProjects.isSystemProjectName("aaEMBEDDEDbb"));
+
         assertFalse(SystemProjects.isSystemProjectName("My Project"));
         assertFalse(SystemProjects.isSystemProjectName(""));
         assertFalse(SystemProjects.isSystemProjectName(null));

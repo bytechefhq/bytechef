@@ -453,6 +453,13 @@ public class ProjectWorkflowExecutionFacadeTest {
         }
 
         @Test
+        public void testEmbeddedListingDoesNotCallTheGatedWorkspaceWorkflowFacade() {
+            facade.getWorkflowExecutions(true, null, null, null, null, null, null, null, null, WORKSPACE_ID, 0);
+
+            verifyNoInteractions(projectFacade);
+        }
+
+        @Test
         @SuppressWarnings("unchecked")
         public void testEmbeddedWorkflowFilterByReferenceWorkflowUuidCoversEveryCatalogVersion() {
             String referenceWorkflowUuid = UUID.randomUUID()

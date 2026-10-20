@@ -56,6 +56,8 @@ public interface ProjectRepository
     @Query("""
             SELECT project.id FROM project
             WHERE project.workspace_id = :workspaceId
+            AND project.name NOT LIKE '\\_\\_EMBEDDED\\_\\_%' ESCAPE '\\'
+            AND project.name NOT LIKE '\\_\\_EMBEDDED\\_AUTOMATION\\_\\_%' ESCAPE '\\'
         """)
     List<Long> findProjectIdsByWorkspaceId(@Param("workspaceId") Long workspaceId);
 }
