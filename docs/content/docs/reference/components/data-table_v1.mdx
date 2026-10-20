@@ -54,15 +54,15 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Delete Record(s)
 Name: deleteRecords
 
-`Delete record(s) from a table`
+`Delete records from a table by ID or by conditions`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
-| deleteBy | Delete By | STRING <details> <summary> Options </summary> <span>IDS</span>, <span>CONDITIONS</span> </details> | Whether to delete the records with the given IDs or every record that matches the conditions. | false |
-| ids | Record IDs | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | IDs of records to delete | true |
+| deleteBy | Delete By | STRING <details> <summary> Options </summary> <span>IDS</span>, <span>CONDITIONS</span> </details> | Whether to delete the records with the given IDs or every record that matches the conditions. When not set, conditions are used if only OR Conditions is given, and Record IDs otherwise; it must be set when both are given. | false |
+| ids | Record IDs | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | IDs of records to delete. Ignored when Delete By is Conditions, or when it is not set and only OR Conditions is given. | true |
 | conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. Every record that meets every condition of at least one AND Condition is deleted. Use Clear Table to delete every record. | true |
 
 #### Example JSON Structure
@@ -236,9 +236,9 @@ Name: findRecords
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
-| conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record. | false |
+| conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record, up to Limit. | false |
 | sortColumn | Sort Column | STRING <details> <summary> Depends On </summary> table </details> | Column to sort the records by. Records are sorted by id when not set. | false |
-| sortDirection | Sort Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> |  | false |
+| sortDirection | Sort Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> | Order of the Sort Column: Ascending or Descending. Has no effect when Sort Column is not set. | false |
 | limit | Limit | INTEGER | Maximum number of records to return | false |
 | offset | Offset | INTEGER | Number of records to skip | false |
 
