@@ -71,6 +71,7 @@ public class ExternalInvocationLogEventListener {
         externalInvocationLog.setIntegrationInstanceId(event.integrationInstanceId());
         externalInvocationLog.setMcpServerId(event.mcpServerId());
         externalInvocationLog.setA2aServerId(event.a2aServerId());
+        externalInvocationLog.setAppId(event.appId());
         externalInvocationLog.setJobId(event.jobId());
         externalInvocationLog.setStatus(event.status());
         externalInvocationLog.setErrorType(truncate(event.errorType(), MAX_NAME_LENGTH));

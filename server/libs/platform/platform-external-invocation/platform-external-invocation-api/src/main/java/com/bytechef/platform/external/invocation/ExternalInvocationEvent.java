@@ -27,7 +27,8 @@ public record ExternalInvocationEvent(
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, ExternalInvocationStatus status,
+    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, @Nullable Long appId,
+    ExternalInvocationStatus status,
     @Nullable String errorType, @Nullable String errorMessage, long durationMs) {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
@@ -57,6 +58,7 @@ public record ExternalInvocationEvent(
         private @Nullable Long mcpServerId;
         private @Nullable Long a2aServerId;
         private @Nullable Long jobId;
+        private @Nullable Long appId;
         private ExternalInvocationStatus status = ExternalInvocationStatus.SUCCESS;
         private @Nullable String errorType;
         private @Nullable String errorMessage;
@@ -142,6 +144,12 @@ public record ExternalInvocationEvent(
             return this;
         }
 
+        public Builder appId(@Nullable Long appId) {
+            this.appId = appId;
+
+            return this;
+        }
+
         public Builder status(ExternalInvocationStatus status) {
             this.status = status;
 
@@ -174,7 +182,7 @@ public record ExternalInvocationEvent(
             return new ExternalInvocationEvent(
                 type, source, kind, invocationName, componentName, componentVersion, operationName, connectionId,
                 environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
-                a2aServerId, jobId, status, errorType, errorMessage, durationMs);
+                a2aServerId, jobId, appId, status, errorType, errorMessage, durationMs);
         }
     }
 }

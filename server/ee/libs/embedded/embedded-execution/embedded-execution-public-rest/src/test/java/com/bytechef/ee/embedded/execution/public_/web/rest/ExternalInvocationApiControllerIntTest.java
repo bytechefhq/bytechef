@@ -57,6 +57,8 @@ class ExternalInvocationApiControllerIntTest {
     static final String EXTERNAL_USER_ID = "external-user-1";
 
     private static final Instant CREATED_DATE = Instant.parse("2026-07-18T10:30:00Z");
+    private static final List<ExternalInvocationKind> EMBEDDED_KINDS = List.of(
+        ExternalInvocationKind.COMPONENT, ExternalInvocationKind.WORKFLOW);
     private static final List<ExternalInvocationSource> EMBEDDED_SOURCES = List.of(
         ExternalInvocationSource.MCP_SERVER, ExternalInvocationSource.API_ACTION,
         ExternalInvocationSource.API_TOOL);
@@ -160,8 +162,8 @@ class ExternalInvocationApiControllerIntTest {
     }
 
     @Test
-    void testGetExternalInvocationsPageReturnsInvocationsOfEveryKind() throws Exception {
-        List<ExternalInvocationLog> externalInvocationLogs = Arrays.stream(ExternalInvocationKind.values())
+    void testGetExternalInvocationsPageReturnsInvocationsOfEveryEmbeddedKind() throws Exception {
+        List<ExternalInvocationLog> externalInvocationLogs = EMBEDDED_KINDS.stream()
             .map(kind -> createExternalInvocationLog(ExternalInvocationSource.MCP_SERVER, kind,
                 ExternalInvocationStatus.SUCCESS))
             .toList();
@@ -174,7 +176,7 @@ class ExternalInvocationApiControllerIntTest {
             .andExpect(
                 jsonPath("$.content[*].kind").value(
                     Matchers.contains(
-                        Arrays.stream(ExternalInvocationKind.values())
+                        EMBEDDED_KINDS.stream()
                             .map(ExternalInvocationKind::name)
                             .toArray())));
     }
