@@ -14,6 +14,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
@@ -23,6 +24,9 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.io.Serializable;
@@ -44,6 +48,9 @@ import org.springframework.beans.factory.support.StaticListableBeanFactory;
  */
 class PermissionServiceResourceTest {
 
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
+
+    private final ConnectionService connectionService = Mockito.mock(ConnectionService.class);
     private final CurrentUserResolver currentUserResolver = Mockito.mock(CurrentUserResolver.class);
     private final PermissionScopeRegistry permissionScopeRegistry = Mockito.mock(PermissionScopeRegistry.class);
     private final ProjectRepository projectRepository = Mockito.mock(ProjectRepository.class);
@@ -60,12 +67,20 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(
         List<ResourceOwnershipResolver> ownershipResolvers, List<ResourceEnvironmentResolver> environmentResolvers) {
 
+        return service(ownershipResolvers, environmentResolvers, new StaticListableBeanFactory());
+    }
+
+    private PermissionServiceImpl service(
+        List<ResourceOwnershipResolver> ownershipResolvers, List<ResourceEnvironmentResolver> environmentResolvers,
+        StaticListableBeanFactory beanFactory) {
+
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, ownershipResolvers, environmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+            connectionServiceBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private static ResourceEnvironmentResolver environmentResolver(String type, Optional<Environment> environment) {
@@ -183,8 +198,8 @@ class PermissionServiceResourceTest {
         lenient().when(currentUserResolver.fetchCurrentUserId())
             .thenReturn(OptionalLong.of(7L));
 
-        com.bytechef.automation.configuration.domain.Project project =
-            Mockito.mock(com.bytechef.automation.configuration.domain.Project.class);
+        Project project =
+            Mockito.mock(Project.class);
 
         when(project.getWorkspaceId()).thenReturn(42L);
         when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
@@ -398,5 +413,201 @@ class PermissionServiceResourceTest {
 
         assertThat(service.hasResourceScopeInEnvironment(1L, "Project", "WORKFLOW_VIEW", Environment.DEVELOPMENT))
             .isTrue();
+    }
+
+    @Test
+    void testADefaultWorkspaceEditorCannotUseAConnectedUserProjectWorkflow() {
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isEmbeddedProjectWorkflow("workflow-1")).thenReturn(true);
+
+        givenAnEditorHoldingConnectionViewInTheDefaultWorkspace();
+
+        PermissionServiceImpl service = service(
+            List.of(resolver("Connection", ResourceOwner.ofWorkspace(42L))),
+            List.of(environmentResolver("Connection", Optional.of(Environment.DEVELOPMENT))),
+            embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testADefaultWorkspaceEditorCanUseAConnectionInAnAutomationProjectWorkflow() {
+        givenAnEditorHoldingConnectionViewInTheDefaultWorkspace();
+
+        PermissionServiceImpl service = service(
+            List.of(resolver("Connection", ResourceOwner.ofWorkspace(42L))),
+            List.of(environmentResolver("Connection", Optional.of(Environment.DEVELOPMENT))),
+            embeddedBeanFactory(Mockito.mock(EmbeddedResourceResolver.class)));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedMemberUsesAnEmbeddedConnectionInAHubProjectWorkflow() {
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+        when(embeddedScopeCacheService.getEmbeddedScopes(7L, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isHubProjectWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedConnectionFromAnotherEnvironmentCannotBeBoundIntoTheRun() {
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+        lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any()))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.PRODUCTION)));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testAnAbsentConnectionServiceDeniesAnIntegrationWorkflowConnection() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+        lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any()))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository, List.of(), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
+            embeddedBeanFactory(embeddedResourceResolver).getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    private void givenAnEditorHoldingConnectionViewInTheDefaultWorkspace() {
+        Project project = new Project();
+
+        project.setWorkspaceId(42L);
+
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+        lenient().when(projectRepository.findByWorkflowId("workflow-1"))
+            .thenReturn(Optional.of(project));
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+    }
+
+    @Test
+    void testAnEmbeddedMemberUsesAnEmbeddedConnectionInAnIntegrationWorkflow() {
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+        when(embeddedScopeCacheService.getEmbeddedScopes(7L, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
+    void testAnEmbeddedConnectionInAnotherEnvironmentIsRefused() {
+        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
+        when(embeddedScopeCacheService.getEmbeddedScopes(7L, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(embeddedScopeCacheService.getEmbeddedScopes(7L, Environment.PRODUCTION)).thenReturn(Set.of());
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.PRODUCTION)));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testAnAutomationConnectionIsRefusedInAnIntegrationWorkflow() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+        lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any()))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.AUTOMATION, Environment.DEVELOPMENT)));
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testAMissingConnectionIsRefusedInAnIntegrationWorkflow() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+        when(connectionService.fetchConnection(1L)).thenReturn(Optional.empty());
+
+        EmbeddedResourceResolver embeddedResourceResolver = Mockito.mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow("workflow-1")).thenReturn(true);
+
+        PermissionServiceImpl service = service(
+            List.of(), List.of(), embeddedBeanFactory(embeddedResourceResolver));
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    private StaticListableBeanFactory connectionServiceBeanFactory() {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("connectionService", connectionService);
+
+        return beanFactory;
+    }
+
+    private static StaticListableBeanFactory embeddedBeanFactory(EmbeddedResourceResolver embeddedResourceResolver) {
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory;
+    }
+
+    private static Connection connection(PlatformType type, Environment environment) {
+        Connection connection = new Connection();
+
+        connection.setEnvironmentId(environment.ordinal());
+        connection.setType(type);
+
+        return connection;
     }
 }

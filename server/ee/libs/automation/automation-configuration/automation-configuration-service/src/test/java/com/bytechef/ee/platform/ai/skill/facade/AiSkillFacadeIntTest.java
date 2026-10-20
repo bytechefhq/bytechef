@@ -34,6 +34,7 @@ import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.domain.User;
@@ -453,7 +454,8 @@ class AiSkillFacadeIntTest {
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
             return new AutomationMethodSecurityExpressionHandler(permissionService);
         }

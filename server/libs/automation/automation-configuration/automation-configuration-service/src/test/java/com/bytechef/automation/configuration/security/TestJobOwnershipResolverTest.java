@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.service.TestJobRegistry;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * Test jobs never reach the persistent job store, so these resolvers are what let a workspace editor attach to, stop,
@@ -64,7 +66,9 @@ class TestJobOwnershipResolverTest {
         when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.of(new TestJob(WORKFLOW_ID, 0)));
         when(projectService.fetchWorkflowProject(WORKFLOW_ID)).thenReturn(Optional.of(project));
 
-        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectService,
+            testJobRegistryProvider);
 
         assertThat(resolver.resolveOwner(JOB_ID)
             .workspaceId()).hasValue(WORKSPACE_ID);
@@ -74,7 +78,9 @@ class TestJobOwnershipResolverTest {
     void testAnUnknownTestJobHasNoOwner() {
         when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.empty());
 
-        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectService,
+            testJobRegistryProvider);
 
         assertThat(resolver.resolveOwner(JOB_ID)
             .workspaceId()).isEmpty();
@@ -84,7 +90,9 @@ class TestJobOwnershipResolverTest {
     void testADeploymentWithoutEditorTestsHasNoOwner() {
         when(testJobRegistryProvider.getIfAvailable()).thenReturn(null);
 
-        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectService,
+            testJobRegistryProvider);
 
         assertThat(resolver.resolveOwner(JOB_ID)
             .workspaceId()).isEmpty();
@@ -100,7 +108,9 @@ class TestJobOwnershipResolverTest {
         when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.of(new TestJob(WORKFLOW_ID, 0)));
         when(projectService.fetchWorkflowProject(WORKFLOW_ID)).thenReturn(Optional.of(project));
 
-        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectService,
+            testJobRegistryProvider);
 
         assertThat(resolver.resolveProjectId(JOB_ID)).hasValue(7L);
     }
@@ -109,7 +119,9 @@ class TestJobOwnershipResolverTest {
     void testResolveProjectIdOfAnUnknownTestJobIsEmpty() {
         when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.empty());
 
-        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), projectService,
+            testJobRegistryProvider);
 
         assertThat(resolver.resolveProjectId(JOB_ID)).isEmpty();
     }
@@ -122,5 +134,51 @@ class TestJobOwnershipResolverTest {
         TestJobEnvironmentResolver resolver = new TestJobEnvironmentResolver(testJobRegistryProvider);
 
         assertThat(resolver.fetchEnvironment(JOB_ID)).contains(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testAnIntegrationTestJobResolvesToEmbedded() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+
+        when(embeddedResourceResolver.isIntegrationWorkflow(WORKFLOW_ID)).thenReturn(true);
+        when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.of(new TestJob(WORKFLOW_ID, 0)));
+
+        TestJobOwnershipResolver resolver =
+            new TestJobOwnershipResolver(providerOf(embeddedResourceResolver), projectService, testJobRegistryProvider);
+
+        assertThat(resolver.resolveOwner(JOB_ID)).isEqualTo(ResourceOwner.ofEmbedded());
+    }
+
+    @Test
+    void testAHubProjectTestJobResolvesToEmbeddedAndAConnectedUserOneToAnEmbeddedProject() {
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        Project project = new Project();
+
+        project.setId(7L);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(embeddedResourceResolver.isEmbeddedProject(7L)).thenReturn(true);
+        when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.of(new TestJob(WORKFLOW_ID, 0)));
+        when(projectService.fetchWorkflowProject(WORKFLOW_ID)).thenReturn(Optional.of(project));
+
+        TestJobOwnershipResolver resolver =
+            new TestJobOwnershipResolver(providerOf(embeddedResourceResolver), projectService, testJobRegistryProvider);
+
+        assertThat(resolver.resolveOwner(JOB_ID)).isEqualTo(ResourceOwner.ofEmbeddedProject());
+
+        when(embeddedResourceResolver.isHubProject(7L)).thenReturn(true);
+
+        assertThat(resolver.resolveOwner(JOB_ID)).isEqualTo(ResourceOwner.ofEmbedded());
+        assertThat(resolver.resolveProjectId(JOB_ID)).hasValue(7L);
+    }
+
+    private static ObjectProvider<EmbeddedResourceResolver> providerOf(
+        EmbeddedResourceResolver embeddedResourceResolver) {
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+
+        beanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        return beanFactory.getBeanProvider(EmbeddedResourceResolver.class);
     }
 }

@@ -57,6 +57,7 @@ import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -136,7 +137,8 @@ class PermissionServiceTest {
             workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -891,7 +893,8 @@ class PermissionServiceTest {
             List.of(connectionEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private void givenWorkflowInWorkspace(long workspaceId) {
@@ -908,7 +911,8 @@ class PermissionServiceTest {
             workspaceUserRepository, List.of(resolvers), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -1054,7 +1058,8 @@ class PermissionServiceTest {
             List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
@@ -1077,7 +1082,8 @@ class PermissionServiceTest {
             List.of(deploymentEnvironmentResolver(null)),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -1108,7 +1114,8 @@ class PermissionServiceTest {
             List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -1180,7 +1187,8 @@ class PermissionServiceTest {
                 workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
                 beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), embeddedScopeCacheService,
                 embeddedUserRepository,
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         @Test
@@ -1563,7 +1571,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, List.of(), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
-                beanFactory.getBeanProvider(EmbeddedResourceResolver.class));
+                beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
     }
 
@@ -1598,7 +1607,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, List.of(), List.of(),
                 beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         @AfterEach
@@ -1671,7 +1681,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, List.of(), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
             assertThat(
                 AutomationAuthorizationContext
@@ -1832,7 +1843,8 @@ class PermissionServiceTest {
                 mock(WorkspaceUserRepository.class), List.of(), List.of(),
                 beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
             AutomationMethodSecurityExpressionHandler expressionHandler =
                 new AutomationMethodSecurityExpressionHandler(permissionService);
@@ -2015,7 +2027,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, resourceOwnershipResolvers, List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         private List<ResourceOwnershipResolver> ownershipResolvers() {
@@ -2097,7 +2110,10 @@ class PermissionServiceTest {
 
         private PermissionServiceImpl service() {
             return service(
-                List.of(new ProjectDeploymentOwnershipResolver(projectRepository)), environmentResolvers());
+                List.of(new ProjectDeploymentOwnershipResolver(
+                    new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                    projectRepository)),
+                environmentResolvers());
         }
 
         private PermissionServiceImpl service(
@@ -2109,7 +2125,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         private List<ResourceEnvironmentResolver> environmentResolvers() {
@@ -2245,12 +2262,15 @@ class PermissionServiceTest {
                 workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         private List<ResourceOwnershipResolver> ownershipResolvers() {
             return List.of(
-                new ProjectDeploymentWorkflowOwnershipResolver(projectDeploymentWorkflowRepository, projectRepository));
+                new ProjectDeploymentWorkflowOwnershipResolver(
+                    new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                    projectDeploymentWorkflowRepository, projectRepository));
         }
 
         private List<ResourceEnvironmentResolver> environmentResolvers() {
@@ -2325,7 +2345,8 @@ class PermissionServiceTest {
                 workspaceUserRepository, resourceOwnershipResolvers, List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
         }
 
         private static List<ResourceOwnershipResolver> ownershipResolvers() {
@@ -2468,7 +2489,8 @@ class PermissionServiceTest {
                 List.of(new AiSkillOwnershipResolver(aiSkillService, userService)), List.of(),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
             PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
 

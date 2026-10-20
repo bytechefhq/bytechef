@@ -18,6 +18,7 @@ package com.bytechef.automation.workflow.execution.security;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,15 +55,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerExecutionOwnershipResolver implements ResourceOwnershipResolver {
 
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectService projectService;
     private final TriggerExecutionService triggerExecutionService;
 
     @SuppressFBWarnings("EI")
     public TriggerExecutionOwnershipResolver(
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
         TriggerExecutionService triggerExecutionService) {
 
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
         this.triggerExecutionService = triggerExecutionService;
@@ -74,8 +79,21 @@ public class TriggerExecutionOwnershipResolver implements ResourceOwnershipResol
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return fetchProject(id)
-            .map(Project::getWorkspaceId)
+        Optional<Project> projectOptional = fetchProject(id);
+
+        if (projectOptional.isEmpty()) {
+            return ResourceOwner.unknown();
+        }
+
+        Project project = projectOptional.get();
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(project.getId())) {
+            return ResourceOwner.ofEmbedded();
+        }
+
+        return Optional.ofNullable(project.getWorkspaceId())
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
     }
