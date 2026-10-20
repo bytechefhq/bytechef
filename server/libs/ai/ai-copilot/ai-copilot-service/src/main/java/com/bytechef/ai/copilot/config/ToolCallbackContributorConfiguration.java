@@ -22,7 +22,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
-import com.bytechef.automation.ai.tool.SkillsTools;
+import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
@@ -45,23 +45,23 @@ public class ToolCallbackContributorConfiguration {
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
         "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
 
-    private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
+    private static final Set<String> MCP_SERVER_TOOL_NAMES = Set.of(
+        "listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject");
 
-    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of(
-        "listMcpServers", "createMcpServer", "listMcpProjectWorkflows");
+    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
 
     private static final Set<String> WORKSPACE_SCOPED_DEPLOYMENT_TOOL_NAMES = Set.of("listProjectDeployments");
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
-        ObjectProvider<SkillsTools> skillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
+        ObjectProvider<ReadSkillsTools> readSkillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-            skillsToolsProvider.ifAvailable(
-                skillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(skillsTools))));
+            readSkillsToolsProvider.ifAvailable(
+                readSkillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(readSkillsTools))));
 
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(
@@ -93,7 +93,7 @@ public class ToolCallbackContributorConfiguration {
                 String name = toolCallback.getToolDefinition()
                     .name();
 
-                if (MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME.equals(name)) {
+                if (!MCP_SERVER_TOOL_NAMES.contains(name)) {
                     continue;
                 }
 

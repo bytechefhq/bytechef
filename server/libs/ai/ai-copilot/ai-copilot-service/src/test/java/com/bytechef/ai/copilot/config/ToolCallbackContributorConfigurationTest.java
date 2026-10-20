@@ -38,6 +38,8 @@ import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.ReadSkillsTools;
+import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
@@ -58,6 +60,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -83,6 +86,24 @@ class ToolCallbackContributorConfigurationTest {
             .extracting(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .containsExactlyInAnyOrder("buildWorkflow", "authorSkill", "debugWorkflowExecution", "importWorkflow");
+    }
+
+    @Test
+    void testCopilotAgentContributorContributesOnlyTheSkillReadTools() {
+        ReadSkillsTools readSkillsTools = new ReadSkillsTools(mock(SkillsTools.class));
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory(
+            Map.of("readSkillsTools", readSkillsTools));
+
+        McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
+            beanFactory.getBeanProvider(ReadSkillsTools.class), catalogOf(intelligentDefinition("authorSkill")),
+            workspaceFacade);
+
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "getAiSkills", "getAiSkill", "getAiSkillFilePaths", "getAiSkillFileContent", "authorSkill");
     }
 
     @Test
@@ -219,31 +240,48 @@ class ToolCallbackContributorConfigurationTest {
     @Nested
     class McpServerCrudContributorTest {
 
-        private final McpProjectWorkflowFacade mcpProjectWorkflowFacade = mock(McpProjectWorkflowFacade.class);
+        private final WorkspaceMcpServerFacade workspaceMcpServerFacade = mock(WorkspaceMcpServerFacade.class);
 
         @Test
-        void testListMcpProjectWorkflowsAcceptsWorkspaceId() {
-            ToolCallback listMcpProjectWorkflowsToolCallback = getListMcpProjectWorkflowsToolCallback();
-
-            assertThat(listMcpProjectWorkflowsToolCallback.getToolDefinition()
-                .inputSchema()).contains("workspaceId");
+        void testContributesOnlyTheMcpServerToolsConfigureMcpServerCannotReplace() {
+            assertThat(getToolCallbacks())
+                .extracting(toolCallback -> toolCallback.getToolDefinition()
+                    .name())
+                .containsExactlyInAnyOrder("listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject")
+                .doesNotContain(
+                    "cloneMcpProject", "listMcpProjectWorkflows", "updateMcpProjectWorkflowParameters");
         }
 
         @Test
-        void testListMcpProjectWorkflowsListsThroughTheFacadeWithTheGivenWorkspace() {
-            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
-            when(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(5L)).thenReturn(List.of());
+        void testListAndCreateMcpServerAcceptWorkspaceId() {
+            assertThat(getToolCallbacks())
+                .filteredOn(toolCallback -> Set.of("listMcpServers", "createMcpServer")
+                    .contains(toolCallback.getToolDefinition()
+                        .name()))
+                .hasSize(2)
+                .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                    .inputSchema()).contains("workspaceId"));
+        }
 
-            String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
+        @Test
+        void testListMcpServersListsThroughTheFacadeWithTheGivenWorkspace() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
+
+            String result = getToolCallbacks().stream()
+                .filter(toolCallback -> "listMcpServers".equals(toolCallback.getToolDefinition()
+                    .name()))
+                .findFirst()
+                .orElseThrow()
+                .call("{\"workspaceId\": 7}");
 
             assertThat(result).isEqualTo("[]");
-            verify(mcpProjectWorkflowFacade).getMcpServerMcpProjectWorkflows(5L);
+            verify(workspaceMcpServerFacade).getWorkspaceMcpServers(7L);
         }
 
         @SuppressWarnings("unchecked")
-        private ToolCallback getListMcpProjectWorkflowsToolCallback() {
+        private List<ToolCallback> getToolCallbacks() {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = new McpServerToolCallbacksFactory(
-                mock(McpProjectFacade.class), mcpProjectWorkflowFacade, mock(WorkspaceMcpServerFacade.class));
+                mock(McpProjectFacade.class), mock(McpProjectWorkflowFacade.class), workspaceMcpServerFacade);
 
             ObjectProvider<McpServerToolCallbacksFactory> provider = mock(ObjectProvider.class);
 
@@ -252,13 +290,7 @@ class ToolCallbackContributorConfigurationTest {
             McpServerToolCallbackContributor contributor = configuration.mcpServerCrudMcpContributor(
                 provider, workspaceFacade);
 
-            return contributor.getToolCallbacks()
-                .stream()
-                .filter(toolCallback -> "listMcpProjectWorkflows".equals(
-                    toolCallback.getToolDefinition()
-                        .name()))
-                .findFirst()
-                .orElseThrow();
+            return contributor.getToolCallbacks();
         }
     }
 
