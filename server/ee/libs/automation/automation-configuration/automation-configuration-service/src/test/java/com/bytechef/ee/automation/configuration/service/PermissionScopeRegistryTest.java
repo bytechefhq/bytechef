@@ -292,10 +292,16 @@ class PermissionScopeRegistryTest {
         private static final Pattern PROGRAMMATIC_EMBEDDED_SCOPE_CHECK_PATTERN = Pattern.compile(
             "\\.hasEmbeddedScope(?:InEnvironment|InEnvironmentId|InEveryEnvironment)?\\(([^)]*)\\)");
 
-        private static final Pattern PROGRAMMATIC_RESOURCE_SCOPE_CHECK_PATTERN = Pattern.compile(
-            "\\.hasResourceScope\\(([^)]*)\\)");
+        private static final String RESOURCE_KEYED_FUNCTIONS = String.join(
+            "|", "hasResourceScopeInEnvironmentId", "hasResourceScopeInEnvironment", "hasResourceScope",
+            "hasWorkflowScopeIfProjectWorkflowInEnvironmentId", "hasWorkflowScopeIfProjectWorkflowInEnvironment",
+            "hasWorkflowScopeIfProjectWorkflow", "hasWorkflowScopeInEnvironment", "hasWorkflowScope");
 
-        private static final Pattern RESOURCE_SCOPE_CALL_PATTERN = Pattern.compile("hasPermission\\(([^)]*)\\)");
+        private static final Pattern PROGRAMMATIC_RESOURCE_SCOPE_CHECK_PATTERN = Pattern.compile(
+            "\\.(?:" + RESOURCE_KEYED_FUNCTIONS + ")\\(([^)]*)\\)");
+
+        private static final Pattern RESOURCE_SCOPE_CALL_PATTERN = Pattern.compile(
+            "\\b(?:hasPermission|" + RESOURCE_KEYED_FUNCTIONS + ")\\(([^)]*)\\)");
 
         private static final Pattern SCOPE_NAME_LITERAL_PATTERN = Pattern.compile("\"([A-Z][A-Z0-9_]{2,})\"");
 
@@ -352,15 +358,19 @@ class PermissionScopeRegistryTest {
                     permissionService.hasResourceScope(id, "Integration", "INTEGRATION_DELETE");
                     permissionService.hasWorkspaceScope(workspaceId, "PROJECT_DELETE");
                     @PreAuthorize("hasPermission(#id, 'Integration', 'INTEGRATION_EDIT') or isTenantAdmin()")
+                    @PreAuthorize("hasResourceScopeInEnvironment(#id, 'Integration', 'WORKFLOW_CREATE', #environment)")
+                    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #id)")
+                    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'PROJECT_VIEW', #environment)")
                     @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment)")
                     """,
                 gatedScopeNames);
 
             assertThat(gatedScopeNames.embedded())
                 .containsExactlyInAnyOrder("EMBEDDED_MEMBER_MANAGE", "PROJECT_CREATE", "CONNECTED_USER_VIEW");
-            assertThat(gatedScopeNames.automation()).containsExactly("PROJECT_DELETE");
-            assertThat(gatedScopeNames.eitherSide()).containsExactlyInAnyOrder("INTEGRATION_DELETE",
-                "INTEGRATION_EDIT");
+            assertThat(gatedScopeNames.automation()).containsExactlyInAnyOrder("PROJECT_DELETE", "PROJECT_VIEW");
+            assertThat(gatedScopeNames.eitherSide())
+                .containsExactlyInAnyOrder("INTEGRATION_DELETE", "INTEGRATION_EDIT", "WORKFLOW_CREATE",
+                    "WORKFLOW_EDIT");
             assertThat(shippedEmbeddedPermissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED))
                 .contains("EMBEDDED_MEMBER_MANAGE")
                 .doesNotContain("PROJECT_CREATE");
