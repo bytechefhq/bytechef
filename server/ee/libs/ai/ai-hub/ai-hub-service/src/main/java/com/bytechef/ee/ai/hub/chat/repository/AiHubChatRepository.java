@@ -58,6 +58,18 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
     List<AiHubChat> findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
         long workspaceId, long userId, int environment, int excludedStatus, int limit);
 
+    @Query("""
+        SELECT cct.* FROM ai_hub_chat cct
+        WHERE cct.workspace_id = :workspaceId
+          AND cct.user_id = :userId
+          AND cct.environment = :environment
+          AND cct.kind IN (:kinds)
+          AND cct.status = :status
+        LIMIT :limit
+        """)
+    List<AiHubChat> findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+        long workspaceId, long userId, int environment, Collection<Integer> kinds, int status, int limit);
+
     Optional<AiHubChat> findByThreadIdAndUserId(String threadId, long userId);
 
     Optional<AiHubChat> findByThreadId(String threadId);

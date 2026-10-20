@@ -19,6 +19,7 @@ import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -246,6 +247,7 @@ class AiHubConfigurationContextTest {
             .withBean(JsonMapper.class, () -> JsonMapper.builder()
                 .build())
             .withBean(PermissionService.class, () -> mock(PermissionService.class))
+            .withBean(ProjectDeploymentFacade.class, () -> mock(ProjectDeploymentFacade.class))
             .withBean(PlatformTransactionManager.class, () -> mock(PlatformTransactionManager.class))
             .withBean(UserService.class, () -> mock(UserService.class))
             .withBean("workerExecutor", Executor.class, () -> Runnable::run);
