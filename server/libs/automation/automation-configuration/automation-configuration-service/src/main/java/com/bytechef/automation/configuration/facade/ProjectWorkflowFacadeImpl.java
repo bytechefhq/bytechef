@@ -35,6 +35,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
@@ -64,7 +65,6 @@ import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateAuthor;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -111,6 +111,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private final ProjectWorkflowCreator projectWorkflowCreator;
     private final ProjectWorkflowService projectWorkflowService;
     private final String publicUrl;
     private final SharedTemplateFileStorage sharedTemplateFileStorage;
@@ -120,7 +121,6 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowFacadeImpl(
@@ -133,7 +133,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
         WorkflowFacade workflowFacade, List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowValidatorFacade workflowValidatorFacade) {
+        ProjectWorkflowCreator projectWorkflowCreator) {
 
         this.componentDefinitionHelper = componentDefinitionHelper;
         this.preBuiltTemplateService = preBuiltTemplateService;
@@ -151,7 +151,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
-        this.workflowValidatorFacade = workflowValidatorFacade;
+        this.projectWorkflowCreator = projectWorkflowCreator;
     }
 
     @Override
@@ -161,13 +161,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     })
     @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'WORKFLOW_CREATE', " + DEVELOPMENT + ")")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
-        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
-
-        Project project = projectService.getProject(projectId);
-
-        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
-
-        return projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
+        return projectWorkflowCreator.addWorkflow(projectId, definition);
     }
 
     @Override

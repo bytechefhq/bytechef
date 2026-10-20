@@ -16,6 +16,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
@@ -51,7 +52,6 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -107,6 +107,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final IntegrationService integrationService;
     private final ProjectService projectService;
     private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private final ProjectWorkflowCreator projectWorkflowCreator;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -115,7 +116,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
@@ -128,11 +128,12 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectService projectService,
         ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        ProjectWorkflowCreator projectWorkflowCreator, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        List<WorkflowPreDeleteListener> workflowPreDeleteListeners, WorkflowValidatorFacade workflowValidatorFacade) {
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
         this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectService = automationWorkflowProjectService;
@@ -145,6 +146,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.integrationService = integrationService;
         this.projectService = projectService;
         this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
+        this.projectWorkflowCreator = projectWorkflowCreator;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -153,7 +155,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.workflowService = workflowService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
-        this.workflowValidatorFacade = workflowValidatorFacade;
     }
 
     @Override
@@ -195,7 +196,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public String createProjectWorkflow(long projectId, String definition, String permissionExpression) {
         getProjectOfAutomationWorkflowProject(projectId);
 
-        ProjectWorkflow projectWorkflow = addWorkflow(
+        ProjectWorkflow projectWorkflow = projectWorkflowCreator.addWorkflow(
             projectId, StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
 
         String normalized = normalizePermissionExpression(permissionExpression);
@@ -290,7 +291,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         String newDefinition = JsonUtils.writeWithDefaultPrettyPrinter(definitionMap);
 
-        ProjectWorkflow newProjectWorkflow = addWorkflow(projectId, newDefinition);
+        ProjectWorkflow newProjectWorkflow = projectWorkflowCreator.addWorkflow(projectId, newDefinition);
 
         workflowTestConfigurationService.copyWorkflowTestConfigurations(
             workflowId, newProjectWorkflow.getWorkflowId());
@@ -330,7 +331,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         for (ProjectWorkflow sourceProjectWorkflow : sourceProjectWorkflows) {
             Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
 
-            addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
+            projectWorkflowCreator.addWorkflow(newProject.getId(), sourceWorkflow.getDefinition());
         }
 
         return newProject.getId();
@@ -638,16 +639,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .map(tag -> new AutomationWorkflowProjectTagDTO(
                 Objects.requireNonNull(tag.getId(), "tag id"), tag.getName()))
             .toList();
-    }
-
-    private ProjectWorkflow addWorkflow(long projectId, String definition) {
-        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
-
-        Project project = projectService.getProject(projectId);
-
-        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
-
-        return projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
     }
 
     private Map<String, Long> getIntegrationIdsByComponentName(Environment environment, ConnectedUser connectedUser) {

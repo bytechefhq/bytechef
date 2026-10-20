@@ -328,6 +328,29 @@ class EmbeddedHubGatesIntTest {
     }
 
     @Test
+    void testDuplicatingAProjectNeedsTheRightToCreate() {
+        long projectId = createHubProject();
+
+        createHubWorkflow(projectId);
+
+        authenticate(EMBEDDED_VIEWER, false);
+
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.duplicateProject(projectId))
+            .isInstanceOf(AccessDeniedException.class);
+
+        authenticate(EDITOR_IN_DEVELOPMENT, false);
+
+        long duplicatedProjectId = automationWorkflowProjectFacade.duplicateProject(projectId);
+
+        createdProjectIds.add(duplicatedProjectId);
+
+        authenticate(TENANT_ADMIN, true);
+
+        assertThat(automationWorkflowProjectFacade.getProject(duplicatedProjectId)
+            .workflowTemplates()).hasSize(1);
+    }
+
+    @Test
     void testATenantAdminWithoutARowStillPasses() {
         authenticate(TENANT_ADMIN, true);
 
