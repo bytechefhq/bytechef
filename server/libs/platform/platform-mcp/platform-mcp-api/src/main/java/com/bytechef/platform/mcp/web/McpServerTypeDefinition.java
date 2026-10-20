@@ -34,6 +34,10 @@ public interface McpServerTypeDefinition {
      */
     boolean isSharedAdministration();
 
+    default boolean isSecretKeyReadableByEditors() {
+        return false;
+    }
+
     /**
      * @param secretKey the MCP server secret key, possibly masked
      * @return the path within the application, without the public URL
