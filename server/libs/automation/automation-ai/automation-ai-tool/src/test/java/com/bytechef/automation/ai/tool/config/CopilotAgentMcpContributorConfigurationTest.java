@@ -35,6 +35,8 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
+import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
+import com.bytechef.platform.ai.skill.tool.SkillsTools;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * @author Ivica Cardic
@@ -72,6 +75,24 @@ class CopilotAgentMcpContributorConfigurationTest {
             .extracting(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .containsExactlyInAnyOrder("buildWorkflow", "authorSkill", "debugWorkflowExecution", "importWorkflow");
+    }
+
+    @Test
+    void testCopilotAgentContributorContributesOnlyTheSkillReadTools() {
+        ReadSkillsTools readSkillsTools = new ReadSkillsTools(mock(SkillsTools.class));
+
+        StaticListableBeanFactory beanFactory = new StaticListableBeanFactory(
+            Map.of("readSkillsTools", readSkillsTools));
+
+        McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
+            beanFactory.getBeanProvider(ReadSkillsTools.class), catalogOf(intelligentDefinition("authorSkill")),
+            workspaceFacade);
+
+        assertThat(contributor.getToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactlyInAnyOrder(
+                "getAiSkills", "getAiSkill", "getAiSkillFilePaths", "getAiSkillFileContent", "authorSkill");
     }
 
     @Test

@@ -22,7 +22,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.platform.ai.skill.tool.SkillsTools;
+import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,14 +43,14 @@ public class CopilotAgentMcpContributorConfiguration {
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
-        ObjectProvider<SkillsTools> skillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
+        ObjectProvider<ReadSkillsTools> readSkillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-            skillsToolsProvider.ifAvailable(
-                skillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(skillsTools))));
+            readSkillsToolsProvider.ifAvailable(
+                readSkillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(readSkillsTools))));
 
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(

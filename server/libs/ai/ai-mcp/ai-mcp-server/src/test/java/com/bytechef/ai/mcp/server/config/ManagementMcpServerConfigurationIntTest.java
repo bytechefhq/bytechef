@@ -41,7 +41,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 class ManagementMcpServerConfigurationIntTest {
 
     private static final List<String> WORKSPACE_SCOPED_TOOL_NAMES = List.of(
-        "listProjects", "searchProjects", "createProject", "searchWorkflows");
+        "listProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
@@ -107,16 +107,8 @@ class ManagementMcpServerConfigurationIntTest {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
-            ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
-
-            List<String> toolNames = Arrays.stream(configuration.toolCallbackProvider()
-                .getToolCallbacks())
-                .map(toolCallback -> toolCallback.getToolDefinition()
-                    .name())
-                .toList();
-
-            assertThat(toolNames)
-                .contains("createProjectWorkflow", "deleteWorkflow", "saveWorkflowTestConnection")
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .contains("deleteWorkflow", "saveWorkflowTestConnection")
                 .doesNotContain(
                     "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
                     "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
@@ -125,22 +117,54 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testCreateProjectWorkflowTakesNameNotDefinition() {
+    void testToolCallbackProviderExposesOneToolPerProjectAndWorkflowRead() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .containsExactlyInAnyOrder(
+                    "listWorkspaces", "listProjects", "getProject", "createProject", "updateProject",
+                    "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
+                    "deleteWorkflow",
+                    "saveWorkflowTestConnection");
+        });
+    }
+
+    @Test
+    void testToolCallbackProviderDropsTheNearDuplicateAndWorkflowCreationTools() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .doesNotContain("createProjectWorkflow", "searchProjects", "getProjectStatus");
+        });
+    }
+
+    @Test
+    void testListToolsTakeAnOptionalQuery() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
             ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
 
-            ToolDefinition toolDefinition = Arrays.stream(configuration.toolCallbackProvider()
+            assertThat(Arrays.stream(configuration.toolCallbackProvider()
                 .getToolCallbacks())
                 .map(ToolCallback::getToolDefinition)
-                .filter(definition -> "createProjectWorkflow".equals(definition.name()))
-                .findFirst()
-                .orElseThrow();
-
-            assertThat(toolDefinition.inputSchema()).contains("\"name\"");
-            assertThat(toolDefinition.inputSchema()).doesNotContain("definition");
+                .filter(definition -> List.of("listProjects", "listWorkflows")
+                    .contains(definition.name())))
+                        .hasSize(2)
+                        .allSatisfy(definition -> assertThat(definition.inputSchema()).contains("\"query\""));
         });
+    }
+
+    @Test
+    void testInstructionsDescribeImportWorkflowWithAProjectIdOrAWorkflowId() {
+        assertThat(ManagementMcpServerConfiguration.INSTRUCTIONS)
+            .contains("createProject (if needed) → importWorkflow with the source")
+            .contains("the projectId for a new workflow or the workflowId for an existing one")
+            .doesNotContain(
+                "createProjectWorkflow", "searchProjects", "getProjectStatus", "cloneMcpProject",
+                "listMcpProjectWorkflows", "—");
     }
 
     @Test
@@ -155,6 +179,14 @@ class ManagementMcpServerConfigurationIntTest {
 
             assertThat(toolCallbackProvider.getToolCallbacks()).isNotNull();
         });
+    }
+
+    private static List<String> getToolNames(ManagementMcpServerConfiguration configuration) {
+        return Arrays.stream(configuration.toolCallbackProvider()
+            .getToolCallbacks())
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
     }
 
     @Nested

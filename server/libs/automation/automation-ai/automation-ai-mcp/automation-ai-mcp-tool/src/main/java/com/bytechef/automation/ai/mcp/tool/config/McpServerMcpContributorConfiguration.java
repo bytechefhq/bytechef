@@ -34,10 +34,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class McpServerMcpContributorConfiguration {
 
-    private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
+    private static final Set<String> MCP_SERVER_TOOL_NAMES = Set.of(
+        "listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject");
 
-    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of(
-        "listMcpServers", "createMcpServer", "listMcpProjectWorkflows");
+    private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of("listMcpServers", "createMcpServer");
 
     @Bean
     McpServerToolCallbackContributor mcpServerCrudMcpContributor(
@@ -58,7 +58,7 @@ public class McpServerMcpContributorConfiguration {
                 String name = toolCallback.getToolDefinition()
                     .name();
 
-                if (MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME.equals(name)) {
+                if (!MCP_SERVER_TOOL_NAMES.contains(name)) {
                     continue;
                 }
 
