@@ -742,4 +742,15 @@ Expected: no `FAILED` task lines, `BUILD SUCCESSFUL`. `AutomationMethodSecurityC
 ## Follow-up plans (not in this document)
 
 - **Plan B, gates:** move the 107 `isTenantAdmin()` gates in the 23 embedded facades to the catalogue (unpinning `KNOWN_UNENFORCED_SCOPES` as each scope is enforced); embedded ownership and environment resolvers for `Integration`, `IntegrationInstanceConfiguration`, `IntegrationInstance`, `ConnectedUser`, `SigningKey`, `McpIntegrationInstanceConfiguration`, `Job`, `TriggerExecution`, `Connection`, `McpServer`, `ApiKey`; the `ApiKeyFacadeImpl` embedded branch (spec decision 9); moving Hub and connected-user projects out of the default workspace (decision 8); `withoutDetails()` redaction in `IntegrationWorkflowExecutionFacadeImpl`; embedded list filtering per environment.
+  - Carried over from Plan A's reviews:
+    - Hub and connected-user projects, and workflows embedded only through such a project, deny on every automation gate for anyone but a tenant admin (`4b8d009d7e8`); replace that with their embedded gates (`CONNECTED_USER_*` in the resource's environment, `INTEGRATION_SETTINGS` for Hub templates).
+    - Finish decision 8 on the remaining automation paths, which still resolve these projects to the default workspace: `ProjectWorkflowOwnershipResolver`, `TestJobOwnershipResolver`, the `ProjectDeployment` and `ProjectDeploymentWorkflow` resolvers, `canUseConnectionInWorkflow`, and the project lists. `0_p_1051` does not ship without this.
+    - The embedded `ApiKey` resolver must not claim rows whose `type` is null; those are platform admin keys.
+    - `PermissionScopeRegistryTest` treats the literals of `.hasResourceScope` and other programmatic checks as automation-side; embedded resource gates and programmatic `hasEmbeddedScope` calls need side-aware handling there.
+    - Worth fixing alongside:
+      - A non-embedded `hasWorkflowScope` check runs about five uncached queries; cache them or use one `EXISTS`.
+      - On configuration-app, the remote `fetchConnection` answers 500 for a missing id instead of a deny.
+      - Deleting a user audits their embedded removal under `WORKSPACE_MEMBERSHIPS_REMOVED`.
+      - `CustomRoleServiceImpl` evicts only `workspaceScopes`; it must also evict `embeddedScopes` once embedded custom roles exist.
+      - A per-environment embedded Admin cannot remove themselves, because removal needs `EMBEDDED_MEMBER_MANAGE` in every environment (decide in Plan C).
 - **Plan C, client, e2e and docs:** `useHasEmbeddedScope`, embedded routes and nav off `AUTHORITIES.ADMIN`, control gating on every embedded page, the read-only integration editor, `detailsHidden` in the embedded run sheet, the Embedded > Settings > Members page, codegen, `routes.test.tsx`, `tests/embedded-rbac` Playwright specs with fixtures, and the embedded users and roles doc page.
