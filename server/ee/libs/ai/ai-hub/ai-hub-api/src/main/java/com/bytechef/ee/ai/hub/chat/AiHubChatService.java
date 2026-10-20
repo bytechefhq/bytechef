@@ -41,6 +41,28 @@ public interface AiHubChatService {
     AiHubChat create(long workspaceId, long userId, int environment, String threadId);
 
     /**
+     * Creates a workflow chat bound to a workflow execution id and the project deployment it belongs to. Every call
+     * inserts a new row with a random thread id, so a repeated call starts a fresh chat. A non-blank {@code title} is
+     * stored on the row.
+     */
+    AiHubChat createWorkflowChat(
+        long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
+        @Nullable String title);
+
+    /**
+     * Archives the requester's active workflow chats in the workspace and environment, capped at one listing page per
+     * call.
+     *
+     * @return the number of chats archived
+     */
+    int bulkArchiveWorkflowChatAiHubChats(long workspaceId, long userId, int environment);
+
+    /**
+     * Stops the in-flight turn of a workflow chat, as {@link #cancelAiHubRun} with no run id.
+     */
+    boolean cancelWorkflowChatTurn(long chatId, long requesterWorkspaceId, long requesterUserId);
+
+    /**
      * Lists the requester's chats in the workspace and environment, most recently updated first. A {@code null} status
      * means every status.
      */
