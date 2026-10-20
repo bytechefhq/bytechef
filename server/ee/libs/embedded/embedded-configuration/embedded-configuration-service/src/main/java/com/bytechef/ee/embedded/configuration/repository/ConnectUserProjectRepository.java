@@ -33,6 +33,9 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
         """)
     boolean existsByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
+    @Query("SELECT COUNT(cup.*) > 0 FROM connected_user_project cup WHERE cup.project_id = :projectId")
+    boolean existsByProjectId(@Param("projectId") long projectId);
+
     @Query("""
         SELECT cup.*
         FROM connected_user_project cup
