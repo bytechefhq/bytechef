@@ -12,7 +12,9 @@ type ChatWorkflow {
     projectDeploymentId: ID!
     projectId: ID!
     projectName: String!
+    projectWorkflowId: ID!
     workflowExecutionId: String!
+    workflowId: ID!
     workflowLabel: String!
 }
 
