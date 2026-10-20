@@ -55,11 +55,11 @@ const AutomationWorkflowProjectListItem = ({
 
     const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
     const canDeleteProject = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
-    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
     const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
     const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
 
-    const canPublishProject = canEditWorkflow && canPublishScope;
+    const canPublishProject = canEditWorkflowOnUnion && canPublishScope;
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 

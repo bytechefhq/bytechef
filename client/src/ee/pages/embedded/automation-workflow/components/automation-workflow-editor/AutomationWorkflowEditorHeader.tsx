@@ -95,6 +95,7 @@ const AutomationWorkflowEditorHeader = ({
     const readOnly = useWorkflowEditorReadOnly();
     const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
     const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
     const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -360,7 +361,7 @@ const AutomationWorkflowEditorHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                {!readOnly && canPublishScope && (
+                {canEditWorkflowOnUnion && canPublishScope && (
                     <PublishPopover
                         isPending={publishProjectMutationIsPending}
                         onPublishProjectSubmit={handlePublishProjectSubmit}

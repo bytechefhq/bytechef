@@ -247,7 +247,7 @@ describe('IntegrationReadOnly', () => {
         expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute('data-read-only', 'true');
         expect(isWorkflowEditorReadOnly()).toBe(true);
         expect(screen.getByRole('button', {name: 'Test'})).toHaveAttribute('data-read-only', 'true');
-        expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
 
         unmount();
 
@@ -283,7 +283,7 @@ describe('IntegrationReadOnly', () => {
 
         expect(screen.getByLabelText('View only')).toHaveTextContent('View only');
         expect(screen.getByRole('button', {name: 'Test'})).toHaveAttribute('data-read-only', 'true');
-        expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
 
         hubHeader.unmount();
 

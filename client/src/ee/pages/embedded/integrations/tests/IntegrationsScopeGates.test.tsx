@@ -201,7 +201,7 @@ describe('Integrations', () => {
     });
 
     it('testAViewerSeesIntegrationsWithoutCreateEditPublishOrDelete', async () => {
-        grant(['WORKFLOW_VIEW'], ['WORKFLOW_VIEW', 'WORKFLOW_EDIT', 'INTEGRATION_PUBLISH']);
+        grant(['WORKFLOW_VIEW']);
 
         renderPage();
 
@@ -218,6 +218,24 @@ describe('Integrations', () => {
         expect(await screen.findByText('View Workflows')).toBeInTheDocument();
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
         expect(screen.queryByText('Publish')).not.toBeInTheDocument();
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    });
+
+    it('testADevelopmentViewerWhoEditsInProductionCanEditAndPublishButNotCreateWorkflows', async () => {
+        grant(['WORKFLOW_VIEW'], ['INTEGRATION_PUBLISH', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW']);
+
+        renderPage();
+
+        await expandWorkflows();
+
+        expect(await screen.findByText('Welcome flow')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Workflow'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Add new tag'})).toBeInTheDocument();
+
+        await openMenu();
+
+        expect(await screen.findByText('Edit')).toBeInTheDocument();
+        expect(screen.getByText('Publish')).toBeInTheDocument();
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
 

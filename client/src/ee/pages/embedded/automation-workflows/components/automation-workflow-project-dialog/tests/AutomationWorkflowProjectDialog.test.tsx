@@ -3,10 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog';
 
+const hoisted = vi.hoisted(() => ({grantedScopes: ['INTEGRATION_CREATE', 'INTEGRATION_SETTINGS'] as string[]}));
+
 vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
     UNION_ENVIRONMENT_ID: -1,
     useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
-    useHasEmbeddedScope: () => true,
+    useHasEmbeddedScope: (scope: string) => hoisted.grantedScopes.includes(scope),
 }));
 
 const existingProject = {
@@ -35,6 +37,8 @@ const defaultProps = {
 };
 
 beforeEach(() => {
+    hoisted.grantedScopes = ['INTEGRATION_CREATE', 'INTEGRATION_SETTINGS'];
+
     windowResizeObserver();
 });
 
@@ -57,6 +61,30 @@ describe('AutomationWorkflowProjectDialog', () => {
 
             expect(screen.getByLabelText('Name')).toHaveValue('');
             expect(screen.getByLabelText('Description')).toHaveValue('');
+        });
+    });
+
+    describe('permission expression gating', () => {
+        it('hides the permission expression on create without settings', () => {
+            hoisted.grantedScopes = ['INTEGRATION_CREATE'];
+
+            render(<AutomationWorkflowProjectDialog {...defaultProps} />);
+
+            expect(screen.queryByText('Permission Expression')).not.toBeInTheDocument();
+        });
+
+        it('hides the permission expression on edit without settings', () => {
+            hoisted.grantedScopes = [];
+
+            render(<AutomationWorkflowProjectDialog {...defaultProps} project={existingProject} />);
+
+            expect(screen.queryByText('Permission Expression')).not.toBeInTheDocument();
+        });
+
+        it('shows the permission expression on edit with settings', () => {
+            render(<AutomationWorkflowProjectDialog {...defaultProps} project={existingProject} />);
+
+            expect(screen.getByText('Permission Expression')).toBeInTheDocument();
         });
     });
 

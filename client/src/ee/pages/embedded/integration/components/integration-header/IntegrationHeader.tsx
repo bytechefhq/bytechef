@@ -71,6 +71,7 @@ const IntegrationHeader = ({
     const isSaving = useIsMutating();
     const readOnly = useWorkflowEditorReadOnly();
     const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
     const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const {
         handleIntegrationWorkflowValueChange,
@@ -136,7 +137,7 @@ const IntegrationHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                {!readOnly && canPublishScope && (
+                {canEditWorkflowOnUnion && canPublishScope && (
                     <PublishPopover
                         isPending={publishIntegrationMutationIsPending}
                         onPublishIntegrationSubmit={handlePublishIntegrationSubmit}

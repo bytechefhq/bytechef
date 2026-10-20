@@ -287,7 +287,7 @@ describe('AutomationWorkflow', () => {
         expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute('data-read-only', 'true');
         expect(isWorkflowEditorReadOnly()).toBe(true);
         expect(screen.getByLabelText('View only')).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
     });
 
     it('opens the Hub editor for editing when Development workflow edit is held', () => {
