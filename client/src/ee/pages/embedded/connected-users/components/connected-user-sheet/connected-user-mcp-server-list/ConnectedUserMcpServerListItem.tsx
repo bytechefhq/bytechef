@@ -11,7 +11,7 @@ import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     ConnectedUserMcpServer,
     useDeleteConnectedUserMcpServerMutation,
@@ -33,7 +33,8 @@ const ConnectedUserMcpServerListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [open, setOpen] = useState(false);
 
-    const isTenantAdmin = useIsTenantAdmin();
+    const canDeleteMcpServer = useHasEmbeddedScope('MCP_DELETE');
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -135,7 +136,7 @@ const ConnectedUserMcpServerListItem = ({
 
                                 <Switch
                                     checked={mcpServer.enabled}
-                                    disabled={!isTenantAdmin}
+                                    disabled={!canEditMcpServer}
                                     onCheckedChange={(value) => {
                                         enableConnectedUserMcpServerMutation.mutate({
                                             connectedUserId: connectedUserId.toString(),
@@ -157,7 +158,7 @@ const ConnectedUserMcpServerListItem = ({
                             </Tooltip>
                         </div>
 
-                        {isTenantAdmin && (
+                        {canDeleteMcpServer && (
                             <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
                         )}
                     </div>

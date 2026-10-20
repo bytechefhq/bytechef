@@ -14,6 +14,11 @@ const hoisted = vi.hoisted(() => ({
     copyToClipboard: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@uidotdev/usehooks', () => ({
     useCopyToClipboard: () => [null, hoisted.copyToClipboard],
 }));

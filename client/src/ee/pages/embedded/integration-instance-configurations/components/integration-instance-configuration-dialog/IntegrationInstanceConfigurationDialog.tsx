@@ -45,6 +45,7 @@ import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/w
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
@@ -149,6 +150,22 @@ interface IntegrationInstanceConfigurationDialogProps {
     updateIntegrationVersion?: boolean;
 }
 
+const IntegrationInstanceConfigurationDialogNextButton = ({
+    canSave,
+    isPending,
+}: {
+    canSave: boolean;
+    isPending: boolean;
+}) => {
+    const {isLastStep} = useDialogSteps();
+
+    if (isLastStep && !canSave) {
+        return null;
+    }
+
+    return <DialogNextButton isPending={isPending} label="Next" lastStepLabel="Save" />;
+};
+
 const IntegrationInstanceConfigurationDialog = ({
     filterWorkflowUuids,
     integrationInstanceConfiguration: integrationInstanceConfigurationProp,
@@ -181,6 +198,9 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
 
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+
     const integrationInstanceConfiguration = selectedExistingConfiguration ?? integrationInstanceConfigurationProp;
 
     const updateIntegrationVersion = updateIntegrationVersionProp || !!selectedExistingConfiguration;
@@ -205,6 +225,8 @@ const IntegrationInstanceConfigurationDialog = ({
             },
             showTabs && isOpen && !!integrationInstanceConfigurationProp?.integrationId
         );
+
+    const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
@@ -757,7 +779,10 @@ const IntegrationInstanceConfigurationDialog = ({
                             <DialogFooter startContent={<DialogCancelButton />}>
                                 <DialogPreviousButton className="lg:hidden" />
 
-                                <DialogNextButton isPending={isSaving} label="Next" lastStepLabel="Save" />
+                                <IntegrationInstanceConfigurationDialogNextButton
+                                    canSave={canSave}
+                                    isPending={isSaving}
+                                />
                             </DialogFooter>
                         }
                         icon={<Settings2Icon />}
@@ -816,7 +841,7 @@ const IntegrationInstanceConfigurationDialog = ({
                             <DialogFooter>
                                 <DialogCancelButton />
 
-                                {canUpdateCredentials && !isUpdatingCredentials && (
+                                {canSave && canUpdateCredentials && !isUpdatingCredentials && (
                                     <Button
                                         onClick={() => setIsUpdatingCredentials(true)}
                                         type="button"
@@ -835,21 +860,23 @@ const IntegrationInstanceConfigurationDialog = ({
                                     />
                                 )}
 
-                                <Button
-                                    disabled={
-                                        isSaving ||
-                                        authorizationTypePending ||
-                                        (isUpdatingCredentials &&
-                                            Object.keys(enteredCredentialsParameters).length === 0)
-                                    }
-                                    icon={isSaving ? <LoadingIcon /> : undefined}
-                                    label="Save"
-                                    onClick={
-                                        isUpdatingCredentials
-                                            ? credentialsForm.handleSubmit(handleSaveCredentialsClick)
-                                            : handleSubmit(handleSaveClick)
-                                    }
-                                />
+                                {canSave && (
+                                    <Button
+                                        disabled={
+                                            isSaving ||
+                                            authorizationTypePending ||
+                                            (isUpdatingCredentials &&
+                                                Object.keys(enteredCredentialsParameters).length === 0)
+                                        }
+                                        icon={isSaving ? <LoadingIcon /> : undefined}
+                                        label="Save"
+                                        onClick={
+                                            isUpdatingCredentials
+                                                ? credentialsForm.handleSubmit(handleSaveCredentialsClick)
+                                                : handleSubmit(handleSaveClick)
+                                        }
+                                    />
+                                )}
                             </DialogFooter>
                         </Form>
                     </DialogMain>
