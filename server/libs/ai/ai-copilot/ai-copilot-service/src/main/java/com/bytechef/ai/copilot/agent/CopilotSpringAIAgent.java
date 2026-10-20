@@ -235,7 +235,7 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             return "The copilot run failed. Reference: " + input.runId();
         }
 
-        String message = throwable.getMessage();
+        String message = mostSpecificMessage(throwable);
 
         return message == null ? "The copilot run failed. Reference: " + input.runId() : message;
     }

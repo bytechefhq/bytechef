@@ -274,6 +274,16 @@ class CopilotSpringAIAgentTest {
         }
 
         @Test
+        void testRunErrorMessageShowsTheCauseHiddenBehindAStreamWrapperForAnUnscopedRun() throws AGUIException {
+            String message = newConverterAgent(null).runErrorMessage(
+                newInput(new State()),
+                new RuntimeException("Stream processing failed",
+                    new IllegalStateException("Your credit balance is too low")));
+
+            assertThat(message).isEqualTo("Your credit balance is too low");
+        }
+
+        @Test
         void testRunErrorMessageNeverReturnsNull() throws AGUIException {
             String message = newConverterAgent(null).runErrorMessage(newInput(new State()), new NullPointerException());
 
