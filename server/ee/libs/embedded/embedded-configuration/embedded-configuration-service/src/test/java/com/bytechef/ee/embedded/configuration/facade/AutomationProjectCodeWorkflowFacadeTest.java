@@ -105,7 +105,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
         inOrder.verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
         inOrder.verify(automationProjectFacade)
-            .publishProject(7L);
+            .publishProject(7L, null);
 
         assertThat(warnings).isNotEmpty();
     }
@@ -126,7 +126,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
-        verify(automationProjectFacade).publishProject(100L);
+        verify(automationProjectFacade).publishProject(100L, null);
         verify(projectService, never()).publishProject(anyLong(), any(), anyBoolean());
     }
 
@@ -175,7 +175,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
-        verify(automationProjectFacade, never()).publishProject(anyLong());
+        verify(automationProjectFacade, never()).publishProject(anyLong(), any());
     }
 
     @Test
@@ -210,7 +210,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         verify(projectCodeWorkflowDraftFacade)
             .saveDraft(any(Project.class), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
-        verify(automationProjectFacade, never()).publishProject(anyLong());
+        verify(automationProjectFacade, never()).publishProject(anyLong(), any());
     }
 
     @Test
@@ -266,7 +266,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
             () -> facade().save(source, Language.JAVASCRIPT, Environment.PRODUCTION, false),
             CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
 
-        verify(automationProjectFacade, never()).publishProject(anyLong());
+        verify(automationProjectFacade, never()).publishProject(anyLong(), any());
     }
 
     @Test

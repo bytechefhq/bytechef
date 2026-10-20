@@ -504,7 +504,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         long projectId = createPublishedProject("Pinned Version", 1);
 
         automationProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         long configurationId = automationProjectConfigurationFacade.createConfiguration(
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
@@ -911,7 +911,7 @@ class AutomationProjectConfigurationFacadeIntTest {
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         automationProjectFacade.deleteProjectWorkflow(workflowUuid);
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         givenReferences(configurationId,
             newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
@@ -2477,7 +2477,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     private void publish(long projectId) {
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
     }
 
     private void redefineDraftWorkflow(String workflowUuid, String definition) {
@@ -2491,7 +2491,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         String workflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, "{\"label\": \"" + label + "\", \"description\": \"\", \"tasks\": []}", null);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         return workflowUuid;
     }
@@ -2548,7 +2548,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         automationProjectFacade.createProjectWorkflow(projectId, null, null);
 
         for (int i = 0; i < publishedVersionCount; i++) {
-            automationProjectFacade.publishProject(projectId);
+            automationProjectFacade.publishProject(projectId, null);
         }
 
         return projectId;

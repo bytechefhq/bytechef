@@ -149,7 +149,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
         String name = "Release Update " + UUID.randomUUID();
         long projectId = createDeployedProject(name);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         int firstVersion = getLastPublishedVersion(projectId);
 
@@ -176,7 +176,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
         String name = "Release Many " + UUID.randomUUID();
         long projectId = createDeployedProject(name);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         int firstVersion = getLastPublishedVersion(projectId);
 
@@ -215,7 +215,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
         String name = "Release Off " + UUID.randomUUID();
         long projectId = createDeployedProject(name);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         int firstVersion = getLastPublishedVersion(projectId);
 
