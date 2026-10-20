@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.config;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
+import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback.TargetWorkflowManager;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
@@ -30,9 +31,12 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
+import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +47,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 class CopilotIntelligentToolContributorConfiguration {
+
+    private static final String IMPORTED_WORKFLOW_NAME = "Imported workflow";
 
     @Bean
     IntelligentToolContributor copilotIntelligentToolContributor(
@@ -66,9 +72,12 @@ class CopilotIntelligentToolContributorConfiguration {
         ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
         @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
 
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
+        TargetWorkflowManager targetWorkflowManager = getTargetWorkflowManager(
+            projectWorkflowLifecycleToolsProvider.getIfAvailable());
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
@@ -81,7 +90,9 @@ class CopilotIntelligentToolContributorConfiguration {
                 "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW, Set.of(IntelligentToolScope.PROJECT),
                 variant -> variant == IntelligentToolVariant.BUILD
                     ? converterBuildFactoryProvider.getIfAvailable() : null,
-                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver), false),
+                chatClientFactory -> new ConverterAgentToolCallback(
+                    chatClientFactory, chatModelResolver, targetWorkflowManager),
+                false),
             new SimpleIntelligentToolDefinition(
                 "configureClusterElement", CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT, Set.of(),
                 variant -> factoryForVariant(
@@ -102,6 +113,31 @@ class CopilotIntelligentToolContributorConfiguration {
                 chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static TargetWorkflowManager getTargetWorkflowManager(
+        @Nullable ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools) {
+
+        if (projectWorkflowLifecycleTools == null) {
+            return null;
+        }
+
+        return new TargetWorkflowManager() {
+
+            @Override
+            public String createWorkflow(long projectId, ToolContext toolContext) {
+                ProjectWorkflowInfo projectWorkflowInfo = projectWorkflowLifecycleTools.createProjectWorkflow(
+                    projectId, IMPORTED_WORKFLOW_NAME, null, toolContext);
+
+                return projectWorkflowInfo.workflowId();
+            }
+
+            @Override
+            public void deleteWorkflow(String workflowId, ToolContext toolContext) {
+                projectWorkflowLifecycleTools.deleteWorkflow(workflowId, toolContext);
+            }
+        };
     }
 
     @Nullable

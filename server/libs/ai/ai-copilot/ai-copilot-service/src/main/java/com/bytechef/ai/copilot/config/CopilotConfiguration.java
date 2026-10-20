@@ -137,6 +137,25 @@ public class CopilotConfiguration {
         returns all three ids.
         """;
 
+    private static final String CONVERTER_SUBAGENT_ADDENDUM = """
+
+        ## Target workflow
+
+        You are a one-shot subagent. Your caller gives you EITHER a `workflowId` (the workflow already exists) OR a
+        `projectId` (the workflow does not exist yet).
+
+        Build and validate the COMPLETE converted definition first, then persist it with ONE call:
+
+        - Given a `workflowId` (a leading `Target workflowId:` line counts) - `getWorkflow(workflowId)` for its
+          current `version`, then `updateWorkflow(workflowId, workflow, version)`.
+        - Given only a `projectId` - ONE `createProjectWorkflow(projectId, workflow)` call carrying the whole
+          definition. Never create an empty or placeholder workflow and fill it in afterwards.
+
+        If you are given both, the `workflowId` wins; never create a second workflow. You cannot create a PROJECT.
+        Given neither a `workflowId` nor a `projectId`, say so plainly and tell the caller to create or choose the
+        project first, then re-invoke you with its `projectId`.
+        """;
+
     private final Resource promptWorkflowEditorAskResource;
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
@@ -848,10 +867,14 @@ public class CopilotConfiguration {
         ScriptTools scriptTools) {
 
         return ChatClient.builder(chatModel)
-            .defaultSystem(converterBuildSystemPrompt)
+            .defaultSystem(converterSubAgentSystemPrompt())
             .defaultTools(
                 projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools)
             .build();
+    }
+
+    String converterSubAgentSystemPrompt() {
+        return converterBuildSystemPrompt + CONVERTER_SUBAGENT_ADDENDUM;
     }
 
     @Bean
