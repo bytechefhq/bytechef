@@ -149,7 +149,7 @@ type AnyDataType =
     | typeof LARGE_MULTI_SELECT_DATA
     | typeof LARGE_SINGLE_SELECT_DATA;
 
-const renderMessage = async (data: AnyDataType) => {
+const renderMessage = async (data: AnyDataType | (AnyDataType & {answerFormat: 'plain'})) => {
     const {default: AskUserQuestionMessage} = await import('../AskUserQuestionMessage');
 
     return render(
@@ -183,6 +183,29 @@ describe('AskUserQuestionMessage', () => {
         expect(appendCalls).toHaveLength(1);
         expect(appendCalls[0]).toMatchObject({
             content: [{text: 'User picked: slack', type: 'text'}],
+            role: 'user',
+        });
+    });
+
+    it('appends the bare label in plain answer mode', async () => {
+        await renderMessage({...SINGLE_SELECT_DATA, answerFormat: 'plain'});
+
+        await userEvent.click(screen.getByRole('button', {name: 'slack'}));
+
+        expect(appendCalls).toHaveLength(1);
+        expect(appendCalls[0]).toMatchObject({content: [{text: 'slack', type: 'text'}], role: 'user'});
+    });
+
+    it('appends one bare answer per line for several questions in plain answer mode', async () => {
+        await renderMessage({...WIZARD_DATA, answerFormat: 'plain'});
+
+        await userEvent.click(screen.getByRole('button', {name: '#general'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Good morning!'}));
+        await userEvent.click(screen.getByRole('button', {name: 'UTC'}));
+
+        expect(appendCalls).toHaveLength(1);
+        expect(appendCalls[0]).toMatchObject({
+            content: [{text: '#general\nGood morning!\nUTC', type: 'text'}],
             role: 'user',
         });
     });

@@ -1,3 +1,4 @@
+import {AiHubChatI, toChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
@@ -19,7 +20,8 @@ export interface AiHubChatLaunchersI {
  * server-side, point the AI Hub stores at it, and navigate.
  *
  * Shared by the home composer and the in-chat composer so the launcher is reachable from anywhere the picker is.
- * Every pick starts a new conversation and navigates away from the current one. A failed create leaves the current
+ * Every pick starts a new conversation and navigates away from the current one. The new chat goes into the cached
+ * active chats list first, so the chat view knows it is a workflow chat before the list refetches. A failed create leaves the current
  * chat in place; the global fetch interceptor already shows the error toast.
  */
 export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
@@ -66,14 +68,19 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
                 return;
             }
 
-            const chat = result.createWorkflowChatAiHubChat;
+            const chat = toChat(result.createWorkflowChatAiHubChat);
+
+            queryClient.setQueryData<AiHubChatI[]>(
+                AiHubChatsKeys.list(currentWorkspaceId, currentEnvironmentId, 'ACTIVE'),
+                (cachedChats) => [chat, ...(cachedChats ?? []).filter((cachedChat) => cachedChat.id !== chat.id)]
+            );
 
             aiHubStore.setState({
                 chatId: chat.threadId,
                 messages: [],
             });
 
-            aiHubChatsStore.getState().setCurrentChatId(Number(chat.id));
+            aiHubChatsStore.getState().setCurrentChatId(chat.id);
 
             queryClient.invalidateQueries({
                 queryKey: [...AiHubChatsKeys.all, 'list', currentWorkspaceId],

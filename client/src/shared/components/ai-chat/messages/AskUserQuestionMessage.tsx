@@ -13,6 +13,11 @@ export interface AskUserQuestionOptionDataI {
 }
 
 export interface AskUserQuestionDataI {
+    /**
+     * How the picked answers are sent: {@code 'plain'} sends the bare answer (one per line for several questions), for
+     * a reader that branches on the answer itself, such as a workflow. By default the message says what was picked.
+     */
+    answerFormat?: 'plain';
     awaitingAnswer?: boolean;
     kind: 'ask-user-question';
     questions: Array<{
@@ -76,7 +81,12 @@ const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionData
         }
 
         const summary = buildAnswerSummary(questions, nextAnswers);
-        const messageText = totalSteps === 1 ? `User picked: ${answer}` : `User picked:\n${summary}`;
+        const messageText =
+            data.answerFormat === 'plain'
+                ? buildPlainAnswer(questions, nextAnswers)
+                : totalSteps === 1
+                  ? `User picked: ${answer}`
+                  : `User picked:\n${summary}`;
 
         markAnswered(fingerprint, totalSteps === 1 ? answer : summary);
 
@@ -428,6 +438,10 @@ const AnsweredSummary = ({persistedAnswer}: {persistedAnswer?: string}) => {
 
 function buildAnswerSummary(questions: AskUserQuestionDataI['questions'], answers: Record<number, string>): string {
     return questions.map((question, index) => `- ${question.question} → ${answers[index] ?? ''}`).join('\n');
+}
+
+function buildPlainAnswer(questions: AskUserQuestionDataI['questions'], answers: Record<number, string>): string {
+    return questions.map((_question, index) => answers[index] ?? '').join('\n');
 }
 
 function fingerprintQuestions(questions: AskUserQuestionDataI['questions']): string {
