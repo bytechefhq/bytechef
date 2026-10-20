@@ -57,12 +57,15 @@ public class ProjectWorkflowLifecycleTools {
     }
 
     @Tool(
-        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
+        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description. Pass a query to return only the workflows whose name or description contains it.")
     public List<WorkflowInfo> listWorkflows(
         @ToolParam(description = "The ID of the project") long projectId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against workflow names and descriptions, case-insensitively. Omit it to list every workflow of the project.") @Nullable String query,
         ToolContext toolContext) {
 
-        return delegate.listWorkflows(projectId, toolContext);
+        return delegate.listWorkflows(projectId, query, toolContext);
     }
 
     @Tool(
