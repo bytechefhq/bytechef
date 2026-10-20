@@ -21,6 +21,7 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Service for managing data table row operations (CRUD and CSV import/export).
@@ -45,6 +46,20 @@ public interface DataTableRowService {
     boolean deleteRow(String baseName, long id, long environmentId);
 
     /**
+     * Deletes every row that satisfies the given conditions in one transaction, publishing a deleted event per row.
+     *
+     * @param baseName      the logical table base name
+     * @param conditions    OR groups of AND conditions, as in {@link #findRows}; at least one non-empty group is
+     *                      required
+     * @param environmentId the environment ID
+     * @return the deleted rows ordered by id
+     * @throws IllegalArgumentException if no non-empty condition group is given, a filter names an unknown column, has
+     *                                  a value that is not valid for the column type, or uses a text operation on a
+     *                                  non-text column
+     */
+    List<DataTableRow> deleteRows(String baseName, List<List<DataTableRowFilter>> conditions, long environmentId);
+
+    /**
      * Gets a single row by its id.
      *
      * @param baseName      the logical table base name
@@ -58,9 +73,11 @@ public interface DataTableRowService {
      * Inserts a row with provided values. Returns the created row including generated id.
      *
      * @param baseName      the logical table base name
-     * @param values        column name to value map
+     * @param values        column name to value map; an id key is ignored and a null or blank value leaves the column
+     *                      empty
      * @param environmentId the environment ID
      * @return the created row with generated id
+     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type
      */
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
 
@@ -82,14 +99,17 @@ public interface DataTableRowService {
      * @param conditions    OR groups of AND conditions: a row matches when it satisfies every filter of at least one
      *                      group; empty groups are ignored, and no groups match every row
      * @param sort          the sort order, or null to order by id ascending
-     * @param limit         maximum number of rows to return
-     * @param offset        number of rows to skip
+     * @param limit         maximum number of rows to return; must not be negative
+     * @param offset        number of rows to skip; must not be negative
      * @param environmentId the environment ID
      * @return list of matching rows with their data
+     * @throws IllegalArgumentException if limit or offset is negative, or a filter names an unknown column, has a value
+     *                                  that is not valid for the column type, or uses a text operation on a non-text
+     *                                  column
      */
     List<DataTableRow> findRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, DataTableRowSort sort, int limit, int offset,
-        long environmentId);
+        String baseName, List<List<DataTableRowFilter>> conditions, @Nullable DataTableRowSort sort, int limit,
+        int offset, long environmentId);
 
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
@@ -103,7 +123,8 @@ public interface DataTableRowService {
 
     /**
      * Imports CSV text into the table. The CSV must contain a header row with column names matching existing columns
-     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored.
+     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored. A cell that is not
+     * valid for its column type stops the import; rows before it stay imported.
      *
      * @param baseName      the logical table base name
      * @param csv           CSV text with header row
@@ -116,9 +137,28 @@ public interface DataTableRowService {
      *
      * @param baseName      the logical table base name
      * @param id            the row id
-     * @param values        column name to value map (only provided columns will be updated)
+     * @param values        column name to value map (only provided columns will be updated); an id key is ignored and a
+     *                      null or blank value clears the column
      * @param environmentId the environment ID
      * @return the updated row
+     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type
      */
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+
+    /**
+     * Updates every row that satisfies the given conditions in one transaction, publishing an updated event per row.
+     *
+     * @param baseName      the logical table base name
+     * @param conditions    OR groups of AND conditions, as in {@link #findRows}; at least one non-empty group is
+     *                      required
+     * @param values        column name to value map; at least one column is required, and values must not be null or
+     *                      blank
+     * @param environmentId the environment ID
+     * @return the updated rows ordered by id
+     * @throws IllegalArgumentException if no non-empty condition group or no column value is given, a filter is
+     *                                  invalid, or a value names id or an unknown column, is null or blank, or is not
+     *                                  valid for the column type
+     */
+    List<DataTableRow> updateRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, Map<String, Object> values, long environmentId);
 }

@@ -14,6 +14,7 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,7 +32,8 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
 
     @Override
     public List<DataTableRow> findRows(
-        String baseName, List<List<DataTableRowFilter>> conditions, DataTableRowSort sort, int limit, int offset,
+        String baseName, List<List<DataTableRowFilter>> conditions, @Nullable DataTableRowSort sort, int limit,
+        int offset,
         long environmentId) {
 
         throw new UnsupportedOperationException();
@@ -48,7 +50,21 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
     }
 
     @Override
+    public List<DataTableRow> updateRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, Map<String, Object> values, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean deleteRow(String baseName, long id, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> deleteRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
