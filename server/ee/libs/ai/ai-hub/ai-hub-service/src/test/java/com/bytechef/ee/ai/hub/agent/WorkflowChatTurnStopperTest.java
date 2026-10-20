@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.ai.hub.agent;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,6 +18,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.tenant.TenantContext;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,16 +32,22 @@ import org.junit.jupiter.api.Test;
 class WorkflowChatTurnStopperTest {
 
     private static final long CHAT_ID = 11L;
+    private static final String TURN_TENANT_ID = "acme";
 
     private JobFacade jobFacade;
-    private WorkflowChatJobRegistry jobRegistry;
     private WorkflowChatTurnStopper stopper;
 
     @BeforeEach
     void setUp() {
+        TenantContext.resetCurrentTenantId();
+
         jobFacade = mock(JobFacade.class);
-        jobRegistry = mock(WorkflowChatJobRegistry.class);
-        stopper = new WorkflowChatTurnStopper(CHAT_ID, jobRegistry, jobFacade);
+        stopper = new WorkflowChatTurnStopper(CHAT_ID, TURN_TENANT_ID, jobFacade);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TenantContext.resetCurrentTenantId();
     }
 
     @Test
@@ -48,7 +59,6 @@ class WorkflowChatTurnStopperTest {
         stopper.onJobId(77L);
 
         verify(jobFacade).stopJob(77L);
-        verify(jobRegistry).clear(CHAT_ID);
     }
 
     @Test
@@ -58,7 +68,6 @@ class WorkflowChatTurnStopperTest {
         stopper.onStopRequested();
 
         verify(jobFacade, times(1)).stopJob(77L);
-        verify(jobRegistry, times(1)).clear(CHAT_ID);
     }
 
     @Test
@@ -75,17 +84,17 @@ class WorkflowChatTurnStopperTest {
     void testJobIdWithoutStopDoesNothing() {
         stopper.onJobId(77L);
 
-        verifyNoInteractions(jobFacade, jobRegistry);
+        verifyNoInteractions(jobFacade);
     }
 
     @Test
     void testWithoutJobFacadeBothSignalsAreANoOp() {
-        WorkflowChatTurnStopper stopperWithoutJobFacade = new WorkflowChatTurnStopper(CHAT_ID, jobRegistry, null);
+        WorkflowChatTurnStopper stopperWithoutJobFacade = new WorkflowChatTurnStopper(CHAT_ID, TURN_TENANT_ID, null);
 
-        stopperWithoutJobFacade.onStopRequested();
-        stopperWithoutJobFacade.onJobId(77L);
-
-        verifyNoInteractions(jobRegistry);
+        assertThatNoException().isThrownBy(() -> {
+            stopperWithoutJobFacade.onStopRequested();
+            stopperWithoutJobFacade.onJobId(77L);
+        });
     }
 
     @Test
@@ -98,6 +107,25 @@ class WorkflowChatTurnStopperTest {
         assertThatNoException().isThrownBy(() -> stopper.onJobId(77L));
 
         verify(jobFacade).stopJob(77L);
-        verify(jobRegistry, never()).clear(CHAT_ID);
+    }
+
+    @Test
+    void testStopJobRunsUnderTheTurnsTenantAndRestoresTheCallersTenant() {
+        AtomicReference<String> stopJobTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            stopJobTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(jobFacade)
+            .stopJob(77L);
+
+        TenantContext.setCurrentTenantId("other");
+
+        stopper.onStopRequested();
+        stopper.onJobId(77L);
+
+        assertThat(stopJobTenantId.get()).isEqualTo(TURN_TENANT_ID);
+        assertThat(TenantContext.getCurrentTenantId()).isEqualTo("other");
     }
 }
