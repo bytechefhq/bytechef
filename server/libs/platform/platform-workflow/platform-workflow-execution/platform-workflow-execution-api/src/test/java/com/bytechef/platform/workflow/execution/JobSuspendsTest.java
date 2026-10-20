@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import java.util.Map;
@@ -28,6 +29,11 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 class JobSuspendsTest {
+
+    @Test
+    void testJobResumeIdKeyMatchesTheOneSuspendedJobsChecks() {
+        assertThat(MetadataConstants.JOB_RESUME_ID).isEqualTo(SuspendedJobs.JOB_RESUME_ID);
+    }
 
     @Test
     void testATaskExecutionWithAJobResumeIdIsSuspending() {

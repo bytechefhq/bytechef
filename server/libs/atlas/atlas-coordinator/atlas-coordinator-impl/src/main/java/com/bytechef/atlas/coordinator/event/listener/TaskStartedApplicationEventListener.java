@@ -24,6 +24,7 @@ import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.execution.service.JobService;
@@ -71,7 +72,7 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
 
             Job job = jobService.getTaskExecutionJob(taskExecutionId);
 
-            if (taskExecution.getStatus() == Status.CANCELLED || job.getStatus() != Job.Status.STARTED) {
+            if (taskExecution.getStatus() == Status.CANCELLED || !SuspendedJobs.canRunTasks(job)) {
                 taskDispatcher.dispatch(
                     new CancelControlTask(
                         Validate.notNull(taskExecution.getJobId(), "jobId"),

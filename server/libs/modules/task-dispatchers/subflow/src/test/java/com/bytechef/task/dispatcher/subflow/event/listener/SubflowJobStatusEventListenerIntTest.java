@@ -259,7 +259,8 @@ class SubflowJobStatusEventListenerIntTest {
                     new ControlTaskDispatcher(eventPublisher),
                     new DefaultTaskDispatcher(
                         eventPublisher,
-                        List.of(new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService, null)))));
+                        List.of(new SuspendTaskDispatcherPreSendProcessor(eventPublisher, jobService, taskStateService,
+                            null)))));
 
             JobExecutor jobExecutor = new JobExecutor(
                 contextService, SpelEvaluator.create(), eventPublisher, jobService, taskDispatcherChain,

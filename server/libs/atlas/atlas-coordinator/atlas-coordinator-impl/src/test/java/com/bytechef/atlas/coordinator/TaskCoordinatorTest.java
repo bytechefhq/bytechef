@@ -44,6 +44,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -284,6 +285,45 @@ class TaskCoordinatorTest {
         assertThat(job.getCurrentTask()).isEqualTo(1);
 
         verify(contextService).peek(4567L, Context.Classname.JOB);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUntargetedResumeOfASuspendedJobDispatchesTheTaskThatSuspendedIt() {
+        Job job = new Job();
+
+        job.setCurrentTask(0);
+        job.setId(4567L);
+        job.setMetadata(
+            Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id", SuspendedJobs.TASK_EXECUTION_RESUME_ID, 21L));
+        job.setStatus(Job.Status.STOPPED);
+        job.setWorkflowId("workflow1");
+
+        JobRepository jobRepository = mock(JobRepository.class);
+
+        when(jobRepository.findById(4567L))
+            .thenReturn(Optional.of(job));
+
+        TaskExecution suspendedTaskExecution = createTaskExecution(TaskExecution.Status.COMPLETED);
+
+        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+
+        when(taskExecutionService.getTaskExecution(21L))
+            .thenReturn(suspendedTaskExecution);
+
+        TaskDispatcher<? super Task> taskDispatcher = (TaskDispatcher<? super Task>) mock(TaskDispatcher.class);
+        JobExecutor jobExecutor = mock(JobExecutor.class);
+
+        TaskCoordinator resumingTaskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), mock(ApplicationEventPublisher.class), jobExecutor, new JobServiceImpl(jobRepository),
+            taskCompletionHandler, taskDispatcher, taskExecutionService);
+
+        resumingTaskCoordinator.onResumeJobEvent(new ResumeJobEvent(4567L));
+
+        verify(taskDispatcher).dispatch(suspendedTaskExecution);
+        verify(jobExecutor, never()).execute(any());
+
+        assertThat(job.getStatus()).isEqualTo(Job.Status.STARTED);
     }
 
     @Test

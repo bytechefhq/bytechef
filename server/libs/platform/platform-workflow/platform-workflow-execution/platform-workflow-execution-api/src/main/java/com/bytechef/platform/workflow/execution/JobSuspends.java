@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -47,8 +48,7 @@ public final class JobSuspends {
      * Tells whether a job is stopped on a suspend that waits for an approval decision.
      */
     public static boolean isAwaitingApproval(Job job) {
-        return job.getStatus() == Job.Status.STOPPED && job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null &&
-            isSuspendedForApproval(job);
+        return SuspendedJobs.isSuspended(job) && isSuspendedForApproval(job);
     }
 
     /**
@@ -64,8 +64,7 @@ public final class JobSuspends {
      * waiting for its result keep waiting instead of treating the suspend as the end of the run.
      */
     public static boolean isAwaitingSubflow(Job job) {
-        return job.getStatus() == Job.Status.STOPPED && job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null &&
-            isSuspendedForSubflow(job);
+        return SuspendedJobs.isSuspended(job) && isSuspendedForSubflow(job);
     }
 
     /**
