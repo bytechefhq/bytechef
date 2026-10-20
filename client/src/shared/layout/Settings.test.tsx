@@ -53,6 +53,7 @@ const aiNavGroup: SettingsNavItemI = {
 };
 
 const embeddedNavItems: SettingsNavItemI[] = [
+    {href: '/embedded/settings/members', title: 'Members'},
     {href: '/embedded/settings/signing-keys', title: 'Signing Keys'},
     {href: '/embedded/settings/api-keys', title: 'Embedded API Keys'},
 ];
@@ -102,6 +103,21 @@ describe('Settings', () => {
         renderSettings(embeddedNavItems);
 
         embeddedNavItems.forEach((navItem) => expect(screen.getByText(navItem.title)).toBeInTheDocument());
+    });
+
+    it('testMembersNeedEmbeddedView', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['API_KEY_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.queryByText('Members')).not.toBeInTheDocument();
+
+        hoisted.embeddedScopes = ['EMBEDDED_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.getByText('Members')).toBeInTheDocument();
     });
 
     it('testSigningKeysNeedEmbeddedSettingsManage', () => {
