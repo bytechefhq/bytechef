@@ -39,10 +39,8 @@ export default function useCreateDataTableDialog(): UseCreateDataTableDialogI {
     const createMutation = useCreateDataTableMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['dataTables']});
-            setOpen(false);
-            setBaseName('');
-            setColumns([{name: '', type: ColumnType.String}]);
-            setDescription('');
+
+            handleClose();
         },
     });
 
@@ -54,6 +52,9 @@ export default function useCreateDataTableDialog(): UseCreateDataTableDialogI {
 
     const handleClose = () => {
         setOpen(false);
+        setBaseName('');
+        setColumns([{name: '', type: ColumnType.String}]);
+        setDescription('');
     };
 
     const handleOpenChange = (open: boolean) => {
