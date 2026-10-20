@@ -90,6 +90,7 @@ import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation.QueryResult;
 import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.platform.component.util.SqlUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -114,6 +115,8 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  * @author Monika Kušter
  */
 public class JdbcComponentHandlerImpl implements ComponentHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(JdbcComponentHandlerImpl.class);
 
     private static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
@@ -309,8 +312,6 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     private final ExecuteJdbcOperation executeJdbcOperation;
     private final InsertJdbcOperation insertJdbcOperation;
     private final String jdbcDriverClassName;
-    private static final Logger logger = LoggerFactory.getLogger(JdbcComponentHandlerImpl.class);
-
     private final QueryJdbcOperation queryJdbcOperation;
     private final UpdateJdbcOperation updateJdbcOperation;
 
@@ -392,8 +393,8 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
             return OutputResponse.of(array().items(object().properties(columnProperties)), queryResult.rows());
         } catch (DataAccessException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Query output could not be resolved: {}", e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Query output could not be resolved: {}", e.getMessage());
             }
 
             return null;
@@ -421,6 +422,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
         return host != null && !host.isBlank() && database != null && !database.isBlank();
     }
 
+    @SuppressFBWarnings("ODR")
     static <T> T executeInReadOnlyTransaction(SingleConnectionDataSource dataSource, Supplier<T> supplier)
         throws SQLException {
 

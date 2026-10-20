@@ -36,6 +36,11 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
     }
 
     public record QueryResult(List<QueryColumn> columns, List<Map<String, Object>> rows) {
+
+        public QueryResult {
+            columns = List.copyOf(columns);
+            rows = List.copyOf(rows);
+        }
     }
 
     public QueryResult executeWithColumns(Map<String, ?> inputParameters, DataSource dataSource) {
