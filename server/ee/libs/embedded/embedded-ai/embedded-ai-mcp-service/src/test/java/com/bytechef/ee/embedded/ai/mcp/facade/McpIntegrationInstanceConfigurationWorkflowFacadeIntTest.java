@@ -180,6 +180,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         private static final int INTEGRATION_VERSION = 2;
 
+        @MockitoBean
+        private EmbeddedMcpReader embeddedMcpReader;
+
         @Autowired
         private Encryption encryption;
 
@@ -335,10 +338,10 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             "bytechef.edition=ee", "bytechef.audit.enabled=true"
         })
     @MockitoBean(types = {
-        IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
-        IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class,
-        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRows.class, McpServerService.class,
-        PermissionService.class,
+        EmbeddedMcpReader.class, IntegrationInstanceConfigurationService.class,
+        IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceWorkflowService.class,
+        IntegrationWorkflowService.class, McpIntegrationInstanceConfigurationService.class,
+        McpIntegrationInstanceRows.class, McpServerService.class, PermissionService.class,
         WorkflowService.class
     })
     class AuditIntTest {
@@ -348,6 +351,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID = 3L;
         private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID = 9L;
         private static final long MCP_SERVER_ID = 2L;
+
+        @Autowired
+        private EmbeddedMcpReader embeddedMcpReader;
 
         @Autowired
         private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -360,9 +366,6 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         @Autowired
         private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
-
-        @Autowired
-        private McpServerService mcpServerService;
 
         @MockitoBean
         private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
@@ -493,7 +496,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             McpServer mcpServer = mock(McpServer.class);
 
             when(mcpServer.getEnvironment()).thenReturn(Environment.DEVELOPMENT);
-            when(mcpServerService.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
+            when(embeddedMcpReader.getMcpServer(MCP_SERVER_ID)).thenReturn(mcpServer);
 
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 mock(IntegrationInstanceConfigurationWorkflow.class);
@@ -682,7 +685,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         @Configuration
         @EnableCaching
         @Import({
-            IntegrationInstanceConfigurationServiceImpl.class,
+            EmbeddedMcpReader.class, IntegrationInstanceConfigurationServiceImpl.class,
             IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
             IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
             IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,

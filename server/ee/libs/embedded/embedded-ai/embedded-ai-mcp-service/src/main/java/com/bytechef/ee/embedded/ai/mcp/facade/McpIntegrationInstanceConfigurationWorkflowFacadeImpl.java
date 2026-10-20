@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     implements McpIntegrationInstanceConfigurationWorkflowFacade {
 
+    private final EmbeddedMcpReader embeddedMcpReader;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
@@ -65,6 +66,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
 
     @SuppressFBWarnings("EI")
     McpIntegrationInstanceConfigurationWorkflowFacadeImpl(
+        EmbeddedMcpReader embeddedMcpReader,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
@@ -74,6 +76,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
         McpServerService mcpServerService, @Lazy PermissionService permissionService,
         WorkflowService workflowService) {
 
+        this.embeddedMcpReader = embeddedMcpReader;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
@@ -94,7 +97,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                 value = "#mcpIntegrationInstanceConfigurationWorkflowId")
         })
     @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationWorkflowId, " +
-        "'McpIntegrationInstanceConfigurationWorkflow', 'MCP_EDIT')")
+        "'McpIntegrationInstanceConfigurationWorkflow', 'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')")
     public void deleteMcpIntegrationInstanceConfigurationWorkflow(long mcpIntegrationInstanceConfigurationWorkflowId) {
         getMcpIntegrationInstanceConfigurationWorkflowOrThrow(mcpIntegrationInstanceConfigurationWorkflowId);
 
@@ -112,7 +115,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                 value = "#integrationInstanceConfigurationWorkflowId")
         })
     @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationId, 'McpIntegrationInstanceConfiguration', " +
-        "'MCP_EDIT')")
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfigurationWorkflow createMcpIntegrationInstanceConfigurationWorkflow(
         long mcpIntegrationInstanceConfigurationId, long integrationInstanceConfigurationWorkflowId) {
 
@@ -128,7 +131,8 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
         long id, @Nullable Long mcpIntegrationInstanceConfigurationId,
         @Nullable Long integrationInstanceConfigurationWorkflowId) {
@@ -152,7 +156,8 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowParameters(
         long id, Map<String, ?> parameters) {
 
@@ -169,7 +174,8 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                 value = "#result?.mcpIntegrationInstanceConfigurationId"),
             @AuditData(key = "enabled", value = "#enabled")
         })
-    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
         long id, boolean enabled) {
 
@@ -185,14 +191,15 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', 'MCP_VIEW')")
+    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfigurationWorkflow', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public McpIntegrationInstanceConfigurationWorkflow getMcpIntegrationInstanceConfigurationWorkflow(long id) {
         return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(id)
             .orElse(null);
     }
 
     @Override
-    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows() {
         Map<Long, Environment> environmentsByMcpServerId = new HashMap<>();
 
@@ -213,7 +220,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
             .stream()
             .filter(
                 mcpIntegrationInstanceConfigurationWorkflow -> permissionService.hasEmbeddedScope(
-                    "MCP_VIEW",
+                    "INTEGRATION_INSTANCE_CONFIGURATION_VIEW",
                     environmentsByMcpServerId.get(
                         mcpServerIdsByMcpIntegrationInstanceConfigurationId.get(
                             mcpIntegrationInstanceConfigurationWorkflow.getMcpIntegrationInstanceConfigurationId()))))
@@ -222,7 +229,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
 
     @Override
     @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationId, 'McpIntegrationInstanceConfiguration', " +
-        "'MCP_VIEW')")
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<McpIntegrationInstanceConfigurationWorkflow>
         getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
             long mcpIntegrationInstanceConfigurationId) {
@@ -303,7 +310,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                 .orElseThrow(() -> new IllegalArgumentException(
                     "McpIntegrationInstanceConfiguration not found: " + mcpIntegrationInstanceConfigurationId));
 
-        McpServer mcpServer = mcpServerService.getMcpServer(mcpIntegrationInstanceConfiguration.getMcpServerId());
+        McpServer mcpServer = embeddedMcpReader.getMcpServer(mcpIntegrationInstanceConfiguration.getMcpServerId());
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
