@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -20,6 +21,8 @@ public interface ApiCollectionEndpointService {
     ApiCollectionEndpoint create(ApiCollectionEndpoint apiCollectionEndpoint);
 
     void delete(long id);
+
+    Optional<ApiCollectionEndpoint> fetchApiCollectionEndpoint(long id);
 
     ApiCollectionEndpoint getOpenApiEndpoint(long id);
 
