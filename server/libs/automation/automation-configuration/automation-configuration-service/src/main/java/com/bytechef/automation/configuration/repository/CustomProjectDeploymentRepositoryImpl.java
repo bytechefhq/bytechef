@@ -29,7 +29,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
  */
 public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeploymentRepository {
 
-    private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
     private static final String API_COLLECTION_NAME_PREFIX = "__API_COLLECTION__";
 
     private final JdbcClient jdbcClient;
@@ -68,8 +67,7 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
                 "project_deployment.id"));
 
         conditions.add(
-            "(NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX) + " AND NOT " +
-                startsWith("project_deployment.name", A2A_SERVER_NAME_PREFIX) + ")");
+            "NOT " + startsWith("project_deployment.name", API_COLLECTION_NAME_PREFIX));
 
         if (embedded != null) {
             if (embedded) {

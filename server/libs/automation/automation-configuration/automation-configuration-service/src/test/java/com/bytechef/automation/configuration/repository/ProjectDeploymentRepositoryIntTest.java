@@ -79,9 +79,7 @@ public class ProjectDeploymentRepositoryIntTest {
         public void testSystemDeploymentPrefixesAreMatchedLiterally() {
             Project project = projectRepository.save(getProject("project"));
 
-            saveProjectDeployment("__A2A_SERVER__1_v1", project);
             saveProjectDeployment("__API_COLLECTION__1_v1", project);
-            saveProjectDeployment("xxA2A_SERVERyy", project);
             saveProjectDeployment("xxAPI_COLLECTIONyy", project);
 
             List<ProjectDeployment> projectDeployments = projectDeploymentRepository.findAllProjectDeployments(
@@ -89,7 +87,7 @@ public class ProjectDeploymentRepositoryIntTest {
 
             assertThat(projectDeployments)
                 .extracting(ProjectDeployment::getName)
-                .containsExactly("xxA2A_SERVERyy", "xxAPI_COLLECTIONyy");
+                .containsExactly("xxAPI_COLLECTIONyy");
         }
 
         @Test

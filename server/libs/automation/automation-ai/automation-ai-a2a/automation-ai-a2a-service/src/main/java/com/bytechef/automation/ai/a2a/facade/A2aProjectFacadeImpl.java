@@ -69,8 +69,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
-    private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
-
     private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
     private final A2aServerService a2aServerService;
@@ -135,7 +133,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectDeployment.setName(A2A_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
+        projectDeployment.setName(a2aServer.getName());
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(a2aServer.getEnvironment());
