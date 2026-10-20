@@ -34,6 +34,7 @@ import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.security.facade.ApiKeyFacadeImpl;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
+import com.bytechef.platform.security.service.OwnedApiKeyCreatorImpl;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -58,7 +59,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @Retention(RetentionPolicy.RUNTIME)
 @EnableMethodSecurity
 @Import({
-    ApiKeyFacadeImpl.class, ApiKeyServiceImpl.class,
+    ApiKeyFacadeImpl.class, ApiKeyServiceImpl.class, OwnedApiKeyCreatorImpl.class,
     PostgreSQLContainerConfiguration.class
 })
 @MockitoBean(types = {

@@ -20,6 +20,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.service.OwnedApiKeyCreator;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.user.domain.User;
@@ -56,11 +57,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     private final ApiKeyService apiKeyService;
+    private final OwnedApiKeyCreator ownedApiKeyCreator;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyFacadeImpl(ApiKeyService apiKeyService, UserService userService) {
+    public ApiKeyFacadeImpl(
+        ApiKeyService apiKeyService, OwnedApiKeyCreator ownedApiKeyCreator, UserService userService) {
+
         this.apiKeyService = apiKeyService;
+        this.ownedApiKeyCreator = ownedApiKeyCreator;
         this.userService = userService;
     }
 
@@ -79,14 +84,14 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
 
-        return saveOwnedApiKey(apiKey, type);
+        return ownedApiKeyCreator.create(apiKey, type);
     }
 
     @Override
     public ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
         checkPlatformUser();
 
-        return saveOwnedApiKey(apiKey, type);
+        return ownedApiKeyCreator.create(apiKey, type);
     }
 
     @Override
@@ -137,6 +142,10 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
         List<ApiKey> apiKeys = apiKeyService.getUserApiKeys(userId);
 
         for (ApiKey apiKey : apiKeys) {
+            if (apiKey.getType() == PlatformType.EMBEDDED) {
+                continue;
+            }
+
             apiKeyService.delete(apiKey.getId());
         }
     }
@@ -145,15 +154,6 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
         if (NonPlatformUserAuthentication.isCurrent()) {
             throw new AccessDeniedException("Only a platform user has platform API keys");
         }
-    }
-
-    private ApiKey saveOwnedApiKey(ApiKey apiKey, @Nullable PlatformType type) {
-        User user = userService.getCurrentUser();
-
-        apiKey.setType(type);
-        apiKey.setUserId(user.getId());
-
-        return apiKeyService.create(apiKey);
     }
 
     private List<ApiKey> filterOwned(List<ApiKey> apiKeys) {
