@@ -33,6 +33,7 @@ import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -90,7 +91,8 @@ class ConnectedUserSkippedChecksExpressionTest {
             mock(WorkspaceUserRepository.class), List.of(), List.of(),
             beanFactory.getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),
-            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class));
+            new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
 
         AutomationMethodSecurityExpressionHandler expressionHandler = new AutomationMethodSecurityExpressionHandler(
             permissionService, beanFactory.getBeanProvider(MethodSecurityExpressionContributor.class));
