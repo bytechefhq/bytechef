@@ -1,6 +1,6 @@
 import ConnectedUserMcpServerListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItem';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useConnectedUserMcpServersQuery} from '@/shared/middleware/graphql';
 
 const ConnectedUserSheetPanelMcpServerList = ({
@@ -10,13 +10,13 @@ const ConnectedUserSheetPanelMcpServerList = ({
     connectedUserId: number;
     connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
 }) => {
-    const isTenantAdmin = useIsTenantAdmin();
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
 
     const {data, isLoading} = useConnectedUserMcpServersQuery(
         {
             connectedUserId: connectedUserId.toString(),
         },
-        {enabled: isTenantAdmin}
+        {enabled: canViewMcpServers}
     );
 
     if (isLoading) {

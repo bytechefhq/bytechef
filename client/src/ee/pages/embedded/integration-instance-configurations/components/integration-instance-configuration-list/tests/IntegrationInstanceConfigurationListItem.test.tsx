@@ -5,6 +5,11 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
     useDeleteIntegrationInstanceConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableIntegrationInstanceConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),

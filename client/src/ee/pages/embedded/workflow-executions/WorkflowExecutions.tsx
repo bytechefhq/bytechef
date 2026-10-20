@@ -782,7 +782,7 @@ export const WorkflowExecutions = () => {
                 )}
             </PageLoader>
 
-            <AutomationWorkflowExecutionSheet />
+            <AutomationWorkflowExecutionSheet embedded />
 
             <EmbeddedWorkflowExecutionSheet />
         </LayoutContainer>

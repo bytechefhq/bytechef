@@ -12,11 +12,16 @@ import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflo
 import useWorkflowExecutionDetail from './hooks/useWorkflowExecutionDetail';
 
 interface WorkflowExecutionDetailProps {
+    embedded?: boolean;
     enabled?: boolean;
     workflowExecutionId: number;
 }
 
-const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
+const WorkflowExecutionDetail = ({
+    embedded = false,
+    enabled = true,
+    workflowExecutionId,
+}: WorkflowExecutionDetailProps) => {
     const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
 
     const {
@@ -62,6 +67,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             activeTab={activeTab}
                             deepestFailedExecution={deepestFailedExecution}
                             dialogOpen={dialogOpen}
+                            embedded={embedded}
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}
                             handleSeeExecutions={handleSeeExecutions}
                             handleTaskClick={handleTaskClick}

@@ -13,6 +13,7 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -24,6 +25,7 @@ interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
     deepestFailedExecution: {execution: TaskExecution | TriggerExecution; path: string[]} | null;
     dialogOpen: boolean;
+    embedded?: boolean;
     handleBreadcrumbNavigate: (index: number) => void;
     handleSeeExecutions: (childJob: Job) => void;
     handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
@@ -46,6 +48,7 @@ const WorkflowExecutionSheetContent = ({
     activeTab,
     deepestFailedExecution,
     dialogOpen,
+    embedded = false,
     handleBreadcrumbNavigate,
     handleSeeExecutions,
     handleTaskClick,
@@ -65,7 +68,10 @@ const WorkflowExecutionSheetContent = ({
 }: WorkflowExecutionSheetContentProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const canViewExecutionDetails = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasWorkspaceExecutionDetailsScope = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasEmbeddedExecutionDetailsScope = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
+
+    const canViewExecutionDetails = embedded ? hasEmbeddedExecutionDetailsScope : hasWorkspaceExecutionDetailsScope;
 
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 

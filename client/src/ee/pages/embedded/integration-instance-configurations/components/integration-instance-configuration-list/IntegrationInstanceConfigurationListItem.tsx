@@ -16,6 +16,7 @@ import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embed
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
@@ -46,6 +47,9 @@ const IntegrationInstanceConfigurationListItem = ({
     const workflowCount = integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.length ?? 0;
 
     const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
+
+    const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -177,6 +181,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                                 },
                                             })}
                                             id={integrationInstanceConfiguration.id!}
+                                            readOnly={!canEditConfiguration}
                                             remainingTags={remainingTags}
                                             tags={integrationInstanceConfiguration.tags}
                                             updateTagsMutation={updateIntegrationInstanceConfigurationTagsMutation}
@@ -206,7 +211,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
                                 <Switch
                                     checked={integrationInstanceConfiguration.enabled}
-                                    disabled={enableIntegrationInstanceConfigurationMutation.isPending}
+                                    disabled={
+                                        !canEditConfiguration ||
+                                        enableIntegrationInstanceConfigurationMutation.isPending
+                                    }
                                     onCheckedChange={handleOnCheckedChange}
                                 />
                             </div>
@@ -227,6 +235,8 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
+                            canDelete={canDeleteConfiguration}
+                            canEdit={canEditConfiguration}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
                             onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}

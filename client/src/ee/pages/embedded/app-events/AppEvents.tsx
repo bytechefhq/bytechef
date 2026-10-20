@@ -5,6 +5,7 @@ import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDi
 import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList';
 import AppEventsFilterTitle from '@/ee/pages/embedded/app-events/components/AppEventsFilterTitle';
 import {useGetAppEventsQuery} from '@/ee/shared/queries/embedded/appEvents.queries';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -14,7 +15,11 @@ import {ZapIcon} from 'lucide-react';
 const AppEvents = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
+    const canCreateAppEventScope = useHasEmbeddedScope('APP_EVENT_CREATE', UNION_ENVIRONMENT_ID);
+
     const {data: appEvents, error: appEventsError, isLoading: appEventsIsLoading} = useGetAppEventsQuery();
+
+    const canCreateAppEvent = canCreateAppEventScope && !currentEnvironmentId;
 
     return (
         <PageLoader errors={[appEventsError]} loading={appEventsIsLoading}>
@@ -26,11 +31,10 @@ const AppEvents = () => {
                             centerTitle={true}
                             position="main"
                             right={
+                                canCreateAppEvent &&
                                 appEvents &&
                                 appEvents.length > 0 && (
-                                    <AppEventDialog
-                                        triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
-                                    />
+                                    <AppEventDialog triggerNode={<Button label="New App Event" />} />
                                 )
                             }
                             title={<AppEventsFilterTitle filterData={{}} workflows={[]} />}
@@ -59,13 +63,13 @@ const AppEvents = () => {
                     <AppEventList appEvents={appEvents} />
                 ) : (
                     <EmptyList
-                        button={
-                            <AppEventDialog
-                                triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
-                            />
-                        }
+                        button={canCreateAppEvent && <AppEventDialog triggerNode={<Button label="New App Event" />} />}
                         icon={<ZapIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new app event."
+                        message={
+                            canCreateAppEvent
+                                ? 'Get started by creating a new app event.'
+                                : 'There are no app events yet.'
+                        }
                         title="No App Events"
                     />
                 )}

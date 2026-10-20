@@ -19,6 +19,7 @@ import {
     useGetIntegrationInstanceQuery,
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -48,6 +49,9 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const queryClient = useQueryClient();
 
@@ -144,7 +148,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
                                     <Switch
                                         checked={connectedUserIntegrationInstance.enabled}
-                                        disabled={!integrationInstance?.integrationInstanceConfiguration?.enabled}
+                                        disabled={
+                                            !canManageConnectedUser ||
+                                            !integrationInstance?.integrationInstanceConfiguration?.enabled
+                                        }
                                         onCheckedChange={(value) => {
                                             enableIntegrationInstanceMutation.mutate({
                                                 enable: value,
@@ -170,7 +177,9 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                        {canDeleteConnectedUser && (
+                            <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                        )}
                     </div>
                 </div>
             )}
