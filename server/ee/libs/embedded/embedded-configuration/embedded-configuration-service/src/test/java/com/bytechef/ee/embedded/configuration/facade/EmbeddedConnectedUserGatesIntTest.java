@@ -26,6 +26,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
@@ -70,6 +71,7 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
@@ -140,6 +142,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -250,11 +253,15 @@ class EmbeddedConnectedUserGatesIntTest {
     private IntegrationService integrationService;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private PermissionService permissionService;
 
     private ConnectedUser developmentConnectedUser;
     private String externalUserId;
     private ConnectedUser productionConnectedUser;
+    private Long referenceProjectId;
 
     @BeforeEach
     void beforeEach() {
@@ -325,6 +332,15 @@ class EmbeddedConnectedUserGatesIntTest {
         }
 
         permissionService.evictAllEmbeddedScopeCache();
+
+        jdbcTemplate.update("DELETE FROM connected_user_project_workflow");
+        jdbcTemplate.update("DELETE FROM connected_user_project");
+
+        if (referenceProjectId != null) {
+            jdbcTemplate.update("DELETE FROM project WHERE id = ?", referenceProjectId);
+
+            referenceProjectId = null;
+        }
 
         connectedUserConnectionRepository.deleteAll();
         integrationInstanceRepository.deleteAll();
@@ -617,6 +633,49 @@ class EmbeddedConnectedUserGatesIntTest {
 
         assertThat(connectedUserService.fetchConnectedUser(productionConnectedUserId)).isPresent();
         assertThat(integrationInstanceRepository.findById(instanceId)).isPresent();
+    }
+
+    @Test
+    void testWorkflowReferencesShowOnlyConnectedUsersOfViewableEnvironments() {
+        String automationWorkflowUuid = UUID.randomUUID()
+            .toString();
+
+        referenceProjectId = jdbcTemplate.queryForObject(
+            "INSERT INTO project (name, workspace_id, uuid, created_date, created_by, last_modified_date, "
+                + "last_modified_by, version) VALUES (?, ?, gen_random_uuid(), now(), 'system', now(), 'system', 0) "
+                + "RETURNING id",
+            Long.class, "reference-" + automationWorkflowUuid, Workspace.DEFAULT_WORKSPACE_ID);
+
+        for (ConnectedUser connectedUser : List.of(productionConnectedUser, developmentConnectedUser)) {
+            Long connectedUserProjectId = jdbcTemplate.queryForObject(
+                "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (?, ?) RETURNING id",
+                Long.class, connectedUser.getId(), referenceProjectId);
+
+            jdbcTemplate.update(
+                "INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_workflow_uuid) "
+                    + "VALUES (?, ?)",
+                connectedUserProjectId, automationWorkflowUuid);
+        }
+
+        Set<String> automationWorkflowUuids = Set.of(automationWorkflowUuid);
+
+        authenticate(VIEWER_IN_PRODUCTION, false);
+
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
+            .extracting(ConnectedUserWorkflowReferenceDTO::environment)
+            .containsExactly(Environment.PRODUCTION.name());
+
+        authenticate(EDITOR_IN_DEVELOPMENT, false);
+
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
+            .extracting(ConnectedUserWorkflowReferenceDTO::environment)
+            .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
+
+        authenticate(TENANT_ADMIN, true);
+
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
+            .extracting(ConnectedUserWorkflowReferenceDTO::environment)
+            .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
     }
 
     @Test
