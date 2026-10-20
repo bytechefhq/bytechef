@@ -46,12 +46,16 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.automation.workflow.execution.security.JobOwnershipResolver;
@@ -79,7 +83,6 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -178,6 +181,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -325,6 +329,12 @@ class EmbeddedGatesIntTest {
     private McpServerService mcpServerService;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private McpToolRepository mcpToolRepository;
 
     @Autowired
@@ -363,6 +373,10 @@ class EmbeddedGatesIntTest {
 
     @BeforeEach
     void beforeEach() {
+        when(projectService.fetchProject(anyLong()))
+            .thenAnswer(invocation -> projectRepository.findById(invocation.getArgument(0)));
+        when(projectService.fetchWorkflowProject(anyString()))
+            .thenAnswer(invocation -> projectRepository.findByWorkflowId(invocation.getArgument(0)));
         when(environmentService.getEnvironment(anyLong()))
             .thenAnswer(invocation -> Environment.values()[((Long) invocation.getArgument(0)).intValue()]);
         when(componentDefinitionService.getComponentDefinition(anyString(), any()))
@@ -786,10 +800,10 @@ class EmbeddedGatesIntTest {
 
             when(automationServer.getType()).thenReturn(PlatformType.AUTOMATION);
 
-            McpServerRepository mcpServerRepository = applicationContext.getBean(McpServerRepository.class);
+            McpServerService chainedMcpServerService = applicationContext.getBean(McpServerService.class);
 
-            when(mcpServerRepository.findById(1L)).thenReturn(Optional.of(embeddedServer));
-            when(mcpServerRepository.findById(2L)).thenReturn(Optional.of(automationServer));
+            when(chainedMcpServerService.fetchMcpServer(1L)).thenReturn(Optional.of(embeddedServer));
+            when(chainedMcpServerService.fetchMcpServer(2L)).thenReturn(Optional.of(automationServer));
 
             WorkspaceMcpServerService workspaceMcpServerService = applicationContext.getBean(
                 WorkspaceMcpServerService.class);
@@ -915,6 +929,13 @@ class EmbeddedGatesIntTest {
     static class ChainedResolversConfiguration {
 
         @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
+
+        @Bean
         ApiKeyService apiKeyService() {
             return mock(ApiKeyService.class);
         }
@@ -945,6 +966,11 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
+        UserService userService() {
+            return mock(UserService.class);
+        }
+
+        @Bean
         EmbeddedResourceResolver embeddedResourceResolver() {
             return mock(EmbeddedResourceResolver.class);
         }
@@ -970,8 +996,8 @@ class EmbeddedGatesIntTest {
         }
 
         @Bean
-        McpServerRepository mcpServerRepository() {
-            return mock(McpServerRepository.class);
+        McpServerService mcpServerService() {
+            return mock(McpServerService.class);
         }
 
         @Bean
@@ -1007,11 +1033,6 @@ class EmbeddedGatesIntTest {
         @Bean
         TriggerExecutionService triggerExecutionService() {
             return mock(TriggerExecutionService.class);
-        }
-
-        @Bean
-        UserService userService() {
-            return mock(UserService.class);
         }
 
         @Bean
@@ -1069,7 +1090,7 @@ class EmbeddedGatesIntTest {
         ApiKeyOwnershipResolver.class, ApiKeyPermissionScopeProvider.class, ApiKeyServiceImpl.class,
         ApiPlatformPermissionScopeProvider.class, AppEventPermissionScopeProvider.class,
         ConnectedUserPermissionScopeProvider.class, ConnectionPermissionScopeProvider.class,
-        CurrentUserResolver.class, CustomRoleScopeResolverImpl.class, DataTablePermissionScopeProvider.class,
+        CurrentUserResolverImpl.class, CustomRoleScopeResolverImpl.class, DataTablePermissionScopeProvider.class,
         DeploymentPermissionScopeProvider.class, EmbeddedApiKeyFacadeImpl.class,
         EmbeddedApiKeyOwnershipResolver.class, EmbeddedJobEnvironmentResolver.class, EmbeddedJobOwnershipResolver.class,
         EmbeddedPermissionScopeProvider.class, EmbeddedPrincipalEnvironmentResolver.class,
@@ -1083,6 +1104,13 @@ class EmbeddedGatesIntTest {
         WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
+
+        @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
 
         @Bean
         UserService userService() {

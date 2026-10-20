@@ -42,6 +42,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -205,6 +206,13 @@ class WorkspaceConnectionFacadeTest {
 
     @Test
     void testDeletingAConnectionDeletesItsGrants() {
+        Connection connection = new Connection();
+
+        connection.setId(CONNECTION_ID);
+        connection.setType(PlatformType.AUTOMATION);
+
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
         workspaceConnectionFacade.delete(CONNECTION_ID);
 
         // resource_id is polymorphic with no foreign key, so a grant left behind would attach to whatever later

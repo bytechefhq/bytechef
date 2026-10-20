@@ -42,8 +42,8 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -1773,8 +1773,11 @@ class PermissionServiceIntTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
-            workspaceUserRepository, List.of(resolver("Project", ResourceOwner.ofWorkspace(workspaceId))), List.of(),
-            permissiveResolver(), List.of(),
+            workspaceUserRepository,
+            List.of(
+                new ProjectOwnershipResolver(
+                    beanFactory.getBeanProvider(EmbeddedResourceResolver.class), projectRepository, userService)),
+            List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),

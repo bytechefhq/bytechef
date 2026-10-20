@@ -20,13 +20,14 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -53,12 +54,12 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -159,7 +160,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class, JobFacade.class,
     JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRowFacade.class,
+    McpAutomationRowFacade.class, McpIntegrationInstanceConfigurationWorkflowService.class,
+    McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class, McpServerService.class,
     McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
@@ -482,7 +484,7 @@ class EmbeddedHubGatesIntTest {
     @Import({
         ApiKeyPermissionScopeProvider.class, ApiPlatformPermissionScopeProvider.class,
         AppEventPermissionScopeProvider.class, ConnectedUserPermissionScopeProvider.class,
-        ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, CustomRoleScopeResolverImpl.class,
+        ConnectionPermissionScopeProvider.class, CurrentUserResolverImpl.class, CustomRoleScopeResolverImpl.class,
         DataTablePermissionScopeProvider.class, DeploymentPermissionScopeProvider.class,
         EmbeddedPermissionScopeProvider.class, EmbeddedScopeCacheService.class,
         EmbeddedSharedPermissionScopeProvider.class, ExecutionPermissionScopeProvider.class,
@@ -529,7 +531,7 @@ class EmbeddedHubGatesIntTest {
         @Primary
         PermissionServiceImpl realPermissionService(
             CurrentUserResolver currentUserResolver, PermissionScopeRegistry permissionScopeRegistry,
-            ProjectRepository projectRepository,
+            ProjectService projectService,
             WorkspaceScopeCache workspaceScopeCache,
             WorkspaceUserRepository workspaceUserRepository,
             List<ResourceOwnershipResolver> ownershipResolvers,
@@ -540,12 +542,13 @@ class EmbeddedHubGatesIntTest {
             ObjectProvider<ConnectionService> connectionServiceProvider) {
 
             return new PermissionServiceImpl(
-                currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
+                currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
                 workspaceUserRepository, ownershipResolvers, List.of(),
                 (resourceType, workspaceId, candidates) -> candidates.stream()
                     .map(VisibilityRecord::id)
                     .collect(Collectors.toSet()),
-                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService, embeddedUserRepository, embeddedResourceResolverProvider,
+                environmentResolvers, connectedUserAccessDeciderProvider, embeddedScopeCacheService,
+                embeddedUserRepository, embeddedResourceResolverProvider,
                 connectionServiceProvider);
         }
     }

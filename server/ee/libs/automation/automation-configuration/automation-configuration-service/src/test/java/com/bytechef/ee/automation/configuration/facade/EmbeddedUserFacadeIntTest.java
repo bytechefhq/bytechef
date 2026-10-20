@@ -16,8 +16,13 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ProjectServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -39,13 +44,13 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.EmbeddedUserServiceImpl;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
@@ -53,6 +58,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -232,7 +238,7 @@ class EmbeddedUserFacadeIntTest {
     @Import({
         ApiKeyPermissionScopeProvider.class, ApiPlatformPermissionScopeProvider.class,
         AppEventPermissionScopeProvider.class, ConnectedUserPermissionScopeProvider.class,
-        ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, CustomRoleScopeResolverImpl.class,
+        ConnectionPermissionScopeProvider.class, CurrentUserResolverImpl.class, CustomRoleScopeResolverImpl.class,
         DataTablePermissionScopeProvider.class, DeploymentPermissionScopeProvider.class,
         EmbeddedPermissionScopeProvider.class, EmbeddedScopeCacheService.class,
         EmbeddedSharedPermissionScopeProvider.class, EmbeddedUserFacadeImpl.class, EmbeddedUserServiceImpl.class,
@@ -241,10 +247,19 @@ class EmbeddedUserFacadeIntTest {
         McpPermissionScopeProvider.class, PermissionScopeRegistry.class, PermissionServiceImpl.class,
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
+        ProjectServiceImpl.class,
+        ProjectVisibilityPolicy.class, ResourceVisibilityConfiguration.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
         WorkspaceScopeCache.class
     })
     static class RealEmbeddedUserFacadeConfiguration {
+
+        @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
 
         @Bean
         CacheManager cacheManager() {
