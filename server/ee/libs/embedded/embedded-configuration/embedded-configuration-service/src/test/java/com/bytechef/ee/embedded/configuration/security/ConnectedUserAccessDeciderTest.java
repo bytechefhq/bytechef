@@ -144,6 +144,30 @@ class ConnectedUserAccessDeciderTest {
     }
 
     @Test
+    void testTwoResolversForOneTypeDoNotBreakTheConnectedUserDecider() {
+        ResourceOwnershipResolver firstJobResolver = resolver("Job");
+        ResourceOwnershipResolver secondJobResolver = resolver("Job");
+        ResourceEnvironmentResolver firstDeploymentEnvironmentResolver = environmentResolver("ProjectDeployment");
+        ResourceEnvironmentResolver secondDeploymentEnvironmentResolver = environmentResolver("ProjectDeployment");
+
+        ConnectedUserAccessDeciderImpl chainedDecider = new ConnectedUserAccessDeciderImpl(
+            automationWorkflowProjectFacade, connectedUserConnectionService, connectedUserProjectService,
+            integrationInstanceService, projectService, projectWorkflowService,
+            List.of(firstDeploymentEnvironmentResolver, secondDeploymentEnvironmentResolver),
+            List.of(firstJobResolver, secondJobResolver, projectDeploymentResolver));
+
+        when(firstJobResolver.resolveProjectId(9L)).thenReturn(OptionalLong.empty());
+        when(secondJobResolver.resolveProjectId(9L)).thenReturn(OptionalLong.of(OWN_PROJECT_ID));
+        when(projectDeploymentResolver.resolveProjectId(5L)).thenReturn(OptionalLong.of(OWN_PROJECT_ID));
+        when(firstDeploymentEnvironmentResolver.fetchEnvironment(5L)).thenReturn(Optional.empty());
+        when(secondDeploymentEnvironmentResolver.fetchEnvironment(5L))
+            .thenReturn(Optional.of(Environment.PRODUCTION));
+
+        assertThat(chainedDecider.decide(9L, "Job", "EXECUTION_VIEW")).isEqualTo(Decision.GRANT);
+        assertThat(chainedDecider.decide(5L, "ProjectDeployment", "DEPLOYMENT_VIEW")).isEqualTo(Decision.GRANT);
+    }
+
+    @Test
     void testOwnProjectDeploymentInAnotherEnvironmentIsDenied() {
         when(projectDeploymentResolver.resolveProjectId(5L)).thenReturn(OptionalLong.of(OWN_PROJECT_ID));
         when(projectDeploymentEnvironmentResolver.fetchEnvironment(5L))

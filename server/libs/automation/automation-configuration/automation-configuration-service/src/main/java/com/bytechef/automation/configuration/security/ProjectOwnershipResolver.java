@@ -57,7 +57,7 @@ public class ProjectOwnershipResolver implements ResourceOwnershipResolver {
         EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
 
         if (embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(id)) {
-            return ResourceOwner.ofEmbedded();
+            return ResourceOwner.ofEmbeddedProject();
         }
 
         return fetchProject(id)
