@@ -52,6 +52,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
+import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.automation.workflow.execution.security.JobOwnershipResolver;
 import com.bytechef.automation.workflow.execution.security.TriggerExecutionOwnershipResolver;
 import com.bytechef.component.definition.ComponentDsl;
@@ -165,11 +167,13 @@ import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidator;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -228,11 +232,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     TaskExecutionService.class, TaskFileStorage.class, TriggerDefinitionFacade.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerFileStorage.class, TriggerLifecycleFacade.class,
     WebhookTriggerTestFacade.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
-    WorkflowNodeTestOutputService.class, WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class
+    WorkflowExecutionRowService.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationFacade.class,
+    WorkflowTestConfigurationService.class
 })
 class EmbeddedGatesIntTest {
 
     private static final String AUTOMATION_EDITOR = "automation-editor";
+    private static final String AUTOMATION_VIEWER = "automation-viewer";
     private static final String DEFINITION = """
         {"label":"Sync contacts","inputs":[],"triggers":[],"tasks":[]}
         """;
@@ -242,7 +248,7 @@ class EmbeddedGatesIntTest {
     private static final String TENANT_ADMIN = "tenant-admin";
     private static final Map<String, Long> USER_IDS_BY_LOGIN = Map.of(
         TENANT_ADMIN, 9900L, EMBEDDED_VIEWER, 9901L, DEVELOPMENT_EDITOR, 9902L, PRODUCTION_ADMIN, 9903L,
-        AUTOMATION_EDITOR, 9904L);
+        AUTOMATION_EDITOR, 9904L, AUTOMATION_VIEWER, 9905L);
 
     @Autowired
     private AutomationWorkflowProjectAdminFacade automationWorkflowProjectAdminFacade;
@@ -329,6 +335,9 @@ class EmbeddedGatesIntTest {
     private PrincipalJobService principalJobService;
 
     @Autowired
+    private ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade;
+
+    @Autowired
     private TagService tagService;
 
     @Autowired
@@ -375,6 +384,9 @@ class EmbeddedGatesIntTest {
 
         workspaceUserRepository.save(
             WorkspaceUser.forRole(userId(AUTOMATION_EDITOR), Workspace.DEFAULT_WORKSPACE_ID, WorkspaceRole.EDITOR,
+                null));
+        workspaceUserRepository.save(
+            WorkspaceUser.forRole(userId(AUTOMATION_VIEWER), Workspace.DEFAULT_WORKSPACE_ID, WorkspaceRole.VIEWER,
                 null));
 
         permissionService.evictAllEmbeddedScopeCache();
@@ -695,6 +707,39 @@ class EmbeddedGatesIntTest {
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> automationWorkflowProjectAdminFacade.getProjects())
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testAWorkspaceViewerCannotListAConnectedUsersRuns() {
+        authenticate(AUTOMATION_VIEWER, false);
+
+        long productionEnvironmentId = Environment.PRODUCTION.ordinal();
+
+        assertThat(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            false, productionEnvironmentId, null, null, null, null, null, null, null, null,
+            Workspace.DEFAULT_WORKSPACE_ID, 0)
+            .getContent()).isEmpty();
+
+        for (Boolean embedded : Arrays.asList(false, true, null)) {
+            assertThatThrownBy(() -> projectWorkflowExecutionFacade.getWorkflowExecutions(
+                embedded, productionEnvironmentId, null, null, null, null, null, connectedUser.getId(), null, null,
+                Workspace.DEFAULT_WORKSPACE_ID, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+    }
+
+    @Test
+    void testAnEmbeddedViewerListsAConnectedUsersRunsInTheirEnvironment() {
+        authenticate(EMBEDDED_VIEWER, false);
+
+        long productionEnvironmentId = Environment.PRODUCTION.ordinal();
+
+        for (Boolean embedded : Arrays.asList(false, true, null)) {
+            assertThat(projectWorkflowExecutionFacade.getWorkflowExecutions(
+                embedded, productionEnvironmentId, null, null, null, null, null, connectedUser.getId(), null, null,
+                Workspace.DEFAULT_WORKSPACE_ID, 0)
+                .getContent()).isEmpty();
+        }
     }
 
     @Test
@@ -1029,7 +1074,8 @@ class EmbeddedGatesIntTest {
         IntegrationPermissionScopeProvider.class, IntegrationWorkflowExecutionFacadeImpl.class,
         KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, OwnedApiKeyCreatorImpl.class,
         PermissionScopeRegistry.class, PermissionServiceImpl.class, ProjectOwnershipResolver.class,
-        ProjectPermissionScopeProvider.class, WorkflowPermissionScopeProvider.class,
+        ProjectPermissionScopeProvider.class, ProjectWorkflowExecutionFacadeImpl.class,
+        WorkflowPermissionScopeProvider.class,
         WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
     })
     static class RealPermissionConfiguration {
