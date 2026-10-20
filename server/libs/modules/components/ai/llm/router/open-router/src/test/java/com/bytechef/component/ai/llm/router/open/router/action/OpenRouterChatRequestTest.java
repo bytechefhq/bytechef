@@ -38,6 +38,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
@@ -73,7 +74,7 @@ class OpenRouterChatRequestTest {
                     }],
                     "response_format": {"type": "text"}
                 }
-                """.formatted(modelId), JsonCompareMode.STRICT))
+                """.replace("%s", modelId), JsonCompareMode.STRICT))
             .andRespond(withSuccess("""
                 {"choices": [{"message": {"content": "Test response"}}]}
                 """, MediaType.APPLICATION_JSON));
@@ -85,13 +86,14 @@ class OpenRouterChatRequestTest {
             ChatModel chatModel = OpenRouterChatAction.CHAT_MODEL.createChatModel(parameters, connection, false);
             UserMessage message = UserMessage.builder()
                 .text("Describe this image")
-                .media(List.of(new Media(MediaType.IMAGE_PNG, new byte[] {
+                .media(List.of(new Media(MediaType.IMAGE_PNG, new ByteArrayResource(new byte[] {
                     1, 2, 3
-                })))
+                }))))
                 .build();
 
             assertEquals("Test response", chatModel.call(new Prompt(message))
-                .getResult()
+                .getResults()
+                .getFirst()
                 .getOutput()
                 .getText());
         }

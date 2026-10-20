@@ -60,10 +60,12 @@ class NanoGptUtilsTest {
 
         assertEquals(List.of(
             option("other/first - $0/$0 per 1M tokens", "other/first", "Gateway description"),
-            option("minimax/minimax-m3.1-flash - $4/$0 per 1M tokens", "minimax/minimax-m3.1-flash", "Gateway description"),
+            option("minimax/minimax-m3.1-flash - $4/$0 per 1M tokens", "minimax/minimax-m3.1-flash",
+                "Gateway description"),
             option("minimax/minimax-m3 - $2/$0 per 1M tokens", "minimax/minimax-m3", "Gateway description"),
             option("other/second - $3/$0 per 1M tokens", "other/second", "Gateway description")),
-            NanoGptUtils.getNanoGptChatModels().apply(parameters, parameters, Map.of(), "", mockedContext));
+            NanoGptUtils.getNanoGptChatModels()
+                .apply(parameters, parameters, Map.of(), "", mockedContext));
         verify(mockedExecutor).queryParameter("detailed", "true");
     }
 
@@ -73,7 +75,8 @@ class NanoGptUtilsTest {
 
         assertEquals(List.of(
             option("minimax/minimax-m3 - $1/$0 per 1M tokens", "minimax/minimax-m3", "Gateway description")),
-            NanoGptUtils.getNanoGptChatModels().apply(parameters, parameters, Map.of(), "", mockedContext));
+            NanoGptUtils.getNanoGptChatModels()
+                .apply(parameters, parameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -102,7 +105,8 @@ class NanoGptUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class))).thenAnswer(invocation -> {
             TypeReference<?> typeReference = invocation.getArgument(0);
 
-            return objectMapper.convertValue(Map.of("data", models), objectMapper.constructType(typeReference.getType()));
+            return objectMapper.convertValue(Map.of("data", models),
+                objectMapper.constructType(typeReference.getType()));
         });
     }
 }

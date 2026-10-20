@@ -107,7 +107,8 @@ class OpenRouterUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class))).thenAnswer(invocation -> {
             TypeReference<?> typeReference = invocation.getArgument(0);
 
-            return objectMapper.convertValue(Map.of("data", models), objectMapper.constructType(typeReference.getType()));
+            return objectMapper.convertValue(Map.of("data", models),
+                objectMapper.constructType(typeReference.getType()));
         });
     }
 }

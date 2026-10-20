@@ -99,7 +99,8 @@ public class OpenRouterUtils {
         boolean miniMaxAdded = false;
 
         for (OpenRouterModel model : models) {
-            if (model.id().startsWith("minimax/")) {
+            if (model.id()
+                .startsWith("minimax/")) {
                 if (!miniMaxAdded) {
                     textModels.addAll(miniMaxModels);
                     miniMaxAdded = true;

@@ -143,8 +143,13 @@ public class NanoGptUtils {
         boolean miniMaxAdded = false;
 
         for (NanoGptModel model : models) {
-            if (model.id().startsWith("minimax/") || model.id().startsWith("MiniMaxAI/") ||
-                model.id().startsWith("MiniMax-")) {
+            if (model.id()
+                .startsWith("minimax/")
+                || model.id()
+                    .startsWith("MiniMaxAI/")
+                ||
+                model.id()
+                    .startsWith("MiniMax-")) {
                 if (!miniMaxAdded) {
                     textModels.addAll(miniMaxModels);
                     miniMaxAdded = true;
