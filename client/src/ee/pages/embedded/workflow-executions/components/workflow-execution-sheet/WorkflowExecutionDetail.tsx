@@ -35,7 +35,7 @@ interface WorkflowExecutionDetailProps {
 
 const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => (
     <WorkflowExecutionDetailQueriesProvider value={embeddedWorkflowExecutionDetailQueries}>
-        <AutomationExecutionDetail enabled={enabled} workflowExecutionId={workflowExecutionId} />
+        <AutomationExecutionDetail embedded enabled={enabled} workflowExecutionId={workflowExecutionId} />
     </WorkflowExecutionDetailQueriesProvider>
 );
 

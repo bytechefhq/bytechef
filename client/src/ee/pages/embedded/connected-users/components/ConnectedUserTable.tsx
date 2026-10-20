@@ -15,6 +15,7 @@ import {ConnectedUser, CredentialStatus} from '@/ee/shared/middleware/embedded/c
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, rowSelectionFeature, tableFeatures, useTable} from '@tanstack/react-table';
 import {EllipsisVerticalIcon, EyeIcon, PowerIcon, PowerOffIcon, Trash2Icon} from 'lucide-react';
@@ -43,6 +44,9 @@ const ConnectedUserTable = ({connectedUsers, onSelectionChange, selectedConnecte
             setConnectedUserSheetOpen: state.setConnectedUserSheetOpen,
         }))
     );
+
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -170,22 +174,28 @@ const ConnectedUserTable = ({connectedUsers, onSelectionChange, selectedConnecte
                                     label="Details"
                                 />
 
-                                <DropdownMenuItem
-                                    data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
-                                    data-index={info.row.index.toString()}
-                                    icon={connectedUsers[info.row.index].enabled ? <PowerOffIcon /> : <PowerIcon />}
-                                    label={connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
-                                />
+                                {canManageConnectedUser && (
+                                    <DropdownMenuItem
+                                        data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
+                                        data-index={info.row.index.toString()}
+                                        icon={connectedUsers[info.row.index].enabled ? <PowerOffIcon /> : <PowerIcon />}
+                                        label={connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteConnectedUser && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    data-action="delete"
-                                    data-index={info.row.index.toString()}
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            data-action="delete"
+                                            data-index={info.row.index.toString()}
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ),
@@ -193,7 +203,7 @@ const ConnectedUserTable = ({connectedUsers, onSelectionChange, selectedConnecte
                     id: 'actions',
                 }),
             ]),
-        [componentDefinitions, connectedUsers]
+        [canDeleteConnectedUser, canManageConnectedUser, componentDefinitions, connectedUsers]
     );
 
     const rowSelection = useMemo(() => {
