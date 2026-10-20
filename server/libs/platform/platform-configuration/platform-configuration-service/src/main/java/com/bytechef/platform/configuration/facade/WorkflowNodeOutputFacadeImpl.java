@@ -466,9 +466,19 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         if (outputResponse == null) {
             if (workflowNodeType.operation() == null) {
-                WorkflowTaskDispatcherDynamicOutputResponse workflowTaskDispatcherDynamicOutputResponse =
-                    getWorkflowTaskDispatcherDynamicOutputResponse(
+                WorkflowTaskDispatcherDynamicOutputResponse workflowTaskDispatcherDynamicOutputResponse = null;
+
+                try {
+                    workflowTaskDispatcherDynamicOutputResponse = getWorkflowTaskDispatcherDynamicOutputResponse(
                         workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache);
+                } catch (RuntimeException e) {
+                    if (!previousNode) {
+                        throw e;
+                    }
+
+                    log.debug(
+                        "Dynamic output of node {} was not resolved: {}", workflowTask.getName(), e.getMessage());
+                }
 
                 if (workflowTaskDispatcherDynamicOutputResponse == null) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
@@ -608,8 +618,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Map<String, ?> outputs = doGetPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName(), environmentId, sampleOutputsCache);
 
-        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        Map<String, ?> inputParameters;
+
+        try {
+            inputParameters = workflowTask.evaluateParameters(
+                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator);
+        } catch (RuntimeException e) {
+            throw new EvaluationException("Couldn't evaluate expression with sample output", e);
+        }
 
         if (taskDispatcherOutput == null || taskDispatcherOutput) {
             Map<String, Object> outputInputParameters = new HashMap<>(inputParameters);
