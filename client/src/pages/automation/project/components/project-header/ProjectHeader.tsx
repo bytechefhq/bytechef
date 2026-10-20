@@ -1,4 +1,3 @@
-import Badge from '@/components/Badge/Badge';
 import {ButtonGroup} from '@/components/ui/button-group';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import ProjectDeploymentsSheet from '@/pages/automation/project/components/ProjectDeploymentsSheet';
@@ -16,6 +15,7 @@ import {useProjectWorkflowViewOnlyNotice} from '@/pages/automation/project/hooks
 import useProjectHeaderDialogsStore from '@/pages/automation/project/stores/useProjectHeaderDialogsStore';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -26,7 +26,6 @@ import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilo
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
-import {EyeIcon} from 'lucide-react';
 import {RefObject, useEffect, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
@@ -172,18 +171,7 @@ const ProjectHeader = ({
 
                 {loadingIndicator}
 
-                {readOnly && viewOnlyNoticeVisible && (
-                    <Badge
-                        aria-label="View only"
-                        className="ml-3"
-                        icon={<EyeIcon />}
-                        role="status"
-                        styleType="secondary-outline"
-                        title="You can view this workflow but not change or run it"
-                    >
-                        View only
-                    </Badge>
-                )}
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex shrink-0 items-center gap-1">

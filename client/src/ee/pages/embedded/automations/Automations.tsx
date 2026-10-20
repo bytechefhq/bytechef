@@ -4,6 +4,7 @@ import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -107,6 +108,9 @@ const Automations = () => {
     const updateProjectMutation = useUpdateAutomationProjectMutation();
     const updateWorkflowMutation = useUpdateAutomationProjectWorkflowMutation();
     const updateWorkflowPermissionExpressionMutation = useUpdateAutomationProjectWorkflowPermissionExpressionMutation();
+    const canCreateProject = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+
 
     const invalidateProjects = () => {
         void queryClient.invalidateQueries({queryKey: ['automationProjectCategories']});
@@ -148,7 +152,7 @@ const Automations = () => {
                     category: values.category || undefined,
                     description: values.description || undefined,
                     name: values.name,
-                    permissionExpression: values.permissionExpression,
+                    permissionExpression: canManageSettings ? values.permissionExpression : undefined,
                     tags: values.tags,
                 },
                 {
@@ -189,7 +193,11 @@ const Automations = () => {
         });
 
         createWorkflowMutation.mutate(
-            {definition, permissionExpression: values.permissionExpression, projectId: pendingWorkflowProjectId},
+            {
+                definition,
+                permissionExpression: canManageSettings ? values.permissionExpression : undefined,
+                projectId: pendingWorkflowProjectId,
+            },
             {
                 onSuccess: (data) => {
                     invalidateProjects();
@@ -219,6 +227,14 @@ const Automations = () => {
             {description: values.description, label: values.label, workflowUuid},
             {
                 onSuccess: () => {
+                    if (!canManageSettings) {
+                        invalidateProjects();
+
+                        handleWorkflowDialogClose();
+
+                        return;
+                    }
+
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid},
                         {
@@ -301,7 +317,11 @@ const Automations = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={<Button aria-label="New Project" label="New Project" onClick={handleNewProject} />}
+                        right={
+                            canCreateProject && (
+                                <Button aria-label="New Project" label="New Project" onClick={handleNewProject} />
+                            )
+                        }
                         title={
                             <ProjectsFilterTitle
                                 categories={categories}
@@ -348,7 +368,7 @@ const Automations = () => {
                         icon={<FilterXIcon />}
                         title="No matching projects"
                     />
-                ) : (
+                ) : canCreateProject ? (
                     <EmptyState
                         actions={<Button label="Create Project" onClick={handleNewProject} />}
                         description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
@@ -357,6 +377,12 @@ const Automations = () => {
                     >
                         <JourneySteps aria-label="Getting started" steps={AUTOMATION_STEPS} />
                     </EmptyState>
+                ) : (
+                    <EmptyState
+                        description="There are no projects yet."
+                        icon={<FolderIcon />}
+                        title="No Projects"
+                    />
                 )}
             </PageLoader>
 

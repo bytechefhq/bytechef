@@ -8,6 +8,16 @@ import AutomationProjectList from '../AutomationProjectList';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 
+const {hasEmbeddedScopeMock} = vi.hoisted(() => ({
+    hasEmbeddedScopeMock: vi.fn(() => true),
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => hasEmbeddedScopeMock(),
+}));
+
 vi.mock('@/shared/queries/platform/environments.queries', () => ({
     useGetEnvironmentsQuery: () => ({data: [{id: 1, name: 'Development'}]}),
 }));
@@ -71,6 +81,8 @@ describe('AutomationProjectList', () => {
     afterEach(() => {
         resetAll();
         vi.clearAllMocks();
+
+        hasEmbeddedScopeMock.mockReturnValue(true);
     });
 
     it('offers creation only from the empty states while the project has no workflows or configurations', async () => {
@@ -87,6 +99,16 @@ describe('AutomationProjectList', () => {
         expect(await screen.findByRole('heading', {name: 'No configurations in Development'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Configure'})).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+    });
+
+    it('offers no workflow creation from the empty state without the workflow create scope', async () => {
+        hasEmbeddedScopeMock.mockReturnValue(false);
+
+        renderList();
+
+        expect(await screen.findByText('No Workflows')).toBeInTheDocument();
+        expect(screen.getByText('There are no workflows yet.')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Workflow'})).not.toBeInTheDocument();
     });
 
     it('shows the tab actions once the project has workflows and configurations', async () => {

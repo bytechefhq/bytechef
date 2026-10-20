@@ -19,9 +19,12 @@ import AutomationProjectDialog, {
 } from '@/ee/pages/embedded/automations/components/automation-project-dialog/AutomationProjectDialog';
 import ConfigurationsListButton from '@/ee/pages/embedded/shared/ConfigurationsListButton';
 import ConfigureButton from '@/ee/pages/embedded/shared/ConfigureButton';
+import {useEmbeddedWorkflowViewOnlyNotice} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowViewOnlyNotice';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
@@ -29,6 +32,7 @@ import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {
     useAutomationProjectCategoriesQuery,
@@ -97,6 +101,11 @@ const AutomationEditorHeader = ({
     useCopilotCompactHeader();
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -221,6 +230,14 @@ const AutomationEditorHeader = ({
             {
                 onSuccess: () => {
                     void queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
+
+                    if (!canManageSettings) {
+                        void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+
+                        setShowWorkflowEditDialog(false);
+
+                        return;
+                    }
 
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid: currentWorkflowId},
@@ -348,6 +365,8 @@ const AutomationEditorHeader = ({
                 />
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex items-center gap-1">
@@ -355,18 +374,21 @@ const AutomationEditorHeader = ({
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
                 <ButtonGroup>
-                    <PublishPopover
-                        disabled={!hasUnpublishedChanges}
-                        isPending={publishProjectMutationIsPending}
-                        onPublishSubmit={handlePublishProjectSubmit}
-                        title="Publish Project"
-                        tooltip="Publish the project"
-                    />
+                    {canEditWorkflowOnUnion && canPublishScope && (
+                        <PublishPopover
+                            disabled={!hasUnpublishedChanges}
+                            isPending={publishProjectMutationIsPending}
+                            onPublishSubmit={handlePublishProjectSubmit}
+                            title="Publish Project"
+                            tooltip="Publish the project"
+                        />
+                    )}
 
                     <ConfigureButton
                         disabledReason={project.published ? undefined : 'Publish the project before configuring it.'}
