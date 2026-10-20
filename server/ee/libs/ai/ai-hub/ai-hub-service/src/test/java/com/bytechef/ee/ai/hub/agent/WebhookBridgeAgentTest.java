@@ -48,6 +48,11 @@ import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import com.sun.net.httpserver.HttpServer;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -531,6 +536,50 @@ class WebhookBridgeAgentTest {
 
         assertThat(releasedLatch.await(2, TimeUnit.SECONDS)).isTrue();
         assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
+    void testResumeRequestIsSentOverHttp11WithoutAnUpgradeHeader() throws Exception {
+        givenSyncChat();
+
+        AtomicReference<String> upgradeHeader = new AtomicReference<>();
+        CountDownLatch requestLatch = new CountDownLatch(1);
+
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+        httpServer.createContext("/resume", exchange -> {
+            upgradeHeader.set(
+                exchange.getRequestHeaders()
+                    .getFirst("Upgrade"));
+
+            byte[] responseBody = "{\"message\":\"done\"}".getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .add("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, responseBody.length);
+
+            try (OutputStream outputStream = exchange.getResponseBody()) {
+                outputStream.write(responseBody);
+            }
+
+            requestLatch.countDown();
+        });
+
+        httpServer.start();
+
+        try {
+            int port = httpServer.getAddress()
+                .getPort();
+
+            resumeRegistry.register(THREAD_ID, "http://127.0.0.1:" + port + "/resume");
+
+            newAgent().runAgent(parametersOf(buildInput("hello")), subscriber);
+
+            assertThat(requestLatch.await(5, TimeUnit.SECONDS)).isTrue();
+            assertThat(upgradeHeader.get()).isNull();
+        } finally {
+            httpServer.stop(0);
+        }
     }
 
     private WebhookBridgeAgent newAgent() throws AGUIException {
