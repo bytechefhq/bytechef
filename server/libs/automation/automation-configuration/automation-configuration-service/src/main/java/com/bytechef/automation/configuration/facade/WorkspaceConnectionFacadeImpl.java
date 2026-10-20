@@ -30,6 +30,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -85,7 +86,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
@@ -108,7 +109,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_VIEW')")
     @Transactional(readOnly = true)
     public ConnectionDTO getConnection(long connectionId) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         return connectionFacade.getConnection(connectionId);
     }
@@ -151,7 +152,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         connectionFacade.update(connectionId, name, tags, version);
     }
@@ -169,7 +170,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void updateConnectionTags(long connectionId, List<Tag> tags) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         connectionFacade.update(connectionId, tags);
     }
@@ -191,5 +192,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         if (connection.getType() != PlatformType.AUTOMATION) {
             throw new NoSuchElementException("Connection does not exist for id=" + connectionId);
         }
+    }
+
+    private void requireAutomationConnectionUnlessConnectedUser(long connectionId) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
+            return;
+        }
+
+        requireAutomationConnection(connectionId);
     }
 }
