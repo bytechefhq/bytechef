@@ -547,6 +547,37 @@ public class SpelEvaluatorTest {
     }
 
     @Test
+    public void testConcatConvertsNonStringValuesToText() {
+        Map<String, Object> variables = new HashMap<>();
+
+        variables.put("id", 42);
+        variables.put("missing", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "order", "=concat('Order #', ${id})",
+                "numbers", "=concat(1, 2.5, true)",
+                "withNull", "=concat('a', ${missing}, 'b')"),
+            variables);
+
+        assertEquals("Order #42", MapUtils.get(map, "order"));
+        assertEquals("12.5true", MapUtils.get(map, "numbers"));
+        assertEquals("ab", MapUtils.get(map, "withNull"));
+    }
+
+    @Test
+    public void testConcatRejectsMaps() {
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("concatenated", "=concat('a', ${map})"), Map.of("map", Map.of("key", "value"))));
+
+        assertEquals(
+            "Invalid arguments for concat. Expected all arguments to be lists, or none of them to be a list or a map.",
+            expressionEvaluationException.getMessage());
+    }
+
+    @Test
     public void testConcatRejectsMixedStringsAndLists() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
@@ -554,7 +585,7 @@ public class SpelEvaluatorTest {
                 Map.of("concatenated", "=concat('a', 'b', {'c'})"), Collections.emptyMap()));
 
         assertEquals(
-            "Invalid arguments for concat. Expected all arguments to be strings or all to be lists.",
+            "Invalid arguments for concat. Expected all arguments to be lists, or none of them to be a list or a map.",
             expressionEvaluationException.getMessage());
     }
 

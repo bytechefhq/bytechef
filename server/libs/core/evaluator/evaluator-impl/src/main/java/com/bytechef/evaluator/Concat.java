@@ -20,6 +20,8 @@ package com.bytechef.evaluator;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
@@ -40,14 +42,6 @@ class Concat implements MethodExecutor {
         }
 
         if (Arrays.stream(arguments)
-            .allMatch(argument -> argument instanceof String)) {
-            return new TypedValue(
-                Arrays.stream(arguments)
-                    .map(argument -> (String) argument)
-                    .collect(Collectors.joining()));
-        }
-
-        if (Arrays.stream(arguments)
             .allMatch(argument -> argument instanceof List<?>)) {
             return new TypedValue(
                 Arrays.stream(arguments)
@@ -55,7 +49,17 @@ class Concat implements MethodExecutor {
                     .toList());
         }
 
-        throw new IllegalArgumentException(
-            "Invalid arguments for concat. Expected all arguments to be strings or all to be lists.");
+        if (Arrays.stream(arguments)
+            .anyMatch(argument -> argument instanceof List<?> || argument instanceof Map<?, ?>)) {
+            throw new IllegalArgumentException(
+                "Invalid arguments for concat. Expected all arguments to be lists, or none of them to be a list or " +
+                    "a map.");
+        }
+
+        return new TypedValue(
+            Arrays.stream(arguments)
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .collect(Collectors.joining()));
     }
 }
