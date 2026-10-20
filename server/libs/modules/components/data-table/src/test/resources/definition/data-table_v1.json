@@ -483,7 +483,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Find records in a table with filters",
+    "description": "Find records in a table that match conditions",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/data-table_v1#find-records"
@@ -524,6 +524,317 @@
       "placeholder": null,
       "regex": null,
       "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "ARRAY_BUILDER",
+        "defaultValue": null,
+        "description": "AND Condition array that contains the conditions a record must all meet",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "items": [ {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "The column to compare.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Column",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "column",
+            "options": null,
+            "optionsDataSource": {
+              "options": { },
+              "optionsLookupDependsOn": [ "table" ]
+            },
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": true,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": "EQUALS",
+            "description": "How to compare the column with the value.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Operation",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "operation",
+            "options": [ {
+              "description": null,
+              "label": "Equals",
+              "value": "EQUALS"
+            }, {
+              "description": null,
+              "label": "Equals Ignore Case",
+              "value": "EQUALS_IGNORE_CASE"
+            }, {
+              "description": null,
+              "label": "Not Equals",
+              "value": "NOT_EQUALS"
+            }, {
+              "description": null,
+              "label": "Contains",
+              "value": "CONTAINS"
+            }, {
+              "description": null,
+              "label": "Not Contains",
+              "value": "NOT_CONTAINS"
+            }, {
+              "description": null,
+              "label": "Starts With",
+              "value": "STARTS_WITH"
+            }, {
+              "description": null,
+              "label": "Ends With",
+              "value": "ENDS_WITH"
+            }, {
+              "description": null,
+              "label": "Greater",
+              "value": "GREATER"
+            }, {
+              "description": null,
+              "label": "Greater or Equals",
+              "value": "GREATER_EQUALS"
+            }, {
+              "description": null,
+              "label": "Less",
+              "value": "LESS"
+            }, {
+              "description": null,
+              "label": "Less or Equals",
+              "value": "LESS_EQUALS"
+            }, {
+              "description": null,
+              "label": "In",
+              "value": "IN"
+            }, {
+              "description": null,
+              "label": "Between",
+              "value": "BETWEEN"
+            }, {
+              "description": null,
+              "label": "Empty",
+              "value": "EMPTY"
+            }, {
+              "description": null,
+              "label": "Not Empty",
+              "value": "NOT_EMPTY"
+            } ],
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": true,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The value to compare with. For Between, the lower bound.",
+            "displayCondition": "!contains({'IN','EMPTY','NOT_EMPTY'}, conditions[index][index].operation)",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Value",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "value",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The upper bound. Both bounds are included.",
+            "displayCondition": "conditions[index][index].operation == 'BETWEEN'",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "To Value",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "valueTo",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "ARRAY_BUILDER",
+            "defaultValue": null,
+            "description": "The values the column must be one of.",
+            "displayCondition": "conditions[index][index].operation == 'IN'",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "items": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": null,
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            } ],
+            "label": "Values",
+            "maxItems": null,
+            "metadata": { },
+            "minItems": null,
+            "multipleValues": null,
+            "name": "values",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "ARRAY"
+          } ],
+          "required": false,
+          "type": "OBJECT"
+        } ],
+        "label": "AND Condition",
+        "maxItems": null,
+        "metadata": { },
+        "minItems": null,
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": "Add AND Condition",
+        "required": false,
+        "type": "ARRAY"
+      } ],
+      "label": "OR Conditions",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "conditions",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "Add OR Condition",
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Column to sort the records by. Records are sorted by id when not set.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sort Column",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sortColumn",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "table" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "ASC",
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sort Direction",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sortDirection",
+      "options": [ {
+        "description": null,
+        "label": "Ascending",
+        "value": "ASC"
+      }, {
+        "description": null,
+        "label": "Descending",
+        "value": "DESC"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -1170,7 +1481,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "findRecords",
-    "description": "Find records in a table with filters",
+    "description": "Find records in a table that match conditions",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -1206,6 +1517,317 @@
       "placeholder": null,
       "regex": null,
       "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "ARRAY_BUILDER",
+        "defaultValue": null,
+        "description": "AND Condition array that contains the conditions a record must all meet",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "items": [ {
+          "additionalProperties": null,
+          "advancedOption": null,
+          "controlType": "OBJECT_BUILDER",
+          "defaultValue": null,
+          "description": null,
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "label": null,
+          "metadata": { },
+          "multipleValues": null,
+          "name": null,
+          "options": null,
+          "optionsDataSource": null,
+          "placeholder": null,
+          "properties": [ {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "The column to compare.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Column",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "column",
+            "options": null,
+            "optionsDataSource": {
+              "options": { },
+              "optionsLookupDependsOn": [ "table" ]
+            },
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": true,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": "EQUALS",
+            "description": "How to compare the column with the value.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Operation",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "operation",
+            "options": [ {
+              "description": null,
+              "label": "Equals",
+              "value": "EQUALS"
+            }, {
+              "description": null,
+              "label": "Equals Ignore Case",
+              "value": "EQUALS_IGNORE_CASE"
+            }, {
+              "description": null,
+              "label": "Not Equals",
+              "value": "NOT_EQUALS"
+            }, {
+              "description": null,
+              "label": "Contains",
+              "value": "CONTAINS"
+            }, {
+              "description": null,
+              "label": "Not Contains",
+              "value": "NOT_CONTAINS"
+            }, {
+              "description": null,
+              "label": "Starts With",
+              "value": "STARTS_WITH"
+            }, {
+              "description": null,
+              "label": "Ends With",
+              "value": "ENDS_WITH"
+            }, {
+              "description": null,
+              "label": "Greater",
+              "value": "GREATER"
+            }, {
+              "description": null,
+              "label": "Greater or Equals",
+              "value": "GREATER_EQUALS"
+            }, {
+              "description": null,
+              "label": "Less",
+              "value": "LESS"
+            }, {
+              "description": null,
+              "label": "Less or Equals",
+              "value": "LESS_EQUALS"
+            }, {
+              "description": null,
+              "label": "In",
+              "value": "IN"
+            }, {
+              "description": null,
+              "label": "Between",
+              "value": "BETWEEN"
+            }, {
+              "description": null,
+              "label": "Empty",
+              "value": "EMPTY"
+            }, {
+              "description": null,
+              "label": "Not Empty",
+              "value": "NOT_EMPTY"
+            } ],
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": true,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The value to compare with. For Between, the lower bound.",
+            "displayCondition": "!contains({'IN','EMPTY','NOT_EMPTY'}, conditions[index][index].operation)",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "Value",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "value",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "The upper bound. Both bounds are included.",
+            "displayCondition": "conditions[index][index].operation == 'BETWEEN'",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": "To Value",
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "valueTo",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "ARRAY_BUILDER",
+            "defaultValue": null,
+            "description": "The values the column must be one of.",
+            "displayCondition": "conditions[index][index].operation == 'IN'",
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "items": [ {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": null,
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": null,
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            } ],
+            "label": "Values",
+            "maxItems": null,
+            "metadata": { },
+            "minItems": null,
+            "multipleValues": null,
+            "name": "values",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "ARRAY"
+          } ],
+          "required": false,
+          "type": "OBJECT"
+        } ],
+        "label": "AND Condition",
+        "maxItems": null,
+        "metadata": { },
+        "minItems": null,
+        "multipleValues": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "placeholder": "Add AND Condition",
+        "required": false,
+        "type": "ARRAY"
+      } ],
+      "label": "OR Conditions",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "conditions",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": "Add OR Condition",
+      "required": false,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Column to sort the records by. Records are sorted by id when not set.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sort Column",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sortColumn",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "table" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "ASC",
+      "description": null,
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sort Direction",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sortDirection",
+      "options": [ {
+        "description": null,
+        "label": "Ascending",
+        "value": "ASC"
+      }, {
+        "description": null,
+        "label": "Descending",
+        "value": "DESC"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,

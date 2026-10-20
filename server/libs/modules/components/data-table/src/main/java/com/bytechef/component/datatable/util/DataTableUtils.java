@@ -16,8 +16,13 @@
 
 package com.bytechef.component.datatable.util;
 
+import static com.bytechef.component.datatable.constant.DataTableConstants.COLUMN;
+import static com.bytechef.component.datatable.constant.DataTableConstants.CONDITIONS;
+import static com.bytechef.component.datatable.constant.DataTableConstants.OPERATION;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
+import static com.bytechef.component.datatable.constant.DataTableConstants.VALUE;
 import static com.bytechef.component.datatable.constant.DataTableConstants.VALUES;
+import static com.bytechef.component.datatable.constant.DataTableConstants.VALUE_TO;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -31,9 +36,12 @@ import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
@@ -41,10 +49,13 @@ import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +92,124 @@ public final class DataTableUtils {
     public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(DataTableService dataTableService) {
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
             searchText, dataTableService);
+    }
+
+    /**
+     * Returns an OptionsFunction listing the columns, including id, of the table selected in the table property.
+     *
+     * @param dataTableService the data table service
+     * @return an OptionsFunction that provides column options
+     */
+    public static ActionDefinition.OptionsFunction<String> getActionColumnOptions(DataTableService dataTableService) {
+        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
+            String baseName = inputParameters.getString(TABLE);
+
+            if (baseName == null || baseName.isBlank()) {
+                return List.of();
+            }
+
+            DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, DEVELOPMENT.ordinal());
+
+            List<String> columnNames = new ArrayList<>();
+
+            columnNames.add("id");
+
+            if (dataTableInfo != null && dataTableInfo.columns() != null) {
+                for (ColumnSpec columnSpec : dataTableInfo.columns()) {
+                    columnNames.add(columnSpec.name());
+                }
+            }
+
+            return columnNames.stream()
+                .filter(columnName -> searchText == null || columnName.toLowerCase()
+                    .contains(searchText.toLowerCase()))
+                .<Option<String>>map(columnName -> option(columnName, columnName))
+                .toList();
+        };
+    }
+
+    /**
+     * Creates the OR Conditions property shared by the actions that select records by condition. The returned property
+     * has no description, so each action can explain what an empty value means for it.
+     *
+     * @param dataTableService the data table service
+     * @return the conditions property
+     */
+    public static ModifiableArrayProperty conditionsProperty(DataTableService dataTableService) {
+        return array(CONDITIONS)
+            .label("OR Conditions")
+            .placeholder("Add OR Condition")
+            .items(
+                array()
+                    .label("AND Condition")
+                    .placeholder("Add AND Condition")
+                    .description("AND Condition array that contains the conditions a record must all meet")
+                    .items(
+                        object()
+                            .properties(
+                                string(COLUMN)
+                                    .label("Column")
+                                    .description("The column to compare.")
+                                    .options(getActionColumnOptions(dataTableService))
+                                    .optionsLookupDependsOn(TABLE)
+                                    .required(true),
+                                string(OPERATION)
+                                    .label("Operation")
+                                    .description("How to compare the column with the value.")
+                                    .options(
+                                        option("Equals", Operation.EQUALS.name()),
+                                        option("Equals Ignore Case", Operation.EQUALS_IGNORE_CASE.name()),
+                                        option("Not Equals", Operation.NOT_EQUALS.name()),
+                                        option("Contains", Operation.CONTAINS.name()),
+                                        option("Not Contains", Operation.NOT_CONTAINS.name()),
+                                        option("Starts With", Operation.STARTS_WITH.name()),
+                                        option("Ends With", Operation.ENDS_WITH.name()),
+                                        option("Greater", Operation.GREATER.name()),
+                                        option("Greater or Equals", Operation.GREATER_EQUALS.name()),
+                                        option("Less", Operation.LESS.name()),
+                                        option("Less or Equals", Operation.LESS_EQUALS.name()),
+                                        option("In", Operation.IN.name()),
+                                        option("Between", Operation.BETWEEN.name()),
+                                        option("Empty", Operation.EMPTY.name()),
+                                        option("Not Empty", Operation.NOT_EMPTY.name()))
+                                    .defaultValue(Operation.EQUALS.name())
+                                    .required(true),
+                                string(VALUE)
+                                    .label("Value")
+                                    .description("The value to compare with. For Between, the lower bound.")
+                                    .displayCondition(
+                                        "!contains({'%s','%s','%s'}, conditions[index][index].%s)".formatted(
+                                            Operation.IN, Operation.EMPTY, Operation.NOT_EMPTY, OPERATION)),
+                                string(VALUE_TO)
+                                    .label("To Value")
+                                    .description("The upper bound. Both bounds are included.")
+                                    .displayCondition(
+                                        "conditions[index][index].%s == '%s'".formatted(
+                                            OPERATION, Operation.BETWEEN)),
+                                array(VALUES)
+                                    .label("Values")
+                                    .description("The values the column must be one of.")
+                                    .items(string())
+                                    .displayCondition(
+                                        "conditions[index][index].%s == '%s'".formatted(
+                                            OPERATION, Operation.IN)))));
+    }
+
+    /**
+     * Reads the OR Conditions property as OR groups of AND conditions, dropping empty groups.
+     *
+     * @param inputParameters the action input parameters
+     * @return the non-empty condition groups
+     */
+    public static List<List<DataTableRowFilter>> getConditions(Parameters inputParameters) {
+        return inputParameters
+            .getList(CONDITIONS, new TypeReference<List<Map<String, Object>>>() {}, List.of())
+            .stream()
+            .filter(andConditions -> andConditions != null && !andConditions.isEmpty())
+            .map(andConditions -> andConditions.stream()
+                .map(DataTableUtils::toDataTableRowFilter)
+                .toList())
+            .toList();
     }
 
     public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
@@ -307,5 +436,24 @@ public final class DataTableUtils {
             case DATE_TIME -> dateTime(name);
             case BOOLEAN -> bool(name);
         };
+    }
+
+    private static DataTableRowFilter toDataTableRowFilter(Map<String, Object> condition) {
+        Object column = condition.get(COLUMN);
+
+        if (!(column instanceof String columnName) || columnName.isBlank()) {
+            throw new IllegalArgumentException("Every condition requires a column");
+        }
+
+        Operation operation = Operation.valueOf(
+            String.valueOf(condition.getOrDefault(OPERATION, Operation.EQUALS.name())));
+
+        Object value = switch (operation) {
+            case IN -> condition.get(VALUES);
+            case BETWEEN -> Arrays.asList(condition.get(VALUE), condition.get(VALUE_TO));
+            default -> condition.get(VALUE);
+        };
+
+        return new DataTableRowFilter(columnName, operation, value);
     }
 }
