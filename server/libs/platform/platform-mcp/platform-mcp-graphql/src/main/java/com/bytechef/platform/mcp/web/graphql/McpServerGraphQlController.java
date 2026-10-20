@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -64,7 +65,11 @@ public class McpServerGraphQlController {
     }
 
     @SchemaMapping(typeName = "McpServer", field = "secretKey")
-    public String secretKey(McpServer mcpServer) {
+    public @Nullable String secretKey(McpServer mcpServer) {
+        if (mcpServerTypeDefinitions.isSecretKeyReadableByEditors(mcpServer.getType())) {
+            return fetchEditableMcpServerSecretKey(mcpServer);
+        }
+
         return mcpServerService.getMcpServerSecretKey(mcpServer.getId());
     }
 
@@ -141,7 +146,21 @@ public class McpServerGraphQlController {
         return mcpServer;
     }
 
+    private @Nullable String fetchEditableMcpServerSecretKey(McpServer mcpServer) {
+        try {
+            return mcpServerService.getEditableMcpServerSecretKey(mcpServer.getId());
+        } catch (AccessDeniedException accessDeniedException) {
+            return null;
+        }
+    }
+
     private String getMcpServerUrl(McpServer mcpServer) {
+        if (mcpServerTypeDefinitions.isSecretKeyReadableByEditors(mcpServer.getType())) {
+            String secretKey = fetchEditableMcpServerSecretKey(mcpServer);
+
+            return buildMcpServerUrl(mcpServer, secretKey == null ? MASKED_SECRET_KEY : secretKey);
+        }
+
         String secretKey;
 
         try {

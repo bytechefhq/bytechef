@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -123,6 +124,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.facade.McpServerFacadeImpl;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
@@ -131,6 +133,8 @@ import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import com.bytechef.platform.mcp.service.McpToolServiceImpl;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
+import com.bytechef.platform.mcp.web.graphql.McpServerGraphQlController;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -290,6 +294,9 @@ class EmbeddedMcpGatesIntTest {
 
     @Autowired
     private McpIntegrationInstanceWorkflowFacade mcpIntegrationInstanceWorkflowFacade;
+
+    @Autowired
+    private McpServerFacade mcpServerFacade;
 
     @Autowired
     private McpServerRepository mcpServerRepository;
@@ -889,6 +896,39 @@ class EmbeddedMcpGatesIntTest {
             productionIntegrationInstanceConfigurationWorkflowId);
     }
 
+    @Test
+    void testOnlyAnEditorOfAnEmbeddedServerReadsItsSecretKey() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.setPublicUrl("http://localhost");
+
+        McpServerGraphQlController mcpServerGraphQlController = new McpServerGraphQlController(
+            applicationProperties, mcpServerFacade, mcpServerService, List.of(new EmbeddedMcpServerTypeDefinition()));
+
+        McpServer productionServer = mcpServerRepository.findById(productionServerId)
+            .orElseThrow();
+
+        String secretKey = productionServer.getSecretKey();
+
+        assertThat(secretKey).isNotBlank();
+
+        for (String login : List.of(EMBEDDED_VIEWER, DEVELOPMENT_EDITOR)) {
+            authenticate(login, false);
+
+            assertThat(mcpServerGraphQlController.secretKey(productionServer)).isNull();
+            assertThat(mcpServerGraphQlController.url(List.of(productionServer)))
+                .containsEntry(productionServer, "http://localhost/api/embedded/********/mcp");
+        }
+
+        for (String login : List.of(EDITOR_IN_PRODUCTION, TENANT_ADMIN)) {
+            authenticate(login, TENANT_ADMIN.equals(login));
+
+            assertThat(mcpServerGraphQlController.secretKey(productionServer)).isEqualTo(secretKey);
+            assertThat(mcpServerGraphQlController.url(List.of(productionServer)))
+                .containsEntry(productionServer, "http://localhost/api/embedded/" + secretKey + "/mcp");
+        }
+    }
+
     private void authenticate(String login, boolean tenantAdmin) {
         String authority = tenantAdmin ? "ROLE_ADMIN" : "ROLE_USER";
 
@@ -1038,6 +1078,29 @@ class EmbeddedMcpGatesIntTest {
             List<WorkflowRepository> workflowRepositories) {
 
             return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+        }
+    }
+
+    private static final class EmbeddedMcpServerTypeDefinition implements McpServerTypeDefinition {
+
+        @Override
+        public PlatformType getType() {
+            return PlatformType.EMBEDDED;
+        }
+
+        @Override
+        public boolean isSharedAdministration() {
+            return false;
+        }
+
+        @Override
+        public boolean isSecretKeyReadableByEditors() {
+            return true;
+        }
+
+        @Override
+        public String resolvePath(String secretKey) {
+            return "/api/embedded/" + secretKey + "/mcp";
         }
     }
 }
