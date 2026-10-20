@@ -39,6 +39,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -290,6 +291,9 @@ class PermissionScopeRegistryTest {
 
         private static final Pattern SCOPE_NAME_LITERAL_PATTERN = Pattern.compile("\"([A-Z][A-Z0-9_]{2,})\"");
 
+        private static final Pattern EMBEDDED_SCOPE_CALL_PATTERN = Pattern.compile(
+            "hasEmbeddedScope(?:InEnvironment|InEnvironmentId|InEveryEnvironment)?\\(([^)]*)\\)");
+
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
                 new ApiKeyPermissionScopeProvider(), new ApiPlatformPermissionScopeProvider(),
@@ -299,15 +303,27 @@ class PermissionScopeRegistryTest {
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider(),
                 new WorkspacePermissionScopeProvider()));
 
+        private final PermissionScopeRegistry shippedEmbeddedPermissionScopeRegistry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(
+                new AppEventPermissionScopeProvider(), new ConnectedUserPermissionScopeProvider(),
+                new EmbeddedPermissionScopeProvider(), new EmbeddedSharedPermissionScopeProvider(),
+                new IntegrationInstanceConfigurationPermissionScopeProvider(),
+                new IntegrationPermissionScopeProvider()));
+
         @Test
-        void testEveryScopeNamedByAGateIsRegistered() {
-            Set<String> registeredScopeNames = shippedPermissionScopeRegistry.getAllScopeNames();
+        void testEveryScopeNamedByAGateIsRegisteredOnItsOwnSide() {
+            Map<PermissionScopeSide, Set<String>> gatedScopeNamesBySide = readScopeNamesNamedByGatesBySide();
             Set<String> gatedScopeNames = readScopeNamesNamedByGates();
 
             assertThat(gatedScopeNames)
                 .as("no @PreAuthorize gate may name a scope that no PermissionScopeProvider declares")
                 .isNotEmpty();
-            assertThat(registeredScopeNames).containsAll(gatedScopeNames);
+            assertThat(shippedEmbeddedPermissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED))
+                .as("the hasEmbeddedScope built-ins may only name embedded-side scopes")
+                .containsAll(gatedScopeNamesBySide.get(PermissionScopeSide.EMBEDDED));
+            assertThat(shippedPermissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION))
+                .as("every other gate may only name automation-side scopes")
+                .containsAll(gatedScopeNamesBySide.get(PermissionScopeSide.AUTOMATION));
         }
 
         @Test
@@ -349,8 +365,19 @@ class PermissionScopeRegistryTest {
         }
 
         private static Set<String> readScopeNamesNamedByGates() {
-            Path serverPath = findRepositoryRootPath().resolve("server");
             Set<String> scopeNames = new TreeSet<>();
+
+            for (Set<String> scopeNamesOfSide : readScopeNamesNamedByGatesBySide().values()) {
+                scopeNames.addAll(scopeNamesOfSide);
+            }
+
+            return scopeNames;
+        }
+
+        private static Map<PermissionScopeSide, Set<String>> readScopeNamesNamedByGatesBySide() {
+            Path serverPath = findRepositoryRootPath().resolve("server");
+            Set<String> automationScopeNames = new TreeSet<>();
+            Set<String> embeddedScopeNames = new TreeSet<>();
 
             try (Stream<Path> paths = Files.walk(serverPath)) {
                 List<Path> javaPaths = paths.filter(Files::isRegularFile)
@@ -368,17 +395,18 @@ class PermissionScopeRegistryTest {
                     Matcher gateAnnotationMatcher = GATE_ANNOTATION_PATTERN.matcher(source);
 
                     while (gateAnnotationMatcher.find()) {
-                        Matcher gateScopeLiteralMatcher = GATE_SCOPE_LITERAL_PATTERN.matcher(
-                            readAnnotationArguments(source, gateAnnotationMatcher.end()));
+                        String annotationArguments = readAnnotationArguments(source, gateAnnotationMatcher.end());
 
-                        while (gateScopeLiteralMatcher.find()) {
-                            String literal = gateScopeLiteralMatcher.group(1);
+                        Matcher embeddedCallMatcher = EMBEDDED_SCOPE_CALL_PATTERN.matcher(annotationArguments);
 
-                            // An authority such as hasAuthority('ROLE_ADMIN') shares the shape but is not a scope.
-                            if (!literal.startsWith("ROLE_")) {
-                                scopeNames.add(literal);
-                            }
+                        while (embeddedCallMatcher.find()) {
+                            collectScopeLiterals(embeddedCallMatcher.group(1), embeddedScopeNames);
                         }
+
+                        collectScopeLiterals(
+                            EMBEDDED_SCOPE_CALL_PATTERN.matcher(annotationArguments)
+                                .replaceAll(""),
+                            automationScopeNames);
                     }
 
                     Matcher programmaticScopeCheckMatcher = PROGRAMMATIC_SCOPE_CHECK_PATTERN.matcher(source);
@@ -388,7 +416,7 @@ class PermissionScopeRegistryTest {
                             programmaticScopeCheckMatcher.group(1));
 
                         while (scopeNameLiteralMatcher.find()) {
-                            scopeNames.add(scopeNameLiteralMatcher.group(1));
+                            automationScopeNames.add(scopeNameLiteralMatcher.group(1));
                         }
                     }
                 }
@@ -396,7 +424,21 @@ class PermissionScopeRegistryTest {
                 throw new UncheckedIOException(ioException);
             }
 
-            return scopeNames;
+            return Map.of(
+                PermissionScopeSide.AUTOMATION, automationScopeNames, PermissionScopeSide.EMBEDDED,
+                embeddedScopeNames);
+        }
+
+        private static void collectScopeLiterals(String expression, Set<String> scopeNames) {
+            Matcher gateScopeLiteralMatcher = GATE_SCOPE_LITERAL_PATTERN.matcher(expression);
+
+            while (gateScopeLiteralMatcher.find()) {
+                String literal = gateScopeLiteralMatcher.group(1);
+
+                if (!literal.startsWith("ROLE_")) {
+                    scopeNames.add(literal);
+                }
+            }
         }
 
         private static String readAnnotationArguments(String source, int startIndex) {
