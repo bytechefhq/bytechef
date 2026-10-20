@@ -1318,7 +1318,8 @@ class PermissionServiceTest {
     @Nested
     class EmbeddedWorkflows {
 
-        private static final String EMBEDDED_WORKFLOW_ID = "embedded-workflow";
+        private static final String INTEGRATION_WORKFLOW_ID = "integration-workflow";
+        private static final String HUB_PROJECT_WORKFLOW_ID = "hub-project-workflow";
         private static final String PROJECT_WORKFLOW_ID = "project-workflow";
         private static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
 
@@ -1333,8 +1334,16 @@ class PermissionServiceTest {
             nestedCurrentUserResolver = mock(CurrentUserResolver.class);
 
             when(nestedCurrentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(USER_ID));
-            when(embeddedResourceResolver.isEmbeddedWorkflow(EMBEDDED_WORKFLOW_ID)).thenReturn(true);
-            when(embeddedResourceResolver.isEmbeddedWorkflow(PROJECT_WORKFLOW_ID)).thenReturn(false);
+            lenient().when(embeddedResourceResolver.isIntegrationWorkflow(INTEGRATION_WORKFLOW_ID))
+                .thenReturn(true);
+            lenient().when(embeddedResourceResolver.isIntegrationWorkflow(HUB_PROJECT_WORKFLOW_ID))
+                .thenReturn(false);
+            lenient().when(embeddedResourceResolver.isEmbeddedProjectWorkflow(HUB_PROJECT_WORKFLOW_ID))
+                .thenReturn(true);
+            lenient().when(embeddedResourceResolver.isIntegrationWorkflow(PROJECT_WORKFLOW_ID))
+                .thenReturn(false);
+            lenient().when(embeddedResourceResolver.isEmbeddedProjectWorkflow(PROJECT_WORKFLOW_ID))
+                .thenReturn(false);
         }
 
         @Test
@@ -1346,9 +1355,9 @@ class PermissionServiceTest {
 
             PermissionServiceImpl service = createService(embeddedResourceResolver);
 
-            assertThat(service.hasWorkflowScope(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+            assertThat(service.hasWorkflowScope(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
                 .isTrue();
-            assertThat(service.hasWorkflowScope(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW, Environment.PRODUCTION))
+            assertThat(service.hasWorkflowScope(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW, Environment.PRODUCTION))
                 .isFalse();
 
             verifyNoInteractions(projectRepository);
@@ -1356,7 +1365,7 @@ class PermissionServiceTest {
 
         @Test
         void testAnIntegrationWorkflowWithoutTheScopeIsDeniedEvenForAWorkspaceEditor() {
-            givenProjectWorkflowInWorkspace(EMBEDDED_WORKFLOW_ID);
+            givenProjectWorkflowInWorkspace(INTEGRATION_WORKFLOW_ID);
 
             lenient().when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong()))
                 .thenReturn(Set.of(WORKFLOW_VIEW, "WORKFLOW_EDIT"));
@@ -1367,8 +1376,8 @@ class PermissionServiceTest {
 
             PermissionServiceImpl service = createService(embeddedResourceResolver);
 
-            assertThat(service.hasWorkflowScope(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW)).isFalse();
-            assertThat(service.hasWorkflowScope(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+            assertThat(service.hasWorkflowScope(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW)).isFalse();
+            assertThat(service.hasWorkflowScope(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
                 .isFalse();
         }
 
@@ -1390,34 +1399,86 @@ class PermissionServiceTest {
         }
 
         @Test
-        void testHasWorkflowScopeIfProjectWorkflowGrantsAnEmbeddedWorkflowByEmbeddedScope() {
+        void testHasWorkflowScopeIfProjectWorkflowGrantsAnIntegrationWorkflowByEmbeddedScope() {
             when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
                 .thenReturn(Set.of(WORKFLOW_VIEW));
 
             PermissionServiceImpl service = createService(embeddedResourceResolver);
 
             assertThat(
-                service.hasWorkflowScopeIfProjectWorkflow(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
-                    .isTrue();
+                service.hasWorkflowScopeIfProjectWorkflow(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW,
+                    Environment.DEVELOPMENT))
+                        .isTrue();
 
             verifyNoInteractions(projectRepository);
         }
 
         @Test
-        void testAnEmbeddedProjectIsAnsweredByTheEmbeddedScope() {
+        void testAHubOrConnectedUserProjectIsDeniedEvenWithTheEmbeddedScope() {
             when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID)).thenReturn(true);
-            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID)).thenReturn(Set.of(WORKFLOW_VIEW));
-            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong()))
+                .thenReturn(Set.of(WORKFLOW_VIEW));
+            lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any()))
                 .thenReturn(Set.of(WORKFLOW_VIEW));
 
             PermissionServiceImpl service = createService(embeddedResourceResolver);
 
-            assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, WORKFLOW_VIEW)).isTrue();
-            assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, "WORKFLOW_EDIT")).isFalse();
+            assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, WORKFLOW_VIEW)).isFalse();
             assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
-                .isTrue();
+                .isFalse();
 
             verifyNoInteractions(projectRepository);
+        }
+
+        @Test
+        void testATenantAdminIsAllowedOnAHubOrConnectedUserProject() {
+            securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+                .thenReturn(true);
+
+            lenient().when(embeddedResourceResolver.isEmbeddedProject(PROJECT_ID))
+                .thenReturn(true);
+
+            PermissionServiceImpl service = createService(embeddedResourceResolver);
+
+            assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, WORKFLOW_VIEW)).isTrue();
+            assertThat(service.hasWorkspaceScopeForProject(PROJECT_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+                .isTrue();
+        }
+
+        @Test
+        void testAWorkflowEmbeddedThroughItsProjectIsDeniedEvenWithTheEmbeddedScope() {
+            lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong()))
+                .thenReturn(Set.of(WORKFLOW_VIEW));
+            lenient().when(embeddedScopeCacheService.getEmbeddedScopes(anyLong(), any()))
+                .thenReturn(Set.of(WORKFLOW_VIEW));
+
+            PermissionServiceImpl service = createService(embeddedResourceResolver);
+
+            assertThat(service.hasWorkflowScope(HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW)).isFalse();
+            assertThat(service.hasWorkflowScope(HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+                .isFalse();
+            assertThat(
+                service.hasWorkflowScopeIfProjectWorkflow(
+                    HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+                        .isFalse();
+
+            verifyNoInteractions(projectRepository);
+        }
+
+        @Test
+        void testATenantAdminIsAllowedOnAWorkflowEmbeddedThroughItsProject() {
+            securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+                .thenReturn(true);
+
+            PermissionServiceImpl service = createService(embeddedResourceResolver);
+
+            assertThat(service.hasWorkflowScope(HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW)).isTrue();
+            assertThat(service.hasWorkflowScope(HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+                .isTrue();
+            assertThat(
+                service.hasWorkflowScopeIfProjectWorkflow(
+                    HUB_PROJECT_WORKFLOW_ID, WORKFLOW_VIEW, Environment.DEVELOPMENT))
+                        .isTrue();
         }
 
         @Test
@@ -1438,14 +1499,14 @@ class PermissionServiceTest {
 
         @Test
         void testWithoutAResolverBeanNothingChanges() {
-            givenProjectWorkflowInWorkspace(EMBEDDED_WORKFLOW_ID);
+            givenProjectWorkflowInWorkspace(INTEGRATION_WORKFLOW_ID);
 
             when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
                 .thenReturn(Set.of(WORKFLOW_VIEW));
 
             PermissionServiceImpl service = createService(null);
 
-            assertThat(service.hasWorkflowScope(EMBEDDED_WORKFLOW_ID, WORKFLOW_VIEW)).isTrue();
+            assertThat(service.hasWorkflowScope(INTEGRATION_WORKFLOW_ID, WORKFLOW_VIEW)).isTrue();
 
             verifyNoInteractions(embeddedScopeCacheService);
         }
