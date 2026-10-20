@@ -1,3 +1,4 @@
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -39,8 +40,6 @@ export const isNavItemCurrent = (pathname: string, href: string): boolean => {
 
 const TENANT_ADMIN_NAV_ITEM_HREFS = [
     '/automation/settings/workspaces',
-    '/embedded/settings/api-keys',
-    '/embedded/settings/signing-keys',
     'ai-providers',
     'ai/memories',
     'ai/skills',
@@ -58,9 +57,19 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
 export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
+    const apiKeyViewGranted = useHasEmbeddedScope('API_KEY_VIEW');
+    const embeddedSettingsManageGranted = useHasEmbeddedScope('EMBEDDED_SETTINGS_MANAGE');
     const isTenantAdmin = useIsTenantAdmin();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
+        if (navItem.href === '/embedded/settings/api-keys') {
+            return apiKeyViewGranted;
+        }
+
+        if (navItem.href === '/embedded/settings/signing-keys') {
+            return embeddedSettingsManageGranted;
+        }
+
         if (!isTenantAdmin && navItem.href !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(navItem.href)) {
             return false;
         }

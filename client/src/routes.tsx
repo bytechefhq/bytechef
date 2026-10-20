@@ -24,6 +24,7 @@ import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
+import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentAccessGuard';
 import EmbeddedIndexRedirect from '@/shared/layout/EmbeddedIndexRedirect';
 import Settings from '@/shared/layout/Settings';
 import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
@@ -1031,7 +1032,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 getAccountRoutes('/embedded'),
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <Integrations />
@@ -1045,7 +1046,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <LazyLoadWrapper>
                                                 <EEVersion>
                                                     <Integration />
@@ -1079,7 +1080,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <DevelopmentIntegrationInstanceConfigurationsRedirect>
                                                     <LazyLoadWrapper>
@@ -1093,7 +1094,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AutomationWorkflows />
@@ -1107,7 +1108,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AutomationWorkflow />
@@ -1135,7 +1136,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <ConnectedUsers />
@@ -1147,7 +1148,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AppEvents />
@@ -1159,7 +1160,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <EmbeddedIntegrationWorkflowExecutions />
@@ -1183,7 +1184,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <EmbeddedConnections />
@@ -1195,7 +1196,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <EmbeddedMcpServers />
@@ -1219,7 +1220,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper>
                                                             <SigningKeys />
@@ -1231,7 +1232,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper>
                                                             <EmbeddedApiKeys />
@@ -1247,6 +1248,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'settings',
                                 },
                             ],
+                            element: <EmbeddedEnvironmentAccessGuard />,
                             errorElement: <ErrorPage />,
                             path: 'embedded',
                         },
