@@ -18,11 +18,14 @@ package com.bytechef.component.datatable.action;
 
 import static com.bytechef.component.datatable.constant.DataTableConstants.LIMIT;
 import static com.bytechef.component.datatable.constant.DataTableConstants.OFFSET;
+import static com.bytechef.component.datatable.constant.DataTableConstants.SORT_COLUMN;
+import static com.bytechef.component.datatable.constant.DataTableConstants.SORT_DIRECTION;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
@@ -35,6 +38,9 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -42,7 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Find Records: Find records in a table with pagination
+ * Find Records: Find records in a table matching conditions, with sorting and pagination
  *
  * @author Ivica Cardic
  */
@@ -66,13 +72,28 @@ public class DataTableFindRecordsAction {
     private ModifiableActionDefinition build() {
         return action("findRecords")
             .title("Find Records")
-            .description("Find records in a table with filters")
+            .description("Find records in a table that match conditions")
             .properties(
                 string(TABLE)
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
                     .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                DataTableUtils.conditionsProperty(dataTableService)
+                    .description(
+                        "OR Condition array that contains AND Condition arrays. A record is returned when it meets " +
+                            "every condition of at least one AND Condition. Leave empty to return every record."),
+                string(SORT_COLUMN)
+                    .label("Sort Column")
+                    .description("Column to sort the records by. Records are sorted by id when not set.")
+                    .options(DataTableUtils.getActionColumnOptions(dataTableService))
+                    .optionsLookupDependsOn(TABLE),
+                string(SORT_DIRECTION)
+                    .label("Sort Direction")
+                    .options(
+                        option("Ascending", Direction.ASC.name()),
+                        option("Descending", Direction.DESC.name()))
+                    .defaultValue(Direction.ASC.name()),
                 integer(LIMIT)
                     .label("Limit")
                     .description("Maximum number of records to return")
@@ -118,8 +139,20 @@ public class DataTableFindRecordsAction {
         int limit = inputParameters.getInteger(LIMIT, 100);
         int offset = inputParameters.getInteger(OFFSET, 0);
 
+        List<List<DataTableRowFilter>> conditions = DataTableUtils.getConditions(inputParameters);
+
+        String sortColumn = inputParameters.getString(SORT_COLUMN);
+
+        DataTableRowSort sort = null;
+
+        if (sortColumn != null && !sortColumn.isBlank()) {
+            sort = new DataTableRowSort(
+                sortColumn, Direction.valueOf(inputParameters.getString(SORT_DIRECTION, Direction.ASC.name())));
+        }
+
         return DataTableUtils.flattenRows(
-            dataTableRowService.listRows(
-                baseName, limit, offset, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
+            dataTableRowService.findRows(
+                baseName, conditions, sort, limit, offset,
+                Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

@@ -22,6 +22,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookTyp
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -39,6 +41,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +51,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -364,30 +368,85 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     @Override
-    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
+        return findRows(baseName, List.of(), null, limit, offset, environmentId);
+    }
+
+    /**
+     * Finds rows of a data table matching the given OR groups of AND conditions.
+     *
+     * <p>
+     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter and sort columns must
+     * match an existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
+     * {@link #validateBaseName(String)}. Filter values use parameterized queries.
+     */
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> findRows(
+        String baseName, List<List<DataTableRowFilter>> conditions, @Nullable DataTableRowSort sort, int limit,
+        int offset, long environmentId) {
+
         validateBaseName(baseName);
 
-        String buildPhysicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(buildPhysicalName);
+        checkHasId(physicalName);
 
-        List<String> columnNames = listColumns(buildPhysicalName).stream()
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+
+        List<String> columnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
-            .filter(n -> !"id".equalsIgnoreCase(n))
+            .filter(name -> !"id".equalsIgnoreCase(name))
             .toList();
 
         String selectColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
             .map(this::escapeIdentifier)
             .collect(Collectors.joining(", ")));
 
-        String sql =
-            "SELECT " + selectColumns + " FROM " + escapeIdentifier(buildPhysicalName) +
-                " ORDER BY \"id\" LIMIT ? OFFSET ?";
+        List<FilterParameter> filterParameters = new ArrayList<>();
+        List<String> orConditions = new ArrayList<>();
+
+        for (List<DataTableRowFilter> andFilters : conditions) {
+            if (andFilters.isEmpty()) {
+                continue;
+            }
+
+            List<String> andConditions = new ArrayList<>();
+
+            for (DataTableRowFilter filter : andFilters) {
+                andConditions.add(
+                    buildCondition(getColumnSpec(columnSpecs, filter.column()), filter, filterParameters));
+            }
+
+            orConditions.add("(" + String.join(" AND ", andConditions) + ")");
+        }
+
+        String whereClause = orConditions.isEmpty() ? "" : " WHERE " + String.join(" OR ", orConditions);
+
+        String orderByClause = " ORDER BY \"id\"";
+
+        if (sort != null) {
+            ColumnSpec sortColumnSpec = getColumnSpec(columnSpecs, sort.column());
+
+            orderByClause = " ORDER BY " + escapeIdentifier(sortColumnSpec.name()) + " " +
+                sort.direction()
+                    .name()
+                +
+                " NULLS LAST, \"id\"";
+        }
+
+        String sql = "SELECT " + selectColumns + " FROM " + escapeIdentifier(physicalName) + whereClause +
+            orderByClause + " LIMIT ? OFFSET ?";
 
         return jdbcTemplate.query(sql, ps -> {
-            ps.setInt(1, Math.max(0, limit));
-            ps.setInt(2, Math.max(0, offset));
+            int index = 1;
+
+            for (FilterParameter filterParameter : filterParameters) {
+                setParam(ps, index++, filterParameter.columnType(), filterParameter.value());
+            }
+
+            ps.setInt(index++, Math.max(0, limit));
+            ps.setInt(index, Math.max(0, offset));
         }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
     }
 
@@ -489,6 +548,142 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String normalizedName = baseName.toLowerCase(Locale.ROOT);
 
         return "dt_" + environmentId + "_" + normalizedName;
+    }
+
+    private String buildCondition(
+        ColumnSpec columnSpec, DataTableRowFilter filter, List<FilterParameter> filterParameters) {
+
+        String column = escapeIdentifier(columnSpec.name());
+        ColumnType columnType = columnSpec.type();
+        DataTableRowFilter.Operation operation = filter.operation();
+
+        return switch (operation) {
+            case EQUALS -> addComparison(column, "=", columnSpec, filter, filterParameters);
+            case EQUALS_IGNORE_CASE -> {
+                String value = (String) coerceTextFilterValue(columnSpec, filter);
+
+                filterParameters.add(new FilterParameter(ColumnType.STRING, value.toLowerCase(Locale.ROOT)));
+
+                yield "LOWER(" + column + ") = ?";
+            }
+            case NOT_EQUALS -> addComparison(column, "IS DISTINCT FROM", columnSpec, filter, filterParameters);
+            case GREATER -> addComparison(column, ">", columnSpec, filter, filterParameters);
+            case GREATER_EQUALS -> addComparison(column, ">=", columnSpec, filter, filterParameters);
+            case LESS -> addComparison(column, "<", columnSpec, filter, filterParameters);
+            case LESS_EQUALS -> addComparison(column, "<=", columnSpec, filter, filterParameters);
+            case CONTAINS -> addLike(column, "%", "%", false, columnSpec, filter, filterParameters);
+            case NOT_CONTAINS -> addLike(column, "%", "%", true, columnSpec, filter, filterParameters);
+            case STARTS_WITH -> addLike(column, "", "%", false, columnSpec, filter, filterParameters);
+            case ENDS_WITH -> addLike(column, "%", "", false, columnSpec, filter, filterParameters);
+            case IN -> {
+                List<Object> values = getFilterValues(filter);
+
+                if (values.isEmpty()) {
+                    yield "1 = 0";
+                }
+
+                for (Object value : values) {
+                    filterParameters.add(new FilterParameter(columnType, coerceFilterValue(columnSpec, filter, value)));
+                }
+
+                yield column + " IN (" + values.stream()
+                    .map(value -> "?")
+                    .collect(Collectors.joining(", ")) + ")";
+            }
+            case BETWEEN -> {
+                List<Object> values = getFilterValues(filter);
+
+                if (values.size() != 2) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation BETWEEN requires exactly two values, got %d".formatted(
+                            columnSpec.name(), values.size()));
+                }
+
+                for (Object value : values) {
+                    filterParameters.add(new FilterParameter(columnType, coerceFilterValue(columnSpec, filter, value)));
+                }
+
+                yield column + " BETWEEN ? AND ?";
+            }
+            case EMPTY -> columnType == ColumnType.STRING
+                ? "(" + column + " IS NULL OR " + column + " = '')" : column + " IS NULL";
+            case NOT_EMPTY -> columnType == ColumnType.STRING
+                ? "(" + column + " IS NOT NULL AND " + column + " <> '')" : column + " IS NOT NULL";
+        };
+    }
+
+    private String addComparison(
+        String column, String comparisonOperator, ColumnSpec columnSpec, DataTableRowFilter filter,
+        List<FilterParameter> filterParameters) {
+
+        filterParameters.add(
+            new FilterParameter(columnSpec.type(), coerceFilterValue(columnSpec, filter, filter.value())));
+
+        return column + " " + comparisonOperator + " ?";
+    }
+
+    private String addLike(
+        String column, String prefix, String suffix, boolean negated, ColumnSpec columnSpec,
+        DataTableRowFilter filter, List<FilterParameter> filterParameters) {
+
+        String value = (String) coerceTextFilterValue(columnSpec, filter);
+
+        filterParameters.add(new FilterParameter(ColumnType.STRING, prefix + escapeLikePattern(value) + suffix));
+
+        if (negated) {
+            return "(" + column + " IS NULL OR " + column + " NOT LIKE ? ESCAPE '\\')";
+        }
+
+        return column + " LIKE ? ESCAPE '\\'";
+    }
+
+    private Object coerceTextFilterValue(ColumnSpec columnSpec, DataTableRowFilter filter) {
+        if (columnSpec.type() != ColumnType.STRING) {
+            throw new IllegalArgumentException(
+                "Filter operation %s is only supported on text columns, but column '%s' is %s".formatted(
+                    filter.operation(), columnSpec.name(), columnSpec.type()));
+        }
+
+        return coerceFilterValue(columnSpec, filter, filter.value());
+    }
+
+    private Object coerceFilterValue(ColumnSpec columnSpec, DataTableRowFilter filter, @Nullable Object rawValue) {
+        Object coercedValue = coerceValue(columnSpec.type(), rawValue);
+
+        if (coercedValue == null) {
+            throw new IllegalArgumentException(
+                "Filter on column '%s' with operation %s requires a value".formatted(
+                    columnSpec.name(), filter.operation()));
+        }
+
+        return coercedValue;
+    }
+
+    private static String escapeLikePattern(String value) {
+        return value.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+    }
+
+    private static ColumnSpec getColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
+        return columnSpecs.stream()
+            .filter(columnSpec -> {
+                String name = columnSpec.name();
+
+                return name.equalsIgnoreCase(columnName);
+            })
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unknown column: " + columnName));
+    }
+
+    private static List<Object> getFilterValues(DataTableRowFilter filter) {
+        if (!(filter.value() instanceof Collection<?> collection)) {
+            throw new IllegalArgumentException(
+                "Filter on column '%s' with operation %s requires a list of values".formatted(
+                    filter.column(), filter.operation()));
+        }
+
+        return new ArrayList<>(collection);
     }
 
     private void checkHasId(String physical) {
@@ -862,5 +1057,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             sql, preparedStatementSetter, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return updatedDataTableRows.isEmpty() ? null : updatedDataTableRows.getFirst();
+    }
+
+    private record FilterParameter(ColumnType columnType, Object value) {
     }
 }
