@@ -23,6 +23,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
  * @author Marko Kriskovic
  */
 public class NanoGptUtils {
+
+    private static final List<String> MINIMAX_TEXT_MODELS = List.of(
+        "minimax/minimax-m3.1-flash", "minimax/minimax-m3");
 
     private NanoGptUtils() {
     }
@@ -44,11 +48,14 @@ public class NanoGptUtils {
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-            return response.data()
+            List<NanoGptModel> models = response.data()
                 .stream()
                 .sorted(Comparator
                     .comparingDouble(NanoGptModel::totalCost)
                     .thenComparing(model -> model.name() == null ? model.id() : model.name()))
+                .toList();
+
+            return getTextModels(models).stream()
                 .map(model -> option(formatModelLabel(model), model.id(), model.description()))
                 .collect(Collectors.toList());
         };
@@ -125,6 +132,29 @@ public class NanoGptUtils {
                 model.id(),
                 model.description()))
             .collect(Collectors.toList());
+    }
+
+    private static List<NanoGptModel> getTextModels(List<NanoGptModel> models) {
+        List<NanoGptModel> miniMaxModels = models.stream()
+            .filter(model -> MINIMAX_TEXT_MODELS.contains(model.id()))
+            .sorted(Comparator.comparingInt(model -> MINIMAX_TEXT_MODELS.indexOf(model.id())))
+            .toList();
+        List<NanoGptModel> textModels = new ArrayList<>();
+        boolean miniMaxAdded = false;
+
+        for (NanoGptModel model : models) {
+            if (model.id().startsWith("minimax/") || model.id().startsWith("MiniMaxAI/") ||
+                model.id().startsWith("MiniMax-")) {
+                if (!miniMaxAdded) {
+                    textModels.addAll(miniMaxModels);
+                    miniMaxAdded = true;
+                }
+            } else {
+                textModels.add(model);
+            }
+        }
+
+        return textModels;
     }
 
     private static String formatEmbeddingModelLabel(NanoGptEmbeddingModel model) {
