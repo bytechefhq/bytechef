@@ -35,6 +35,23 @@ class ResourceOwnerTest {
     }
 
     @Test
+    void testAnEmbeddedProjectOwnerThatIsNotEmbeddedIsRejected() {
+        assertThatThrownBy(() -> new ResourceOwner(OptionalLong.empty(), OptionalLong.empty(), false, true))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testAnEmbeddedProjectOwnerIsEmbeddedAndKnown() {
+        ResourceOwner resourceOwner = ResourceOwner.ofEmbeddedProject();
+
+        assertThat(resourceOwner.embedded()).isTrue();
+        assertThat(resourceOwner.embeddedProject()).isTrue();
+        assertThat(resourceOwner.isUnknown()).isFalse();
+        assertThat(ResourceOwner.ofEmbedded()
+            .embeddedProject()).isFalse();
+    }
+
+    @Test
     void testEmbeddedFactoriesAreNotUnknown() {
         assertThat(ResourceOwner.ofEmbedded()
             .isUnknown()).isFalse();
