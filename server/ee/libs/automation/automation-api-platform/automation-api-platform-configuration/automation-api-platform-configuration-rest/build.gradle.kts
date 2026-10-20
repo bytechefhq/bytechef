@@ -31,6 +31,7 @@ val generateOpenAPISpringPublic by tasks.registering(org.openapitools.generator.
     apiPackage.set("com.bytechef.ee.automation.apiplatform.configuration.public_.web.rest")
     configOptions.set(
         mapOf(
+            "containerDefaultToNull" to "true",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"

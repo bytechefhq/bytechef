@@ -74,6 +74,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,27 +168,41 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(
             apiCollectionEndpoint.getApiCollectionId());
 
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
-            .fetchProjectDeploymentWorkflow(
-                apiCollection.getProjectDeploymentId(),
-                projectWorkflowService.getProjectWorkflowWorkflowId(
-                    apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()))
-            .orElseGet(() -> {
-                ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
-
-                newProjectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
-                newProjectDeploymentWorkflow.setWorkflowId(
-                    projectWorkflowService.getProjectWorkflowWorkflowId(
-                        apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()));
-
-                return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
-            });
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = resolveProjectDeploymentWorkflow(
+            apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid());
 
         apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
 
         return new ApiCollectionEndpointDTO(
             apiCollectionEndpointService.create(apiCollectionEndpoint), projectDeploymentWorkflow.isEnabled(),
             apiCollectionEndpointDTO.workflowUuid());
+    }
+
+    /**
+     * Calls {@link #createApiCollectionEndpoint(ApiCollectionEndpointDTO)} and
+     * {@link #updateApiCollectionEndpointWorkflow} on this instance, so the collection-keyed gate above is the only one
+     * evaluated for the whole operation.
+     */
+    @Override
+    @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.apiCollectionId, 'ApiCollection', 'API_PLATFORM_EDIT')")
+    public ApiCollectionEndpointDTO createApiCollectionEndpoint(
+        ApiCollectionEndpointDTO apiCollectionEndpointDTO, List<ProjectDeploymentWorkflowConnection> connections,
+        Map<String, ?> inputs) {
+
+        ApiCollectionEndpointDTO createdApiCollectionEndpointDTO = createApiCollectionEndpoint(
+            apiCollectionEndpointDTO);
+
+        if (connections == null && inputs == null) {
+            return createdApiCollectionEndpointDTO;
+        }
+
+        ApiCollectionEndpointDTO currentApiCollectionEndpointDTO = toApiCollectionEndpointDTO(
+            apiCollectionEndpointService.getOpenApiEndpoint(createdApiCollectionEndpointDTO.id()));
+
+        return updateApiCollectionEndpointWorkflow(
+            createdApiCollectionEndpointDTO.id(),
+            connections == null ? currentApiCollectionEndpointDTO.connections() : connections,
+            inputs == null ? currentApiCollectionEndpointDTO.inputs() : inputs);
     }
 
     @Override
@@ -356,16 +371,77 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         return toApiCollectionDTO(apiCollectionService.update(apiCollection));
     }
 
-    // Keyed on the endpoint id, whose collection is read from the stored row: the update writes by id and ignores the
-    // collection id in the request, so a guard on that id would check a collection the write never touches.
+    /**
+     * Updates an endpoint and, when the supplied DTO names a workflow, re-points it at that workflow's
+     * {@link ProjectDeploymentWorkflow} — find-or-create, exactly as {@link #createApiCollectionEndpoint} does.
+     *
+     * <p>
+     * {@link ApiCollectionEndpointDTO#toApiCollectionEndpoint()} maps neither {@code apiCollectionId} reliably (the
+     * REST model marks it read-only) nor {@code projectDeploymentWorkflowId} at all, so both are resolved from the
+     * PERSISTED row rather than from the DTO — the same reason {@link #updateApiCollection} resolves its deployment
+     * from the persisted collection. Without the re-resolution an endpoint whose {@code workflowUuid} changed kept
+     * pointing at its previous workflow, silently serving the wrong one.
+     * </p>
+     *
+     * <p>
+     * The gate is keyed on the endpoint the body writes, and the body refuses an endpoint that does not belong to the
+     * collection the DTO names, so an editor of one collection cannot reach another collection's endpoint by pairing
+     * its id with a collection id they can edit.
+     * </p>
+     */
     @Override
     @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
         ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointDTO.toApiCollectionEndpoint();
 
-        apiCollectionEndpoint = apiCollectionEndpointService.update(apiCollectionEndpoint);
+        ApiCollectionEndpoint persistedApiCollectionEndpoint = apiCollectionEndpointService.getOpenApiEndpoint(
+            Objects.requireNonNull(apiCollectionEndpoint.getId(), "id"));
 
-        return toApiCollectionEndpointDTO(apiCollectionEndpoint);
+        if (!Objects.equals(
+            persistedApiCollectionEndpoint.getApiCollectionId(), apiCollectionEndpointDTO.apiCollectionId())) {
+
+            throw new AccessDeniedException(
+                "API collection endpoint %s does not belong to API collection %s".formatted(
+                    apiCollectionEndpoint.getId(), apiCollectionEndpointDTO.apiCollectionId()));
+        }
+
+        String workflowUuid = apiCollectionEndpointDTO.workflowUuid();
+
+        if (workflowUuid != null) {
+            ApiCollection apiCollection = apiCollectionService.getApiCollection(
+                persistedApiCollectionEndpoint.getApiCollectionId());
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = resolveProjectDeploymentWorkflow(
+                apiCollection.getProjectDeploymentId(), workflowUuid);
+
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
+        }
+
+        return toApiCollectionEndpointDTO(apiCollectionEndpointService.update(apiCollectionEndpoint));
+    }
+
+    /**
+     * Calls {@link #updateApiCollectionEndpoint(ApiCollectionEndpointDTO)} and
+     * {@link #updateApiCollectionEndpointWorkflow} on this instance, so the endpoint-keyed gate above is the only one
+     * evaluated, both changes share one transaction, and the collection check of the former runs before the latter.
+     */
+    @Override
+    @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
+    public ApiCollectionEndpointDTO updateApiCollectionEndpoint(
+        ApiCollectionEndpointDTO apiCollectionEndpointDTO, List<ProjectDeploymentWorkflowConnection> connections,
+        Map<String, ?> inputs) {
+
+        ApiCollectionEndpointDTO updatedApiCollectionEndpointDTO = updateApiCollectionEndpoint(
+            apiCollectionEndpointDTO);
+
+        if (connections == null && inputs == null) {
+            return updatedApiCollectionEndpointDTO;
+        }
+
+        return updateApiCollectionEndpointWorkflow(
+            updatedApiCollectionEndpointDTO.id(),
+            connections == null ? updatedApiCollectionEndpointDTO.connections() : connections,
+            inputs == null ? updatedApiCollectionEndpointDTO.inputs() : inputs);
     }
 
     @Override

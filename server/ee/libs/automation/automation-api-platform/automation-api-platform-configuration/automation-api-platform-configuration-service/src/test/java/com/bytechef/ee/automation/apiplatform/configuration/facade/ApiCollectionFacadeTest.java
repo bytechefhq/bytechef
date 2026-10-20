@@ -51,7 +51,9 @@ import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVer
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingConnection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionVersionUpdateDTO.MissingInput;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
+import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiEndpointRepository;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
+import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointServiceImpl;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -318,6 +320,34 @@ class ApiCollectionFacadeTest {
     }
 
     @Test
+    void testCreateApiCollectionEndpointWithConnectionsDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheCollection() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.createApiCollectionEndpoint(apiCollectionEndpointDTO(), List.of(), null),
+            API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", false);
+    }
+
+    @Test
+    void testCreateApiCollectionEndpointWithConnectionsAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheCollection() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.createApiCollectionEndpoint(apiCollectionEndpointDTO(), List.of(), null),
+            API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
+    void testUpdateApiCollectionEndpointWithConnectionsDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheEndpoint() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.updateApiCollectionEndpoint(apiCollectionEndpointDTO(), List.of(), null),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", false);
+    }
+
+    @Test
+    void testUpdateApiCollectionEndpointWithConnectionsAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheEndpoint() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.updateApiCollectionEndpoint(apiCollectionEndpointDTO(), List.of(), null),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
     void testGetOpenApiSpecificationDeniesWhenTheApiPlatformViewScopeIsRefused() {
         assertResourceGuard(() -> apiCollectionFacade.getOpenApiSpecification(API_COLLECTION_ID), API_COLLECTION_ID,
             API_COLLECTION_TYPE, "API_PLATFORM_VIEW", false);
@@ -548,6 +578,420 @@ class ApiCollectionFacadeTest {
                 .containsExactly("uuid-903", "uuid-901", "uuid-902");
         }
 
+    }
+
+    @Nested
+    class EndpointUpdate {
+
+        private final ApiCollectionEndpointService apiCollectionEndpointService =
+            mock(ApiCollectionEndpointService.class);
+        private final ApiCollectionService apiCollectionService = mock(ApiCollectionService.class);
+        private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+        private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
+            mock(ProjectDeploymentWorkflowService.class);
+        private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        private final ApiCollectionFacade apiCollectionFacade = new ApiCollectionFacadeImpl(
+            apiCollectionService, apiCollectionEndpointService, mock(ComponentConnectionFacade.class),
+            mock(EnvironmentService.class), projectDeploymentFacade, mock(ProjectDeploymentService.class),
+            projectDeploymentWorkflowService, mock(ProjectService.class), projectWorkflowService,
+            mock(TagService.class), mock(WorkflowService.class));
+
+        /**
+         * The pointer is what ties an endpoint to the workflow it serves, and every {@code api_collection_endpoint} row
+         * FKs to it. Because {@link ApiCollectionEndpointDTO#toApiCollectionEndpoint()} does not map it, an update
+         * whose DTO carries no pointer must leave the persisted one alone rather than blanking it.
+         */
+        @Test
+        void testUpdateApiCollectionEndpointKeepsProjectDeploymentWorkflowWhenTheWorkflowIsUnchanged() {
+            stubEndpointUpdate(901L);
+
+            apiCollectionFacade.updateApiCollectionEndpoint(endpointDTO("wf-uuid"));
+
+            assertThat(capturedUpdatedEndpoint().getProjectDeploymentWorkflowId()).isEqualTo(901L);
+        }
+
+        @Test
+        void testUpdateApiCollectionEndpointRepointsProjectDeploymentWorkflowWhenTheWorkflowChanged() {
+            stubEndpointUpdate(902L);
+
+            apiCollectionFacade.updateApiCollectionEndpoint(endpointDTO("other-wf-uuid"));
+
+            assertThat(capturedUpdatedEndpoint().getProjectDeploymentWorkflowId()).isEqualTo(902L);
+        }
+
+        /**
+         * A uuid naming no workflow of this collection is bad caller input, not a server fault: before the endpoint
+         * update learned to re-resolve the pointer it was silently ignored, and the naive re-resolution reported it as
+         * an untyped {@code IllegalArgumentException} — a 500.
+         */
+        @Test
+        void testUpdateApiCollectionEndpointRejectsAWorkflowUuidOutsideTheCollection() {
+            ApiCollectionEndpoint persistedApiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            persistedApiCollectionEndpoint.setId(501L);
+            persistedApiCollectionEndpoint.setApiCollectionId(100L);
+            persistedApiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(501L)).thenReturn(persistedApiCollectionEndpoint);
+
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, "foreign-wf-uuid"))
+                .thenReturn(Optional.empty());
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = endpointDTO("foreign-wf-uuid");
+
+            assertThatThrownBy(() -> apiCollectionFacade.updateApiCollectionEndpoint(apiCollectionEndpointDTO))
+                .isInstanceOf(ConfigurationException.class)
+                .extracting(exception -> ((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(ApiCollectionErrorType.WORKFLOW_NOT_FOUND.getErrorKey());
+
+            verify(apiCollectionEndpointService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateApiCollectionEndpointRejectsAMalformedWorkflowUuidTheSameWay() {
+            ApiCollectionEndpoint persistedApiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            persistedApiCollectionEndpoint.setId(501L);
+            persistedApiCollectionEndpoint.setApiCollectionId(100L);
+            persistedApiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(501L)).thenReturn(persistedApiCollectionEndpoint);
+
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+
+            // UUID.fromString throws before the repository is reached; the caller must not be able to tell that apart
+            // from a well-formed uuid naming nothing.
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, "not-a-uuid"))
+                .thenThrow(new IllegalArgumentException("Invalid UUID string: not-a-uuid"));
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = endpointDTO("not-a-uuid");
+
+            assertThatThrownBy(() -> apiCollectionFacade.updateApiCollectionEndpoint(apiCollectionEndpointDTO))
+                .isInstanceOf(ConfigurationException.class)
+                .extracting(exception -> ((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(ApiCollectionErrorType.WORKFLOW_NOT_FOUND.getErrorKey());
+        }
+
+        @Test
+        void testUpdateEndpointWithConnectionsAndInputsAppliesBothInOneCall() {
+            stubEndpointUpdate(901L);
+
+            ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection =
+                new ProjectDeploymentWorkflowConnection(62L, "key", "node");
+
+            apiCollectionFacade.updateApiCollectionEndpoint(
+                endpointDTO("wf-uuid"), List.of(projectDeploymentWorkflowConnection), Map.of("region", "us"));
+
+            assertThat(capturedUpdatedEndpoint().getProjectDeploymentWorkflowId()).isEqualTo(901L);
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> captor = ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(captor.capture());
+
+            assertThat(captor.getValue()
+                .getConnections()).containsExactly(projectDeploymentWorkflowConnection);
+            assertThat(captor.getValue()
+                .getInputs()
+                .get("region")).isEqualTo("us");
+        }
+
+        @Test
+        void testUpdateEndpointWithOnlyInputsKeepsTheCurrentConnections() {
+            stubEndpointUpdate(901L);
+
+            ProjectDeploymentWorkflowConnection currentConnection =
+                new ProjectDeploymentWorkflowConnection(61L, "key", "node");
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L);
+
+            projectDeploymentWorkflow.setConnections(List.of(currentConnection));
+            projectDeploymentWorkflow.setInputs(Map.of("region", "eu"));
+
+            apiCollectionFacade.updateApiCollectionEndpoint(endpointDTO("wf-uuid"), null, Map.of("region", "us"));
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> captor = ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(captor.capture());
+
+            assertThat(captor.getValue()
+                .getConnections()).containsExactly(currentConnection);
+            assertThat(captor.getValue()
+                .getInputs()
+                .get("region")).isEqualTo("us");
+        }
+
+        @Test
+        void testUpdateEndpointWithOnlyConnectionsKeepsTheCurrentInputs() {
+            stubEndpointUpdate(901L);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L);
+
+            projectDeploymentWorkflow.setInputs(Map.of("region", "eu"));
+
+            ProjectDeploymentWorkflowConnection newConnection =
+                new ProjectDeploymentWorkflowConnection(62L, "key", "node");
+
+            apiCollectionFacade.updateApiCollectionEndpoint(endpointDTO("wf-uuid"), List.of(newConnection), null);
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> captor = ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(captor.capture());
+
+            assertThat(captor.getValue()
+                .getConnections()).containsExactly(newConnection);
+            assertThat(captor.getValue()
+                .getInputs()
+                .get("region")).isEqualTo("eu");
+        }
+
+        @Test
+        void testUpdateEndpointWithoutConnectionsOrInputsLeavesTheWorkflowAlone() {
+            stubEndpointUpdate(901L);
+
+            apiCollectionFacade.updateApiCollectionEndpoint(endpointDTO("wf-uuid"), null, null);
+
+            verify(projectDeploymentFacade, never()).updateProjectDeploymentWorkflow(any());
+        }
+
+        @Test
+        void testCreateEndpointWithConnectionsAppliesThem() {
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, "uuid-1"))
+                .thenReturn(Optional.of("workflow-1"));
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setId(901L);
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "workflow-1"))
+                .thenReturn(Optional.of(projectDeploymentWorkflow));
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(projectDeploymentWorkflow);
+            when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-1")).thenReturn("uuid-1");
+
+            ApiCollectionEndpoint createdApiCollectionEndpoint = createEndpoint(7L, "orders", HttpMethod.GET, 901L);
+
+            when(apiCollectionEndpointService.create(any(ApiCollectionEndpoint.class)))
+                .thenReturn(createdApiCollectionEndpoint);
+            when(apiCollectionEndpointService.getOpenApiEndpoint(7L)).thenReturn(createdApiCollectionEndpoint);
+
+            ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection =
+                new ProjectDeploymentWorkflowConnection(62L, "key", "node");
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = apiCollectionFacade.createApiCollectionEndpoint(
+                new ApiCollectionEndpointDTO(
+                    100L, null, null, false, HttpMethod.GET, null, null, null, "orders", "orders", 0L, 0, "uuid-1"),
+                List.of(projectDeploymentWorkflowConnection), Map.of("region", "us"));
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> captor = ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(captor.capture());
+
+            ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = captor.getValue();
+
+            assertThat(updatedProjectDeploymentWorkflow.getId()).isEqualTo(901L);
+            assertThat(updatedProjectDeploymentWorkflow.getConnections()).containsExactly(
+                projectDeploymentWorkflowConnection);
+            assertThat(updatedProjectDeploymentWorkflow.getInputs()
+                .get("region")).isEqualTo("us");
+            assertThat(apiCollectionEndpointDTO.id()).isEqualTo(7L);
+            assertThat(apiCollectionEndpointDTO.workflowUuid()).isEqualTo("uuid-1");
+        }
+
+        @Test
+        void testCreateEndpointWithoutConnectionsOrInputsLeavesTheWorkflowAlone() {
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, "uuid-1"))
+                .thenReturn(Optional.of("workflow-1"));
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setId(901L);
+
+            when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "workflow-1"))
+                .thenReturn(Optional.of(projectDeploymentWorkflow));
+            when(apiCollectionEndpointService.create(any(ApiCollectionEndpoint.class)))
+                .thenReturn(createEndpoint(7L, "orders", HttpMethod.GET, 901L));
+
+            apiCollectionFacade.createApiCollectionEndpoint(
+                new ApiCollectionEndpointDTO(
+                    100L, null, null, false, HttpMethod.GET, null, null, null, "orders", "orders", 0L, 0, "uuid-1"),
+                null, null);
+
+            verify(projectDeploymentFacade, never()).updateProjectDeploymentWorkflow(any());
+        }
+
+        private ApiCollectionEndpoint capturedUpdatedEndpoint() {
+            ArgumentCaptor<ApiCollectionEndpoint> apiCollectionEndpointCaptor =
+                ArgumentCaptor.forClass(ApiCollectionEndpoint.class);
+
+            verify(apiCollectionEndpointService).update(apiCollectionEndpointCaptor.capture());
+
+            return apiCollectionEndpointCaptor.getValue();
+        }
+
+        /**
+         * Stubs the whole update path so the endpoint resolves onto the project deployment workflow
+         * {@code resolvedProjectDeploymentWorkflowId}. The persisted row points at 901, so passing 902 models a source
+         * endpoint that moved onto another workflow.
+         */
+        private void stubEndpointUpdate(long resolvedProjectDeploymentWorkflowId) {
+            ApiCollectionEndpoint persistedApiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            persistedApiCollectionEndpoint.setId(501L);
+            persistedApiCollectionEndpoint.setApiCollectionId(100L);
+            persistedApiCollectionEndpoint.setHttpMethod(HttpMethod.GET);
+            persistedApiCollectionEndpoint.setName("getOrders");
+            persistedApiCollectionEndpoint.setPath("orders");
+            persistedApiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(501L)).thenReturn(persistedApiCollectionEndpoint);
+
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(eq(200L), any()))
+                .thenReturn(Optional.of("workflow-1"));
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setId(resolvedProjectDeploymentWorkflowId);
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "workflow-1"))
+                .thenReturn(Optional.of(projectDeploymentWorkflow));
+            when(apiCollectionEndpointService.update(any())).thenAnswer(invocation -> invocation.getArgument(0));
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(resolvedProjectDeploymentWorkflowId))
+                .thenReturn(projectDeploymentWorkflow);
+            when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-1")).thenReturn("wf-uuid");
+        }
+
+        private static ApiCollectionEndpointDTO endpointDTO(String workflowUuid) {
+            return new ApiCollectionEndpointDTO(
+                100L, null, null, true, HttpMethod.GET, 501L, null, null, "listOrders", "orders", 901L, 0,
+                workflowUuid);
+        }
+    }
+
+    @Nested
+    class EndpointRepoint {
+
+        private final ApiEndpointRepository apiEndpointRepository = mock(ApiEndpointRepository.class);
+        private final ApiCollectionService apiCollectionService = mock(ApiCollectionService.class);
+        private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+        private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
+            mock(ProjectDeploymentWorkflowService.class);
+        private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        private final ApiCollectionFacade apiCollectionFacade = new ApiCollectionFacadeImpl(
+            apiCollectionService, new ApiCollectionEndpointServiceImpl(apiEndpointRepository),
+            mock(ComponentConnectionFacade.class), mock(EnvironmentService.class), projectDeploymentFacade,
+            mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, mock(ProjectService.class),
+            projectWorkflowService, mock(TagService.class), mock(WorkflowService.class));
+
+        @Test
+        void testUpdateApiCollectionEndpointRepointsThePersistedEndpointAndAppliesConnectionsToTheNewWorkflow() {
+            ApiCollectionEndpoint persistedApiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            persistedApiCollectionEndpoint.setId(501L);
+            persistedApiCollectionEndpoint.setApiCollectionId(100L);
+            persistedApiCollectionEndpoint.setHttpMethod(HttpMethod.GET);
+            persistedApiCollectionEndpoint.setName("getOrders");
+            persistedApiCollectionEndpoint.setPath("orders");
+            persistedApiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            when(apiEndpointRepository.findById(501L)).thenReturn(Optional.of(persistedApiCollectionEndpoint));
+            when(apiEndpointRepository.save(any(ApiCollectionEndpoint.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            ApiCollection apiCollection = new ApiCollection();
+
+            apiCollection.setId(100L);
+            apiCollection.setProjectDeploymentId(200L);
+
+            when(apiCollectionService.getApiCollection(100L)).thenReturn(apiCollection);
+            when(projectWorkflowService.fetchProjectWorkflowWorkflowId(200L, "other-wf-uuid"))
+                .thenReturn(Optional.of("workflow-2"));
+
+            ProjectDeploymentWorkflow oldProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            oldProjectDeploymentWorkflow.setId(901L);
+            oldProjectDeploymentWorkflow.setProjectDeploymentId(200L);
+            oldProjectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            newProjectDeploymentWorkflow.setId(902L);
+            newProjectDeploymentWorkflow.setProjectDeploymentId(200L);
+            newProjectDeploymentWorkflow.setWorkflowId("workflow-2");
+
+            when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(200L, "workflow-2"))
+                .thenReturn(Optional.of(newProjectDeploymentWorkflow));
+            lenient().when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(oldProjectDeploymentWorkflow);
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(902L))
+                .thenReturn(newProjectDeploymentWorkflow);
+            when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-2")).thenReturn("other-wf-uuid");
+
+            ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection =
+                new ProjectDeploymentWorkflowConnection(62L, "key", "node");
+
+            apiCollectionFacade.updateApiCollectionEndpoint(
+                new ApiCollectionEndpointDTO(
+                    100L, null, null, true, HttpMethod.GET, 501L, null, null, "listOrders", "orders", 901L, 0,
+                    "other-wf-uuid"),
+                List.of(projectDeploymentWorkflowConnection), Map.of("region", "us"));
+
+            ArgumentCaptor<ApiCollectionEndpoint> apiCollectionEndpointCaptor =
+                ArgumentCaptor.forClass(ApiCollectionEndpoint.class);
+
+            verify(apiEndpointRepository).save(apiCollectionEndpointCaptor.capture());
+
+            assertThat(apiCollectionEndpointCaptor.getValue()
+                .getProjectDeploymentWorkflowId()).isEqualTo(902L);
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> projectDeploymentWorkflowCaptor =
+                ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(projectDeploymentWorkflowCaptor.capture());
+
+            ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowCaptor.getValue();
+
+            assertThat(updatedProjectDeploymentWorkflow.getId()).isEqualTo(902L);
+            assertThat(updatedProjectDeploymentWorkflow.getConnections()).containsExactly(
+                projectDeploymentWorkflowConnection);
+            assertThat(oldProjectDeploymentWorkflow.getConnections()).isEmpty();
+        }
     }
 
     @Nested
