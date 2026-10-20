@@ -917,11 +917,11 @@ class EmbeddedConnectedUserGatesIntTest {
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ConnectionFacade connectionFacade, ConnectionService connectionService,
-            ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+            PermissionService permissionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
             WorkflowTestConfigurationService workflowTestConfigurationService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, permissionService,
                 projectDeploymentWorkflowService, workflowTestConfigurationService,
                 mock(WorkspaceConnectionService.class));
         }
