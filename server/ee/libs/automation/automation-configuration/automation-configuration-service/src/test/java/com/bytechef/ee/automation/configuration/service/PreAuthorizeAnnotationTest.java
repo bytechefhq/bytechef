@@ -461,6 +461,9 @@ class PreAuthorizeAnnotationTest {
             "hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')");
         assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServer", serverEdit);
         assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServerSecretKey", "isTenantAdmin()");
+        assertEveryPublicOverloadIsGated(
+            Class.forName("com.bytechef.platform.mcp.service.McpServerServiceImpl"), "getEmbeddedMcpServerSecretKey",
+            serverEdit);
         assertEveryPublicOverloadIsGated(serverFacade, "updateEmbeddedMcpServerTags", serverEdit);
         assertEveryPublicOverloadIsGated(
             serverFacade, "updateEmbeddedMcpTool",

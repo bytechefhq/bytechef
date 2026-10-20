@@ -18,6 +18,7 @@ package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
@@ -28,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -64,7 +66,11 @@ public class McpServerGraphQlController {
     }
 
     @SchemaMapping(typeName = "McpServer", field = "secretKey")
-    public String secretKey(McpServer mcpServer) {
+    public @Nullable String secretKey(McpServer mcpServer) {
+        if (mcpServer.getType() == PlatformType.EMBEDDED) {
+            return fetchEmbeddedMcpServerSecretKey(mcpServer);
+        }
+
         return mcpServerService.getMcpServerSecretKey(mcpServer.getId());
     }
 
@@ -125,7 +131,21 @@ public class McpServerGraphQlController {
         return buildMcpServerUrl(mcpServer, mcpServer.getSecretKey());
     }
 
+    private @Nullable String fetchEmbeddedMcpServerSecretKey(McpServer mcpServer) {
+        try {
+            return mcpServerService.getEmbeddedMcpServerSecretKey(mcpServer.getId());
+        } catch (AccessDeniedException accessDeniedException) {
+            return null;
+        }
+    }
+
     private String getMcpServerUrl(McpServer mcpServer) {
+        if (mcpServer.getType() == PlatformType.EMBEDDED) {
+            String secretKey = fetchEmbeddedMcpServerSecretKey(mcpServer);
+
+            return buildMcpServerUrl(mcpServer, secretKey == null ? MASKED_SECRET_KEY : secretKey);
+        }
+
         String secretKey;
 
         try {
