@@ -23,6 +23,7 @@ import DevelopmentProjectDeploymentsRedirect from '@/pages/automation/project-de
 import loadProject from '@/pages/automation/project/loadProject';
 import ResumeForm from '@/pages/automation/resume-form/ResumeForm';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -35,6 +36,8 @@ import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentA
 import EmbeddedIndexRedirect from '@/shared/layout/EmbeddedIndexRedirect';
 import Settings from '@/shared/layout/Settings';
 import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
+import SettingsLayout from '@/shared/layout/SettingsLayout';
+import {getSettingsNavItems} from '@/shared/layout/settingsNavItems';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import OrganizationSettingsRedirect from '@/shared/navigation/OrganizationSettingsRedirect';
@@ -104,6 +107,7 @@ const ApiConnectorImportPage = lazy(
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedMembers = lazy(() => import('@/ee/pages/settings/embedded/members/EmbeddedMembers'));
 const EmbeddedMemories = lazy(() => import('@/ee/pages/settings/embedded/memories/EmbeddedMemories'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AutomationGettingStarted = lazy(() => import('@/pages/automation/getting-started/AutomationGettingStarted'));
@@ -254,27 +258,6 @@ const currentWorkspaceSettingsRoutes = {
             path: 'workspace-api-keys',
         },
     ],
-    navItems: [
-        {
-            title: 'Current Workspace',
-        },
-        {
-            href: 'workspace-users',
-            title: 'Users',
-        },
-        {
-            href: 'git-configuration',
-            title: 'Git Configuration',
-        },
-        {
-            href: 'workspace-api-keys',
-            title: 'API Keys',
-        },
-    ],
-};
-
-const organizationSettingsNavItem = {
-    title: 'Organization',
 };
 
 // Platform settings routes
@@ -345,7 +328,7 @@ const platformSettingsRoutes = {
         },
         {
             element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <LazyLoadWrapper>
                         <McpServer />
                     </LazyLoadWrapper>
@@ -494,93 +477,23 @@ const platformSettingsRoutes = {
             path: 'audit-events',
         },
     ],
-    navItems: [
-        {
-            href: 'users',
-            title: 'Users',
-        },
-        {
-            href: 'global-custom-roles',
-            title: 'Roles',
-        },
-        {
-            href: 'billing',
-            title: 'Billing',
-        },
-        {
-            items: [
-                {
-                    href: 'ai-providers',
-                    title: 'Providers',
-                },
-                {
-                    href: 'ai/skills',
-                    title: 'Skills',
-                },
-                {
-                    href: 'ai/memories',
-                    title: 'Memories',
-                },
-            ],
-            title: 'AI',
-        },
-        {
-            href: 'mcp-server',
-            title: 'MCP Server',
-        },
-        {
-            href: 'custom-components',
-            title: 'Custom Components',
-        },
-        {
-            href: `api-connectors`,
-            title: 'API Connectors',
-        },
-        {
-            href: 'notifications',
-            title: 'Notifications',
-        },
-        {
-            href: 'identity-providers',
-            title: 'Identity Providers',
-        },
-        {
-            href: 'registered-clients',
-            title: 'OAuth2 Clients',
-        },
-        {
-            href: 'admin-api-keys',
-            title: 'Admin API Keys',
-        },
-        {
-            href: 'audit-events',
-            title: 'Audit Events',
-        },
-    ],
 };
 
-const automationSettingsNavItems = [
-    ...currentWorkspaceSettingsRoutes.navItems,
-    organizationSettingsNavItem,
-    {
-        href: '/automation/settings/workspaces',
-        title: 'Workspaces',
-    },
-    ...platformSettingsRoutes.navItems,
-];
+const automationMemoriesRoute = {
+    element: (
+        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+            <LazyLoadWrapper>
+                <AiAutoMemories />
+            </LazyLoadWrapper>
+        </PrivateRoute>
+    ),
+    path: 'ai/memories',
+};
 
-const embeddedSettingsNavItems = [
-    {
-        href: '/embedded/settings/signing-keys',
-        title: 'Signing Keys',
-    },
-    {
-        href: '/embedded/settings/api-keys',
-        title: 'API Keys',
-    },
-    organizationSettingsNavItem,
-    ...platformSettingsRoutes.navItems,
-];
+const organizationSettingsRedirectRoutes = ORGANIZATION_SETTINGS_PAGES.map((organizationSettingsPage) => ({
+    element: <OrganizationSettingsRedirect />,
+    path: `${organizationSettingsPage}/*`,
+}));
 
 export const loadEnvironments = async (queryClient: QueryClient) => {
     if (authenticationStore.getState().authenticated) {
@@ -1032,7 +945,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <SettingsIndexRedirect
                                                     fallbackHref="/automation/account"
-                                                    sidebarNavItems={automationSettingsNavItems}
+                                                    sidebarNavItems={getSettingsNavItems(PlatformType.AUTOMATION)}
                                                     tenantAdminHref="workspaces"
                                                 />
                                             ),
@@ -1054,7 +967,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         automationMemoriesRoute,
                                         ...organizationSettingsRedirectRoutes,
                                     ],
-                                    element: <Settings sidebarNavItems={automationSettingsNavItems} />,
+                                    element: <SettingsLayout />,
                                     path: 'settings',
                                 },
                             ],
@@ -1284,11 +1197,23 @@ export const getRouter = (queryClient: QueryClient) =>
                                             element: (
                                                 <SettingsIndexRedirect
                                                     fallbackHref="/embedded/account"
-                                                    sidebarNavItems={embeddedSettingsNavItems}
+                                                    sidebarNavItems={getSettingsNavItems(PlatformType.EMBEDDED)}
                                                     tenantAdminHref="signing-keys"
                                                 />
                                             ),
                                             index: true,
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedMembers />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'members',
                                         },
                                         {
                                             element: (
@@ -1328,7 +1253,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         ...organizationSettingsRedirectRoutes,
                                     ],
-                                    element: <Settings sidebarNavItems={embeddedSettingsNavItems} />,
+                                    element: <SettingsLayout />,
                                     path: 'settings',
                                 },
                             ],

@@ -1,4 +1,4 @@
-import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -51,7 +51,6 @@ export const isNavItemCurrent = (pathname: string, href: string): boolean => {
 };
 
 const TENANT_ADMIN_NAV_ITEM_HREFS = [
-    '/automation/settings/workspaces',
     'ai-providers',
     'ai/memories',
     'ai/skills',
@@ -64,16 +63,24 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
     'notifications',
     'registered-clients',
     'users',
+    'workspaces',
 ];
 
 export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
     const apiKeyViewGranted = useHasEmbeddedScope('API_KEY_VIEW');
+    const embeddedMembersViewGranted = useHasEmbeddedScope('EMBEDDED_VIEW', UNION_ENVIRONMENT_ID);
     const embeddedSettingsManageGranted = useHasEmbeddedScope('EMBEDDED_SETTINGS_MANAGE');
     const isTenantAdmin = useIsTenantAdmin();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
+        const pageKey = getSettingsPageKey(navItem.href);
+
+        if (navItem.href === '/embedded/settings/members') {
+            return embeddedMembersViewGranted;
+        }
+
         if (navItem.href === '/embedded/settings/api-keys') {
             return apiKeyViewGranted;
         }
@@ -82,11 +89,11 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
             return embeddedSettingsManageGranted;
         }
 
-        if (!isTenantAdmin && navItem.href !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(navItem.href)) {
+        if (!isTenantAdmin && pageKey !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(pageKey)) {
             return false;
         }
 
-        if (navItem.href === 'api-connectors') {
+        if (pageKey === 'api-connectors') {
             return isFeatureFlagEnabled('ff-207');
         }
 
@@ -98,7 +105,7 @@ export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]):
             return isFeatureFlagEnabled('ff-1039');
         }
 
-        if (navItem.href === 'mcp-server') {
+        if (pageKey === 'mcp-server') {
             return isFeatureFlagEnabled('ff-2197');
         }
 

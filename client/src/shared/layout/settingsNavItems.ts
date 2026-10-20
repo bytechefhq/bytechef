@@ -20,6 +20,10 @@ const automationSectionNavItems: SettingsNavItemI[] = [
         title: 'Current Workspace',
     },
     {
+        href: `${AUTOMATION_SETTINGS_PATH}/workspace-users`,
+        title: 'Users',
+    },
+    {
         href: `${AUTOMATION_SETTINGS_PATH}/git-configuration`,
         title: 'Git Configuration',
     },
@@ -39,6 +43,10 @@ const automationSectionNavItems: SettingsNavItemI[] = [
 ];
 
 const embeddedSectionNavItems: SettingsNavItemI[] = [
+    {
+        href: `${EMBEDDED_SETTINGS_PATH}/members`,
+        title: 'Members',
+    },
     {
         href: `${EMBEDDED_SETTINGS_PATH}/signing-keys`,
         title: 'Signing Keys',
@@ -62,6 +70,10 @@ const organizationNavItems: SettingsNavItemI[] = [
     {
         href: `${ORGANIZATION_SETTINGS_PATH}/users`,
         title: 'Users',
+    },
+    {
+        href: `${ORGANIZATION_SETTINGS_PATH}/global-custom-roles`,
+        title: 'Roles',
     },
     {
         href: BILLING_SETTINGS_PATH,
