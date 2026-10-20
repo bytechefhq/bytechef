@@ -97,6 +97,7 @@ const ApiConnectorImportPage = lazy(
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedMembers = lazy(() => import('@/ee/pages/settings/embedded/members/EmbeddedMembers'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AutomationGettingStarted = lazy(() => import('@/pages/automation/getting-started/AutomationGettingStarted'));
 const EmbeddedGettingStarted = lazy(() => import('@/ee/pages/embedded/getting-started/EmbeddedGettingStarted'));
@@ -549,6 +550,10 @@ const automationSettingsNavItems = [
 ];
 
 const embeddedSettingsNavItems = [
+    {
+        href: '/embedded/settings/members',
+        title: 'Members',
+    },
     {
         href: '/embedded/settings/signing-keys',
         title: 'Signing Keys',
@@ -1255,6 +1260,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                                 />
                                             ),
                                             index: true,
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedMembers />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'members',
                                         },
                                         {
                                             element: (

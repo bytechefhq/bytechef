@@ -314,6 +314,16 @@ describe('WorkspaceUsers', () => {
         expect(screen.queryByRole('button', {name: /remove development role/i})).not.toBeInTheDocument();
     });
 
+    it('names a custom role in the only-role removal confirmation instead of leaving it blank', async () => {
+        hoisted.workspaceUsers = [{...developmentRole, customRoleId: '999', workspaceRole: null}];
+
+        render(<WorkspaceUsers />);
+
+        await userEvent.click(await screen.findByRole('button', {name: /remove development role/i}));
+
+        expect(screen.getByText(/keep the custom role in every environment/i)).toBeInTheDocument();
+    });
+
     it('warns about that environment when the member holds others', async () => {
         hoisted.workspaceUsers = [developmentRole, productionRole];
 
