@@ -145,6 +145,10 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - `worker-app/` - Task execution workers
 - `runtime-job-app/` - Runtime job execution
 
+### Apps (EE)
+Governed AI-built apps: app secret key + `/api/app/v1` auth, execution lane, flat tool names, the connection proxy and
+the connection-delete guard SPI. See `.agents/apps.md` before working in that area.
+
 ### Available Components
 ByteChef includes 250+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
 
@@ -461,23 +465,27 @@ connections are created through their own facade and not counted), wired via
     - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
     - Resolve named beans via `context.bean("beanName", Class)` in supplier
     - Test `BeanRegistrar` specs by capturing `Consumer<Spec<T>>` with `ArgumentCaptor`, applying to mock `Spec`, and verifying fluent calls
-- **Five executors, no queues.** `AsyncConfiguration` defines `taskExecutor` (default `@Async`, limit
+- **Six executors, no queues.** `AsyncConfiguration` defines `taskExecutor` (default `@Async`, limit
   `bytechef.async.concurrency-limit`), `workerExecutor` (task handlers + trigger executions, limit
   `bytechef.worker.task.subscriptions.default`), `syncWorkerExecutor` (the API-Platform sync path and the editor's
-  Test button, limit `bytechef.worker.task.sync-concurrency-limit`), `messageEventExecutor` (Spring-event→broker
-  bridge, unbounded) and `webhookDeliveryExecutor` (outbound webhook POSTs: job status and task started webhooks,
-  notification webhooks, Slack; unbounded). The sync lane is a bulkhead, not extra capacity:
-  without it a burst of scheduled runs saturates the worker lane and an interactive caller blocks on a permit while
-  holding a request thread.
-  All are queue-less `SimpleAsyncTaskExecutor`s: a submitter waits for a permit. Anything that runs component code
-  or blocks on I/O goes on `workerExecutor`, never the default. Work handed off by a thread that must not wait on a
-  remote endpoint goes on an unbounded lane and bounds itself inside the task, as `WebhookDeliveryService` does with
-  `bytechef.webhook-delivery.concurrency-limit` (one global permit per POST) and `max-pending-deliveries` (per
-  endpoint); each endpoint receives one delivery at a time, so a slow endpoint cannot take every permit. On shutdown
-  the executor interrupts its tasks and waits up to 10 s. On virtual threads the interrupt closes a blocked POST's
-  socket; on platform threads `SimpleClientHttpRequestFactory` does not respond to it, so a POST blocked in its read
-  (up to 30 s) is abandoned when the JVM exits. Virtual threads change only the thread factory —
-  they do not lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
+  Test button, limit `bytechef.worker.task.sync-concurrency-limit`), `appExecutor` (the actions, tools and proxy calls
+  Apps request, limit `bytechef.app.execution.concurrency-limit`; registered only when that property is set, which only
+  `server-app`'s `application-bytechef.yml` does), `messageEventExecutor` (Spring-event→broker bridge, unbounded) and
+  `webhookDeliveryExecutor` (outbound webhook POSTs: job status and task started webhooks, notification webhooks,
+  Slack; unbounded).
+  The sync lane is a bulkhead, not extra capacity: without it a burst of scheduled runs saturates the worker lane and
+  an interactive caller blocks on a permit while holding a request thread. The app lane is the same bulkhead one step
+  further: apps are external, machine-driven callers, and on the sync lane a burst from them would starve the editor's
+  Test button and the API-Platform sync path. App workflow runs do not use it — they go through the job path on
+  `workerExecutor`. All are queue-less `SimpleAsyncTaskExecutor`s: a submitter waits for a permit. Anything that runs
+  component code or blocks on I/O goes on `workerExecutor`, never the default. Work handed off by a thread that must
+  not wait on a remote endpoint goes on an unbounded lane and bounds itself inside the task, as `WebhookDeliveryService`
+  does with `bytechef.webhook-delivery.concurrency-limit` (one global permit per POST) and `max-pending-deliveries`
+  (per endpoint); each endpoint receives one delivery at a time, so a slow endpoint cannot take every permit. On
+  shutdown the executor interrupts its tasks and waits up to 10 s. On virtual threads the interrupt closes a blocked
+  POST's socket; on platform threads `SimpleClientHttpRequestFactory` does not respond to it, so a POST blocked in its
+  read (up to 30 s) is abandoned when the JVM exits. Virtual threads change only the thread factory — they do not
+  lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
   because it only hands messages to the broker: starving it stalls every workflow, while the real work is already
   bounded at `workerExecutor` (and DB connections at Hikari's `maximum-pool-size`). Don't bound
   `AsyncMessageBroker`'s own dispatch executor either — it carries work-initiating and completion events together,
