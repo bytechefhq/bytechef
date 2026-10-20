@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261006000001-1" author="Ivica Cardic">
+        <createTable tableName="app">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="visibility" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hosting_target" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(2048)"/>
+            <column name="last_deployed_date" type="TIMESTAMP"/>
+            <column name="secret_key_hash" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_key_hint" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_key_last_used_date" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app" columnNames="uuid" constraintName="uk_app_uuid"/>
+        <addUniqueConstraint tableName="app" columnNames="secret_key_hash" constraintName="uk_app_secret_key_hash"/>
+        <addUniqueConstraint tableName="app" columnNames="workspace_id, environment, name"
+            constraintName="uk_app_workspace_environment_name"/>
+
+        <createIndex tableName="app" indexName="idx_app_workspace_environment">
+            <column name="workspace_id"/>
+            <column name="environment"/>
+        </createIndex>
+
+        <createTable tableName="app_connection">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="binding_key" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proxy_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proxy_allowed_methods" type="VARCHAR(64)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="app_connection" columnNames="app_id, binding_key"
+            constraintName="uk_app_connection_app_binding_key"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_connection"
+            baseColumnNames="app_id"
+            constraintName="fk_app_connection_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="app_connection"
+            baseColumnNames="connection_id"
+            constraintName="fk_app_connection_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"/>
+
+        <createIndex tableName="app_connection" indexName="idx_app_connection_connection">
+            <column name="connection_id"/>
+        </createIndex>
+
+        <createTable tableName="app_connection_operation">
+            <column name="app_connection_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="app_connection_operation"
+            columnNames="app_connection_id, operation_type, operation_name"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_connection_operation"
+            baseColumnNames="app_connection_id"
+            constraintName="fk_app_connection_operation_app_connection"
+            referencedTableName="app_connection"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>
