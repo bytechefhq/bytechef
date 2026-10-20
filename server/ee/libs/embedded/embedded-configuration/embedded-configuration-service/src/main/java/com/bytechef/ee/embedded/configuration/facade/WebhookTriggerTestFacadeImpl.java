@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
  */
 @Service("com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacade")
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     private final com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade webhookTriggerTestFacade;
@@ -33,11 +32,13 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public String startWebhookTriggerTest(String workflowId, @Nullable String triggerName, long environmentId) {
         return webhookTriggerTestFacade.enableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public void stopWebhookTriggerTest(String workflowId, @Nullable String triggerName, long environmentId) {
         webhookTriggerTestFacade.disableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
     }
