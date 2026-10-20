@@ -125,6 +125,77 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testEmbeddedIntegrationGates() throws Exception {
+        String base = "com.bytechef.ee.embedded.configuration.facade.";
+        Class<?> integrationFacade = Class.forName(base + "IntegrationFacadeImpl");
+        Class<?> categoryFacade = Class.forName(base + "IntegrationCategoryFacadeImpl");
+        Class<?> tagFacade = Class.forName(base + "IntegrationTagFacadeImpl");
+        Class<?> workflowFacade = Class.forName(base + "IntegrationWorkflowFacadeImpl");
+        Class<?> webhookFacade = Class.forName(base + "WebhookTriggerTestAdminFacadeImpl");
+
+        String development = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
+        String workflowView = "hasEmbeddedScope('WORKFLOW_VIEW')";
+        String integrationView = "hasPermission(#id, 'Integration', 'WORKFLOW_VIEW')";
+        String integrationEdit = "hasPermission(#id, 'Integration', 'WORKFLOW_EDIT')";
+
+        assertEveryPublicOverloadIsGated(integrationFacade, "createIntegration",
+            "hasEmbeddedScope('INTEGRATION_CREATE')");
+        assertEveryPublicOverloadIsGated(
+            integrationFacade, "deleteIntegration", "hasPermission(#id, 'Integration', 'INTEGRATION_DELETE')");
+        assertEveryPublicOverloadIsGated(integrationFacade, "getIntegration", integrationView);
+        assertEveryPublicOverloadIsGated(integrationFacade, "getIntegrationVersions", integrationView);
+        assertEveryPublicOverloadIsGated(integrationFacade, "getIntegrations", workflowView);
+        assertEveryPublicOverloadIsGated(
+            integrationFacade, "publishIntegration",
+            "hasPermission(#id, 'Integration', 'WORKFLOW_EDIT') and "
+                + "hasPermission(#id, 'Integration', 'INTEGRATION_PUBLISH')");
+        assertEveryPublicOverloadIsGated(
+            integrationFacade, "updateIntegration",
+            "hasPermission(#integrationDTO.id, 'Integration', 'WORKFLOW_EDIT')");
+
+        assertEveryPublicOverloadIsGated(categoryFacade, "getIntegrationCategories", workflowView);
+
+        assertEveryPublicOverloadIsGated(tagFacade, "getIntegrationTags", workflowView);
+        assertEveryPublicOverloadIsGated(tagFacade, "updateIntegrationTags", integrationEdit);
+
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "addWorkflow",
+            "hasResourceScopeInEnvironment(#integrationId, 'Integration', 'WORKFLOW_CREATE', " + development + ")");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "deleteWorkflow",
+            "hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_DELETE', " + development + ")");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "updateWorkflow",
+            "hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + development + ")");
+        assertEveryPublicOverloadIsGated(
+            workflowFacade, "updatePermissionExpression",
+            "hasPermission(#integrationWorkflowId, 'IntegrationWorkflow', 'INTEGRATION_SETTINGS')");
+        assertOverloadPreAuthorize(
+            workflowFacade, "getIntegrationWorkflow", new Class<?>[] {
+                String.class
+            },
+            "hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')");
+        assertOverloadPreAuthorize(
+            workflowFacade, "getIntegrationWorkflow", new Class<?>[] {
+                long.class
+            },
+            "hasPermission(#integrationWorkflowId, 'IntegrationWorkflow', 'WORKFLOW_VIEW')");
+        assertOverloadPreAuthorize(workflowFacade, "getIntegrationWorkflows", new Class<?>[0], workflowView);
+        assertOverloadPreAuthorize(
+            workflowFacade, "getIntegrationWorkflows", new Class<?>[] {
+                long.class
+            },
+            "hasPermission(#integrationId, 'Integration', 'WORKFLOW_VIEW')");
+        assertEveryPublicOverloadIsGated(workflowFacade, "getIntegrationVersionWorkflows", integrationView);
+
+        String webhookGate =
+            "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)";
+
+        assertEveryPublicOverloadIsGated(webhookFacade, "startWebhookTriggerTest", webhookGate);
+        assertEveryPublicOverloadIsGated(webhookFacade, "stopWebhookTriggerTest", webhookGate);
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");

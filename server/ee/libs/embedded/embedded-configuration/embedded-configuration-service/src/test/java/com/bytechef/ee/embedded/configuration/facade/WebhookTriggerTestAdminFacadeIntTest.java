@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -79,8 +80,10 @@ class WebhookTriggerTestAdminFacadeIntTest {
     }
 
     @Test
-    void testNonAdminIsDeniedBeforeTheSharedFacadeIsTouched() {
-        when(permissionService.isTenantAdmin()).thenReturn(false);
+    void testAMemberWithoutTheDevelopmentEditScopeIsDeniedBeforeTheSharedFacadeIsTouched() {
+        when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .thenReturn(false);
 
         assertThatThrownBy(
             () -> webhookTriggerTestAdminFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
@@ -93,8 +96,10 @@ class WebhookTriggerTestAdminFacadeIntTest {
     }
 
     @Test
-    void testTenantAdminReachesTheSharedFacadeTypedEmbedded() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+    void testAMemberWithTheDevelopmentEditScopeReachesTheSharedFacadeTypedEmbedded() {
+        when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .thenReturn(true);
         when(webhookTriggerTestFacade.enableTrigger(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.EMBEDDED))
             .thenReturn("https://example.org/webhook");
 
