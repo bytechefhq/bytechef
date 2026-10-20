@@ -1,11 +1,3 @@
-import Button from '@/components/Button/Button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationWorkflowPermissionExpressionField from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowPermissionExpressionField';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
@@ -15,6 +7,7 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
     useIntegrationWorkflowsByIntegrationIdQuery,
@@ -23,7 +16,6 @@ import {
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 
@@ -163,41 +155,14 @@ const IntegrationWorkflowListItem = ({
                     <TooltipContent>Last Modified Date</TooltipContent>
                 </Tooltip>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            icon={<EditIcon />}
-                            label="Edit"
-                            onClick={() => {
-                                setIsPermissionExpressionSeeded(false);
-                                setShowEditDialog(true);
-                            }}
-                        />
-
-                        <DropdownMenuItem
-                            icon={<DownloadIcon />}
-                            label="Export"
-                            onClick={() =>
-                                (window.location.href = `/api/embedded/internal/workflows/${workflow.id}/export`)
-                            }
-                        />
-
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={() => {
-                                setShowDeleteDialog(true);
-                            }}
-                            variant="destructive"
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <WorkflowListRowDropdownMenu
+                    exportUrl={`/api/embedded/internal/workflows/${workflow.id}/export`}
+                    onDeleteClick={() => setShowDeleteDialog(true)}
+                    onEditClick={() => {
+                        setIsPermissionExpressionSeeded(false);
+                        setShowEditDialog(true);
+                    }}
+                />
             </div>
 
             {showDeleteDialog && (
