@@ -20,6 +20,7 @@ import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
@@ -34,11 +35,15 @@ import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
+import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
@@ -71,11 +76,12 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * <p>
  * Tool lists are built explicitly (spec D3), never by sweeping every {@link ToolCallback} bean. ASK holds the read
- * views of the project, workflow and deployment tools, the read pickers and {@code openWorkflowTab}. BUILD holds the
- * full project tools, the workflow lifecycle tools (no tool that writes workflow content), the deployment write tools,
- * every picker, {@code openWorkflowTab}, and the {@code buildWorkflow} / {@code importWorkflow} delegates, which are
- * the only way it authors workflow content. The delegates' sub-agents never see a tool the approval gate gates by
- * default ({@link AiHubGatedToolFilterAdvisor}).
+ * views of the project, workflow and deployment tools, the read pickers, {@code openWorkflowTab} and
+ * {@code openWorkflowChatTab}. BUILD holds the full project tools, the workflow lifecycle tools (no tool that writes
+ * workflow content), the deployment write tools, every picker, {@code openWorkflowTab}, the workflow chat tools
+ * ({@code openWorkflowChatTab}, {@code listChatWorkflows}, {@code createWorkflowChat}), and the {@code buildWorkflow} /
+ * {@code importWorkflow} delegates, which are the only way it authors workflow content. The delegates' sub-agents never
+ * see a tool the approval gate gates by default ({@link AiHubGatedToolFilterAdvisor}).
  * </p>
  *
  * <p>
@@ -119,6 +125,7 @@ public class AiHubConfiguration {
         ReadProjectWorkflowTools readProjectWorkflowTools,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
+        AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -130,6 +137,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
+        toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, toolCallbacks, aiHubSessionMemory, chatModel,
@@ -147,7 +155,9 @@ public class AiHubConfiguration {
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
-        AiHubChatArtifactRecorder aiHubChatArtifactRecorder, SecurityContextRehydrator securityContextRehydrator,
+        ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
+        AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
+        SecurityContextRehydrator securityContextRehydrator,
         AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
@@ -158,6 +168,9 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
+        toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+        toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
+        toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,

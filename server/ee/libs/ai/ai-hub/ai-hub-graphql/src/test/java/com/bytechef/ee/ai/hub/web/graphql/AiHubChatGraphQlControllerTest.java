@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade.ChatWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactService;
@@ -33,6 +34,7 @@ import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,7 +76,7 @@ class AiHubChatGraphQlControllerTest {
     @Test
     void testCreateWorkflowChatRefusesAnIdOutsideTheWorkspaceListing() {
         when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
-        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-x")).thenReturn(false);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-x")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> controller.createWorkflowChatAiHubChat(7L, 0, "exec-x", 42L, null))
             .isInstanceOf(ForbiddenException.class);
@@ -85,7 +87,8 @@ class AiHubChatGraphQlControllerTest {
     @Test
     void testCreateWorkflowChatRequiresTheWorkflowViewScope() {
         when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(false);
-        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-1")).thenReturn(true);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-1"))
+            .thenReturn(Optional.of(listedChatWorkflow("exec-1", 42L)));
 
         assertThatThrownBy(() -> controller.createWorkflowChatAiHubChat(7L, 0, "exec-1", 42L, null))
             .isInstanceOf(ForbiddenException.class);
@@ -106,10 +109,25 @@ class AiHubChatGraphQlControllerTest {
         AiHubChat created = mock(AiHubChat.class);
 
         when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
-        when(projectDeploymentFacade.isWorkspaceChatWorkflow(7L, "exec-1")).thenReturn(true);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-1"))
+            .thenReturn(Optional.of(listedChatWorkflow("exec-1", 42L)));
         when(chatService.createWorkflowChat(7L, 10L, 0, "exec-1", 42L, "Title")).thenReturn(created);
 
         assertThat(controller.createWorkflowChatAiHubChat(7L, 0, "exec-1", 42L, "Title")).isSameAs(created);
+    }
+
+    @Test
+    void testCreateWorkflowChatStoresTheListingsDeploymentIdInsteadOfAMismatchedClientId() {
+        AiHubChat created = mock(AiHubChat.class);
+
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-1"))
+            .thenReturn(Optional.of(listedChatWorkflow("exec-1", 42L)));
+        when(chatService.createWorkflowChat(7L, 10L, 0, "exec-1", 42L, null)).thenReturn(created);
+
+        assertThat(controller.createWorkflowChatAiHubChat(7L, 0, "exec-1", 999L, null)).isSameAs(created);
+
+        verify(chatService).createWorkflowChat(7L, 10L, 0, "exec-1", 42L, null);
     }
 
     @Test
@@ -280,5 +298,10 @@ class AiHubChatGraphQlControllerTest {
     @Test
     void testChatIsOwnerFalseForANonOwner() {
         assertThat(controller.chatIsOwner(new AiHubChat(11L))).isFalse();
+    }
+
+    private static ChatWorkflow listedChatWorkflow(String workflowExecutionId, long projectDeploymentId) {
+        return new ChatWorkflow(
+            projectDeploymentId, 100L, "Support", 1001L, workflowExecutionId, "wf-1", "Support bot");
     }
 }

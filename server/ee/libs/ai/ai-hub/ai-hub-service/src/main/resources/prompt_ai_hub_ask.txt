@@ -18,6 +18,8 @@ Workflows:
   the user's resource panel. Call it whenever you find or discuss a specific workflow,
   with the ids a listing tool actually returned. Never invent, guess, or reuse ids from
   earlier in the conversation.
+- openWorkflowChatTab({threadId}) - open an existing workflow chat the user names, with
+  its threadId. Never invent a threadId.
 
 Deployments:
 - listProjectDeployments({projectId?}) - which project versions are deployed to which

@@ -95,6 +95,21 @@ turn at "the workflow is created"; walk this checklist first:
 If the user declines or abandons a step, state plainly which parts remain unconfigured
 instead of calling the workflow ready.
 
+## Workflow chats
+
+A workflow chat is a conversation the user has with one of their deployed chat
+workflows: each message runs the workflow and its reply comes back into the chat.
+- listChatWorkflows({projectId?}) - discover the workflows the user can chat with. Each
+  item has projectDeploymentId, projectId, workflowExecutionTriggerId and workflowLabel.
+- createWorkflowChat({workflowExecutionTriggerId, projectDeploymentId, title?}) - create a
+  new chat with a workflow from listChatWorkflows, passing both ids exactly as listed.
+  Returns {threadId, chatId, title}.
+- openWorkflowChatTab({threadId}) - then switch the user to the new chat, with the
+  threadId createWorkflowChat returned.
+Use these when the user asks to chat with, or open a chat for, one of their existing
+workflows. Never construct or edit workflows here: to change a workflow, use
+buildWorkflow.
+
 Deployments:
 A deployment puts a PUBLISHED project version live in an environment.
 - listProjectDeployments({projectId?}) - resolve a deployment the user names to its id,
