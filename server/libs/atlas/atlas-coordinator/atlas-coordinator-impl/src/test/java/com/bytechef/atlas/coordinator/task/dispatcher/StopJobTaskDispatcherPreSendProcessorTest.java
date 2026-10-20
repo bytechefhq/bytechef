@@ -22,9 +22,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.RandomUtils;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,8 +66,29 @@ public class StopJobTaskDispatcherPreSendProcessorTest {
         assertThat(taskExecution.getEndDate()).isNotNull();
     }
 
+    @Test
+    public void testProcessWithSuspendedJob() {
+        taskExecution = process(Job.Status.STOPPED, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+        assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.STARTED);
+        assertThat(taskExecution.getEndDate()).isNull();
+    }
+
+    @Test
+    public void testProcessWithCancelledJob() {
+        taskExecution = process(Job.Status.CANCELLED, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+        assertThat(taskExecution.getStatus()).isEqualTo(TaskExecution.Status.CANCELLED);
+    }
+
     private TaskExecution process(Job.Status status) {
+        return process(status, Map.of());
+    }
+
+    private TaskExecution process(Job.Status status, Map<String, Object> metadata) {
         Job job = new Job();
+
+        job.setMetadata(metadata);
         job.setStatus(status);
 
         when(jobService.getJob(anyLong())).thenReturn(job);

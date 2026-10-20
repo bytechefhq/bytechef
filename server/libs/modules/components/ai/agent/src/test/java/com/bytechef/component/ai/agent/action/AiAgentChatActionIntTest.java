@@ -32,6 +32,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
@@ -204,7 +205,7 @@ class AiAgentChatActionIntTest {
         eventPublisher = createEventPublisher(asyncMessageBroker);
 
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = List.of(
-            new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateFacade, null),
+            new SuspendTaskDispatcherPreSendProcessor(eventPublisher, jobService, taskStateFacade, null),
             new ModelConnectionTaskDispatcherPreSendProcessor());
 
         jobSyncExecutor = new JobSyncExecutor(
@@ -233,6 +234,11 @@ class AiAgentChatActionIntTest {
                 ResumeJobEvent resumeJobEvent = (ResumeJobEvent) message;
 
                 Long taskExecutionId = resumeJobEvent.getTaskExecutionId();
+
+                if (taskExecutionId == null) {
+                    taskExecutionId = SuspendedJobs.getSuspendedTaskExecutionId(
+                        jobService.getJob(resumeJobEvent.getJobId()));
+                }
 
                 if (taskExecutionId != null) {
                     clearTransientStateLikeADatabaseReload(taskExecutionId);
