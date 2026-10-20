@@ -16,6 +16,7 @@ import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useA
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
+import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
@@ -74,6 +75,8 @@ const AiHubPanel = () => {
     const {data: archivedChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ARCHIVED');
 
     const chatActions = useAiHubChatActions();
+
+    const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
@@ -192,8 +195,10 @@ const AiHubPanel = () => {
                                         writeLastUsedModel(currentWorkspaceId, provider, model);
                                         setChatLlmSelection(currentChatId, provider, model);
                                     }}
+                                    onSelectWorkflowChat={onSelectWorkflowChat}
                                     selectedModel={shownLlmSelection?.model ?? null}
                                     selectedProvider={shownLlmSelection?.provider ?? null}
+                                    workflowChats={workflowChats}
                                 />
                             ) : null
                         }
