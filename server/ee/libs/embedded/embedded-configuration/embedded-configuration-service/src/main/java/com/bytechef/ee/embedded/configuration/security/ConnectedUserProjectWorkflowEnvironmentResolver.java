@@ -22,9 +22,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
- * Keyed by the connected user project workflow id. The environment is the one of the connected user that owns the
- * workflow's connected user project.
- *
  * @version ee
  *
  * @author Ivica Cardic

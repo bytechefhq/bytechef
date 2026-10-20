@@ -21,15 +21,10 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
- * Reads through the plural {@code getConnections}, which returns nothing for an unknown id, rather than
- * {@code getConnection}, which throws: an absent connection has no environment, while any other failure must reach the
- * permission check and deny.
- *
  * @author Ivica Cardic
  */
 @Component
@@ -53,13 +48,13 @@ public class ConnectionEnvironmentResolver implements ResourceEnvironmentResolve
             return Optional.empty();
         }
 
-        List<Connection> connections = connectionService.getConnections(List.of(number.longValue()));
+        Optional<Connection> connectionOptional = connectionService.fetchConnection(number.longValue());
 
-        if (connections.isEmpty()) {
+        if (connectionOptional.isEmpty()) {
             return Optional.empty();
         }
 
-        Connection connection = connections.getFirst();
+        Connection connection = connectionOptional.get();
 
         int environmentId = connection.getEnvironmentId();
 

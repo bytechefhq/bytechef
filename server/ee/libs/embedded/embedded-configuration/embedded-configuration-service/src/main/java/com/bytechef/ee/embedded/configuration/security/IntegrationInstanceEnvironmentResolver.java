@@ -20,8 +20,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
- * An instance carries no environment of its own; it takes the one of its configuration.
- *
  * @version ee
  *
  * @author Ivica Cardic

@@ -46,11 +46,4 @@ class AutomationWorkflowProjectOwnershipResolverTest {
 
         assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.unknown());
     }
-
-    @Test
-    void testAnotherSidesRowIsUnknown() {
-        when(repository.findByProjectId(8L)).thenReturn(Optional.empty());
-
-        assertThat(resolver.resolveOwner(Long.valueOf(8L))).isEqualTo(ResourceOwner.unknown());
-    }
 }

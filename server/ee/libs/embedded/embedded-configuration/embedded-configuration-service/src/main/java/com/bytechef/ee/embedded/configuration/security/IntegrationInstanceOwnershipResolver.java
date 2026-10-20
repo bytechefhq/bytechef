@@ -15,8 +15,6 @@ import java.io.Serializable;
 import org.springframework.stereotype.Component;
 
 /**
- * Reads the repository only, because it runs inside permission checks.
- *
  * @version ee
  *
  * @author Ivica Cardic

@@ -19,10 +19,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
- * Keyed by the project workflow uuid, the version-independent identifier shared by every version of a workflow. Reads
- * repositories and the unguarded {@link ProjectWorkflowService} only, because it runs inside permission checks. Answers
- * only when one of the workflow's projects is a Hub project.
- *
  * @version ee
  *
  * @author Ivica Cardic

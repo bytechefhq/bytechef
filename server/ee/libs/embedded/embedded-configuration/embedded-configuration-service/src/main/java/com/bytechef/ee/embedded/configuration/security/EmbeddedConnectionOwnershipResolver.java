@@ -17,9 +17,6 @@ import java.io.Serializable;
 import org.springframework.stereotype.Component;
 
 /**
- * Answers only for {@code PlatformType.EMBEDDED} connections and reads them through {@code fetchConnection}, which
- * works on the distributed configuration app. Automation connections stay with the automation resolver.
- *
  * @version ee
  *
  * @author Ivica Cardic

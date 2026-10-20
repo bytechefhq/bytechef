@@ -210,6 +210,17 @@ class ResourceOwnershipResolverTest {
     }
 
     @Test
+    void testEveryPinnedUngatedResolverTypeStillHasAResolver() {
+        Set<String> staleResolverTypes = new TreeSet<>(KNOWN_UNGATED_RESOLVER_TYPES);
+
+        staleResolverTypes.removeAll(ownershipResolverTypes.keySet());
+
+        assertThat(staleResolverTypes)
+            .as("these pinned types have no registered resolver, so remove them from KNOWN_UNGATED_RESOLVER_TYPES")
+            .isEmpty();
+    }
+
+    @Test
     void testEveryEnvironmentResolverHasAMatchingOwnershipResolver() {
         Set<String> strandedEnvironmentResolvers = new TreeSet<>();
 
