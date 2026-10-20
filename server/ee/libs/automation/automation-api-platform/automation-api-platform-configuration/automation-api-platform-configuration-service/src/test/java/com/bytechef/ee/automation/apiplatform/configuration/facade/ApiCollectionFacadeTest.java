@@ -99,6 +99,7 @@ class ApiCollectionFacadeTest {
         IllegalStateException bodyReachedException = new IllegalStateException(BODY_REACHED);
 
         when(apiCollectionEndpointService.getOpenApiEndpoint(anyLong())).thenThrow(bodyReachedException);
+        when(apiCollectionEndpointService.getApiEndpoints(anyLong())).thenThrow(bodyReachedException);
         when(apiCollectionEndpointService.update(any(ApiCollectionEndpoint.class))).thenThrow(bodyReachedException);
         when(apiCollectionService.getApiCollection(anyLong())).thenThrow(bodyReachedException);
         when(apiCollectionService.getApiCollectionProjectIds(anyLong())).thenThrow(bodyReachedException);
@@ -270,6 +271,18 @@ class ApiCollectionFacadeTest {
     void testGetApiCollectionEndpointAllowsWhenTheApiPlatformViewScopeIsGrantedOnTheEndpoint() {
         assertResourceGuard(() -> apiCollectionFacade.getApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID),
             API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_VIEW", true);
+    }
+
+    @Test
+    void testGetApiCollectionEndpointsDeniesWhenTheApiPlatformViewScopeIsRefusedOnTheCollection() {
+        assertResourceGuard(() -> apiCollectionFacade.getApiCollectionEndpoints(API_COLLECTION_ID), API_COLLECTION_ID,
+            API_COLLECTION_TYPE, "API_PLATFORM_VIEW", false);
+    }
+
+    @Test
+    void testGetApiCollectionEndpointsAllowsWhenTheApiPlatformViewScopeIsGrantedOnTheCollection() {
+        assertResourceGuard(() -> apiCollectionFacade.getApiCollectionEndpoints(API_COLLECTION_ID), API_COLLECTION_ID,
+            API_COLLECTION_TYPE, "API_PLATFORM_VIEW", true);
     }
 
     @Test
@@ -468,6 +481,50 @@ class ApiCollectionFacadeTest {
                 .thenReturn("uuid-1");
 
             return projectDeploymentWorkflow;
+        }
+
+        @Test
+        void testGetApiCollectionEndpointsOrdersByPathThenMethod() {
+            ApiCollectionEndpoint postInvoices = createEndpoint(1L, "invoices", HttpMethod.POST, 901L);
+            ApiCollectionEndpoint getOrders = createEndpoint(2L, "orders", HttpMethod.GET, 902L);
+            ApiCollectionEndpoint getInvoices = createEndpoint(3L, "invoices", HttpMethod.GET, 903L);
+
+            when(apiCollectionEndpointService.getApiEndpoints(100L))
+                .thenReturn(List.of(postInvoices, getOrders, getInvoices));
+
+            for (long projectDeploymentWorkflowId : List.of(901L, 902L, 903L)) {
+                ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+                projectDeploymentWorkflow.setProjectDeploymentId(200L);
+                projectDeploymentWorkflow.setWorkflowId("workflow-" + projectDeploymentWorkflowId);
+
+                when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentWorkflowId))
+                    .thenReturn(projectDeploymentWorkflow);
+                when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-" + projectDeploymentWorkflowId))
+                    .thenReturn("uuid-" + projectDeploymentWorkflowId);
+            }
+
+            List<ApiCollectionEndpointDTO> apiCollectionEndpointDTOs = apiCollectionFacade.getApiCollectionEndpoints(100L);
+
+            assertThat(apiCollectionEndpointDTOs).extracting(ApiCollectionEndpointDTO::id)
+                .containsExactly(3L, 1L, 2L);
+            assertThat(apiCollectionEndpointDTOs).extracting(ApiCollectionEndpointDTO::workflowUuid)
+                .containsExactly("uuid-903", "uuid-901", "uuid-902");
+        }
+
+        private static ApiCollectionEndpoint createEndpoint(
+            long id, String path, HttpMethod httpMethod, long projectDeploymentWorkflowId) {
+
+            ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            apiCollectionEndpoint.setApiCollectionId(100L);
+            apiCollectionEndpoint.setHttpMethod(httpMethod);
+            apiCollectionEndpoint.setId(id);
+            apiCollectionEndpoint.setName(path);
+            apiCollectionEndpoint.setPath(path);
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+
+            return apiCollectionEndpoint;
         }
     }
 

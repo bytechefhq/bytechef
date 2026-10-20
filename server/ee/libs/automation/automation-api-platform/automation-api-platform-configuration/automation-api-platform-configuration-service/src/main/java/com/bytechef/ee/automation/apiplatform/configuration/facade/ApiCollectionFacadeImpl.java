@@ -56,6 +56,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,21 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_VIEW')")
     public ApiCollectionEndpointDTO getApiCollectionEndpoint(long id) {
         return toApiCollectionEndpointDTO(apiCollectionEndpointService.getOpenApiEndpoint(id));
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#apiCollectionId, 'ApiCollection', 'API_PLATFORM_VIEW')")
+    public List<ApiCollectionEndpointDTO> getApiCollectionEndpoints(long apiCollectionId) {
+        List<ApiCollectionEndpoint> apiCollectionEndpoints = new ArrayList<>(
+            apiCollectionEndpointService.getApiEndpoints(apiCollectionId));
+
+        apiCollectionEndpoints.sort(
+            Comparator.comparing(ApiCollectionEndpoint::getPath)
+                .thenComparing(ApiCollectionEndpoint::getHttpMethod));
+
+        return apiCollectionEndpoints.stream()
+            .map(this::toApiCollectionEndpointDTO)
+            .toList();
     }
 
     @Override
