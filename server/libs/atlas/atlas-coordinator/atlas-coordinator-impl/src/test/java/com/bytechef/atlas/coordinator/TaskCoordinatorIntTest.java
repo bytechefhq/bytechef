@@ -50,6 +50,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.JobRepository;
@@ -448,6 +449,41 @@ public class TaskCoordinatorIntTest {
         assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(persistedJob.getVersion()).isEqualTo(originalJob.getVersion());
         assertThat(persistedJob.getLastModifiedDate()).isEqualTo(originalJob.getLastModifiedDate());
+    }
+
+    @Test
+    public void testUntargetedResumeOfASuspendedJobDispatchesTheTaskThatSuspendedIt() {
+        long jobId = saveJob(Job.Status.STOPPED, EncodingUtils.base64EncodeToString("resume-suspended"), 0);
+
+        TaskExecution suspendedTaskExecution = saveTaskExecution(jobId, null, TaskExecution.Status.COMPLETED);
+
+        Job job = getJob(jobId);
+
+        job.setMetadata(
+            Map.of(
+                SuspendedJobs.JOB_RESUME_ID, "resume-id",
+                SuspendedJobs.TASK_EXECUTION_RESUME_ID, Objects.requireNonNull(suspendedTaskExecution.getId())));
+
+        jobRepository.save(job);
+
+        TaskDispatcher<? super Task> taskDispatcher = newTaskDispatcher();
+        JobExecutor jobExecutor = mock(JobExecutor.class);
+
+        TaskCoordinator taskCoordinator = createTaskCoordinator(
+            List.of(), List.of(), mock(ApplicationEventPublisher.class), jobExecutor,
+            mock(TaskCompletionHandler.class), taskDispatcher);
+
+        taskCoordinator.onResumeJobEvent(new ResumeJobEvent(jobId));
+
+        ArgumentCaptor<TaskExecution> taskExecutionArgumentCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskDispatcher).dispatch(taskExecutionArgumentCaptor.capture());
+        verify(jobExecutor, never()).execute(any());
+
+        TaskExecution dispatchedTaskExecution = taskExecutionArgumentCaptor.getValue();
+
+        assertThat(dispatchedTaskExecution.getId()).isEqualTo(suspendedTaskExecution.getId());
+        assertThat(getJob(jobId).getStatus()).isEqualTo(Job.Status.STARTED);
     }
 
     @Test
