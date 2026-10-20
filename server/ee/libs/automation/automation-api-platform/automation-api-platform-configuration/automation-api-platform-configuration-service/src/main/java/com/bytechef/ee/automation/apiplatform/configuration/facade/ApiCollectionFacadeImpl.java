@@ -198,9 +198,29 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
+    public ApiCollectionEndpointDTO enableApiCollectionEndpoint(long id, boolean enable) {
+        ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointService.getOpenApiEndpoint(id);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflow(apiCollectionEndpoint.getProjectDeploymentWorkflowId());
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId(), enable);
+
+        return toApiCollectionEndpointDTO(apiCollectionEndpoint);
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_VIEW')")
     public ApiCollectionDTO getApiCollection(long id) {
         return toApiCollectionDTO(apiCollectionService.getApiCollection(id));
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_VIEW')")
+    public ApiCollectionEndpointDTO getApiCollectionEndpoint(long id) {
+        return toApiCollectionEndpointDTO(apiCollectionEndpointService.getOpenApiEndpoint(id));
     }
 
     @Override

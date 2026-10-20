@@ -28,7 +28,11 @@ public interface ApiCollectionFacade {
 
     void deleteApiCollectionEndpoint(long id);
 
+    ApiCollectionEndpointDTO enableApiCollectionEndpoint(long id, boolean enable);
+
     ApiCollectionDTO getApiCollection(long id);
+
+    ApiCollectionEndpointDTO getApiCollectionEndpoint(long id);
 
     List<ApiCollectionDTO> getApiCollections(long workspaceId, Long environmentId, Long projectId, Long tagId);
 

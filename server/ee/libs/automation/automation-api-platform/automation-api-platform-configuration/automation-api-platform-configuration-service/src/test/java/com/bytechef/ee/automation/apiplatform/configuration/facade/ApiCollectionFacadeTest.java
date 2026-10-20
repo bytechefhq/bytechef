@@ -90,6 +90,7 @@ class ApiCollectionFacadeTest {
     void beforeEach() {
         IllegalStateException bodyReachedException = new IllegalStateException(BODY_REACHED);
 
+        when(apiCollectionEndpointService.getOpenApiEndpoint(anyLong())).thenThrow(bodyReachedException);
         when(apiCollectionEndpointService.update(any(ApiCollectionEndpoint.class))).thenThrow(bodyReachedException);
         when(apiCollectionService.getApiCollection(anyLong())).thenThrow(bodyReachedException);
         when(apiCollectionService.getApiCollectionProjectIds(anyLong())).thenThrow(bodyReachedException);
@@ -237,6 +238,30 @@ class ApiCollectionFacadeTest {
     void testDeleteApiCollectionEndpointAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheEndpoint() {
         assertResourceGuard(() -> apiCollectionFacade.deleteApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID),
             API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
+    void testEnableApiCollectionEndpointDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheEndpoint() {
+        assertResourceGuard(() -> apiCollectionFacade.enableApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID, true),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", false);
+    }
+
+    @Test
+    void testEnableApiCollectionEndpointAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheEndpoint() {
+        assertResourceGuard(() -> apiCollectionFacade.enableApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID, true),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
+    void testGetApiCollectionEndpointDeniesWhenTheApiPlatformViewScopeIsRefusedOnTheEndpoint() {
+        assertResourceGuard(() -> apiCollectionFacade.getApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_VIEW", false);
+    }
+
+    @Test
+    void testGetApiCollectionEndpointAllowsWhenTheApiPlatformViewScopeIsGrantedOnTheEndpoint() {
+        assertResourceGuard(() -> apiCollectionFacade.getApiCollectionEndpoint(API_COLLECTION_ENDPOINT_ID),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_VIEW", true);
     }
 
     @Test

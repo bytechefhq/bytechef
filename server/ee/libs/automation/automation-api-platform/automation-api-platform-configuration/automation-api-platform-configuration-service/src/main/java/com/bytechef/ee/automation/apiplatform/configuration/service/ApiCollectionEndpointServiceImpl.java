@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiEndpointRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -50,6 +51,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiCollectionEndpoint> fetchApiCollectionEndpoint(long id) {
+        return apiEndpointRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApiCollectionEndpoint getOpenApiEndpoint(long id) {
         return OptionalUtils.get(apiEndpointRepository.findById(id));
     }
@@ -70,6 +77,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
         curApiCollectionEndpoint.setHttpMethod(apiCollectionEndpoint.getHttpMethod());
         curApiCollectionEndpoint.setName(apiCollectionEndpoint.getName());
         curApiCollectionEndpoint.setPath(apiCollectionEndpoint.getPath());
+
+        Long projectDeploymentWorkflowId = apiCollectionEndpoint.getProjectDeploymentWorkflowId();
+
+        if (projectDeploymentWorkflowId != null) {
+            curApiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+        }
 
         return apiEndpointRepository.save(curApiCollectionEndpoint);
     }
