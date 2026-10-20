@@ -14,8 +14,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
-import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
+import com.bytechef.ee.embedded.configuration.repository.AutomationProjectRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,29 +26,29 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class AutomationWorkflowProjectWorkflowOwnershipResolverTest {
+class AutomationProjectWorkflowOwnershipResolverTest {
 
     private static final String WORKFLOW_UUID = UUID.randomUUID()
         .toString();
 
-    private final AutomationWorkflowProjectRepository automationWorkflowProjectRepository =
-        mock(AutomationWorkflowProjectRepository.class);
+    private final AutomationProjectRepository automationProjectRepository =
+        mock(AutomationProjectRepository.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
-    private final AutomationWorkflowProjectWorkflowOwnershipResolver resolver =
-        new AutomationWorkflowProjectWorkflowOwnershipResolver(
-            automationWorkflowProjectRepository, projectWorkflowService);
+    private final AutomationProjectWorkflowOwnershipResolver resolver =
+        new AutomationProjectWorkflowOwnershipResolver(
+            automationProjectRepository, projectWorkflowService);
 
     @Test
     void testResourceTypeMatchesTheGateToken() {
-        assertThat(resolver.resourceType()).isEqualTo("AutomationWorkflowProjectWorkflow");
+        assertThat(resolver.resourceType()).isEqualTo("AutomationProjectWorkflow");
     }
 
     @Test
     void testResolvesAnEmbeddedRow() {
         when(projectWorkflowService.getWorkflowUuidProjectWorkflows(WORKFLOW_UUID))
             .thenReturn(List.of(new ProjectWorkflow(7L, 1, "workflow-1")));
-        when(automationWorkflowProjectRepository.findByProjectId(7L))
-            .thenReturn(Optional.of(new AutomationWorkflowProject(7L)));
+        when(automationProjectRepository.findByProjectId(7L))
+            .thenReturn(Optional.of(new AutomationProject(7L)));
 
         assertThat(resolver.resolveOwner(WORKFLOW_UUID)).isEqualTo(ResourceOwner.ofEmbedded());
         assertThat(resolver.resolveOwner(UUID.fromString(WORKFLOW_UUID))).isEqualTo(ResourceOwner.ofEmbedded());
@@ -65,7 +65,7 @@ class AutomationWorkflowProjectWorkflowOwnershipResolverTest {
     void testAnotherSidesRowIsUnknown() {
         when(projectWorkflowService.getWorkflowUuidProjectWorkflows(WORKFLOW_UUID))
             .thenReturn(List.of(new ProjectWorkflow(7L, 1, "workflow-1")));
-        when(automationWorkflowProjectRepository.findByProjectId(7L)).thenReturn(Optional.empty());
+        when(automationProjectRepository.findByProjectId(7L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveOwner(WORKFLOW_UUID)).isEqualTo(ResourceOwner.unknown());
     }
