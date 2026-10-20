@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.security;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
+import com.bytechef.ee.embedded.configuration.repository.AutomationProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -30,18 +30,18 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
 
-    private final AutomationWorkflowProjectRepository automationWorkflowProjectRepository;
+    private final AutomationProjectRepository automationProjectRepository;
     private final ConnectUserProjectRepository connectUserProjectRepository;
     private final IntegrationWorkflowRepository integrationWorkflowRepository;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedResourceResolverImpl(
-        AutomationWorkflowProjectRepository automationWorkflowProjectRepository,
+        AutomationProjectRepository automationProjectRepository,
         ConnectUserProjectRepository connectUserProjectRepository,
         IntegrationWorkflowRepository integrationWorkflowRepository, ProjectWorkflowService projectWorkflowService) {
 
-        this.automationWorkflowProjectRepository = automationWorkflowProjectRepository;
+        this.automationProjectRepository = automationProjectRepository;
         this.connectUserProjectRepository = connectUserProjectRepository;
         this.integrationWorkflowRepository = integrationWorkflowRepository;
         this.projectWorkflowService = projectWorkflowService;
@@ -63,7 +63,7 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
 
     @Override
     public boolean isHubProject(long projectId) {
-        return automationWorkflowProjectRepository.findByProjectId(projectId)
+        return automationProjectRepository.findByProjectId(projectId)
             .isPresent();
     }
 

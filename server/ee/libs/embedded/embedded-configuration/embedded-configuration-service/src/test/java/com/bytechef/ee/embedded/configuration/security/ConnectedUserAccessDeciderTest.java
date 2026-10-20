@@ -151,7 +151,7 @@ class ConnectedUserAccessDeciderTest {
         ResourceEnvironmentResolver secondDeploymentEnvironmentResolver = environmentResolver("ProjectDeployment");
 
         ConnectedUserAccessDeciderImpl chainedDecider = new ConnectedUserAccessDeciderImpl(
-            automationWorkflowProjectFacade, connectedUserConnectionService, connectedUserProjectService,
+            automationProjectFacade, connectedUserConnectionService, connectedUserProjectService,
             integrationInstanceService, projectService, projectWorkflowService,
             List.of(firstDeploymentEnvironmentResolver, secondDeploymentEnvironmentResolver),
             List.of(firstJobResolver, secondJobResolver, projectDeploymentResolver));
