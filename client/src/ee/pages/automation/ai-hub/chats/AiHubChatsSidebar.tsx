@@ -10,6 +10,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
 import {AiHubChatsKeys, useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import {useLiveWorkflowLabel} from '@/ee/pages/automation/ai-hub/chats/hooks/useLiveWorkflowLabel';
 import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
@@ -28,6 +29,7 @@ import {
     PencilIcon,
     RotateCcwIcon,
     Trash2Icon,
+    WorkflowIcon,
 } from 'lucide-react';
 import {type MouseEvent, useEffect, useMemo, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
@@ -35,7 +37,7 @@ import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 import AiHubChatActionDialogs from './AiHubChatActionDialogs';
-import {AiHubChatI, generateAiHubChatTitle, getChatDisplayTitle} from './api/chats.api';
+import {AiHubChatI, generateAiHubChatTitle, getChatDisplayTitle, isWebhookBridgedChat} from './api/chats.api';
 
 export const CHATS_PAGE_SIZE = 25;
 
@@ -86,6 +88,8 @@ const ChatItem = ({
 
     const queryClient = useQueryClient();
 
+    const liveWorkflowLabel = useLiveWorkflowLabel(chat);
+
     const isArchived = chat.status === 'ARCHIVED';
 
     const handleRetryTitleGeneration = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -122,7 +126,28 @@ const ChatItem = ({
             )}
         >
             <button className="flex flex-1 items-center gap-1.5 truncate text-left" onClick={onSelect} type="button">
-                <MessageSquareIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
+                {isWebhookBridgedChat(chat.kind) ? (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <WorkflowIcon
+                                aria-label="Workflow chat"
+                                className="size-3.5 shrink-0 text-muted-foreground"
+                                role="img"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent side="right">
+                            Workflow chat: messages go to the workflow&apos;s chat trigger instead of an LLM.
+                            {liveWorkflowLabel && liveWorkflowLabel !== chat.title && (
+                                <div className="mt-1 text-xs opacity-90">
+                                    Current workflow label: <span className="font-medium">{liveWorkflowLabel}</span>
+                                </div>
+                            )}
+                        </TooltipContent>
+                    </Tooltip>
+                ) : (
+                    <MessageSquareIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />
+                )}
 
                 <span className={twMerge('truncate', isCurrent && 'font-semibold')}>{getChatDisplayTitle(chat)}</span>
 

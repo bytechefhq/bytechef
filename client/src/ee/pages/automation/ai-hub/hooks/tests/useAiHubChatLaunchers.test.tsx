@@ -84,4 +84,20 @@ describe('useAiHubChatLaunchers', () => {
         expect(aiHubChatsStore.getState().currentChatId).toBe(9);
         expect(aiHubStore.getState().chatId).toBe('thread-9');
     });
+
+    it('settles without switching chats when creating the workflow chat fails', async () => {
+        createMutateAsyncMock.mockRejectedValue(new Error('Workflow is not deployed'));
+
+        aiHubStore.setState({chatId: 'thread-home'});
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        await act(async () => {
+            await expect(result.current.onSelectWorkflowChat('exec-1', '5', 'Acme — Support')).resolves.toBeUndefined();
+        });
+
+        expect(navigateMock).not.toHaveBeenCalled();
+        expect(aiHubChatsStore.getState().currentChatId).toBeUndefined();
+        expect(aiHubStore.getState().chatId).toBe('thread-home');
+    });
 });

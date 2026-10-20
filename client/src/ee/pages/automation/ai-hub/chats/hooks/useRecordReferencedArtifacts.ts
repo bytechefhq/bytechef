@@ -6,7 +6,11 @@ import {useEffect, useRef} from 'react';
 import {isWorkspaceIdKnown} from '../isWorkspaceIdKnown';
 import {AiHubChatsKeys} from './useChats';
 
-export default function useRecordReferencedArtifacts(chatId: number | undefined, workspaceId: number | undefined) {
+export default function useRecordReferencedArtifacts(
+    chatId: number | undefined,
+    workspaceId: number | undefined,
+    enabled = true
+) {
     const seenRef = useRef<Set<string>>(new Set());
     const previousChatIdRef = useRef<number | undefined>(chatId);
 
@@ -27,7 +31,7 @@ export default function useRecordReferencedArtifacts(chatId: number | undefined,
             previousChatIdRef.current = chatId;
         }
 
-        if (chatId == null || tabsActiveChatId !== chatId || !isWorkspaceIdKnown(workspaceId)) {
+        if (!enabled || chatId == null || tabsActiveChatId !== chatId || !isWorkspaceIdKnown(workspaceId)) {
             return;
         }
 
@@ -52,7 +56,7 @@ export default function useRecordReferencedArtifacts(chatId: number | undefined,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [openTabs, chatId, tabsActiveChatId, workspaceId]);
+    }, [enabled, openTabs, chatId, tabsActiveChatId, workspaceId]);
 }
 
 function toWorkflowMetadata(tab: AiHubTabType): {projectId: string; projectWorkflowId: number} {
