@@ -343,7 +343,7 @@ class AutomationProjectConfigurationResolverIntTest {
         automationProjectFacade.createProjectWorkflow(projectId, WORKFLOW_DEFINITION, null);
 
         for (int version = 0; version < versionCount; version++) {
-            automationProjectFacade.publishProject(projectId);
+            automationProjectFacade.publishProject(projectId, null);
         }
 
         return projectId;

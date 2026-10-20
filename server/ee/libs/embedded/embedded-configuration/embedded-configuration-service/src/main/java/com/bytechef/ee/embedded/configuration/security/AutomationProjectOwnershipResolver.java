@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.security;
 
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
-import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
+import com.bytechef.ee.embedded.configuration.repository.AutomationProjectRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
@@ -21,25 +21,25 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class AutomationWorkflowProjectOwnershipResolver implements ResourceOwnershipResolver {
+public class AutomationProjectOwnershipResolver implements ResourceOwnershipResolver {
 
-    private final AutomationWorkflowProjectRepository automationWorkflowProjectRepository;
+    private final AutomationProjectRepository automationProjectRepository;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectOwnershipResolver(
-        AutomationWorkflowProjectRepository automationWorkflowProjectRepository) {
+    public AutomationProjectOwnershipResolver(
+        AutomationProjectRepository automationProjectRepository) {
 
-        this.automationWorkflowProjectRepository = automationWorkflowProjectRepository;
+        this.automationProjectRepository = automationProjectRepository;
     }
 
     @Override
     public String resourceType() {
-        return "AutomationWorkflowProject";
+        return "AutomationProject";
     }
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return automationWorkflowProjectRepository.findByProjectId(id)
+        return automationProjectRepository.findByProjectId(id)
             .isPresent() ? ResourceOwner.ofEmbedded() : ResourceOwner.unknown();
     }
 

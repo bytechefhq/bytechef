@@ -78,10 +78,6 @@ public interface AutomationProjectFacade {
     List<AutomationProjectConfigurationReleaseDTO> getPublishedProjectConfigurations(
         String externalUserId, Environment environment);
 
-    default void publishProject(long projectId) {
-        publishProject(projectId, null);
-    }
-
     int publishProject(long projectId, @Nullable String description);
 
     /**
