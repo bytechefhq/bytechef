@@ -20,11 +20,16 @@ const hoisted = vi.hoisted(() => ({
     accessibleEmbeddedEnvironmentIds: undefined as number[] | undefined,
     accessibleEnvironmentIds: undefined as number[] | undefined,
     currentEnvironmentId: 0,
+    embeddedHookActiveArguments: [] as boolean[],
     setCurrentEnvironmentId: vi.fn(),
 }));
 
 vi.mock('@/shared/hooks/useAccessibleEmbeddedEnvironmentIds', () => ({
-    useAccessibleEmbeddedEnvironmentIds: () => hoisted.accessibleEmbeddedEnvironmentIds,
+    useAccessibleEmbeddedEnvironmentIds: (active?: boolean) => {
+        hoisted.embeddedHookActiveArguments.push(active ?? true);
+
+        return hoisted.accessibleEmbeddedEnvironmentIds;
+    },
 }));
 
 vi.mock('@/shared/hooks/useAccessibleEnvironmentIds', () => ({
@@ -109,6 +114,7 @@ const renderSidebar = (open = true, pathname = '/automation/projects', sidebarNa
 describe('AppSidebar', () => {
     beforeEach(() => {
         hoisted.accessibleEmbeddedEnvironmentIds = undefined;
+        hoisted.embeddedHookActiveArguments = [];
         hoisted.accessibleEnvironmentIds = undefined;
         hoisted.currentEnvironmentId = 0;
         usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
@@ -282,6 +288,13 @@ describe('AppSidebar', () => {
             renderSidebar(true, '/embedded/configurations');
 
             expect(screen.getByTestId('visible-environments')).toHaveTextContent('1,2');
+        });
+
+        it('does not activate the embedded scope queries on automation pages', () => {
+            renderSidebar(true, '/automation/projects');
+
+            expect(hoisted.embeddedHookActiveArguments.length).toBeGreaterThan(0);
+            expect(hoisted.embeddedHookActiveArguments.every((active) => !active)).toBe(true);
         });
 
         it('switches an embedded member to the first accessible embedded environment', () => {

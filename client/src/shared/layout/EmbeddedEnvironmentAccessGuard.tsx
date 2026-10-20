@@ -1,6 +1,7 @@
 import EmptyList from '@/components/EmptyList';
 import {toEnvironmentName} from '@/shared/constants';
 import useEeEdition from '@/shared/edition/useEeEdition';
+import {UNION_ENVIRONMENT_ID} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIsEmbeddedMember} from '@/shared/hooks/useIsEmbeddedMember';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -13,6 +14,7 @@ const UNGUARDED_PATH_PREFIXES = ['/embedded/account'];
 const EmbeddedEnvironmentAccessGuard = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const embeddedScopeState = usePermissionStore((state) => state.embeddedScopeStates[currentEnvironmentId]);
+    const unionScopeState = usePermissionStore((state) => state.embeddedScopeStates[UNION_ENVIRONMENT_ID]);
 
     const eeEdition = useEeEdition();
     const {loading: membershipLoading, member} = useIsEmbeddedMember();
@@ -29,6 +31,10 @@ const EmbeddedEnvironmentAccessGuard = () => {
 
     if (membershipLoading) {
         return null;
+    }
+
+    if (unionScopeState?.status === 'error') {
+        return <Outlet />;
     }
 
     if (!member) {

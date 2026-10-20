@@ -121,6 +121,15 @@ describe('EmbeddedEnvironmentAccessGuard', () => {
         expect(screen.getByText('Connections page')).toBeInTheDocument();
     });
 
+    it('renders the page when loading the union scopes failed', () => {
+        setScopeStates({[UNION_ENVIRONMENT_ID]: {status: 'error'}});
+
+        renderAtPath('/embedded/connections');
+
+        expect(screen.getByText('Connections page')).toBeInTheDocument();
+        expect(screen.queryByText(MEMBERSHIP_NOTICE)).not.toBeInTheDocument();
+    });
+
     it('renders the page for a tenant admin', () => {
         setAccount(['ROLE_ADMIN']);
         setScopeStates({

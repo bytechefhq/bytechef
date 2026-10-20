@@ -104,6 +104,7 @@ describe('App', () => {
 
     afterEach(() => {
         authenticationStore.setState({account: undefined, authenticated: false});
+        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
 
         vi.clearAllMocks();
     });
@@ -192,7 +193,5 @@ describe('App', () => {
         expect(getByText('Integration Configurations')).toBeInTheDocument();
         expect(queryByText('Integrations')).not.toBeInTheDocument();
         expect(queryByText('Automations')).not.toBeInTheDocument();
-
-        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
     });
 });

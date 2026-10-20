@@ -69,7 +69,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const accessibleAutomationEnvironmentIds = useAccessibleEnvironmentIds(
         currentType === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
     );
-    const accessibleEmbeddedEnvironmentIds = useAccessibleEmbeddedEnvironmentIds();
+    const accessibleEmbeddedEnvironmentIds = useAccessibleEmbeddedEnvironmentIds(currentType === PlatformType.EMBEDDED);
 
     const accessibleEnvironmentIds =
         currentType === PlatformType.EMBEDDED ? accessibleEmbeddedEnvironmentIds : accessibleAutomationEnvironmentIds;
