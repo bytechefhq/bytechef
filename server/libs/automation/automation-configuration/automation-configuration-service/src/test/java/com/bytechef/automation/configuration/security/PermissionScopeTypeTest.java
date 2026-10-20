@@ -65,10 +65,6 @@ class PermissionScopeTypeTest {
      * Removing an entry is the whole cost of enforcing one: write the gate, delete the line.
      */
     private static final Set<String> KNOWN_UNENFORCED_SCOPES = Set.of(
-        "INTEGRATION_CREATE",
-        "INTEGRATION_PUBLISH",
-        "INTEGRATION_SETTINGS",
-        "INTEGRATION_DELETE",
         "INTEGRATION_INSTANCE_CONFIGURATION_VIEW",
         "INTEGRATION_INSTANCE_CONFIGURATION_CREATE",
         "INTEGRATION_INSTANCE_CONFIGURATION_EDIT",
