@@ -488,6 +488,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             throw new ConflictException("The conversation changed while truncating; retry");
         }
 
+        clearPendingWorkflowQuestionOnCommit(threadId);
+
         supersedePendingApprovalsOfDroppedToolCalls(
             chat, activeEvents.subList(0, cutoffEventIndex), activeEvents.get(messageEventIndex)
                 .getTimestamp());
@@ -653,22 +655,43 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         inFlightRunRegistry.retireThread(threadId);
 
-        clearPendingWorkflowQuestion(chatId);
-
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
 
         if (!cleanupScheduled) {
             deleteSessionMessages(threadId);
+            clearPendingWorkflowQuestion(threadId);
         }
     }
 
-    private void clearPendingWorkflowQuestion(long chatId) {
+    private void clearPendingWorkflowQuestionOnCommit(String threadId) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            clearPendingWorkflowQuestion(threadId);
+
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                clearPendingWorkflowQuestion(threadId);
+            }
+        });
+    }
+
+    private void clearPendingWorkflowQuestion(String threadId) {
         WebhookResumeRegistry webhookResumeRegistry = webhookResumeRegistryProvider.getIfAvailable();
 
-        if (webhookResumeRegistry != null) {
-            webhookResumeRegistry.clear(chatId);
+        if (webhookResumeRegistry == null) {
+            return;
+        }
+
+        try {
+            webhookResumeRegistry.clear(threadId);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to clear the pending workflow question of thread {}", threadId, exception);
         }
     }
 
@@ -683,6 +706,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             public void afterCommit() {
                 runInNewTransaction(() -> deleteSessionMessages(threadId), "purge the session of thread " + threadId);
                 runInNewTransaction(() -> deleteLeftoverApprovals(chatId), "delete the approvals of chat " + chatId);
+
+                clearPendingWorkflowQuestion(threadId);
             }
 
             @Override

@@ -15,6 +15,34 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
+ * Per-chat resume URL registry, keyed by the chat's thread id. Workflow chats that emit {@code ask_user_question} pause
+ * execution and hand the client a {@code resumeUrl} to POST the user's answer to. The URL is registered here on the way
+ * through and consumed on the next user turn to decide whether to start a fresh workflow run (the default) or resume
+ * the paused one.
+ *
+ * <p>
+ * Backed by Spring's {@link CacheManager} so multi-instance deployments work correctly. The cache name
+ * ({@value #CACHE_NAME}) is configured by the platform's central {@code CacheConfiguration}, which also sets the TTL.
+ * </p>
+ *
+ * <p>
+ * <b>TTL is correctness, not just hygiene.</b> A paused workflow that exceeds the cache TTL also likely exceeds the
+ * workflow engine's server-side timeout, so a resume attempt after that boundary would fail anyway.
+ * </p>
+ *
+ * <p>
+ * <b>Keyed by thread id, not chat id.</b> The cache is shared by every tenant and entries are put directly, without the
+ * tenant-aware key generator, so a numeric chat id would collide across schema-per-tenant tenants. Workflow chat thread
+ * ids are random UUIDs.
+ * </p>
+ *
+ * <p>
+ * <b>consume() is not strictly atomic across instances.</b> Spring Cache exposes {@link Cache#get} and
+ * {@link Cache#evictIfPresent} as separate operations. The worst case is a duplicate resume POST when two
+ * near-simultaneous turns from the same chat hit two different instances and both observe the entry before either
+ * evicts; that is narrow enough to accept.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -33,24 +61,24 @@ public class WebhookResumeRegistry {
         this.cacheManager = cacheManager;
     }
 
-    public void register(long chatId, String resumeUrl) {
-        getCache().put(chatId, resumeUrl);
+    public void register(String threadId, String resumeUrl) {
+        getCache().put(threadId, resumeUrl);
     }
 
-    public @Nullable String consume(long chatId) {
+    public @Nullable String consume(String threadId) {
         Cache cache = getCache();
 
-        String resumeUrl = cache.get(chatId, String.class);
+        String resumeUrl = cache.get(threadId, String.class);
 
         if (resumeUrl != null) {
-            cache.evictIfPresent(chatId);
+            cache.evictIfPresent(threadId);
         }
 
         return resumeUrl;
     }
 
-    public void clear(long chatId) {
-        getCache().evictIfPresent(chatId);
+    public void clear(String threadId) {
+        getCache().evictIfPresent(threadId);
     }
 
     private Cache getCache() {
