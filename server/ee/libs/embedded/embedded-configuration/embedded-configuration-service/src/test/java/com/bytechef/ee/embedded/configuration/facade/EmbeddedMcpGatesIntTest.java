@@ -328,6 +328,8 @@ class EmbeddedMcpGatesIntTest {
     private long developmentMcpConfigurationId;
     private long developmentMcpWorkflowId;
     private long developmentServerId;
+    private long integrationId;
+
     private String externalUserId;
     private long integrationInstanceId;
     private long developmentMcpToolId;
@@ -364,6 +366,8 @@ class EmbeddedMcpGatesIntTest {
         connectedUser = connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
 
         Integration integration = createPublishedIntegration();
+
+        integrationId = integration.getId();
 
         Workflow workflow = workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
@@ -505,7 +509,7 @@ class EmbeddedMcpGatesIntTest {
         embeddedMcpServerFacade.updateEmbeddedMcpToolEnabled(mcpToolId, false);
 
         McpComponent createdMcpComponent = embeddedMcpServerFacade.createEmbeddedMcpComponent(
-            new McpComponent("otherComponent", 1, productionServerId, null), List.of());
+            new McpComponent("componentName", 2, productionServerId, null), integrationId, List.of());
 
         assertThat(embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(productionServerId))
             .hasSize(2);
@@ -528,7 +532,7 @@ class EmbeddedMcpGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> embeddedMcpServerFacade.createEmbeddedMcpComponent(
-                new McpComponent("otherComponent", 1, developmentServerId, null), List.of()))
+                new McpComponent("componentName", 2, developmentServerId, null), integrationId, List.of()))
                     .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> embeddedMcpServerFacade.createEmbeddedMcpServer("created", Environment.DEVELOPMENT, null))
@@ -619,7 +623,7 @@ class EmbeddedMcpGatesIntTest {
             .orElseThrow();
 
         assertThatThrownBy(
-            () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(developmentMcpComponent, null, List.of()))
+            () -> embeddedMcpServerFacade.updateEmbeddedMcpComponent(developmentMcpComponent, null, null, List.of()))
                 .isInstanceOf(AccessDeniedException.class);
 
         assertThat(mcpToolRepository.findById(developmentMcpToolId)).isPresent();
@@ -628,7 +632,7 @@ class EmbeddedMcpGatesIntTest {
 
         assertThat(mcpToolRepository.findById(mcpToolId)).isEmpty();
 
-        embeddedMcpServerFacade.updateEmbeddedMcpComponent(productionMcpComponent, null, List.of());
+        embeddedMcpServerFacade.updateEmbeddedMcpComponent(productionMcpComponent, null, null, List.of());
     }
 
     @Test
