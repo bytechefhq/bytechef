@@ -44,7 +44,8 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useResolveAiHubToolApprovalMutation: () => ({mutateAsync: hoisted.resolveMutateAsync}),
 }));
 
-vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', () => ({
+vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/ee/pages/automation/ai-hub/chats/api/chats.api')>()),
     createAiHubChat: vi.fn(),
     generateAiHubChatTitle: vi.fn(() => Promise.resolve()),
     patchChat: vi.fn(() => Promise.resolve()),

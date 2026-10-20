@@ -19,7 +19,8 @@ export interface AiHubChatLaunchersI {
  * server-side, point the AI Hub stores at it, and navigate.
  *
  * Shared by the home composer and the in-chat composer so the launcher is reachable from anywhere the picker is.
- * Every pick starts a new conversation and navigates away from the current one.
+ * Every pick starts a new conversation and navigates away from the current one. A failed create leaves the current
+ * chat in place; the global fetch interceptor already shows the error toast.
  */
 export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -51,13 +52,19 @@ export const useAiHubChatLaunchers = (): AiHubChatLaunchersI => {
                 return;
             }
 
-            const result = await createWorkflowChatMutation.mutateAsync({
-                environment: currentEnvironmentId,
-                projectDeploymentId,
-                title: label,
-                workflowExecutionId,
-                workspaceId: String(currentWorkspaceId),
-            });
+            let result;
+
+            try {
+                result = await createWorkflowChatMutation.mutateAsync({
+                    environment: currentEnvironmentId,
+                    projectDeploymentId,
+                    title: label,
+                    workflowExecutionId,
+                    workspaceId: String(currentWorkspaceId),
+                });
+            } catch {
+                return;
+            }
 
             const chat = result.createWorkflowChatAiHubChat;
 

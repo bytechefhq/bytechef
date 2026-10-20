@@ -11,7 +11,7 @@ import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSide
 import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
 import AiHubChatActionDialogs from '@/ee/pages/automation/ai-hub/chats/AiHubChatActionDialogs';
-import {getChatDisplayTitle} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {getChatDisplayTitle, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
@@ -41,6 +41,9 @@ import {useShallow} from 'zustand/react/shallow';
 /**
  * The chat view: a header (sidebar toggle, chat title, resource-panel toggle, chat options), the floating artifacts
  * card, the thread and the composer with the chat's model picker.
+ *
+ * <p>A workflow chat shows a workflow badge next to its title, and has no model picker and no suggestion chips: its
+ * turns run the workflow behind it, not the hub agent.</p>
  */
 const AiHubPanel = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -84,6 +87,8 @@ const AiHubPanel = () => {
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 
+    const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
+
     const shownLlmSelection =
         chatLlmSelection?.provider != null && chatLlmSelection.model != null
             ? chatLlmSelection
@@ -104,6 +109,15 @@ const AiHubPanel = () => {
                     <h2 className="min-w-0 truncate text-base font-medium" title={chatTitle}>
                         {chatTitle}
                     </h2>
+
+                    {isWorkflowChat && (
+                        <span
+                            className="shrink-0 rounded-full bg-surface-brand-secondary px-2 py-1 text-xs leading-none font-medium text-content-brand-primary"
+                            title="This chat runs a workflow. Messages go to the workflow's chat trigger instead of an LLM."
+                        >
+                            Workflow chat
+                        </span>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -175,7 +189,7 @@ const AiHubPanel = () => {
 
             <div className="relative -mr-1 flex min-h-0 flex-1 flex-col">
                 <div className="min-h-0 flex-1">
-                    <AiHubThread contentInsetRight={artifactsCardVisible} />
+                    <AiHubThread contentInsetRight={artifactsCardVisible} showSuggestions={!isWorkflowChat} />
                 </div>
 
                 <div
@@ -186,7 +200,7 @@ const AiHubPanel = () => {
                 >
                     <AiHubChatComposer
                         modelPicker={
-                            currentChatId != null && currentWorkspaceId != null ? (
+                            !isWorkflowChat && currentChatId != null && currentWorkspaceId != null ? (
                                 <ModelPicker
                                     defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                     defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}

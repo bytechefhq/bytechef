@@ -5,6 +5,7 @@ import AiHubHomePanel from '@/ee/pages/automation/ai-hub/AiHubHomePanel';
 import AiHubPanel from '@/ee/pages/automation/ai-hub/AiHubPanel';
 import AiHubResourcePanel from '@/ee/pages/automation/ai-hub/AiHubResourcePanel';
 import AiHubChatsSidebar from '@/ee/pages/automation/ai-hub/chats/AiHubChatsSidebar';
+import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import useRecordReferencedArtifacts from '@/ee/pages/automation/ai-hub/chats/hooks/useRecordReferencedArtifacts';
 import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
@@ -152,14 +153,17 @@ const AiHub = () => {
 
     useResetAiHubStoresOnWorkspaceChange();
     useResetAiHubChatOnEnvironmentChange();
-    useRecordReferencedArtifacts(currentChatId, currentWorkspaceId);
+
+    const chats = useMemo(() => [...(activeChats ?? []), ...(archivedChats ?? [])], [activeChats, archivedChats]);
+
+    const currentChatIsWorkflowChat = isWebhookBridgedChat(chats.find((chat) => chat.id === currentChatId)?.kind);
+
+    useRecordReferencedArtifacts(currentChatId, currentWorkspaceId, !currentChatIsWorkflowChat);
 
     const hasActiveChat = currentChatId != null || hasMessages;
     const hasResourceContent = hasActiveChat || hasOpenTabs;
     const showResourcePanel = rightPanelOpen && hasResourceContent;
     const resourcePanelMounted = hasResourceContent || resourcePanelMountedState;
-
-    const chats = useMemo(() => [...(activeChats ?? []), ...(archivedChats ?? [])], [activeChats, archivedChats]);
 
     const isWorkspaceKnown = isWorkspaceIdKnown(currentWorkspaceId);
 
