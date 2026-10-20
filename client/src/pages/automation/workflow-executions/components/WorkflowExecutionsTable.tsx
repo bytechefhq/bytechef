@@ -23,7 +23,10 @@ interface ExecutionColumnI {
     header: (depth: number) => string;
     headerClassName?: string;
     id: string;
+    pinned?: boolean;
 }
+
+const PINNED_COLUMN_CLASS_NAME = 'sticky right-0 z-10 bg-surface-main';
 
 const columns: ExecutionColumnI[] = [
     {
@@ -95,6 +98,7 @@ const columns: ExecutionColumnI[] = [
         header: () => 'Actions',
         headerClassName: 'text-center',
         id: 'actions',
+        pinned: true,
     },
 ];
 
@@ -110,7 +114,11 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
 
             {columns.map((column) => (
                 <TableHead
-                    className={twMerge('w-4 text-sm font-medium text-inherit', column.headerClassName)}
+                    className={twMerge(
+                        'w-4 text-sm font-medium text-inherit',
+                        column.pinned && PINNED_COLUMN_CLASS_NAME,
+                        column.headerClassName
+                    )}
                     key={column.id}
                 >
                     {column.header(depth)}
@@ -161,7 +169,7 @@ const ExecutionRows = ({
                 <Fragment key={`${depth}_${rowKey}`}>
                     <TableRow
                         className={twMerge(
-                            'cursor-pointer border-0 hover:bg-surface-brand-secondary',
+                            'group cursor-pointer border-0 hover:bg-surface-brand-secondary',
                             !expandable && 'even:bg-surface-neutral-secondary',
                             depth > 0 && 'border-b border-stroke-neutral-secondary',
                             expandable && 'border-b-0'
@@ -192,7 +200,13 @@ const ExecutionRows = ({
 
                         {columns.map((column) => (
                             <TableCell
-                                className={twMerge('py-4 whitespace-nowrap', column.cellClassName)}
+                                className={twMerge(
+                                    'py-4 whitespace-nowrap',
+                                    column.pinned && PINNED_COLUMN_CLASS_NAME,
+                                    column.pinned && 'group-hover:bg-surface-brand-secondary',
+                                    column.pinned && !expandable && 'group-even:bg-surface-neutral-secondary',
+                                    column.cellClassName
+                                )}
                                 key={column.id}
                             >
                                 {column.cell(execution)}
