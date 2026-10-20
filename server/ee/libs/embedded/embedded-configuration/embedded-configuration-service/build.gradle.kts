@@ -62,6 +62,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
+    testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-graphql"))
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))

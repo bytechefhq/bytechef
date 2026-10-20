@@ -63,6 +63,8 @@ public interface McpServerService {
 
     String getMcpServerSecretKey(long mcpServerId);
 
+    String getEmbeddedMcpServerSecretKey(long mcpServerId);
+
     /**
      * Retrieves an MCP server by its secret key.
      *
