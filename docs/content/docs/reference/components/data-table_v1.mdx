@@ -177,13 +177,16 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Find Records
 Name: findRecords
 
-`Find records in a table with filters`
+`Find records in a table that match conditions`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
+| conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record. | false |
+| sortColumn | Sort Column | STRING <details> <summary> Depends On </summary> table </details> | Column to sort the records by. Records are sorted by id when not set. | false |
+| sortDirection | Sort Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> |  | false |
 | limit | Limit | INTEGER | Maximum number of records to return | false |
 | offset | Offset | INTEGER | Number of records to skip | false |
 
@@ -194,6 +197,15 @@ Name: findRecords
   "name" : "findRecords",
   "parameters" : {
     "table" : "",
+    "conditions" : [ [ {
+      "column" : "",
+      "operation" : "",
+      "value" : "",
+      "valueTo" : "",
+      "values" : [ "" ]
+    } ] ],
+    "sortColumn" : "",
+    "sortDirection" : "",
     "limit" : 1,
     "offset" : 1
   },
