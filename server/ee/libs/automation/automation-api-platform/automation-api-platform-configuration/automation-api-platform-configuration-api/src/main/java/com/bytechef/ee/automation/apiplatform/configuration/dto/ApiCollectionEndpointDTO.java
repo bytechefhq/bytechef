@@ -16,27 +16,55 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.dto;
 
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@SuppressFBWarnings("EI")
 public record ApiCollectionEndpointDTO(
-    long apiCollectionId,
-    String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, String path, long projectDeploymentWorkflowId, int version,
-    String workflowUuid) {
+    long apiCollectionId, List<ProjectDeploymentWorkflowConnection> connections,
+    String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id, Map<String, ?> inputs,
+    String lastModifiedBy, Instant lastModifiedDate, String name, String path, long projectDeploymentWorkflowId,
+    int version, String workflowUuid) {
+
+    public ApiCollectionEndpointDTO {
+        connections = connections == null ? List.of() : List.copyOf(connections);
+        inputs = inputs == null ? Map.of() : Collections.unmodifiableMap(new HashMap<>(inputs));
+    }
+
+    public ApiCollectionEndpointDTO(
+        long apiCollectionId, String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id,
+        String lastModifiedBy, Instant lastModifiedDate, String name, String path, long projectDeploymentWorkflowId,
+        int version, String workflowUuid) {
+
+        this(
+            apiCollectionId, List.of(), createdBy, createdDate, enabled, httpMethod, id, Map.of(), lastModifiedBy,
+            lastModifiedDate, name, path, projectDeploymentWorkflowId, version, workflowUuid);
+    }
 
     public ApiCollectionEndpointDTO(
         ApiCollectionEndpoint apiCollectionEndpoint, boolean enabled, String workflowUuid) {
 
+        this(apiCollectionEndpoint, List.of(), enabled, Map.of(), workflowUuid);
+    }
+
+    public ApiCollectionEndpointDTO(
+        ApiCollectionEndpoint apiCollectionEndpoint, List<ProjectDeploymentWorkflowConnection> connections,
+        boolean enabled, Map<String, ?> inputs, String workflowUuid) {
+
         this(
-            apiCollectionEndpoint.getApiCollectionId(), apiCollectionEndpoint.getCreatedBy(),
-            apiCollectionEndpoint.getCreatedDate(), enabled,
-            apiCollectionEndpoint.getHttpMethod(), apiCollectionEndpoint.getId(),
-            apiCollectionEndpoint.getLastModifiedBy(), apiCollectionEndpoint.getLastModifiedDate(),
-            apiCollectionEndpoint.getName(), apiCollectionEndpoint.getPath(),
-            apiCollectionEndpoint.getProjectDeploymentWorkflowId(), apiCollectionEndpoint.getVersion(),
-            workflowUuid);
+            apiCollectionEndpoint.getApiCollectionId(), connections, apiCollectionEndpoint.getCreatedBy(),
+            apiCollectionEndpoint.getCreatedDate(), enabled, apiCollectionEndpoint.getHttpMethod(),
+            apiCollectionEndpoint.getId(), inputs, apiCollectionEndpoint.getLastModifiedBy(),
+            apiCollectionEndpoint.getLastModifiedDate(), apiCollectionEndpoint.getName(),
+            apiCollectionEndpoint.getPath(), apiCollectionEndpoint.getProjectDeploymentWorkflowId(),
+            apiCollectionEndpoint.getVersion(), workflowUuid);
     }
 
     public ApiCollectionEndpoint toApiCollectionEndpoint() {

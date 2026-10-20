@@ -7,11 +7,14 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -20,6 +23,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
@@ -29,8 +34,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
-import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
@@ -40,10 +45,13 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
+import java.util.Map;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -290,6 +298,20 @@ class ApiCollectionFacadeTest {
     }
 
     @Test
+    void testUpdateApiCollectionEndpointWorkflowDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheEndpoint() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.updateApiCollectionEndpointWorkflow(API_COLLECTION_ENDPOINT_ID, List.of(), null),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", false);
+    }
+
+    @Test
+    void testUpdateApiCollectionEndpointWorkflowAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheEndpoint() {
+        assertResourceGuard(
+            () -> apiCollectionFacade.updateApiCollectionEndpointWorkflow(API_COLLECTION_ENDPOINT_ID, List.of(), null),
+            API_COLLECTION_ENDPOINT_ID, API_COLLECTION_ENDPOINT_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Test
     void testUpdateApiCollectionTagsDeniesWhenTheApiPlatformEditScopeIsRefusedOnTheCollection() {
         assertResourceGuard(() -> apiCollectionFacade.updateApiCollectionTags(API_COLLECTION_ID, List.of()),
             API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", false);
@@ -299,6 +321,154 @@ class ApiCollectionFacadeTest {
     void testUpdateApiCollectionTagsAllowsWhenTheApiPlatformEditScopeIsGrantedOnTheCollection() {
         assertResourceGuard(() -> apiCollectionFacade.updateApiCollectionTags(API_COLLECTION_ID, List.of()),
             API_COLLECTION_ID, API_COLLECTION_TYPE, "API_PLATFORM_EDIT", true);
+    }
+
+    @Nested
+    class EndpointWorkflow {
+
+        private final ApiCollectionEndpointService apiCollectionEndpointService =
+            mock(ApiCollectionEndpointService.class);
+        private final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+        private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
+            mock(ProjectDeploymentWorkflowService.class);
+        private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        private final ApiCollectionFacade apiCollectionFacade = new ApiCollectionFacadeImpl(
+            mock(ApiCollectionService.class), apiCollectionEndpointService, mock(EnvironmentService.class),
+            projectDeploymentFacade, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+            mock(ProjectService.class), projectWorkflowService, mock(TagService.class), mock(WorkflowService.class));
+
+        @Test
+        void testEnableApiCollectionEndpointEnablesTheWorkflowOnTheBackingDeployment() {
+            ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            apiCollectionEndpoint.setApiCollectionId(100L);
+            apiCollectionEndpoint.setHttpMethod(HttpMethod.GET);
+            apiCollectionEndpoint.setId(7L);
+            apiCollectionEndpoint.setName("list-invoices");
+            apiCollectionEndpoint.setPath("invoices");
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setEnabled(false);
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(7L)).thenReturn(apiCollectionEndpoint);
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(projectDeploymentWorkflow);
+            when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-1")).thenReturn("uuid-1");
+            doAnswer(invocation -> {
+                projectDeploymentWorkflow.setEnabled(invocation.getArgument(2));
+
+                return null;
+            }).when(projectDeploymentFacade)
+                .enableProjectDeploymentWorkflow(200L, "workflow-1", true);
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = apiCollectionFacade.enableApiCollectionEndpoint(7L, true);
+
+            verify(projectDeploymentFacade).enableProjectDeploymentWorkflow(200L, "workflow-1", true);
+
+            assertThat(apiCollectionEndpointDTO.id()).isEqualTo(7L);
+            assertThat(apiCollectionEndpointDTO.enabled()).isTrue();
+        }
+
+        @Test
+        void testGetApiCollectionEndpointReturnsTheEndpointWithItsWorkflowUuid() {
+            ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            apiCollectionEndpoint.setApiCollectionId(100L);
+            apiCollectionEndpoint.setHttpMethod(HttpMethod.GET);
+            apiCollectionEndpoint.setId(7L);
+            apiCollectionEndpoint.setName("list-invoices");
+            apiCollectionEndpoint.setPath("invoices");
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(7L)).thenReturn(apiCollectionEndpoint);
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(projectDeploymentWorkflow);
+            when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-1")).thenReturn("uuid-1");
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = apiCollectionFacade.getApiCollectionEndpoint(7L);
+
+            assertThat(apiCollectionEndpointDTO.name()).isEqualTo("list-invoices");
+            assertThat(apiCollectionEndpointDTO.workflowUuid()).isEqualTo("uuid-1");
+        }
+
+        @Test
+        void testGetApiCollectionEndpointReturnsConnectionsAndInputs() {
+            stubEndpointWorkflow(false, 4);
+
+            ApiCollectionEndpointDTO apiCollectionEndpointDTO = apiCollectionFacade.getApiCollectionEndpoint(7L);
+
+            assertThat(apiCollectionEndpointDTO.connections()).hasSize(1);
+            assertThat(apiCollectionEndpointDTO.connections()
+                .get(0)
+                .getConnectionId()).isEqualTo(61L);
+            assertThat(apiCollectionEndpointDTO.inputs()
+                .get("region")).isEqualTo("eu");
+        }
+
+        @Test
+        void testUpdateApiCollectionEndpointWorkflowKeepsEnabledAndVersion() {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = stubEndpointWorkflow(true, 4);
+
+            ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection =
+                new ProjectDeploymentWorkflowConnection(62L, "key", "node");
+
+            apiCollectionFacade.updateApiCollectionEndpointWorkflow(
+                7L, List.of(projectDeploymentWorkflowConnection), Map.of("region", "us"));
+
+            ArgumentCaptor<ProjectDeploymentWorkflow> captor = ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+            verify(projectDeploymentFacade).updateProjectDeploymentWorkflow(captor.capture());
+
+            ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = captor.getValue();
+
+            assertThat(updatedProjectDeploymentWorkflow.getId()).isEqualTo(901L);
+            assertThat(updatedProjectDeploymentWorkflow.getConnections()).containsExactly(
+                projectDeploymentWorkflowConnection);
+            assertThat(updatedProjectDeploymentWorkflow.getInputs()
+                .get("region")).isEqualTo("us");
+            assertThat(updatedProjectDeploymentWorkflow.isEnabled()).isEqualTo(projectDeploymentWorkflow.isEnabled());
+            assertThat(updatedProjectDeploymentWorkflow.isEnabled()).isTrue();
+            assertThat(updatedProjectDeploymentWorkflow.getVersion()).isEqualTo(4);
+        }
+
+        private ProjectDeploymentWorkflow stubEndpointWorkflow(boolean enabled, int version) {
+            ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+            apiCollectionEndpoint.setApiCollectionId(100L);
+            apiCollectionEndpoint.setHttpMethod(HttpMethod.GET);
+            apiCollectionEndpoint.setId(7L);
+            apiCollectionEndpoint.setName("list-invoices");
+            apiCollectionEndpoint.setPath("invoices");
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(901L);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(List.of(new ProjectDeploymentWorkflowConnection(61L, "key", "node")));
+            projectDeploymentWorkflow.setEnabled(enabled);
+            projectDeploymentWorkflow.setId(901L);
+            projectDeploymentWorkflow.setInputs(Map.of("region", "eu"));
+            projectDeploymentWorkflow.setProjectDeploymentId(200L);
+            projectDeploymentWorkflow.setVersion(version);
+            projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+            when(apiCollectionEndpointService.getOpenApiEndpoint(7L)).thenReturn(apiCollectionEndpoint);
+            when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(901L))
+                .thenReturn(projectDeploymentWorkflow);
+            lenient().when(projectWorkflowService.getProjectWorkflowUuid(200L, "workflow-1"))
+                .thenReturn("uuid-1");
+
+            return projectDeploymentWorkflow;
+        }
     }
 
     private void assertResourceGuard(

@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -337,6 +338,26 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
+    public ApiCollectionEndpointDTO updateApiCollectionEndpointWorkflow(
+        long id, List<ProjectDeploymentWorkflowConnection> connections, Map<String, ?> inputs) {
+
+        ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointService.getOpenApiEndpoint(id);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflow(apiCollectionEndpoint.getProjectDeploymentWorkflowId());
+
+        List<ProjectDeploymentWorkflowConnection> newConnections = connections == null ? List.of() : connections;
+
+        projectDeploymentWorkflow.setConnections(newConnections);
+        projectDeploymentWorkflow.setInputs(inputs == null ? Map.of() : inputs);
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        return toApiCollectionEndpointDTO(apiCollectionEndpoint);
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public void updateApiCollectionTags(long id, List<Tag> tags) {
         tags = checkTags(tags);
@@ -529,6 +550,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             projectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentWorkflow.getWorkflowId());
 
         return new ApiCollectionEndpointDTO(
-            apiCollectionEndpoint, projectDeploymentWorkflow.isEnabled(), workflowUuid);
+            apiCollectionEndpoint, projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.isEnabled(),
+            projectDeploymentWorkflow.getInputs(), workflowUuid);
     }
 }
