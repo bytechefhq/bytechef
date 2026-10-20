@@ -117,6 +117,7 @@ class PreAuthorizeAnnotationTest {
         String inEnvironment = "hasEmbeddedScopeInEnvironment('EMBEDDED_MEMBER_MANAGE', #environment)";
 
         assertEveryPublicOverloadIsGated(clazz, "addEmbeddedUser", everyEnvironment);
+        assertEveryPublicOverloadIsGated(clazz, "addEmbeddedUserByEmail", everyEnvironment);
         assertEveryPublicOverloadIsGated(clazz, "getEmbeddedUsers", "hasEmbeddedScope('EMBEDDED_VIEW')");
         assertEveryPublicOverloadIsGated(clazz, "updateEmbeddedUserRole", everyEnvironment);
         assertEveryPublicOverloadIsGated(clazz, "removeEmbeddedUser", everyEnvironment);

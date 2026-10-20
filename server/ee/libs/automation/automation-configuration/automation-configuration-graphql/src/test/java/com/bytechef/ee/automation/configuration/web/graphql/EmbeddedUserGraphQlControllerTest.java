@@ -86,6 +86,18 @@ class EmbeddedUserGraphQlControllerTest {
         assertThat(view.inherited()).isFalse();
     }
 
+    @Test
+    void testAddEmbeddedUserByEmailMapsTheRole() {
+        when(embeddedUserFacade.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR))
+            .thenReturn(EmbeddedUser.forRole(6L, WorkspaceRole.EDITOR));
+
+        EmbeddedUserView view = controller.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR);
+
+        assertThat(view.userId()).isEqualTo(6L);
+        assertThat(view.embeddedRole()).isEqualTo(WorkspaceRole.EDITOR.name());
+        assertThat(view.inherited()).isFalse();
+    }
+
     private static User user(long id) {
         User user = new User();
 
