@@ -11,6 +11,7 @@ import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connecte
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectsQuery,
     ConnectedUserProjectsQuery,
@@ -57,6 +58,9 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+
     const queryClient = useQueryClient();
 
     const deleteConnectedUserProjectWorkflowMutation = useDeleteConnectedUserProjectWorkflowMutation({
@@ -270,7 +274,11 @@ const ConnectedUserProjectWorkflowListItem = ({
                                                 checked={
                                                     connectedUserProjectWorkflow.enabled && !turnedOffByAdministrator
                                                 }
-                                                disabled={enableDisabled || turnedOffByAdministrator}
+                                                disabled={
+                                                    !canManageConnectedUser ||
+                                                    enableDisabled ||
+                                                    turnedOffByAdministrator
+                                                }
                                                 onCheckedChange={(value) => {
                                                     enableConnectedUserProjectWorkflowMutation.mutate({
                                                         enable: value,
@@ -286,10 +294,14 @@ const ConnectedUserProjectWorkflowListItem = ({
                             </div>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={editable ? () => setShowEditDialog(true) : undefined}
-                        />
+                        {(canDeleteConnectedUser || (editable && canManageConnectedUser)) && (
+                            <ConnectedUserSheetDeleteDropdownMenu
+                                onDeleteClick={canDeleteConnectedUser ? () => setShowDeleteDialog(true) : undefined}
+                                onEditClick={
+                                    editable && canManageConnectedUser ? () => setShowEditDialog(true) : undefined
+                                }
+                            />
+                        )}
                     </div>
                 </div>
             </li>
