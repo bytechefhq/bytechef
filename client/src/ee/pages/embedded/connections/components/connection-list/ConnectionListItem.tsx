@@ -1,15 +1,14 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateConnectionTagsMutation} from '@/ee/shared/mutations/embedded/connectionTags.mutations';
@@ -168,23 +167,21 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                     <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                                 </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="p-0">
+                                <DropdownMenuContent align="end">
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item"
+                                        icon={<EditIcon />}
+                                        label="Edit"
                                         onClick={() => setShowEditDialog(true)}
-                                    >
-                                        <EditIcon /> Edit
-                                    </DropdownMenuItem>
+                                    />
 
-                                    <DropdownMenuSeparator className="m-0" />
+                                    <DropdownMenuSeparator />
 
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item-destructive"
+                                        icon={<Trash2Icon />}
+                                        label="Delete"
                                         onClick={() => setShowDeleteDialog(true)}
                                         variant="destructive"
-                                    >
-                                        <Trash2Icon /> Delete
-                                    </DropdownMenuItem>
+                                    />
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
