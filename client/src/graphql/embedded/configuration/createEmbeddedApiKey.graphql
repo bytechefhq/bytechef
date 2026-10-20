@@ -1,0 +1,3 @@
+mutation CreateEmbeddedApiKey($input: CreateEmbeddedApiKeyInput!) {
+    createEmbeddedApiKey(input: $input)
+}
