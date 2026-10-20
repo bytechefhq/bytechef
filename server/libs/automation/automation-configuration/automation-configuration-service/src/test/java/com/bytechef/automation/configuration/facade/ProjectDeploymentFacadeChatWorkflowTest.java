@@ -58,6 +58,15 @@ class ProjectDeploymentFacadeChatWorkflowTest {
     private static final String CHAT_WORKFLOW_DEFINITION =
         "{\"label\":\"%s\",\"triggers\":[{\"name\":\"chat_1\",\"type\":\"chat/v1/newChatMessage\"}],\"tasks\":[]}";
 
+    private static final String WEBHOOK_BEFORE_CHAT_WORKFLOW_DEFINITION =
+        "{\"label\":\"Webhook first\",\"triggers\":[{\"name\":\"webhook_1\","
+            + "\"type\":\"webhook/v1/autoRespondWithHTTPOK\"},{\"name\":\"chat_1\","
+            + "\"type\":\"chat/v1/newChatMessage\"}],\"tasks\":[]}";
+
+    private static final String NON_CHAT_WORKFLOW_DEFINITION =
+        "{\"label\":\"Webhook\",\"triggers\":[{\"name\":\"trigger_1\",\"type\":\"webhook/v1/autoRespondWithHTTPOK\"}],"
+            + "\"tasks\":[]}";
+
     private static final long ENVIRONMENT_ID = 2L;
     private static final long PROJECT_DEPLOYMENT_ID = 10L;
     private static final long PROJECT_WORKFLOW_ID = 1000L;
@@ -153,6 +162,77 @@ class ProjectDeploymentFacadeChatWorkflowTest {
             .thenReturn(List.of());
 
         assertThat(createProjectDeploymentFacade().findWorkspaceChatWorkflow(WORKSPACE_ID, "anything")).isEmpty();
+    }
+
+    @Test
+    void testListingSkipsADeploymentWithoutAProjectRow() {
+        stubOneChatWorkflow();
+
+        Mockito.when(projectService.getProjects(ArgumentMatchers.anyList()))
+            .thenReturn(List.of());
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
+    }
+
+    @Test
+    void testListingSkipsAWorkflowWithoutAProjectWorkflow() {
+        stubOneChatWorkflow();
+
+        Mockito.when(projectWorkflowService.getWorkflowProjectWorkflows(ArgumentMatchers.anyList()))
+            .thenReturn(List.of());
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
+    }
+
+    @Test
+    void testListingSkipsADisabledDeployment() {
+        StubbedChatWorkflow stubbedChatWorkflow = stubOneChatWorkflow();
+
+        stubbedChatWorkflow.projectDeployment()
+            .setEnabled(false);
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
+    }
+
+    @Test
+    void testListingSkipsADisabledDeploymentWorkflow() {
+        StubbedChatWorkflow stubbedChatWorkflow = stubOneChatWorkflow();
+
+        stubbedChatWorkflow.projectDeploymentWorkflow()
+            .setEnabled(false);
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
+    }
+
+    @Test
+    void testListingSkipsAWorkflowWithoutAChatTrigger() {
+        stubOneChatWorkflow();
+
+        Mockito.when(workflowService.getWorkflows(ArgumentMatchers.anyList()))
+            .thenReturn(
+                List.of(new Workflow(WORKFLOW_ID, NON_CHAT_WORKFLOW_DEFINITION, Workflow.Format.JSON)));
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
+    }
+
+    @Test
+    void testListingTakesTheExecutionIdOfTheChatTriggerWhenAWebhookTriggerPrecedesIt() {
+        stubOneChatWorkflow();
+
+        Mockito.when(workflowService.getWorkflows(ArgumentMatchers.anyList()))
+            .thenReturn(
+                List.of(new Workflow(WORKFLOW_ID, WEBHOOK_BEFORE_CHAT_WORKFLOW_DEFINITION, Workflow.Format.JSON)));
+
+        List<ChatWorkflow> chatWorkflows = createProjectDeploymentFacade()
+            .getWorkspaceChatWorkflows(WORKSPACE_ID, null);
+
+        assertThat(chatWorkflows).hasSize(1);
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(
+            chatWorkflows.getFirst()
+                .workflowExecutionId());
+
+        assertThat(workflowExecutionId.getTriggerName()).isEqualTo("chat_1");
     }
 
     private StubbedChatWorkflow stubOneChatWorkflow() {
