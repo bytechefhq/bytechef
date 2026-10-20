@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
@@ -65,6 +66,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider;
     private final CurrentUserResolver currentUserResolver;
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final EmbeddedScopeCacheService embeddedScopeCacheService;
     private final EmbeddedUserRepository embeddedUserRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
@@ -84,10 +86,12 @@ public class PermissionServiceImpl implements PermissionService {
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
         ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider,
-        EmbeddedScopeCacheService embeddedScopeCacheService, EmbeddedUserRepository embeddedUserRepository) {
+        EmbeddedScopeCacheService embeddedScopeCacheService, EmbeddedUserRepository embeddedUserRepository,
+        ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider) {
 
         this.connectedUserAccessDeciderProvider = connectedUserAccessDeciderProvider;
         this.currentUserResolver = currentUserResolver;
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.embeddedScopeCacheService = embeddedScopeCacheService;
         this.embeddedUserRepository = embeddedUserRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
@@ -250,6 +254,10 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
+        if (isEmbeddedProject(projectId)) {
+            return hasEmbeddedScope(scope);
+        }
+
         Long workspaceId = projectService.fetchProject(projectId)
             .map(Project::getWorkspaceId)
             .orElse(null);
@@ -278,7 +286,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findById(projectId)
+        if (isEmbeddedProject(projectId)) {
+            return hasEmbeddedScope(scope, environment);
+        }
+
+        Long workspaceId = projectService.fetchProject(projectId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 
@@ -402,6 +414,18 @@ public class PermissionServiceImpl implements PermissionService {
         return ownerUserId.isPresent() && isCurrentUser(ownerUserId.getAsLong());
     }
 
+    private boolean isEmbeddedProject(long projectId) {
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedProject(projectId);
+    }
+
+    private boolean isEmbeddedWorkflow(String workflowId) {
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        return embeddedResourceResolver != null && embeddedResourceResolver.isEmbeddedWorkflow(workflowId);
+    }
+
     private ResourceOwner resolveOwner(String resourceType, Serializable id) {
         for (ResourceOwnershipResolver resourceOwnershipResolver : resourceOwnershipResolvers.get(resourceType)) {
             ResourceOwner resourceOwner = resourceOwnershipResolver.resolveOwner(id);
@@ -468,6 +492,10 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
+        if (isEmbeddedWorkflow(workflowId)) {
+            return hasEmbeddedScope(scope);
+        }
+
         Long workspaceId = projectService.fetchWorkflowProject(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
@@ -496,7 +524,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
+        if (isEmbeddedWorkflow(workflowId)) {
+            return hasEmbeddedScope(scope, environment);
+        }
+
+        Long workspaceId = projectService.fetchWorkflowProject(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 
@@ -524,7 +556,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
+        if (isEmbeddedWorkflow(workflowId)) {
+            return hasEmbeddedScope(scope, environment);
+        }
+
+        Long workspaceId = projectService.fetchWorkflowProject(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 
@@ -552,7 +588,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
+        Long workspaceId = projectService.fetchWorkflowProject(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 
