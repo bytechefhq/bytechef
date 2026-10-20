@@ -27,7 +27,6 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ class ConnectionOwnershipResolverTest {
 
         connection.setType(type);
 
-        when(connectionService.getConnections(List.of(7L))).thenReturn(List.of(connection));
+        when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection));
     }
 
     @Test
@@ -83,7 +82,7 @@ class ConnectionOwnershipResolverTest {
 
     @Test
     void testResolveOwnerFailsClosedWhenTheConnectionDoesNotExist() {
-        when(connectionService.getConnections(List.of(7L))).thenReturn(List.of());
+        when(connectionService.fetchConnection(7L)).thenReturn(Optional.empty());
 
         assertThat(resolver.resolveOwner(7L)).isEqualTo(ResourceOwner.unknown());
     }

@@ -65,6 +65,12 @@ public interface ResourceOwnershipResolver {
      */
     record ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded) {
 
+        public ResourceOwner {
+            if (embedded && workspaceId.isPresent()) {
+                throw new IllegalArgumentException("An embedded resource owner cannot have a workspace");
+            }
+        }
+
         public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
             this(workspaceId, ownerUserId, false);
         }

@@ -21,7 +21,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,9 +51,9 @@ public class ConnectionOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        List<Connection> connections = connectionService.getConnections(List.of(id));
+        Optional<Connection> connection = connectionService.fetchConnection(id);
 
-        if (connections.isEmpty() || connections.getFirst()
+        if (connection.isEmpty() || connection.get()
             .getType() != PlatformType.AUTOMATION) {
 
             return ResourceOwner.unknown();
