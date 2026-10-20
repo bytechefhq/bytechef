@@ -12,6 +12,7 @@ import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -55,6 +56,8 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
     );
+
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -170,16 +173,22 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
-                            disabled={enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
+                            disabled={
+                                !canEditConfiguration || enableIntegrationInstanceConfigurationWorkflowMutation.isPending
+                            }
                             onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />
                     </div>
                 </div>
 
-                <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
-                    onEditClick={() => setShowEditWorkflowDialog(true)}
-                    workflow={workflow}
-                />
+                {canEditConfiguration ? (
+                    <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
+                        onEditClick={() => setShowEditWorkflowDialog(true)}
+                        workflow={workflow}
+                    />
+                ) : (
+                    <div aria-hidden="true" className="size-9 shrink-0" />
+                )}
             </div>
 
             {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && fetchedWorkflow && (

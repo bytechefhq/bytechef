@@ -19,6 +19,11 @@ vi.mock('@uidotdev/usehooks', () => ({
     useCopyToClipboard: () => [null, hoisted.copyToClipboard],
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations', () => ({
     useEnableIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));

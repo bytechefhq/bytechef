@@ -10,6 +10,11 @@ import IntegrationInstanceConfigurationWorkflowListItem from '../IntegrationInst
 
 const {rowPropsMock} = vi.hoisted(() => ({rowPropsMock: vi.fn()}));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
     default: (props: object) => {
         rowPropsMock(props);

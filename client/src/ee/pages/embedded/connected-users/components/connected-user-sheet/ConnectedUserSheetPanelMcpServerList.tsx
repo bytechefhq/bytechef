@@ -5,6 +5,7 @@ import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-u
 import ConnectedUserMcpServerListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItem';
 import ProvisionMcpServerDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-mcp-server-dialog/ProvisionMcpServerDialog';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {
     useConnectedUserMcpServersQuery,
@@ -22,13 +23,14 @@ const ConnectedUserSheetPanelMcpServerList = ({
 }) => {
     const [showProvisionDialog, setShowProvisionDialog] = useState(false);
 
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
     const isTenantAdmin = useIsTenantAdmin();
 
     const {data, isLoading} = useConnectedUserMcpServersQuery(
         {
             connectedUserId: connectedUserId.toString(),
         },
-        {enabled: isTenantAdmin}
+        {enabled: canViewMcpServers}
     );
 
     const {data: provisionableData} = useProvisionableConnectedUserMcpServersQuery(

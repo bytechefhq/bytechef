@@ -12,11 +12,16 @@ import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflo
 import useWorkflowExecutionDetail from './hooks/useWorkflowExecutionDetail';
 
 interface WorkflowExecutionDetailProps {
+    embedded?: boolean;
     enabled?: boolean;
     workflowExecutionId: number;
 }
 
-const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
+const WorkflowExecutionDetail = ({
+    embedded = false,
+    enabled = true,
+    workflowExecutionId,
+}: WorkflowExecutionDetailProps) => {
     const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
 
     const {useGetComponentDefinitionsQuery} = useWorkflowExecutionDetailQueries();
@@ -89,6 +94,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     {(job || triggerExecution) && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
+                            embedded={embedded}
                             focusedExecution={focusedExecution}
                             focusedTaskExecutionError={focusedTaskExecutionError}
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}

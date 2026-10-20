@@ -7,14 +7,14 @@ import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/
 import ConnectedUserSheetPanelWorkflowExecutionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowExecutionList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
-import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 interface ConnectedUserSheetPanelProps {
     connectedUser: ConnectedUser;
 }
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
-    const isTenantAdmin = useIsTenantAdmin();
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
 
     return (
         <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
@@ -30,7 +30,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
 
                     <TabsTrigger value="workflows">Automations</TabsTrigger>
 
-                    {isTenantAdmin && <TabsTrigger value="mcp-servers">MCP Servers</TabsTrigger>}
+                    {canViewMcpServers && <TabsTrigger value="mcp-servers">MCP Servers</TabsTrigger>}
 
                     <TabsTrigger value="connections">Connections</TabsTrigger>
 
@@ -59,7 +59,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                {isTenantAdmin && (
+                {canViewMcpServers && (
                     <TabsContent value="mcp-servers">
                         {connectedUser.id != null && (
                             <ConnectedUserSheetPanelMcpServerList
