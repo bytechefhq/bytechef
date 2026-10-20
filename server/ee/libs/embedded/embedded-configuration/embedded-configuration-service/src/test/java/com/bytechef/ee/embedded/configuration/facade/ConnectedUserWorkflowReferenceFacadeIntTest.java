@@ -42,6 +42,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -129,6 +130,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -275,6 +277,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private PlatformTransactionManager platformTransactionManager;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private PrincipalJobService principalJobService;
 
     @Autowired
@@ -289,8 +294,14 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     @Autowired
     private WorkflowService workflowService;
 
+    @AfterEach
+    void afterEach() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(false);
+    }
+
     @BeforeEach
     void setUp() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition(anyString(), anyInt()))
             .thenReturn(new ComponentDefinition("slack"));
         when(connectionService.getConnections(PlatformType.EMBEDDED))

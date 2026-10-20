@@ -119,7 +119,7 @@ public class AutomationProjectConfigurationFacadeImpl
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
-    private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
+    private final ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
     private final ConnectionService connectionService;
     private final JobService jobService;
     private final McpAutomationRowFacade mcpAutomationRowFacade;
@@ -143,7 +143,7 @@ public class AutomationProjectConfigurationFacadeImpl
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService,
-        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
+        ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader,
         ConnectionService connectionService, JobService jobService, McpAutomationRowFacade mcpAutomationRowFacade,
         PlatformTransactionManager platformTransactionManager, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
@@ -162,7 +162,7 @@ public class AutomationProjectConfigurationFacadeImpl
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
-        this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
+        this.connectedUserWorkflowReferenceReader = connectedUserWorkflowReferenceReader;
         this.connectionService = connectionService;
         this.jobService = jobService;
         this.mcpAutomationRowFacade = mcpAutomationRowFacade;
@@ -1603,7 +1603,7 @@ public class AutomationProjectConfigurationFacadeImpl
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
-        return connectedUserWorkflowReferenceFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceReader.getReferences(workflowUuids)
             .stream()
             .filter(reference -> connectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))

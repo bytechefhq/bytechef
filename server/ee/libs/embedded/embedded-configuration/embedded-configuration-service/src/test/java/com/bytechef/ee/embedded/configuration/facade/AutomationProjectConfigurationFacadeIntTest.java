@@ -166,7 +166,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectedUserWorkflowReferenceFacade.class,
+    ConnectedUserWorkflowReferenceReader.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -291,7 +291,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Autowired
-    private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
+    private ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -2044,7 +2044,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(
                 new ConnectedUserWorkflowReferenceDTO(
                     fixture.secondWorkflowUuid(), connectedUserId, "user-" + connectedUserId,
@@ -2464,7 +2464,7 @@ class AutomationProjectConfigurationFacadeIntTest {
                 reference.connectedUserId(), configuration.getProjectId(), configurationId);
         }
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(references));
     }
 
