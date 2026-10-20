@@ -34,6 +34,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
             AND (:status IS NULL OR status = :status)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
+            AND (:appId IS NULL OR app_id = :appId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
@@ -47,7 +48,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
         @Param("source") @Nullable Integer source, @Param("status") @Nullable Integer status,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
         @Param("connectedUserId") @Nullable Long connectedUserId,
-        @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
+        @Param("integrationInstanceId") @Nullable Long integrationInstanceId, @Param("appId") @Nullable Long appId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate,
         @Param("limit") int limit, @Param("offset") long offset);
 
@@ -60,6 +61,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
             AND (:status IS NULL OR status = :status)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
+            AND (:appId IS NULL OR app_id = :appId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
@@ -71,7 +73,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
         @Param("source") @Nullable Integer source, @Param("status") @Nullable Integer status,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
         @Param("connectedUserId") @Nullable Long connectedUserId,
-        @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
+        @Param("integrationInstanceId") @Nullable Long integrationInstanceId, @Param("appId") @Nullable Long appId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate);
 
     @Query("""
