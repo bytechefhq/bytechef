@@ -591,4 +591,12 @@ The trigger input, output and state that `getTriggerExecutionDTO` always fills a
   - Configuration-app returning a 500 instead of a deny for a missing connection id (remote `fetchConnection`).
   - Deleting a user audits their embedded removal under `WORKSPACE_MEMBERSHIPS_REMOVED`.
   - `CustomRoleServiceImpl` evicting the embedded scope cache, which is needed only once embedded custom roles exist.
-- Plan C repoints the client's Embedded API Keys page from the shared `apiKeys` queries to the `embeddedApiKeys` queries and mutations from Task 11.
+- Plan C repoints the client's Embedded API Keys page from the shared `apiKeys` queries to the `embeddedApiKeys` queries and mutations from Task 11. The mutations take `CreateEmbeddedApiKeyInput` and `UpdateEmbeddedApiKeyInput`; the platform schema has no input types to reuse.
+- Carried into Plan C from the execution of this plan:
+  - `API_KEY_VIEW` is an Editor scope, so embedded Viewers see no API keys page.
+  - Rotating an embedded MCP server's secret key stays tenant admin only (`updateEmbeddedMcpServerSecretKey`, like automation's `rotateSecretKey`). The docs list it as tenant-level. The secret key and URL go only to `MCP_EDIT` holders; Viewers get null.
+  - Members without the edit scope get no credentials: run responses never carry `connectionParameters`; instance configuration reads need `INTEGRATION_INSTANCE_CONFIGURATION_EDIT`; embedded connection reads need `CONNECTION_EDIT` (connected-user admin reads need `CONNECTED_USER_MANAGE`). The client shows these fields as hidden instead of empty.
+  - MCP instance configurations use the `INTEGRATION_INSTANCE_CONFIGURATION_*` scopes (delete is Admin), and an MCP server can only be linked to a configuration in the same environment.
+  - The automation connection endpoints refuse embedded connections; the embedded admin endpoints are the only way to manage them.
+  - Open question for the user: whether automation should also hide connection credentials and MCP secret keys from workspace members without the edit scope (embedded does; automation is unchanged).
+  - Parked minors: connected-user project runs are gated by `EXECUTION_*` rather than `CONNECTED_USER_VIEW`; tag lists are not environment-filtered (names only); `getIntegrationInstanceConfigurationIntegration(s)` returns credential maps but is reached only internally from `ConnectedUserIntegrationFacadeImpl`; trigger output is read before redaction (wasted I/O only).
