@@ -1248,6 +1248,14 @@ export type AddEmbeddedUserMutationVariables = Exact<{
 
 export type AddEmbeddedUserMutation = { addEmbeddedUser: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
 
+export type AddEmbeddedUserByEmailMutationVariables = Exact<{
+  email: string;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type AddEmbeddedUserByEmailMutation = { addEmbeddedUserByEmail: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
+
 export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7003,6 +7011,35 @@ export const useAddEmbeddedUserMutation = <
       {
     mutationKey: ['AddEmbeddedUser'],
     mutationFn: (variables?: AddEmbeddedUserMutationVariables) => fetcher<AddEmbeddedUserMutation, AddEmbeddedUserMutationVariables>(AddEmbeddedUserDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AddEmbeddedUserByEmailDocument = new TypedDocumentString(`
+    mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole!) {
+  addEmbeddedUserByEmail(email: $email, role: $role) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
+
+export const useAddEmbeddedUserByEmailMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddEmbeddedUserByEmailMutation, TError, AddEmbeddedUserByEmailMutationVariables, TContext>) => {
+    
+    return useMutation<AddEmbeddedUserByEmailMutation, TError, AddEmbeddedUserByEmailMutationVariables, TContext>(
+      {
+    mutationKey: ['AddEmbeddedUserByEmail'],
+    mutationFn: (variables?: AddEmbeddedUserByEmailMutationVariables) => fetcher<AddEmbeddedUserByEmailMutation, AddEmbeddedUserByEmailMutationVariables>(AddEmbeddedUserByEmailDocument, variables)(),
     ...options
   }
     )};

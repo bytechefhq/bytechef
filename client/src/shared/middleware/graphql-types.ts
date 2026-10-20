@@ -1864,6 +1864,8 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   /** Add a user as an embedded member with a built-in role. */
   addEmbeddedUser: EmbeddedUser;
+  /** Add an existing user, found by email, as an embedded member with a built-in role. */
+  addEmbeddedUserByEmail: EmbeddedUser;
   /**
    * Add a user to a workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of the
    * workspace, so a member holding it in only some of them is denied. Supply exactly one of `role` or
@@ -2121,6 +2123,12 @@ export type MutationAddDataTableColumnArgs = {
 export type MutationAddEmbeddedUserArgs = {
   role: WorkspaceRole;
   userId: Scalars['ID']['input'];
+};
+
+
+export type MutationAddEmbeddedUserByEmailArgs = {
+  email: Scalars['String']['input'];
+  role: WorkspaceRole;
 };
 
 
