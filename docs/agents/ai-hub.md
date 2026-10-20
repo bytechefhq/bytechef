@@ -147,8 +147,12 @@ A turn or truncation against a held thread is refused: the turn POST answers 409
 ## Playwright specs
 
 `client/test/playwright/tests/ai-hub/` (`aiHub`, `aiHubApprovals`, `aiHubBuild`, `aiHubChats`, `aiHubLive`,
-`aiHubModesAndRoles`, `aiHubNavigation`, `aiHubRegressions`, `aiHubWorkflowTab`), with `pages/aiHubPage.ts`,
-`fixtures/aiHubChats.ts` and `utils/aiHubUtils.ts`. Run setup is in `client/test/playwright/README.md`.
+`aiHubModesAndRoles`, `aiHubNavigation`, `aiHubRegressions`, `aiHubWorkflowChats`, `aiHubWorkflowTab`), with
+`pages/aiHubPage.ts`, `fixtures/aiHubChats.ts` and `utils/aiHubUtils.ts`. Run setup is in
+`client/test/playwright/README.md`. `aiHubWorkflowChats` covers the picker's Workflow chats cascade and its search,
+creating and opening a workflow chat, the controls a workflow chat drops (model picker, resources, `@` mention), its
+header badge and sidebar icon, and Stop sending one `cancelAiHubRun`; `stubWorkflowChats` in `fixtures/aiHubChats.ts`
+serves the chat workflows and turns a real chat into the workflow chat, so no deployed chat workflow is needed.
 
 ## Deferred phases
 
