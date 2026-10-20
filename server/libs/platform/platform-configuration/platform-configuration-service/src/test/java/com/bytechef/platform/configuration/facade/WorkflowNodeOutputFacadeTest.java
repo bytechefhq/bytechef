@@ -37,6 +37,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -66,7 +67,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.expression.EvaluationException;
 
 /**
  * @author Ivica Cardic
@@ -321,7 +321,7 @@ class WorkflowNodeOutputFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Map.of());
         when(evaluator.evaluate(any(), any(), anyBoolean()))
-            .thenThrow(new IllegalArgumentException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
+            .thenThrow(new ExpressionEvaluationException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
@@ -343,7 +343,7 @@ class WorkflowNodeOutputFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeOutputOfLoopThrowsEvaluationExceptionOnItemsEvaluationFailure() {
+    void testGetWorkflowNodeOutputOfLoopThrowsExpressionEvaluationExceptionOnItemsEvaluationFailure() {
         WorkflowTask loopTask = new WorkflowTask(
             Map.of(
                 "name", "loop1", "type", "loop/v1",
@@ -363,14 +363,14 @@ class WorkflowNodeOutputFacadeTest {
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Map.of());
         when(evaluator.evaluate(any(), any(), anyBoolean()))
-            .thenThrow(new IllegalArgumentException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
+            .thenThrow(new ExpressionEvaluationException("Invalid expression: ${range(1, ${config.linesPerRow)}"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of());
 
             assertThrows(
-                EvaluationException.class,
+                ExpressionEvaluationException.class,
                 () -> workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "loop1", ENVIRONMENT_ID));
         }
     }
@@ -613,7 +613,7 @@ class WorkflowNodeOutputFacadeTest {
     }
 
     @Test
-    void testGetWorkflowNodeOutputThrowsEvaluationExceptionOnParameterEvaluationFailure() {
+    void testGetWorkflowNodeOutputThrowsExpressionEvaluationExceptionOnParameterEvaluationFailure() {
         WorkflowTask action1Task = new WorkflowTask(
             Map.of("name", "action1", "type", "component/v1/action1"));
 
@@ -633,14 +633,15 @@ class WorkflowNodeOutputFacadeTest {
         when(actionDefinitionService.isDynamicOutputDefined("component", 1, "action1")).thenReturn(true);
         when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
             .thenReturn(Map.of());
-        when(evaluator.evaluate(any(), any(), anyBoolean())).thenThrow(new RuntimeException("evaluation error"));
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenThrow(new ExpressionEvaluationException("evaluation error"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
                 .thenReturn(List.of());
 
             assertThrows(
-                EvaluationException.class,
+                ExpressionEvaluationException.class,
                 () -> workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "action1", ENVIRONMENT_ID));
         }
     }

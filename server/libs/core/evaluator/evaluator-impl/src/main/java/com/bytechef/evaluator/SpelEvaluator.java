@@ -238,7 +238,7 @@ public class SpelEvaluator implements Evaluator {
                                 return value;
                             }
 
-                            throw new IllegalArgumentException("Invalid formula expression: " + string);
+                            throw new ExpressionEvaluationException("Invalid formula expression: " + string);
                         }
 
                         String formula = string.substring(1);
@@ -259,7 +259,8 @@ public class SpelEvaluator implements Evaluator {
                             return value;
                         }
 
-                        throw new IllegalArgumentException("Unparseable formula expression: " + string, parseException);
+                        throw new ExpressionEvaluationException("Unparseable formula expression: " + string,
+                            parseException);
                     }
                 } else {
                     if (!validateTextExpression(string)) {
@@ -271,7 +272,7 @@ public class SpelEvaluator implements Evaluator {
                             return value;
                         }
 
-                        throw new IllegalArgumentException("Invalid expression: " + string);
+                        throw new ExpressionEvaluationException("Invalid expression: " + string);
                     }
 
                     expression = expressionParser.parseExpression(
@@ -301,10 +302,11 @@ public class SpelEvaluator implements Evaluator {
                         if (spelEvaluationException.getCause() instanceof AccessException accessException &&
                             accessException.getCause() instanceof IllegalArgumentException illegalArgumentException) {
 
-                            throw illegalArgumentException;
+                            throw new ExpressionEvaluationException(
+                                illegalArgumentException.getMessage(), illegalArgumentException);
                         }
 
-                        throw new IllegalArgumentException(
+                        throw new ExpressionEvaluationException(
                             "Unevaluatable expression: " + value + " - " + spelEvaluationException.getMessage(),
                             spelEvaluationException);
                     }

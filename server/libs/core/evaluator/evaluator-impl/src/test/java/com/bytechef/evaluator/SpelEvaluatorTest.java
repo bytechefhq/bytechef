@@ -94,7 +94,7 @@ public class SpelEvaluatorTest {
 
         context.put("number", "5");
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("type", "type", "hello", "=T(java.lang.Integer).valueOf(number)"), context));
     }
 
@@ -431,13 +431,13 @@ public class SpelEvaluatorTest {
     public void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("hour", "=${localDateTime}.getHour()"), Map.of("localDateTime", localDateTime)));
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("hour", "=${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime)));
 
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("hour", "${localDateTime.getHour()}"), Map.of("localDateTime", localDateTime)));
     }
 
@@ -507,18 +507,18 @@ public class SpelEvaluatorTest {
 
     @Test
     public void test48() {
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
                 Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
                 Map.of("str1", 6, "str2", "abc")));
 
-        assertEquals("Invalid arguments for equalsIgnoreCase.", illegalArgumentException.getMessage());
+        assertEquals("Invalid arguments for equalsIgnoreCase.", expressionEvaluationException.getMessage());
     }
 
     @Test
     public void testIncompleteFormulaThrowsInStrictMode() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> EVALUATOR.evaluate(
+        assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=222+"), Collections.emptyMap()));
     }
 
@@ -554,7 +554,7 @@ public class SpelEvaluatorTest {
     })
     public void testFunctionWithInvalidArgumentsThrowsInStrictMode(String formula) {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap()));
     }
 
@@ -587,7 +587,7 @@ public class SpelEvaluatorTest {
     })
     void testShouldRejectSpelInjectionPayloads(String payload) {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", payload), Collections.emptyMap()),
             payload);
     }
@@ -595,7 +595,7 @@ public class SpelEvaluatorTest {
     @Test
     void testBeanReferenceIsRejectedAtRuntime() {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=@dangerousService"), Collections.emptyMap()));
     }
 
@@ -708,7 +708,7 @@ public class SpelEvaluatorTest {
     })
     void testShouldRejectInvalidAccessors(String accessor) {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
             accessor);
     }
@@ -717,13 +717,13 @@ public class SpelEvaluatorTest {
     public void testEvaluationFailureThrowsInStrictMode() {
         String formula = "=${startDate} > parseDate('2026-08-24T22:00:00Z', \"yyyy-MM-dd'T'HH:mm:ssX\")";
 
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", formula), Map.of("startDate", "2026-08-26T00:00:00.000Z")));
 
-        assertTrue(illegalArgumentException.getMessage()
+        assertTrue(expressionEvaluationException.getMessage()
             .contains("Cannot compare instances of class java.lang.String and class java.time.ZonedDateTime"));
-        assertNotNull(illegalArgumentException.getCause());
+        assertNotNull(expressionEvaluationException.getCause());
     }
 
     @Test
@@ -769,13 +769,13 @@ public class SpelEvaluatorTest {
     public void testParseDateRejectsALocalTimeArgument() {
         Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
 
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate(${dbTime})"), context));
 
-        assertTrue(illegalArgumentException.getMessage()
+        assertTrue(expressionEvaluationException.getMessage()
             .contains("parseDate"));
-        assertTrue(illegalArgumentException.getMessage()
+        assertTrue(expressionEvaluationException.getMessage()
             .contains("10:15:30"));
     }
 
@@ -783,11 +783,11 @@ public class SpelEvaluatorTest {
     public void testParseDateTimeRejectsALocalTimeArgument() {
         Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
 
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDateTime(${dbTime})"), context));
 
-        assertTrue(illegalArgumentException.getMessage()
+        assertTrue(expressionEvaluationException.getMessage()
             .contains("parseDateTime"));
     }
 
@@ -796,7 +796,7 @@ public class SpelEvaluatorTest {
         Map<String, Object> context = Map.of("dbValue", 123);
 
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate(${dbValue})"), context));
     }
 
@@ -811,7 +811,7 @@ public class SpelEvaluatorTest {
     @Test
     public void testFormulaEvaluationFailureStillThrowsForTheSameFailure() {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=${items[5]} > 1"), Map.of("items", List.of(1, 2, 3))));
     }
 
@@ -835,12 +835,12 @@ public class SpelEvaluatorTest {
 
     @Test
     public void testParseDateUnparseableTextThrowsInStrictMode() {
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate('not-a-date')"), Collections.emptyMap()));
 
-        assertTrue(illegalArgumentException.getMessage()
-            .contains("parseDate"), illegalArgumentException.getMessage());
+        assertTrue(expressionEvaluationException.getMessage()
+            .contains("parseDate"), expressionEvaluationException.getMessage());
     }
 
     @Test
@@ -886,18 +886,18 @@ public class SpelEvaluatorTest {
 
     @Test
     public void testParseDateWithNoArgumentsThrowsInStrictMode() {
-        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
-            IllegalArgumentException.class,
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate()"), Collections.emptyMap()));
 
-        assertTrue(illegalArgumentException.getMessage()
-            .contains("parseDate"), illegalArgumentException.getMessage());
+        assertTrue(expressionEvaluationException.getMessage()
+            .contains("parseDate"), expressionEvaluationException.getMessage());
     }
 
     @Test
     public void testParseDateWithTooManyArgumentsThrowsInStrictMode() {
         assertThrowsExactly(
-            IllegalArgumentException.class,
+            ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
                 Map.of("value", "=parseDate('2026-08-26', 'yyyy-MM-dd', 'extra')"), Collections.emptyMap()));
     }
