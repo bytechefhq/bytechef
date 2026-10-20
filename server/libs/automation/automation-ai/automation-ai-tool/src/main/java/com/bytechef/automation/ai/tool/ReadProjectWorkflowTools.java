@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -48,10 +49,15 @@ public class ReadProjectWorkflowTools {
     }
 
     @Tool(
-        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
+        description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description. Pass a query to return only the workflows whose name or description contains it.")
     public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId, ToolContext toolContext) {
-        return delegate.listWorkflows(projectId, toolContext);
+        @ToolParam(description = "The ID of the project") long projectId,
+        @ToolParam(
+            required = false,
+            description = "Optional text to match against workflow names and descriptions, case-insensitively. Omit it to list every workflow of the project.") @Nullable String query,
+        ToolContext toolContext) {
+
+        return delegate.listWorkflows(projectId, query, toolContext);
     }
 
     @Tool(
