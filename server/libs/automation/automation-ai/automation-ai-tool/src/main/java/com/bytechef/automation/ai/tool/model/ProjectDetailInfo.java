@@ -33,10 +33,13 @@ public record ProjectDetailInfo(
     @JsonProperty("name") @JsonPropertyDescription("The name of the project") String name,
     @JsonProperty("description") @JsonPropertyDescription("The description of the project") String description,
     @JsonProperty("status") @JsonPropertyDescription("The current status of the project") String status,
+    @JsonProperty("is_published") @JsonPropertyDescription("Whether the project is published") boolean isPublished,
+    @JsonProperty("last_version") @JsonPropertyDescription("The last version number") int lastVersion,
     @JsonProperty("category_id") @JsonPropertyDescription("The category ID of the project") Long categoryId,
     @JsonProperty("workspace_id") @JsonPropertyDescription("The workspace ID of the project") Long workspaceId,
     @JsonProperty("tag_ids") @JsonPropertyDescription("The tag IDs associated with the project") List<Long> tagIds,
     @JsonProperty("versions") @JsonPropertyDescription("The versions of the project") List<ProjectVersionInfo> versions,
+    @JsonProperty("deployments") @JsonPropertyDescription("The deployment status information") List<ProjectDeploymentStatusInfo> deployments,
     @JsonProperty("created_date") @JsonPropertyDescription("When the project was created") Instant createdDate,
     @JsonProperty("last_modified_date") @JsonPropertyDescription("When the project was last modified") Instant lastModifiedDate,
     @JsonProperty("last_published_date") @JsonPropertyDescription("When the project was last published") Instant lastPublishedDate) {

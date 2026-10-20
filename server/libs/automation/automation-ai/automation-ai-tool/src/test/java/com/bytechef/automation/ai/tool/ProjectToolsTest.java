@@ -45,6 +45,7 @@ import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Nested;
@@ -93,7 +94,7 @@ class ProjectToolsTest {
 
         ProjectTools projectTools = newTools();
 
-        assertThatCode(() -> projectTools.listProjects(WORKSPACE_ID, toolContext))
+        assertThatCode(() -> projectTools.listProjects(WORKSPACE_ID, null, toolContext))
             .isInstanceOf(ExecutionException.class)
             .hasMessageContaining("Workspace 1 is not accessible to the caller.");
 
@@ -106,7 +107,7 @@ class ProjectToolsTest {
 
         mockWorkspaceProjects(projectDTO(7L, "Alpha"));
 
-        List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, toolContext);
+        List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, null, toolContext);
 
         assertThat(projectInfos).extracting(ProjectInfo::id)
             .containsExactly(7L);
@@ -119,7 +120,7 @@ class ProjectToolsTest {
 
         mockWorkspaceProjects(projectDTO(7L, "Alpha"));
 
-        assertThat(newTools().listProjects(null, toolContext)).hasSize(1);
+        assertThat(newTools().listProjects(null, null, toolContext)).hasSize(1);
     }
 
     @Test
@@ -128,7 +129,7 @@ class ProjectToolsTest {
 
         ProjectTools projectTools = newTools();
 
-        assertThatCode(() -> projectTools.listProjects(null, toolContext))
+        assertThatCode(() -> projectTools.listProjects(null, null, toolContext))
             .isInstanceOf(ExecutionException.class)
             .hasMessageContaining("listWorkspaces");
     }
@@ -143,6 +144,75 @@ class ProjectToolsTest {
 
         assertThat(projectInfos).extracting(ProjectInfo::id)
             .containsExactly(7L);
+    }
+
+    @Test
+    void testListProjectsWithAQueryReturnsOnlyMatchingProjects() {
+        givenTheCallerIsAWorkspaceMember();
+
+        mockWorkspaceProjects(
+            projectDTO(7L, "Alpha"), projectDTO(8L, "Beta"),
+            ProjectDTO.builder()
+                .description("Mirrors ALPHA data")
+                .id(9L)
+                .name("Gamma")
+                .workspaceId(WORKSPACE_ID)
+                .build());
+
+        List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, " alp ", toolContext);
+
+        assertThat(projectInfos).extracting(ProjectInfo::id)
+            .containsExactly(7L, 9L);
+    }
+
+    @Test
+    void testListProjectsWithABlankQueryListsEveryProject() {
+        givenTheCallerIsAWorkspaceMember();
+
+        mockWorkspaceProjects(projectDTO(7L, "Alpha"), projectDTO(8L, "Beta"));
+
+        assertThat(newTools().listProjects(WORKSPACE_ID, "  ", toolContext)).extracting(ProjectInfo::id)
+            .containsExactly(7L, 8L);
+    }
+
+    @Test
+    void testGetProjectCarriesTheProjectStatus() {
+        Instant lastPublishedDate = Instant.parse("2026-10-01T10:00:00Z");
+
+        when(projectFacade.getProject(7L)).thenReturn(
+            ProjectDTO.builder()
+                .id(7L)
+                .lastProjectVersion(3)
+                .lastPublishedDate(lastPublishedDate)
+                .lastStatus(ProjectVersion.Status.PUBLISHED)
+                .name("Alpha")
+                .projectVersions(List.of())
+                .workspaceId(WORKSPACE_ID)
+                .build());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .enabled(true)
+            .environment(Environment.PRODUCTION)
+            .id(9L)
+            .projectId(7L)
+            .projectVersion(2)
+            .build();
+
+        when(projectDeploymentFacade.getWorkspaceProjectDeployments(WORKSPACE_ID, null, 7L, null, false))
+            .thenReturn(List.of(projectDeploymentDTO));
+
+        ProjectDetailInfo projectDetailInfo = newTools().getProject(7L, toolContext);
+
+        assertThat(projectDetailInfo.status()).isEqualTo("PUBLISHED");
+        assertThat(projectDetailInfo.isPublished()).isTrue();
+        assertThat(projectDetailInfo.lastVersion()).isEqualTo(3);
+        assertThat(projectDetailInfo.lastPublishedDate()).isEqualTo(lastPublishedDate);
+        assertThat(projectDetailInfo.deployments()).singleElement()
+            .satisfies(deployment -> {
+                assertThat(deployment.id()).isEqualTo(9L);
+                assertThat(deployment.environment()).isEqualTo("PRODUCTION");
+                assertThat(deployment.enabled()).isTrue();
+            });
     }
 
     @Test
@@ -327,7 +397,7 @@ class ProjectToolsTest {
         void testListProjectsListsOnlyTheScopedProject() {
             when(projectFacade.getProject(OWN_PROJECT_ID)).thenReturn(projectDTO(OWN_PROJECT_ID, "Alpha"));
 
-            List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, scopedToolContext());
+            List<ProjectInfo> projectInfos = newTools().listProjects(WORKSPACE_ID, null, scopedToolContext());
 
             assertThat(projectInfos).extracting(ProjectInfo::id)
                 .containsExactly(OWN_PROJECT_ID);
