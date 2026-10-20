@@ -36,6 +36,8 @@ public interface ApiCollectionFacade {
 
     ApiCollectionEndpointDTO getApiCollectionEndpoint(long id);
 
+    List<ApiCollectionEndpointDTO> getApiCollectionEndpoints(long apiCollectionId);
+
     List<ApiCollectionDTO> getApiCollections(long workspaceId, Long environmentId, Long projectId, Long tagId);
 
     List<Tag> getApiCollectionTags(long workspaceId);
