@@ -11,8 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -20,8 +18,10 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
@@ -31,6 +31,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.platform.mcp.service.McpServerService;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -90,7 +91,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
     }
 
     @Test
-    void testEveryMethodRequiresTenantAdmin() {
+    void testEveryMethodIsDeniedWithoutEmbeddedScopes() {
         List<Method> methods =
             Arrays.stream(McpIntegrationInstanceConfigurationWorkflowFacade.class.getDeclaredMethods())
                 .filter(method -> !method.isSynthetic())
@@ -104,8 +105,6 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
                 .as("%s.%s", McpIntegrationInstanceConfigurationWorkflowFacade.class.getSimpleName(), method.getName())
                 .isInstanceOf(AccessDeniedException.class);
         }
-
-        verify(permissionService, times(methods.size())).isTenantAdmin();
     }
 
     private void invoke(Method method) throws Throwable {
@@ -169,7 +168,13 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
 
         @MockitoBean
+        private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+
+        @MockitoBean
         private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+
+        @MockitoBean
+        private McpServerService mcpServerService;
 
         private long integrationId;
         private long integrationInstanceConfigurationId;
@@ -299,7 +304,12 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
         @Bean
         static MethodSecurityExpressionHandler methodSecurityExpressionHandler(PermissionService permissionService) {
-            return new AutomationMethodSecurityExpressionHandler(permissionService);
+            AutomationMethodSecurityExpressionHandler handler =
+                new AutomationMethodSecurityExpressionHandler(permissionService);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
 
         @Bean

@@ -49,7 +49,8 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') or " +
+        "isConnectedUser()")
     public void enableMcpIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowUuid, boolean enable) {
 
@@ -77,7 +78,8 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') or " +
+        "isConnectedUser()")
     public void updateMcpIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
 
