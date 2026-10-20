@@ -25,8 +25,12 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
+import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
+import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
+import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
@@ -41,12 +45,14 @@ import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRepository;
 import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRuleRepository;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicyImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatArtifactServiceImpl;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatServiceImpl;
 import com.bytechef.ee.ai.hub.chat.TitleGenerationService;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatArtifactRepository;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
+import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatArtifactGraphQlController;
@@ -54,6 +60,7 @@ import com.bytechef.ee.ai.hub.web.graphql.AiHubChatGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalRuleGraphQlController;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -63,6 +70,9 @@ import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import tools.jackson.databind.json.JsonMapper;
@@ -88,7 +98,10 @@ class AiHubConfigurationContextTest {
                 assertThat(context).hasBean("aiHubSessionMemory");
                 assertThat(context).hasSingleBean(AiHubSessionMemory.class);
                 assertThat(context.getBeansOfType(LocalAgent.class)).containsOnlyKeys(
-                    "aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent");
+                    "aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent", "aiHubAskRoutingAgent",
+                    "aiHubBuildRoutingAgent", "webhookBridgeAgent");
+                assertInjectedLocalAgentsAreTheTwoRouters(context);
+                assertBothRoutersHoldTheBridge(context);
 
                 AiHubSpringAIAgent askAgent = context.getBean("aiHubAskSpringAIAgent", AiHubSpringAIAgent.class);
                 AiHubSpringAIAgent buildAgent = context.getBean("aiHubBuildSpringAIAgent", AiHubSpringAIAgent.class);
@@ -124,8 +137,8 @@ class AiHubConfigurationContextTest {
                 assertThat(context).hasSingleBean(AiHubChatArtifactGraphQlController.class);
                 assertThat(context).hasSingleBean(AiHubToolApprovalGraphQlController.class);
                 assertThat(context).hasSingleBean(AiHubToolApprovalRuleGraphQlController.class);
-                assertThat(context.getBeansOfType(LocalAgent.class)).containsOnlyKeys(
-                    "aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent");
+                assertInjectedLocalAgentsAreTheTwoRouters(context);
+                assertBothRoutersHoldTheBridge(context);
             });
     }
 
@@ -193,10 +206,33 @@ class AiHubConfigurationContextTest {
         assertThat(sessionMemoryAdvisor.getOrder()).isGreaterThan(ToolCallingAdvisor.DEFAULT_ORDER);
     }
 
+    private static void assertInjectedLocalAgentsAreTheTwoRouters(ApplicationContext context) {
+        List<LocalAgent> localAgents = context.getBean(LocalAgentsHolder.class).localAgents;
+
+        assertThat(localAgents).extracting(LocalAgent::getAgentId)
+            .containsExactlyInAnyOrder("ai_hub_ask", "ai_hub_build");
+        assertThat(localAgents).allMatch(AiHubRoutingAgent.class::isInstance);
+    }
+
+    private static void assertBothRoutersHoldTheBridge(ApplicationContext context) {
+        assertThat(context.getBeansOfType(WebhookBridgeAgent.class)).containsOnlyKeys("webhookBridgeAgent");
+
+        WebhookBridgeAgent webhookBridgeAgent = context.getBean(WebhookBridgeAgent.class);
+
+        for (String routerBeanName : List.of("aiHubAskRoutingAgent", "aiHubBuildRoutingAgent")) {
+            AiHubRoutingAgent router = context.getBean(routerBeanName, AiHubRoutingAgent.class);
+
+            assertThat(ReflectionTestUtils.getField(router, "webhookBridgeAgent")).as(routerBeanName)
+                .isSameAs(webhookBridgeAgent);
+        }
+    }
+
     private static ApplicationContextRunner contextRunner(AiHubAgentFixtures fixtures) {
         return new ApplicationContextRunner()
             .withPropertyValues("bytechef.ai.memory.provider=in_memory")
-            .withUserConfiguration(AiHubConfiguration.class)
+            .withUserConfiguration(
+                AiHubConfiguration.class, WebhookResumeRegistry.class, WorkflowChatGuard.class,
+                WorkflowChatMetrics.class)
             .withBean(ChatModel.class, () -> fixtures.chatModel)
             .withBean(ReadProjectTools.class, () -> fixtures.readProjectTools)
             .withBean(ReadProjectWorkflowTools.class, () -> fixtures.readProjectWorkflowTools)
@@ -211,7 +247,14 @@ class AiHubConfigurationContextTest {
             .withBean(ProjectWorkflowFacade.class, () -> fixtures.projectWorkflowFacade)
             .withBean(AiHubChatArtifactRecorder.class, () -> fixtures.artifactRecorder)
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
-            .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate);
+            .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate)
+            .withBean(AiHubChatService.class, () -> fixtures.chatService)
+            .withBean(InFlightAiHubRunRegistry.class, () -> fixtures.inFlightRunRegistry)
+            .withBean(JsonMapper.class, () -> JsonMapper.builder()
+                .build())
+            .withBean(CacheManager.class, ConcurrentMapCacheManager::new)
+            .withBean(WebhookWorkflowExecutor.class, () -> mock(WebhookWorkflowExecutor.class))
+            .withBean(LocalAgentsHolder.class);
     }
 
     private static ApplicationContextRunner fullGraphRunner(AiHubAgentFixtures fixtures) {
@@ -225,7 +268,8 @@ class AiHubConfigurationContextTest {
                 AiHubToolApprovalFacadeImpl.class, AiHubToolApprovalRuleFacadeImpl.class, AiHubApprovalGate.class,
                 TitleGenerationService.class, AiHubChatGraphQlController.class,
                 AiHubChatArtifactGraphQlController.class, AiHubToolApprovalGraphQlController.class,
-                AiHubToolApprovalRuleGraphQlController.class)
+                AiHubToolApprovalRuleGraphQlController.class, WebhookResumeRegistry.class, WorkflowChatGuard.class,
+                WorkflowChatMetrics.class)
             .withBean(ChatModel.class, () -> fixtures.chatModel)
             .withBean(ReadProjectTools.class, () -> fixtures.readProjectTools)
             .withBean(ReadProjectWorkflowTools.class, () -> fixtures.readProjectWorkflowTools)
@@ -250,6 +294,18 @@ class AiHubConfigurationContextTest {
             .withBean(ProjectDeploymentFacade.class, () -> mock(ProjectDeploymentFacade.class))
             .withBean(PlatformTransactionManager.class, () -> mock(PlatformTransactionManager.class))
             .withBean(UserService.class, () -> mock(UserService.class))
-            .withBean("workerExecutor", Executor.class, () -> Runnable::run);
+            .withBean("workerExecutor", Executor.class, () -> Runnable::run)
+            .withBean(CacheManager.class, ConcurrentMapCacheManager::new)
+            .withBean(WebhookWorkflowExecutor.class, () -> mock(WebhookWorkflowExecutor.class))
+            .withBean(LocalAgentsHolder.class);
+    }
+
+    static final class LocalAgentsHolder {
+
+        private final List<LocalAgent> localAgents;
+
+        LocalAgentsHolder(List<LocalAgent> localAgents) {
+            this.localAgents = localAgents;
+        }
     }
 }

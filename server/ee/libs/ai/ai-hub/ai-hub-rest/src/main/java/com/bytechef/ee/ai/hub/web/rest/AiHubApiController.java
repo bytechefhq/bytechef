@@ -20,6 +20,7 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
@@ -61,10 +62,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * AG-UI dispatch entry point for the AI Hub chat. A turn is checked in this order: workspace role for the requested
- * mode, the chat behind the thread id (created on the first turn, otherwise owner or tenant admin and the same
- * workspace), the one-turn-per-chat gate, then pending approvals are superseded, the verified identity is written into
- * the run state, and the agent of the mode runs.
+ * AG-UI dispatch entry point for the AI Hub chat. A turn is checked in this order: the VIEWER workspace role, the chat
+ * behind the thread id (created on the first turn, otherwise owner or tenant admin and the same workspace), then the
+ * chat kind's rule (the {@code WORKFLOW_VIEW} workspace scope for a workflow chat, the EDITOR role for a BUILD turn on
+ * any other chat), the one-turn-per-chat gate, then pending approvals are superseded, the verified identity is written
+ * into the run state, and the agent of the mode runs.
  *
  * <p>
  * The literal path {@code /ai/chat/ai_hub} resolves ahead of the Copilot's generic {@code /ai/chat/{agentId}}.
@@ -84,7 +86,9 @@ public class AiHubApiController {
 
     private static final Logger log = LoggerFactory.getLogger(AiHubApiController.class);
 
+    private static final String CHAT_NOT_ACCESSIBLE_REASON = "AiHubChat is not accessible to the current user";
     private static final String UNKNOWN_THREAD_REASON = "Unknown thread";
+    private static final String WORKSPACE_NOT_ACCESSIBLE_REASON = "Workspace is not accessible to the current user";
 
     private final AiHubChatAccessPolicy accessPolicy;
     private final AiHubChatService chatService;
@@ -122,15 +126,31 @@ public class AiHubApiController {
 
         Mode mode = resolveMode(agUiParameters);
 
-        long workspaceId = enforceWorkspaceRole(agUiParameters, mode);
+        long workspaceId = resolveWorkspaceId(agUiParameters);
 
-        LocalAgent localAgent = resolveAgent(mode);
+        PermissionService permissionService = permissionServiceProvider.getIfAvailable();
+
+        requireWorkspaceRole(permissionService, workspaceId, "VIEWER");
 
         String threadId = resolveThreadId(agUiParameters);
 
         long environmentId = AiHubRunState.clampEnvironmentId(readLong(agUiParameters, AiHubStateKeys.ENVIRONMENT_ID));
 
-        AiHubChat chat = resolveChat(threadId, userId, workspaceId, environmentId);
+        Optional<AiHubChat> existingChatOptional = findExistingChat(threadId, userId, workspaceId);
+
+        AiHubChatKind kind = existingChatOptional.map(AiHubChat::getKind)
+            .orElse(AiHubChatKind.STANDARD);
+
+        if (kind.isWebhookBridged()) {
+            requireWorkspaceScope(permissionService, workspaceId, "WORKFLOW_VIEW");
+        } else if (mode == Mode.BUILD) {
+            requireWorkspaceRole(permissionService, workspaceId, "EDITOR");
+        }
+
+        AiHubChat chat = existingChatOptional.orElseGet(
+            () -> createChat(threadId, userId, workspaceId, environmentId));
+
+        LocalAgent localAgent = resolveAgent(mode);
 
         InFlightRun run = inFlightRunRegistry.tryStart(threadId, agUiParameters.getRunId())
             .orElseThrow(TurnInFlightException::new);
@@ -224,29 +244,39 @@ public class AiHubApiController {
     }
 
     /**
-     * Reads the requested workspace from the run state and requires the caller to hold the mode's minimum workspace
-     * role: VIEWER for ASK, EDITOR for BUILD. Fails closed when no permission service is available.
+     * Reads the requested workspace from the run state; a request without one is a 400.
      */
-    private long enforceWorkspaceRole(AgUiParameters agUiParameters, Mode mode) {
+    private static long resolveWorkspaceId(AgUiParameters agUiParameters) {
         Long workspaceId = readLong(agUiParameters, AiHubStateKeys.WORKSPACE_ID);
 
         if (workspaceId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing workspaceId in request state");
         }
 
-        PermissionService permissionService = permissionServiceProvider.getIfAvailable();
+        return workspaceId;
+    }
 
-        String minimumRole = switch (mode) {
-            case ASK -> "VIEWER";
-            case BUILD -> "EDITOR";
-        };
+    /**
+     * Requires the caller to hold {@code minimumRole} in the workspace. Fails closed when no permission service is
+     * available.
+     */
+    private static void requireWorkspaceRole(
+        @Nullable PermissionService permissionService, long workspaceId, String minimumRole) {
 
         if (permissionService == null || !permissionService.hasWorkspaceRole(workspaceId, minimumRole)) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "Workspace is not accessible to the current user");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, WORKSPACE_NOT_ACCESSIBLE_REASON);
         }
+    }
 
-        return workspaceId;
+    /**
+     * Requires the caller to hold {@code scope} in the workspace. Fails closed when no permission service is available.
+     */
+    private static void requireWorkspaceScope(
+        @Nullable PermissionService permissionService, long workspaceId, String scope) {
+
+        if (permissionService == null || !permissionService.hasWorkspaceScope(workspaceId, scope)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, WORKSPACE_NOT_ACCESSIBLE_REASON);
+        }
     }
 
     /**
@@ -306,12 +336,11 @@ public class AiHubApiController {
     }
 
     /**
-     * Returns the chat behind {@code threadId}, creating it on the thread's first turn, so a chat row always exists
-     * before the agent runs and the approval gate can resolve it. The thread of a deleted chat (retired in the run
-     * registry) answers 404 {@code CHAT_NOT_FOUND}. An existing chat must not be in {@code DELETED} status, must be one
-     * the caller may participate in and must live in the requested workspace.
+     * Returns the existing chat behind {@code threadId}, empty on the thread's first turn. The thread of a deleted chat
+     * (retired in the run registry) answers 404 {@code CHAT_NOT_FOUND}. An existing chat must not be in {@code DELETED}
+     * status, must be one the caller may participate in and must live in the requested workspace.
      */
-    private AiHubChat resolveChat(String threadId, long userId, long workspaceId, long environmentId) {
+    private Optional<AiHubChat> findExistingChat(String threadId, long userId, long workspaceId) {
         if (inFlightRunRegistry.isRetired(threadId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, AiHubTurnErrorCode.CHAT_NOT_FOUND.name());
         }
@@ -324,18 +353,22 @@ public class AiHubApiController {
             if (chat.getStatus() == AiHubChatStatus.DELETED || !accessPolicy.canParticipate(chat, userId)
                 || !Objects.equals(chat.getWorkspaceId(), workspaceId)) {
 
-                throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "AiHubChat is not accessible to the current user");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, CHAT_NOT_ACCESSIBLE_REASON);
             }
-
-            return chat;
         }
 
+        return chatOptional;
+    }
+
+    /**
+     * Creates the chat on the thread's first turn, after the turn's checks passed, so a chat row always exists before
+     * the agent runs and the approval gate can resolve it. Only standard chats are created here.
+     */
+    private AiHubChat createChat(String threadId, long userId, long workspaceId, long environmentId) {
         try {
             return chatService.create(workspaceId, userId, Math.toIntExact(environmentId), threadId);
         } catch (ConflictException exception) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "AiHubChat is not accessible to the current user", exception);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, CHAT_NOT_ACCESSIBLE_REASON, exception);
         }
     }
 

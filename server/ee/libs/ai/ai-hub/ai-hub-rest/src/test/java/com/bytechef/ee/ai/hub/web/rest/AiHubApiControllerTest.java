@@ -40,6 +40,7 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
+import com.bytechef.ee.ai.hub.chat.AiHubChatKind;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
@@ -346,12 +347,83 @@ class AiHubApiControllerTest {
         assertStatus(() -> controller.chat(agUiParameters("BUILD", "run-1")), HttpStatus.FORBIDDEN);
 
         verify(buildAgent, never()).runAgent(any(), any());
-        verify(chatService, never()).findByThreadId(anyString());
+        verify(toolApprovalService, never()).supersedePending(anyLong());
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
 
         controller.chat(agUiParameters("ASK", "run-2"));
 
-        verify(permissionService).hasWorkspaceRole(WORKSPACE_ID, "VIEWER");
+        verify(permissionService, times(2)).hasWorkspaceRole(WORKSPACE_ID, "VIEWER");
         verify(askAgent).runAgent(any(RunAgentParameters.class), any(AgentSubscriber.class));
+    }
+
+    @Test
+    void testWorkflowChatTurnRequiresTheWorkflowViewScope() {
+        stubExistingChat(workflowChat());
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_VIEW")).thenReturn(false);
+
+        assertThatThrownBy(() -> controller.chat(agUiParameters("ASK", "run-1")))
+            .isInstanceOf(ResponseStatusException.class)
+            .extracting("statusCode")
+            .isEqualTo(HttpStatus.FORBIDDEN);
+
+        verify(askAgent, never()).runAgent(any(), any());
+        verify(toolApprovalService, never()).supersedePending(anyLong());
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
+    void testWorkflowChatTurnSkipsTheBuildEditorRule() {
+        stubExistingChat(workflowChat());
+
+        when(permissionService.hasWorkspaceRole(WORKSPACE_ID, "EDITOR")).thenReturn(false);
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_VIEW")).thenReturn(true);
+
+        assertThat(controller.chat(agUiParameters("BUILD", "run-1"))).isNotNull();
+
+        verify(permissionService, never()).hasWorkspaceRole(WORKSPACE_ID, "EDITOR");
+        verify(buildAgent).runAgent(any(RunAgentParameters.class), any(AgentSubscriber.class));
+    }
+
+    @Test
+    void testWorkflowChatTurnStillRequiresTheViewerRole() {
+        stubExistingChat(workflowChat());
+
+        when(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).thenReturn(false);
+        lenient().when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_VIEW"))
+            .thenReturn(true);
+
+        assertStatus(() -> controller.chat(agUiParameters("ASK", "run-1")), HttpStatus.FORBIDDEN);
+
+        verify(chatService, never()).findByThreadId(anyString());
+        verify(askAgent, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testStandardChatBuildTurnStillRequiresEditor() {
+        stubExistingChat(chat(OWNER_USER_ID, WORKSPACE_ID));
+
+        when(permissionService.hasWorkspaceRole(WORKSPACE_ID, "EDITOR")).thenReturn(false);
+        lenient().when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_VIEW"))
+            .thenReturn(true);
+
+        assertStatus(() -> controller.chat(agUiParameters("BUILD", "run-1")), HttpStatus.FORBIDDEN);
+
+        verify(permissionService, never()).hasWorkspaceScope(anyLong(), anyString());
+        verify(buildAgent, never()).runAgent(any(), any());
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
+    void testViewerBuildTurnOnANewThreadIsForbiddenAndCreatesNoChat() {
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.empty());
+        when(permissionService.hasWorkspaceRole(WORKSPACE_ID, "EDITOR")).thenReturn(false);
+
+        assertStatus(() -> controller.chat(agUiParameters("BUILD", "run-1")), HttpStatus.FORBIDDEN);
+
+        verify(chatService, never()).create(anyLong(), anyLong(), anyInt(), anyString());
+        verify(buildAgent, never()).runAgent(any(), any());
+        assertThat(inFlightRunRegistry.isInFlight(THREAD_ID)).isFalse();
     }
 
     @Test
@@ -687,6 +759,14 @@ class AiHubApiControllerTest {
         chat.setId(CHAT_ID);
         chat.setThreadId(THREAD_ID);
         chat.setWorkspaceId(workspaceId);
+
+        return chat;
+    }
+
+    private static AiHubChat workflowChat() {
+        AiHubChat chat = chat(OWNER_USER_ID, WORKSPACE_ID);
+
+        chat.setKind(AiHubChatKind.WORKFLOW_CHAT);
 
         return chat;
     }
