@@ -51,8 +51,11 @@ Server (`server/ee/libs/ai/ai-hub/` unless noted):
   `WebhookBridgeAgent` and everything else to the existing `AiHubSpringAIAgent`. The LLM agent beans get
   `@Bean(defaultCandidate = false)` as on `0_732`, so they leave the `List<LocalAgent>` and their ids do not collide
   with the router's (several consumers build an id map with no merge function and would fail at startup). Plus
-  `AgUiStreamBridge`, `WorkflowChatGuard`, `WorkflowChatJobRegistry`, `WebhookResumeRegistry`,
-  `metric/WorkflowChatMetrics` (self-contained Micrometer counters, ported as is).
+  `AgUiStreamBridge`, `WorkflowChatGuard`, `WebhookResumeRegistry`, `metric/WorkflowChatMetrics` (self-contained
+  Micrometer counters, ported as is) and a new per-turn `WorkflowChatTurnStopper` (see Stop below).
+  `WorkflowChatGuard` and `WebhookResumeRegistry` key their caches by the chat's thread id, a UUID, because numeric
+  chat ids repeat across tenants in schema-per-tenant mode. `0_732`'s `WorkflowChatJobRegistry` is not ported: the
+  bridge stops only the turn's own job through its stopper, so nothing would read the registry.
 - Tools: `ListChatWorkflowsToolCallback`, `CreateWorkflowChatToolCallback`, `OpenWorkflowChatTabToolCallback`. This
   branch has no tool catalog or `searchTool`, so all three are pinned: BUILD gets all three, ASK gets
   `OpenWorkflowChatTabToolCallback` only. The BUILD prompt's "Workflow execution" section is ported without
@@ -63,9 +66,9 @@ Server (`server/ee/libs/ai/ai-hub/` unless noted):
   (automation-configuration-service); the GraphQL controller delegates to it, as on `0_732`. `HostedChatTriggers`
   (platform-configuration-api) replaces the inlined `hasHostedChatTrigger`. Filters kept: enabled deployment and
   deployment workflow, hosted chat trigger, resolvable webhook execution id, plus the permission rule below.
-- Cache registrations in `server/libs/config/cache-config/.../CacheConfiguration.java`, Redis and Caffeine, as on
-  `0_732`: `WebhookResumeRegistry.resumeUrls` (30 min), `WorkflowChatJobRegistry.jobIds` (30 min),
-  `WorkflowChatGuard.lastTurn` (5 min). The `inFlight` cache is not registered (see Stop below). The three classes
+- Cache registrations in `server/libs/config/cache-config/.../CacheConfiguration.java`, Redis and Caffeine, for two
+  caches only: `WebhookResumeRegistry.resumeUrls` (30 min) and `WorkflowChatGuard.lastTurn` (5 min). Neither
+  `0_732`'s `WorkflowChatJobRegistry.jobIds` nor its `inFlight` cache is registered (see Stop below). The two classes
   switch from `@ConditionalOnProperty(bytechef.ai.hub.enabled)` to this branch's `@ConditionalOnAiHub`.
 - `ai-hub-service/build.gradle.kts` gains the modules the ported code imports: `platform-webhook-api`,
   `atlas-execution-api`, `atlas-configuration-api`, `platform-component-api`, `platform-configuration-api`,
@@ -80,11 +83,12 @@ Client (`client/src/ee/pages/automation/ai-hub/` unless noted):
   `artifacts/useAiHubArtifactsCard.ts`, `chats/hooks/useRecordReferencedArtifacts.ts`,
   `chats/hooks/useLiveWorkflowLabel.ts`, `chats/hooks/useAiHubChatActions.ts` (cancel), the runtime provider's
   `ask-workflow-question` handling and the `openWorkflowChatTab` tool result.
-- GraphQL documents: new `createWorkflowChatAiHubChat.graphql` and `cancelWorkflowChatTurn.graphql` under
-  `client/src/graphql/ai/aihub/chat/`, `workspaceChatWorkflows.graphql` and
-  `workflowChatProjectDeploymentWorkflow.graphql` under `client/src/graphql/automation/configuration/`; the existing
-  `aiHubChats.graphql`, `createAiHubChat.graphql` and `updateAiHubChat.graphql` select `kind`, `workflowExecutionId`
-  and `projectDeploymentId`. No client document for `bulkArchiveWorkflowChatAiHubChats`. Codegen regenerated.
+- GraphQL documents: new `createWorkflowChatAiHubChat.graphql` under `client/src/graphql/ai/aihub/chat/`;
+  `workspaceChatWorkflows.graphql` under `client/src/graphql/automation/configuration/` gains `projectWorkflowId` and
+  `workflowId` (`workflowChatProjectDeploymentWorkflow.graphql` already exists here); the existing `aiHubChats.graphql`,
+  `createAiHubChat.graphql`, `updateAiHubChat.graphql` and `generateAiHubChatTitle.graphql` select `kind`,
+  `workflowExecutionId` and `projectDeploymentId`. No client document for `cancelWorkflowChatTurn` (the client sends
+  `cancelAiHubRun`) or `bulkArchiveWorkflowChatAiHubChats`. Codegen regenerated.
 
 ## Not in this phase
 
@@ -111,10 +115,12 @@ Client (`client/src/ee/pages/automation/ai-hub/` unless noted):
 
 **Stop and delete (my call).** A workflow-chat turn follows the phase 1 run rules in `InFlightAiHubRunRegistry`, like
 any other turn: one run per chat, the turn-in-flight 409, Stop by `cancel(threadId, runId)` including the early-Stop
-tombstone, and `retireThread` on delete. The registry has no per-run callback, so the bridge subscribes to
-`stopRequested(threadId)` the way `RunStopAdvisor` does, and stops the workflow job (`WorkflowChatJobRegistry` lookup,
-`JobFacade.stopJob`) as soon as it both knows the job id and has seen the stop. One subscription covers the Stop
-click, chat deletion, and a Stop that lands before the `start` event delivers the job id. Timing: Stop closes the SSE
+tombstone, and `retireThread` on delete. The registry has no per-run callback, so each turn builds a
+`WorkflowChatTurnStopper` bound to the turn's tenant and subscribes it to the run registry's `stopRequested(threadId)`
+signal the way `RunStopAdvisor` does. The stopper calls `JobFacade.stopJob` once, for the job id this turn's `start`
+event delivered and under the turn's tenant, as soon as it has both the job id and the stop; a stream error stops the
+job the same way. One subscription covers the Stop click, chat deletion, and a Stop that lands before the `start`
+event delivers the job id. No job registry is kept, since only the turn that started a job ever stops it. Timing: Stop closes the SSE
 stream at once; the chat stays held until the bridge reports the run finalized, which happens when the job's terminal
 status reaches the stream, normally right after the stop, or at the latest `DRAIN_TIMEOUT` (2 minutes) after the
 cancel. `0_732` has the same shape with a 30-minute backstop. The client sends one `cancelAiHubRun` for every chat
@@ -168,7 +174,7 @@ unchanged and separate from the workflow's memory; rewind and delete in the hub 
 
 - Port the `0_732` tests for the ported classes (`AgUiStreamBridgeTest`, `AiHubRoutingAgentTest`,
   `WebhookBridgeAgentTest`, `WebhookBridgeAgentResumeTest`, `WebhookBridgeAgentTenantContextTest`,
-  `WebhookResumeRegistryTest`, `WorkflowChatGuardTest`, `WorkflowChatJobRegistryTest`,
+  `WebhookResumeRegistryTest`, `WorkflowChatGuardTest`, `WorkflowChatTurnStopperTest` (new),
   `CreateWorkflowChatToolCallbackTest`, `OpenWorkflowChatTabToolCallbackTest`, `HostedChatTriggersTest`,
   `ProjectDeploymentFacadeChatWorkflowTest`) and the client tests that cover the ported client files; drop or adapt
   the parts that need agent chats, attachments, suspending tasks or `runChatWorkflow`. `WebhookBridgeAgentE2EIntTest`
