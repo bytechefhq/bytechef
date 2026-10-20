@@ -217,7 +217,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -226,7 +226,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
         ConnectedUserProjectWorkflow reference = provisionWithInputs(
             externalUserId, workflowUuid, Map.of("channel", "#a"));
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         String deployedWorkflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             automationProjectId, 1, workflowUuid);
@@ -361,7 +361,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -389,7 +389,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
@@ -499,7 +499,7 @@ class ConnectedUserMcpAutomationResolverIntTest {
 
         String workflowUuid = addWorkflow(automationProjectId, definition);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configuration = createConfiguration(automationProjectId, "A");
 
