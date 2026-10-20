@@ -234,7 +234,7 @@ describe('MultiSelect component', () => {
         for (const commandItem of [selectAllItem, optionItem]) {
             const checkIcon = commandItem?.querySelector('svg');
 
-            expect(checkIcon).toHaveClass('text-content-onsurface-primary');
+            expect(checkIcon).toHaveClass('text-content-onbrand');
             expect(checkIcon?.parentElement).toHaveClass('bg-surface-brand-primary');
             expect(checkIcon?.parentElement).not.toHaveClass('[&_svg]:invisible');
         }

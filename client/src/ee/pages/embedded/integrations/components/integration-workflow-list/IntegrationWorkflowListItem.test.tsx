@@ -164,6 +164,8 @@ describe('IntegrationWorkflowListItem', () => {
             workflowTriggerComponentNames: ['manual'],
         });
 
+        // Exact text, not toHaveTextContent: that matches substrings, so an unsliced "manual,slack,gmail" would
+        // pass while the trigger got drawn twice — once as its chip, once as a task icon.
         expect(screen.getByTestId('workflow-components-list').textContent).toBe('slack,gmail');
     });
 

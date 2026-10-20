@@ -314,7 +314,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                 : '[&_svg]:invisible'
                                         )}
                                     >
-                                        <CheckIcon className="size-3.5 text-content-onsurface-primary" />
+                                        <CheckIcon className="text-content-onbrand size-3.5" />
                                     </div>
 
                                     <span aria-label="Select All">Select All</span>
@@ -340,7 +340,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                             : '[&_svg]:invisible'
                                                     )}
                                                 >
-                                                    <CheckIcon className="size-3.5 text-content-onsurface-primary" />
+                                                    <CheckIcon className="text-content-onbrand size-3.5" />
                                                 </div>
 
                                                 {option.icon && (
