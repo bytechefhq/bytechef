@@ -150,14 +150,17 @@ const loadChatAndRenderProvider = async () => {
             environmentId: 0,
             id: 9,
             isOwner: true,
+            kind: 'STANDARD' as const,
             lastPreview: null,
             messageCount: SERVER_ROWS.length,
             ownerUserId: 1,
+            projectDeploymentId: null,
             status: 'ACTIVE',
             threadId: 'thread-9',
             title: 'Slack',
             updatedAt: '2026-10-19T08:00:05Z',
             userId: 1,
+            workflowExecutionId: null,
             workspaceId: 1,
         });
     });
