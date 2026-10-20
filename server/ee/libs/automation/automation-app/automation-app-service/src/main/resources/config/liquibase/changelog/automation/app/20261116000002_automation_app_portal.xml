@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261116000002-1" author="Ivica Cardic">
+        <createTable tableName="app_favorite">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="app_favorite" columnNames="user_id, app_id" constraintName="pk_app_favorite"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_favorite"
+            baseColumnNames="app_id"
+            constraintName="fk_app_favorite_app"
+            referencedTableName="app"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="app_favorite"
+            baseColumnNames="user_id"
+            constraintName="fk_app_favorite_user"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="app_favorite" indexName="idx_app_favorite_app">
+            <column name="app_id"/>
+        </createIndex>
+
+        <createTable tableName="app_instance_usage">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_used_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="use_count" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="app_instance_usage" columnNames="user_id, app_instance_id"
+            constraintName="pk_app_instance_usage"/>
+
+        <addForeignKeyConstraint
+            baseTableName="app_instance_usage"
+            baseColumnNames="app_instance_id"
+            constraintName="fk_app_instance_usage_app_instance"
+            referencedTableName="app_instance"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="app_instance_usage"
+            baseColumnNames="user_id"
+            constraintName="fk_app_instance_usage_user"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex tableName="app_instance_usage" indexName="idx_app_instance_usage_app_instance">
+            <column name="app_instance_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
