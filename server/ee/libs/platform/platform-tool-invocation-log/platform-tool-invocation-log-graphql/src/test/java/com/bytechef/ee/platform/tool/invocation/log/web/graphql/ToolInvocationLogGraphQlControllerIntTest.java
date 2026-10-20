@@ -68,7 +68,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
         when(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
                 eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), eq(5L),
-                isNull(), isNull(),
+                isNull(), isNull(), isNull(),
                 isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
@@ -113,7 +113,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(1);
 
         verify(toolInvocationLogFacade, never()).getToolInvocationLogs(
-            any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
     }
 
     @Test
@@ -121,6 +121,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
         when(
             toolInvocationLogFacade.getToolInvocationLogs(
                 eq(PlatformType.EMBEDDED), isNull(), isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(), isNull(),
+                isNull(),
                 eq(0)))
                     .thenReturn(new PageImpl<>(List.of()));
 
@@ -138,7 +139,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(0);
 
         verify(toolInvocationLogFacade, never()).getWorkspaceToolInvocationLogs(
-            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
     }
 
     @Test
@@ -146,7 +147,7 @@ class ToolInvocationLogGraphQlControllerIntTest {
         when(
             toolInvocationLogFacade.getToolInvocationLogs(
                 eq(PlatformType.AUTOMATION), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), isNull(),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
                 isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(toolInvocationLogDTO()), PageRequest.of(0, 50), 1));
 

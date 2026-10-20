@@ -89,11 +89,12 @@ class ToolInvocationLogFacadeIntTest {
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(toolInvocationLogService.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, 3L, null,
+            null,
             null, null, 0))
                 .thenReturn(page);
 
         assertThat(toolInvocationLogFacade.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, 3L,
-            null, null, null, 0))
+            null, null, null, null, 0))
                 .isEmpty();
     }
 
@@ -104,12 +105,14 @@ class ToolInvocationLogFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(
             toolInvocationLogService.getToolInvocationLogs(
-                PlatformType.AUTOMATION, 2, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, 2, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, null,
+                0))
                     .thenReturn(page);
 
         assertThat(
             toolInvocationLogFacade.getToolInvocationLogs(
-                PlatformType.AUTOMATION, 2L, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, 2L, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null,
+                null, 0))
                     .isEmpty();
     }
 
@@ -137,7 +140,7 @@ class ToolInvocationLogFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(
             toolInvocationLogService.getToolInvocationLogs(
-                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0))
                     .thenReturn(
                         new PageImpl<>(
                             List.of(
@@ -146,7 +149,7 @@ class ToolInvocationLogFacadeIntTest {
         when(workflowService.fetchWorkflow("workflow-1")).thenReturn(Optional.of(workflow));
 
         Page<ToolInvocationLogDTO> toolInvocationLogDTOPage = toolInvocationLogFacade.getToolInvocationLogs(
-            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0);
 
         assertThat(toolInvocationLogDTOPage.getContent())
             .extracting(ToolInvocationLogDTO::toolInvocationLog, ToolInvocationLogDTO::workflowName)
@@ -161,7 +164,7 @@ class ToolInvocationLogFacadeIntTest {
 
         assertThatThrownBy(
             () -> toolInvocationLogFacade.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, null,
-                null, null, null, 0))
+                null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(toolInvocationLogService);
@@ -176,7 +179,7 @@ class ToolInvocationLogFacadeIntTest {
         assertThatThrownBy(
             () -> callSkippingChecks(
                 () -> toolInvocationLogFacade.getToolInvocationLogs(
-                    PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0)))
+                    PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0)))
                         .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(toolInvocationLogService);
@@ -190,12 +193,14 @@ class ToolInvocationLogFacadeIntTest {
         when(
             toolInvocationLogService.getWorkspaceToolInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null,
+                null,
                 1))
                     .thenReturn(page);
 
         assertThat(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2L, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null,
+                null,
                 1))
                     .isEmpty();
     }
@@ -206,7 +211,7 @@ class ToolInvocationLogFacadeIntTest {
 
         assertThatThrownBy(
             () -> toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
-                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(toolInvocationLogService);
@@ -221,7 +226,7 @@ class ToolInvocationLogFacadeIntTest {
         assertThatThrownBy(
             () -> callSkippingChecks(
                 () -> toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
-                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, 0)))
+                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, 0)))
                         .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(toolInvocationLogService);

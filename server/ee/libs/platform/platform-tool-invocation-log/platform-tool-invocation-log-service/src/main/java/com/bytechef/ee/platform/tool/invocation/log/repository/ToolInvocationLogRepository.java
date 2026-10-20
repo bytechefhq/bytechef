@@ -33,6 +33,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
+            AND (:appId IS NULL OR app_id = :appId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
             AND (CAST(:endDate AS TIMESTAMP) IS NULL OR created_date <= CAST(:endDate AS TIMESTAMP))
         ORDER BY created_date DESC
@@ -43,7 +44,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
         @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
-        @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
+        @Param("integrationInstanceId") @Nullable Long integrationInstanceId, @Param("appId") @Nullable Long appId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate,
         @Param("limit") int limit, @Param("offset") long offset);
 
@@ -57,6 +58,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
+            AND (:appId IS NULL OR app_id = :appId)
             AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
             AND (CAST(:endDate AS TIMESTAMP) IS NULL OR created_date <= CAST(:endDate AS TIMESTAMP))
         """)
@@ -65,7 +67,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
         @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
-        @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
+        @Param("integrationInstanceId") @Nullable Long integrationInstanceId, @Param("appId") @Nullable Long appId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate);
 
     @Modifying

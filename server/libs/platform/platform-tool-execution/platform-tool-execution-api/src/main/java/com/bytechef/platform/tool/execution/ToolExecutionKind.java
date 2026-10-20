@@ -22,5 +22,6 @@ package com.bytechef.platform.tool.execution;
 public enum ToolExecutionKind {
 
     COMPONENT,
-    WORKFLOW
+    WORKFLOW,
+    HTTP_PROXY
 }

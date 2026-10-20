@@ -46,13 +46,13 @@ public class ToolInvocationLogGraphQlController {
         @Argument PlatformType type, @Argument @Nullable Long environmentId, @Argument @Nullable String surface,
         @Argument @Nullable String outcome,
         @Argument @Nullable Long mcpServerId, @Argument @Nullable Long connectedUserId,
-        @Argument @Nullable Long integrationInstanceId, @Argument @Nullable Long fromDate,
-        @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
+        @Argument @Nullable Long integrationInstanceId, @Argument @Nullable Long appId,
+        @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             toolInvocationLogFacade.getToolInvocationLogs(
                 type, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
-                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                integrationInstanceId, appId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     @QueryMapping(name = "workspaceToolInvocationLogs")
@@ -61,12 +61,13 @@ public class ToolInvocationLogGraphQlController {
         @Argument @Nullable String surface,
         @Argument @Nullable String outcome, @Argument @Nullable Long mcpServerId,
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
-        @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
+        @Argument @Nullable Long appId, @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate,
+        @Argument @Nullable Integer page) {
 
         return toPage(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
                 type, workspaceId, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
-                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                integrationInstanceId, appId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     private static ToolInvocationLogPage toPage(Page<ToolInvocationLogDTO> toolInvocationLogPage) {
@@ -107,7 +108,8 @@ public class ToolInvocationLogGraphQlController {
             toolInvocationLog.getConnectionId(), toolInvocationLog.getEnvironment(),
             toolInvocationLog.getWorkspaceId(), toolInvocationLog.getExternalUserId(),
             toolInvocationLog.getConnectedUserId(), toolInvocationLog.getIntegrationInstanceId(),
-            toolInvocationLog.getMcpServerId(), toolInvocationLog.getJobId(), toolInvocationLogDTO.workflowName(),
+            toolInvocationLog.getMcpServerId(), toolInvocationLog.getJobId(), toolInvocationLog.getAppId(),
+            toolInvocationLogDTO.workflowName(),
             toolInvocationLog.getOutcome()
                 .name(),
             toolInvocationLog.getErrorType(), toolInvocationLog.getErrorMessage(),
@@ -118,7 +120,7 @@ public class ToolInvocationLogGraphQlController {
     record ToolInvocationLogItem(
         Long id, String surface, String kind, String toolName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
-        Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long jobId, String workflowName,
+        Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long jobId, Long appId, String workflowName,
         String outcome, String errorType, String errorMessage, int durationMs, Long createdDate) {
     }
 

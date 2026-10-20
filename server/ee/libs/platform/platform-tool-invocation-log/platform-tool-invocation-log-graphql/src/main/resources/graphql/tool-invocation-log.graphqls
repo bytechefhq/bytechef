@@ -7,6 +7,7 @@ extend type Query {
         mcpServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
+        appId: Long
         fromDate: Long
         toDate: Long
         page: Int = 0
@@ -20,6 +21,7 @@ extend type Query {
         mcpServerId: Long
         connectedUserId: Long
         integrationInstanceId: Long
+        appId: Long
         fromDate: Long
         toDate: Long
         page: Int = 0
@@ -42,6 +44,7 @@ type ToolInvocationLogType {
     integrationInstanceId: Long
     mcpServerId: Long
     jobId: Long
+    appId: Long
     workflowName: String
     outcome: String!
     errorType: String

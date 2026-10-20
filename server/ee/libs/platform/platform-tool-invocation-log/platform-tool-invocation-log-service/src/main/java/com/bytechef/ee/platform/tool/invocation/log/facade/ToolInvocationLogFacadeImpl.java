@@ -61,12 +61,12 @@ public class ToolInvocationLogFacadeImpl implements ToolInvocationLogFacade {
         PlatformType type, @Nullable Long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
+        @Nullable Long appId, @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return toToolInvocationLogDTOPage(
             toolInvocationLogService.getToolInvocationLogs(
                 type, environmentId == null ? null : Math.toIntExact(environmentId), surface, outcome, mcpServerId,
-                connectedUserId, integrationInstanceId, startDate, endDate, pageNumber));
+                connectedUserId, integrationInstanceId, appId, startDate, endDate, pageNumber));
     }
 
     @Override
@@ -74,13 +74,13 @@ public class ToolInvocationLogFacadeImpl implements ToolInvocationLogFacade {
     public Page<ToolInvocationLogDTO> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
-        int pageNumber) {
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
+        @Nullable Instant endDate, int pageNumber) {
 
         return toToolInvocationLogDTOPage(
             toolInvocationLogService.getWorkspaceToolInvocationLogs(
                 type, workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, connectedUserId,
-                integrationInstanceId, startDate, endDate, pageNumber));
+                integrationInstanceId, appId, startDate, endDate, pageNumber));
     }
 
     private Map<Long, String> getWorkflowNamesByJobId(List<Long> jobIds) {

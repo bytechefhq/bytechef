@@ -29,11 +29,11 @@ public interface ToolInvocationLogService {
         PlatformType type, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
+        @Nullable Long appId, @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
     Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
         PlatformType type, long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
-        int pageNumber);
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
+        @Nullable Instant endDate, int pageNumber);
 }

@@ -74,6 +74,9 @@ public class ToolInvocationLog {
     @Column("job_id")
     private Long jobId;
 
+    @Column("app_id")
+    private Long appId;
+
     @Column("outcome")
     private int outcome;
 
@@ -154,6 +157,10 @@ public class ToolInvocationLog {
 
     public @Nullable Long getJobId() {
         return jobId;
+    }
+
+    public @Nullable Long getAppId() {
+        return appId;
     }
 
     public ToolExecutionOutcome getOutcome() {
@@ -238,6 +245,10 @@ public class ToolInvocationLog {
 
     public void setJobId(Long jobId) {
         this.jobId = jobId;
+    }
+
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
     public void setOutcome(ToolExecutionOutcome outcome) {
