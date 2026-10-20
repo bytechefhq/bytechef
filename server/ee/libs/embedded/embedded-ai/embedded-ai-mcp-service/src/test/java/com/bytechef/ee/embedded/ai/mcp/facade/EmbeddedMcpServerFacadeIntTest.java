@@ -55,6 +55,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -140,7 +141,7 @@ class EmbeddedMcpServerFacadeIntTest {
     }
 
     @Test
-    void testEveryMethodRequiresTenantAdmin() {
+    void testEveryMethodIsDeniedToAUserWithoutEmbeddedScopes() {
         authenticate(nonAdmin());
 
         List<Method> methods = Arrays.stream(EmbeddedMcpServerFacade.class.getDeclaredMethods())
@@ -162,7 +163,7 @@ class EmbeddedMcpServerFacadeIntTest {
 
         @ParameterizedTest
         @MethodSource("com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacadeIntTest#administrationOperations")
-        void testDeniedToNonAdmin(Consumer<EmbeddedMcpServerFacade> operation) {
+        void testDeniedToAUserWithoutEmbeddedScopes(Consumer<EmbeddedMcpServerFacade> operation) {
             assertDenied(nonAdmin(), operation);
         }
 
@@ -545,6 +546,14 @@ class EmbeddedMcpServerFacadeIntTest {
             return 0L;
         }
 
+        if (type == McpComponent.class) {
+            return createMcpComponent(0L, 0L);
+        }
+
+        if (type == McpTool.class) {
+            return createMcpTool(0L, 0L);
+        }
+
         return null;
     }
 
@@ -609,12 +618,23 @@ class EmbeddedMcpServerFacadeIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
+            return mock(PermissionService.class, invocation -> {
+                Class<?> returnType = invocation.getMethod()
+                    .getReturnType();
 
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+                if (returnType != boolean.class) {
+                    return Answers.RETURNS_DEFAULTS.answer(invocation);
+                }
 
-            return permissionService;
+                String methodName = invocation.getMethod()
+                    .getName();
+
+                if (methodName.equals("isAuthorizationSkipped")) {
+                    return false;
+                }
+
+                return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
+            });
         }
     }
 }
