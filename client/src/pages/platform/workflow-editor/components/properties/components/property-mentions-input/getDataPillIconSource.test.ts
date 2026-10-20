@@ -106,4 +106,32 @@ describe('getDataPillIconSource', () => {
             })
         ).toBe('http-client-icon');
     });
+
+    it('maps the generic trigger node to the workflow trigger component', () => {
+        const triggerWorkflow = {workflowTriggerComponentNames: ['webhook']} as Workflow;
+
+        expect(
+            getDataPillIconSource({
+                componentDefinitions: [{icon: 'webhook-icon', name: 'webhook', version: 1}],
+                mentionDisplay: '${trigger_1.body}',
+                workflow: triggerWorkflow,
+            })
+        ).toBe('webhook-icon');
+    });
+
+    it('resolves a mention without the expression prefix', () => {
+        expect(
+            getDataPillIconSource({
+                componentDefinitions: [{icon: 'http-client-icon', name: 'httpClient', version: 1}],
+                mentionDisplay: 'httpClient_1.body',
+                workflow,
+            })
+        ).toBe('http-client-icon');
+    });
+
+    it('falls back to the string type icon when no definition matches', () => {
+        expect(getDataPillIconSource({mentionDisplay: '${unknown_1.value}', workflow})).toMatch(
+            /^data:image\/svg\+xml;charset=utf-8,/
+        );
+    });
 });
