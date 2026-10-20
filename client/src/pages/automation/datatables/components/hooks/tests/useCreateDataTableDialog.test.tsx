@@ -90,6 +90,34 @@ describe('useCreateDataTableDialog', () => {
 
             expect(result.current.open).toBe(false);
         });
+
+        it('resets form when closed without creating', () => {
+            const {result} = renderHook(() => useCreateDataTableDialog());
+
+            act(() => {
+                result.current.handleOpen();
+            });
+
+            act(() => {
+                result.current.handleBaseNameChange('orders');
+                result.current.handleDescriptionChange('Customer orders');
+                result.current.handleColumnNameChange(0, 'id');
+                result.current.handleColumnTypeChange(0, ColumnType.Integer);
+                result.current.handleAddColumn();
+            });
+
+            act(() => {
+                result.current.handleClose();
+            });
+
+            act(() => {
+                result.current.handleOpen();
+            });
+
+            expect(result.current.baseName).toBe('');
+            expect(result.current.description).toBe('');
+            expect(result.current.columns).toEqual([{name: '', type: ColumnType.String}]);
+        });
     });
 
     describe('form state', () => {
