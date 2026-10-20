@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
@@ -154,7 +155,7 @@ class WorkspaceConnectionAuditIntTest {
 
             return new WorkspaceConnectionFacadeImpl(
                 mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), mock(ConnectionService.class),
-                projectDeploymentWorkflowService,
+                mock(PermissionService.class), projectDeploymentWorkflowService,
                 mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
         }
     }
