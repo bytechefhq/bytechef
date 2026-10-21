@@ -23,6 +23,12 @@ billing:
     success-url: ${bytechef.public-url}/automation/settings/billing?checkout=success
     cancel-url: ${bytechef.public-url}/automation/settings/billing
 
+docs:
+  changelog-url: https://github.com/bytechefhq/bytechef/releases
+  community-support-url: https://discord.gg/VKvNxHjpYx
+  documentation-url: https://docs.bytechef.io
+  report-bug-url: https://github.com/bytechefhq/bytechef/issues
+
 github-proxy:
   baseUrl: https://github-proxy.bytechef.io/
 
@@ -42,6 +48,11 @@ info:
     customerPortalUrl: ${billing.stripe.customer-portal-url:}
   application:
     edition: ${bytechef.edition:}
+  docs:
+    changelogUrl: ${docs.changelog-url:}
+    communitySupportUrl: ${docs.community-support-url:}
+    documentationUrl: ${docs.documentation-url:}
+    reportBugUrl: ${docs.report-bug-url:}
   featureFlags: ${bytechef.feature-flags}
   helpHub:
     enabled: ${bytechef.help-hub.enabled}
