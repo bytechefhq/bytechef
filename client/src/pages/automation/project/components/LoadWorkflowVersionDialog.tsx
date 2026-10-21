@@ -43,8 +43,8 @@ const LoadWorkflowVersionDialog = ({onClose, projectId, workflowUuid}: LoadWorkf
         onSuccess: (_, {projectVersion}) => {
             clearWorkflowHistory();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
-            queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(projectId)});
 
             toast(`Workflow loaded from version V${projectVersion} into the draft.`);
 
