@@ -39,6 +39,7 @@ import com.bytechef.platform.component.service.OperationDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.tenant.TenantContext;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -68,6 +69,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -310,8 +312,7 @@ class HttpClientExecutor {
         builder.formPart(
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
-                BodyPublishers.ofInputStream(() -> tempFileStorage.getInputStream(
-                    ((FileEntryImpl) fileEntry).getFileEntry())),
+                BodyPublishers.ofInputStream(getInputStreamSupplier(fileEntry)),
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
@@ -359,9 +360,15 @@ class HttpClientExecutor {
 
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofInputStream(
-                () -> tempFileStorage.getInputStream(((FileEntryImpl) fileEntry).getFileEntry())),
+            BodyPublishers.ofInputStream(getInputStreamSupplier(fileEntry)),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
+    }
+
+    private Supplier<InputStream> getInputStreamSupplier(FileEntry fileEntry) {
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        return () -> TenantContext.callWithTenantId(
+            tenantId, () -> tempFileStorage.getInputStream(((FileEntryImpl) fileEntry).getFileEntry()));
     }
 
     private ConnectionDefinitionService getConnectionDefinitionService() {
