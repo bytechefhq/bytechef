@@ -19,6 +19,9 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -36,7 +39,6 @@ import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +77,8 @@ class ScopedProjectGuardTest {
 
     @Test
     void testCheckWorkflowAllowsAWorkflowOfTheScopedProject() {
+        givenOwnedProject(OWN_PROJECT_ID);
+
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
 
@@ -102,24 +106,30 @@ class ScopedProjectGuardTest {
 
     @Test
     void testGetAccessibleProjectIdsReturnsOnlyTheScopedProject() {
+        lenient().when(projectService.getWorkspaceProjectIds(anyLong(), anySet()))
+            .thenReturn(List.of(OWN_PROJECT_ID, OWNED_PROJECT_ID));
+
         assertThat(
             newGuard().getAccessibleProjectIds(
                 null, scopedToolContext(), ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS))
                     .containsExactly(OWN_PROJECT_ID);
-
-        verify(projectService, never()).getWorkspaceProjectIds(any(Long.class));
     }
 
     @Test
-    void testGetProjectRejectsAProjectOwnedByAFeatureLikeAnInaccessibleOne() {
+    void testGetProjectRejectsAConnectedUserProjectLikeAnInaccessibleOne() {
         Project project = mock(Project.class);
 
         when(project.getWorkspaceId()).thenReturn(WORKSPACE_ID);
         when(projectService.fetchProject(OWNED_PROJECT_ID)).thenReturn(Optional.of(project));
         when(workspaceScopeResolver.resolveWorkspace(any(), any()))
             .thenReturn(new WorkspaceScopeResolver.Resolved(WORKSPACE_ID, 1L));
-        when(projectOwnershipService.getOwnedProjectIds(List.of(OWNED_PROJECT_ID), EnumSet.allOf(ProjectOwner.class)))
-            .thenReturn(Set.of(OWNED_PROJECT_ID));
+        when(projectOwnershipService.getOwnedProjectIds(any(), any()))
+            .thenAnswer(invocation -> {
+                Set<ProjectOwner> projectOwners = invocation.getArgument(1);
+
+                return projectOwners.contains(ProjectOwner.EMBEDDED_CONNECTED_USER)
+                    ? Set.of(OWNED_PROJECT_ID) : Set.of();
+            });
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
 
@@ -128,6 +138,18 @@ class ScopedProjectGuardTest {
                 OWNED_PROJECT_ID, WORKSPACE_ID, null, ProjectToolErrorType.GET_PROJECT))
                     .isInstanceOf(ExecutionException.class)
                     .hasMessage("Project " + OWNED_PROJECT_ID + " not found in workspace " + WORKSPACE_ID);
+    }
+
+    @Test
+    void testGetProjectReturnsTheScopedProjectEvenWhenItIsOwned() {
+        givenOwnedProject(OWN_PROJECT_ID);
+
+        Project project = mock(Project.class);
+
+        when(projectService.getProject(OWN_PROJECT_ID)).thenReturn(project);
+
+        assertThat(newGuard().getProject(OWN_PROJECT_ID, null, scopedToolContext(), ProjectToolErrorType.GET_PROJECT))
+            .isSameAs(project);
     }
 
     @Test
@@ -191,6 +213,11 @@ class ScopedProjectGuardTest {
                 ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION))
                     .isInstanceOf(ExecutionException.class)
                     .hasMessage(ScopedConnectionGuard.UNVERIFIED_MESSAGE);
+    }
+
+    private void givenOwnedProject(long projectId) {
+        lenient().when(projectOwnershipService.getOwnedProjectIds(any(), any()))
+            .thenReturn(Set.of(projectId));
     }
 
     private ScopedProjectGuard newGuard() {

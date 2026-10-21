@@ -36,6 +36,8 @@ import org.springframework.ai.chat.model.ToolContext;
  */
 final class ProjectWorkspaceScope {
 
+    static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER);
+
     static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional when the account has exactly one workspace or the conversation is already " +
             "scoped to a workspace; otherwise required — a workspace_required error lists the candidates.";
@@ -74,7 +76,7 @@ final class ProjectWorkspaceScope {
     }
 
     static List<Project> getWorkspaceProjects(ProjectService projectService, long workspaceId) {
-        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId));
+        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId, HIDDEN_PROJECT_OWNERS));
     }
 
     static void checkWorkspaceWorkflow(
@@ -104,7 +106,7 @@ final class ProjectWorkspaceScope {
 
     private static boolean isOwned(ProjectOwnershipService projectOwnershipService, long projectId) {
         Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
-            List.of(projectId), EnumSet.allOf(ProjectOwner.class));
+            List.of(projectId), HIDDEN_PROJECT_OWNERS);
 
         return !ownedProjectIds.isEmpty();
     }

@@ -10,12 +10,14 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -129,6 +131,11 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public List<Long> getWorkspaceProjectIds(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getWorkspaceProjectIds(long workspaceId, Set<ProjectOwner> excludedProjectOwners) {
         throw new UnsupportedOperationException();
     }
 

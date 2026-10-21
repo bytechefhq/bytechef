@@ -246,6 +246,33 @@ class EmbeddedOwnerContributorIntTest {
     }
 
     @Test
+    void testWorkspaceProjectIdsExcludingConnectedUserProjectsKeepCatalogProjects() {
+        long catalogProjectId = automationWorkflowProjectFacade.createProject(
+            "Reachable Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+
+        String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "published", null);
+
+        Project catalogProject = projectService.getProject(catalogProjectId);
+        Project connectedUserProject = projectService.getProject(
+            connectedUserProjectService.getConnectUserProject(externalUserId, Environment.PRODUCTION)
+                .getProjectId());
+
+        assertThat(
+            projectService.getWorkspaceProjectIds(
+                catalogProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                    .contains(catalogProjectId);
+        assertThat(
+            projectService.getWorkspaceProjectIds(
+                connectedUserProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                    .doesNotContain(connectedUserProject.getId());
+        assertThat(projectService.getWorkspaceProjectIds(catalogProject.getWorkspaceId()))
+            .doesNotContain(catalogProjectId);
+    }
+
+    @Test
     void testEmbeddedFilterSelectsConnectedUserAndReferenceDeployments() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
             "Reference Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);

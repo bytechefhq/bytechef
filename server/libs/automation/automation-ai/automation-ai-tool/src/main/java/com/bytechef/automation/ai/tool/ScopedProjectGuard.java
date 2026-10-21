@@ -130,7 +130,9 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId == null) {
             return Set.copyOf(
-                projectService.getWorkspaceProjectIds(resolveWorkspaceId(workspaceId, toolContext, errorType)));
+                projectService.getWorkspaceProjectIds(
+                    resolveWorkspaceId(workspaceId, toolContext, errorType),
+                    ProjectWorkspaceScope.HIDDEN_PROJECT_OWNERS));
         }
 
         return Set.of(scopedProjectId);
