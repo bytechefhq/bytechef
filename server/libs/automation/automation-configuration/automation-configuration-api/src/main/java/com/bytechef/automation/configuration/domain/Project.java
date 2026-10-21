@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -135,6 +136,12 @@ public final class Project {
         return getClass().hashCode();
     }
 
+    public Optional<ProjectVersion> fetchProjectVersion(int version) {
+        return projectVersions.stream()
+            .filter(projectVersion -> projectVersion.getVersion() == version)
+            .findFirst();
+    }
+
     public Long getCategoryId() {
         return categoryId == null ? null : categoryId.getId();
     }
@@ -233,6 +240,10 @@ public final class Project {
         projectVersions.add(new ProjectVersion(newVersion));
 
         return newVersion;
+    }
+
+    public void removeProjectVersion(int version) {
+        projectVersions.removeIf(projectVersion -> projectVersion.getVersion() == version);
     }
 
     public void setCategory(Category category) {

@@ -177,6 +177,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public void removeProjectVersion(long id, int projectVersion) {
+        Project project = getProject(id);
+
+        project.removeProjectVersion(projectVersion);
+
+        projectRepository.save(project);
+    }
+
+    @Override
     public Project update(long id, List<Long> tagIds) {
         Project project = getProject(id);
 

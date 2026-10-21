@@ -665,6 +665,54 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ProjectVersion"
+  /projects/{id}/versions/{projectVersion}:
+    delete:
+      description: "Deletes a published project version."
+      summary: "Deletes a published project version."
+      tags:
+        - "project"
+      operationId: "deleteProjectVersion"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "204":
+          description: "Successful operation."
+  /projects/{id}/versions/{projectVersion}/restore:
+    post:
+      description: "Replaces the draft workflows of a project with the workflows of a published project version."
+      summary: "Restores a published project version into the draft."
+      tags:
+        - "project"
+      operationId: "restoreProjectVersion"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "204":
+          description: "Successful operation."
   /projects/{id}/versions/{projectVersion}/workflows:
     get:
       description: "Get workflows for particular project version."

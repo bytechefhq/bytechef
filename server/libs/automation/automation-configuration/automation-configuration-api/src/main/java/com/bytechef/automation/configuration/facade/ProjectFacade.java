@@ -33,6 +33,8 @@ public interface ProjectFacade {
 
     void deleteProject(long id);
 
+    void deleteProjectVersion(long id, int projectVersion);
+
     void deleteSharedProject(long id);
 
     ProjectDTO duplicateProject(long id);
@@ -63,6 +65,8 @@ public interface ProjectFacade {
     long importProjectTemplate(String id, long workspaceId, boolean sharedProject);
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
+
+    void restoreProjectVersion(long id, int projectVersion);
 
     void updateProject(ProjectDTO projectDTO);
 }
