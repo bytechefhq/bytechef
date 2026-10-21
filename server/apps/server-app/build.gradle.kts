@@ -382,6 +382,7 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
+    testImplementation(project(":claude-code-plugin:plugin-tools"))
     testImplementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
