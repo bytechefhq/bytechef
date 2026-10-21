@@ -1,6 +1,10 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 const ConnectedUserSheetDeleteDropdownMenu = ({onDeleteClick}: {onDeleteClick: () => void}) => (
@@ -15,9 +19,7 @@ const ConnectedUserSheetDeleteDropdownMenu = ({onDeleteClick}: {onDeleteClick: (
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-            <DropdownMenuItem className="dropdown-menu-item-destructive" onClick={onDeleteClick} variant="destructive">
-                <Trash2Icon /> Delete
-            </DropdownMenuItem>
+            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
         </DropdownMenuContent>
     </DropdownMenu>
 );
