@@ -16,7 +16,9 @@
 
 package com.bytechef.evaluator;
 
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Map;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -33,12 +35,27 @@ class Size implements MethodExecutor {
             return new TypedValue(0);
         }
 
-        List<?> l1 = (List<?>) arguments[0];
+        Object value = arguments[0];
 
-        if (l1 == null) {
+        if (value == null) {
             return new TypedValue(-1);
         }
 
-        return new TypedValue(l1.size());
+        if (value instanceof Collection<?> collection) {
+            return new TypedValue(collection.size());
+        }
+
+        if (value instanceof Map<?, ?> map) {
+            return new TypedValue(map.size());
+        }
+
+        if (value.getClass()
+            .isArray()) {
+
+            return new TypedValue(Array.getLength(value));
+        }
+
+        throw new AccessException("Invalid argument for size: " + value.getClass()
+            .getName() + " is not a collection, map or array");
     }
 }
