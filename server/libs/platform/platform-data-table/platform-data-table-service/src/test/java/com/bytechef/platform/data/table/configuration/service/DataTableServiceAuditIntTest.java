@@ -19,6 +19,10 @@ package com.bytechef.platform.data.table.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -258,5 +263,22 @@ class DataTableServiceAuditIntTest {
         DataTableAuditMapper.class
     })
     static class AuditConfiguration {
+
+        private static final String MATCH_NOTHING = "%1$s = 0";
+
+        @Bean
+        ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+            return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, MATCH_NOTHING);
+        }
+
+        @Bean
+        ProjectOwnerContributor embeddedConnectedUserProjectOwnerContributor() {
+            return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, MATCH_NOTHING);
+        }
+
+        @Bean
+        ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor() {
+            return ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, MATCH_NOTHING);
+        }
     }
 }
