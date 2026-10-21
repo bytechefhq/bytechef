@@ -206,6 +206,11 @@ public class ApplicationProperties {
     private UserGuiding userGuiding = new UserGuiding();
 
     /**
+     * Outbound webhook delivery configuration
+     */
+    private WebhookDelivery webhookDelivery = new WebhookDelivery();
+
+    /**
      * Webhook URL for external integrations
      */
     private String webhookUrl;
@@ -342,6 +347,10 @@ public class ApplicationProperties {
 
     public UserGuiding getUserGuiding() {
         return userGuiding;
+    }
+
+    public WebhookDelivery getWebhookDelivery() {
+        return webhookDelivery;
     }
 
     public String getWebhookUrl() {
@@ -482,6 +491,10 @@ public class ApplicationProperties {
 
     public void setUserGuiding(UserGuiding userGuiding) {
         this.userGuiding = userGuiding;
+    }
+
+    public void setWebhookDelivery(WebhookDelivery webhookDelivery) {
+        this.webhookDelivery = webhookDelivery;
     }
 
     public void setWebhookUrl(String webhookUrl) {
@@ -4644,6 +4657,39 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /**
+     * Outbound webhook delivery, such as Data Table triggers.
+     */
+    public static class WebhookDelivery {
+
+        /**
+         * Outbound webhook POSTs allowed at the same time; must be at least 1
+         */
+        private int concurrencyLimit;
+
+        /**
+         * Deliveries to one webhook allowed to wait or run at the same time before new ones to it are dropped; must be
+         * at least 1. A delivery carries every row changed by one write.
+         */
+        private int maxPendingDeliveries;
+
+        public int getConcurrencyLimit() {
+            return concurrencyLimit;
+        }
+
+        public int getMaxPendingDeliveries() {
+            return maxPendingDeliveries;
+        }
+
+        public void setConcurrencyLimit(int concurrencyLimit) {
+            this.concurrencyLimit = concurrencyLimit;
+        }
+
+        public void setMaxPendingDeliveries(int maxPendingDeliveries) {
+            this.maxPendingDeliveries = maxPendingDeliveries;
         }
     }
 

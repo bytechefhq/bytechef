@@ -1,3 +1,7 @@
 spring:
   liquibase:
     contexts: configuration,connection,execution
+bytechef:
+  webhook-delivery:
+    concurrency-limit: 10
+    max-pending-deliveries: 1000
