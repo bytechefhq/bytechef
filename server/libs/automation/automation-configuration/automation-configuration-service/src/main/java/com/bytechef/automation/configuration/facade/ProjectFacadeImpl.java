@@ -290,12 +290,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner) {
-        return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwner);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         return projectOwnershipService.getOwnedProjectIds(projectIds, projectOwners);
     }
