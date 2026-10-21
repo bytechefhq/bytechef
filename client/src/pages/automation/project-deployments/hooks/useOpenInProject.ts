@@ -5,6 +5,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback} from 'react';
+import {flushSync} from 'react-dom';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
@@ -12,11 +13,23 @@ const PROJECTS_HREF = '/automation/projects';
 
 export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?: () => void} = {}) {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const canOpenInProject = currentEnvironmentId === DEVELOPMENT_ENVIRONMENT;
+    const navigateInDevelopment = useCallback(
+        (path: string) => {
+            onBeforeNavigate?.();
+
+            if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
+                flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
+            }
+
+            navigate(path);
+        },
+        [currentEnvironmentId, navigate, onBeforeNavigate, setCurrentEnvironmentId]
+    );
 
     const openProject = useCallback(
         async (projectId: number) => {
@@ -34,14 +47,12 @@ export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?:
                     return;
                 }
 
-                onBeforeNavigate?.();
-
-                navigate(`${PROJECTS_HREF}/${projectId}/project-workflows/${firstProjectWorkflowId}`);
+                navigateInDevelopment(`${PROJECTS_HREF}/${projectId}/project-workflows/${firstProjectWorkflowId}`);
             } catch {
                 return;
             }
         },
-        [navigate, onBeforeNavigate, queryClient]
+        [navigateInDevelopment, queryClient]
     );
 
     const openProjectWorkflow = useCallback(
@@ -62,15 +73,15 @@ export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?:
                     return;
                 }
 
-                onBeforeNavigate?.();
-
-                navigate(`${PROJECTS_HREF}/${projectId}/project-workflows/${matchingWorkflow.projectWorkflowId}`);
+                navigateInDevelopment(
+                    `${PROJECTS_HREF}/${projectId}/project-workflows/${matchingWorkflow.projectWorkflowId}`
+                );
             } catch {
                 return;
             }
         },
-        [navigate, onBeforeNavigate, queryClient]
+        [navigateInDevelopment, queryClient]
     );
 
-    return {canOpenInProject, openProject, openProjectWorkflow};
+    return {openProject, openProjectWorkflow};
 }
