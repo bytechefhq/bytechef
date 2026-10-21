@@ -40,7 +40,7 @@ Behavior:
 - The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
 - Managed connections do not offer **Update credentials**.
 
-Only the connection's owner (the user who created it) or a tenant admin can replace its credentials. The server rejects the request for anyone else. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` [audit event](/platform/settings/audit-events). The event holds the connection ID only. Credential values are never recorded.
+Only the connection's owner (the member who created it, or the member it was reassigned to) or an organization admin can replace its credentials, and only with the `CONNECTION_EDIT` scope. The server rejects the request for anyone else. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` [audit event](/platform/settings/audit-events). The event holds the connection ID only. Credential values are never recorded.
 
 This applies to automation connections. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
 
@@ -71,6 +71,12 @@ Organization connections are listed on every workspace's **Connections** page. C
 {/* TODO screenshot: Settings → Connections - the Organization Connections table with Name / Component / Environment / Created By / Last Modified columns, and the New Connection button */}
 
 ## The visibility model
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Connection visibility is not available in the latest released version of ByteChef.
+</Callout>
 
 Visibility is a property of the connection and is set at the workspace level. There is no project-level connection visibility: a connection is shared with its workspace (or the whole organization), never with a single project, and every project in the workspace that can see the connection can use it.
 
@@ -129,9 +135,9 @@ Renaming, retagging and deleting a connection each need two things at once:
 
 With the built-in roles, `CONNECTION_EDIT` and `CONNECTION_DELETE` come with Editor, so an Editor or Admin can change the connections they own; a Viewer who owns a connection cannot change it, and neither an Editor nor a workspace Admin can change a connection someone else owns. A custom role can carry the scopes too. Organization admins pass both checks. The **Connections** list offers **Edit** and **Delete** only to those who may use them, and a request from anyone else is refused (HTTP 403, or a GraphQL `FORBIDDEN` error).
 
-Replacing credentials is stricter: it needs `CONNECTION_EDIT` **and** being the connection's owner. An organization admin who does not own a connection can rename, retag, delete or reassign it, but cannot view or replace its credentials. The exception is an organization connection, whose credentials every organization admin can view and replace.
+Replacing credentials needs `CONNECTION_EDIT` **and** being the connection's owner or an organization admin. An organization admin who does not own a connection can rename, retag, delete, reassign it and replace its credentials, but cannot view them: the credential fields start empty. The exception is an organization connection, whose credentials every organization admin can view and replace.
 
-Replacing credentials keeps the connection's id, so every workflow and deployment that uses it follows the new credentials. The submitted authorization fields replace the stored ones as a whole, the connection's credentials are marked valid again, and the operation is refused for a connection that is not active. It is available in the edit dialog as **Update credentials**, and through the `updateConnectionCredentials` GraphQL mutation, which takes the connection's current version so a concurrent change is rejected rather than overwritten. See [Connections](/platform/automation/build/connections#replacing-a-connections-credentials).
+Replacing credentials keeps the connection's id, so every workflow and deployment that uses it follows the new credentials. The submitted authorization fields replace the stored ones as a whole, the connection's credentials are marked valid again, and the operation is refused for a connection that is not active. It is available in the edit dialog as **Update credentials**, and through the `updateConnectionCredentials` GraphQL mutation, which takes the connection's current version so a concurrent change is rejected rather than overwritten. See [Connections](/platform/automation/build/connections#update-credentials).
 
 ## When a member leaves a workspace
 
@@ -139,6 +145,8 @@ Removing a member from a workspace does two things to the connections in that wo
 
 1. Every grant naming that member on the workspace's connections is revoked at once.
 2. Every connection the member owns moves to **Pending reassignment** (status `PENDING_REASSIGNMENT`). A former member no longer counts as the owner.
+
+Deleting a user account does the same in every workspace the user belonged to.
 
 A pending connection stays in place, but workflows cannot run on it (see the next section). An organization admin resolves it from the connection's menu with **Reassign owner**, choosing a new owner from the workspace; the connection becomes active again, and the new owner can edit it and, as its owner, view and replace its credentials. The previous owner loses that access. Reassigning an active connection hands over its credentials the same way. A connection whose status is `REVOKED` cannot be reassigned.
 
@@ -150,32 +158,6 @@ Before a deployed workflow runs, every connection it uses must be active. If any
 - a run started by a trigger does not start a job and fails with the same error.
 
 Each refused run is recorded in the audit log as `WORKFLOW_PAUSED`. Reassigning the connection lets the next run go through.
-
-## Editing connection properties
-
-Some connections have properties besides their credentials, for example the base URI of an HTTP Client connection. In the automation **Connections** list, choose **Edit** on the connection. The dialog shows the connection's name, its properties filled in with the stored values, and its tags. Change what you need and click **Save**.
-
-- Only the connection's properties are changed. The stored credentials are kept; replace them with **Update credentials** (see [Replacing credentials](#replacing-credentials)).
-- A property you clear is removed from the connection.
-- Only the connection's owner (the user who created it) or a tenant admin can save the changes.
-- If someone else changed the connection after you opened it, the save is rejected. Reload and try again.
-
-## Replacing credentials
-
-When a connection's credentials stop working, for example after a password change or a revoked token, you can enter new ones instead of creating a new connection. Every workflow that uses the connection keeps it.
-
-In the automation **Connections** list, choose **Edit** on the connection. The dialog opens on the credentials form by itself when the connection's credentials were rejected; otherwise click **Update credentials** in the dialog footer. Enter the new values, click **Update credentials** again, and the dialog confirms with "Credentials updated".
-
-- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept, and tokens saved for the previous credentials, such as an OAuth2 refresh token, are discarded.
-- Properties outside the authorization, such as a base URL or region, are not changed, and the authorization type cannot be switched.
-- Saving stores the values; it does not test them. A wrong credential is flagged as invalid the next time the connection runs.
-- Saving clears the connection's invalid-credentials flag, so workflows that were blocked by it run again.
-- The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
-- Managed connections cannot be changed this way.
-
-Only the connection's owner (the member who created it, or the member it was reassigned to) can replace its credentials; a tenant admin cannot replace the credentials of a connection they do not own. Organization connections are the exception: any organization admin can replace their credentials. The **Update credentials** button is shown only to those who can replace them. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
-
-This applies to automation connections only. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
 
 ## Changing visibility
 
@@ -208,7 +190,6 @@ In Community Edition, and on screens without a workspace context, no badge is sh
 
 Where the feature is unavailable - Community Edition, or any surface with no workspace context - **no badge appears at all**: a connection simply shows its name, and visibility is not part of the UI.
 
-### At the API level
 
 The picker is backed by four operations. Each is allowed for the connection's owner, a workspace admin of the owning workspace, or an organization admin; the UI offers the picker to the owner and organization admins.
 
@@ -241,3 +222,5 @@ A refused manual run is recorded under the user who started it. A refused run fi
 ## Metrics
 
 `bytechef_connection_create` (counter) increments on every connection created through the workspace facade, tagged `visibility=PRIVATE|WORKSPACE`, so you can watch how much credential sharing actually happens against how much stays private. The tag reads the *persisted* visibility rather than the request body, so it reflects the CE and embedded overrides. Organization connections are created through their own facade and are not counted here.
+
+See [Audit Events](/platform/settings/audit-events).
