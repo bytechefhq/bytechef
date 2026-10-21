@@ -197,3 +197,42 @@ test.describe('Connection lifecycle on member removal', () => {
         expect(renameResponse.status(), await renameResponse.text()).toBe(204);
     });
 });
+
+test.describe('Connection lifecycle on user deletion', () => {
+    test('deleting a user moves the connections they own in every workspace to PENDING_REASSIGNMENT', async () => {
+        const adminApi = await createAdminApiContext(RBAC_BASE_URL);
+
+        const firstWorkspaceId = (await createWorkspace(adminApi)).id;
+        const secondWorkspaceId = (await createWorkspace(adminApi)).id;
+
+        const deletedUser = await createWorkspaceMember(adminApi, firstWorkspaceId, 'EDITOR');
+
+        await addWorkspaceMember(adminApi, secondWorkspaceId, deletedUser, 'EDITOR');
+
+        const deletedUserApi = await createUserApiContext(deletedUser.email, deletedUser.password);
+
+        try {
+            const firstConnectionId = await createConnection(deletedUserApi, firstWorkspaceId);
+            const secondConnectionId = await createConnection(deletedUserApi, secondWorkspaceId);
+
+            expect((await getConnection(adminApi, firstConnectionId)).status).toBe('ACTIVE');
+
+            await deleteRoleUser(adminApi, deletedUser);
+
+            for (const connectionId of [firstConnectionId, secondConnectionId]) {
+                await expect
+                    .poll(async () => (await getConnection(adminApi, connectionId)).status, {timeout: 15000})
+                    .toBe('PENDING_REASSIGNMENT');
+            }
+        } finally {
+            await deletedUserApi.dispose();
+
+            await deleteRoleUser(adminApi, deletedUser);
+
+            await deleteWorkspace(adminApi, firstWorkspaceId);
+            await deleteWorkspace(adminApi, secondWorkspaceId);
+
+            await adminApi.dispose();
+        }
+    });
+});
