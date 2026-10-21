@@ -19,10 +19,12 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +116,25 @@ public class ProjectServiceImpl implements ProjectService {
             .stream()
             .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProjectVersion getPublishedProjectVersion(long id, int projectVersion) {
+        Project project = getProject(id);
+
+        ProjectVersion publishedProjectVersion = project.fetchProjectVersion(projectVersion)
+            .orElseThrow(() -> new ConfigurationException(
+                "Project version v=%s not found".formatted(projectVersion),
+                ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
+
+        if (publishedProjectVersion.getStatus() != Status.PUBLISHED) {
+            throw new ConfigurationException(
+                "Project version v=%s is not published".formatted(projectVersion),
+                ProjectErrorType.PROJECT_VERSION_NOT_PUBLISHED);
+        }
+
+        return publishedProjectVersion;
     }
 
     @Override

@@ -27,6 +27,7 @@ public class ProjectErrorType extends AbstractErrorType {
     public static final ProjectErrorType PROJECT_VERSION_NOT_FOUND = new ProjectErrorType(100);
     public static final ProjectErrorType PROJECT_VERSION_NOT_PUBLISHED = new ProjectErrorType(101);
     public static final ProjectErrorType PROJECT_VERSION_DEPLOYED = new ProjectErrorType(102);
+    public static final ProjectErrorType PROJECT_VERSION_WORKFLOW_NOT_FOUND = new ProjectErrorType(103);
 
     private ProjectErrorType(int errorKey) {
         super(Project.class, errorKey);

@@ -26,13 +26,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
@@ -42,6 +45,8 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
+import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
@@ -95,6 +100,12 @@ class ProjectWorkflowFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ProjectDeploymentFacadeHelper projectDeploymentFacadeHelper;
+
+    @Autowired
+    private ProjectFacade projectFacade;
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -568,6 +579,119 @@ class ProjectWorkflowFacadeIntTest {
             .containsExactlyInAnyOrder("branch_1", "slack_1", "googleMail_1");
     }
 
+    @Test
+    public void testGetProjectWorkflowVersions() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflowDTO projectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        String workflowUuid = projectWorkflowDTO.getWorkflowUuid();
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "second", false);
+
+        assertThat(projectWorkflowFacade.getProjectWorkflowVersions(projectDTO.id(), workflowUuid))
+            .extracting(ProjectVersion::getVersion)
+            .containsExactly(2, 1);
+    }
+
+    @Test
+    public void testRestoreProjectVersionWorkflow() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflowDTO projectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(
+            projectDTO, "{\"label\": \"Version 1\", \"description\": \"Test Description\", \"tasks\": []}");
+        ProjectWorkflowDTO otherProjectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        String workflowUuid = projectWorkflowDTO.getWorkflowUuid();
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository
+            .findByProjectIdAndProjectVersionAndUuid(projectDTO.id(), 2, UUID.fromString(workflowUuid))
+            .orElseThrow();
+        ProjectWorkflow otherDraftProjectWorkflow = projectWorkflowRepository
+            .findByProjectIdAndProjectVersionAndUuid(
+                projectDTO.id(), 2, UUID.fromString(otherProjectWorkflowDTO.getWorkflowUuid()))
+            .orElseThrow();
+
+        String draftWorkflowId = draftProjectWorkflow.getWorkflowId();
+
+        Workflow draftWorkflow = workflowRepository.findById(draftWorkflowId)
+            .orElseThrow();
+
+        projectWorkflowFacade.updateWorkflow(
+            draftWorkflowId, "{\"label\": \"Version 2\", \"description\": \"Test Description\", \"tasks\": []}",
+            draftWorkflow.getVersion());
+
+        String otherDraftDefinition = workflowRepository.findById(otherDraftProjectWorkflow.getWorkflowId())
+            .orElseThrow()
+            .getDefinition();
+
+        projectWorkflowFacade.restoreProjectVersionWorkflow(projectDTO.id(), 1, workflowUuid);
+
+        ProjectWorkflow restoredProjectWorkflow = projectWorkflowRepository
+            .findByProjectIdAndProjectVersionAndUuid(projectDTO.id(), 2, UUID.fromString(workflowUuid))
+            .orElseThrow();
+
+        assertThat(restoredProjectWorkflow.getId()).isEqualTo(draftProjectWorkflow.getId());
+        assertThat(restoredProjectWorkflow.getWorkflowId()).isEqualTo(draftWorkflowId);
+        assertThat(workflowRepository.findById(draftWorkflowId)
+            .orElseThrow()
+            .getLabel()).isEqualTo("Version 1");
+        assertThat(workflowRepository.findById(otherDraftProjectWorkflow.getWorkflowId())
+            .orElseThrow()
+            .getDefinition()).isEqualTo(otherDraftDefinition);
+    }
+
+    @Test
+    public void testRestoreProjectVersionWorkflowReaddsWorkflowDeletedFromDraft() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflowDTO projectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        String workflowUuid = projectWorkflowDTO.getWorkflowUuid();
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository
+            .findByProjectIdAndProjectVersionAndUuid(projectDTO.id(), 2, UUID.fromString(workflowUuid))
+            .orElseThrow();
+
+        projectWorkflowFacade.deleteWorkflow(draftProjectWorkflow.getWorkflowId());
+
+        projectWorkflowFacade.restoreProjectVersionWorkflow(projectDTO.id(), 1, workflowUuid);
+
+        assertThat(
+            projectWorkflowRepository.findByProjectIdAndProjectVersionAndUuid(
+                projectDTO.id(), 2, UUID.fromString(workflowUuid)))
+                    .isPresent();
+    }
+
+    @Test
+    public void testRestoreProjectVersionWorkflowRejectsInvalidVersion() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflowDTO projectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        String workflowUuid = projectWorkflowDTO.getWorkflowUuid();
+
+        assertThatThrownBy(() -> projectWorkflowFacade.restoreProjectVersionWorkflow(projectDTO.id(), 1, workflowUuid))
+            .isInstanceOf(ConfigurationException.class);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        String unknownWorkflowUuid = UUID.randomUUID()
+            .toString();
+
+        assertThatThrownBy(
+            () -> projectWorkflowFacade.restoreProjectVersionWorkflow(projectDTO.id(), 1, unknownWorkflowUuid))
+                .isInstanceOf(ConfigurationException.class);
+    }
+
     @Nested
     @ContextConfiguration(classes = Authorization.MethodSecurityConfiguration.class)
     class Authorization {
@@ -631,6 +755,7 @@ class ProjectWorkflowFacadeIntTest {
     class PreAuthorizeEnforcement {
 
         private static final long PROJECT_ID = 11L;
+        private static final String UUID_STRING = "00000000-0000-0000-0000-000000000041";
         private static final String WORKFLOW_ID = "workflow-41";
 
         @MockitoBean
@@ -657,6 +782,16 @@ class ProjectWorkflowFacadeIntTest {
                 () -> projectWorkflowFacade.duplicateWorkflow(PROJECT_ID, WORKFLOW_ID));
             assertRequiresScope(
                 WORKFLOW_ID, "Workflow", "WORKFLOW_DELETE", () -> projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_EDIT",
+                () -> projectWorkflowFacade.restoreProjectVersionWorkflow(PROJECT_ID, 1, UUID_STRING));
+        }
+
+        @Test
+        void testWorkflowVersionReadIsProtected() {
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_VIEW",
+                () -> projectWorkflowFacade.getProjectWorkflowVersions(PROJECT_ID, UUID_STRING));
         }
 
         private void

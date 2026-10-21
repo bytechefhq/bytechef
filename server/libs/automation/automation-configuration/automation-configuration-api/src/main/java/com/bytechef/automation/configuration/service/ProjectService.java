@@ -51,6 +51,8 @@ public interface ProjectService {
 
     List<ProjectVersion> getProjectVersions(Long id);
 
+    ProjectVersion getPublishedProjectVersion(long id, int projectVersion);
+
     List<Project> getProjects(List<Long> ids);
 
     List<Project> getProjects(
