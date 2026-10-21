@@ -84,21 +84,23 @@ public class DataTableDeleteRecordsAction {
                 string(DELETE_BY)
                     .label("Delete By")
                     .description("Whether to delete the records with the given IDs or every record that matches " +
-                        "the conditions. When not set, conditions are used if only OR Conditions is given, and " +
+                        "the conditions. The editor asks for Record IDs until Conditions is chosen. In a workflow " +
+                        "definition that leaves it out, conditions are used if only OR Conditions is given and " +
                         "Record IDs otherwise; it must be set when both are given.")
                     .options(
                         option("Record IDs", DeleteBy.IDS.name()),
                         option("Conditions", DeleteBy.CONDITIONS.name())),
                 array(IDS)
                     .label("Record IDs")
-                    .description("IDs of records to delete. Ignored when Delete By is Conditions, or when it is " +
-                        "not set and only OR Conditions is given.")
+                    .description(
+                        "IDs of records to delete; required unless Delete By is Conditions, and ignored when it is.")
                     .displayCondition("%s != '%s'".formatted(DELETE_BY, DeleteBy.CONDITIONS))
                     .required(true)
                     .items(integer("id")),
                 DataTableUtils.conditionsProperty(dataTableService)
                     .description(
-                        "OR Condition array that contains AND Condition arrays. Every record that meets every " +
+                        "OR Condition array that contains AND Condition arrays; required when Delete By is " +
+                            "Conditions. Every record that meets every " +
                             "condition of at least one AND Condition is deleted. Use Clear Table to delete every " +
                             "record.")
                     .displayCondition("%s == '%s'".formatted(DELETE_BY, DeleteBy.CONDITIONS))
@@ -133,12 +135,7 @@ public class DataTableDeleteRecordsAction {
                     "Delete by conditions requires at least one condition; use Clear Table to delete every record");
             }
 
-            List<Long> deletedIds = dataTableRowService.deleteRows(baseName, conditions, environmentId)
-                .stream()
-                .map(DataTableRow::id)
-                .toList();
-
-            return toResult(deletedIds);
+            return deleteRows(baseName, conditions, environmentId);
         }
 
         List<Long> ids = Arrays.stream(inputParameters.getRequiredArray(IDS))
@@ -153,6 +150,10 @@ public class DataTableDeleteRecordsAction {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("id", Operation.IN, ids)));
 
+        return deleteRows(baseName, conditions, environmentId);
+    }
+
+    private Map<String, Object> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
         List<Long> deletedIds = dataTableRowService.deleteRows(baseName, conditions, environmentId)
             .stream()
             .map(DataTableRow::id)
@@ -184,15 +185,23 @@ public class DataTableDeleteRecordsAction {
     }
 
     private static long toId(Object id) {
-        try {
-            BigDecimal bigDecimal = new BigDecimal(String.valueOf(id)
-                .trim());
+        BigDecimal bigDecimal;
 
-            return bigDecimal.longValueExact();
+        try {
+            bigDecimal = new BigDecimal(String.valueOf(id)
+                .trim());
         } catch (NumberFormatException exception) {
             throw new IllegalArgumentException("Record ID '%s' is not a number".formatted(id), exception);
+        }
+
+        try {
+            return bigDecimal.longValueExact();
         } catch (ArithmeticException exception) {
-            throw new IllegalArgumentException("Record ID '%s' is not a whole number".formatted(id), exception);
+            BigDecimal strippedBigDecimal = bigDecimal.stripTrailingZeros();
+
+            String reason = strippedBigDecimal.scale() > 0 ? "is not a whole number" : "is out of range";
+
+            throw new IllegalArgumentException("Record ID '%s' %s".formatted(id, reason), exception);
         }
     }
 

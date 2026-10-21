@@ -17,7 +17,9 @@
 package com.bytechef.platform.data.table.execution.listener;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,11 +54,14 @@ import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
@@ -76,27 +81,35 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(classes = DataTableIntTestConfiguration.class)
 @Import(H2DataSourceConfiguration.class)
 class DataTableWebhookEventListenerIntTest {
@@ -114,6 +127,15 @@ class DataTableWebhookEventListenerIntTest {
 
     @Autowired
     private DataTableWebhookEventListener dataTableWebhookEventListener;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
+
+    @Autowired
+    private ObjectProvider<MeterRegistry> meterRegistryProvider;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -135,6 +157,7 @@ class DataTableWebhookEventListenerIntTest {
     private final AtomicInteger failureStatus = new AtomicInteger(400);
     private HttpServer httpServer;
     private final BlockingQueue<String> missingBodies = new LinkedBlockingQueue<>();
+    private final BlockingQueue<String> requestUris = new LinkedBlockingQueue<>();
     private final BlockingQueue<Integer> scriptedStatuses = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> updatedBodies = new LinkedBlockingQueue<>();
 
@@ -177,6 +200,206 @@ class DataTableWebhookEventListenerIntTest {
 
         assertTrue(body.contains("\"type\":\"RECORD_CREATED\""), body);
         assertTrue(containsId(body, dataTableRow.id()), body);
+    }
+
+    @Test
+    void testDeliveredBodyNestsTheRowUnderPayload() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+            List.of(
+                new DataTableWebhookService.Webhook(
+                    3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+        DataTableRow dataTableRow = dataTableRowService.insertRow(
+            "items", Map.of("title", "Apple"), DEV_ENVIRONMENT_ID);
+
+        Map<?, ?> body = objectMapper.readValue(takeBodies(createdBodies, 1).getFirst(), Map.class);
+
+        assertEquals(List.of("payload", "table", "timestamp", "type"), sortedKeys(body));
+        assertEquals("RECORD_CREATED", body.get("type"));
+        assertEquals("items", body.get("table"));
+        assertNotNull(Instant.parse((String) body.get("timestamp")));
+
+        Map<?, ?> payload = (Map<?, ?>) body.get("payload");
+
+        assertEquals(List.of("id", "values"), sortedKeys(payload));
+        assertEquals(dataTableRow.id(), ((Number) payload.get("id")).longValue());
+
+        Map<?, ?> values = (Map<?, ?>) payload.get("values");
+
+        assertEquals("Apple", values.get("title"));
+    }
+
+    @Test
+    void testDeliveredBodyWritesDatesAndDateTimesAsIsoText() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        dataTableService.dropTable("dated", DEV_ENVIRONMENT_ID);
+        dataTableService.createTable(
+            "dated", null,
+            List.of(new ColumnSpec("due", ColumnType.DATE), new ColumnSpec("created", ColumnType.DATE_TIME)),
+            DEV_ENVIRONMENT_ID);
+
+        try {
+            when(dataTableWebhookService.listWebhooks("dated", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            dataTableRowService.insertRow(
+                "dated", Map.of("due", "2026-01-31", "created", "2026-01-31T10:00:00+02:00"), DEV_ENVIRONMENT_ID);
+
+            Map<?, ?> body = objectMapper.readValue(takeBodies(createdBodies, 1).getFirst(), Map.class);
+            Map<?, ?> payload = (Map<?, ?>) body.get("payload");
+            Map<?, ?> values = (Map<?, ?>) payload.get("values");
+
+            assertEquals("2026-01-31", values.get("due"));
+            assertEquals("2026-01-31T08:00:00.000Z", values.get("created"));
+        } finally {
+            dataTableService.dropTable("dated", DEV_ENVIRONMENT_ID);
+        }
+    }
+
+    @Test
+    void testWebhookUrlIsPostedWithoutReencodingIt() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+            List.of(
+                new DataTableWebhookService.Webhook(
+                    3, 1, baseUrl + "/created/caf%C3%A9?filter=%7Bnew%7D", DataTableWebhookType.RECORD_CREATED,
+                    DEV_ENVIRONMENT_ID)));
+
+        insertItems("Apple");
+
+        takeBodies(createdBodies, 1);
+
+        assertEquals("/created/caf%C3%A9?filter=%7Bnew%7D", requestUris.poll(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void testWebhookUrlThatIsNotAValidUriIsEncodedBeforePosting() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+            List.of(
+                new DataTableWebhookService.Webhook(
+                    3, 1, baseUrl + "/created/my hook", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+        insertItems("Apple");
+
+        takeBodies(createdBodies, 1);
+
+        assertEquals("/created/my%20hook", requestUris.poll(5, TimeUnit.SECONDS));
+    }
+
+    @Test
+    void testWritesSkippedDuringASuspensionAreLoggedAsAnErrorOnce(CapturedOutput capturedOutput) throws Exception {
+        String baseUrl = startWebhookServer();
+
+        DataTableWebhookService.Webhook missingWebhook = new DataTableWebhookService.Webhook(
+            3, 1, baseUrl + "/missing", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(List.of(missingWebhook));
+
+        dataTableWebhookEventListener.onDataTableWebhookEvent(
+            new DataTableWebhookEvent(
+                "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(1L, Map.of())),
+                DEV_ENVIRONMENT_ID));
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> dataTableWebhookEventListener.getSuspendedUntil(missingWebhook) != null);
+
+        double skippedCount = getUnsentRowCount(
+            DataTableWebhookType.RECORD_CREATED, DataTableWebhookEventListener.SKIPPED_OUTCOME);
+
+        for (long id = 2; id <= 4; id++) {
+            dataTableWebhookEventListener.onDataTableWebhookEvent(
+                new DataTableWebhookEvent(
+                    "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(id, Map.of())),
+                    DEV_ENVIRONMENT_ID));
+        }
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> getUnsentRowCount(
+                DataTableWebhookType.RECORD_CREATED, DataTableWebhookEventListener.SKIPPED_OUTCOME)
+                - skippedCount == 3);
+
+        String output = capturedOutput.getOut();
+
+        assertEquals(1, output.split("later skipped writes are logged at debug level", -1).length - 1, output);
+    }
+
+    @Test
+    void testDeletedRowsSkippedDuringASuspensionAreLoggedAsAnErrorEveryTime(CapturedOutput capturedOutput)
+        throws Exception {
+
+        String baseUrl = startWebhookServer();
+
+        DataTableWebhookService.Webhook missingWebhook = new DataTableWebhookService.Webhook(
+            3, 1, baseUrl + "/missing", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID);
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(List.of(missingWebhook));
+
+        dataTableWebhookEventListener.onDataTableWebhookEvent(
+            new DataTableWebhookEvent(
+                "items", DataTableWebhookType.RECORD_DELETED, List.of(new DataTableRow(1L, Map.of())),
+                DEV_ENVIRONMENT_ID));
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> dataTableWebhookEventListener.getSuspendedUntil(missingWebhook) != null);
+
+        for (long id = 2; id <= 4; id++) {
+            dataTableWebhookEventListener.onDataTableWebhookEvent(
+                new DataTableWebhookEvent(
+                    "items", DataTableWebhookType.RECORD_DELETED, List.of(new DataTableRow(id, Map.of())),
+                    DEV_ENVIRONMENT_ID));
+        }
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> LongStream.rangeClosed(2, 4)
+                .allMatch(id -> capturedOutput.getOut()
+                    .contains("1 of 1 rows (record ids [" + id + "]) were not sent")));
+
+        assertFalse(capturedOutput.getOut()
+            .contains("later skipped writes are logged at debug level"));
+    }
+
+    @Test
+    void testFailuresBeforeReachingTheEndpointDoNotSuspendIt() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        DataTableWebhookService.Webhook createdWebhook = new DataTableWebhookService.Webhook(
+            3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(List.of(createdWebhook));
+
+        long sentId = DataTableWebhookEventListener.MAX_CONSECUTIVE_FAILURES + 1;
+
+        List<DataTableRow> rows = new ArrayList<>(
+            LongStream.rangeClosed(1, DataTableWebhookEventListener.MAX_CONSECUTIVE_FAILURES)
+                .mapToObj(id -> new DataTableRow(id, Map.of("unwritable", new UnwritableValue())))
+                .toList());
+
+        rows.add(new DataTableRow(sentId, Map.of("title", "Apple")));
+
+        dataTableWebhookEventListener.onDataTableWebhookEvent(
+            new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, rows, DEV_ENVIRONMENT_ID));
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> {
+                String body = createdBodies.poll(200, TimeUnit.MILLISECONDS);
+
+                return body != null && containsId(body, sentId);
+            });
+
+        assertNull(dataTableWebhookEventListener.getSuspendedUntil(createdWebhook));
     }
 
     @Test
@@ -266,6 +489,89 @@ class DataTableWebhookEventListenerIntTest {
     }
 
     @Test
+    void testUnusableEndpointCountsUnsentRowsAndLogsEveryDeletedRecordId(CapturedOutput capturedOutput)
+        throws Exception {
+
+        String baseUrl = startWebhookServer();
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+            List.of(
+                new DataTableWebhookService.Webhook(
+                    3, 1, baseUrl + "/missing", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID)));
+
+        double failedCount = getUnsentRowCount(DataTableWebhookEventListener.FAILED_OUTCOME);
+        double skippedCount = getUnsentRowCount(DataTableWebhookEventListener.SKIPPED_OUTCOME);
+        double suspensionCount = getCount(meterRegistry.find(DataTableWebhookEventListener.SUSPENSIONS_COUNTER)
+            .counter());
+
+        List<DataTableRow> rows = LongStream.rangeClosed(1, 30)
+            .mapToObj(id -> new DataTableRow(id, Map.of()))
+            .toList();
+
+        dataTableWebhookEventListener.onDataTableWebhookEvent(
+            new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_DELETED, rows, DEV_ENVIRONMENT_ID));
+
+        String skippedRecordIds = String.valueOf(
+            LongStream.rangeClosed(2, 30)
+                .boxed()
+                .toList());
+
+        await()
+            .atMost(Duration.ofSeconds(10))
+            .until(() -> capturedOutput.getOut()
+                .contains("skipped 29 rows (record ids " + skippedRecordIds + ")"));
+
+        assertEquals(1, takeBodies(missingBodies, 1).size());
+        assertEquals(1, getUnsentRowCount(DataTableWebhookEventListener.FAILED_OUTCOME) - failedCount);
+        assertEquals(29, getUnsentRowCount(DataTableWebhookEventListener.SKIPPED_OUTCOME) - skippedCount);
+        assertEquals(
+            1, getCount(meterRegistry.find(DataTableWebhookEventListener.SUSPENSIONS_COUNTER)
+                .counter()) - suspensionCount);
+    }
+
+    @Test
+    void testClosingTheDeliveryExecutorLogsAndCountsTheRowsItDidNotSend(CapturedOutput capturedOutput)
+        throws Exception {
+
+        startWebhookServer();
+
+        failureStatus.set(503);
+        failuresLeft.set(Integer.MAX_VALUE);
+
+        SimpleAsyncTaskExecutor closingWebhookDeliveryExecutor = new SimpleAsyncTaskExecutor("closing-delivery-");
+
+        closingWebhookDeliveryExecutor.setCancelRemainingTasksOnClose(true);
+        closingWebhookDeliveryExecutor.setTaskTerminationTimeout(10_000);
+
+        DataTableWebhookEventListener closingDataTableWebhookEventListener = new DataTableWebhookEventListener(
+            dataTableWebhookService, closingWebhookDeliveryExecutor, createApplicationProperties(10, 10, 100),
+            meterRegistryProvider);
+
+        double failedCount = getUnsentRowCount(DataTableWebhookEventListener.FAILED_OUTCOME);
+        double skippedCount = getUnsentRowCount(DataTableWebhookEventListener.SKIPPED_OUTCOME);
+
+        List<DataTableRow> rows = LongStream.rangeClosed(1, 3)
+            .mapToObj(id -> new DataTableRow(id, Map.of()))
+            .toList();
+
+        closingDataTableWebhookEventListener.onDataTableWebhookEvent(
+            new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_DELETED, rows, DEV_ENVIRONMENT_ID));
+
+        takeBodies(deletedBodies, 1);
+
+        closingWebhookDeliveryExecutor.close();
+
+        assertTrue(
+            capturedOutput.getOut()
+                .contains(
+                    "was interrupted by shutdown; 2 of 3 rows (record ids [2, 3]) were not sent and 1 rows failed " +
+                        "before (first record ids [1], first failure: HTTP 503)"),
+            capturedOutput.getOut());
+        assertEquals(1, getUnsentRowCount(DataTableWebhookEventListener.FAILED_OUTCOME) - failedCount);
+        assertEquals(2, getUnsentRowCount(DataTableWebhookEventListener.SKIPPED_OUTCOME) - skippedCount);
+    }
+
+    @Test
     void testUnusableEndpointSuspendsLaterDeliveriesUntilItsUrlChanges() throws Exception {
         String baseUrl = startWebhookServer();
 
@@ -349,6 +655,10 @@ class DataTableWebhookEventListenerIntTest {
             DataTableWebhookEventListener.redactUrls(
                 "I/O error on POST request for \"https://hooks.example.com/t/secret%20token?key=abc%7C1\": " +
                     "Connection refused; see file:///etc/hosts"));
+        assertEquals(
+            "I/O error on POST request for \"bytechef_server\": Read timed out",
+            DataTableWebhookEventListener.redactUrls(
+                "I/O error on POST request for \"http://bytechef_server:8080/hook?token=abc\": Read timed out"));
     }
 
     @ParameterizedTest
@@ -514,7 +824,7 @@ class DataTableWebhookEventListenerIntTest {
 
             dataTableWebhookEventListener.onDataTableWebhookEvent(
                 new DataTableWebhookEvent(
-                    "items", DataTableWebhookType.RECORD_DELETED, Map.of("id", 99L, "values", Map.of()),
+                    "items", DataTableWebhookType.RECORD_DELETED, List.of(new DataTableRow(99L, Map.of())),
                     DEV_ENVIRONMENT_ID));
         });
 
@@ -548,12 +858,14 @@ class DataTableWebhookEventListenerIntTest {
     void testUnusableWebhookDoesNotStopAnotherWebhook() throws Exception {
         String baseUrl = startWebhookServer();
 
+        DataTableWebhookService.Webhook invalidWebhook = new DataTableWebhookService.Webhook(
+            2, 1, "not a url", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID);
+
         when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
             List.of(
                 new DataTableWebhookService.Webhook(
                     1, 1, baseUrl + "/missing", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID),
-                new DataTableWebhookService.Webhook(
-                    2, 1, "not a url", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID),
+                invalidWebhook,
                 new DataTableWebhookService.Webhook(
                     3, 1, baseUrl + "/deleted", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID)));
 
@@ -567,6 +879,7 @@ class DataTableWebhookEventListenerIntTest {
         assertEquals(1, takeBodies(missingBodies, 1).size());
         assertNull(deletedBodies.poll(500, TimeUnit.MILLISECONDS));
         assertNull(missingBodies.poll(500, TimeUnit.MILLISECONDS));
+        assertNotNull(dataTableWebhookEventListener.getSuspendedUntil(invalidWebhook));
     }
 
     @ParameterizedTest
@@ -696,6 +1009,30 @@ class DataTableWebhookEventListenerIntTest {
     }
 
     @Test
+    void testInsertRowsListsWebhooksOnceAndPostsOnePayloadPerInsertedRow() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+            List.of(
+                new DataTableWebhookService.Webhook(
+                    3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+        dataTableRowService.insertRows(
+            "items", List.of(Map.of("title", "Apple"), Map.of("title", "Banana"), Map.of("title", "Cherry")),
+            DEV_ENVIRONMENT_ID);
+
+        List<String> bodies = takeBodies(createdBodies, 3);
+
+        assertTrue(bodies.get(0)
+            .contains("Apple"), bodies.get(0));
+        assertTrue(bodies.get(2)
+            .contains("Cherry"), bodies.get(2));
+
+        verify(dataTableWebhookService, times(1)).listWebhooks(anyString(), anyLong());
+        verify(webhookDeliveryExecutor, times(1)).execute(any(Runnable.class));
+    }
+
+    @Test
     void testFailingWebhookLookupDoesNotFailTheChange() {
         when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenThrow(
             new IllegalStateException("database unavailable"));
@@ -740,27 +1077,41 @@ class DataTableWebhookEventListenerIntTest {
         0, -1
     })
     void testLimitsBelowOneAreRejected(int limit) {
-        ApplicationProperties concurrencyLimitProperties = createApplicationProperties(limit, 1);
+        ApplicationProperties concurrencyLimitProperties = createApplicationProperties(limit, 1, 1);
 
         IllegalArgumentException concurrencyLimitException = assertThrows(
             IllegalArgumentException.class,
             () -> new DataTableWebhookEventListener(
-                dataTableWebhookService, webhookDeliveryExecutor, concurrencyLimitProperties));
+                dataTableWebhookService, webhookDeliveryExecutor, concurrencyLimitProperties,
+                meterRegistryProvider));
 
         assertEquals(
             "bytechef.webhook-delivery.concurrency-limit must be at least 1, was " + limit,
             concurrencyLimitException.getMessage());
 
-        ApplicationProperties maxPendingDeliveriesProperties = createApplicationProperties(1, limit);
+        ApplicationProperties maxPendingDeliveriesProperties = createApplicationProperties(1, limit, 1);
 
         IllegalArgumentException maxPendingDeliveriesException = assertThrows(
             IllegalArgumentException.class,
             () -> new DataTableWebhookEventListener(
-                dataTableWebhookService, webhookDeliveryExecutor, maxPendingDeliveriesProperties));
+                dataTableWebhookService, webhookDeliveryExecutor, maxPendingDeliveriesProperties,
+                meterRegistryProvider));
 
         assertEquals(
             "bytechef.webhook-delivery.max-pending-deliveries must be at least 1, was " + limit,
             maxPendingDeliveriesException.getMessage());
+
+        ApplicationProperties maxPendingRowsProperties = createApplicationProperties(1, 1, limit);
+
+        IllegalArgumentException maxPendingRowsException = assertThrows(
+            IllegalArgumentException.class,
+            () -> new DataTableWebhookEventListener(
+                dataTableWebhookService, webhookDeliveryExecutor, maxPendingRowsProperties,
+                meterRegistryProvider));
+
+        assertEquals(
+            "bytechef.webhook-delivery.max-pending-rows must be at least 1, was " + limit,
+            maxPendingRowsException.getMessage());
     }
 
     @Nested
@@ -818,6 +1169,49 @@ class DataTableWebhookEventListenerIntTest {
             assertTrue(bodies.getFirst()
                 .contains("Apple"), bodies.getFirst());
             assertNull(blockedBodies.poll(1000, TimeUnit.MILLISECONDS));
+        }
+
+        @Test
+        void testDeliveriesWaitingForABusyWebhookDoNotQueueAheadOfAnotherWebhook() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/blocked", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            insertItems("Apple");
+
+            await()
+                .atMost(Duration.ofSeconds(5))
+                .until(() -> blockedInFlightCount.get() == 1);
+
+            insertItems("Banana", "Cherry");
+
+            verify(webhookDeliveryExecutor, timeout(5000).times(3)).execute(any(Runnable.class));
+
+            Thread.sleep(200);
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        4, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            insertItems("Date");
+
+            verify(webhookDeliveryExecutor, timeout(5000).times(4)).execute(any(Runnable.class));
+
+            Thread.sleep(200);
+
+            blockedReleaseLatch.countDown();
+
+            takeBodies(blockedBodies, 3);
+
+            List<String> paths = new ArrayList<>();
+
+            requestUris.drainTo(paths);
+
+            assertEquals(List.of("/blocked", "/created", "/blocked", "/blocked"), paths);
         }
     }
 
@@ -877,7 +1271,7 @@ class DataTableWebhookEventListenerIntTest {
             TenantContext.runWithTenantId(
                 "other", () -> dataTableWebhookEventListener.onDataTableWebhookEvent(
                     new DataTableWebhookEvent(
-                        "items", DataTableWebhookType.RECORD_CREATED, Map.of("id", 99L, "values", Map.of()),
+                        "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(99L, Map.of())),
                         DEV_ENVIRONMENT_ID)));
 
             assertTrue(containsId(takeBodies(createdBodies, 1).getFirst(), 99L));
@@ -947,6 +1341,50 @@ class DataTableWebhookEventListenerIntTest {
         }
 
         @Test
+        void testMalformedWebhookUrlSuspendsTheWebhookAndFreesItsPendingSlot() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            DataTableWebhookService.Webhook malformedWebhook = new DataTableWebhookService.Webhook(
+                3, 1, baseUrl + "/created/{id}", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(malformedWebhook));
+
+            dataTableWebhookEventListener.onDataTableWebhookEvent(
+                new DataTableWebhookEvent(
+                    "items", DataTableWebhookType.RECORD_CREATED,
+                    List.of(new DataTableRow(1L, Map.of()), new DataTableRow(2L, Map.of())), DEV_ENVIRONMENT_ID));
+
+            await()
+                .atMost(Duration.ofSeconds(5))
+                .until(() -> dataTableWebhookEventListener.getSuspendedUntil(malformedWebhook) != null);
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .until(() -> {
+                    dataTableWebhookEventListener.onDataTableWebhookEvent(
+                        new DataTableWebhookEvent(
+                            "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(99L, Map.of())),
+                            DEV_ENVIRONMENT_ID));
+
+                    String body = createdBodies.poll(200, TimeUnit.MILLISECONDS);
+
+                    return body != null && containsId(body, 99L);
+                });
+
+            assertEquals(
+                0, createdBodies.stream()
+                    .filter(body -> containsId(body, 1L) || containsId(body, 2L))
+                    .count());
+        }
+
+        @Test
         void testRejectedDeliveryFreesItsPendingSlot() throws Exception {
             String baseUrl = startWebhookServer();
 
@@ -970,11 +1408,150 @@ class DataTableWebhookEventListenerIntTest {
         }
     }
 
-    private static ApplicationProperties createApplicationProperties(int concurrencyLimit, int maxPendingDeliveries) {
+    @Nested
+    @TestPropertySource(
+        properties = {
+            "bytechef.webhook-delivery.concurrency-limit=1", "bytechef.webhook-delivery.max-pending-rows=2"
+        })
+    class MaxPendingRowsOfTwo {
+
+        @Test
+        void testDeliveriesBeyondThePendingRowLimitAcrossWebhooksAreDropped() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/blocked", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            insertItems("Apple");
+
+            await()
+                .atMost(Duration.ofSeconds(5))
+                .until(() -> blockedInFlightCount.get() == 1);
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        4, 1, baseUrl + "/blocked", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            insertItems("Banana");
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        5, 1, baseUrl + "/blocked", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            insertItems("Cherry");
+
+            verify(webhookDeliveryExecutor, times(2)).execute(any(Runnable.class));
+
+            blockedReleaseLatch.countDown();
+
+            List<String> bodies = takeBodies(blockedBodies, 2);
+
+            assertTrue(
+                bodies.stream()
+                    .anyMatch(body -> body.contains("Apple")),
+                bodies::toString);
+            assertTrue(
+                bodies.stream()
+                    .anyMatch(body -> body.contains("Banana")),
+                bodies::toString);
+            assertNull(blockedBodies.poll(1000, TimeUnit.MILLISECONDS));
+
+            await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .until(() -> {
+                    insertItems("Date");
+
+                    String body = blockedBodies.poll(200, TimeUnit.MILLISECONDS);
+
+                    return body != null && body.contains("Date");
+                });
+        }
+
+        @Test
+        void testDeliveryThatFailsToBeScheduledFreesItsPendingRowsAndDoesNotFailTheChange() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            doThrow(new IllegalStateException("decorating the delivery failed"))
+                .doCallRealMethod()
+                .when(webhookDeliveryExecutor)
+                .execute(any(Runnable.class));
+
+            assertDoesNotThrow(
+                () -> dataTableWebhookEventListener.onDataTableWebhookEvent(
+                    new DataTableWebhookEvent(
+                        "items", DataTableWebhookType.RECORD_CREATED,
+                        List.of(new DataTableRow(1L, Map.of()), new DataTableRow(2L, Map.of())), DEV_ENVIRONMENT_ID)));
+
+            insertItems("Cherry");
+
+            List<String> bodies = takeBodies(createdBodies, 1);
+
+            assertTrue(bodies.getFirst()
+                .contains("Cherry"), bodies.getFirst());
+            assertNull(createdBodies.poll(500, TimeUnit.MILLISECONDS));
+        }
+
+        @Test
+        void testWriteOfMoreRowsThanTheLimitIsDeliveredWhenNothingIsPending() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            dataTableWebhookEventListener.onDataTableWebhookEvent(
+                new DataTableWebhookEvent(
+                    "items", DataTableWebhookType.RECORD_CREATED,
+                    List.of(
+                        new DataTableRow(1L, Map.of()), new DataTableRow(2L, Map.of()), new DataTableRow(3L, Map.of())),
+                    DEV_ENVIRONMENT_ID));
+
+            assertEquals(3, takeBodies(createdBodies, 3).size());
+        }
+
+        @Test
+        void testWriteOfMoreRowsThanTheLimitIsDeliveredToEveryMatchingWebhook() throws Exception {
+            String baseUrl = startWebhookServer();
+
+            when(dataTableWebhookService.listWebhooks("items", DEV_ENVIRONMENT_ID)).thenReturn(
+                List.of(
+                    new DataTableWebhookService.Webhook(
+                        3, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID),
+                    new DataTableWebhookService.Webhook(
+                        4, 1, baseUrl + "/created", DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID)));
+
+            dataTableWebhookEventListener.onDataTableWebhookEvent(
+                new DataTableWebhookEvent(
+                    "items", DataTableWebhookType.RECORD_CREATED,
+                    List.of(
+                        new DataTableRow(1L, Map.of()), new DataTableRow(2L, Map.of()), new DataTableRow(3L, Map.of())),
+                    DEV_ENVIRONMENT_ID));
+
+            verify(webhookDeliveryExecutor, times(2)).execute(any(Runnable.class));
+
+            assertEquals(6, takeBodies(createdBodies, 6).size());
+        }
+    }
+
+    private static ApplicationProperties createApplicationProperties(
+        int concurrencyLimit, int maxPendingDeliveries, int maxPendingRows) {
+
         ApplicationProperties.WebhookDelivery webhookDelivery = new ApplicationProperties.WebhookDelivery();
 
         webhookDelivery.setConcurrencyLimit(concurrencyLimit);
         webhookDelivery.setMaxPendingDeliveries(maxPendingDeliveries);
+        webhookDelivery.setMaxPendingRows(maxPendingRows);
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
@@ -987,6 +1564,28 @@ class DataTableWebhookEventListenerIntTest {
         return Pattern.compile("\"id\":" + id + "[,}]")
             .matcher(body)
             .find();
+    }
+
+    private static List<String> sortedKeys(Map<?, ?> map) {
+        return map.keySet()
+            .stream()
+            .map(String::valueOf)
+            .sorted()
+            .toList();
+    }
+
+    private static double getCount(Counter counter) {
+        return counter == null ? 0 : counter.count();
+    }
+
+    private double getUnsentRowCount(String outcome) {
+        return getUnsentRowCount(DataTableWebhookType.RECORD_DELETED, outcome);
+    }
+
+    private double getUnsentRowCount(DataTableWebhookType type, String outcome) {
+        return getCount(meterRegistry.find(DataTableWebhookEventListener.UNSENT_ROWS_COUNTER)
+            .tags("type", type.name(), "outcome", outcome)
+            .counter());
     }
 
     private List<Long> insertItems(String... titles) {
@@ -1029,6 +1628,12 @@ class DataTableWebhookEventListenerIntTest {
     }
 
     private void receive(HttpExchange exchange, BlockingQueue<String> bodies) throws IOException {
+        URI requestUri = exchange.getRequestURI();
+
+        requestUris.add(
+            requestUri.getRawQuery() == null
+                ? requestUri.getRawPath() : requestUri.getRawPath() + "?" + requestUri.getRawQuery());
+
         try (InputStream inputStream = exchange.getRequestBody()) {
             bodies.add(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
         }
@@ -1093,6 +1698,13 @@ class DataTableWebhookEventListenerIntTest {
         }
 
         return takenBodies;
+    }
+
+    public static final class UnwritableValue {
+
+        public String getValue() {
+            throw new IllegalStateException("Value cannot be written");
+        }
     }
 
     private static final class MutableClock extends Clock {

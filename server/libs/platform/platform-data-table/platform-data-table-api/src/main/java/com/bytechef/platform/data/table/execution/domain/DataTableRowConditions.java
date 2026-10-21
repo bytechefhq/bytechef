@@ -17,35 +17,56 @@
 package com.bytechef.platform.data.table.execution.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * OR groups of AND conditions: a row matches when it satisfies every filter of at least one group. No groups, as built
- * by {@link #matchAll()} or by the constructor with an empty list, match every row; an empty group is rejected.
- * {@link #of(List)} needs at least one filter.
+ * OR groups of AND conditions: a row matches when it satisfies every filter of at least one group. Only
+ * {@link #matchAll()} matches every row; {@link #of(List)} and {@link #anyOf(List)} need at least one filter and reject
+ * an empty group.
  *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record DataTableRowConditions(List<List<DataTableRowFilter>> groups) {
+public final class DataTableRowConditions {
 
     private static final DataTableRowConditions MATCH_ALL = new DataTableRowConditions(List.of());
 
-    public DataTableRowConditions {
+    private final List<List<DataTableRowFilter>> groups;
+
+    private DataTableRowConditions(List<List<DataTableRowFilter>> groups) {
+        this.groups = groups;
+    }
+
+    public static DataTableRowConditions anyOf(List<List<DataTableRowFilter>> groups) {
         Objects.requireNonNull(groups, "groups must not be null");
 
-        groups = groups.stream()
-            .map(group -> List.copyOf(Objects.requireNonNull(group, "condition group must not be null")))
-            .toList();
+        if (groups.isEmpty()) {
+            throw new IllegalArgumentException(
+                "At least one condition group is required; use matchAll() to match every row");
+        }
 
-        for (int index = 0; index < groups.size(); index++) {
-            List<DataTableRowFilter> group = groups.get(index);
+        List<List<DataTableRowFilter>> copiedGroups = new ArrayList<>();
+
+        for (int groupIndex = 0; groupIndex < groups.size(); groupIndex++) {
+            List<DataTableRowFilter> group = Objects.requireNonNull(
+                groups.get(groupIndex), "condition group %d must not be null".formatted(groupIndex + 1));
 
             if (group.isEmpty()) {
-                throw new IllegalArgumentException("Condition group %d is empty".formatted(index + 1));
+                throw new IllegalArgumentException("Condition group %d is empty".formatted(groupIndex + 1));
             }
+
+            for (int filterIndex = 0; filterIndex < group.size(); filterIndex++) {
+                Objects.requireNonNull(
+                    group.get(filterIndex),
+                    "filter %d of condition group %d must not be null".formatted(filterIndex + 1, groupIndex + 1));
+            }
+
+            copiedGroups.add(List.copyOf(group));
         }
+
+        return new DataTableRowConditions(List.copyOf(copiedGroups));
     }
 
     public static DataTableRowConditions matchAll() {
@@ -59,10 +80,48 @@ public record DataTableRowConditions(List<List<DataTableRowFilter>> groups) {
             throw new IllegalArgumentException("At least one filter is required; use matchAll() to match every row");
         }
 
-        return new DataTableRowConditions(List.of(filters));
+        return anyOf(List.of(filters));
+    }
+
+    public List<List<DataTableRowFilter>> groups() {
+        return groups;
     }
 
     public boolean isMatchAll() {
         return groups.isEmpty();
+    }
+
+    /**
+     * Returns these conditions when they hold at least one condition, for operations that change the selected rows.
+     *
+     * @return these conditions
+     * @throws IllegalArgumentException if these conditions match every row
+     */
+    public DataTableRowConditions requireAtLeastOneCondition() {
+        if (isMatchAll()) {
+            throw new IllegalArgumentException("At least one condition is required to select the rows to change");
+        }
+
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        return object instanceof DataTableRowConditions dataTableRowConditions
+            && groups.equals(dataTableRowConditions.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return groups.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "DataTableRowConditions{groups=" + groups + "}";
     }
 }

@@ -53,7 +53,7 @@ The table opens in a spreadsheet-like grid where you can:
 - **Add a row** - fill in the new empty row at the bottom.
 - **Edit a cell** - click it and type; changes save when you move off the cell. Each cell uses an editor matched to its column type (text, number, checkbox, date, or date-time picker).
 - **Delete rows** - select one or more with the row checkboxes and delete them.
-- **Import a CSV** - from the grid's **⋮** actions menu, bulk-load rows from a file whose header matches your column names. Header columns the table does not have are skipped. A cell that does not fit its column type stops the import and no row is imported; the error names the CSV line to fix.
+- **Import a CSV** - from the grid's **⋮** actions menu, bulk-load rows from a file whose header matches your column names. Header columns the table does not have are skipped, but a header that matches none of them, for example because the file uses semicolons instead of commas, stops the import. A cell that does not fit its column type stops the import and no row is imported; the error names the CSV line to fix.
 - **Export a CSV** - from the same **⋮** menu, download the current rows.
 
 ![The Data Table grid - typed columns, two rows selected with the row checkboxes, and a number cell open in its editor](data-tables/data-table-grid.png)
@@ -74,7 +74,7 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 
 | Action | What it does |
 |---|---|
-| **Create Records** | Insert one or more new rows |
+| **Create Record(s)** | Insert one or more new rows; an invalid record stops the step and no row is inserted |
 | **Get Record** | Fetch a single row by its `id` |
 | **Find Records** | List the rows that match **OR Conditions**, sorted by a column, with **Limit** and **Offset** for paging |
 | **Update Record** | Update an existing row by its `id` |
@@ -101,9 +101,9 @@ matches, nothing changes and the step reports a count of 0. Each condition picks
 | **Equals** / **Not Equals** | is, or is not, the value. **Not Equals** also matches cells with no value |
 | **Equals Ignore Case** | equals the text, ignoring upper and lower case |
 | **Contains** / **Not Contains** / **Starts With** / **Ends With** | contains, does not contain, starts with or ends with the text. These comparisons are case-sensitive. **Not Contains** also matches cells with no value |
-| **Greater** / **Greater or Equals** / **Less** / **Less or Equals** | compares as a number, date, boolean or text |
+| **Greater** / **Greater or Equals** / **Less** / **Less or Equals** | compares as a number, date, boolean or text. Text is ordered by the database's collation, so letter case and accents may not order the way you expect |
 | **In** | is one of the listed **Values** |
-| **Between** | lies between **Value** and **To Value**, both included. If **Value** is greater than **To Value**, no row matches |
+| **Between** | lies between **Value** and **To Value**, both included. On number, date, date-time and boolean columns a **Value** after **To Value** is rejected; on text columns it matches no row |
 | **Empty** / **Not Empty** | does not have, or has, a value. For text columns an empty string counts as empty |
 
 The text operations - **Equals Ignore Case**, **Contains**, **Not Contains**, **Starts With** and
@@ -115,7 +115,7 @@ example `abc` or `10.5` for an integer column, `2025` for a date column, or `202
 exist. Date columns take a date such as `2026-01-31`; a date and time is accepted too and only its date is used, after
 converting it to UTC when it has a zone offset. Date-time columns need a date and a time such as `2026-01-31T08:00:00`; one with a zone offset, such as
 `2026-01-31T10:00:00+02:00` or `2026-01-31T08:00:00Z`, is converted to UTC, and one without is used as written. In
-a condition, a number such as a Unix timestamp is rejected for both. **Create Records**, **Update Record** and
+a condition, a number such as a Unix timestamp is rejected for both. **Create Record(s)**, **Update Record** and
 **Update Records** still accept a whole number for a date or date-time column and read it as Unix epoch milliseconds
 in UTC, so `1769846400000` is stored as `2026-01-31T08:00:00`. A number too small to be epoch milliseconds, such as
 epoch seconds or `20260131`, is rejected. Every operation except **Empty** and **Not Empty** needs a
@@ -128,8 +128,9 @@ stops the step.
 
 **Update Records** sets every column it is given to the same value on all matching rows. Its values
 must not be blank and must not include `id`; to clear a column, use **Update Record** on a single row,
-where a blank value empties the column: a text column is set to an empty string and other columns to no value. **Create Records**, **Update Record** and **Update Records**
-reject a column the table does not have and a value that does not fit the column type.
+where a blank value empties the column: a text column is set to an empty string and other columns to no value. **Update Records**
+rejects a column the table does not have. **Create Record(s)** and **Update Record** ignore such a column and log a warning,
+but stop with an error when none of the given columns exists. All three reject a value that does not fit the column type.
 
 **Sort Column** and **Sort Direction** set the order of the results; rows with no value come last, while an
 empty string in a text column sorts as text. Without a **Sort Column** rows come back sorted by `id`, which is insertion order.
@@ -142,15 +143,26 @@ A workflow can also start in response to a row change:
 - **Record Updated** - a row was changed
 - **Record Deleted** - a row was removed
 
-**Update Records**, **Delete Record(s)** and a CSV import send one trigger event for every row they change, after
-the change is saved. A slow or unreachable endpoint never holds up the step that changed the rows. Delivery is best
+Every row change sends one trigger event per changed row once it is saved, whether it comes from a Data Table action
+(**Clear Table** included), from editing rows in the table, or from a CSV import. A slow or unreachable endpoint never holds up the step that changed the rows. Delivery is best
 effort: unreachable endpoints, server errors and rate-limit responses are retried with backoff, with retry waits adding
 up to about a minute per row on top of the request timeouts. If an endpoint answers that it does not exist or does not
 accept the request, redirects it elsewhere, or has an invalid URL, the remaining rows of that step are not sent to it.
 Other failures, such as refusing access or errors that persist after retries, do the same after 10 consecutive failed
-rows. After either stop, no rows are sent to that webhook for 5 minutes, or until its URL is changed. When too many
-deliveries to a webhook are already pending, none of the step's rows are sent to it. Failed and skipped rows are
-reported only in the server log, so check it when a trigger did not fire.
+rows to that webhook, counted across steps. A row the endpoint accepts, or rejects as invalid (400, 409 or 422), resets
+that count; a rejected row fails on its own. A row that fails before reaching the endpoint, for example because one of
+its values cannot be sent as JSON, fails on its own and leaves the count unchanged.
+After either stop, no rows are sent to that webhook for 5 minutes, or until its URL is changed, including rows of steps
+whose delivery had already started. This pause is kept in memory on each server and ends on restart. When too many
+Each webhook receives one step's rows at a time, so a slow endpoint delays only its own deliveries. When too many
+deliveries to a webhook are already pending, none of the step's rows are sent to it, and when too many changed rows
+are still waiting to be sent, none of the step's rows are sent to any webhook. When the server shuts down, deliveries
+still in progress stop and their remaining rows are skipped; a delivery that has not stopped after about 10 seconds is
+cut off, and only a shutdown warning with the number of pending deliveries and rows records it. Failed and skipped rows are not
+retried later. The server log names them by record id (every id for deleted rows, the first 20 otherwise), and the
+`bytechef_data_table_webhook_unsent_rows_total` metric counts them by event type and outcome (`failed`, `skipped` or
+`dropped`), with paused webhooks counted in `bytechef_data_table_webhook_suspensions_total`; check these when a trigger
+did not fire. A webhook URL must be an absolute `http` or `https` URL, otherwise enabling the trigger fails.
 
 This makes Data Tables a lightweight event source - for example, "when a row is added to the *Customers* table, send a welcome email."
 

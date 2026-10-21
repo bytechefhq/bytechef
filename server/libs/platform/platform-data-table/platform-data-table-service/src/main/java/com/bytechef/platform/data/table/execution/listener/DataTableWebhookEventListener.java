@@ -19,25 +19,36 @@ package com.bytechef.platform.data.table.execution.listener;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.Serial;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.sql.Date;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
@@ -46,7 +57,6 @@ import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -61,10 +71,13 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriTemplateHandler;
 
 /**
- * POSTs the row payloads of a committed {@link DataTableWebhookEvent} to each matching webhook, one delivery task per
- * webhook on {@code webhookDeliveryExecutor}.
+ * POSTs each row of a {@link DataTableWebhookEvent} to each matching webhook, one delivery task per webhook on
+ * {@code webhookDeliveryExecutor}. A webhook runs one delivery at a time, so a slow endpoint queues for the shared POST
+ * limit with at most one delivery. Events published in a transaction are delivered after it commits, and events
+ * published outside one right away.
  *
  * @author Ivica Cardic
  */
@@ -74,12 +87,17 @@ public final class DataTableWebhookEventListener {
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    static final String DROPPED_OUTCOME = "dropped";
+    static final String FAILED_OUTCOME = "failed";
     static final Duration INITIAL_RETRY_INTERVAL = Duration.ofSeconds(2);
     static final int MAX_CONSECUTIVE_FAILURES = 10;
     private static final int MAX_FAILURE_MESSAGE_LENGTH = 200;
-    private static final int MAX_LOGGED_FAILED_IDS = 20;
+    private static final int MAX_LOGGED_RECORD_IDS = 20;
     private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
+    static final String SKIPPED_OUTCOME = "skipped";
     static final Duration SUSPENSION_DURATION = Duration.ofMinutes(5);
+    static final String SUSPENSIONS_COUNTER = "bytechef_data_table_webhook_suspensions";
+    static final String UNSENT_ROWS_COUNTER = "bytechef_data_table_webhook_unsent_rows";
     private static final Pattern URL_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+.-]*://[^\\s\"'<>]+");
 
     private volatile Clock clock = Clock.systemUTC();
@@ -87,16 +105,21 @@ public final class DataTableWebhookEventListener {
     private final DataTableWebhookService dataTableWebhookService;
     private final Semaphore deliverySemaphore;
     private final int maxPendingDeliveries;
+    private final int maxPendingRows;
+    private final ObjectProvider<MeterRegistry> meterRegistryProvider;
     private final Map<WebhookKey, Integer> pendingDeliveryCounts = new ConcurrentHashMap<>();
+    private final AtomicLong pendingRowCount = new AtomicLong();
     private final RestTemplate restTemplate = createRestTemplate();
+    private final Map<SuspensionKey, Instant> skipLoggedSuspendedUntilInstants = new ConcurrentHashMap<>();
     private final Map<SuspensionKey, Instant> suspendedUntilInstants = new ConcurrentHashMap<>();
     private final TaskExecutor webhookDeliveryExecutor;
+    private final Map<WebhookKey, Semaphore> webhookSemaphores = new ConcurrentHashMap<>();
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEventListener(
         DataTableWebhookService dataTableWebhookService,
         @Qualifier("webhookDeliveryExecutor") TaskExecutor webhookDeliveryExecutor,
-        ApplicationProperties applicationProperties) {
+        ApplicationProperties applicationProperties, ObjectProvider<MeterRegistry> meterRegistryProvider) {
 
         ApplicationProperties.WebhookDelivery webhookDelivery = applicationProperties.getWebhookDelivery();
 
@@ -114,9 +137,18 @@ public final class DataTableWebhookEventListener {
                 "bytechef.webhook-delivery.max-pending-deliveries must be at least 1, was " + maxPendingDeliveries);
         }
 
+        int maxPendingRows = webhookDelivery.getMaxPendingRows();
+
+        if (maxPendingRows < 1) {
+            throw new IllegalArgumentException(
+                "bytechef.webhook-delivery.max-pending-rows must be at least 1, was " + maxPendingRows);
+        }
+
         this.dataTableWebhookService = dataTableWebhookService;
         this.deliverySemaphore = new Semaphore(concurrencyLimit, true);
         this.maxPendingDeliveries = maxPendingDeliveries;
+        this.maxPendingRows = maxPendingRows;
+        this.meterRegistryProvider = meterRegistryProvider;
         this.webhookDeliveryExecutor = webhookDeliveryExecutor;
     }
 
@@ -124,7 +156,7 @@ public final class DataTableWebhookEventListener {
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
         String baseName = event.getBaseName();
         long environmentId = event.getEnvironmentId();
-        List<Map<String, Object>> payloads = event.getPayloads();
+        List<DataTableRow> rows = event.getRows();
         DataTableWebhookType type = event.getType();
 
         List<DataTableWebhookService.Webhook> hooks;
@@ -136,68 +168,121 @@ public final class DataTableWebhookEventListener {
                 .toList();
         } catch (RuntimeException runtimeException) {
             log.error(
-                "Data table webhooks for {} on table '{}' in environment {} could not be listed; {} payloads " +
+                "Data table webhooks for {} on table '{}' in environment {} could not be listed; {} rows " +
                     "(record ids {}) were not sent",
-                type, baseName, environmentId, payloads.size(), describeRecordIds(payloads), runtimeException);
+                type, baseName, environmentId, rows.size(), describeRecordIds(type, rows), runtimeException);
+
+            countUnsentRows(type, DROPPED_OUTCOME, rows.size());
 
             return;
         }
 
+        if (hooks.isEmpty()) {
+            return;
+        }
+
+        if (!reservePendingRows(rows.size())) {
+            log.error(
+                "Data table webhooks {} for {} on table '{}' in environment {} were dropped because {} rows of " +
+                    "webhook deliveries are already pending; {} rows (record ids {}) were not sent",
+                hooks.stream()
+                    .map(DataTableWebhookService.Webhook::id)
+                    .toList(),
+                type, baseName, environmentId, pendingRowCount.get(), rows.size(), describeRecordIds(type, rows));
+
+            countUnsentRows(type, DROPPED_OUTCOME, rows.size() * hooks.size());
+
+            return;
+        }
+
+        PendingRows pendingRows = new PendingRows(rows.size(), hooks.size());
+
         for (DataTableWebhookService.Webhook hook : hooks) {
-            scheduleDelivery(hook, type, baseName, environmentId, payloads);
+            scheduleDelivery(hook, type, baseName, environmentId, rows, pendingRows);
         }
     }
 
     private void scheduleDelivery(
         DataTableWebhookService.Webhook hook, DataTableWebhookType type, String baseName, long environmentId,
-        List<Map<String, Object>> payloads) {
+        List<DataTableRow> rows, PendingRows pendingRows) {
 
         String tenantId = TenantContext.getCurrentTenantId();
 
         WebhookKey webhookKey = new WebhookKey(tenantId, hook.id());
 
         if (pendingDeliveryCounts.merge(webhookKey, 1, Integer::sum) > maxPendingDeliveries) {
-            releasePendingDelivery(webhookKey);
+            releasePending(webhookKey, pendingRows);
 
             log.error(
                 "Data table webhook {} on host {} for {} on table '{}' in environment {} was dropped because {} " +
-                    "of its deliveries are already pending; {} payloads (record ids {}) were not sent",
-                hook.id(), getHost(hook), type, baseName, environmentId, maxPendingDeliveries, payloads.size(),
-                describeRecordIds(payloads));
+                    "of its deliveries are already pending; {} rows (record ids {}) were not sent",
+                hook.id(), getHost(hook), type, baseName, environmentId, maxPendingDeliveries, rows.size(),
+                describeRecordIds(type, rows));
+
+            countUnsentRows(type, DROPPED_OUTCOME, rows.size());
 
             return;
         }
 
         try {
             webhookDeliveryExecutor.execute(
-                () -> deliver(webhookKey, hook, type, baseName, environmentId, payloads));
-        } catch (TaskRejectedException taskRejectedException) {
-            releasePendingDelivery(webhookKey);
+                () -> deliver(webhookKey, hook, type, baseName, environmentId, rows, pendingRows));
+        } catch (RuntimeException runtimeException) {
+            releasePending(webhookKey, pendingRows);
 
             log.error(
                 "Data table webhook {} on host {} for {} on table '{}' in environment {} could not be scheduled; {} " +
-                    "payloads (record ids {}) were not sent",
-                hook.id(), getHost(hook), type, baseName, environmentId, payloads.size(), describeRecordIds(payloads),
-                taskRejectedException);
+                    "rows (record ids {}) were not sent",
+                hook.id(), getHost(hook), type, baseName, environmentId, rows.size(), describeRecordIds(type, rows),
+                runtimeException);
+
+            countUnsentRows(type, DROPPED_OUTCOME, rows.size());
         }
     }
 
     private void deliver(
         WebhookKey webhookKey, DataTableWebhookService.Webhook hook, DataTableWebhookType type, String baseName,
-        long environmentId, List<Map<String, Object>> payloads) {
+        long environmentId, List<DataTableRow> rows, PendingRows pendingRows) {
+
+        Semaphore webhookSemaphore = webhookSemaphores.computeIfAbsent(webhookKey, key -> new Semaphore(1, true));
+
+        try {
+            webhookSemaphore.acquire();
+        } catch (InterruptedException interruptedException) {
+            Thread currentThread = Thread.currentThread();
+
+            currentThread.interrupt();
+
+            log.error(
+                "Data table webhook {} on host {} for {} on table '{}' in environment {} was interrupted by shutdown; "
+                    +
+                    "{} of {} rows (record ids {}) were not sent",
+                hook.id(), getHost(hook), type, baseName, environmentId, rows.size(), rows.size(),
+                describeRecordIds(type, rows));
+
+            countUnsentRows(type, SKIPPED_OUTCOME, rows.size());
+
+            releasePending(webhookKey, pendingRows);
+
+            return;
+        }
 
         try {
             callWebhook(
                 createRetryTemplate(), new SuspensionKey(webhookKey.tenantId(), hook.id(), hook.url()), hook, type,
-                baseName, environmentId, payloads);
+                baseName, environmentId, rows);
         } catch (RuntimeException runtimeException) {
             log.error(
                 "Data table webhook {} on host {} for {} on table '{}' in environment {} failed unexpectedly; " +
-                    "{} payloads (record ids {}) may not have been sent",
-                hook.id(), getHost(hook), type, baseName, environmentId, payloads.size(), describeRecordIds(payloads),
-                runtimeException);
+                    "{} rows (record ids {}) may not have been sent",
+                hook.id(), getHost(hook), type, baseName, environmentId, rows.size(),
+                describeRecordIds(type, rows), runtimeException);
+
+            countUnsentRows(type, FAILED_OUTCOME, rows.size());
         } finally {
-            releasePendingDelivery(webhookKey);
+            webhookSemaphore.release();
+
+            releasePending(webhookKey, pendingRows);
         }
     }
 
@@ -210,14 +295,15 @@ public final class DataTableWebhookEventListener {
 
         if (pendingDeliveryCount > 0) {
             log.warn(
-                "Shutting down with {} data table webhook deliveries to webhooks {} still pending; their remaining " +
-                    "payloads may not be sent",
-                pendingDeliveryCount, pendingDeliveryCounts.keySet());
+                "Shutting down with {} data table webhook deliveries of {} rows to webhooks {} still pending; " +
+                    "deliveries that do not stop within the shutdown wait are cut off without logging their rows",
+                pendingDeliveryCount, pendingRowCount.get(), pendingDeliveryCounts.keySet());
         }
     }
 
     void clearSuspensions() {
         consecutiveFailedCounts.clear();
+        skipLoggedSuspendedUntilInstants.clear();
         suspendedUntilInstants.clear();
     }
 
@@ -248,8 +334,41 @@ public final class DataTableWebhookEventListener {
         return null;
     }
 
+    private void releasePending(WebhookKey webhookKey, PendingRows pendingRows) {
+        releasePendingDelivery(webhookKey);
+        releasePendingRows(pendingRows);
+    }
+
     private void releasePendingDelivery(WebhookKey webhookKey) {
-        pendingDeliveryCounts.computeIfPresent(webhookKey, (key, count) -> count > 1 ? count - 1 : null);
+        pendingDeliveryCounts.compute(webhookKey, (key, count) -> {
+            if (count == null || count <= 1) {
+                webhookSemaphores.remove(key);
+
+                return null;
+            }
+
+            return count - 1;
+        });
+    }
+
+    private void releasePendingRows(PendingRows pendingRows) {
+        if (pendingRows.release()) {
+            pendingRowCount.addAndGet(-pendingRows.getRowCount());
+        }
+    }
+
+    private boolean reservePendingRows(int rowCount) {
+        long currentPendingRowCount;
+
+        do {
+            currentPendingRowCount = pendingRowCount.get();
+
+            if (currentPendingRowCount > 0 && currentPendingRowCount + rowCount > maxPendingRows) {
+                return false;
+            }
+        } while (!pendingRowCount.compareAndSet(currentPendingRowCount, currentPendingRowCount + rowCount));
+
+        return true;
     }
 
     private Instant suspend(SuspensionKey suspensionKey) {
@@ -260,36 +379,41 @@ public final class DataTableWebhookEventListener {
         suspendedUntilInstants.put(suspensionKey, suspendedUntil);
         consecutiveFailedCounts.remove(suspensionKey);
 
+        MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();
+
+        if (meterRegistry != null) {
+            Counter.builder(SUSPENSIONS_COUNTER)
+                .description("Data table webhook endpoints suspended after failed deliveries")
+                .register(meterRegistry)
+                .increment();
+        }
+
         return suspendedUntil;
     }
 
     private void callWebhook(
         RetryTemplate retryTemplate, SuspensionKey suspensionKey, DataTableWebhookService.Webhook hook,
-        DataTableWebhookType type, String baseName, long environmentId, List<Map<String, Object>> payloads) {
+        DataTableWebhookType type, String baseName, long environmentId, List<DataTableRow> rows) {
 
         int failedCount = 0;
-        List<Object> failedIds = new ArrayList<>();
+        List<Long> failedIds = new ArrayList<>();
         RetryException firstRetryException = null;
-        Object lastFailedId = null;
+        boolean interrupted = false;
+        Long lastFailedId = null;
         int skippedCount = 0;
         RetryException stoppingRetryException = null;
         Instant suspendedUntil = null;
 
-        for (int index = 0; index < payloads.size(); index++) {
-            Map<String, Object> payload = payloads.get(index);
-            Map<String, Object> body = new HashMap<>();
-
-            body.put("type", type.name());
-            body.put("table", baseName);
-            body.put("timestamp", String.valueOf(clock.instant()));
-            body.put("payload", payload);
+        for (int index = 0; index < rows.size(); index++) {
+            DataTableRow row = rows.get(index);
+            Map<String, Object> body = createBody(type, baseName, row);
 
             try {
                 retryTemplate.execute(() -> {
                     if (log.isDebugEnabled()) {
                         log.debug(
                             "Calling data table webhook {} on host {} for {} record id {}", hook.id(), getHost(hook),
-                            type, payload.get("id"));
+                            type, row.id());
                     }
 
                     return post(suspensionKey, hook, body);
@@ -300,29 +424,26 @@ public final class DataTableWebhookEventListener {
                 Throwable cause = retryException.getCause();
 
                 if (cause instanceof DeliverySuspendedException deliverySuspendedException) {
-                    skippedCount = payloads.size() - index;
+                    skippedCount = rows.size() - index;
                     suspendedUntil = deliverySuspendedException.getSuspendedUntil();
+
+                    break;
+                }
+
+                if (cause instanceof InterruptedException) {
+                    skippedCount = rows.size() - index;
+                    interrupted = true;
 
                     break;
                 }
 
                 failedCount++;
 
-                int consecutiveFailedCount;
-
-                if (isPayloadRejected(cause)) {
-                    consecutiveFailedCounts.remove(suspensionKey);
-
-                    consecutiveFailedCount = 0;
-                } else {
-                    consecutiveFailedCount = consecutiveFailedCounts.merge(suspensionKey, 1, Integer::sum);
+                if (type == DataTableWebhookType.RECORD_DELETED || failedIds.size() < MAX_LOGGED_RECORD_IDS) {
+                    failedIds.add(row.id());
                 }
 
-                if (failedIds.size() < MAX_LOGGED_FAILED_IDS) {
-                    failedIds.add(payload.get("id"));
-                }
-
-                lastFailedId = payload.get("id");
+                lastFailedId = row.id();
 
                 if (firstRetryException == null) {
                     firstRetryException = retryException;
@@ -331,14 +452,22 @@ public final class DataTableWebhookEventListener {
                 Thread currentThread = Thread.currentThread();
 
                 if (currentThread.isInterrupted()) {
-                    skippedCount = payloads.size() - index - 1;
-                    stoppingRetryException = retryException;
+                    skippedCount = rows.size() - index - 1;
+                    interrupted = true;
 
                     break;
                 }
 
+                int consecutiveFailedCount = 0;
+
+                if (isPayloadRejected(cause)) {
+                    consecutiveFailedCounts.remove(suspensionKey);
+                } else if (isEndpointFailure(cause)) {
+                    consecutiveFailedCount = consecutiveFailedCounts.merge(suspensionKey, 1, Integer::sum);
+                }
+
                 if (isEndpointUnusable(cause) || consecutiveFailedCount >= MAX_CONSECUTIVE_FAILURES) {
-                    skippedCount = payloads.size() - index - 1;
+                    skippedCount = rows.size() - index - 1;
                     stoppingRetryException = retryException;
 
                     Instant currentSuspendedUntil = getSuspendedUntil(suspensionKey);
@@ -350,31 +479,65 @@ public final class DataTableWebhookEventListener {
             }
         }
 
-        if (stoppingRetryException != null) {
+        countUnsentRows(type, FAILED_OUTCOME, failedCount);
+        countUnsentRows(type, SKIPPED_OUTCOME, skippedCount);
+
+        List<DataTableRow> skippedRows = rows.subList(rows.size() - skippedCount, rows.size());
+
+        if (interrupted) {
             log.error(
-                "Data table webhook {} on host {} for {} on table '{}' in environment {} stopped after {} of {} " +
-                    "payloads failed (first record ids {}, last record id {}, first failure: {}, last failure: {}) " +
-                    "and skipped {} payloads (record ids {} to {}){}",
-                hook.id(), getHost(hook), type, baseName, environmentId, failedCount, payloads.size(), failedIds,
-                lastFailedId, describeFailure(hook, firstRetryException), describeFailure(hook, stoppingRetryException),
-                skippedCount, getSkippedId(payloads, skippedCount, true), getSkippedId(payloads, skippedCount, false),
-                suspendedUntil == null ? "" : "; deliveries are suspended until " + suspendedUntil);
-        } else if (suspendedUntil != null) {
-            log.error(
-                "Data table webhook {} on host {} for {} on table '{}' in environment {} is suspended until {} after " +
-                    "its endpoint failed; {} of {} payloads (record ids {} to {}) were not sent{}",
-                hook.id(), getHost(hook), type, baseName, environmentId, suspendedUntil, skippedCount,
-                payloads.size(), getSkippedId(payloads, skippedCount, true),
-                getSkippedId(payloads, skippedCount, false),
+                "Data table webhook {} on host {} for {} on table '{}' in environment {} was interrupted by shutdown; "
+                    +
+                    "{} of {} rows (record ids {}) were not sent{}",
+                hook.id(), getHost(hook), type, baseName, environmentId, skippedCount, rows.size(),
+                describeRecordIds(type, skippedRows),
                 firstRetryException == null
                     ? ""
-                    : " and " + failedCount + " payloads failed before (first record ids " + failedIds +
+                    : " and " + failedCount + " rows failed before (first record ids " + failedIds +
                         ", first failure: " + describeFailure(hook, firstRetryException) + ")");
+        } else if (stoppingRetryException != null) {
+            log.error(
+                "Data table webhook {} on host {} for {} on table '{}' in environment {} stopped after {} of {} " +
+                    "rows failed (first record ids {}, last record id {}, first failure: {}, last failure: {}) " +
+                    "and skipped {} rows (record ids {}){}",
+                hook.id(), getHost(hook), type, baseName, environmentId, failedCount, rows.size(), failedIds,
+                lastFailedId, describeFailure(hook, firstRetryException), describeFailure(hook, stoppingRetryException),
+                skippedCount, describeRecordIds(type, skippedRows),
+                suspendedUntil == null ? "" : "; deliveries are suspended until " + suspendedUntil);
+        } else if (suspendedUntil != null) {
+            if (firstRetryException != null) {
+                log.error(
+                    "Data table webhook {} on host {} for {} on table '{}' in environment {} is suspended until {} " +
+                        "after its endpoint failed; {} of {} rows (record ids {}) were not sent and {} rows failed " +
+                        "before (first record ids {}, first failure: {})",
+                    hook.id(), getHost(hook), type, baseName, environmentId, suspendedUntil, skippedCount,
+                    rows.size(), describeRecordIds(type, skippedRows), failedCount, failedIds,
+                    describeFailure(hook, firstRetryException));
+            } else if (type == DataTableWebhookType.RECORD_DELETED) {
+                log.error(
+                    "Data table webhook {} on host {} for {} on table '{}' in environment {} is suspended until {} " +
+                        "after its endpoint failed; {} of {} rows (record ids {}) were not sent",
+                    hook.id(), getHost(hook), type, baseName, environmentId, suspendedUntil, skippedCount,
+                    rows.size(), describeRecordIds(type, skippedRows));
+            } else if (!suspendedUntil.equals(skipLoggedSuspendedUntilInstants.put(suspensionKey, suspendedUntil))) {
+                log.error(
+                    "Data table webhook {} on host {} for {} on table '{}' in environment {} is suspended until {} " +
+                        "after its endpoint failed; {} of {} rows (record ids {}) were not sent; later skipped " +
+                        "writes are logged at debug level until then",
+                    hook.id(), getHost(hook), type, baseName, environmentId, suspendedUntil, skippedCount,
+                    rows.size(), describeRecordIds(type, skippedRows));
+            } else if (log.isDebugEnabled()) {
+                log.debug(
+                    "Data table webhook {} on host {} for {} on table '{}' in environment {} is suspended until {}; " +
+                        "{} of {} rows (record ids {}) were not sent",
+                    hook.id(), getHost(hook), type, baseName, environmentId, suspendedUntil, skippedCount,
+                    rows.size(), describeRecordIds(type, skippedRows));
+            }
         } else if (firstRetryException != null) {
             log.error(
                 "Data table webhook {} on host {} for {} on table '{}' in environment {} failed for {} of {} " +
-                    "payloads (first record ids {}, last record id {}, first failure: {})",
-                hook.id(), getHost(hook), type, baseName, environmentId, failedCount, payloads.size(), failedIds,
+                    "rows (first record ids {}, last record id {}, first failure: {})",
+                hook.id(), getHost(hook), type, baseName, environmentId, failedCount, rows.size(), failedIds,
                 lastFailedId, describeFailure(hook, firstRetryException));
         }
     }
@@ -400,8 +563,8 @@ public final class DataTableWebhookEventListener {
                 throw new DeliverySuspendedException(suspendedUntil);
             }
 
-            return restTemplate.postForObject(hook.url(), body, String.class);
-        } catch (RestClientException | IllegalArgumentException exception) {
+            return restTemplate.postForObject(getUri(hook), body, String.class);
+        } catch (RestClientException | InvalidWebhookUrlException exception) {
             if (isEndpointUnusable(exception)) {
                 suspend(suspensionKey);
             }
@@ -409,6 +572,47 @@ public final class DataTableWebhookEventListener {
             throw exception;
         } finally {
             deliverySemaphore.release();
+        }
+    }
+
+    private Map<String, Object> createBody(DataTableWebhookType type, String baseName, DataTableRow row) {
+        Map<String, Object> body = new HashMap<>();
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("id", row.id());
+        payload.put("values", toPayloadValues(row.values()));
+
+        body.put("type", type.name());
+        body.put("table", baseName);
+        body.put("timestamp", String.valueOf(clock.instant()));
+        body.put("payload", payload);
+
+        return body;
+    }
+
+    private URI getUri(DataTableWebhookService.Webhook hook) {
+        URI uri = parseUri(hook.url());
+
+        String scheme = uri.getScheme();
+
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new InvalidWebhookUrlException("Webhook URL is not an absolute http or https URL", null);
+        }
+
+        return uri;
+    }
+
+    private URI parseUri(String url) {
+        try {
+            return URI.create(url);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            UriTemplateHandler uriTemplateHandler = restTemplate.getUriTemplateHandler();
+
+            try {
+                return uriTemplateHandler.expand(url);
+            } catch (IllegalArgumentException | IllegalStateException exception) {
+                throw new InvalidWebhookUrlException("Webhook URL is not valid", exception);
+            }
         }
     }
 
@@ -425,15 +629,54 @@ public final class DataTableWebhookEventListener {
         return restTemplate;
     }
 
-    private static String describeRecordIds(List<Map<String, Object>> payloads) {
-        Map<String, Object> firstPayload = payloads.getFirst();
-        Map<String, Object> lastPayload = payloads.getLast();
-
-        if (payloads.size() == 1) {
-            return String.valueOf(firstPayload.get("id"));
+    private void countUnsentRows(DataTableWebhookType type, String outcome, int rowCount) {
+        if (rowCount == 0) {
+            return;
         }
 
-        return firstPayload.get("id") + " to " + lastPayload.get("id");
+        MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();
+
+        if (meterRegistry != null) {
+            Counter.builder(UNSENT_ROWS_COUNTER)
+                .tag("type", type.name())
+                .tag("outcome", outcome)
+                .description("Data table rows not sent to a webhook, per webhook")
+                .register(meterRegistry)
+                .increment(rowCount);
+        }
+    }
+
+    private static String describeRecordIds(DataTableWebhookType type, List<DataTableRow> rows) {
+        int maxLoggedRecordIds = type == DataTableWebhookType.RECORD_DELETED ? rows.size() : MAX_LOGGED_RECORD_IDS;
+
+        List<Long> recordIds = rows.stream()
+            .limit(maxLoggedRecordIds)
+            .map(DataTableRow::id)
+            .toList();
+
+        if (rows.size() > maxLoggedRecordIds) {
+            return recordIds + " and " + (rows.size() - maxLoggedRecordIds) + " more";
+        }
+
+        return String.valueOf(recordIds);
+    }
+
+    private static Map<String, @Nullable Object> toPayloadValues(Map<String, Object> values) {
+        Map<String, @Nullable Object> payloadValues = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof Date date) {
+                LocalDate localDate = date.toLocalDate();
+
+                value = localDate.toString();
+            }
+
+            payloadValues.put(entry.getKey(), value);
+        }
+
+        return payloadValues;
     }
 
     private static String abbreviate(String text) {
@@ -489,7 +732,7 @@ public final class DataTableWebhookEventListener {
                 return description + " redirect without a location";
             }
 
-            String locationHost = location.getHost();
+            String locationHost = getHost(location);
 
             return description + " redirect to host " + (locationHost == null ? getHost(hook) : locationHost);
         }
@@ -510,23 +753,17 @@ public final class DataTableWebhookEventListener {
             || throwable instanceof HttpClientErrorException.Gone
             || throwable instanceof HttpClientErrorException.MethodNotAllowed
             || throwable instanceof HttpClientErrorException.UnsupportedMediaType
-            || throwable instanceof IllegalArgumentException;
+            || throwable instanceof InvalidWebhookUrlException;
+    }
+
+    private static boolean isEndpointFailure(@Nullable Throwable throwable) {
+        return throwable instanceof RestClientResponseException || throwable instanceof ResourceAccessException;
     }
 
     private static boolean isPayloadRejected(@Nullable Throwable throwable) {
         return throwable instanceof HttpClientErrorException.BadRequest
             || throwable instanceof HttpClientErrorException.Conflict
             || throwable instanceof HttpClientErrorException.UnprocessableContent;
-    }
-
-    private static @Nullable Object getSkippedId(List<Map<String, Object>> payloads, int skippedCount, boolean first) {
-        if (skippedCount == 0) {
-            return null;
-        }
-
-        Map<String, Object> payload = payloads.get(first ? payloads.size() - skippedCount : payloads.size() - 1);
-
-        return payload.get("id");
     }
 
     private static boolean isRetryable(@Nullable Throwable throwable) {
@@ -553,25 +790,39 @@ public final class DataTableWebhookEventListener {
     }
 
     private static String getUrlHost(String url) {
-        try {
-            URI uri = URI.create(url);
+        String host = getHost(url);
 
-            String host = uri.getHost();
-
-            return host == null ? "<url>" : host;
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return "<url>";
-        }
+        return host == null ? "<url>" : host;
     }
 
     private static String getHost(DataTableWebhookService.Webhook hook) {
-        try {
-            URI uri = URI.create(hook.url());
+        String host = getHost(hook.url());
 
-            return String.valueOf(uri.getHost());
+        return host == null ? "<invalid url>" : host;
+    }
+
+    private static @Nullable String getHost(String url) {
+        try {
+            return getHost(URI.create(url));
         } catch (IllegalArgumentException illegalArgumentException) {
-            return "<invalid url>";
+            return null;
         }
+    }
+
+    private static @Nullable String getHost(URI uri) {
+        String host = uri.getHost();
+
+        if (host == null && uri.isAbsolute()) {
+            try {
+                URL url = uri.toURL();
+
+                host = url.getHost();
+            } catch (IllegalArgumentException | MalformedURLException exception) {
+                return null;
+            }
+        }
+
+        return host == null || host.isEmpty() ? null : host;
     }
 
     private static final class Non2xxResponseErrorHandler extends DefaultResponseErrorHandler {
@@ -597,6 +848,35 @@ public final class DataTableWebhookEventListener {
 
         private Instant getSuspendedUntil() {
             return suspendedUntil;
+        }
+    }
+
+    private static final class InvalidWebhookUrlException extends RuntimeException {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private InvalidWebhookUrlException(String message, @Nullable RuntimeException cause) {
+            super(message, cause);
+        }
+    }
+
+    private static final class PendingRows {
+
+        private final AtomicInteger remainingDeliveryCount;
+        private final int rowCount;
+
+        private PendingRows(int rowCount, int deliveryCount) {
+            this.remainingDeliveryCount = new AtomicInteger(deliveryCount);
+            this.rowCount = rowCount;
+        }
+
+        private int getRowCount() {
+            return rowCount;
+        }
+
+        private boolean release() {
+            return remainingDeliveryCount.decrementAndGet() == 0;
         }
     }
 
