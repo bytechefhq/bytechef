@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -56,13 +57,13 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -135,6 +136,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -161,7 +163,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionService.class, ContextService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, JobFacade.class, JobService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceConfigurationWorkflowService.class, McpAutomationRowFacade.class,
+    McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
@@ -218,6 +221,9 @@ class EmbeddedCredentialsGatesIntTest {
     private IntegrationWorkflowService integrationWorkflowService;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private PermissionService permissionService;
 
     @Autowired
@@ -263,8 +269,9 @@ class EmbeddedCredentialsGatesIntTest {
 
         integrationWorkflowService.addWorkflow(integration.getId(), 1, workflow.getId());
 
-        productionConfigurationId = createConfiguration(integration.getId(), Environment.PRODUCTION);
-        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT);
+        productionConfigurationId = createConfiguration(
+            integration.getId(), Environment.PRODUCTION, PRODUCTION_EDITOR);
+        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT, TENANT_ADMIN);
     }
 
     @AfterEach
@@ -307,7 +314,7 @@ class EmbeddedCredentialsGatesIntTest {
     }
 
     @Test
-    void testAProductionEditorGetsCredentialsOnlyForProductionConfigurations() {
+    void testAProductionEditorGetsCredentialsOnlyForTheProductionConfigurationItCreated() {
         authenticate(PRODUCTION_EDITOR, false);
 
         assertCredentialsVisible(
@@ -331,22 +338,45 @@ class EmbeddedCredentialsGatesIntTest {
     }
 
     @Test
-    void testATenantAdminGetsCredentialsInEveryEnvironment() {
+    void testATenantAdminGetsCredentialsOnlyForTheConfigurationItCreated() {
         authenticate(TENANT_ADMIN, true);
 
-        assertCredentialsVisible(
+        assertCredentialsHidden(
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(productionConfigurationId));
         assertCredentialsVisible(
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(developmentConfigurationId));
 
-        integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurations(null, null, null, true)
-            .forEach(EmbeddedCredentialsGatesIntTest::assertCredentialsVisible);
+        for (boolean includeAllFields : List.of(true, false)) {
+            List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs =
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurations(
+                    null, null, null, includeAllFields);
+
+            assertThat(integrationInstanceConfigurationDTOs).hasSize(2);
+
+            for (IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTOs) {
+
+                if (integrationInstanceConfigurationDTO.id() == developmentConfigurationId) {
+                    assertCredentialsVisible(integrationInstanceConfigurationDTO, includeAllFields);
+                } else {
+                    assertCredentialsHidden(integrationInstanceConfigurationDTO);
+                }
+            }
+        }
     }
 
     private static void assertCredentialsHidden(IntegrationInstanceConfigurationDTO dto) {
         assertThat(dto.connectionAuthorizationParameters()).isEmpty();
         assertThat(dto.connectionConnectionParameters()).isEmpty();
         assertThat(dto.connectionParameters()).isEmpty();
+    }
+
+    private static void assertCredentialsVisible(IntegrationInstanceConfigurationDTO dto, boolean includeAllFields) {
+        if (includeAllFields) {
+            assertCredentialsVisible(dto);
+        } else {
+            assertThat(dto.connectionParameters()
+                .get("api_key")).isEqualTo("secret-api-key-12345678");
+        }
     }
 
     private static void assertCredentialsVisible(IntegrationInstanceConfigurationDTO dto) {
@@ -366,7 +396,7 @@ class EmbeddedCredentialsGatesIntTest {
                 new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
-    private long createConfiguration(long integrationId, Environment environment) {
+    private long createConfiguration(long integrationId, Environment environment, String createdBy) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setAuthorizationType(AuthorizationType.API_KEY);
@@ -379,6 +409,10 @@ class EmbeddedCredentialsGatesIntTest {
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
+
+        jdbcTemplate.update(
+            "UPDATE integration_instance_configuration SET created_by = ? WHERE id = ?", createdBy,
+            integrationInstanceConfiguration.getId());
 
         return integrationInstanceConfiguration.getId();
     }
@@ -419,7 +453,7 @@ class EmbeddedCredentialsGatesIntTest {
         KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
         PermissionServiceImpl.class,
         ProjectPermissionScopeProvider.class, WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 

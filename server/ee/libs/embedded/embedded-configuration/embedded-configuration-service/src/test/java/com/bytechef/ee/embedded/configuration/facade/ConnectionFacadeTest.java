@@ -18,7 +18,7 @@ import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMe
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class ConnectionAdminFacadeTest {
+class ConnectionFacadeTest {
 
-    private ConnectionAdminFacadeImpl connectionAdminFacade;
+    private ConnectionFacadeImpl connectionFacade;
     private ConnectionService connectionService;
     private PermissionService permissionService;
     private TagService tagService;
@@ -45,9 +45,10 @@ class ConnectionAdminFacadeTest {
         permissionService = mock(PermissionService.class);
         tagService = mock(TagService.class);
 
-        connectionAdminFacade = new ConnectionAdminFacadeImpl(
+        connectionFacade = new ConnectionFacadeImpl(
             mock(ConnectedUserConnectionMembership.class), mock(ConnectedUserConnectionService.class),
-            mock(ConnectionFacade.class), connectionService, permissionService, tagService);
+            mock(com.bytechef.platform.connection.facade.ConnectionFacade.class),
+            mock(ConnectionOwnershipExemption.class), connectionService, permissionService, tagService);
 
         when(connectionService.getConnections(PlatformType.EMBEDDED)).thenReturn(
             List.of(
@@ -60,7 +61,7 @@ class ConnectionAdminFacadeTest {
     void testGetConnectionTagsReadsOnlyEnvironmentsTheCallerCanView() {
         when(permissionService.hasEmbeddedScope("CONNECTION_VIEW", Environment.PRODUCTION)).thenReturn(true);
 
-        connectionAdminFacade.getConnectionTags();
+        connectionFacade.getConnectionTags();
 
         verify(tagService).getTags(List.of(3L));
     }
@@ -71,14 +72,14 @@ class ConnectionAdminFacadeTest {
             when(permissionService.hasEmbeddedScope("CONNECTION_VIEW", environment)).thenReturn(true);
         }
 
-        assertThat(connectionAdminFacade.getConnectionTags()).hasSize(1);
+        assertThat(connectionFacade.getConnectionTags()).hasSize(1);
 
         verify(tagService).getTags(List.of(1L, 2L, 3L));
     }
 
     @Test
     void testGetConnectionTagsReadsNothingWithoutTheScope() {
-        connectionAdminFacade.getConnectionTags();
+        connectionFacade.getConnectionTags();
 
         verify(tagService).getTags(List.of());
     }
