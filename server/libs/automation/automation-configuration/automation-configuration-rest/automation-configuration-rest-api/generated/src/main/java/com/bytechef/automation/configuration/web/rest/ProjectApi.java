@@ -108,6 +108,37 @@ public interface ProjectApi {
     }
 
 
+    String PATH_DELETE_PROJECT_VERSION = "/projects/{id}/versions/{projectVersion}";
+    /**
+     * DELETE /projects/{id}/versions/{projectVersion} : Deletes a published project version.
+     * Deletes a published project version.
+     *
+     * @param id The id of a project. (required)
+     * @param projectVersion The version of a project. (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "deleteProjectVersion",
+        summary = "Deletes a published project version.",
+        description = "Deletes a published project version.",
+        tags = { "project" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = ProjectApi.PATH_DELETE_PROJECT_VERSION
+    )
+    default ResponseEntity<Void> deleteProjectVersion(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectVersion", description = "The version of a project.", required = true, in = ParameterIn.PATH) @PathVariable("projectVersion") Integer projectVersion
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_DUPLICATE_PROJECT = "/projects/{id}/duplicate";
     /**
      * POST /projects/{id}/duplicate : Duplicates existing project.
@@ -377,6 +408,37 @@ public interface ProjectApi {
     default ResponseEntity<Void> publishProject(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "PublishProjectRequestModel", description = "") @Valid @RequestBody(required = false) @Nullable PublishProjectRequestModel publishProjectRequestModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_RESTORE_PROJECT_VERSION = "/projects/{id}/versions/{projectVersion}/restore";
+    /**
+     * POST /projects/{id}/versions/{projectVersion}/restore : Restores a published project version into the draft.
+     * Replaces the draft workflows of a project with the workflows of a published project version.
+     *
+     * @param id The id of a project. (required)
+     * @param projectVersion The version of a project. (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "restoreProjectVersion",
+        summary = "Restores a published project version into the draft.",
+        description = "Replaces the draft workflows of a project with the workflows of a published project version.",
+        tags = { "project" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ProjectApi.PATH_RESTORE_PROJECT_VERSION
+    )
+    default ResponseEntity<Void> restoreProjectVersion(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectVersion", description = "The version of a project.", required = true, in = ParameterIn.PATH) @PathVariable("projectVersion") Integer projectVersion
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
