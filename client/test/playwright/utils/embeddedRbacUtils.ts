@@ -3,7 +3,14 @@ import {createSign} from 'crypto';
 
 import getRandomString from './getRandomString';
 import {login} from './login';
-import {type BuiltInRoleType, type EnvironmentType, type RoleUserI, graphql, sendInternalApi} from './rbacUtils';
+import {
+    type BuiltInRoleType,
+    ENVIRONMENT_IDS,
+    type EnvironmentType,
+    type RoleUserI,
+    graphql,
+    sendInternalApi,
+} from './rbacUtils';
 
 export type EmbeddedDataEnvironmentType = 'DEVELOPMENT' | 'PRODUCTION';
 
@@ -24,15 +31,14 @@ export interface EmbeddedDataI {
     workflowUuid: string;
 }
 
+export interface EmbeddedDataDraftI {
+    byEnvironment: Partial<Record<EmbeddedDataEnvironmentType, Partial<EmbeddedEnvironmentDataI>>>;
+    integrationId?: number;
+}
+
 export const EMBEDDED_DATA_ENVIRONMENTS: EmbeddedDataEnvironmentType[] = ['DEVELOPMENT', 'PRODUCTION'];
 
 const EMBEDDED_INTERNAL = '/api/embedded/internal';
-
-export const EMBEDDED_ENVIRONMENT_IDS: Record<EnvironmentType, number> = {
-    DEVELOPMENT: 0,
-    PRODUCTION: 2,
-    STAGING: 1,
-};
 
 export async function embeddedInternalApi<T>(
     apiContext: APIRequestContext,
@@ -124,7 +130,7 @@ export async function setEmbeddedOnlyEnvironmentRole(
 
     await setEmbeddedEnvironmentRole(adminApi, userId, environment, role);
 
-    for (const otherEnvironment of Object.keys(EMBEDDED_ENVIRONMENT_IDS) as EnvironmentType[]) {
+    for (const otherEnvironment of Object.keys(ENVIRONMENT_IDS) as EnvironmentType[]) {
         if (otherEnvironment !== environment) {
             await removeEmbeddedEnvironmentRole(adminApi, userId, otherEnvironment);
         }
@@ -158,7 +164,7 @@ export async function openAsEmbeddedRoleUser(
     browser: Browser,
     baseURL: string,
     roleUser: RoleUserI,
-    environmentId: number = EMBEDDED_ENVIRONMENT_IDS.DEVELOPMENT
+    environmentId: number = ENVIRONMENT_IDS.DEVELOPMENT
 ): Promise<{context: BrowserContext; page: Page}> {
     const context = await browser.newContext({baseURL});
 
@@ -198,9 +204,10 @@ async function createEnvironmentData(
     baseURL: string,
     environment: EmbeddedDataEnvironmentType,
     integrationId: number,
-    suffix: string
+    suffix: string,
+    draft: Partial<EmbeddedEnvironmentDataI>
 ): Promise<EmbeddedEnvironmentDataI> {
-    const environmentId = EMBEDDED_ENVIRONMENT_IDS[environment];
+    const environmentId = ENVIRONMENT_IDS[environment];
 
     const label = environment.toLowerCase();
 
@@ -218,6 +225,9 @@ async function createEnvironmentData(
     );
 
     const signingKey = signingKeys.find((candidate) => candidate.name === signingKeyName)!;
+
+    draft.signingKeyId = signingKey.id;
+    draft.signingKeyName = signingKeyName;
 
     const connectedUserExternalId = `rbac_ext_${label}_${suffix}`;
 
@@ -237,13 +247,18 @@ async function createEnvironmentData(
         await connectedUserApi.dispose();
     }
 
-    const connectedUsersBody = await embeddedInternalApi<
-        {content: {externalId: string; id: number}[]} | {externalId: string; id: number}[]
-    >(adminApi, 'GET', `/connected-users?environmentId=${environmentId}&search=${connectedUserExternalId}`);
+    const connectedUsersPage = await embeddedInternalApi<{content: {externalId: string; id: number}[]}>(
+        adminApi,
+        'GET',
+        `/connected-users?environmentId=${environmentId}&search=${connectedUserExternalId}`
+    );
 
-    const connectedUsers = Array.isArray(connectedUsersBody) ? connectedUsersBody : connectedUsersBody.content;
+    const connectedUserId = connectedUsersPage.content.find(
+        (candidate) => candidate.externalId === connectedUserExternalId
+    )!.id;
 
-    const connectedUserId = connectedUsers.find((candidate) => candidate.externalId === connectedUserExternalId)!.id;
+    draft.connectedUserExternalId = connectedUserExternalId;
+    draft.connectedUserId = connectedUserId;
 
     const connectionId = await embeddedInternalApi<number>(adminApi, 'POST', '/connections', {
         componentName: 'httpClient',
@@ -252,7 +267,9 @@ async function createEnvironmentData(
         name: `rbac_shared_${label}_${suffix}`,
         parameters: {},
         shared: true,
-    }).then((body) => (typeof body === 'number' ? body : (body as unknown as {id: number}).id));
+    });
+
+    draft.connectionId = connectionId;
 
     const instanceConfigurationId = await embeddedInternalApi<number>(
         adminApi,
@@ -269,6 +286,8 @@ async function createEnvironmentData(
         }
     );
 
+    draft.instanceConfigurationId = instanceConfigurationId;
+
     const mcpServer = await graphql<{createEmbeddedMcpServer: {id: string}}>(
         adminApi,
         `
@@ -280,6 +299,8 @@ async function createEnvironmentData(
         `,
         {input: {enabled: true, environmentId: String(environmentId), name: `rbac_mcp_${label}_${suffix}`}}
     );
+
+    draft.mcpServerId = mcpServer.createEmbeddedMcpServer.id;
 
     return {
         connectedUserExternalId,
@@ -297,42 +318,63 @@ export async function createEmbeddedData(adminApi: APIRequestContext, baseURL: s
 
     const integrationName = `rbac_integration_${suffix}`;
 
-    const integrationId = await embeddedInternalApi<number>(adminApi, 'POST', '/integrations', {
-        componentName: 'httpClient',
-        multipleInstances: false,
-        name: integrationName,
-    });
+    const draft: EmbeddedDataDraftI = {byEnvironment: {}};
 
-    const workflowDefinition = JSON.stringify({
-        label: 'rbac embedded workflow',
-        tasks: [
-            {label: 'HTTP', name: 'httpClient_1', parameters: {uri: 'http://localhost'}, type: 'httpClient/v1/get'},
-        ],
-        triggers: [{label: 'Manual', name: 'trigger_1', type: 'manual/v1/manual'}],
-    });
+    try {
+        const integrationId = await embeddedInternalApi<number>(adminApi, 'POST', '/integrations', {
+            componentName: 'httpClient',
+            multipleInstances: false,
+            name: integrationName,
+        });
 
-    await embeddedInternalApi(adminApi, 'POST', `/integrations/${integrationId}/workflows`, {
-        definition: workflowDefinition,
-    });
+        draft.integrationId = integrationId;
 
-    await embeddedInternalApi(adminApi, 'POST', `/integrations/${integrationId}/publish`, {description: 'rbac'});
+        const workflowDefinition = JSON.stringify({
+            label: 'rbac embedded workflow',
+            tasks: [
+                {label: 'HTTP', name: 'httpClient_1', parameters: {uri: 'http://localhost'}, type: 'httpClient/v1/get'},
+            ],
+            triggers: [{label: 'Manual', name: 'trigger_1', type: 'manual/v1/manual'}],
+        });
 
-    const workflows = await embeddedInternalApi<{id: string}[]>(
-        adminApi,
-        'GET',
-        `/integrations/${integrationId}/workflows`
-    );
+        await embeddedInternalApi(adminApi, 'POST', `/integrations/${integrationId}/workflows`, {
+            definition: workflowDefinition,
+        });
 
-    const byEnvironment = {} as Record<EmbeddedDataEnvironmentType, EmbeddedEnvironmentDataI>;
+        await embeddedInternalApi(adminApi, 'POST', `/integrations/${integrationId}/publish`, {description: 'rbac'});
 
-    for (const environment of EMBEDDED_DATA_ENVIRONMENTS) {
-        byEnvironment[environment] = await createEnvironmentData(adminApi, baseURL, environment, integrationId, suffix);
+        const workflows = await embeddedInternalApi<{id: string}[]>(
+            adminApi,
+            'GET',
+            `/integrations/${integrationId}/workflows`
+        );
+
+        const byEnvironment = {} as Record<EmbeddedDataEnvironmentType, EmbeddedEnvironmentDataI>;
+
+        for (const environment of EMBEDDED_DATA_ENVIRONMENTS) {
+            const environmentDraft: Partial<EmbeddedEnvironmentDataI> = {};
+
+            draft.byEnvironment[environment] = environmentDraft;
+
+            byEnvironment[environment] = await createEnvironmentData(
+                adminApi,
+                baseURL,
+                environment,
+                integrationId,
+                suffix,
+                environmentDraft
+            );
+        }
+
+        return {byEnvironment, integrationId, integrationName, workflowUuid: workflows[0].id};
+    } catch (error) {
+        await deleteEmbeddedData(adminApi, draft);
+
+        throw error;
     }
-
-    return {byEnvironment, integrationId, integrationName, workflowUuid: workflows[0].id};
 }
 
-export async function deleteEmbeddedData(adminApi: APIRequestContext, embeddedData: EmbeddedDataI): Promise<void> {
+export async function deleteEmbeddedData(adminApi: APIRequestContext, embeddedData: EmbeddedDataDraftI): Promise<void> {
     const failures: string[] = [];
 
     const attempt = async (description: string, action: () => Promise<unknown>) => {
@@ -346,40 +388,58 @@ export async function deleteEmbeddedData(adminApi: APIRequestContext, embeddedDa
     for (const environment of [...EMBEDDED_DATA_ENVIRONMENTS].reverse()) {
         const environmentData = embeddedData.byEnvironment[environment];
 
-        await attempt(`delete MCP server ${environmentData.mcpServerId}`, () =>
-            graphql(
-                adminApi,
-                'mutation DeleteEmbeddedMcpServer($id: ID!) { deleteEmbeddedMcpServer(mcpServerId: $id) }',
-                {
-                    id: environmentData.mcpServerId,
-                }
-            )
-        );
+        if (!environmentData) {
+            continue;
+        }
 
-        await attempt(`delete instance configuration ${environmentData.instanceConfigurationId}`, () =>
-            embeddedInternalApi(
-                adminApi,
-                'DELETE',
-                `/integration-instance-configurations/${environmentData.instanceConfigurationId}`
-            )
-        );
+        const {connectedUserId, connectionId, instanceConfigurationId, mcpServerId, signingKeyId} = environmentData;
 
-        await attempt(`delete connection ${environmentData.connectionId}`, () =>
-            embeddedInternalApi(adminApi, 'DELETE', `/connections/${environmentData.connectionId}`)
-        );
+        if (mcpServerId) {
+            await attempt(`delete MCP server ${mcpServerId}`, () =>
+                graphql(
+                    adminApi,
+                    'mutation DeleteEmbeddedMcpServer($id: ID!) { deleteEmbeddedMcpServer(mcpServerId: $id) }',
+                    {id: mcpServerId}
+                )
+            );
+        }
 
-        await attempt(`delete connected user ${environmentData.connectedUserId}`, () =>
-            embeddedInternalApi(adminApi, 'DELETE', `/connected-users/${environmentData.connectedUserId}`)
-        );
+        if (instanceConfigurationId) {
+            await attempt(`delete instance configuration ${instanceConfigurationId}`, () =>
+                embeddedInternalApi(
+                    adminApi,
+                    'DELETE',
+                    `/integration-instance-configurations/${instanceConfigurationId}`
+                )
+            );
+        }
 
-        await attempt(`delete signing key ${environmentData.signingKeyId}`, () =>
-            embeddedInternalApi(adminApi, 'DELETE', `/signing-keys/${environmentData.signingKeyId}`)
-        );
+        if (connectionId) {
+            await attempt(`delete connection ${connectionId}`, () =>
+                embeddedInternalApi(adminApi, 'DELETE', `/connections/${connectionId}`)
+            );
+        }
+
+        if (connectedUserId) {
+            await attempt(`delete connected user ${connectedUserId}`, () =>
+                embeddedInternalApi(adminApi, 'DELETE', `/connected-users/${connectedUserId}`)
+            );
+        }
+
+        if (signingKeyId) {
+            await attempt(`delete signing key ${signingKeyId}`, () =>
+                embeddedInternalApi(adminApi, 'DELETE', `/signing-keys/${signingKeyId}`)
+            );
+        }
     }
 
-    await attempt(`delete integration ${embeddedData.integrationId}`, () =>
-        embeddedInternalApi(adminApi, 'DELETE', `/integrations/${embeddedData.integrationId}`)
-    );
+    if (embeddedData.integrationId) {
+        const {integrationId} = embeddedData;
+
+        await attempt(`delete integration ${integrationId}`, () =>
+            embeddedInternalApi(adminApi, 'DELETE', `/integrations/${integrationId}`)
+        );
+    }
 
     for (const failure of failures) {
         console.warn(`embeddedData teardown: ${failure}`);

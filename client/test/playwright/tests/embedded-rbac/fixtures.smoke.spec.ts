@@ -1,14 +1,13 @@
-import {expect} from '@playwright/test';
+import {type APIRequestContext, expect} from '@playwright/test';
 
 import {embeddedRolesTest as test} from '../../fixtures/embeddedRoles';
 import {
     EMBEDDED_DATA_ENVIRONMENTS,
-    EMBEDDED_ENVIRONMENT_IDS,
     embeddedInternalApi,
     fetchMyEmbeddedScopes,
     openAsEmbeddedRoleUser,
 } from '../../utils/embeddedRbacUtils';
-import {RBAC_BASE_URL, createRoleUserApiContext} from '../../utils/rbacUtils';
+import {ENVIRONMENT_IDS, type EnvironmentType, RBAC_BASE_URL, createRoleUserApiContext} from '../../utils/rbacUtils';
 
 const VIEWER_SCOPES = [
     'EMBEDDED_VIEW',
@@ -36,19 +35,40 @@ const EDITOR_ONLY_SCOPES = [
 
 const ADMIN_ONLY_SCOPES = ['EMBEDDED_MEMBER_MANAGE', 'INTEGRATION_DELETE', 'MCP_DELETE', 'EXECUTION_DELETE'];
 
+const ALL_ENVIRONMENTS: EnvironmentType[] = ['DEVELOPMENT', 'STAGING', 'PRODUCTION'];
+
+async function expectScopes(
+    apiContext: APIRequestContext,
+    environment: EnvironmentType,
+    expected: string[],
+    absent: string[]
+): Promise<void> {
+    const scopes = await fetchMyEmbeddedScopes(apiContext, environment);
+
+    expect(scopes, `held in ${environment}`).toEqual(expect.arrayContaining(expected));
+
+    for (const scope of absent) {
+        expect(scopes, `${scope} in ${environment}`).not.toContain(scope);
+    }
+}
+
 test.describe('Embedded RBAC fixtures', () => {
     test('every fixture user can sign in', async ({browser, embeddedRoleUsers}) => {
         for (const [key, roleUser] of Object.entries(embeddedRoleUsers)) {
             await test.step(`sign in as ${key}`, async () => {
                 const roleUserApi = await createRoleUserApiContext(RBAC_BASE_URL, roleUser);
 
-                await roleUserApi.dispose();
+                try {
+                    expect(Array.isArray(await fetchMyEmbeddedScopes(roleUserApi))).toBe(true);
+                } finally {
+                    await roleUserApi.dispose();
+                }
 
                 const {context, page} = await openAsEmbeddedRoleUser(
                     browser,
                     RBAC_BASE_URL,
                     roleUser,
-                    EMBEDDED_ENVIRONMENT_IDS.DEVELOPMENT
+                    ENVIRONMENT_IDS.DEVELOPMENT
                 );
 
                 await expect(page).not.toHaveURL(/\/login/);
@@ -62,45 +82,48 @@ test.describe('Embedded RBAC fixtures', () => {
         const viewerApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.VIEWER);
 
         try {
-            for (const environment of ['DEVELOPMENT', 'PRODUCTION'] as const) {
-                const scopes = await fetchMyEmbeddedScopes(viewerApi, environment);
-
-                expect(scopes).toEqual(expect.arrayContaining(VIEWER_SCOPES));
-
-                for (const scope of [...EDITOR_ONLY_SCOPES, ...ADMIN_ONLY_SCOPES]) {
-                    expect(scopes, `${scope} in ${environment}`).not.toContain(scope);
-                }
+            for (const environment of ALL_ENVIRONMENTS) {
+                await expectScopes(viewerApi, environment, VIEWER_SCOPES, [
+                    ...EDITOR_ONLY_SCOPES,
+                    ...ADMIN_ONLY_SCOPES,
+                ]);
             }
         } finally {
             await viewerApi.dispose();
         }
     });
 
-    test('EDITOR holds the editor scopes but not the admin scopes', async ({embeddedRoleUsers}) => {
+    test('EDITOR holds the editor scopes but not the admin scopes in every environment', async ({
+        embeddedRoleUsers,
+    }) => {
         const editorApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.EDITOR);
 
         try {
-            const scopes = await fetchMyEmbeddedScopes(editorApi, 'DEVELOPMENT');
-
-            expect(scopes).toEqual(expect.arrayContaining([...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES]));
-
-            for (const scope of ADMIN_ONLY_SCOPES) {
-                expect(scopes, scope).not.toContain(scope);
+            for (const environment of ALL_ENVIRONMENTS) {
+                await expectScopes(
+                    editorApi,
+                    environment,
+                    [...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES],
+                    ADMIN_ONLY_SCOPES
+                );
             }
         } finally {
             await editorApi.dispose();
         }
     });
 
-    test('ADMIN holds every scope level', async ({embeddedRoleUsers}) => {
+    test('ADMIN holds every scope level in every environment', async ({embeddedRoleUsers}) => {
         const adminRoleApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.ADMIN);
 
         try {
-            const scopes = await fetchMyEmbeddedScopes(adminRoleApi, 'PRODUCTION');
-
-            expect(scopes).toEqual(
-                expect.arrayContaining([...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES, ...ADMIN_ONLY_SCOPES])
-            );
+            for (const environment of ALL_ENVIRONMENTS) {
+                await expectScopes(
+                    adminRoleApi,
+                    environment,
+                    [...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES, ...ADMIN_ONLY_SCOPES],
+                    []
+                );
+            }
         } finally {
             await adminRoleApi.dispose();
         }
@@ -110,9 +133,13 @@ test.describe('Embedded RBAC fixtures', () => {
         const productionEditorApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.PRODUCTION_EDITOR);
 
         try {
-            expect(await fetchMyEmbeddedScopes(productionEditorApi, 'PRODUCTION')).toEqual(
-                expect.arrayContaining([...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES])
+            await expectScopes(
+                productionEditorApi,
+                'PRODUCTION',
+                [...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES],
+                ADMIN_ONLY_SCOPES
             );
+
             expect(await fetchMyEmbeddedScopes(productionEditorApi, 'DEVELOPMENT')).toEqual([]);
         } finally {
             await productionEditorApi.dispose();
@@ -126,9 +153,13 @@ test.describe('Embedded RBAC fixtures', () => {
         );
 
         try {
-            expect(await fetchMyEmbeddedScopes(developmentEditorApi, 'DEVELOPMENT')).toEqual(
-                expect.arrayContaining([...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES])
+            await expectScopes(
+                developmentEditorApi,
+                'DEVELOPMENT',
+                [...VIEWER_SCOPES, ...EDITOR_ONLY_SCOPES],
+                ADMIN_ONLY_SCOPES
             );
+
             expect(await fetchMyEmbeddedScopes(developmentEditorApi, 'PRODUCTION')).toEqual([]);
         } finally {
             await developmentEditorApi.dispose();

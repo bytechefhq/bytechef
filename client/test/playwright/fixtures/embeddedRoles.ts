@@ -51,38 +51,63 @@ export const embeddedRolesTest = base.extend<object, EmbeddedRolesWorkerFixtures
         async ({adminApi}, use, workerInfo) => {
             const baseURL = getBaseUrl(workerInfo.project.use.baseURL);
 
-            const embeddedRoleUsers: EmbeddedRoleUsersType = {
-                ADMIN: await createAccount(adminApi, baseURL),
-                DEVELOPMENT_EDITOR: await createAccount(adminApi, baseURL),
-                EDITOR: await createAccount(adminApi, baseURL),
-                OUTSIDER: await createAccount(adminApi, baseURL),
-                PRODUCTION_EDITOR: await createAccount(adminApi, baseURL),
-                VIEWER: await createAccount(adminApi, baseURL),
+            const createdRoleUsers: RoleUserI[] = [];
+
+            const createRoleUser = async (): Promise<RoleUserI> => {
+                const roleUser = await createAccount(adminApi, baseURL);
+
+                createdRoleUsers.push(roleUser);
+
+                return roleUser;
             };
 
-            await setEmbeddedRole(adminApi, embeddedRoleUsers.ADMIN.userId!, 'ADMIN');
-            await setEmbeddedRole(adminApi, embeddedRoleUsers.EDITOR.userId!, 'EDITOR');
-            await setEmbeddedRole(adminApi, embeddedRoleUsers.VIEWER.userId!, 'VIEWER');
+            const cleanUp = async () => {
+                for (const roleUser of createdRoleUsers) {
+                    await removeEmbeddedUser(adminApi, roleUser.userId!).catch(() => undefined);
 
-            await setEmbeddedOnlyEnvironmentRole(
-                adminApi,
-                embeddedRoleUsers.PRODUCTION_EDITOR.userId!,
-                'PRODUCTION',
-                'EDITOR'
-            );
-            await setEmbeddedOnlyEnvironmentRole(
-                adminApi,
-                embeddedRoleUsers.DEVELOPMENT_EDITOR.userId!,
-                'DEVELOPMENT',
-                'EDITOR'
-            );
+                    await deleteRoleUser(adminApi, roleUser).catch((error: unknown) => {
+                        console.warn(`embeddedRoleUsers teardown: deleting ${roleUser.login} failed: ${error}`);
+                    });
+                }
+            };
+
+            let embeddedRoleUsers: EmbeddedRoleUsersType;
+
+            try {
+                embeddedRoleUsers = {
+                    ADMIN: await createRoleUser(),
+                    DEVELOPMENT_EDITOR: await createRoleUser(),
+                    EDITOR: await createRoleUser(),
+                    OUTSIDER: await createRoleUser(),
+                    PRODUCTION_EDITOR: await createRoleUser(),
+                    VIEWER: await createRoleUser(),
+                };
+
+                await setEmbeddedRole(adminApi, embeddedRoleUsers.ADMIN.userId!, 'ADMIN');
+                await setEmbeddedRole(adminApi, embeddedRoleUsers.EDITOR.userId!, 'EDITOR');
+                await setEmbeddedRole(adminApi, embeddedRoleUsers.VIEWER.userId!, 'VIEWER');
+
+                await setEmbeddedOnlyEnvironmentRole(
+                    adminApi,
+                    embeddedRoleUsers.PRODUCTION_EDITOR.userId!,
+                    'PRODUCTION',
+                    'EDITOR'
+                );
+                await setEmbeddedOnlyEnvironmentRole(
+                    adminApi,
+                    embeddedRoleUsers.DEVELOPMENT_EDITOR.userId!,
+                    'DEVELOPMENT',
+                    'EDITOR'
+                );
+            } catch (error) {
+                await cleanUp();
+
+                throw error;
+            }
 
             await use(embeddedRoleUsers);
 
-            for (const roleUser of Object.values(embeddedRoleUsers)) {
-                await removeEmbeddedUser(adminApi, roleUser.userId!).catch(() => undefined);
-                await deleteRoleUser(adminApi, roleUser);
-            }
+            await cleanUp();
         },
         {scope: 'worker'},
     ],
