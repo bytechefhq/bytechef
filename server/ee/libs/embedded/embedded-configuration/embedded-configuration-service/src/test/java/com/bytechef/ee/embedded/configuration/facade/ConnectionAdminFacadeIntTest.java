@@ -146,7 +146,7 @@ class ConnectionAdminFacadeIntTest {
 
         verify(connectionFacade).delete(eq(7L), any());
         verify(connectionFacade).getConnection(7L);
-        verify(connectionFacade).getConnectionTags(PlatformType.EMBEDDED);
+        verify(connectionService).getConnections(PlatformType.EMBEDDED);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(connectionFacade).update(7L, "name", List.of(), 0);
         verify(connectionFacade).update(7L, List.of());
