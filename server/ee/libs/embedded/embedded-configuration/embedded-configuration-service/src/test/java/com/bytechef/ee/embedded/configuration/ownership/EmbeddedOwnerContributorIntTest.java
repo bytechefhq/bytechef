@@ -327,7 +327,7 @@ class EmbeddedOwnerContributorIntTest {
     }
 
     @Test
-    void testAiAutoMemoryOwnerKindsMatchToday() {
+    void testOwnedProjectIdsSeparateCatalogFromConnectedUserProjects() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
             "Owner Kinds Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
 

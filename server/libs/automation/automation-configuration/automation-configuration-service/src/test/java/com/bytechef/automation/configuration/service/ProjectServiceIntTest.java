@@ -26,18 +26,22 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacadeImpl;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.tag.service.TagService;
@@ -66,6 +70,9 @@ public class ProjectServiceIntTest {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private ProjectDeploymentRepository projectDeploymentRepository;
+
+    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -84,14 +91,13 @@ public class ProjectServiceIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        testOwnerContributors.clear();
-
         category = categoryRepository.save(new Category("name"));
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @AfterEach
     public void afterEach() {
+        projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
 
@@ -299,6 +305,34 @@ public class ProjectServiceIntTest {
         assertThat(projectService.getProjects(null, null, null, null, null, workspace.getId()))
             .extracting(Project::getId)
             .containsExactly(unownedProject.getId());
+    }
+
+    @Test
+    public void testGetProjectsKeepsAProjectWhoseDeploymentAnotherModuleOwns() {
+        Project project = projectRepository.save(
+            Project.builder()
+                .name("Orders")
+                .workspaceId(workspace.getId())
+                .build());
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        projectDeployment.setName("Orders MCP server");
+        projectDeployment.setProjectId(project.getId());
+        projectDeployment.setProjectVersion(1);
+
+        projectDeployment = projectDeploymentRepository.save(projectDeployment);
+
+        for (ProjectDeploymentOwner projectDeploymentOwner : ProjectDeploymentOwner.values()) {
+            testOwnerContributors.addDeploymentId(projectDeploymentOwner, projectDeployment.getId());
+        }
+
+        assertThat(projectService.getProjects(null, null, null, null, null, workspace.getId()))
+            .extracting(Project::getId)
+            .containsExactly(project.getId());
+        assertThat(projectService.getWorkspaceProjectIds(workspace.getId()))
+            .containsExactly(project.getId());
     }
 
     @Test

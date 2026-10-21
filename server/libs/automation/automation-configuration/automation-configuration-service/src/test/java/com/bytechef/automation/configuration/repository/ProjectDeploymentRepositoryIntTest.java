@@ -64,8 +64,6 @@ public class ProjectDeploymentRepositoryIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        testOwnerContributors.clear();
-
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 

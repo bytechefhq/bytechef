@@ -81,15 +81,11 @@ class ProjectSearchAssetProviderIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testOwnerContributors.clear();
-
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @AfterEach
     void afterEach() {
-        testOwnerContributors.clear();
-
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
 

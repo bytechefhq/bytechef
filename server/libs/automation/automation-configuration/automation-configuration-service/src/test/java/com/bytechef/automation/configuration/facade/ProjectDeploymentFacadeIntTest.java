@@ -195,8 +195,6 @@ public class ProjectDeploymentFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testOwnerContributors.clear();
-
         workspace = workspaceRepository.save(new Workspace("test"));
 
         projectDeploymentFacadeHelper = new ProjectDeploymentFacadeHelper(

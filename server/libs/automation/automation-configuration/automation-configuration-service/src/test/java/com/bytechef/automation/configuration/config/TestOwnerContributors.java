@@ -20,8 +20,8 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -32,12 +32,12 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class TestOwnerContributors {
 
-    private final Set<Long> catalogIds = new HashSet<>();
-    private final Set<Long> connectedUserIds = new HashSet<>();
-    private final Set<Long> apiCollectionIds = new HashSet<>();
-    private final Set<Long> a2aServerIds = new HashSet<>();
-    private final Set<Long> embeddedIds = new HashSet<>();
-    private final Set<Long> mcpServerIds = new HashSet<>();
+    private final Set<Long> catalogIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> connectedUserIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> apiCollectionIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> a2aServerIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> embeddedIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> mcpServerIds = ConcurrentHashMap.newKeySet();
 
     public void addCatalogId(long projectId) {
         catalogIds.add(projectId);
