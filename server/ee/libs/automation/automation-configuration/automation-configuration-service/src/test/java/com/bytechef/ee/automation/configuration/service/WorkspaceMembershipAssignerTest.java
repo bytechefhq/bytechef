@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PermissionService.UserWorkspacePair;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -22,11 +23,14 @@ import com.bytechef.ee.automation.configuration.repository.WorkspaceUserReposito
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Covers the platform-to-automation seam that places an invited user into workspaces.
@@ -39,8 +43,10 @@ class WorkspaceMembershipAssignerTest {
 
     private static final long USER_ID = 42L;
 
+    private ApplicationEventPublisher applicationEventPublisher;
     private EmbeddedUserService embeddedUserService;
     private PermissionService permissionService;
+    private UserService userService;
     private WorkspaceService workspaceService;
     private WorkspaceUserRepository workspaceUserRepository;
     private WorkspaceUserService workspaceUserService;
@@ -48,15 +54,24 @@ class WorkspaceMembershipAssignerTest {
 
     @BeforeEach
     void setUp() {
+        applicationEventPublisher = mock(ApplicationEventPublisher.class);
         embeddedUserService = mock(EmbeddedUserService.class);
         permissionService = mock(PermissionService.class);
+        userService = mock(UserService.class);
+
+        User user = new User();
+
+        user.setLogin("bob");
+
+        when(userService.getUser(USER_ID)).thenReturn(user);
+
         workspaceService = mock(WorkspaceService.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
         workspaceUserService = mock(WorkspaceUserService.class);
 
         workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserService, permissionService, workspaceService, workspaceUserRepository,
-            workspaceUserService);
+            applicationEventPublisher, embeddedUserService, permissionService, userService, workspaceService,
+            workspaceUserRepository, workspaceUserService);
     }
 
     @Test
@@ -176,5 +191,29 @@ class WorkspaceMembershipAssignerTest {
         workspaceMembershipAssigner.removeMemberships(USER_ID);
 
         verify(embeddedUserService).deleteEmbeddedMemberships(USER_ID);
+    }
+
+    @Test
+    void testRemoveMembershipsPublishesAWorkspaceUserRemovedEventPerWorkspace() {
+        when(workspaceUserRepository.findAllByUserId(USER_ID)).thenReturn(
+            List.of(
+                WorkspaceUser.forRole(USER_ID, 1L, WorkspaceRole.VIEWER, Environment.DEVELOPMENT),
+                WorkspaceUser.forRole(USER_ID, 1L, WorkspaceRole.ADMIN, Environment.PRODUCTION),
+                WorkspaceUser.forRole(USER_ID, 2L, WorkspaceRole.EDITOR)));
+
+        workspaceMembershipAssigner.removeMemberships(USER_ID);
+
+        verify(applicationEventPublisher).publishEvent(new WorkspaceUserRemovedEvent(1L, USER_ID, "bob"));
+        verify(applicationEventPublisher).publishEvent(new WorkspaceUserRemovedEvent(2L, USER_ID, "bob"));
+    }
+
+    @Test
+    void testRemoveMembershipsWithNoRowsPublishesNoEvent() {
+        when(workspaceUserRepository.findAllByUserId(USER_ID)).thenReturn(List.of());
+
+        workspaceMembershipAssigner.removeMemberships(USER_ID);
+
+        verify(applicationEventPublisher, never()).publishEvent(ArgumentMatchers.any(Object.class));
+        verifyNoInteractions(userService);
     }
 }
