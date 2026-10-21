@@ -74,9 +74,13 @@ public class InsertJdbcOperationIntTest {
             SCHEMA, "public",
             TABLE, "test");
 
-        Map<String, Integer> result = new InsertJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        assertEquals(2, result.get(ROWS));
+            Map<String, Integer> result = new InsertJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            assertEquals(2, result.get(ROWS));
+        }
     }
 }
