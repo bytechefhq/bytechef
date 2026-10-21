@@ -217,6 +217,7 @@ class ConnectionFacadeIntTest {
         verify(platformConnectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
         verify(platformConnectionFacade).delete(eq(7L), any());
         verify(platformConnectionFacade).getConnection(7L);
+        verify(connectionService).getConnections(PlatformType.EMBEDDED);
         verify(platformConnectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(platformConnectionFacade).update(7L, "name", List.of(), 0);
         verify(platformConnectionFacade).update(7L, List.of());
