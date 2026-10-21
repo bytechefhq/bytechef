@@ -1,9 +1,14 @@
-import {type APIRequestContext, expect, request as playwrightRequest} from '@playwright/test';
+import {type APIRequestContext, expect} from '@playwright/test';
 import {readFileSync} from 'fs';
 
 import {type EmbeddedRoleUserKeyType, embeddedRolesTest as test} from '../../fixtures/embeddedRoles';
 import {SAMPLE_WORKFLOW_PATH} from '../../utils/constants';
-import {type EmbeddedDataI, embeddedInternalApi, signConnectedUserJwt} from '../../utils/embeddedRbacUtils';
+import {
+    type EmbeddedDataI,
+    createConnectedUserApi,
+    createTeardownAttempt,
+    embeddedInternalApi,
+} from '../../utils/embeddedRbacUtils';
 import getRandomString from '../../utils/getRandomString';
 import {RBAC_BASE_URL, createRoleUserApiContext, graphql, postGraphQl, sendInternalApi} from '../../utils/rbacUtils';
 
@@ -439,28 +444,13 @@ interface GateConnectedUserI {
 }
 
 async function createConnectedUserConnections(adminApi: APIRequestContext): Promise<GateConnectedUserI> {
-    const signingKeyName = `${GATE_PREFIX}_signing_key`;
-
-    const {privateKey} = await embeddedInternalApi<{privateKey: string}>(adminApi, 'POST', '/signing-keys', {
-        environmentId: 0,
-        name: signingKeyName,
-    });
-
-    const signingKeys = await embeddedInternalApi<{id: number; keyId: string; name: string}[]>(
+    const {api: connectedUserApi, signingKeyId} = await createConnectedUserApi(
         adminApi,
-        'GET',
-        '/signing-keys?environmentId=0'
+        RBAC_BASE_URL,
+        'DEVELOPMENT',
+        GATE_CONNECTED_USER_EXTERNAL_ID,
+        `${GATE_PREFIX}_signing_key`
     );
-
-    const signingKey = signingKeys.find((candidate) => candidate.name === signingKeyName)!;
-
-    const connectedUserApi = await playwrightRequest.newContext({
-        baseURL: RBAC_BASE_URL,
-        extraHTTPHeaders: {
-            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, privateKey, GATE_CONNECTED_USER_EXTERNAL_ID)}`,
-            'X-Environment': 'DEVELOPMENT',
-        },
-    });
 
     try {
         const createConnectedUserConnection = async (name: string): Promise<number> => {
@@ -478,7 +468,7 @@ async function createConnectedUserConnections(adminApi: APIRequestContext): Prom
             connectedUserScratchConnectionId: await createConnectedUserConnection(
                 `${GATE_PREFIX}_connected_user_scratch_connection`
             ),
-            gateSigningKeyId: signingKey.id,
+            gateSigningKeyId: signingKeyId,
         };
     } finally {
         await connectedUserApi.dispose();
@@ -584,13 +574,7 @@ async function deleteGateResources(
 ) {
     const isGateResource = (name: string | null | undefined) => !!name?.startsWith(GATE_PREFIX);
 
-    const attempt = async (description: string, action: () => Promise<unknown>) => {
-        try {
-            await action();
-        } catch (error) {
-            console.warn(`embedded serverGates teardown: ${description}: ${error}`);
-        }
-    };
+    const attempt = createTeardownAttempt('embedded serverGates');
 
     for (const environmentId of [0, 1, 2]) {
         const configurations = await embeddedInternalApi<{id: number; name: string}[]>(
@@ -686,7 +670,7 @@ async function deleteGateResources(
 }
 
 test.describe('Embedded server-side permission gates', () => {
-    test.describe.configure({mode: 'serial'});
+    test.describe.configure({mode: 'serial', retries: 0});
 
     const callers: Partial<Record<EmbeddedRoleUserKeyType, APIRequestContext>> = {};
 

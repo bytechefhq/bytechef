@@ -23,11 +23,25 @@ interface EditorResourcesI {
     integrationWorkflow: IntegrationWorkflowI;
 }
 
+function isGraphQlMutation(postData: string | null): boolean {
+    if (!postData) {
+        return false;
+    }
+
+    try {
+        const {query} = JSON.parse(postData) as {query?: string};
+
+        return (query || '').trimStart().startsWith('mutation');
+    } catch {
+        return postData.includes('mutation');
+    }
+}
+
 function isWriteRequest(request: Request): boolean {
     const url = request.url();
 
     if (url.includes('/graphql')) {
-        return (request.postData() || '').trimStart().startsWith('mutation');
+        return isGraphQlMutation(request.postData());
     }
 
     return url.includes('/api/') && request.method() !== 'GET';
