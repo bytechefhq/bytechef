@@ -26,6 +26,7 @@ import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedFlatToolCallback;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.configuration.workflow.WorkflowKindChecker;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,8 @@ public class ToolCallbackContributorConfiguration {
         "buildWorkflow", "importWorkflow", "configureClusterElement", "writeScript", "authorSkill",
         "debugWorkflowExecution", "configureMcpServer");
 
+    private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
+
     private static final String MCP_PROJECT_WORKFLOW_PARAMETERS_TOOL_NAME = "updateMcpProjectWorkflowParameters";
 
     private static final Set<String> WORKSPACE_SCOPED_MCP_TOOL_NAMES = Set.of(
@@ -55,7 +58,9 @@ public class ToolCallbackContributorConfiguration {
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
         ObjectProvider<SkillsTools> skillsToolsProvider,
-        IntelligentToolCatalog intelligentToolCatalog, WorkspaceScopeResolver workspaceScopeResolver) {
+        IntelligentToolCatalog intelligentToolCatalog,
+        ObjectProvider<WorkflowKindChecker> workflowKindCheckerProvider,
+        WorkspaceScopeResolver workspaceScopeResolver) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -63,11 +68,15 @@ public class ToolCallbackContributorConfiguration {
             skillsToolsProvider.ifAvailable(
                 skillsTools -> toolCallbacks.addAll(List.of(ToolCallbacks.from(skillsTools))));
 
+            List<WorkflowKindChecker> workflowKindCheckers = workflowKindCheckerProvider.orderedStream()
+                .toList();
+
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(
                     INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
                     (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                        toolCallback, workspaceScopeResolver)));
+                        toolCallback, workspaceScopeResolver,
+                        BUILD_WORKFLOW_TOOL_NAME.equals(definition.name()) ? workflowKindCheckers : List.of())));
 
             return toolCallbacks;
         };

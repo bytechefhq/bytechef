@@ -39,11 +39,16 @@ import tools.jackson.databind.node.ObjectNode;
 public class ScriptTools {
     private static final Logger log = LoggerFactory.getLogger(ScriptTools.class);
 
+    private final AppCallableDraftGuard appCallableDraftGuard;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
 
     @SuppressFBWarnings("EI")
-    public ScriptTools(ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard) {
+    public ScriptTools(
+        AppCallableDraftGuard appCallableDraftGuard, ProjectWorkflowFacade projectWorkflowFacade,
+        ScopedProjectGuard scopedProjectGuard) {
+
+        this.appCallableDraftGuard = appCallableDraftGuard;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
     }
@@ -61,6 +66,8 @@ public class ScriptTools {
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
+
+            appCallableDraftGuard.checkDraft(toolContext, workflowId);
 
             String workflowDefinition = projectWorkflowDTO.getDefinition();
 

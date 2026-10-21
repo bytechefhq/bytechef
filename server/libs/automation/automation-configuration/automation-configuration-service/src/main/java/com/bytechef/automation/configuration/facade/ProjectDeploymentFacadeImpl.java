@@ -27,12 +27,22 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.Candidate;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedConnection;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedWorkflow;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.MissingInput;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.RemovedWorkflow;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.UnresolvedConnection;
+import com.bytechef.automation.configuration.dto.DeploymentConnectionChoiceDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -47,7 +57,9 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -55,6 +67,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -68,25 +82,37 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 /**
@@ -99,7 +125,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
     private static final String CONNECTION_RESOURCE_TYPE = "Connection";
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
 
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -119,6 +147,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
+    private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final String webhookUrl;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
@@ -136,8 +165,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, PermissionService permissionService,
         WorkflowService workflowService,
-        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners) {
+        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners,
+        @Lazy ConnectionDefinitionService connectionDefinitionService,
+        @Lazy WorkspaceConnectionFacade workspaceConnectionFacade) {
 
+        this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
@@ -157,6 +189,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
+        this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
@@ -321,6 +354,118 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 // TODO find a way to delete all tags not referenced anymore
 //        project.getTagIds()
 //            .forEach(tagService::delete);
+    }
+
+    @Override
+    @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'DEPLOYMENT_CREATE', " +
+        "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT) and " +
+        "(#projectDeploymentId == null or hasPermission(#projectDeploymentId, 'ProjectDeployment', " +
+        "'DEPLOYMENT_EDIT'))")
+    public DeployProjectResultDTO deployProject(
+        long projectId, @Nullable Long projectDeploymentId, List<String> enabledWorkflowUuids,
+        List<DeploymentConnectionChoiceDTO> connections, Map<String, Map<String, ?>> inputs) {
+
+        Project project = projectService.getProject(projectId);
+
+        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            List.of(projectId), EnumSet.allOf(ProjectOwner.class));
+
+        if (!ownedProjectIds.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        ProjectDeployment projectDeployment = fetchDevelopmentProjectDeployment(projectId, projectDeploymentId);
+
+        int projectVersion = getDeployableProjectVersion(project);
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(projectId, projectVersion);
+
+        checkWorkflowUuids(projectId, projectVersion, projectWorkflows, enabledWorkflowUuids, connections, inputs);
+
+        long workspaceId = Objects.requireNonNull(project.getWorkspaceId(), "workspaceId");
+        Map<String, ProjectDeploymentWorkflow> currentProjectDeploymentWorkflows = projectDeployment == null
+            ? Map.of() : getProjectDeploymentWorkflowsByUuid(projectDeployment);
+        Map<String, String> draftWorkflowIds = getWorkflowIdsByUuid(projectId, project.getLastProjectVersion());
+        Map<String, List<ConnectionDTO>> candidateConnections = new HashMap<>();
+
+        List<DeployedWorkflow> deployedWorkflows = new ArrayList<>();
+        List<MissingInput> missingInputs = new ArrayList<>();
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = new ArrayList<>();
+        List<UnresolvedConnection> unresolvedConnections = new ArrayList<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            String workflowUuid = projectWorkflow.getUuidAsString();
+            Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+            ProjectDeploymentWorkflow currentProjectDeploymentWorkflow = currentProjectDeploymentWorkflows.get(
+                workflowUuid);
+
+            boolean enabled = enabledWorkflowUuids.contains(workflowUuid) ||
+                (currentProjectDeploymentWorkflow != null && currentProjectDeploymentWorkflow.isEnabled());
+
+            List<DeployedConnection> deployedConnections = new ArrayList<>();
+            List<ProjectDeploymentWorkflowConnection> workflowConnections = new ArrayList<>();
+
+            for (ComponentConnection componentConnection : componentConnectionFacade
+                .getWorkflowComponentConnections(workflow.getId())) {
+
+                List<ConnectionDTO> candidates = candidateConnections.computeIfAbsent(
+                    componentConnection.componentName() + ":" + componentConnection.componentVersion(),
+                    candidateKey -> getCandidateConnections(workspaceId, componentConnection));
+
+                ConnectionDTO connection = chooseConnection(
+                    workflowUuid, componentConnection, candidates, connections, currentProjectDeploymentWorkflow);
+
+                if (connection == null) {
+                    if (enabled && componentConnection.required()) {
+                        unresolvedConnections.add(
+                            toUnresolvedConnection(workflowUuid, workflow, componentConnection, candidates));
+                    }
+
+                    continue;
+                }
+
+                long connectionId = Objects.requireNonNull(connection.id(), "id");
+
+                workflowConnections.add(
+                    new ProjectDeploymentWorkflowConnection(
+                        connectionId, componentConnection.key(), componentConnection.workflowNodeName()));
+                deployedConnections.add(
+                    new DeployedConnection(
+                        componentConnection.workflowNodeName(), componentConnection.key(), connectionId,
+                        connection.name()));
+            }
+
+            Map<String, ?> workflowInputs = resolveInputs(workflowUuid, inputs, currentProjectDeploymentWorkflow);
+
+            if (enabled) {
+                missingInputs.addAll(getMissingInputs(workflowUuid, workflow, workflowInputs));
+            }
+
+            projectDeploymentWorkflows.add(
+                toProjectDeploymentWorkflow(workflow.getId(), enabled, workflowInputs, workflowConnections));
+            deployedWorkflows.add(
+                new DeployedWorkflow(
+                    workflowUuid, workflow.getId(), getWorkflowName(workflow), enabled,
+                    draftWorkflowIds.get(workflowUuid), deployedConnections));
+        }
+
+        checkConnectionChoicesMatchSlots(connections, deployedWorkflows);
+
+        List<RemovedWorkflow> removedWorkflows = projectDeployment == null
+            ? List.of() : getRemovedWorkflows(projectDeployment, projectWorkflows);
+
+        if (!unresolvedConnections.isEmpty() || !missingInputs.isEmpty()) {
+            return new DeployProjectResultDTO(
+                projectDeployment == null ? null : projectDeployment.getId(), projectVersion, deployedWorkflows,
+                removedWorkflows, unresolvedConnections, missingInputs);
+        }
+
+        long savedProjectDeploymentId = projectDeployment == null
+            ? createDevelopmentProjectDeployment(project, projectVersion, projectDeploymentWorkflows)
+            : redeployDevelopmentProjectDeployment(projectDeployment, projectVersion, projectDeploymentWorkflows);
+
+        return new DeployProjectResultDTO(
+            savedProjectDeploymentId, projectVersion, deployedWorkflows, removedWorkflows, List.of(), List.of());
     }
 
     // Enabling installs the deployment's triggers with its own connections, so unattended repeating execution of a
@@ -827,6 +972,434 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         }
     }
 
+    private void checkConnectionChoicesMatchSlots(
+        List<DeploymentConnectionChoiceDTO> connectionChoices, List<DeployedWorkflow> deployedWorkflows) {
+
+        Set<List<String>> chosenSlots = new HashSet<>();
+
+        for (DeploymentConnectionChoiceDTO connectionChoice : connectionChoices) {
+            boolean firstChoiceForSlot = chosenSlots.add(
+                Arrays.asList(
+                    connectionChoice.workflowUuid(), connectionChoice.workflowNodeName(), connectionChoice.key()));
+
+            if (!firstChoiceForSlot) {
+                throw new ConfigurationException(
+                    "Workflow %s has several connection choices for slot %s/%s; pass one".formatted(
+                        connectionChoice.workflowUuid(), connectionChoice.workflowNodeName(), connectionChoice.key()),
+                    ProjectDeploymentErrorType.INVALID_CONNECTION_CHOICE);
+            }
+
+            boolean matched = deployedWorkflows.stream()
+                .filter(deployedWorkflow -> Objects.equals(
+                    deployedWorkflow.workflowUuid(), connectionChoice.workflowUuid()))
+                .flatMap(deployedWorkflow -> deployedWorkflow.connections()
+                    .stream())
+                .anyMatch(deployedConnection -> Objects.equals(
+                    deployedConnection.workflowNodeName(), connectionChoice.workflowNodeName()) &&
+                    Objects.equals(deployedConnection.key(), connectionChoice.key()));
+
+            if (!matched) {
+                throw new ConfigurationException(
+                    "Workflow %s has no connection slot %s/%s".formatted(
+                        connectionChoice.workflowUuid(), connectionChoice.workflowNodeName(), connectionChoice.key()),
+                    ProjectDeploymentErrorType.INVALID_CONNECTION_CHOICE);
+            }
+        }
+    }
+
+    private static void checkWorkflowUuids(
+        long projectId, int projectVersion, List<ProjectWorkflow> projectWorkflows, List<String> enabledWorkflowUuids,
+        List<DeploymentConnectionChoiceDTO> connectionChoices, Map<String, Map<String, ?>> inputs) {
+
+        Set<String> workflowUuids = projectWorkflows.stream()
+            .map(ProjectWorkflow::getUuidAsString)
+            .collect(Collectors.toCollection(TreeSet::new));
+
+        List<String> unknownWorkflowUuids = Stream.of(
+            enabledWorkflowUuids.stream(),
+            connectionChoices.stream()
+                .map(DeploymentConnectionChoiceDTO::workflowUuid),
+            inputs.keySet()
+                .stream())
+            .flatMap(Function.identity())
+            .filter(workflowUuid -> workflowUuid == null || !workflowUuids.contains(workflowUuid))
+            .distinct()
+            .toList();
+
+        if (!unknownWorkflowUuids.isEmpty()) {
+            throw new ConfigurationException(
+                "Workflows %s are not in version %d of project %d; its workflow uuids are %s".formatted(
+                    unknownWorkflowUuids, projectVersion, projectId, workflowUuids),
+                ProjectDeploymentErrorType.INVALID_DEPLOYMENT);
+        }
+    }
+
+    private static @Nullable ConnectionDTO chooseConnection(
+        String workflowUuid, ComponentConnection componentConnection, List<ConnectionDTO> candidates,
+        List<DeploymentConnectionChoiceDTO> connectionChoices,
+        @Nullable ProjectDeploymentWorkflow currentProjectDeploymentWorkflow) {
+
+        Optional<DeploymentConnectionChoiceDTO> connectionChoice = connectionChoices.stream()
+            .filter(choice -> Objects.equals(choice.workflowUuid(), workflowUuid) &&
+                Objects.equals(choice.workflowNodeName(), componentConnection.workflowNodeName()) &&
+                Objects.equals(choice.key(), componentConnection.key()))
+            .findFirst();
+
+        if (connectionChoice.isPresent()) {
+            DeploymentConnectionChoiceDTO deploymentConnectionChoiceDTO = connectionChoice.get();
+
+            long connectionId = deploymentConnectionChoiceDTO.connectionId();
+
+            return findCandidate(candidates, connectionId)
+                .orElseThrow(() -> new ConfigurationException(
+                    "Connection %d cannot be used for slot %s/%s of workflow %s; usable candidates: %s".formatted(
+                        connectionId, componentConnection.workflowNodeName(), componentConnection.key(), workflowUuid,
+                        describeCandidates(candidates)),
+                    ProjectDeploymentErrorType.INVALID_CONNECTION_CHOICE));
+        }
+
+        if (currentProjectDeploymentWorkflow != null) {
+            Optional<ConnectionDTO> currentConnection = currentProjectDeploymentWorkflow.getConnections()
+                .stream()
+                .filter(workflowConnection -> Objects.equals(
+                    workflowConnection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+                    Objects.equals(workflowConnection.getWorkflowConnectionKey(), componentConnection.key()))
+                .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+                .filter(Objects::nonNull)
+                .flatMap(connectionId -> findCandidate(candidates, connectionId).stream())
+                .findFirst();
+
+            if (currentConnection.isPresent()) {
+                return currentConnection.get();
+            }
+        }
+
+        return candidates.size() == 1 ? candidates.getFirst() : null;
+    }
+
+    private long createDevelopmentProjectDeployment(
+        Project project, int projectVersion, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        projectDeployment.setName(project.getName());
+        projectDeployment.setProjectId(project.getId());
+        projectDeployment.setProjectVersion(projectVersion);
+
+        projectDeployment = projectDeploymentService.create(projectDeployment);
+
+        checkProjectDeploymentWorkflows(projectDeployment, -1, projectDeploymentWorkflows, List.of());
+
+        return Objects.requireNonNull(projectDeployment.getId(), "id");
+    }
+
+    private static String describeCandidates(List<ConnectionDTO> candidates) {
+        if (candidates.isEmpty()) {
+            return "none";
+        }
+
+        return candidates.stream()
+            .map(candidate -> "%d (%s)".formatted(candidate.id(), candidate.name()))
+            .collect(Collectors.joining(", "));
+    }
+
+    private @Nullable ProjectDeployment fetchDevelopmentProjectDeployment(
+        long projectId, @Nullable Long projectDeploymentId) {
+
+        if (projectDeploymentId == null) {
+            List<Long> projectDeploymentIds = projectDeploymentService
+                .getProjectDeployments(false, Environment.DEVELOPMENT, projectId, null, null)
+                .stream()
+                .map(ProjectDeployment::getId)
+                .toList();
+
+            Set<Long> ownedProjectDeploymentIds = getFeatureOwnedProjectDeploymentIds(projectDeploymentIds);
+
+            List<Long> developmentProjectDeploymentIds = projectDeploymentIds.stream()
+                .filter(
+                    candidateProjectDeploymentId -> !ownedProjectDeploymentIds.contains(candidateProjectDeploymentId))
+                .toList();
+
+            if (!developmentProjectDeploymentIds.isEmpty()) {
+                throw new ConfigurationException(
+                    "Project %d already has a DEVELOPMENT deployment %s; pass its projectDeploymentId".formatted(
+                        projectId, developmentProjectDeploymentIds),
+                    ProjectDeploymentErrorType.INVALID_DEPLOYMENT);
+            }
+
+            return null;
+        }
+
+        return projectDeploymentService.fetchProjectDeployment(projectDeploymentId)
+            .filter(projectDeployment -> Objects.equals(projectDeployment.getProjectId(), projectId))
+            .filter(projectDeployment -> projectDeployment.getEnvironment() == Environment.DEVELOPMENT)
+            .filter(projectDeployment -> getFeatureOwnedProjectDeploymentIds(List.of(projectDeploymentId)).isEmpty())
+            .orElseThrow(() -> new ConfigurationException(
+                "Project deployment %d is not a DEVELOPMENT deployment of project %d".formatted(
+                    projectDeploymentId, projectId),
+                ProjectDeploymentErrorType.INVALID_DEPLOYMENT));
+    }
+
+    private Set<Long> getFeatureOwnedProjectDeploymentIds(List<Long> projectDeploymentIds) {
+        if (projectDeploymentIds.isEmpty()) {
+            return Set.of();
+        }
+
+        Set<Long> ownedProjectDeploymentIds = new HashSet<>();
+
+        for (ProjectDeploymentOwner projectDeploymentOwner : ProjectDeploymentOwner.values()) {
+            ownedProjectDeploymentIds.addAll(
+                projectOwnershipService.getOwnedProjectDeploymentIds(projectDeploymentIds, projectDeploymentOwner));
+        }
+
+        return ownedProjectDeploymentIds;
+    }
+
+    private static Optional<ConnectionDTO> findCandidate(List<ConnectionDTO> candidates, long connectionId) {
+        return candidates.stream()
+            .filter(candidate -> Objects.equals(candidate.id(), connectionId))
+            .findFirst();
+    }
+
+    private List<ConnectionDTO> getCandidateConnections(long workspaceId, ComponentConnection componentConnection) {
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
+            componentConnection.componentName(), componentConnection.componentVersion());
+
+        return workspaceConnectionFacade
+            .getConnections(
+                workspaceId, componentConnection.componentName(), connectionDefinition.getVersion(),
+                (long) Environment.DEVELOPMENT.ordinal(), null)
+            .stream()
+            .filter(this::isUsableCandidate)
+            .toList();
+    }
+
+    private int getDeployableProjectVersion(Project project) {
+        long projectId = Objects.requireNonNull(project.getId(), "id");
+        ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
+
+        if (lastPublishedProjectVersion == null) {
+            throw new ConfigurationException(
+                "Project %d has never been published; call publishProject first".formatted(projectId),
+                ProjectDeploymentErrorType.UNPUBLISHED_CHANGES);
+        }
+
+        int publishedProjectVersion = lastPublishedProjectVersion.getVersion();
+
+        Map<String, String> draftWorkflowIds = getWorkflowIdsByUuid(projectId, project.getLastProjectVersion());
+        Map<String, String> publishedWorkflowIds = getWorkflowIdsByUuid(projectId, publishedProjectVersion);
+
+        boolean unpublishedChanges = !Objects.equals(draftWorkflowIds.keySet(), publishedWorkflowIds.keySet()) ||
+            draftWorkflowIds.entrySet()
+                .stream()
+                .anyMatch(entry -> !hasSameDefinition(entry.getValue(), publishedWorkflowIds.get(entry.getKey())));
+
+        if (unpublishedChanges) {
+            throw new ConfigurationException(
+                "Project %d has unpublished changes; call publishProject first".formatted(projectId),
+                ProjectDeploymentErrorType.UNPUBLISHED_CHANGES);
+        }
+
+        return publishedProjectVersion;
+    }
+
+    private static List<MissingInput> getMissingInputs(
+        String workflowUuid, Workflow workflow, Map<String, ?> workflowInputs) {
+
+        List<MissingInput> missingInputs = new ArrayList<>();
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            Object value = workflowInputs.get(input.name());
+
+            if (input.required() && (value == null || (value instanceof String string && string.isBlank()))) {
+                missingInputs.add(new MissingInput(workflowUuid, input.name()));
+            }
+        }
+
+        return missingInputs;
+    }
+
+    private Map<String, ProjectDeploymentWorkflow> getProjectDeploymentWorkflowsByUuid(
+        ProjectDeployment projectDeployment) {
+
+        long projectDeploymentId = Objects.requireNonNull(projectDeployment.getId(), "id");
+
+        Map<String, ProjectDeploymentWorkflow> projectDeploymentWorkflows = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeploymentId)) {
+
+            projectDeploymentWorkflows.put(
+                projectWorkflowService.getProjectWorkflowUuid(
+                    projectDeploymentId, projectDeploymentWorkflow.getWorkflowId()),
+                projectDeploymentWorkflow);
+        }
+
+        return projectDeploymentWorkflows;
+    }
+
+    private List<WorkflowTriggerRegistration> getEnabledWorkflowTriggerRegistrations(long projectDeploymentId) {
+        return projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId)
+            .stream()
+            .filter(ProjectDeploymentWorkflow::isEnabled)
+            .flatMap(projectDeploymentWorkflow -> getWorkflowTriggerRegistrations(projectDeploymentWorkflow).stream())
+            .toList();
+    }
+
+    private List<RemovedWorkflow> getRemovedWorkflows(
+        ProjectDeployment projectDeployment, List<ProjectWorkflow> projectWorkflows) {
+
+        Set<String> workflowUuids = projectWorkflows.stream()
+            .map(ProjectWorkflow::getUuidAsString)
+            .collect(Collectors.toSet());
+
+        return projectWorkflowService
+            .getProjectWorkflows(projectDeployment.getProjectId(), projectDeployment.getProjectVersion())
+            .stream()
+            .filter(projectWorkflow -> !workflowUuids.contains(projectWorkflow.getUuidAsString()))
+            .map(projectWorkflow -> new RemovedWorkflow(
+                projectWorkflow.getUuidAsString(),
+                getWorkflowName(workflowService.getWorkflow(projectWorkflow.getWorkflowId()))))
+            .toList();
+    }
+
+    private List<WorkflowTriggerRegistration> getWorkflowTriggerRegistrations(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+
+        Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+        long projectDeploymentId = projectDeploymentWorkflow.getProjectDeploymentId();
+
+        List<WorkflowTriggerRegistration> workflowTriggerRegistrations = new ArrayList<>();
+
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+            workflowTriggerRegistrations.add(
+                new WorkflowTriggerRegistration(
+                    projectDeploymentId, workflow.getId(),
+                    WorkflowExecutionId.of(
+                        PlatformType.AUTOMATION, projectDeploymentId, projectWorkflow.getUuidAsString(),
+                        workflowTrigger.getName()),
+                    WorkflowNodeType.ofType(workflowTrigger.getType()),
+                    workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
+                    getConnectionId(projectDeploymentWorkflow, workflowTrigger)));
+        }
+
+        return workflowTriggerRegistrations;
+    }
+
+    private Map<String, String> getWorkflowIdsByUuid(long projectId, int projectVersion) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getUuidAsString, ProjectWorkflow::getWorkflowId));
+    }
+
+    private static String getWorkflowName(Workflow workflow) {
+        String label = workflow.getLabel();
+
+        return label == null ? workflow.getId() : label;
+    }
+
+    private boolean hasSameDefinition(String workflowId, String otherWorkflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+        Workflow otherWorkflow = workflowService.getWorkflow(otherWorkflowId);
+
+        return Objects.equals(workflow.getDefinition(), otherWorkflow.getDefinition());
+    }
+
+    private boolean isUsableCandidate(ConnectionDTO connection) {
+        Long connectionId = connection.id();
+
+        return connectionId != null && connectionId >= 0 && connection.credentialStatus() == CredentialStatus.VALID &&
+            permissionService.hasResourceScope(connectionId, CONNECTION_RESOURCE_TYPE, CONNECTION_VIEW);
+    }
+
+    private long redeployDevelopmentProjectDeployment(
+        ProjectDeployment projectDeployment, int projectVersion,
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+
+        long projectDeploymentId = Objects.requireNonNull(projectDeployment.getId(), "id");
+        int oldProjectVersion = projectDeployment.getProjectVersion();
+        List<WorkflowTriggerRegistration> enabledWorkflowTriggerRegistrations = projectDeployment.isEnabled()
+            ? getEnabledWorkflowTriggerRegistrations(projectDeploymentId) : List.of();
+
+        ProjectDeployment disabledProjectDeployment = projectDeploymentService.getProjectDeployment(
+            projectDeploymentId);
+
+        disabledProjectDeployment.setEnabled(false);
+        disabledProjectDeployment.setProjectVersion(projectVersion);
+
+        disabledProjectDeployment = projectDeploymentService.update(disabledProjectDeployment);
+
+        checkProjectDeploymentWorkflows(
+            disabledProjectDeployment, oldProjectVersion, projectDeploymentWorkflows,
+            projectWorkflowService.getProjectWorkflows(disabledProjectDeployment.getProjectId()));
+
+        runAfterCommit(() -> disableWorkflowTriggersQuietly(enabledWorkflowTriggerRegistrations));
+
+        return projectDeploymentId;
+    }
+
+    private static void runAfterCommit(Runnable runnable) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            runnable.run();
+
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                runnable.run();
+            }
+        });
+    }
+
+    private static Map<String, ?> resolveInputs(
+        String workflowUuid, Map<String, Map<String, ?>> inputs,
+        @Nullable ProjectDeploymentWorkflow currentProjectDeploymentWorkflow) {
+
+        Map<String, ?> workflowInputs = inputs.get(workflowUuid);
+
+        if (workflowInputs != null) {
+            return workflowInputs;
+        }
+
+        if (currentProjectDeploymentWorkflow != null) {
+            return currentProjectDeploymentWorkflow.getInputs();
+        }
+
+        return Map.of();
+    }
+
+    private static ProjectDeploymentWorkflow toProjectDeploymentWorkflow(
+        String workflowId, boolean enabled, Map<String, ?> workflowInputs,
+        List<ProjectDeploymentWorkflowConnection> workflowConnections) {
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(workflowConnections);
+        projectDeploymentWorkflow.setEnabled(enabled);
+        projectDeploymentWorkflow.setInputs(workflowInputs);
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        return projectDeploymentWorkflow;
+    }
+
+    private static UnresolvedConnection toUnresolvedConnection(
+        String workflowUuid, Workflow workflow, ComponentConnection componentConnection,
+        List<ConnectionDTO> candidates) {
+
+        return new UnresolvedConnection(
+            workflowUuid, getWorkflowName(workflow), componentConnection.workflowNodeName(),
+            componentConnection.key(), componentConnection.componentName(), componentConnection.required(),
+            candidates.stream()
+                .map(candidate -> new Candidate(Objects.requireNonNull(candidate.id(), "id"), candidate.name()))
+                .toList());
+    }
+
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
@@ -838,20 +1411,30 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private void disableWorkflowTriggers(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
-        Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
+        for (WorkflowTriggerRegistration workflowTriggerRegistration : getWorkflowTriggerRegistrations(
+            projectDeploymentWorkflow)) {
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+            disableWorkflowTrigger(workflowTriggerRegistration);
+        }
+    }
 
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
-                projectWorkflow.getUuidAsString(), workflowTrigger.getName());
+    private void disableWorkflowTrigger(WorkflowTriggerRegistration workflowTriggerRegistration) {
+        triggerLifecycleFacade.executeTriggerDisable(
+            workflowTriggerRegistration.workflowId(), workflowTriggerRegistration.workflowExecutionId(),
+            workflowTriggerRegistration.workflowNodeType(), workflowTriggerRegistration.triggerParameters(),
+            workflowTriggerRegistration.connectionId());
+    }
 
-            triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow, workflowTrigger));
+    private void disableWorkflowTriggersQuietly(List<WorkflowTriggerRegistration> workflowTriggerRegistrations) {
+        for (WorkflowTriggerRegistration workflowTriggerRegistration : workflowTriggerRegistrations) {
+            try {
+                disableWorkflowTrigger(workflowTriggerRegistration);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Failed to disarm trigger {} of workflow {} after redeploying project deployment {}",
+                    workflowTriggerRegistration.workflowExecutionId(), workflowTriggerRegistration.workflowId(),
+                    workflowTriggerRegistration.projectDeploymentId(), exception);
+            }
         }
     }
 
@@ -1244,5 +1827,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
         }
+    }
+
+    private record WorkflowTriggerRegistration(
+        long projectDeploymentId, String workflowId, WorkflowExecutionId workflowExecutionId,
+        WorkflowNodeType workflowNodeType, Map<String, ?> triggerParameters, @Nullable Long connectionId) {
     }
 }

@@ -27,6 +27,9 @@ public class ProjectDeploymentErrorType extends AbstractErrorType {
     public static final ProjectDeploymentErrorType PROJECT_NOT_PUBLISHED = new ProjectDeploymentErrorType(100);
     public static final ProjectDeploymentErrorType WORKFLOW_CONNECTIONS_NOT_FOUND = new ProjectDeploymentErrorType(101);
     public static final ProjectDeploymentErrorType INVALID_PROJECT_VERSION = new ProjectDeploymentErrorType(102);
+    public static final ProjectDeploymentErrorType UNPUBLISHED_CHANGES = new ProjectDeploymentErrorType(103);
+    public static final ProjectDeploymentErrorType INVALID_DEPLOYMENT = new ProjectDeploymentErrorType(104);
+    public static final ProjectDeploymentErrorType INVALID_CONNECTION_CHOICE = new ProjectDeploymentErrorType(105);
 
     private ProjectDeploymentErrorType(int errorKey) {
         super(ProjectDeployment.class, errorKey);

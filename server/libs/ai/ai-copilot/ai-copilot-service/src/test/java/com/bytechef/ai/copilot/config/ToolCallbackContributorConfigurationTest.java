@@ -40,6 +40,8 @@ import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.workflow.WorkflowKind;
+import com.bytechef.automation.configuration.workflow.WorkflowKindChecker;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -47,6 +49,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
@@ -72,7 +75,7 @@ class ToolCallbackContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, emptyProvider(), mock(WorkspaceScopeResolver.class));
 
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -85,7 +88,7 @@ class ToolCallbackContributorConfigurationTest {
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), catalogOf(), mock(WorkspaceScopeResolver.class));
+            emptyProvider(), catalogOf(), emptyProvider(), mock(WorkspaceScopeResolver.class));
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -98,11 +101,38 @@ class ToolCallbackContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, emptyProvider(), mock(WorkspaceScopeResolver.class));
 
         assertThat(contributor.getToolCallbacks())
             .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
                 .inputSchema()).contains("workspaceId"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void onlyBuildWorkflowOffersTheKindsOfTheRegisteredCheckers() {
+        IntelligentToolCatalog intelligentToolCatalog = catalogOf(
+            intelligentDefinition("buildWorkflow"), intelligentDefinition("writeScript"));
+
+        WorkflowKindChecker scheduledChecker = mock(WorkflowKindChecker.class);
+
+        when(scheduledChecker.kind()).thenReturn(WorkflowKind.SCHEDULED);
+
+        ObjectProvider<WorkflowKindChecker> workflowKindCheckerProvider = mock(ObjectProvider.class);
+
+        when(workflowKindCheckerProvider.orderedStream()).thenAnswer(invocation -> Stream.of(scheduledChecker));
+
+        McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
+            emptyProvider(), intelligentToolCatalog, workflowKindCheckerProvider, mock(WorkspaceScopeResolver.class));
+
+        Map<String, String> inputSchemas = contributor.getToolCallbacks()
+            .stream()
+            .map(ToolCallback::getToolDefinition)
+            .collect(Collectors.toMap(ToolDefinition::name, ToolDefinition::inputSchema));
+
+        assertThat(inputSchemas.get("buildWorkflow")).contains("\"kind\"")
+            .contains("\"SCHEDULED\"");
+        assertThat(inputSchemas.get("writeScript")).doesNotContain("\"kind\"");
     }
 
     @Test

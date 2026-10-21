@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,30 +28,46 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedConnection;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.DeployedWorkflow;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.MissingInput;
+import com.bytechef.automation.configuration.dto.DeployProjectResultDTO.RemovedWorkflow;
+import com.bytechef.automation.configuration.dto.DeploymentConnectionChoiceDTO;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -59,17 +76,26 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
@@ -82,6 +108,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
@@ -106,6 +133,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
@@ -1323,6 +1352,41 @@ public class ProjectDeploymentFacadeIntTest {
         }
 
         @Test
+        void testDeployProjectIsDeniedWithoutTheDeploymentCreateScopeInDevelopment() {
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.deployProject(PROJECT_ID, null, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScopeInEnvironment(
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE", Environment.DEVELOPMENT);
+        }
+
+        @Test
+        void testDeployProjectIsDeniedWithoutTheDeploymentEditScopeOnTheNamedDeployment() {
+            when(permissionService.hasResourceScopeInEnvironment(
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE", Environment.DEVELOPMENT)).thenReturn(true);
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.deployProject(
+                    PROJECT_ID, PROJECT_DEPLOYMENT_ID, List.of(), List.of(), Map.of()))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testDeployProjectIsAllowedWithBothScopes() {
+            when(permissionService.hasResourceScopeInEnvironment(
+                PROJECT_ID, "Project", "DEPLOYMENT_CREATE", Environment.DEVELOPMENT)).thenReturn(true);
+
+            grant("DEPLOYMENT_EDIT");
+
+            Throwable throwable = catchThrowable(
+                () -> projectDeploymentFacade.deployProject(
+                    PROJECT_ID, PROJECT_DEPLOYMENT_ID, List.of(), List.of(), Map.of()));
+
+            assertThat(throwable).isNotInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
         void testCreateProjectDeploymentWorkflowJobIsDeniedWithoutTheDeploymentScope() {
             assertThatThrownBy(
                 () -> projectDeploymentFacade.createProjectDeploymentWorkflowJob(PROJECT_DEPLOYMENT_ID, WORKFLOW_ID))
@@ -1499,6 +1563,792 @@ public class ProjectDeploymentFacadeIntTest {
 
         @EnableMethodSecurity
         static class Config {
+        }
+    }
+
+    /**
+     * The deploy rules of the Apps agent loop against real project, version and deployment rows. Connection candidates
+     * come from a mocked {@link WorkspaceConnectionFacade}: what it returns stands for what the caller can see, so a
+     * PRIVATE connection of someone else is simply absent from its answer. Method security is not active in this
+     * context; the guard is pinned by {@code ProjectDeploymentFacadeAuthorizationTest}.
+     */
+    @Nested
+    @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
+    @SpringBootTest(
+        classes = ProjectIntTestConfiguration.class,
+        properties = {
+            "bytechef.workflow.repository.jdbc.enabled=true"
+        })
+    @Import(PostgreSQLContainerConfiguration.class)
+    @ProjectIntTestConfigurationSharedMocks
+    class DeployProject {
+
+        private static final String SLACK = "slack";
+        private static final String SLACK_NODE = "sendMessage_1";
+        private static final ComponentConnection SLACK_SLOT =
+            new ComponentConnection(SLACK, 1, SLACK_NODE, SLACK, true);
+        private static final String WORKFLOW_A = """
+            {"label": "Sync A", "triggers": [], "tasks": []}""";
+        private static final String WORKFLOW_B = """
+            {"label": "Sync B", "triggers": [], "tasks": []}""";
+        private static final String WORKFLOW_WITH_TRIGGER = """
+            {"label": "Sync A",
+             "triggers": [{"label": "Schedule", "name": "trigger_1", "type": "schedule/v1/schedule"}],
+             "tasks": []}""";
+        private static final String WORKFLOW_B_WITH_TRIGGER = """
+            {"label": "Sync B",
+             "triggers": [{"label": "Schedule", "name": "trigger_1", "type": "schedule/v1/schedule"}],
+             "tasks": []}""";
+        private static final String WORKFLOW_WITH_INPUT = """
+            {"label": "Sync A",
+             "inputs": [{"name": "region", "label": "Region", "type": "string", "required": true}],
+             "triggers": [], "tasks": []}""";
+
+        @Autowired
+        private ComponentConnectionFacade componentConnectionFacade;
+
+        @MockitoBean
+        private ConnectionDefinitionService connectionDefinitionService;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @Autowired
+        private ProjectService projectService;
+
+        @Autowired
+        private ProjectWorkflowService projectWorkflowService;
+
+        @Autowired
+        private PlatformTransactionManager transactionManager;
+
+        @MockitoBean
+        private WorkspaceConnectionFacade workspaceConnectionFacade;
+
+        @Autowired
+        private WorkflowService workflowService;
+
+        @BeforeEach
+        void beforeEachDeployProject() {
+            ConnectionDefinition connectionDefinition = mock(ConnectionDefinition.class);
+
+            when(connectionDefinition.getVersion()).thenReturn(1);
+            when(connectionDefinitionService.getConnectionDefinition(SLACK, 1)).thenReturn(connectionDefinition);
+            when(componentConnectionFacade.getWorkflowComponentConnections(anyString()))
+                .thenReturn(List.of(SLACK_SLOT));
+            when(componentConnectionFacade.getComponentConnection(anyString(), eq(SLACK_NODE), eq(SLACK)))
+                .thenReturn(SLACK_SLOT);
+            when(connectionService.getConnection(anyLong()))
+                .thenAnswer(invocation -> connection(invocation.getArgument(0)));
+            when(permissionService.hasResourceScope(any(), eq("Connection"), eq("CONNECTION_VIEW"))).thenReturn(true);
+            when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
+
+            stubCandidates(connectionDTO(101L, "Slack A"));
+        }
+
+        @Test
+        public void testCreatesTheDeploymentWithARowForEveryWorkflowAndPicksTheOnlyCandidate() {
+            long projectId = createPublishedProject(WORKFLOW_A, WORKFLOW_B);
+            String workflowAUuid = uuidOf(projectId, "Sync A");
+            String workflowBUuid = uuidOf(projectId, "Sync B");
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowAUuid), List.of(), Map.of());
+
+            assertThat(result.written()).isTrue();
+
+            long projectDeploymentId = Objects.requireNonNull(result.projectDeploymentId());
+
+            ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
+                .orElseThrow();
+
+            assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
+            assertThat(projectDeployment.isEnabled()).isFalse();
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .extracting(ProjectDeploymentWorkflow::isEnabled, ProjectDeploymentWorkflow::getConnectionsCount)
+                .containsExactlyInAnyOrder(tuple(true, 1), tuple(false, 1));
+            assertThat(result.workflows())
+                .extracting(DeployedWorkflow::workflowUuid, DeployedWorkflow::enabled)
+                .containsExactlyInAnyOrder(tuple(workflowAUuid, true), tuple(workflowBUuid, false));
+            assertThat(result.workflows())
+                .allSatisfy(deployedWorkflow -> {
+                    assertThat(deployedWorkflow.draftWorkflowId()).isNotEqualTo(deployedWorkflow.workflowId());
+                    assertThat(deployedWorkflow.connections())
+                        .extracting(DeployedConnection::connectionId, DeployedConnection::connectionName)
+                        .containsExactly(tuple(101L, "Slack A"));
+                });
+        }
+
+        @Test
+        public void testRedeployAfterPublishUpdatesTheSameDeploymentSoItsBindingsStayValid() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            updateDraft(workflowUuid, """
+                {"label": "Sync A", "description": "changed", "triggers": [], "tasks": []}""");
+
+            projectFacade.publishProject(projectId, "Second", false);
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, List.of(), List.of(), Map.of());
+
+            String publishedWorkflowId = publishedWorkflowId(projectId, workflowUuid);
+
+            assertThat(result.projectDeploymentId()).isEqualTo(projectDeploymentId);
+            assertThat(result.removedWorkflows()).isEmpty();
+            assertThat(projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid))
+                .contains(publishedWorkflowId);
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .singleElement()
+                .satisfies(projectDeploymentWorkflow -> {
+                    assertThat(projectDeploymentWorkflow.getWorkflowId()).isEqualTo(publishedWorkflowId);
+                    assertThat(projectDeploymentWorkflow.isEnabled()).isTrue();
+                });
+        }
+
+        @Test
+        public void testSubsetOfEnabledWorkflowsKeepsEveryOtherRowAndItsEnabledState() {
+            long projectId = createPublishedProject(WORKFLOW_A, WORKFLOW_B);
+            String workflowAUuid = uuidOf(projectId, "Sync A");
+            String workflowBUuid = uuidOf(projectId, "Sync B");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowAUuid, workflowBUuid));
+
+            deploy(projectId, projectDeploymentId, List.of(workflowAUuid));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .extracting(ProjectDeploymentWorkflow::isEnabled)
+                .containsExactly(true, true);
+        }
+
+        @Test
+        public void testExplicitConnectionWithoutConnectionUseIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            stubCandidates(connectionDTO(101L, "Slack A"), connectionDTO(102L, "Slack B"));
+
+            when(permissionService.hasResourceScope(eq(102L), eq("Connection"), eq("CONNECTION_VIEW")))
+                .thenReturn(false);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, 102L)), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("Connection 102 cannot be used");
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testPrivateConnectionInvisibleToTheCallerIsNeitherACandidateNorAccepted() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, 103L)), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("Connection 103 cannot be used");
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of());
+
+            assertThat(result.workflows()
+                .getFirst()
+                .connections())
+                    .extracting(DeployedConnection::connectionId)
+                    .containsExactly(101L);
+        }
+
+        @Test
+        public void testDeploymentOfProductionIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            long productionDeploymentId = saveDeployment(projectId, "Orders", Environment.PRODUCTION);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, productionDeploymentId, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("is not a DEVELOPMENT deployment of project");
+        }
+
+        @Test
+        public void testDeploymentOfAnotherProjectIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            long otherProjectId = createPublishedProject(WORKFLOW_B);
+            long otherDeploymentId = saveDeployment(otherProjectId, "Other", Environment.DEVELOPMENT);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, otherDeploymentId, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("is not a DEVELOPMENT deployment of project");
+        }
+
+        @Test
+        public void testCreateWhenTheProjectAlreadyHasADevelopmentDeploymentIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+
+            saveDeployment(projectId, "Orders", Environment.DEVELOPMENT);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("pass its projectDeploymentId");
+        }
+
+        @Test
+        public void testSystemDeploymentOfTheProjectIsIgnored() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            long mcpServerDeploymentId = saveDeployment(projectId, "orders", Environment.DEVELOPMENT);
+
+            testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.MCP_SERVER, mcpServerDeploymentId);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, mcpServerDeploymentId, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class);
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(), List.of(), Map.of());
+
+            assertThat(result.projectDeploymentId()).isNotEqualTo(mcpServerDeploymentId);
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(mcpServerDeploymentId))
+                .isEmpty();
+        }
+
+        @Test
+        public void testRemovedWorkflowsAreReported() {
+            long projectId = createPublishedProject(WORKFLOW_A, WORKFLOW_B);
+            String workflowAUuid = uuidOf(projectId, "Sync A");
+            String workflowBUuid = uuidOf(projectId, "Sync B");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowAUuid, workflowBUuid));
+
+            projectWorkflowFacade.deleteWorkflow(projectWorkflowService.getLastWorkflowId(workflowBUuid));
+            projectFacade.publishProject(projectId, "Without B", false);
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, List.of(), List.of(), Map.of());
+
+            assertThat(result.removedWorkflows()).containsExactly(new RemovedWorkflow(workflowBUuid, "Sync B"));
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .hasSize(1);
+        }
+
+        @Test
+        public void testAmbiguousRequiredSlotOfAnEnabledWorkflowWritesNothing() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            stubCandidates(connectionDTO(101L, "Slack A"), connectionDTO(102L, "Slack B"));
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of());
+
+            assertThat(result.written()).isFalse();
+            assertThat(result.projectDeploymentId()).isNull();
+            assertThat(result.unresolvedConnections())
+                .singleElement()
+                .satisfies(unresolvedConnection -> {
+                    assertThat(unresolvedConnection.workflowUuid()).isEqualTo(workflowUuid);
+                    assertThat(unresolvedConnection.workflowNodeName()).isEqualTo(SLACK_NODE);
+                    assertThat(unresolvedConnection.required()).isTrue();
+                    assertThat(unresolvedConnection.candidates())
+                        .extracting(DeployProjectResultDTO.Candidate::id)
+                        .containsExactly(101L, 102L);
+                });
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testDisabledWorkflowWithAnAmbiguousSlotDoesNotBlock() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+
+            stubCandidates(connectionDTO(101L, "Slack A"), connectionDTO(102L, "Slack B"));
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(), List.of(), Map.of());
+
+            assertThat(result.written()).isTrue();
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                Objects.requireNonNull(result.projectDeploymentId())))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.isEnabled()).isFalse();
+                        assertThat(projectDeploymentWorkflow.getConnectionsCount()).isZero();
+                    });
+        }
+
+        @Test
+        public void testMissingRequiredInputWritesNothingAndAGivenOneIsStored() {
+            long projectId = createPublishedProject(WORKFLOW_WITH_INPUT);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            DeployProjectResultDTO missing = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of());
+
+            assertThat(missing.written()).isFalse();
+            assertThat(missing.missingInputs()).containsExactly(new MissingInput(workflowUuid, "region"));
+            assertThat(projectDeploymentRepository.count()).isZero();
+
+            DeployProjectResultDTO written = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of(workflowUuid, Map.of("region", "eu")));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                Objects.requireNonNull(written.projectDeploymentId())))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.getInputs())
+                        .extractingByKey("region")
+                        .isEqualTo("eu"));
+        }
+
+        @Test
+        public void testNeverPublishedProjectIsRefused() {
+            ProjectDTO projectDTO =
+                projectDeploymentFacadeHelper.createProject(Objects.requireNonNull(workspace.getId()));
+
+            projectDeploymentFacadeHelper.addTestWorkflow(projectDTO, WORKFLOW_A);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                Objects.requireNonNull(projectDTO.id()), null, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("call publishProject first");
+        }
+
+        @Test
+        public void testChangedDefinitionIsAnUnpublishedChange() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+
+            updateDraft(uuidOf(projectId, "Sync A"), """
+                {"label": "Sync A", "description": "changed", "triggers": [], "tasks": []}""");
+
+            assertUnpublishedChanges(projectId);
+        }
+
+        @Test
+        public void testAddedWorkflowIsAnUnpublishedChange() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+
+            projectWorkflowFacade.addWorkflow(projectId, WORKFLOW_B);
+
+            assertUnpublishedChanges(projectId);
+        }
+
+        @Test
+        public void testRemovedWorkflowIsAnUnpublishedChange() {
+            long projectId = createPublishedProject(WORKFLOW_A, WORKFLOW_B);
+
+            projectWorkflowFacade.deleteWorkflow(projectWorkflowService.getLastWorkflowId(uuidOf(projectId, "Sync B")));
+
+            assertUnpublishedChanges(projectId);
+        }
+
+        @Test
+        public void testRedeployOfTheSameVersionUpdatesRowsInPlace() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            stubCandidates(connectionDTO(101L, "Slack A"), connectionDTO(102L, "Slack B"));
+
+            deploy(projectId, projectDeploymentId, List.of());
+
+            assertThat(connectionIdsOf(projectDeploymentId)).containsExactly(101L);
+
+            projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, List.of(),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, 102L)), Map.of());
+
+            assertThat(connectionIdsOf(projectDeploymentId)).containsExactly(102L);
+        }
+
+        @Test
+        public void testUnknownWorkflowUuidIsRefusedNamingTheVersionsUuids() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+            String publishedWorkflowId = publishedWorkflowId(projectId, workflowUuid);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(publishedWorkflowId), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining(workflowUuid);
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testConnectionForAnUnknownSlotIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, "missing_1", SLACK, 101L)), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("has no connection slot missing_1/slack");
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testConnectionChoiceWithANullSlotFieldIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, null, SLACK, 101L)), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("has no connection slot null/slack");
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testNullWorkflowUuidIsRefusedNamingTheVersionsUuids() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, Arrays.asList(workflowUuid, null), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("[null]")
+                    .hasMessageContaining(workflowUuid);
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testSystemProjectIsRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+
+            testOwnerContributors.addAutomationWorkflowProjectId(projectId);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(NoSuchElementException.class);
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testRedeployOfAnEnabledDeploymentLeavesItDisabledWithItsRowsIntact() {
+            long projectId = createPublishedProject(WORKFLOW_WITH_TRIGGER);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, List.of(), List.of(), Map.of());
+
+            assertThat(result.written()).isTrue();
+            assertThat(result.projectDeploymentId()).isEqualTo(projectDeploymentId);
+            assertThat(projectDeploymentRepository.findById(projectDeploymentId)
+                .orElseThrow()
+                .isEnabled()).isFalse();
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+                .singleElement()
+                .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.isEnabled()).isTrue());
+            assertThat(connectionIdsOf(projectDeploymentId)).containsExactly(101L);
+
+            verify(triggerLifecycleFacade).executeTriggerDisable(any(), any(), any(), any(), any());
+        }
+
+        @Test
+        public void testFailedRedeployWriteLeavesTheEnabledDeploymentArmed() {
+            long projectId = createPublishedProject(WORKFLOW_WITH_TRIGGER);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            Connection productionConnection = connection(101L);
+
+            productionConnection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+
+            doReturn(productionConnection).when(connectionService)
+                .getConnection(101L);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class);
+
+            assertThat(projectDeploymentRepository.findById(projectDeploymentId)
+                .orElseThrow()
+                .isEnabled()).isTrue();
+            assertThat(connectionIdsOf(projectDeploymentId)).containsExactly(101L);
+
+            verify(triggerLifecycleFacade, never()).executeTriggerDisable(any(), any(), any(), any(), any());
+        }
+
+        @Test
+        public void testRedeployDisarmsTheOldTriggersOnlyAfterTheTransactionCommitsAndArmsNothing() {
+            long projectId = createPublishedProject(WORKFLOW_WITH_TRIGGER);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            String oldWorkflowId = publishedWorkflowId(projectId, workflowUuid);
+
+            updateDraft(workflowUuid, """
+                {"label": "Sync A", "description": "changed",
+                 "triggers": [{"label": "Schedule", "name": "trigger_1", "type": "schedule/v1/schedule"}],
+                 "tasks": []}""");
+
+            projectFacade.publishProject(projectId, "Second", false);
+
+            clearInvocations(triggerLifecycleFacade);
+
+            TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+            transactionTemplate.executeWithoutResult(transactionStatus -> {
+                projectDeploymentFacade.deployProject(projectId, projectDeploymentId, List.of(), List.of(), Map.of());
+
+                verify(triggerLifecycleFacade, never()).executeTriggerDisable(any(), any(), any(), any(), any());
+            });
+
+            verify(triggerLifecycleFacade).executeTriggerDisable(eq(oldWorkflowId), any(), any(), any(), any());
+            verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+                any(), any(), any(), any(), any(), any(), anyLong());
+        }
+
+        @Test
+        public void testRolledBackRedeployLeavesTheEnabledDeploymentArmed() {
+            long projectId = createPublishedProject(WORKFLOW_WITH_TRIGGER);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+            clearInvocations(triggerLifecycleFacade);
+
+            TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+            transactionTemplate.executeWithoutResult(transactionStatus -> {
+                projectDeploymentFacade.deployProject(projectId, projectDeploymentId, List.of(), List.of(), Map.of());
+
+                transactionStatus.setRollbackOnly();
+            });
+
+            assertThat(projectDeploymentRepository.findById(projectDeploymentId)
+                .orElseThrow()
+                .isEnabled()).isTrue();
+
+            verify(triggerLifecycleFacade, never()).executeTriggerDisable(any(), any(), any(), any(), any());
+        }
+
+        @Test
+        public void testSeveralConnectionChoicesForOneSlotAreRefused() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            stubCandidates(connectionDTO(101L, "Slack A"), connectionDTO(102L, "Slack B"));
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(
+                    new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, 101L),
+                    new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, 102L)),
+                Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("has several connection choices for slot sendMessage_1/slack");
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        @Test
+        public void testAiProviderConnectionIsNeverACandidate() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+            long aiProviderConnectionId = -1L;
+
+            stubCandidates(connectionDTO(aiProviderConnectionId, "OpenAI"), connectionDTO(101L, "Slack A"));
+
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid),
+                List.of(new DeploymentConnectionChoiceDTO(workflowUuid, SLACK_NODE, SLACK, aiProviderConnectionId)),
+                Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("Connection %d cannot be used".formatted(aiProviderConnectionId));
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of());
+
+            assertThat(connectionIdsOf(Objects.requireNonNull(result.projectDeploymentId()))).containsExactly(101L);
+        }
+
+        @Test
+        public void testConnectionWithInvalidCredentialsIsNeverACandidate() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            ConnectionDTO invalidConnectionDTO = ConnectionDTO.builder(connectionDTO(102L, "Slack B"))
+                .credentialStatus(CredentialStatus.INVALID)
+                .build();
+
+            stubCandidates(invalidConnectionDTO, connectionDTO(101L, "Slack A"));
+
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, null, List.of(workflowUuid), List.of(), Map.of());
+
+            assertThat(connectionIdsOf(Objects.requireNonNull(result.projectDeploymentId()))).containsExactly(101L);
+        }
+
+        @Test
+        public void testOptionalSlotGetsItsOnlyCandidateAndIsSkippedWithoutOne() {
+            long projectId = createPublishedProject(WORKFLOW_A);
+            String workflowUuid = uuidOf(projectId, "Sync A");
+
+            when(componentConnectionFacade.getWorkflowComponentConnections(anyString()))
+                .thenReturn(List.of(new ComponentConnection(SLACK, 1, SLACK_NODE, SLACK, false)));
+
+            stubCandidates();
+
+            long projectDeploymentId = deploy(projectId, null, List.of(workflowUuid));
+
+            assertThat(connectionIdsOf(projectDeploymentId)).isEmpty();
+
+            stubCandidates(connectionDTO(101L, "Slack A"));
+
+            deploy(projectId, projectDeploymentId, List.of(workflowUuid));
+
+            assertThat(connectionIdsOf(projectDeploymentId)).containsExactly(101L);
+        }
+
+        private void assertUnpublishedChanges(long projectId) {
+            assertThatThrownBy(() -> projectDeploymentFacade.deployProject(
+                projectId, null, List.of(), List.of(), Map.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("has unpublished changes; call publishProject first");
+
+            assertThat(projectDeploymentRepository.count()).isZero();
+        }
+
+        private List<Long> connectionIdsOf(long projectDeploymentId) {
+            return projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId)
+                .stream()
+                .flatMap(projectDeploymentWorkflow -> projectDeploymentWorkflow.getConnections()
+                    .stream())
+                .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+                .toList();
+        }
+
+        private long createPublishedProject(String... workflowDefinitions) {
+            ProjectDTO projectDTO =
+                projectDeploymentFacadeHelper.createProject(Objects.requireNonNull(workspace.getId()));
+
+            for (String workflowDefinition : workflowDefinitions) {
+                projectDeploymentFacadeHelper.addTestWorkflow(projectDTO, workflowDefinition);
+            }
+
+            long projectId = Objects.requireNonNull(projectDTO.id());
+
+            projectFacade.publishProject(projectId, "Published for test", false);
+
+            return projectId;
+        }
+
+        private long deploy(long projectId, Long projectDeploymentId, List<String> enabledWorkflowUuids) {
+            DeployProjectResultDTO result = projectDeploymentFacade.deployProject(
+                projectId, projectDeploymentId, enabledWorkflowUuids, List.of(), Map.of());
+
+            assertThat(result.written()).isTrue();
+
+            return Objects.requireNonNull(result.projectDeploymentId());
+        }
+
+        private List<ProjectWorkflow> publishedProjectWorkflows(long projectId) {
+            Project project = projectService.getProject(projectId);
+
+            ProjectVersion projectVersion = Objects.requireNonNull(project.getLastPublishedProjectVersion());
+
+            return projectWorkflowService.getProjectWorkflows(projectId, projectVersion.getVersion());
+        }
+
+        private String publishedWorkflowId(long projectId, String workflowUuid) {
+            return publishedProjectWorkflows(projectId).stream()
+                .filter(projectWorkflow -> Objects.equals(projectWorkflow.getUuidAsString(), workflowUuid))
+                .map(ProjectWorkflow::getWorkflowId)
+                .findFirst()
+                .orElseThrow();
+        }
+
+        private long saveDeployment(long projectId, String name, Environment environment) {
+            ProjectDeployment projectDeployment = new ProjectDeployment();
+
+            projectDeployment.setEnabled(false);
+            projectDeployment.setEnvironment(environment);
+            projectDeployment.setName(name);
+            projectDeployment.setProjectId(projectId);
+            projectDeployment.setProjectVersion(
+                Objects.requireNonNull(projectService.getProject(projectId)
+                    .getLastPublishedProjectVersion())
+                    .getVersion());
+
+            ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(projectDeployment);
+
+            return Objects.requireNonNull(savedProjectDeployment.getId());
+        }
+
+        private void stubCandidates(ConnectionDTO... connectionDTOs) {
+            when(
+                workspaceConnectionFacade.getConnections(
+                    eq(Objects.requireNonNull(workspace.getId())), eq(SLACK), eq(1), eq(0L), isNull()))
+                        .thenReturn(List.of(connectionDTOs));
+        }
+
+        private void updateDraft(String workflowUuid, String definition) {
+            String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+            ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(draftWorkflowId);
+
+            projectWorkflowFacade.updateWorkflow(draftWorkflowId, definition, projectWorkflowDTO.getVersion());
+        }
+
+        private String uuidOf(long projectId, String label) {
+            return publishedProjectWorkflows(projectId).stream()
+                .filter(projectWorkflow -> Objects.equals(
+                    workflowService.getWorkflow(projectWorkflow.getWorkflowId())
+                        .getLabel(),
+                    label))
+                .map(ProjectWorkflow::getUuidAsString)
+                .findFirst()
+                .orElseThrow();
+        }
+
+        private static Connection connection(long id) {
+            Connection connection = new Connection();
+
+            connection.setComponentName(SLACK);
+            connection.setEnvironmentId(Environment.DEVELOPMENT.ordinal());
+            connection.setId(id);
+            connection.setName("Slack " + id);
+
+            return connection;
+        }
+
+        private static ConnectionDTO connectionDTO(long id, String name) {
+            return ConnectionDTO.builder()
+                .componentName(SLACK)
+                .connectionVersion(1)
+                .credentialStatus(CredentialStatus.VALID)
+                .environmentId(Environment.DEVELOPMENT.ordinal())
+                .id(id)
+                .name(name)
+                .status(ConnectionStatus.ACTIVE)
+                .visibility(ResourceVisibility.WORKSPACE)
+                .build();
         }
     }
 }
