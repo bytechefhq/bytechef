@@ -1,10 +1,11 @@
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
-import {render, screen, waitFor} from '@testing-library/react';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
     useHasEmbeddedScope: () => true,
@@ -191,12 +192,31 @@ describe('ConnectionDialog', () => {
     describe('editing a connection whose credentials were rejected', () => {
         const invalidConnection = {
             componentName: 'slack',
+            createdBy: 'creator@localhost.com',
             credentialStatus: 'INVALID',
             id: 7,
             name: 'Slack',
             tags: [],
             version: 1,
         };
+
+        const authenticateAs = (login: string) =>
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login} as never,
+                    authenticated: true,
+                });
+            });
+
+        beforeEach(() => {
+            authenticateAs('creator@localhost.com');
+        });
+
+        afterEach(() => {
+            act(() => {
+                authenticationStore.setState({account: undefined, authenticated: false});
+            });
+        });
 
         const renderEditDialog = (withCredentialsMutation: boolean) => {
             const updateConnectionMutate = vi.fn();
@@ -235,6 +255,16 @@ describe('ConnectionDialog', () => {
 
             expect(await screen.findByText('These credentials were rejected')).toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        });
+
+        it('stays in name and tags mode for an admin who did not create the connection', () => {
+            authenticateAs('admin@localhost.com');
+
+            renderEditDialog(true);
+
+            expect(screen.queryByText('These credentials were rejected')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
         });
     });
 });

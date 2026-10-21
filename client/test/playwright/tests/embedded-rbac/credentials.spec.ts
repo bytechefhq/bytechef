@@ -211,7 +211,7 @@ test.describe('Embedded credentials', () => {
         const viewerApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.VIEWER);
 
         try {
-            await test.step('the tenant admin sees the stored credentials', async () => {
+            await test.step('the tenant admin who created them sees the stored credentials', async () => {
                 const connection = await embeddedInternalApi<ConnectionI>(
                     adminApi,
                     'GET',
@@ -291,27 +291,79 @@ test.describe('Embedded credentials', () => {
         }
     });
 
-    test('an EDITOR gets the credentials and the MCP secret key', async ({embeddedRoleUsers}) => {
+    test('an EDITOR sees credentials only of what it created, and the MCP secret key', async ({
+        adminApi,
+        embeddedRoleUsers,
+    }) => {
         const editorApi = await createRoleUserApiContext(RBAC_BASE_URL, embeddedRoleUsers.EDITOR);
 
+        const editorConnectionMarker = getRandomString().slice(0, 8);
+
+        let editorConnectionId: number | undefined;
+
         try {
-            const connection = await embeddedInternalApi(editorApi, 'GET', `/connections/${resources.connectionId}`);
+            await test.step('the tenant admin created connection and configuration stay hidden', async () => {
+                const connection = await embeddedInternalApi(
+                    editorApi,
+                    'GET',
+                    `/connections/${resources.connectionId}`
+                );
 
-            expect(JSON.stringify(connection)).toContain(CONNECTION_USERNAME_MARKER);
+                expect(JSON.stringify(connection)).toContain(resources.connectionName);
+                expect(JSON.stringify(connection)).not.toContain(CONNECTION_USERNAME_MARKER);
 
-            const configuration = await embeddedInternalApi(
-                editorApi,
-                'GET',
-                `/integration-instance-configurations/${resources.configurationId}`
-            );
+                const configuration = await embeddedInternalApi(
+                    editorApi,
+                    'GET',
+                    `/integration-instance-configurations/${resources.configurationId}`
+                );
 
-            expect(JSON.stringify(configuration)).toContain(CONFIGURATION_USERNAME_MARKER);
+                expect(JSON.stringify(configuration)).toContain(resources.configurationName);
+                expect(JSON.stringify(configuration)).not.toContain(CONFIGURATION_USERNAME_MARKER);
+            });
 
-            const mcpServer = await fetchMcpServer(editorApi, resources.mcpServerId);
+            await test.step('the connection the EDITOR creates shows its credentials only to the EDITOR', async () => {
+                editorConnectionId = await embeddedInternalApi<number>(editorApi, 'POST', '/connections', {
+                    authorizationType: 'BASIC_AUTH',
+                    componentName: 'httpClient',
+                    connectionVersion: 1,
+                    environmentId: ENVIRONMENT_IDS.DEVELOPMENT,
+                    name: `rbac_credentials_editor_${NAME_SUFFIX}`,
+                    parameters: {
+                        password: `rbac_editor_secret_${editorConnectionMarker}`,
+                        username: `rbac_editor_user_${editorConnectionMarker}`,
+                    },
+                });
 
-            expect(mcpServer.secretKey).toBe(resources.mcpServerSecretKey);
-            expect(mcpServer.url).toContain(resources.mcpServerSecretKey);
+                const editorConnection = await embeddedInternalApi(
+                    editorApi,
+                    'GET',
+                    `/connections/${editorConnectionId}`
+                );
+
+                expect(JSON.stringify(editorConnection)).toContain(editorConnectionMarker);
+
+                const adminConnection = await embeddedInternalApi(
+                    adminApi,
+                    'GET',
+                    `/connections/${editorConnectionId}`
+                );
+
+                expect(JSON.stringify(adminConnection)).toContain(`rbac_credentials_editor_${NAME_SUFFIX}`);
+                expect(JSON.stringify(adminConnection)).not.toContain(editorConnectionMarker);
+            });
+
+            await test.step('the MCP secret key is visible to an EDITOR', async () => {
+                const mcpServer = await fetchMcpServer(editorApi, resources.mcpServerId);
+
+                expect(mcpServer.secretKey).toBe(resources.mcpServerSecretKey);
+                expect(mcpServer.url).toContain(resources.mcpServerSecretKey);
+            });
         } finally {
+            if (editorConnectionId !== undefined) {
+                await embeddedInternalApi(adminApi, 'DELETE', `/connections/${editorConnectionId}`).catch(() => {});
+            }
+
             await editorApi.dispose();
         }
     });
