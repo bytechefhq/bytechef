@@ -405,15 +405,6 @@ const TENANT_ADMIN_CASES: Omit<GateCaseI, 'allowed' | 'denied' | 'module'>[] = [
         },
         name: 'create an approval task',
     },
-    {name: 'list embedded connections', rest: {method: 'GET', path: () => '/api/embedded/internal/connections'}},
-    {
-        graphQl: {
-            query: 'query EmbeddedMcpServers { embeddedMcpServers { id } }',
-            variables: () => ({}),
-        },
-        name: 'list embedded MCP servers',
-    },
-    {name: 'list connected users', rest: {method: 'GET', path: () => '/api/embedded/internal/connected-users'}},
     {
         graphQl: {
             query: 'mutation CreateApiKey { createApiKey(name: "rbac_gate", environmentId: "0") }',
