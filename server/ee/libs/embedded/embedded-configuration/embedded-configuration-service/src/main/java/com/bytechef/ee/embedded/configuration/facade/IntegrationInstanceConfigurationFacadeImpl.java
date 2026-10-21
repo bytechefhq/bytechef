@@ -164,6 +164,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
+        if (integrationInstanceConfigurationDTO.authorizationType() == null) {
+            throw new ConfigurationException(
+                "An integration instance configuration requires an authorizationType",
+                IntegrationInstanceConfigurationErrorType.AUTHORIZATION_TYPE_REQUIRED);
+        }
+
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
             .toIntegrationInstanceConfiguration();
 

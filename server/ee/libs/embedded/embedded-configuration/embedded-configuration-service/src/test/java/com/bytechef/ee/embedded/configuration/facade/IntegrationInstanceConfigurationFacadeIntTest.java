@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -126,6 +127,36 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                     .isInstanceOf(ConfigurationException.class)
                     .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
                         .isEqualTo(104));
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationRefusesAMissingAuthorizationType() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .connectionParameters(Map.of())
+                .environment(Environment.STAGING)
+                .integrationId(integration.getId())
+                .integrationInstanceConfigurationWorkflows(List.of())
+                .integrationVersion(1)
+                .name("instance-configuration-" + UUID.randomUUID())
+                .tags(List.of())
+                .build();
+
+        assertThatCode(integrationInstanceConfigurationDTO::toIntegrationInstanceConfiguration)
+            .doesNotThrowAnyException();
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationDTO))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(105));
+
+        assertThat(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations()).isEmpty();
     }
 
     @Test
