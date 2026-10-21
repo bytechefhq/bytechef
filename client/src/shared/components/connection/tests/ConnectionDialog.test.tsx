@@ -13,6 +13,14 @@ import {Control, Controller} from 'react-hook-form';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
     useGetConnectionDefinitionsQuery: vi.fn(() => ({data: undefined})),
