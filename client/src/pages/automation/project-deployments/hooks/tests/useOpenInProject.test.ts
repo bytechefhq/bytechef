@@ -40,18 +40,33 @@ describe('useOpenInProject', () => {
         environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
     });
 
-    it('allows opening the project editor only in Development', () => {
-        const {rerender, result} = renderHook(() => useOpenInProject());
+    it('switches to Development before opening the project from another environment', async () => {
+        environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
 
-        expect(result.current.canOpenInProject).toBe(true);
+        fetchQueryMock.mockResolvedValue({id: 7, projectWorkflowIds: [11]});
 
-        act(() => {
-            environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
+        navigateMock.mockImplementation(() => {
+            expect(environmentStore.getState().currentEnvironmentId).toBe(DEVELOPMENT_ENVIRONMENT);
         });
 
-        rerender();
+        const {result} = renderHook(() => useOpenInProject());
 
-        expect(result.current.canOpenInProject).toBe(false);
+        await act(() => result.current.openProject(7));
+
+        expect(navigateMock).toHaveBeenCalledWith('/automation/projects/7/project-workflows/11');
+        expect(environmentStore.getState().currentEnvironmentId).toBe(DEVELOPMENT_ENVIRONMENT);
+    });
+
+    it('keeps the environment when the lookup fails outside Development', async () => {
+        environmentStore.setState({currentEnvironmentId: STAGING_ENVIRONMENT});
+
+        fetchQueryMock.mockRejectedValue(new Error('network'));
+
+        const {result} = renderHook(() => useOpenInProject());
+
+        await act(() => result.current.openProjectWorkflow(7, 'deployed-uuid'));
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(STAGING_ENVIRONMENT);
     });
 
     it('opens the first workflow of the project', async () => {

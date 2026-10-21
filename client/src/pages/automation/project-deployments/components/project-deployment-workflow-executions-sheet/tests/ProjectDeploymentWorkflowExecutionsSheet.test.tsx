@@ -35,7 +35,7 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
     default: (options: {onBeforeNavigate?: () => void}) => {
         openInProjectOptionsMock(options);
 
-        return {canOpenInProject: true, openProject: openProjectMock, openProjectWorkflow: openProjectWorkflowMock};
+        return {openProject: openProjectMock, openProjectWorkflow: openProjectWorkflowMock};
     },
 }));
 

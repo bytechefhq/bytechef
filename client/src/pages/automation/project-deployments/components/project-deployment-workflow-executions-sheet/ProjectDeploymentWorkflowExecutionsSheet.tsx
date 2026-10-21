@@ -69,7 +69,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
         setProjectDeploymentWorkflowSheetOpen(false);
     }, [setProjectDeploymentWorkflowSheetOpen, setWorkflowExecutionSheetOpen]);
 
-    const {canOpenInProject, openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
+    const {openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
 
     const {data: workflowExecution} = useGetProjectWorkflowExecutionQuery(
         {id: workflowExecutionId},
@@ -106,7 +106,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
     const executionsTabActive = activeTab === 'executions';
     const workflowExecutionDetailOpen = enabled && executionsTabActive && workflowExecutionSheetOpen;
 
-    const showOpenInProject = canOpenInProject && projectId != null;
+    const showOpenInProject = projectId != null;
 
     let headerProjectVersion = projectVersion;
 

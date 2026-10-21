@@ -20,7 +20,7 @@ const {openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({canOpenInProject: true, openProject: vi.fn(), openProjectWorkflow: openProjectWorkflowMock}),
+    default: () => ({openProject: vi.fn(), openProjectWorkflow: openProjectWorkflowMock}),
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({

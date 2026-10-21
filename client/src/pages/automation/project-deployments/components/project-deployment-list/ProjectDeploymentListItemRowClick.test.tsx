@@ -12,7 +12,6 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
     default: () => ({
-        canOpenInProject: true,
         openProject: hoisted.openProjectMock,
         openProjectWorkflow: vi.fn(),
     }),
