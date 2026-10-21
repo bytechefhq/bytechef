@@ -18,10 +18,12 @@ package com.bytechef.platform.security.web.authentication;
 
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -32,6 +34,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
     private @Nullable Long apiKeyId;
     private long environmentId;
     private boolean environmentIdPresent;
+    private @Nullable Object principal;
     private @Nullable String tenantId;
     private @Nullable User user;
 
@@ -64,6 +67,24 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         setDetails(user);
     }
 
+    /**
+     * Authenticated, and retaining the environment the pre-authentication token was built for, with a non-{@code User}
+     * principal. Apps authenticate with their own key, and the principal is an app, not a user.
+     */
+    protected AbstractApiKeyAuthenticationToken(
+        long environmentId, String tenantId, Object principal, Collection<? extends GrantedAuthority> authorities) {
+
+        super(authorities);
+
+        this.environmentId = environmentId;
+        this.environmentIdPresent = true;
+        this.principal = principal;
+        this.tenantId = tenantId;
+
+        setAuthenticated(true);
+        setDetails(principal);
+    }
+
     @Override
     public Object getCredentials() {
         return null;
@@ -71,7 +92,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
     @Override
     public String getName() {
-        if (user == null) {
+        if (user == null && principal == null) {
             return UnresolvedCredentialAuthenticationToken.PRINCIPAL;
         }
 
@@ -81,7 +102,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
     @Override
     @SuppressFBWarnings("EI")
     public @Nullable Object getPrincipal() {
-        return user;
+        return principal != null ? principal : user;
     }
 
     public abstract CredentialType getCredentialType();

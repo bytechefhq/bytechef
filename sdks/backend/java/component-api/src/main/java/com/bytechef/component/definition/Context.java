@@ -830,6 +830,7 @@ public interface Context {
             private ResponseType responseType;
             private Duration connectTimeout;
             private boolean disableAuthorization;
+            private Long maxResponseBytes;
 
             public Configuration() {
             }
@@ -910,6 +911,17 @@ public interface Context {
                 return disableAuthorization;
             }
 
+            /**
+             * Returns the largest response body, in bytes, the client reads before it aborts the request with
+             * {@link com.bytechef.component.exception.HttpResponseTooLargeException}. Honoured for
+             * {@link ResponseType#BINARY} responses, whose body is read as a stream.
+             *
+             * @return the configured maximum, or {@code null} when the body is not limited
+             */
+            public @Nullable Long getMaxResponseBytes() {
+                return maxResponseBytes;
+            }
+
             public static final class ConfigurationBuilder {
 
                 private boolean allowUnauthorizedCerts;
@@ -921,6 +933,7 @@ public interface Context {
                 private ResponseType responseType;
                 private Duration connectTimeout;
                 private boolean disableAuthorization;
+                private Long maxResponseBytes;
 
                 private ConfigurationBuilder() {
                 }
@@ -943,14 +956,15 @@ public interface Context {
                         Objects.equals(proxy, that.proxy) &&
                         Objects.equals(requestTimeout, that.requestTimeout) &&
                         Objects.equals(responseType, that.responseType) &&
-                        Objects.equals(connectTimeout, that.connectTimeout);
+                        Objects.equals(connectTimeout, that.connectTimeout) &&
+                        Objects.equals(maxResponseBytes, that.maxResponseBytes);
                 }
 
                 @Override
                 public int hashCode() {
                     return Objects.hash(
                         allowUnauthorizedCerts, connectTimeout, filename, followAllRedirects, followRedirect,
-                        proxy, requestTimeout, responseType, disableAuthorization);
+                        proxy, requestTimeout, responseType, disableAuthorization, maxResponseBytes);
                 }
 
                 public ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
@@ -1006,6 +1020,27 @@ public interface Context {
                     return this;
                 }
 
+                /**
+                 * Sets the largest response body, in bytes, the client reads. A larger body is cut off as soon as the
+                 * limit is passed, before the rest is received: the connection is released, whatever was stored is
+                 * deleted and the request fails with
+                 * {@link com.bytechef.component.exception.HttpResponseTooLargeException}. Honoured for
+                 * {@link ResponseType#BINARY} responses.
+                 *
+                 * @param maxResponseBytes the maximum number of response body bytes, at least 1
+                 * @return this builder
+                 */
+                public ConfigurationBuilder maxResponseBytes(long maxResponseBytes) {
+                    if (maxResponseBytes < 1) {
+                        throw new IllegalArgumentException(
+                            "maxResponseBytes must be at least 1, but was " + maxResponseBytes);
+                    }
+
+                    this.maxResponseBytes = maxResponseBytes;
+
+                    return this;
+                }
+
                 public Configuration build() {
                     Configuration configuration = new Configuration();
 
@@ -1018,6 +1053,7 @@ public interface Context {
                     configuration.allowUnauthorizedCerts = this.allowUnauthorizedCerts;
                     configuration.filename = this.filename;
                     configuration.disableAuthorization = this.disableAuthorization;
+                    configuration.maxResponseBytes = this.maxResponseBytes;
 
                     return configuration;
                 }
