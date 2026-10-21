@@ -23,6 +23,8 @@ import java.time.Duration;
  */
 public final class OAuth2AuthorizationServerConstants {
 
+    public static final Duration APP_REFRESH_TOKEN_REUSE_GRACE = Duration.ofSeconds(10);
+    public static final String APP_USE_SCOPE = "app:use";
     public static final Duration MCP_ACCESS_TOKEN_TIME_TO_LIVE = Duration.ofHours(1);
     public static final Duration MCP_REFRESH_TOKEN_TIME_TO_LIVE = Duration.ofDays(30);
     public static final String TENANT_ID_CLAIM = "tenant_id";

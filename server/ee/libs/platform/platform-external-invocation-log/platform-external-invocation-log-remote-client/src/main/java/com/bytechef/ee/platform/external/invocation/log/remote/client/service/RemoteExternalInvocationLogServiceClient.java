@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.external.invocation.log.remote.client.service;
 
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.security.ViewableAppInstances;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
@@ -64,7 +65,7 @@ public class RemoteExternalInvocationLogServiceClient implements ExternalInvocat
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Long appId,
-        @Nullable Instant startDate,
+        @Nullable Long appInstanceId, ViewableAppInstances viewableAppInstances, @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 
         throw new UnsupportedOperationException();

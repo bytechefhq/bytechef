@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.external.invocation.log.service;
 
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
+import com.bytechef.ee.platform.external.invocation.log.security.ViewableAppInstances;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
@@ -42,7 +43,7 @@ public interface ExternalInvocationLogService {
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
-        @Nullable Instant endDate,
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Long appInstanceId,
+        ViewableAppInstances viewableAppInstances, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber);
 }

@@ -71,7 +71,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                 eq(5L),
                 isNull(),
                 isNull(), isNull(),
-                isNull(),
+                isNull(), isNull(),
                 isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(externalInvocationLogDTO()), PageRequest.of(0, 50), 1));
 
@@ -120,6 +120,70 @@ class ExternalInvocationLogGraphQlControllerIntTest {
     }
 
     @Test
+    void testWorkspaceExternalInvocationLogsPassesTheAppInstanceAndExposesTheEndUser() {
+        ExternalInvocationLog signedInExternalInvocationLog = new ExternalInvocationLog();
+
+        signedInExternalInvocationLog.setId(3L);
+        signedInExternalInvocationLog.setSource(ExternalInvocationSource.APP_ACTION);
+        signedInExternalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        signedInExternalInvocationLog.setAppId(9L);
+        signedInExternalInvocationLog.setAppInstanceId(50L);
+        signedInExternalInvocationLog.setUserId(21L);
+        signedInExternalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
+        signedInExternalInvocationLog.setDurationMs(5);
+
+        ExternalInvocationLog keyOnlyExternalInvocationLog = new ExternalInvocationLog();
+
+        keyOnlyExternalInvocationLog.setId(4L);
+        keyOnlyExternalInvocationLog.setSource(ExternalInvocationSource.APP_ACTION);
+        keyOnlyExternalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        keyOnlyExternalInvocationLog.setAppId(9L);
+        keyOnlyExternalInvocationLog.setAppInstanceId(50L);
+        keyOnlyExternalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
+        keyOnlyExternalInvocationLog.setDurationMs(5);
+
+        when(
+            externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
+                eq(PlatformType.AUTOMATION), eq(7L), eq(2L), isNull(), isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(9L), eq(50L), isNull(), isNull(), eq(0)))
+                    .thenReturn(
+                        new PageImpl<>(
+                            List.of(
+                                new ExternalInvocationLogDTO(signedInExternalInvocationLog, null, "Ada Lovelace"),
+                                new ExternalInvocationLogDTO(keyOnlyExternalInvocationLog, null, null)),
+                            PageRequest.of(0, 50), 2));
+
+        graphQlTester
+            .document("""
+                query {
+                    workspaceExternalInvocationLogs(
+                        type: AUTOMATION, workspaceId: "7", environmentId: "2", appId: 9, appInstanceId: 50
+                    ) {
+                        content {
+                            appInstanceId
+                            userId
+                            userName
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("workspaceExternalInvocationLogs.content[0].appInstanceId")
+            .entity(Long.class)
+            .isEqualTo(50L)
+            .path("workspaceExternalInvocationLogs.content[0].userId")
+            .entity(Long.class)
+            .isEqualTo(21L)
+            .path("workspaceExternalInvocationLogs.content[0].userName")
+            .entity(String.class)
+            .isEqualTo("Ada Lovelace")
+            .path("workspaceExternalInvocationLogs.content[1].userId")
+            .valueIsNull()
+            .path("workspaceExternalInvocationLogs.content[1].userName")
+            .valueIsNull();
+    }
+
+    @Test
     void testExternalInvocationLogsUsesTheTenantWideFacadeQuery() {
         when(
             externalInvocationLogFacade.getExternalInvocationLogs(
@@ -143,7 +207,8 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             .isEqualTo(0);
 
         verify(externalInvocationLogFacade, never()).getWorkspaceExternalInvocationLogs(
-            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), isNull(), any(), any(), anyInt());
+            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), isNull(), any(), any(), any(),
+            anyInt());
     }
 
     @Test
@@ -195,7 +260,8 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                 isNull(), isNull(), isNull(), isNull(), isNull(), eq(0)))
                     .thenReturn(
                         new PageImpl<>(
-                            List.of(new ExternalInvocationLogDTO(externalInvocationLog, null)), PageRequest.of(0, 50),
+                            List.of(new ExternalInvocationLogDTO(externalInvocationLog, null, null)),
+                            PageRequest.of(0, 50),
                             1));
 
         graphQlTester
@@ -248,6 +314,6 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         externalInvocationLog.setEnvironment(2);
         externalInvocationLog.setCreatedDate(Instant.ofEpochMilli(1_000L));
 
-        return new ExternalInvocationLogDTO(externalInvocationLog, "Send Message");
+        return new ExternalInvocationLogDTO(externalInvocationLog, "Send Message", null);
     }
 }

@@ -139,6 +139,28 @@ class UserServiceIntTest {
 
     @Test
     @Transactional
+    void testGetUsersReturnsTheUsersWithTheGivenIdsAndSkipsUnknownIds() {
+        User savedUser = userRepository.save(user);
+
+        User otherUser = new User();
+
+        otherUser.setActivated(true);
+        otherUser.setEmail("other@localhost");
+        otherUser.setLangKey(DEFAULT_LANGKEY);
+        otherUser.setLogin("other");
+        otherUser.setPassword(RandomStringUtils.randomAlphanumeric(60));
+
+        userRepository.save(otherUser);
+
+        List<User> users = userService.getUsers(List.of(savedUser.getId(), Long.MAX_VALUE));
+
+        assertThat(users).extracting(User::getLogin)
+            .containsExactly(DEFAULT_LOGIN);
+        assertThat(userService.getUsers(List.of())).isEmpty();
+    }
+
+    @Test
+    @Transactional
     void testRemoveOldPersistentTokens() {
         userRepository.save(user);
 

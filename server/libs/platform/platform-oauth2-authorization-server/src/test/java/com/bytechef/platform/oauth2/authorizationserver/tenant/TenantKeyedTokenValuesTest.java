@@ -37,6 +37,35 @@ class TenantKeyedTokenValuesTest {
     }
 
     @Test
+    void testGeneratedValueWithAnAuthorizationIdCarriesBothIds() {
+        String value = TenantKeyedTokenValues.generate("acme", "2f1c0f4e-6a1b-4c8e-9d1a-5b7e3c2a1f00");
+
+        assertThat(value).matches("[A-Za-z0-9_-]+");
+        assertThat(TenantKeyedTokenValues.parseTenantId(value)).contains("acme");
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId(value))
+            .contains("2f1c0f4e-6a1b-4c8e-9d1a-5b7e3c2a1f00");
+    }
+
+    @Test
+    void testValueWithoutAnAuthorizationIdHasNone() {
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId(TenantKeyedTokenValues.generate("acme"))).isEmpty();
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId("not base64 !")).isEmpty();
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId(null)).isEmpty();
+        assertThat(
+            TenantKeyedTokenValues.parseAuthorizationId(EncodingUtils.urlEncodeBase64ToString("acme:random:id;x")))
+                .isEmpty();
+        assertThat(
+            TenantKeyedTokenValues.parseAuthorizationId(EncodingUtils.urlEncodeBase64ToString("acme:random:id:x")))
+                .isEmpty();
+    }
+
+    @Test
+    void testGenerateRejectsAuthorizationIdsThatCouldNotBeParsedBack() {
+        assertThatIllegalArgumentException().isThrownBy(() -> TenantKeyedTokenValues.generate("acme", "a:b"));
+        assertThatIllegalArgumentException().isThrownBy(() -> TenantKeyedTokenValues.generate("acme", ""));
+    }
+
+    @Test
     void testGenerateRejectsTenantIdsThatCouldNotBeParsedBack() {
         assertThatIllegalArgumentException().isThrownBy(() -> TenantKeyedTokenValues.generate("ac:me"));
         assertThatIllegalArgumentException().isThrownBy(() -> TenantKeyedTokenValues.generate("public; DROP TABLE x"));

@@ -9,13 +9,16 @@ package com.bytechef.ee.platform.external.invocation.log.service;
 
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvocationLogRepository;
+import com.bytechef.ee.platform.external.invocation.log.security.ViewableAppInstances;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 50;
+
+    private static final List<Long> UNMATCHED_APP_INSTANCE_IDS = List.of(-1L);
 
     private static final List<Integer> NON_FAILED_STATUSES = List.of(
         ExternalInvocationStatus.SUCCESS.ordinal(), ExternalInvocationStatus.APPROVAL_REQUIRED.ordinal(),
@@ -80,9 +85,7 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
 
         return findPage(
             type, null, environment, source, status, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
-            appId,
-            startDate,
-            endDate, pageNumber);
+            appId, null, false, UNMATCHED_APP_INSTANCE_IDS, startDate, endDate, pageNumber);
     }
 
     @Override
@@ -91,13 +94,16 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
-        @Nullable Instant endDate,
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Long appInstanceId,
+        ViewableAppInstances viewableAppInstances, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
+
+        Set<Long> appInstanceIds = viewableAppInstances.appInstanceIds();
 
         return findPage(
             type, workspaceId, environment, source, status, mcpServerId, a2aServerId, connectedUserId,
-            integrationInstanceId, appId,
+            integrationInstanceId, appId, appInstanceId, viewableAppInstances.restricted(),
+            appInstanceIds.isEmpty() ? UNMATCHED_APP_INSTANCE_IDS : List.copyOf(appInstanceIds),
             startDate, endDate, pageNumber);
     }
 
@@ -106,9 +112,9 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
-        @Nullable Instant endDate,
-        int pageNumber) {
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Long appInstanceId,
+        boolean appInstancesRestricted, Collection<Long> viewableAppInstanceIds, @Nullable Instant startDate,
+        @Nullable Instant endDate, int pageNumber) {
 
         Integer sourceOrdinal = source == null ? null : source.ordinal();
         Integer statusOrdinal = status == null ? null : status.ordinal();
@@ -118,12 +124,14 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
         List<ExternalInvocationLog> content = externalInvocationLogRepository.findFiltered(
             type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
-            integrationInstanceId, appId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
+            integrationInstanceId, appId, appInstanceId, appInstancesRestricted, viewableAppInstanceIds, startDate,
+            endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = externalInvocationLogRepository.countFiltered(
             type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
-            integrationInstanceId, appId, startDate, endDate);
+            integrationInstanceId, appId, appInstanceId, appInstancesRestricted, viewableAppInstanceIds, startDate,
+            endDate);
 
         return new PageImpl<>(content, pageRequest, total);
     }

@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.tenant;
 
+import com.bytechef.platform.oauth2.authorizationserver.registration.AppClients;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
@@ -53,13 +55,23 @@ public class TenantKeyedRefreshTokenGenerator implements OAuth2TokenGenerator<OA
             TokenSettings tokenSettings = registeredClient.getTokenSettings();
 
             return new OAuth2RefreshToken(
-                TenantKeyedTokenValues.generate(TenantContext.getCurrentTenantId()), issuedAt,
-                issuedAt.plus(tokenSettings.getRefreshTokenTimeToLive()));
+                generateTokenValue(context), issuedAt, issuedAt.plus(tokenSettings.getRefreshTokenTimeToLive()));
         }
 
         return new OAuth2RefreshToken(
-            TenantKeyedTokenValues.generate(TenantContext.getCurrentTenantId()), refreshToken.getIssuedAt(),
-            refreshToken.getExpiresAt());
+            generateTokenValue(context), refreshToken.getIssuedAt(), refreshToken.getExpiresAt());
+    }
+
+    private static String generateTokenValue(OAuth2TokenContext context) {
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        OAuth2Authorization authorization = context.getAuthorization();
+
+        if (authorization == null || !AppClients.isAppClient(context.getRegisteredClient())) {
+            return TenantKeyedTokenValues.generate(tenantId);
+        }
+
+        return TenantKeyedTokenValues.generate(tenantId, authorization.getId());
     }
 
     private static boolean isRotatingPublicClient(OAuth2TokenContext context) {

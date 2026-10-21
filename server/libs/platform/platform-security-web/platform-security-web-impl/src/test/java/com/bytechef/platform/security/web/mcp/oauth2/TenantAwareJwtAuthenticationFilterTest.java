@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -624,6 +625,37 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(doSelfIssuerRequest(filter)).isEqualTo(200);
         assertThat(checked).containsExactly("token@acme");
+    }
+
+    @Test
+    void testAppTokenIsRejectedOnMcpEndpoint() throws Exception {
+        String path = automationPath("acme");
+
+        Jwt appToken = jwtWithTenant("acme", "openid profile app:use", "app-" + UUID.randomUUID());
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new JwtAuthenticationToken(
+                    appToken,
+                    Set.of(
+                        new SimpleGrantedAuthority("SCOPE_openid"), new SimpleGrantedAuthority("SCOPE_profile"),
+                        new SimpleGrantedAuthority("SCOPE_app:use"))));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        selfIssuerFilterWithChecker(NOT_REVOKED_CHECKER).doFilter(
+            request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getHeader("WWW-Authenticate")).startsWith("Bearer error=\"insufficient_scope\"");
+        assertThat(chainInvoked).isFalse();
+
+        Issuer selfIssuer = selfIssuerProperties().getIssuers()
+            .getFirst();
+
+        assertThat(new McpAudienceValidator().isAudienceValid(appToken, selfIssuer, endpointUrl(path))).isFalse();
     }
 
     @Test

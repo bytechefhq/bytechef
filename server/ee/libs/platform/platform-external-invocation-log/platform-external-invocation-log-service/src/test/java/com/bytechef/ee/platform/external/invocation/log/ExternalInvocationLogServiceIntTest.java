@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.platform.external.invocation.log.config.ExternalInvocationLogIntTestConfiguration;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvocationLogRepository;
+import com.bytechef.ee.platform.external.invocation.log.security.ViewableAppInstances;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
@@ -19,6 +20,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +146,8 @@ class ExternalInvocationLogServiceIntTest {
         create(PlatformType.EMBEDDED, ExternalInvocationStatus.SUCCESS, 5L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of()), null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getWorkspaceId)
@@ -158,10 +161,166 @@ class ExternalInvocationLogServiceIntTest {
         createInWorkspace(8L, 2, 6L);
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, 6L, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, 6L, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of()), null, null, 0);
 
         assertThat(page.getTotalElements()).isZero();
         assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
+    void testWorkspaceQueryFilteredByAppInstanceReturnsOnlyThatInstancesRows() {
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 51L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, 5L, 50L,
+            ViewableAppInstances.only(Set.of(50L, 51L)), null, null,
+            0);
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsOnly(50L);
+
+        Page<ExternalInvocationLog> unfilteredPage = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, 5L, null,
+            ViewableAppInstances.only(Set.of(50L, 51L)), null, null,
+            0);
+
+        assertThat(unfilteredPage.getTotalElements()).isEqualTo(3);
+    }
+
+    @Test
+    void testWorkspaceQueryNamingAnInstanceHostedInAnotherWorkspaceMatchesNothing() {
+        createForAppInstance(8L, 5L, 60L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, 5L, 60L,
+            ViewableAppInstances.only(Set.of(60L)), null, null, 0);
+
+        assertThat(page.getTotalElements()).isZero();
+        assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
+    void testWorkspaceQueryNamingAnUnknownAppInstanceMatchesNothing() {
+        createForAppInstance(7L, 5L, 50L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, 999L,
+            ViewableAppInstances.only(Set.of(50L)), null, null, 0);
+
+        assertThat(page.getTotalElements()).isZero();
+    }
+
+    @Test
+    void testWorkspaceQueryReturnsRowsOfViewableAppInstancesAndRowsWithoutAnInstance() {
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 51L);
+        createInWorkspace(7L, 2, 5L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of(50L)), null, null,
+            0);
+
+        assertThat(page.getTotalElements()).isEqualTo(3);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsExactlyInAnyOrder(50L, 50L, null);
+    }
+
+    @Test
+    void testWorkspaceQueryWithoutViewableAppInstancesReturnsOnlyRowsWithoutAnInstance() {
+        createForAppInstance(7L, 5L, 50L);
+        createInWorkspace(7L, 2, 5L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of()), null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsExactly((Long) null);
+    }
+
+    @Test
+    void testWorkspaceQueryNamingAnAppInstanceTheCallerMayNotViewMatchesNothing() {
+        createForAppInstance(7L, 5L, 51L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, 51L,
+            ViewableAppInstances.only(Set.of(50L)), null, null,
+            0);
+
+        assertThat(page.getTotalElements()).isZero();
+        assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
+    void testWorkspaceQueryCountsAndPagesOnlyTheRowsTheCallerMayView() {
+        for (int index = 0; index < 60; index++) {
+            createForAppInstance(7L, 5L, 51L);
+        }
+
+        for (int index = 0; index < 3; index++) {
+            createForAppInstance(7L, 5L, 50L);
+        }
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of(50L)), null, null,
+            0);
+
+        assertThat(page.getTotalElements()).isEqualTo(3);
+        assertThat(page.getTotalPages()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsOnly(50L)
+            .hasSize(3);
+    }
+
+    @Test
+    void testUnrestrictedWorkspaceQueryReturnsRowsOfEveryAppInstanceIncludingDeletedOnes() {
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 51L);
+        createForAppInstance(7L, 5L, 999L);
+        createInWorkspace(7L, 2, 5L);
+        createForAppInstance(8L, 5L, 60L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.all(), null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsExactlyInAnyOrder(50L, 51L, 999L, null);
+    }
+
+    @Test
+    void testRestrictedWorkspaceQueryHidesRowsOfADeletedAppInstance() {
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(7L, 5L, 999L);
+        createForAppInstance(7L, 5L, 999L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of(50L)), null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ExternalInvocationLog::getAppInstanceId)
+            .containsExactly(50L);
+    }
+
+    @Test
+    void testTenantWideQueryReturnsRowsOfEveryAppInstance() {
+        createForAppInstance(7L, 5L, 50L);
+        createForAppInstance(8L, 5L, 51L);
+
+        Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, 5L, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
     }
 
     @Test
@@ -197,7 +356,8 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLogService.create(embeddedExternalInvocationLog);
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of()), null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ExternalInvocationLog::getMcpServerId)
@@ -280,6 +440,24 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setInvocationName("slack_sendMessage");
         externalInvocationLog.setAppId(appId);
+        externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
+        externalInvocationLog.setDurationMs(5);
+        externalInvocationLog.setCreatedDate(Instant.now());
+
+        externalInvocationLogService.create(externalInvocationLog);
+    }
+
+    private void createForAppInstance(long workspaceId, long appId, long appInstanceId) {
+        ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
+
+        externalInvocationLog.setType(PlatformType.AUTOMATION);
+        externalInvocationLog.setSource(ExternalInvocationSource.APP_ACTION);
+        externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        externalInvocationLog.setInvocationName("slack_sendMessage");
+        externalInvocationLog.setWorkspaceId(workspaceId);
+        externalInvocationLog.setEnvironment(2);
+        externalInvocationLog.setAppId(appId);
+        externalInvocationLog.setAppInstanceId(appInstanceId);
         externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
         externalInvocationLog.setDurationMs(5);
         externalInvocationLog.setCreatedDate(Instant.now());

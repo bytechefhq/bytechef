@@ -20,6 +20,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiPlatformPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.AppPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DataTablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
@@ -233,6 +234,19 @@ class PermissionScopeRegistryTest {
             .doesNotContain("INTEGRATION_CREATE", "CONNECTED_USER_VIEW", "APP_EVENT_VIEW", "EMBEDDED_VIEW");
     }
 
+    @Test
+    void testAppScopesAreAssignedByRank() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.<PermissionScopeProvider>of(new AppPermissionScopeProvider()));
+
+        assertThat(registry.getScopeNames(WorkspaceRole.VIEWER))
+            .containsExactlyInAnyOrder("APP_VIEW", "APP_USE");
+        assertThat(registry.getScopeNames(WorkspaceRole.EDITOR))
+            .containsExactlyInAnyOrder("APP_VIEW", "APP_USE", "APP_DEPLOY");
+        assertThat(registry.getScopeNames(WorkspaceRole.ADMIN))
+            .containsExactlyInAnyOrder("APP_VIEW", "APP_USE", "APP_DEPLOY", "APP_MANAGE");
+    }
+
     private static PermissionScopeProvider automationProvider(ScopeDefinition... scopeDefinitions) {
         return () -> Set.of(scopeDefinitions);
     }
@@ -275,6 +289,8 @@ class PermissionScopeRegistryTest {
     @Nested
     class ShippedCatalog {
 
+        private static final Set<String> SCOPES_AWAITING_THEIR_GATES = Set.of();
+
         private static final Pattern BLOCK_COMMENT_PATTERN = Pattern.compile("/\\*[\\s\\S]*?\\*/");
 
         private static final Pattern GATE_ANNOTATION_PATTERN = Pattern.compile(
@@ -314,7 +330,7 @@ class PermissionScopeRegistryTest {
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
                 new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
-                new ApiPlatformPermissionScopeProvider(),
+                new ApiPlatformPermissionScopeProvider(), new AppPermissionScopeProvider(),
                 new ConnectionPermissionScopeProvider(), new DataTablePermissionScopeProvider(),
                 new DeploymentPermissionScopeProvider(), new ExecutionPermissionScopeProvider(),
                 new KnowledgeBasePermissionScopeProvider(), new McpPermissionScopeProvider(),
@@ -381,7 +397,10 @@ class PermissionScopeRegistryTest {
 
         @Test
         void testEveryRegisteredScopeIsNamedByAGate() {
-            Set<String> registeredScopeNames = shippedPermissionScopeRegistry.getAllScopeNames();
+            Set<String> registeredScopeNames = new TreeSet<>(shippedPermissionScopeRegistry.getAllScopeNames());
+
+            registeredScopeNames.removeAll(SCOPES_AWAITING_THEIR_GATES);
+
             Set<String> gatedScopeNames = readGatedScopeNames().all();
 
             assertThat(gatedScopeNames)
@@ -406,6 +425,17 @@ class PermissionScopeRegistryTest {
                 "KNOWLEDGE_BASE_VIEW", "KNOWLEDGE_BASE_CREATE", "KNOWLEDGE_BASE_EDIT");
             assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
                 "KNOWLEDGE_BASE_CREATE", "KNOWLEDGE_BASE_EDIT");
+        }
+
+        @Test
+        void testNoExemptedScopeHasGainedAGate() {
+            Set<String> gatedScopeNames = new TreeSet<>(readGatedScopeNames().all());
+
+            gatedScopeNames.retainAll(SCOPES_AWAITING_THEIR_GATES);
+
+            assertThat(gatedScopeNames)
+                .as("these scopes are now gated, remove them from SCOPES_AWAITING_THEIR_GATES")
+                .isEmpty();
         }
 
         @Test

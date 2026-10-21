@@ -1,0 +1,362 @@
+extend type Query {
+    app(id: ID!): App!
+    appCategories(workspaceId: ID!): [Category!]!
+    appGrants(workspaceId: ID!, appId: ID!): [Long!]!
+    appApiCollections(appInstanceId: ID!): [AppApiCollectionBinding!]!
+    appBindableApiCollections(appInstanceId: ID!): [AppBindableApiCollection!]!
+    appBindableConnections(appInstanceId: ID!): [AppBindableConnection!]!
+    appBindableWorkflows(appInstanceId: ID!): [AppBindableWorkflow!]!
+    appBindings(appInstanceId: ID!): [AppBinding!]!
+    appComponentOperations(componentName: String!, componentVersion: Int!): AppComponentOperations!
+    appDeployment(appInstanceId: ID!, appDeploymentId: ID!): AppDeployment!
+    appDeployments(appInstanceId: ID!, limit: Int = 50): [AppDeployment!]!
+    appInstance(id: ID!): AppInstance!
+    appInstanceGrants(workspaceId: ID!, appInstanceId: ID!): [Long!]!
+    appInstanceVersions(appInstanceId: ID!, limit: Int = 50): [AppVersion!]!
+    appInstances(appId: ID!): [AppInstance!]!
+    appTags(workspaceId: ID!): [Tag!]!
+    appUserAuthAvailable(workspaceId: ID!): Boolean!
+    appVersions(appId: ID!, limit: Int = 50): [AppVersion!]!
+    appWorkflows(appInstanceId: ID!): [AppWorkflowBinding!]!
+    apps(workspaceId: ID!): [App!]!
+    hostedAppInstances(workspaceId: ID!, environmentId: ID!): [AppInstance!]!
+    portalApps(environmentId: ID!): [PortalApp!]!
+}
+
+extend type Mutation {
+    bindAppApiCollection(appInstanceId: ID!, apiCollectionId: ID!): AppApiCollectionBinding!
+    bindAppConnection(appInstanceId: ID!, input: AppBindingInput!): AppBinding!
+    bindAppWorkflow(appInstanceId: ID!, input: AppWorkflowBindingInput!): AppWorkflowBinding!
+    cancelAppDeployment(appInstanceId: ID!, appDeploymentId: ID!): AppDeployment!
+    createApp(workspaceId: ID!, environmentId: ID!, input: AppInput!): AppInstanceSecretKey!
+    createAppInstance(
+        appId: ID!, workspaceId: ID!, environmentId: ID!, input: AppInstanceInput!
+    ): AppInstanceSecretKey!
+    createAppVersion(appId: ID!, input: AppVersionInput!): AppVersion!
+    deleteApp(id: ID!): Boolean!
+    deleteAppInstance(id: ID!): Boolean!
+    deployAppInstance(appInstanceId: ID!, appVersionId: ID!): AppDeployment!
+    grantAppAccess(workspaceId: ID!, appId: ID!, userId: ID!): Boolean!
+    grantAppInstanceAccess(workspaceId: ID!, appInstanceId: ID!, userId: ID!): Boolean!
+    recordAppDeployment(appInstanceId: ID!, input: AppDeploymentRecordInput!): AppDeployment!
+    revokeAppAccess(workspaceId: ID!, appId: ID!, userId: ID!): Boolean!
+    revokeAppInstanceAccess(workspaceId: ID!, appInstanceId: ID!, userId: ID!): Boolean!
+    recordAppLaunch(appInstanceId: ID!): Boolean!
+    rollbackAppInstance(appInstanceId: ID!, appVersionId: ID!): AppDeployment!
+    rotateAppInstanceSecretKey(id: ID!): AppInstanceSecretKey!
+    setAppFavorite(appId: ID!, favorite: Boolean!): Boolean!
+    setAppInstanceVisibility(workspaceId: ID!, appInstanceId: ID!, visibility: ResourceVisibility!): Boolean!
+    setAppVisibility(workspaceId: ID!, appId: ID!, visibility: ResourceVisibility!): Boolean!
+    unbindAppApiCollection(appInstanceId: ID!, apiCollectionId: ID!): Boolean!
+    unbindAppConnection(appInstanceId: ID!, bindingKey: String!): Boolean!
+    unbindAppWorkflow(appInstanceId: ID!, workflowKey: String!): Boolean!
+    updateApp(id: ID!, input: AppUpdateInput!): App!
+    updateAppInstance(id: ID!, input: AppInstanceUpdateInput!): AppInstance!
+    updateAppInstanceConfiguration(id: ID!, configuration: Map!): AppInstance!
+    updateAppInstanceDeploymentSettings(id: ID!, input: AppInstanceDeploymentSettingsInput!): AppInstance!
+    updateAppInstanceStatus(id: ID!, status: AppInstanceStatus!): AppInstance!
+    updateAppInstanceUserAuth(id: ID!, userAuthMode: AppUserAuthMode!): AppInstance!
+    updateAppStatus(id: ID!, status: AppStatus!): App!
+    updateAppTags(id: ID!, tags: [TagInput!]!): App!
+}
+
+enum AppStatus {
+    DRAFT
+    ACTIVE
+    SUSPENDED
+    ARCHIVED
+}
+
+enum AppInstanceStatus {
+    ACTIVE
+    SUSPENDED
+    TERMINATED
+}
+
+enum AppHostingTarget {
+    VERCEL
+    SELF_HOSTED
+}
+
+enum AppUserAuthMode {
+    NONE
+    OPTIONAL
+    REQUIRED
+}
+
+enum AppDeploymentProviderType {
+    VERCEL
+    EXTERNAL
+    DEPLOY_HOOK
+}
+
+enum AppDeploymentStatus {
+    QUEUED
+    BUILDING
+    READY
+    FAILED
+    CANCELED
+}
+
+type App {
+    id: ID!
+    uuid: String!
+    name: String!
+    description: String
+    workspaceId: ID!
+    ownerUserId: ID!
+    categoryId: ID
+    tagIds: [ID!]!
+    hasIcon: Boolean!
+    status: AppStatus!
+    visibility: String!
+    portalDiscoverable: Boolean!
+    instances: [AppInstance!]!
+    foreignInstances: [ForeignAppInstance!]!
+    versions(limit: Int = 50): [AppVersion!]!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
+type AppSummary {
+    id: ID!
+    name: String!
+    description: String
+    categoryId: ID
+    hasIcon: Boolean!
+    status: AppStatus!
+}
+
+type AppInstance {
+    id: ID!
+    uuid: String!
+    app: AppSummary!
+    workspaceId: ID!
+    environmentId: ID!
+    name: String!
+    ownerUserId: ID!
+    status: AppInstanceStatus!
+    visibility: String!
+    hostingTarget: AppHostingTarget!
+    url: String
+    secretKeyHint: String
+    secretKeyLastUsedDate: String
+    userAuthMode: AppUserAuthMode!
+    configuration: Map!
+    currentAppDeploymentId: ID
+    currentDeployment: AppDeployment
+    deploymentConnectionId: ID
+    deploymentProviderAvailable: Boolean!
+    deploymentSettings: Map!
+    deployments(limit: Int = 50): [AppDeployment!]!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+    version: Int!
+}
+
+type AppVersion {
+    id: ID!
+    appId: ID!
+    name: String!
+    gitRef: String
+    gitCommitSha: String
+    description: String
+    createdBy: String
+    createdDate: String
+}
+
+type AppDeployment {
+    id: ID!
+    appInstanceId: ID!
+    appVersion: AppVersion!
+    provider: AppDeploymentProviderType!
+    providerDeploymentId: String
+    url: String
+    status: AppDeploymentStatus!
+    errorMessage: String
+    current: Boolean!
+    createdBy: String
+    createdDate: String
+    finishedDate: String
+}
+
+type ForeignAppInstance {
+    id: ID!
+    name: String!
+    workspaceId: ID!
+    environmentId: ID!
+    status: AppInstanceStatus!
+    currentAppDeploymentId: ID
+}
+
+type AppInstanceSecretKey {
+    appInstance: AppInstance!
+    secretKey: String!
+}
+
+type AppBinding {
+    id: ID!
+    appInstanceId: ID!
+    bindingKey: String!
+    connectionId: ID!
+    connectionName: String!
+    componentName: String!
+    connectionVersion: Int!
+    componentVersion: Int
+    actionNames: [String!]!
+    toolNames: [String!]!
+    proxyEnabled: Boolean!
+    proxyAllowedMethods: [String!]!
+}
+
+type AppBindableConnection {
+    id: ID!
+    name: String!
+    componentName: String!
+    connectionVersion: Int!
+    componentVersion: Int!
+}
+
+type AppComponentOperations {
+    actionNames: [String!]!
+    toolNames: [String!]!
+}
+
+type AppApiCollectionBinding {
+    id: ID!
+    appInstanceId: ID!
+    apiCollectionId: ID!
+    name: String!
+    contextPath: String
+    collectionVersion: Int!
+    projectId: ID
+    projectName: String
+    available: Boolean!
+    projectDeploymentId: ID
+    projectVersion: Int
+}
+
+type AppBindableApiCollection {
+    apiCollectionId: ID!
+    name: String!
+    contextPath: String
+    collectionVersion: Int!
+    projectId: ID!
+    projectName: String
+    available: Boolean!
+}
+
+type AppWorkflowBinding {
+    id: ID!
+    appInstanceId: ID!
+    workflowKey: String!
+    projectDeploymentId: ID!
+    projectDeploymentName: String
+    workflowUuid: String!
+    workflowName: String
+    available: Boolean!
+}
+
+type AppBindableWorkflow {
+    projectDeploymentId: ID!
+    projectDeploymentName: String!
+    projectName: String!
+    workflowUuid: String!
+    workflowName: String!
+    description: String
+}
+
+type PortalApp {
+    id: ID!
+    name: String!
+    description: String
+    categoryId: ID
+    categoryName: String
+    hasIcon: Boolean!
+    favorite: Boolean!
+    lastUsedDate: String
+    instances: [PortalAppInstance!]!
+}
+
+type PortalAppInstance {
+    id: ID!
+    name: String!
+    workspaceId: ID!
+    workspaceName: String!
+    url: String!
+    lastUsedDate: String
+    useCount: Int!
+}
+
+input AppCategoryInput {
+    id: ID
+    name: String
+}
+
+input AppInput {
+    name: String!
+    description: String
+    hostingTarget: AppHostingTarget!
+    userAuthMode: AppUserAuthMode
+    visibility: String
+    category: AppCategoryInput
+    portalDiscoverable: Boolean
+}
+
+input AppUpdateInput {
+    name: String
+    description: String
+    category: AppCategoryInput
+    portalDiscoverable: Boolean
+}
+
+input AppInstanceInput {
+    name: String!
+    hostingTarget: AppHostingTarget!
+    userAuthMode: AppUserAuthMode
+    visibility: String
+}
+
+input AppInstanceUpdateInput {
+    name: String
+    hostingTarget: AppHostingTarget
+    url: String
+}
+
+input AppInstanceDeploymentSettingsInput {
+    deploymentConnectionId: ID
+    deploymentSettings: Map
+}
+
+input AppVersionInput {
+    name: String!
+    gitRef: String
+    gitCommitSha: String
+    description: String
+}
+
+input AppDeploymentRecordInput {
+    versionName: String!
+    url: String
+    gitCommitSha: String
+}
+
+input AppBindingInput {
+    bindingKey: String!
+    connectionId: ID!
+    actionNames: [String!]!
+    toolNames: [String!]!
+    proxyEnabled: Boolean!
+    proxyAllowedMethods: [String!]!
+}
+
+input AppWorkflowBindingInput {
+    workflowKey: String!
+    projectDeploymentId: ID!
+    workflowUuid: String!
+}
