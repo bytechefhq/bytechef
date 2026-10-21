@@ -62,6 +62,7 @@ import {
 } from '../utils/layoutUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import removeTrailingBranchPlaceholders from '../utils/removeTrailingBranchPlaceholders';
+import shiftNodesHorizontally from '../utils/shiftNodesHorizontally';
 import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 import useClusterElementsViewMode from './useClusterElementsViewMode';
@@ -751,13 +752,7 @@ export default function useLayout({
         const shift = -widthDelta / 2;
         const {nodes: currentNodes, setNodes: updateNodes} = useWorkflowDataStore.getState();
 
-        const shiftedNodes = currentNodes.map((node) => ({
-            ...node,
-            position: {
-                ...node.position,
-                x: node.position.x + shift,
-            },
-        }));
+        const shiftedNodes = shiftNodesHorizontally(currentNodes, shift);
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
     }, [copilotPanelOpen, leftSidebarOpen]);
