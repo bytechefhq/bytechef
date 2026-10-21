@@ -39,6 +39,8 @@ include("cli:commands:embedded")
 include("cli:commands:component")
 include("cli:commands:component:init:openapi")
 
+include("claude-code-plugin:plugin-tools")
+
 include("server:apps:server-app")
 
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql")
