@@ -19,7 +19,10 @@ package com.bytechef.automation.task.repository;
 import com.bytechef.automation.task.domain.ApprovalTask;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -27,6 +30,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ApprovalTaskRepository extends CrudRepository<ApprovalTask, Long> {
+
+    @Modifying
+    @Query("UPDATE approval_task SET assignee_id = NULL, version = version + 1 WHERE assignee_id = :assigneeId")
+    void clearAssignee(@Param("assigneeId") long assigneeId);
 
     List<ApprovalTask> findAllByEnvironment(int environment);
 

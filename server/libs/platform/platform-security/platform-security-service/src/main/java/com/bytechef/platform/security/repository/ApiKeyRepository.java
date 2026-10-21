@@ -19,7 +19,10 @@ package com.bytechef.platform.security.repository;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -27,6 +30,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
+
+    @Modifying
+    @Query("DELETE FROM api_key WHERE user_id = :userId")
+    void deleteAllByUserId(@Param("userId") long userId);
 
     boolean existsBySecretKeyAndEnvironment(String secretKey, int environment);
 

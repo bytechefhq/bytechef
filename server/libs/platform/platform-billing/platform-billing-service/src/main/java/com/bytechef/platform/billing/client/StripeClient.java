@@ -29,6 +29,8 @@ public interface StripeClient {
 
     void cancelAtPeriodEnd(String stripeSubscriptionId, String tenantId);
 
+    void cancelImmediately(String stripeSubscriptionId, String tenantId);
+
     void reactivateSubscription(String stripeSubscriptionId, String tenantId);
 
     String fetchProductDefaultPriceId(String productId);

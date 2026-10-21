@@ -22,11 +22,14 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,13 +46,16 @@ public class WorkflowContinuationHelper {
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
 
     @SuppressFBWarnings("EI")
     WorkflowContinuationHelper(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade) {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
     }
 
     /**
@@ -62,6 +68,14 @@ public class WorkflowContinuationHelper {
     public void createContinuationJob(String workflowExecutionIdString, Map<String, Object> afterCallData) {
         try {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(workflowExecutionIdString);
+
+            if (InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId())) {
+                log.debug(
+                    "Dropping continuation job for inactive tenant: workflowExecutionId={}",
+                    workflowExecutionIdString);
+
+                return;
+            }
 
             JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
                 workflowExecutionId.getType());

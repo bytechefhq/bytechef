@@ -43,6 +43,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TenantRepository {
 
+    private static final String TENANT_DELETION_SUBQUERY =
+        "SELECT 1 FROM public.tenant_deletion d WHERE 'bytechef_' || d.tenant_id = schema_name AND d.status IN ";
+
+    private static final String LIVE_TENANT_IDS_CONDITION =
+        "NOT EXISTS (" + TENANT_DELETION_SUBQUERY + "(0, 1))";
+
     private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final DataSource dataSource;
@@ -57,7 +63,8 @@ public class TenantRepository {
             tenantId -> "SELECT '%s' FROM %s.organization c WHERE UPPER(c.name) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             organizationName,
-            1);
+            1,
+            findTenantIds());
 
         if (tenantIds.size() > 1) {
             throw new RuntimeException(
@@ -72,21 +79,33 @@ public class TenantRepository {
     }
 
     /**
-     * Retrieves all tenant schema names from the database.
+     * Retrieves the ids of live tenants, excluding those pending deletion or purged.
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_JDBC suppression is safe because the query uses only a constant prefix
      * ({@code TenantConstants.TENANT_PREFIX}) with no user input. The LIKE pattern is hardcoded.
      */
-    @SuppressFBWarnings("SQL_INJECTION_JDBC")
     public List<String> findTenantIds() {
+        return findTenantIds(LIVE_TENANT_IDS_CONDITION);
+    }
+
+    /**
+     * Retrieves the ids of live tenants plus those pending deletion, whose schemas still exist.
+     */
+    public List<String> findTenantIdsIncludingPendingDeletion() {
+        return findTenantIds(
+            "(" + LIVE_TENANT_IDS_CONDITION + " OR EXISTS (" + TENANT_DELETION_SUBQUERY + "(0)))");
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
+    private List<String> findTenantIds(String condition) {
         List<String> tenants = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
             ResultSet resultSet =
                 statement.executeQuery(
-                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE '%s'".formatted(
-                        TenantConstants.TENANT_PREFIX + '%'));
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE '%s' AND %s".formatted(
+                        TenantConstants.TENANT_PREFIX + '%', condition));
 
             while (resultSet.next()) {
                 String schemaName = resultSet.getString(1);
@@ -104,28 +123,40 @@ public class TenantRepository {
         return tenants;
     }
 
-    public List<String> findTenantIdsByUserEmail(String email) {
-        List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+    private List<String> findTenantIdsByUserEmail(String email, List<String> tenantIds) {
+        return findTenantIdsByQueryWithParam(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.email) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
-            email,
-            1);
+            email, 1, tenantIds)
+                .stream()
+                .map(row -> row[0])
+                .collect(Collectors.toList());
+    }
 
-        return tenantIds.stream()
-            .map(row -> row[0])
-            .collect(Collectors.toList());
+    private List<String> findTenantIdsByUserLogin(String login, List<String> tenantIds) {
+        return findTenantIdsByQueryWithParam(
+            tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.login) = UPPER(?)".formatted(
+                tenantId, TenantUtils.getDatabaseSchema(tenantId)),
+            login, 1, tenantIds)
+                .stream()
+                .map(row -> row[0])
+                .collect(Collectors.toList());
+    }
+
+    public List<String> findTenantIdsByUserEmail(String email) {
+        return findTenantIdsByUserEmail(email, findTenantIds());
+    }
+
+    public List<String> findTenantIdsByUserEmailIncludingPendingDeletion(String email) {
+        return findTenantIdsByUserEmail(email, findTenantIdsIncludingPendingDeletion());
     }
 
     public List<String> findTenantIdsByUserLogin(String login) {
-        List<String[]> tenantIds = findTenantIdsByQueryWithParam(
-            tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.login) = UPPER(?)".formatted(
-                tenantId, TenantUtils.getDatabaseSchema(tenantId)),
-            login,
-            1);
+        return findTenantIdsByUserLogin(login, findTenantIds());
+    }
 
-        return tenantIds.stream()
-            .map(row -> row[0])
-            .collect(Collectors.toList());
+    public List<String> findTenantIdsByUserLoginIncludingPendingDeletion(String login) {
+        return findTenantIdsByUserLogin(login, findTenantIdsIncludingPendingDeletion());
     }
 
     public List<Tenant> findTenants() {
@@ -166,7 +197,8 @@ public class TenantRepository {
     }
 
     /**
-     * Retrieves the maximum tenant ID from existing schemas.
+     * Retrieves the maximum tenant ID over existing schemas and tenant deletion records, so that the ids of deleted
+     * tenants are never reused.
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_JDBC suppression is safe because the query uses only a constant prefix
@@ -175,15 +207,19 @@ public class TenantRepository {
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     public String findMaxTenantId() {
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
-            ResultSet resultSet =
-                statement.executeQuery(
-                    "SELECT MAX(schema_name) FROM information_schema.schemata WHERE schema_name LIKE '%s'".formatted(
-                        TenantConstants.TENANT_PREFIX + '%'));
+            String prefix = TenantConstants.TENANT_PREFIX;
+
+            ResultSet resultSet = statement.executeQuery(
+                "SELECT MAX(id) FROM (SELECT REPLACE(schema_name, '" + prefix + "_', '') AS id "
+                    + "FROM information_schema.schemata WHERE schema_name LIKE '" + prefix + "_%' "
+                    + "UNION ALL SELECT tenant_id AS id FROM public.tenant_deletion) t");
 
             if (resultSet.next()) {
-                String schemaName = resultSet.getString(1);
+                String tenantId = resultSet.getString(1);
 
-                return getTenantId(schemaName);
+                if (tenantId != null) {
+                    return tenantId;
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -211,12 +247,31 @@ public class TenantRepository {
         }
     }
 
+    @SuppressFBWarnings("SQL_INJECTION_JDBC")
+    public boolean schemaExists(String tenantId) {
+        validateTenantId(tenantId);
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT 1 FROM information_schema.schemata WHERE schema_name = ?")) {
+
+            preparedStatement.setString(1, TenantUtils.getDatabaseSchema(tenantId));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     public String findTenantIdByUserActivationKey(String activationKey) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.activation_key) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             activationKey,
-            1);
+            1,
+            findTenantIds());
 
         if (tenantIds.size() > 1) {
             throw new RuntimeException(
@@ -235,7 +290,8 @@ public class TenantRepository {
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.reset_key) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             resetKey,
-            1);
+            1,
+            findTenantIds());
 
         if (tenantIds.size() > 1) {
             throw new RuntimeException(
@@ -261,14 +317,14 @@ public class TenantRepository {
      * @param queryTemplate function that generates a query template with ? placeholder for each tenant
      * @param parameter     the parameter value to bind (user input)
      * @param columns       number of columns to retrieve
+     * @param tenantIds     ids of the tenants whose schemas are searched
      * @return list of result rows
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     protected List<String[]> findTenantIdsByQueryWithParam(
-        Function<String, String> queryTemplate, String parameter, int columns) {
+        Function<String, String> queryTemplate, String parameter, int columns, List<String> tenantIds) {
 
         List<String[]> rows = new ArrayList<>();
-        List<String> tenantIds = findTenantIds();
 
         if (tenantIds.isEmpty()) {
             return Collections.emptyList();

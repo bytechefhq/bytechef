@@ -20,6 +20,10 @@ import java.util.Map;
 public class NoOpTriggerScheduler implements TriggerScheduler {
 
     @Override
+    public void cancelAllForTenant(String tenantId) {
+    }
+
+    @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
     }
 

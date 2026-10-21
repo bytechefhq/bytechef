@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.user.remote.client.service;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.service.UserService;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -110,6 +111,11 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public User getUser(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<User> getUsersByAuthorityName(String authorityName) {
         throw new UnsupportedOperationException();
     }
 

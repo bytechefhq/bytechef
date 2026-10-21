@@ -26,12 +26,15 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -54,15 +58,18 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerController(
         ApplicationProperties applicationProperties, TempFileStorage tempFileStorage,
-        WebhookWorkflowExecutor webhookWorkflowExecutor) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         super(applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
 
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
@@ -90,6 +97,11 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         @PathVariable String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId())) {
+            return ResponseEntity.status(HttpStatus.GONE)
+                .build();
+        }
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
@@ -143,8 +155,13 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
     public SseEmitter sseStreamWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest)
         throws Exception {
 
-        SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, workflowExecutionId.getTenantId())) {
+            throw new ResponseStatusException(HttpStatus.GONE);
+        }
+
+        SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             SseEmitterStreamBridge bridge = new SseEmitterStreamBridge(emitter);

@@ -51,6 +51,10 @@ final class TenantRoutingInMemoryChatMemoryRepository implements ChatMemoryRepos
         resolve().deleteByConversationId(conversationId);
     }
 
+    void evictTenant(String tenantId) {
+        repositories.remove(tenantId);
+    }
+
     private ChatMemoryRepository resolve() {
         return repositories.computeIfAbsent(
             TenantContext.getCurrentTenantId(), tenantId -> new InMemoryChatMemoryRepository());

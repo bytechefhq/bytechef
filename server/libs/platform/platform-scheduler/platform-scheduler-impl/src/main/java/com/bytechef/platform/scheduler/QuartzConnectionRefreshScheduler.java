@@ -22,12 +22,16 @@ import com.bytechef.platform.scheduler.job.ConnectionOAuth2TokenRefreshJob;
 import com.bytechef.platform.scheduler.util.QuartzConnectionRefreshUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,42 @@ public class QuartzConnectionRefreshScheduler implements ConnectionRefreshSchedu
     @SuppressFBWarnings("EI")
     public QuartzConnectionRefreshScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
+    }
+
+    @Override
+    public void cancelAllForTenant(String tenantId) {
+        List<String> failures = new ArrayList<>();
+
+        try {
+            for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(CONNECTION_OAUTH_2_TOKEN_REFRESH))) {
+                try {
+                    JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+                    if (jobDetail == null) {
+                        continue;
+                    }
+
+                    JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+                    if (tenantId.equals(jobDataMap.getString("tenantId"))) {
+                        scheduler.deleteJob(jobKey);
+                    }
+                } catch (SchedulerException e) {
+                    log.error("Unable to delete refresh token job with key: {}", jobKey, e);
+
+                    failures.add(jobKey.toString());
+                }
+            }
+        } catch (SchedulerException e) {
+            log.error("Unable to list refresh token jobs for tenantId: {}", tenantId, e);
+
+            failures.add(CONNECTION_OAUTH_2_TOKEN_REFRESH);
+        }
+
+        if (!failures.isEmpty()) {
+            throw new IllegalStateException(
+                "Unable to cancel refresh token jobs %s of tenant %s".formatted(failures, tenantId));
+        }
     }
 
     @Override

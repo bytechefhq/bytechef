@@ -23,6 +23,8 @@ import java.time.Instant;
  */
 public interface ConnectionRefreshScheduler {
 
+    void cancelAllForTenant(String tenantId);
+
     void cancelConnectionRefresh(Long connectionId, String tenantId);
 
     void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId);

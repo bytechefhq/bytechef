@@ -50,7 +50,7 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        List<String> tenantIds = tenantService.getTenantIds();
+        List<String> tenantIds = tenantService.getTenantIdsIncludingPendingDeletion();
 
         if (log.isDebugEnabled()) {
             log.debug("Initializing PgVectorStore schema for {} tenants", tenantIds.size());

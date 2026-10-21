@@ -74,7 +74,7 @@ class MultiTenantKnowledgeBasePgVectorLoaderConfigurationTest {
     void testLoaderRegisteredWhenPgVectorConfigured() {
         TenantService tenantService = mock(TenantService.class);
 
-        when(tenantService.getTenantIds()).thenReturn(List.of());
+        when(tenantService.getTenantIdsIncludingPendingDeletion()).thenReturn(List.of());
 
         new ApplicationContextRunner()
             .withUserConfiguration(MultiTenantKnowledgeBasePgVectorLoaderConfiguration.class)

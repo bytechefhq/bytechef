@@ -19,8 +19,10 @@ package com.bytechef.platform.user.web.rest;
 import static com.bytechef.platform.user.web.rest.MultiTenantAccountControllerIntTest.MultiTenantAccountControllerConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
@@ -37,6 +39,8 @@ import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
+import com.bytechef.tenant.domain.TenantDeletion;
+import com.bytechef.tenant.service.TenantDeletionService;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,6 +48,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -56,6 +61,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -83,6 +90,9 @@ class MultiTenantAccountControllerIntTest {
     private MailService mailService;
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -90,6 +100,9 @@ class MultiTenantAccountControllerIntTest {
 
     @Autowired
     private MockMvc restAccountMockMvc;
+
+    @Autowired
+    private TenantDeletionService tenantDeletionService;
 
     @Autowired
     private TenantService tenantService;
@@ -112,6 +125,8 @@ class MultiTenantAccountControllerIntTest {
         for (String tenantId : tenantIds) {
             tenantService.deleteTenant(tenantId);
         }
+
+        new JdbcTemplate(dataSource).update("DELETE FROM public.tenant_deletion");
 
         TenantContext.resetCurrentTenantId();
     }
@@ -652,6 +667,91 @@ class MultiTenantAccountControllerIntTest {
 
             assertThat(updatedUser.getEmail()).isEqualTo("save-existing-email-1@example.com");
         });
+    }
+
+    @Test
+    void testRequestOrganizationDeletion() throws Exception {
+        String login = registerAndActivateUser("org-deletion");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/organization/delete")
+                    .with(user(login).authorities(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper
+                        .writeValueAsBytes(Map.of("confirmation", login + "@example.com", "password", "Password1")))
+                    .with(csrf())
+                    .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000001"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.purgeAfter").isNotEmpty());
+
+        TenantDeletion tenantDeletion = tenantDeletionService.fetchTenantDeletion("000001")
+            .orElseThrow();
+
+        assertThat(tenantDeletion.status()).isEqualTo(TenantDeletion.Status.PENDING_DELETION);
+        assertThat(tenantDeletion.requestedBy()).isEqualTo(login);
+    }
+
+    @Test
+    void testRequestOrganizationDeletionRejectsNonAdmin() throws Exception {
+        String login = registerAndActivateUser("org-deletion-user");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/organization/delete")
+                    .with(user(login).authorities(new SimpleGrantedAuthority(AuthorityConstants.USER)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper
+                        .writeValueAsBytes(Map.of("confirmation", login + "@example.com", "password", "Password1")))
+                    .with(csrf())
+                    .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000001"))
+            .andExpect(status().isForbidden());
+
+        assertThat(tenantDeletionService.fetchTenantDeletion("000001")).isEmpty();
+    }
+
+    @Test
+    void testRequestOrganizationDeletionRejectsWrongConfirmation() throws Exception {
+        String login = registerAndActivateUser("org-deletion-wrong");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/organization/delete")
+                    .with(user(login).authorities(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper
+                        .writeValueAsBytes(Map.of("confirmation", "someone@else.com", "password", "Password1")))
+                    .with(csrf())
+                    .sessionAttr(TenantConstants.CURRENT_TENANT_ID, "000001"))
+            .andExpect(status().isBadRequest());
+
+        assertThat(tenantDeletionService.fetchTenantDeletion("000001")).isEmpty();
+    }
+
+    private String registerAndActivateUser(String login) throws Exception {
+        ManagedUserVM managedUserVM = new ManagedUserVM();
+
+        managedUserVM.setLogin(login);
+        managedUserVM.setPassword("Password1");
+        managedUserVM.setFirstName("Alice");
+        managedUserVM.setLastName("Test");
+        managedUserVM.setEmail(login + "@example.com");
+        managedUserVM.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+
+        restAccountMockMvc
+            .perform(
+                post("/api/register").contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(managedUserVM))
+                    .with(csrf()))
+            .andExpect(status().isCreated());
+
+        User registeredUser = userRepository.findByLogin(login)
+            .orElseThrow();
+
+        restAccountMockMvc.perform(get("/api/activate?key={activationKey}", registeredUser.getActivationKey()))
+            .andExpect(status().isOk());
+
+        return login;
     }
 
     @TestConfiguration

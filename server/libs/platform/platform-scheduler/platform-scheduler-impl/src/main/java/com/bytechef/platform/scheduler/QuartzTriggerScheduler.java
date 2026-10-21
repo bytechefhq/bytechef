@@ -32,7 +32,9 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import org.quartz.CronScheduleBuilder;
@@ -45,6 +47,7 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +69,39 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         this.scheduler = scheduler;
     }
 
+    @Override
+    public void cancelAllForTenant(String tenantId) {
+        List<String> failures = new ArrayList<>();
+
+        for (String jobGroup : List.of(SCHEDULE_TRIGGER, POLLING_TRIGGER, DYNAMIC_WEBHOOK_TRIGGER_REFRESH)) {
+            try {
+                for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(jobGroup))) {
+                    if (!isTenantJobKey(jobKey, tenantId)) {
+                        continue;
+                    }
+
+                    try {
+                        scheduler.deleteJob(jobKey);
+                    } catch (SchedulerException e) {
+                        log.error("Unable to delete trigger job with key: {}", jobKey, e);
+
+                        failures.add(jobKey.toString());
+                    }
+                }
+            } catch (SchedulerException e) {
+                log.error("Unable to list trigger jobs for jobGroup: {}", jobGroup, e);
+
+                failures.add(jobGroup);
+            }
+        }
+
+        if (!failures.isEmpty()) {
+            throw new IllegalStateException(
+                "Unable to cancel trigger jobs %s of tenant %s".formatted(failures, tenantId));
+        }
+    }
+
+    @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
         deleteJob(workflowExecutionId, DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
     }
@@ -178,6 +214,18 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             log.debug("Trigger job not found for jobName: {}, jobGroup: {}", jobName, jobGroup);
         } catch (SchedulerException e) {
             log.error("Unable to delete trigger job for jobName: {}, jobGroup: {}", jobName, jobGroup, e);
+        }
+    }
+
+    private static boolean isTenantJobKey(JobKey jobKey, String tenantId) {
+        try {
+            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(jobKey.getName());
+
+            return tenantId.equals(workflowExecutionId.getTenantId());
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            log.debug("Skipping trigger job with key that is not a workflow execution id: {}", jobKey);
+
+            return false;
         }
     }
 

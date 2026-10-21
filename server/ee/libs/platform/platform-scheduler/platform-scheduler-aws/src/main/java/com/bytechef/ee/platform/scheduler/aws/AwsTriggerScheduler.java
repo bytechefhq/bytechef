@@ -13,17 +13,22 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedule
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_POLLING_TRIGGER_QUEUE;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SCHEDULE_TRIGGER_QUEUE;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants;
+import com.bytechef.ee.platform.scheduler.aws.util.AwsScheduleUtils;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
     private static final String SCHEDULE_TRIGGER = "ScheduleTrigger";
     private static final String POLLING_TRIGGER = "PollingTrigger";
     private static final String ONE_TIME_TASK = "OneTimeTask";
+    private static final int SCHEDULE_NAME_TAIL_LENGTH = 16;
 
     private final int pollingTriggerCheckPeriod;
     private final SchedulerClient schedulerClient;
@@ -64,6 +70,23 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
         this.sqsArn = "arn:aws:sqs:" + aws.getRegion() + ":" + accountId;
         this.roleArn = "arn:aws:iam::" + accountId + ":role/schedule-role";
+    }
+
+    @Override
+    public void cancelAllForTenant(String tenantId) {
+        List<String> failures = new ArrayList<>();
+
+        for (String groupName : List.of(SCHEDULE_TRIGGER, POLLING_TRIGGER, DYNAMIC_WEBHOOK_TRIGGER_REFRESH)) {
+            failures.addAll(
+                AwsScheduleUtils.deleteSchedules(
+                    schedulerClient, groupName, groupName,
+                    scheduleName -> isTenantScheduleName(scheduleName, groupName, tenantId)));
+        }
+
+        if (!failures.isEmpty()) {
+            throw new IllegalStateException(
+                "Unable to cancel trigger schedules %s of tenant %s".formatted(failures, tenantId));
+        }
     }
 
     @Override
@@ -252,6 +275,30 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         LocalDateTime executeAtDateTime = LocalDateTime.ofInstant(executeAtSecond, ZoneOffset.UTC);
 
         return "at(" + executeAtDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ")";
+    }
+
+    private static boolean isTenantScheduleName(String scheduleName, String groupName, String tenantId) {
+        if (!scheduleName.startsWith(groupName)) {
+            return false;
+        }
+
+        String nameTail = scheduleName.substring(groupName.length());
+
+        if (nameTail.length() != SCHEDULE_NAME_TAIL_LENGTH) {
+            return false;
+        }
+
+        try {
+            String decodedNameTail = new String(EncodingUtils.base64Decode(nameTail), StandardCharsets.UTF_8);
+
+            int separatorIndex = decodedNameTail.indexOf(':');
+
+            return separatorIndex >= 0 && tenantId.equals(decodedNameTail.substring(0, separatorIndex));
+        } catch (IllegalArgumentException e) {
+            log.debug("Skipping schedule whose name does not carry a workflow execution id: {}", scheduleName);
+
+            return false;
+        }
     }
 
     private static String getOneTimeTaskName(long jobId) {

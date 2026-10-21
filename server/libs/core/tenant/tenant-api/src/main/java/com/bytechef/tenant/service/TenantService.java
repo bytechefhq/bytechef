@@ -38,6 +38,8 @@ public interface TenantService {
 
     List<String> getTenantIds();
 
+    List<String> getTenantIdsIncludingPendingDeletion();
+
     boolean isMultiTenantEnabled();
 
     void loadChangelog(List<String> tenantIds, Tenancy tenancy);

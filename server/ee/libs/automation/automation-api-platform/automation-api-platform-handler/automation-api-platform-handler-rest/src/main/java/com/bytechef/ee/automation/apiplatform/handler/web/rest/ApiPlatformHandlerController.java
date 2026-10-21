@@ -34,6 +34,8 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantDeletionService;
+import com.bytechef.tenant.util.InactiveTenants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -78,6 +82,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -86,7 +91,8 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         ApplicationProperties applicationProperties, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, TempFileStorage tempFileStorage,
-        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowService workflowService) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowService workflowService,
+        ObjectProvider<TenantDeletionService> tenantDeletionServiceProvider) {
 
         super(applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
 
@@ -95,6 +101,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
+        this.tenantDeletionServiceProvider = tenantDeletionServiceProvider;
         this.workflowService = workflowService;
     }
 
@@ -136,7 +143,14 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private ResponseEntity<Object> doHandle(
         HttpMethod httpMethod, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
-        return TenantContext.callWithTenantId(TenantContext.getCurrentTenantId(), () -> {
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        if (InactiveTenants.isInactive(tenantDeletionServiceProvider, tenantId)) {
+            return ResponseEntity.status(HttpStatus.GONE)
+                .build();
+        }
+
+        return TenantContext.callWithTenantId(tenantId, () -> {
             Map<String, List<String>> variables;
 
             String requestURI = httpServletRequest.getRequestURI();

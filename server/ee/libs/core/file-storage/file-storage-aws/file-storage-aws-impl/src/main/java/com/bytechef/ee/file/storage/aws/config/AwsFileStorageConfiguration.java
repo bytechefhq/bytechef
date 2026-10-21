@@ -11,6 +11,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Aws;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.ee.file.storage.aws.service.AwsFileStorageServiceImpl;
+import com.bytechef.file.storage.teardown.FileStorageTenantTeardownContributor;
 import io.awspring.cloud.s3.S3ObjectConverter;
 import io.awspring.cloud.s3.S3OutputStreamProvider;
 import io.awspring.cloud.s3.S3Template;
@@ -50,6 +51,13 @@ public class AwsFileStorageConfiguration {
             .getAws();
 
         return new AwsFileStorageServiceImpl(s3Client, s3Template, aws.getBucket());
+    }
+
+    @Bean
+    FileStorageTenantTeardownContributor awsFileStorageTenantTeardownContributor(
+        AwsFileStorageService awsFileStorageService) {
+
+        return new FileStorageTenantTeardownContributor(awsFileStorageService);
     }
 
     @Bean

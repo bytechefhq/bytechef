@@ -145,6 +145,12 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         return tenantRepository.findTenantIds();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getTenantIdsIncludingPendingDeletion() {
+        return tenantRepository.findTenantIdsIncludingPendingDeletion();
+    }
+
     @Transactional(readOnly = true)
     public List<Tenant> getTenants() {
         return tenantRepository.findTenants();
@@ -185,13 +191,15 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     @Override
     @Transactional(readOnly = true)
     public boolean tenantIdsByUserEmailExist(String email) {
-        return !getTenantIdsByUserEmail(email).isEmpty();
+        return !tenantRepository.findTenantIdsByUserEmailIncludingPendingDeletion(email)
+            .isEmpty();
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean tenantIdsByUserLoginExist(String email) {
-        return !getTenantIdsByUserLogin(email).isEmpty();
+        return !tenantRepository.findTenantIdsByUserLoginIncludingPendingDeletion(email)
+            .isEmpty();
     }
 
     private String getRuntimeContext(Tenancy tenancy) {

@@ -20,6 +20,7 @@ import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.repository.ApprovalTaskRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class ApprovalTaskServiceImpl implements ApprovalTaskService {
 
     private final ApprovalTaskRepository approvalTaskRepository;
 
+    @SuppressFBWarnings("EI")
     public ApprovalTaskServiceImpl(ApprovalTaskRepository approvalTaskRepository) {
         this.approvalTaskRepository = approvalTaskRepository;
     }

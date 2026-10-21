@@ -1,3 +1,4 @@
+import AccountProfileDeleteOrganization from '@/pages/account/settings/AccountProfileDeleteOrganization';
 import AccountProfileDetails from '@/pages/account/settings/AccountProfileDetails';
 import AccountProfileLinkedAccounts from '@/pages/account/settings/AccountProfileLinkedAccounts';
 import AccountProfileMfa from '@/pages/account/settings/AccountProfileMfa';
@@ -26,6 +27,8 @@ const AccountProfile = () => {
                     {identityProvidersEnabled && <AccountProfileMfa />}
 
                     {identityProvidersEnabled && <AccountProfileLinkedAccounts />}
+
+                    <AccountProfileDeleteOrganization />
                 </div>
             </div>
         </LayoutContainer>

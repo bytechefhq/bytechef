@@ -24,6 +24,7 @@ import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.event.UserDeletingEvent;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
@@ -42,6 +43,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -50,6 +52,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -70,6 +73,7 @@ public class UserServiceImpl implements UserService {
 
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final PersistentTokenRepository persistentTokenRepository;
     private final SecretGenerator totpSecretGenerator = new DefaultSecretGenerator();
@@ -77,11 +81,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     public UserServiceImpl(
-        AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+        AuthorityRepository authorityRepository, CacheManager cacheManager, ApplicationEventPublisher eventPublisher,
+        PasswordEncoder passwordEncoder, PersistentTokenRepository persistentTokenRepository,
+        UserRepository userRepository) {
 
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.eventPublisher = eventPublisher;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
@@ -223,6 +229,12 @@ public class UserServiceImpl implements UserService {
     public void delete(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
+                long userId = user.getId();
+
+                eventPublisher.publishEvent(new UserDeletingEvent(userId, user.getLogin()));
+
+                persistentTokenRepository.deleteAll(persistentTokenRepository.findAllByUserId(userId));
+
                 userRepository.delete(user);
 
                 this.clearUserCaches(user);
@@ -590,6 +602,18 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<User> getAllActiveUsers(Pageable pageable) {
         return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable);
+    }
+
+    @Override
+    public List<User> getUsersByAuthorityName(String authorityName) {
+        return authorityRepository.findByName(authorityName)
+            .map(authority -> userRepository.findAll()
+                .stream()
+                .filter(User::isActivated)
+                .filter(user -> user.getAuthorityIds()
+                    .contains(authority.getId()))
+                .toList())
+            .orElse(List.of());
     }
 
     @Override

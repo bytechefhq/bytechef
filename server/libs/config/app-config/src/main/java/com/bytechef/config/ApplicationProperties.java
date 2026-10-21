@@ -18,6 +18,7 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -4585,12 +4586,41 @@ public class ApplicationProperties {
          */
         private Mode mode = Mode.SINGLE;
 
+        private Deletion deletion = new Deletion();
+
+        public Deletion getDeletion() {
+            return deletion;
+        }
+
         public Mode getMode() {
             return mode;
         }
 
+        public void setDeletion(Deletion deletion) {
+            this.deletion = deletion;
+        }
+
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+
+        /**
+         * Tenant deletion configuration.
+         */
+        public static class Deletion {
+
+            /**
+             * Period between a deletion request and the permanent purge of the tenant data
+             */
+            private Duration gracePeriod = Duration.ofDays(30);
+
+            public Duration getGracePeriod() {
+                return gracePeriod;
+            }
+
+            public void setGracePeriod(Duration gracePeriod) {
+                this.gracePeriod = gracePeriod;
+            }
         }
     }
 

@@ -31,8 +31,16 @@ class InMemoryChatMemoryConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "in_memory")
-    ChatMemoryRepository inMemoryChatMemoryRepository() {
+    TenantRoutingInMemoryChatMemoryRepository inMemoryChatMemoryRepository() {
         return new TenantRoutingInMemoryChatMemoryRepository();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "in_memory")
+    InMemoryChatMemoryTenantTeardownContributor inMemoryChatMemoryTenantTeardownContributor(
+        TenantRoutingInMemoryChatMemoryRepository inMemoryChatMemoryRepository) {
+
+        return new InMemoryChatMemoryTenantTeardownContributor(inMemoryChatMemoryRepository);
     }
 
     @Bean

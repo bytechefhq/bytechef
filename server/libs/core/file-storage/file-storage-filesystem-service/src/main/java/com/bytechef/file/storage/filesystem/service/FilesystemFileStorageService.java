@@ -21,6 +21,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.util.TenantIdUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -67,6 +68,43 @@ public class FilesystemFileStorageService implements FileStorageService {
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public FilesystemFileStorageService(String baseDir) {
         this.baseDirPath = Paths.get(baseDir);
+    }
+
+    @Override
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
+    public void deleteTenantFiles(String tenantId) {
+        Path tenantDirectoryPath = baseDirPath.resolve(TenantIdUtils.requireValid(tenantId));
+
+        if (!pathExists(tenantDirectoryPath)) {
+            return;
+        }
+
+        try {
+            Files.walkFileTree(tenantDirectoryPath, new SimpleFileVisitor<>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                    Files.deleteIfExists(file);
+
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path directory, IOException ioException)
+                    throws IOException {
+
+                    if (ioException != null) {
+                        throw ioException;
+                    }
+
+                    Files.deleteIfExists(directory);
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException ioException) {
+            throw new FileStorageException("Cannot delete files of tenant " + tenantId, ioException);
+        }
     }
 
     @Override

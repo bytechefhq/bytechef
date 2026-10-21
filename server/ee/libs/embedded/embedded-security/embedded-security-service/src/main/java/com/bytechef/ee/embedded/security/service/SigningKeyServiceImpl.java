@@ -55,6 +55,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     private final SigningKeyRepository signingKeyRepository;
 
+    @SuppressFBWarnings("EI")
     public SigningKeyServiceImpl(SigningKeyRepository signingKeyRepository) {
         this.signingKeyRepository = signingKeyRepository;
     }

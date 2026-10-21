@@ -22,6 +22,7 @@ import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private final ApiKeyAuditPublisher apiKeyAuditPublisher;
     private final ApiKeyRepository apiKeyRepository;
 
+    @SuppressFBWarnings("EI")
     public ApiKeyServiceImpl(ApiKeyAuditPublisher apiKeyAuditPublisher, ApiKeyRepository apiKeyRepository) {
         this.apiKeyAuditPublisher = apiKeyAuditPublisher;
         this.apiKeyRepository = apiKeyRepository;

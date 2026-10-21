@@ -19,11 +19,14 @@ package com.bytechef.platform.user.facade;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.LastAdminDeletionException;
+import com.bytechef.platform.user.exception.SelfDeletionException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.validator.PasswordValidator;
@@ -69,6 +72,21 @@ class UserManagementFacadeImpl implements UserManagementFacade {
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteUser(String login) {
+        if (Objects.equals(login, SecurityUtils.getCurrentUserLogin())) {
+            throw new SelfDeletionException();
+        }
+
+        List<User> administrators = userService.getUsersByAuthorityName(AuthorityConstants.ADMIN);
+
+        boolean targetIsAdministrator = administrators.stream()
+            .anyMatch(user -> Objects.equals(user.getLogin(), login));
+        boolean otherAdministratorExists = administrators.stream()
+            .anyMatch(user -> !Objects.equals(user.getLogin(), login));
+
+        if (targetIsAdministrator && !otherAdministratorExists) {
+            throw new LastAdminDeletionException();
+        }
+
         userService.delete(login);
     }
 
