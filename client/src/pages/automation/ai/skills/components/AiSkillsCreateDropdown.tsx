@@ -1,5 +1,10 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import AiSkillUploadDialog from '@/pages/automation/ai/skills/components/AiSkillUploadDialog';
 import AiSkillWriteDialog from '@/pages/automation/ai/skills/components/AiSkillWriteDialog';
 import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';

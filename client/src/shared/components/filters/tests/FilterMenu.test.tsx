@@ -3,22 +3,27 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import FilterMenu, {type FilterGroupI, hasActiveFilters, isFilterGroupActive, resetFilterGroups} from '../FilterMenu';
 
-vi.mock('@/components/ui/dropdown-menu', () => ({
+vi.mock('@/components/DropdownMenu/DropdownMenu', () => ({
     DropdownMenu: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     DropdownMenuContent: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     DropdownMenuGroup: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     DropdownMenuItem: ({
         children,
         disabled,
+        icon,
+        label,
         onClick,
     }: {
-        children: React.ReactNode;
-        className?: string;
+        children?: React.ReactNode;
         disabled?: boolean;
+        icon?: React.ReactNode;
+        label?: string;
         onClick?: () => void;
     }) => (
         <button disabled={disabled} onClick={onClick} type="button">
-            {children}
+            {icon}
+
+            {label ?? children}
         </button>
     ),
     DropdownMenuLabel: ({children}: {children: React.ReactNode}) => <div>{children}</div>,

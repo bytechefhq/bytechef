@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {Input} from '@/components/Input/Input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
@@ -143,15 +143,20 @@ const AiSkills = () => {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handlers.onDownload}>
-                            <DownloadIcon className="mr-2 size-4" /> Download Skill
-                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            icon={<DownloadIcon />}
+                            label="Download Skill"
+                            onClick={handlers.onDownload}
+                        />
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem onClick={handlers.onDelete} variant="destructive">
-                            <Trash2Icon className="mr-2 size-4" /> Delete Skill
-                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            icon={<Trash2Icon />}
+                            label="Delete Skill"
+                            onClick={handlers.onDelete}
+                            variant="destructive"
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

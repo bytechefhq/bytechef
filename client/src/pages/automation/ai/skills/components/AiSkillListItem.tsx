@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
@@ -81,22 +81,22 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                            <DropdownMenuItem onClick={handleDownloadClick}>
-                                <DownloadIcon className="mr-2 size-4" />
-                                Download
-                            </DropdownMenuItem>
+                            <DropdownMenuItem icon={<DownloadIcon />} label="Download" onClick={handleDownloadClick} />
 
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-                                <PencilIcon className="mr-2 size-4" />
-                                Edit
-                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                icon={<PencilIcon />}
+                                label="Edit"
+                                onClick={() => setShowEditDialog(true)}
+                            />
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
-                                <TrashIcon className="mr-2 size-4 text-content-destructive" />
-                                Delete
-                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                icon={<TrashIcon />}
+                                label="Delete"
+                                onClick={() => setShowDeleteDialog(true)}
+                                variant="destructive"
+                            />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

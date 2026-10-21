@@ -1,11 +1,13 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {render, resetAll, screen} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiSkills from '../AiSkills';
+import useAiSkillDetailToolbarStore from '../stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '../stores/useAiSkillsStore';
 
 const {closeSkillDetailMock, invalidateSkillQueriesMock, navigateMock, openSkillDetailMock, tagFilterGroupsRef} =
@@ -46,17 +48,23 @@ const LIST_PATH = '/automation/settings/ai/skills';
 
 const renderPage = (pathname = LIST_PATH) =>
     render(
-        <MemoryRouter initialEntries={[pathname]}>
-            <Routes>
-                <Route element={<AiSkills />} path="/:platform/settings/ai/skills/:skillId" />
+        <TooltipProvider>
+            <MemoryRouter initialEntries={[pathname]}>
+                <Routes>
+                    <Route element={<AiSkills />} path="/:platform/settings/ai/skills/:skillId" />
 
-                <Route element={<AiSkills />} path="/:platform/settings/ai/skills" />
-            </Routes>
-        </MemoryRouter>
+                    <Route element={<AiSkills />} path="/:platform/settings/ai/skills" />
+                </Routes>
+            </MemoryRouter>
+        </TooltipProvider>
     );
 
 describe('AiSkills', () => {
     beforeEach(() => {
+        windowResizeObserver();
+
+        useAiSkillDetailToolbarStore.getState().resetToolbar();
+
         useAiSkillsStore.setState({
             closeSkillDetail: closeSkillDetailMock,
             openSkillDetail: openSkillDetailMock,
@@ -138,5 +146,47 @@ describe('AiSkills', () => {
         useCopilotPostTurnRegistry.getState().runFor(Source.SKILLS);
 
         expect(invalidateSkillQueriesMock).toHaveBeenCalled();
+    });
+
+    describe('detail more-actions menu', () => {
+        const onCopilot = vi.fn();
+        const onDelete = vi.fn();
+        const onDownload = vi.fn();
+        const onSave = vi.fn();
+
+        const openMoreActionsMenu = async () => {
+            useAiSkillDetailToolbarStore.setState({handlers: {onCopilot, onDelete, onDownload, onSave}});
+            useAiSkillsStore.setState({selectedSkillId: '42', skillsView: 'detail'});
+
+            renderPage(`${LIST_PATH}/42`);
+
+            await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        };
+
+        it('renders with the design-system DropdownMenu', async () => {
+            await openMoreActionsMenu();
+
+            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+            expect(screen.getByRole('menuitem', {name: 'Download Skill'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete Skill'})).toHaveClass(
+                'text-content-destructive-primary'
+            );
+        });
+
+        it('downloads the skill when Download Skill is clicked', async () => {
+            await openMoreActionsMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Download Skill'}));
+
+            expect(onDownload).toHaveBeenCalledTimes(1);
+        });
+
+        it('deletes the skill when Delete Skill is clicked', async () => {
+            await openMoreActionsMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Delete Skill'}));
+
+            expect(onDelete).toHaveBeenCalledTimes(1);
+        });
     });
 });
