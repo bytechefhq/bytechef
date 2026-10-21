@@ -16,12 +16,15 @@ import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     Authorization,
     AuthorizationType,
@@ -127,6 +130,10 @@ const ConnectionDialog = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
+    const canEditWorkspaceConnection = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -188,7 +195,13 @@ const ConnectionDialog = ({
 
     const isEdit = !!connection?.id;
 
-    const canUpdateCredentials = isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed;
+    const canEditConnection =
+        currentType === PlatformType.EMBEDDED ? canEditEmbeddedConnection : canEditWorkspaceConnection;
+
+    const credentialsHidden = isEdit && !canEditConnection;
+
+    const canUpdateCredentials =
+        isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && !credentialsHidden;
 
     const handleConnectionSuccess = (connectionId: number | void) => {
         queryClient.invalidateQueries({
@@ -397,7 +410,7 @@ const ConnectionDialog = ({
     }
 
     function saveConnection(additionalParameters?: object) {
-        if (isUpdatingCredentials && credentialsMutation) {
+        if (isUpdatingCredentials && credentialsMutation && !credentialsHidden) {
             const {parameters} = getValues();
 
             return credentialsMutation.mutateAsync({
@@ -852,6 +865,7 @@ const ConnectionDialog = ({
                                         baseUri={connection.baseUri}
                                         connectionDefinition={connectionDefinition}
                                         connectionParameters={connection.connectionParameters}
+                                        credentialsHidden={credentialsHidden}
                                     />
                                 </div>
                             )}

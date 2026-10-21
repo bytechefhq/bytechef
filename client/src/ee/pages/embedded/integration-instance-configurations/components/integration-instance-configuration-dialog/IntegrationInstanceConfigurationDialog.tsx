@@ -115,6 +115,8 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
 
+    const credentialsHidden = !!integrationInstanceConfiguration?.id && !canEditConfiguration;
+
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
         curIntegrationVersion!,
@@ -285,8 +287,17 @@ const IntegrationInstanceConfigurationDialog = ({
         }
 
         if (integrationInstanceConfiguration?.id) {
+            const {
+                /* eslint-disable @typescript-eslint/no-unused-vars */
+                connectionAuthorizationParameters: _connectionAuthorizationParameters,
+                connectionConnectionParameters: _connectionConnectionParameters,
+                connectionParameters: _connectionParameters,
+                /* eslint-enable @typescript-eslint/no-unused-vars */
+                ...integrationInstanceConfigurationWithoutCredentials
+            } = integrationInstanceConfiguration;
+
             updateIntegrationInstanceConfigurationMutation.mutate({
-                ...integrationInstanceConfiguration,
+                ...integrationInstanceConfigurationWithoutCredentials,
                 ...formData,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
@@ -493,6 +504,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                             connectionParameters={
                                                 integrationInstanceConfiguration.connectionConnectionParameters
                                             }
+                                            credentialsHidden={credentialsHidden}
                                         />
                                     </div>
                                 )}
