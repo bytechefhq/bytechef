@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class FileEntryController {
 
     private final TempFileStorage tempFileStorage;
 
+    @SuppressFBWarnings("EI")
     public FileEntryController(TempFileStorage tempFileStorage) {
         this.tempFileStorage = tempFileStorage;
     }
