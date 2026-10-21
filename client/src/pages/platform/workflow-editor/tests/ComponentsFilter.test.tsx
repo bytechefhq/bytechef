@@ -1,5 +1,15 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {fireEvent, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {
+    fireEvent,
+    render,
+    resetAll,
+    screen,
+    userEvent,
+    waitFor,
+    windowResizeObserver,
+    within,
+} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 import ComponentsFilter from '../components/filters/ComponentsFilter';
@@ -29,7 +39,12 @@ const mockToggleCategory = vi.fn();
 const mockSetActiveView = vi.fn();
 const mockDeselectAllCategories = vi.fn();
 
-const renderComponentsFilter = (filterLabel: string, filterTooltip: string, customState = {}) => {
+const renderComponentsFilter = (
+    filterLabel: string,
+    filterTooltip: string,
+    customState = {},
+    filteredCategories: {icon?: ReactNode; label: string}[] = mockFilteredCategories
+) => {
     const mockFilterState = {
         activeView: 'all' as const,
         filteredCount: 0,
@@ -48,7 +63,7 @@ const renderComponentsFilter = (filterLabel: string, filterTooltip: string, cust
                     tooltip: filterTooltip,
                 }}
                 filterState={mockFilterState}
-                filteredCategories={mockFilteredCategories}
+                filteredCategories={filteredCategories}
                 filteredComponents={[]}
                 setActiveView={mockSetActiveView}
                 setSearchValue={mockSetSearchValue}
@@ -326,4 +341,76 @@ it('should call "deselectAllCategories" when "Deselect" button is clicked for tr
 
         expect(mockDeselectAllCategories).toHaveBeenCalled();
     });
+});
+
+it('should render the categories with the design-system DropdownMenu', async () => {
+    renderComponentsFilter('actions', 'Filter actions by category', {selectedCategories: ['Category2']});
+
+    await userEvent.click(screen.getByLabelText('Filter actions'));
+
+    expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+    expect(screen.getAllByRole('menuitemcheckbox').map((menuItem) => menuItem.textContent)).toEqual([
+        'Category1',
+        'Category2',
+        'Category3',
+    ]);
+    expect(screen.getByRole('menuitemcheckbox', {name: 'Category1'})).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByRole('menuitemcheckbox', {name: 'Category2'})).toHaveAttribute('aria-checked', 'true');
+});
+
+it('should toggle a category and keep the menu open when clicking its row', async () => {
+    renderComponentsFilter('actions', 'Filter actions by category');
+
+    await userEvent.click(screen.getByLabelText('Filter actions'));
+
+    await userEvent.click(screen.getByRole('menuitemcheckbox', {name: 'Category3'}));
+
+    expect(mockToggleCategory).toHaveBeenCalledTimes(1);
+    expect(mockToggleCategory).toHaveBeenCalledWith('Category3');
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+});
+
+it('should show the category icon, falling back to the bot icon, in each row', async () => {
+    renderComponentsFilter('actions', 'Filter actions by category', {}, [
+        {icon: <span data-testid="category-icon" />, label: 'Category1'},
+        {label: 'Category2'},
+    ]);
+
+    await userEvent.click(screen.getByLabelText('Filter actions'));
+
+    const categoryWithIconRow = screen.getByRole('menuitemcheckbox', {name: 'Category1'});
+    const categoryWithoutIconRow = screen.getByRole('menuitemcheckbox', {name: 'Category2'});
+
+    expect(within(categoryWithIconRow).getByTestId('category-icon')).toBeInTheDocument();
+    expect(categoryWithIconRow.querySelector('svg.lucide-bot')).not.toBeInTheDocument();
+    expect(categoryWithoutIconRow.querySelector('svg.lucide-bot')).toBeInTheDocument();
+});
+
+it('should show a message instead of rows when no category matches', async () => {
+    renderComponentsFilter('actions', 'Filter actions by category', {}, []);
+
+    await userEvent.click(screen.getByLabelText('Filter actions'));
+
+    expect(screen.getByText('No categories found')).toBeInTheDocument();
+    expect(screen.queryByRole('menuitemcheckbox')).not.toBeInTheDocument();
+});
+
+it('should keep the search input focused while hovering over a category row', async () => {
+    renderComponentsFilter('actions', 'Filter actions by category');
+
+    await userEvent.click(screen.getByLabelText('Filter actions'));
+
+    const searchInput = screen.getByPlaceholderText('Find category');
+
+    searchInput.focus();
+
+    const categoryRow = screen.getByRole('menuitemcheckbox', {name: 'Category1'});
+
+    await userEvent.hover(categoryRow);
+
+    expect(searchInput).toHaveFocus();
+
+    await userEvent.unhover(categoryRow);
+
+    expect(searchInput).toHaveFocus();
 });

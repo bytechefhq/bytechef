@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {Input} from '@/components/Input/Input';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {BotIcon, CircleMinusIcon, ListFilterIcon, SearchIcon, XIcon} from 'lucide-react';
-import {ReactNode, useCallback} from 'react';
+import {ReactNode, isValidElement, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface FilterStateProps {
@@ -118,7 +118,7 @@ const ComponentsFilter = ({
                     <TooltipContent side="left">{filterConfig.tooltip}</TooltipContent>
                 </Tooltip>
 
-                <DropdownMenuContent align="start" className="mr-2 overflow-hidden p-1">
+                <DropdownMenuContent align="start" className="mr-2 overflow-hidden">
                     <div className="mb-1 flex items-center">
                         <div className="relative w-full rounded-md bg-background">
                             <SearchIcon className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
@@ -166,21 +166,15 @@ const ComponentsFilter = ({
                         {filteredCategories.map((category) => (
                             <DropdownMenuCheckboxItem
                                 checked={filterState.selectedCategories.includes(category.label)}
-                                className="flex w-task-filter-dropdown-menu-width cursor-pointer items-center justify-between gap-5 rounded-md px-3 hover:bg-surface-neutral-primary-hover [&>span:first-child]:static [&>span:first-child]:order-last"
+                                className="w-task-filter-dropdown-menu-width px-3 hover:bg-surface-neutral-primary-hover [&>span:first-child]:static [&>span:first-child]:order-last [&>span:first-child]:ml-auto"
+                                icon={isValidElement(category.icon) ? category.icon : <BotIcon />}
                                 key={category.label}
+                                label={category.label}
                                 onCheckedChange={() => toggleCategory(category.label)}
                                 onPointerLeave={(event) => event.preventDefault()}
                                 onPointerMove={(event) => event.preventDefault()}
                                 onSelect={(event) => event.preventDefault()}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span className="[&>svg]:size-4">
-                                        {category.icon ? category.icon : <BotIcon />}
-                                    </span>
-
-                                    <span>{category.label}</span>
-                                </div>
-                            </DropdownMenuCheckboxItem>
+                            />
                         ))}
                     </ScrollArea>
                 </DropdownMenuContent>
