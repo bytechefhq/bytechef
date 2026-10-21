@@ -5,13 +5,14 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {Control, Controller} from 'react-hook-form';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
     useHasEmbeddedScope: () => true,
@@ -269,12 +270,31 @@ describe('ConnectionDialog', () => {
     describe('editing a connection whose credentials were rejected', () => {
         const invalidConnection = {
             componentName: 'slack',
+            createdBy: 'creator@localhost.com',
             credentialStatus: 'INVALID',
             id: 7,
             name: 'Slack',
             tags: [],
             version: 1,
         };
+
+        const authenticateAs = (login: string) =>
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login} as never,
+                    authenticated: true,
+                });
+            });
+
+        beforeEach(() => {
+            authenticateAs('creator@localhost.com');
+        });
+
+        afterEach(() => {
+            act(() => {
+                authenticationStore.setState({account: undefined, authenticated: false});
+            });
+        });
 
         const renderEditDialog = (withCredentialsMutation: boolean) => {
             const updateConnectionMutate = vi.fn();
@@ -309,6 +329,16 @@ describe('ConnectionDialog', () => {
             expect(await screen.findByText('These credentials were rejected')).toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
         });
+
+        it('stays in name and tags mode for an admin who did not create the connection', () => {
+            authenticateAs('admin@localhost.com');
+
+            renderEditDialog(true);
+
+            expect(screen.queryByText('These credentials were rejected')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+        });
     });
 
     describe('replacing the credentials of an existing connection', () => {
@@ -316,11 +346,27 @@ describe('ConnectionDialog', () => {
             authorizationType: 'OAUTH2_AUTHORIZATION_CODE',
             componentName: 'slack',
             connectionVersion: 2,
+            createdBy: 'creator@localhost.com',
             id: 11,
             name: 'Slack',
             tags: [],
             version: 4,
         };
+
+        beforeEach(() => {
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login: 'creator@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
+        });
+
+        afterEach(() => {
+            act(() => {
+                authenticationStore.setState({account: undefined, authenticated: false});
+            });
+        });
 
         it('requests the OAuth2 authorization parameters for the connection component and version', () => {
             vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
@@ -480,11 +526,27 @@ describe('ConnectionDialog', () => {
         const connection = {
             componentName: 'httpClient',
             connectionParameters: {baseUri: 'https://old.example.com', token: '****'},
+            createdBy: 'creator@localhost.com',
             id: 9,
             name: 'HTTP',
             tags: [],
             version: 3,
         };
+
+        beforeEach(() => {
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login: 'creator@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
+        });
+
+        afterEach(() => {
+            act(() => {
+                authenticationStore.setState({account: undefined, authenticated: false});
+            });
+        });
 
         const renderPropertiesDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) => {
             const credentialsMutateAsync = vi.fn().mockResolvedValue(undefined);
