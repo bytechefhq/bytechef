@@ -1,6 +1,7 @@
 import {Form} from '@/components/ui/form';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -55,10 +56,14 @@ vi.mock(
 vi.mock(
     '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect',
     () => ({
-        default: ({onChange}: {onChange: (value: number) => void}) => (
-            <button onClick={() => onChange(2)} type="button">
-                Choose V2
-            </button>
+        default: ({onChange, projectVersion}: {onChange: (value: number) => void; projectVersion?: number}) => (
+            <>
+                {projectVersion != null && <span>{`Selected V${projectVersion}`}</span>}
+
+                <button onClick={() => onChange(2)} type="button">
+                    Choose V2
+                </button>
+            </>
         ),
     })
 );
@@ -110,6 +115,38 @@ const ChangeVersionHarness = ({
                 getValues={form.getValues}
                 handleTabChange={vi.fn()}
                 onDeploymentSelect={onDeploymentSelect}
+                projectDeployment={undefined}
+                projectDeployments={projectDeployments}
+                projectDeploymentsLoading={false}
+                setValue={form.setValue}
+                showTabs
+            />
+        </Form>
+    );
+};
+
+const TabsHarness = ({projectDeployments}: {projectDeployments: ProjectDeployment[]}) => {
+    const [basicStepTab, setBasicStepTab] = useState<'new-deployment' | 'change-version'>('change-version');
+
+    const form = useForm<ProjectDeployment>({defaultValues: {name: '', projectId: 1}});
+
+    const handleTabChange = (tab: 'new-deployment' | 'change-version') => {
+        setBasicStepTab(tab);
+
+        if (tab === 'new-deployment') {
+            form.reset({name: '', projectId: 1, projectVersion: undefined});
+        }
+    };
+
+    return (
+        <Form {...form}>
+            <ProjectDeploymentDialogBasicStep
+                basicStepTab={basicStepTab}
+                changeProjectVersion={false}
+                control={form.control}
+                getValues={form.getValues}
+                handleTabChange={handleTabChange}
+                onDeploymentSelect={vi.fn()}
                 projectDeployment={undefined}
                 projectDeployments={projectDeployments}
                 projectDeploymentsLoading={false}
@@ -189,5 +226,23 @@ describe('ProjectDeploymentDialogBasicStep', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Choose AI Agent'}));
 
         expect(screen.getByPlaceholderText('My CRM Project')).toHaveValue('My deployment');
+    });
+
+    it('should clear the version picked from an existing deployment when switching to the new tab', async () => {
+        render(
+            <TabsHarness
+                projectDeployments={
+                    [
+                        {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3},
+                    ] as ProjectDeployment[]
+                }
+            />
+        );
+
+        expect(screen.getByText('Selected V3')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'New'}));
+
+        expect(screen.queryByText('Selected V3')).not.toBeInTheDocument();
     });
 });

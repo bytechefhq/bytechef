@@ -328,6 +328,11 @@ const ProjectDeploymentDialogBasicStep = ({
                 }
 
                 handleTabChange(normalizedValue);
+
+                if (normalizedValue === 'new-deployment') {
+                    setCurrentProjectId(getValues('projectId'));
+                    setCurrentProjectVersion(getValues('projectVersion'));
+                }
             }}
             value={basicStepTab}
         >
