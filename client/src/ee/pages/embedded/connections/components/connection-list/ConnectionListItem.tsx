@@ -10,6 +10,7 @@ import {
     useUpdateConnectionMutation,
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
@@ -151,6 +152,7 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditDialog(false)}
+                    platformType={PlatformType.EMBEDDED}
                     showSharedOption
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     useUpdateConnectionCredentialsMutation={useUpdateConnectionCredentialsMutation}

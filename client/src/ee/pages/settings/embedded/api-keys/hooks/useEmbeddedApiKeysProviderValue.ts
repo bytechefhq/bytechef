@@ -12,6 +12,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
+import {toast} from 'sonner';
 
 const EMBEDDED_API_KEYS_QUERY_KEY = ['EmbeddedApiKeys'];
 
@@ -44,7 +45,15 @@ const useEmbeddedApiKeysProviderValue = (): ApiKeysProviderStateI => {
                 onSuccess: (data) => {
                     void queryClient.invalidateQueries({queryKey: EMBEDDED_API_KEYS_QUERY_KEY});
 
-                    props?.onSuccess?.(data.createEmbeddedApiKey ?? '');
+                    if (!data.createEmbeddedApiKey) {
+                        toast.error('The API key was not created. Please try again.');
+
+                        props?.onError?.(new Error('The API key was not created.'));
+
+                        return;
+                    }
+
+                    props?.onSuccess?.(data.createEmbeddedApiKey);
                 },
             });
 
