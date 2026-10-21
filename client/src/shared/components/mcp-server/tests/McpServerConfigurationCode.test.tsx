@@ -17,10 +17,16 @@ const renderConfigurationCode = (onRefresh = vi.fn()) => {
 };
 
 beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true});
+
     windowResizeObserver();
 });
 
 afterEach(() => {
+    act(() => {
+        vi.runOnlyPendingTimers();
+    });
+
     resetAll();
     vi.clearAllMocks();
     vi.useRealTimers();

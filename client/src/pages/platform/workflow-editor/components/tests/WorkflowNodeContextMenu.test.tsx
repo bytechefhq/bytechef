@@ -1,7 +1,7 @@
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {NodeDataType} from '@/shared/types';
-import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const triggerNodeData = {
@@ -34,12 +34,19 @@ const renderContextMenu = (readOnly: boolean, onDelete = vi.fn()) =>
 
 describe('WorkflowNodeContextMenu', () => {
     beforeEach(() => {
+        vi.useFakeTimers({shouldAdvanceTime: true});
+
         windowResizeObserver();
     });
 
     afterEach(() => {
+        act(() => {
+            vi.runOnlyPendingTimers();
+        });
+
         resetAll();
         vi.restoreAllMocks();
+        vi.useRealTimers();
     });
 
     it('lets an editor delete a trigger through the confirmation dialog', async () => {
