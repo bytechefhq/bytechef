@@ -1,5 +1,6 @@
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -193,6 +194,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    act(() => {
+        authenticationStore.setState({account: undefined, authenticated: false});
+    });
+
     resetAll();
     vi.clearAllMocks();
 
@@ -673,11 +678,19 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                 connectionAuthorizationParameters: {value: 'secret-api-key-value'},
                 connectionConnectionParameters: {subdomain: 'acme-subdomain'},
                 connectionParameters: {subdomain: 'acme-subdomain', value: 'secret-api-key-value'},
+                createdBy: 'creator@localhost.com',
                 id: 1,
                 integrationId: 2,
                 integrationVersion: 1,
                 name: 'Existing',
             } as unknown as IntegrationInstanceConfiguration;
+
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_USER'], login: 'creator@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
 
             hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
             hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_VIEW'];
@@ -718,6 +731,41 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
             expect(JSON.stringify(payload)).not.toContain('secret-api-key-value');
             expect(payload).toMatchObject({id: 1, name: 'Existing'});
+        });
+
+        it('should show credentials as hidden to an admin who did not create the configuration', () => {
+            const existingConfiguration = {
+                authorizationType: 'API_KEY',
+                connectionParameters: {value: 'secret-api-key-value'},
+                createdBy: 'creator@localhost.com',
+                id: 1,
+                integrationId: 2,
+                integrationVersion: 1,
+                name: 'Existing',
+            } as unknown as IntegrationInstanceConfiguration;
+
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.grantedScopes = [
+                'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+                'INTEGRATION_INSTANCE_CONFIGURATION_VIEW',
+            ];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('connection-parameters')).toHaveAttribute('data-credentials-hidden', 'true');
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
 
         it('should keep the stored authorization type when saving', async () => {
