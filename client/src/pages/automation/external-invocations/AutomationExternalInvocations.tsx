@@ -5,7 +5,7 @@ import WorkflowExecutionSheet from '@/pages/automation/workflow-executions/compo
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
-import {PlatformType, useA2aServersQuery, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useA2aServersQuery, useAppsQuery, useWorkspaceMcpServersQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useCallback, useMemo} from 'react';
 
@@ -20,11 +20,17 @@ export const AutomationExternalInvocations = () => {
     useLoadWorkspaceScopes(currentWorkspaceId);
 
     const canViewA2aServers = useHasWorkspaceScope(currentWorkspaceId, 'A2A_VIEW');
+    const canViewApps = useHasWorkspaceScope(currentWorkspaceId, 'APP_VIEW');
     const canViewMcpServers = useHasWorkspaceScope(currentWorkspaceId, 'MCP_VIEW');
 
     const {data: a2aServersData} = useA2aServersQuery(
         {workspaceId: currentWorkspaceId + ''},
         {enabled: currentWorkspaceId != null && canViewA2aServers}
+    );
+
+    const {data: appsData} = useAppsQuery(
+        {workspaceId: String(currentWorkspaceId)},
+        {enabled: currentWorkspaceId != null && canViewApps}
     );
 
     const {data} = useWorkspaceMcpServersQuery(
@@ -38,6 +44,11 @@ export const AutomationExternalInvocations = () => {
                 .filter((a2aServer) => a2aServer != null)
                 .map((a2aServer) => ({label: a2aServer!.name, value: a2aServer!.id})),
         [a2aServersData]
+    );
+
+    const appOptions = useMemo(
+        () => (appsData?.apps ?? []).map((app) => ({label: app.name, value: app.id})),
+        [appsData]
     );
 
     const mcpServerOptions = useMemo(
@@ -72,6 +83,7 @@ export const AutomationExternalInvocations = () => {
     return (
         <ExternalInvocations
             a2aServerOptions={a2aServerOptions}
+            appOptions={appOptions}
             firstRunEmptyState={<AutomationExternalInvocationsEmptyState hasMcpServer={hasMcpServer} />}
             key={`${currentWorkspaceId}-${currentEnvironmentId}`}
             mcpServerOptions={mcpServerOptions}

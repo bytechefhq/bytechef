@@ -9,8 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {PLATFORM_MODES, getPlatformModePath} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ChevronDownIcon, CircleCheckIcon, ClipboardCheckIcon} from 'lucide-react';
+import {ChevronDownIcon, CircleCheckIcon, ClipboardCheckIcon, LayoutGridIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 export const AppSidebarLogo = () => (
@@ -25,6 +26,7 @@ interface AppSidebarModeSelectProps {
 }
 
 export function AppSidebarModeSelect({currentMode, showModes = true}: AppSidebarModeSelectProps) {
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentType = usePlatformTypeStore((state) => state.setCurrentType);
 
@@ -100,6 +102,17 @@ export function AppSidebarModeSelect({currentMode, showModes = true}: AppSidebar
 
                             <span className="font-medium">Approval Tasks</span>
                         </DropdownMenuItem>
+
+                        {edition === EditionType.EE && (
+                            <DropdownMenuItem
+                                className="cursor-pointer items-center gap-3 py-2"
+                                onClick={() => navigate('/automation/portal')}
+                            >
+                                <LayoutGridIcon className="size-5 shrink-0" />
+
+                                <span className="font-medium">App Portal</span>
+                            </DropdownMenuItem>
+                        )}
                     </>
                 )}
             </DropdownMenuContent>

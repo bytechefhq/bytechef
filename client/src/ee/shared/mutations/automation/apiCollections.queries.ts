@@ -17,6 +17,12 @@ export const ApiCollectionKeys = {
     apiCollections: ['apiCollections'] as const,
 };
 
+export const useGetApiCollectionQuery = (id: number) =>
+    useQuery<ApiCollection, Error>({
+        queryKey: [...ApiCollectionKeys.apiCollections, id],
+        queryFn: () => new ApiCollectionApi().getApiCollection({id}),
+    });
+
 export const useGetApiCollectionsQuery = (request: GetWorkspaceApiCollectionsRequest) =>
     useQuery<ApiCollection[], Error>({
         queryKey: ApiCollectionKeys.filteredProjectDeployments(request),

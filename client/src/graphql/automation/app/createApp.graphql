@@ -1,0 +1,32 @@
+mutation createApp($workspaceId: ID!, $environmentId: ID!, $input: AppInput!) {
+    createApp(workspaceId: $workspaceId, environmentId: $environmentId, input: $input) {
+        secretKey
+        appInstance {
+            id
+            uuid
+            app {
+                id
+                name
+                description
+                status
+            }
+            workspaceId
+            environmentId
+            name
+            ownerUserId
+            status
+            visibility
+            hostingTarget
+            url
+            secretKeyHint
+            secretKeyLastUsedDate
+            userAuthMode
+            currentAppDeploymentId
+            createdBy
+            createdDate
+            lastModifiedBy
+            lastModifiedDate
+            version
+        }
+    }
+}

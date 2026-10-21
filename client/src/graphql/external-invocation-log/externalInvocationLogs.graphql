@@ -7,6 +7,7 @@ query ExternalInvocationLogs(
     $a2aServerId: Long
     $connectedUserId: Long
     $integrationInstanceId: Long
+    $appId: Long
     $fromDate: Long
     $toDate: Long
     $page: Int
@@ -20,6 +21,7 @@ query ExternalInvocationLogs(
         a2aServerId: $a2aServerId
         connectedUserId: $connectedUserId
         integrationInstanceId: $integrationInstanceId
+        appId: $appId
         fromDate: $fromDate
         toDate: $toDate
         page: $page
@@ -40,6 +42,7 @@ query ExternalInvocationLogs(
             mcpServerId
             a2aServerId
             jobId
+            appId
             workflowName
             status
             errorType

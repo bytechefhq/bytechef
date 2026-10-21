@@ -23,6 +23,7 @@ vi.mock('@/shared/queries/automation/workspaces.queries', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: vi.fn((selector: (state: {application: {edition: string} | null}) => unknown) =>
         selector({application: {edition: hoisted.edition}})
     ),
@@ -65,6 +66,8 @@ const renderWorkspaceSelect = (pathname = '/automation/projects') =>
                 <Route element={<AppSidebarWorkspaceSelect />} path={pathname} />
 
                 <Route element={<div>Approval tasks page</div>} path="/automation/approval-tasks" />
+
+                <Route element={<div>App Portal page</div>} path="/automation/portal" />
 
                 <Route element={<div>Workspaces settings page</div>} path="/automation/settings/workspaces" />
 
@@ -238,6 +241,33 @@ describe('AppSidebarWorkspaceSelect', () => {
         expect(screen.queryByRole('menuitem', {name: 'Approval Tasks'})).not.toBeInTheDocument();
     });
 
+    it('opens the App Portal from below Approval Tasks in the mode menu in automation mode', async () => {
+        const user = userEvent.setup();
+
+        renderWorkspaceSelect();
+
+        await user.click(screen.getByRole('button', {name: 'Switch mode'}));
+
+        const menuItemNames = (await screen.findAllByRole('menuitem')).map((menuItem) => menuItem.textContent);
+
+        expect(menuItemNames.slice(-2)).toEqual(['Approval Tasks', 'App Portal']);
+
+        await user.click(screen.getByRole('menuitem', {name: 'App Portal'}));
+
+        expect(await screen.findByText('App Portal page')).toBeInTheDocument();
+    });
+
+    it('hides the App Portal from the mode menu in embedded mode', async () => {
+        const user = userEvent.setup();
+
+        renderWorkspaceSelect('/embedded/integrations');
+
+        await user.click(screen.getByRole('button', {name: 'Switch mode'}));
+
+        expect(await screen.findByRole('menuitem', {name: /Embedded/})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'App Portal'})).not.toBeInTheDocument();
+    });
+
     it('offers Approval Tasks on an Organization settings page when no mode is remembered', async () => {
         hoisted.currentType = undefined;
 
@@ -261,6 +291,7 @@ describe('AppSidebarWorkspaceSelect', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Approval Tasks'}));
 
         expect(screen.queryByText('Mode')).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'App Portal'})).not.toBeInTheDocument();
         expect(await screen.findByText('Approval tasks page')).toBeInTheDocument();
     });
 });

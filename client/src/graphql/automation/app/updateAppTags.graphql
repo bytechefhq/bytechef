@@ -1,0 +1,6 @@
+mutation updateAppTags($id: ID!, $tags: [TagInput!]!) {
+    updateAppTags(id: $id, tags: $tags) {
+        id
+        tagIds
+    }
+}

@@ -356,6 +356,20 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('leaves a failed app icon upload or removal to the form that shows it inline', () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'The icon is larger than 256 KB.', title: 'Bad Request'},
+                status: 400,
+                url: 'http://localhost/api/automation/internal/apps/5/icon',
+            });
+
+            expect(hoisted.registeredHandlers!.response(response)).toBe(response);
+            expect(response.clone).not.toHaveBeenCalled();
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
         it('skips toast for a failed AI Hub presence heartbeat', async () => {
             renderHook(() => useFetchInterceptor());
 

@@ -142,6 +142,23 @@ describe('AppSidebarFooter', () => {
         expect(screen.queryByText('Approval Tasks')).not.toBeInTheDocument();
     });
 
+    it('keeps the App Portal out of the user menu in EE automation mode', async () => {
+        hoisted.edition = 'EE';
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Log Out')).toBeInTheDocument();
+        expect(screen.queryByText('App Portal')).not.toBeInTheDocument();
+    });
+
     it('opens the Automation settings from an Organization settings page after coming from Automation', async () => {
         const user = userEvent.setup();
 

@@ -1,0 +1,12 @@
+query appInstanceVersions($appInstanceId: ID!, $limit: Int) {
+    appInstanceVersions(appInstanceId: $appInstanceId, limit: $limit) {
+        id
+        appId
+        name
+        gitRef
+        gitCommitSha
+        description
+        createdBy
+        createdDate
+    }
+}

@@ -1,0 +1,29 @@
+mutation updateAppInstanceStatus($id: ID!, $status: AppInstanceStatus!) {
+    updateAppInstanceStatus(id: $id, status: $status) {
+        id
+        uuid
+        app {
+            id
+            name
+            description
+            status
+        }
+        workspaceId
+        environmentId
+        name
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        secretKeyHint
+        secretKeyLastUsedDate
+        userAuthMode
+        currentAppDeploymentId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

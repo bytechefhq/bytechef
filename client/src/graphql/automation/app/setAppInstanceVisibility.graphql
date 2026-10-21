@@ -1,0 +1,3 @@
+mutation setAppInstanceVisibility($workspaceId: ID!, $appInstanceId: ID!, $visibility: ResourceVisibility!) {
+    setAppInstanceVisibility(workspaceId: $workspaceId, appInstanceId: $appInstanceId, visibility: $visibility)
+}

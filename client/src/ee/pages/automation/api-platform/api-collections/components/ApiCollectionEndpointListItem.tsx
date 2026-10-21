@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {getApiCollectionEndpointPath} from '@/ee/pages/automation/api-platform/api-collections/utils/getApiCollectionEndpointPath';
+import {getHttpMethodBadgeStyles} from '@/ee/pages/automation/api-platform/api-collections/utils/getHttpMethodBadgeStyles';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
@@ -26,15 +27,7 @@ import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automatio
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    CloudDownloadIcon,
-    EditIcon,
-    EllipsisVerticalIcon,
-    FolderSyncIcon,
-    SendToBackIcon,
-    Trash2Icon,
-    UploadIcon,
-} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -124,40 +117,7 @@ const ApiCollectionEndpointListItem = ({
 
     const method = apiCollectionEndpoint.httpMethod;
 
-    const httpMethodStyles = useMemo(() => {
-        switch (method) {
-            case 'GET':
-                return {
-                    icon: <CloudDownloadIcon className="size-3" />,
-                    textColor: 'text-content-brand-primary',
-                };
-            case 'POST':
-                return {
-                    icon: <UploadIcon className="size-3" />,
-                    textColor: 'text-content-success-primary',
-                };
-            case 'PUT':
-                return {
-                    icon: <SendToBackIcon className="size-3" />,
-                    textColor: 'text-content-warning-primary',
-                };
-            case 'PATCH':
-                return {
-                    icon: <FolderSyncIcon className="size-3" />,
-                    textColor: 'text-orange-700 dark:text-orange-400',
-                };
-            case 'DELETE':
-                return {
-                    icon: <Trash2Icon className="size-3" />,
-                    textColor: 'text-content-destructive-primary',
-                };
-            default:
-                return {
-                    icon: undefined,
-                    textColor: '',
-                };
-        }
-    }, [method]);
+    const httpMethodStyles = useMemo(() => getHttpMethodBadgeStyles(method), [method]);
 
     const {icon, textColor} = httpMethodStyles;
 

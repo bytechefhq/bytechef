@@ -13,6 +13,7 @@ import {AutomationExternalInvocations} from './AutomationExternalInvocations';
 const hoisted = vi.hoisted(() => ({
     grantedScopes: new Set<string>(),
     useA2aServersQueryMock: vi.fn(),
+    useAppsQueryMock: vi.fn(),
     useExternalInvocationLogsQueryMock: vi.fn(),
     useWorkspaceExternalInvocationLogsQueryMock: vi.fn(),
     useWorkspaceMcpServersQueryMock: vi.fn(),
@@ -21,6 +22,7 @@ const hoisted = vi.hoisted(() => ({
 vi.mock('@/shared/middleware/graphql', () => ({
     PlatformType: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     useA2aServersQuery: hoisted.useA2aServersQueryMock,
+    useAppsQuery: hoisted.useAppsQueryMock,
     useEnvironmentsQuery: () => ({data: undefined}),
     useExternalInvocationLogsQuery: hoisted.useExternalInvocationLogsQueryMock,
     useWorkspaceExternalInvocationLogsQuery: hoisted.useWorkspaceExternalInvocationLogsQueryMock,
@@ -42,6 +44,7 @@ vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sh
 vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
     ExternalInvocations: ({
         a2aServerOptions,
+        appOptions,
         firstRunEmptyState,
         mcpServerOptions,
         onViewJob,
@@ -50,6 +53,7 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
         workspaceScope,
     }: {
         a2aServerOptions: Array<{label: string; value: string}>;
+        appOptions: Array<{label: string; value: string}>;
         firstRunEmptyState: ReactNode;
         onViewJob: (jobId: number) => void;
         workflowExecutionSheet: ReactNode;
@@ -57,10 +61,12 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
     } & Parameters<typeof useExternalInvocations>[0]) => {
         const {
             filterA2aServerId,
+            filterAppId,
             filterMcpServerId,
             filterPageNumber,
             filterStatus,
             handleA2aServerChange,
+            handleAppChange,
             handleMcpServerChange,
             handlePaginationClick,
             handleStatusChange,
@@ -69,10 +75,12 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
         return (
             <div>
                 <span data-testid="filters">
-                    {`a2a=${filterA2aServerId ?? ''};mcp=${filterMcpServerId ?? ''};status=${filterStatus ?? ''};page=${filterPageNumber}`}
+                    {`a2a=${filterA2aServerId ?? ''};app=${filterAppId ?? ''};mcp=${filterMcpServerId ?? ''};status=${filterStatus ?? ''};page=${filterPageNumber}`}
                 </span>
 
                 <button onClick={() => handleA2aServerChange({label: 'Agent', value: '4'})}>pick a2a server</button>
+
+                <button onClick={() => handleAppChange({label: 'Support', value: '5'})}>pick app</button>
 
                 <button onClick={() => handleMcpServerChange({label: 'Server', value: '9'})}>pick server</button>
 
@@ -84,6 +92,14 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
                     {mcpServerOptions.map((mcpServerOption) => (
                         <li data-testid="mcp-server-option" key={mcpServerOption.value}>
                             {`${mcpServerOption.value}:${mcpServerOption.label}`}
+                        </li>
+                    ))}
+                </ul>
+
+                <ul>
+                    {appOptions.map((appOption) => (
+                        <li data-testid="app-option" key={appOption.value}>
+                            {`${appOption.value}:${appOption.label}`}
                         </li>
                     ))}
                 </ul>
@@ -123,9 +139,11 @@ const renderPage = () =>
 
 describe('AutomationExternalInvocations', () => {
     beforeEach(() => {
-        hoisted.grantedScopes = new Set(['A2A_VIEW', 'MCP_VIEW']);
+        hoisted.grantedScopes = new Set(['A2A_VIEW', 'APP_VIEW', 'MCP_VIEW']);
         hoisted.useA2aServersQueryMock.mockReset();
         hoisted.useA2aServersQueryMock.mockReturnValue({data: undefined});
+        hoisted.useAppsQueryMock.mockReset();
+        hoisted.useAppsQueryMock.mockReturnValue({data: undefined});
         hoisted.useExternalInvocationLogsQueryMock.mockReset();
         hoisted.useExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
         hoisted.useWorkspaceMcpServersQueryMock.mockReset();
@@ -145,13 +163,15 @@ describe('AutomationExternalInvocations', () => {
         async (_scope, switchScope, environmentId, workspaceId) => {
             renderPage();
 
+            await userEvent.click(screen.getByRole('button', {name: 'pick app'}));
             await userEvent.click(screen.getByRole('button', {name: 'pick server'}));
             await userEvent.click(screen.getByRole('button', {name: 'pick status'}));
             await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=9;status=ERROR;page=3');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;app=5;mcp=9;status=ERROR;page=3');
             expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
+                    appId: 5,
                     environmentId: '2',
                     mcpServerId: 9,
                     page: 3,
@@ -166,9 +186,10 @@ describe('AutomationExternalInvocations', () => {
                 switchScope();
             });
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=;status=;page=0');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;app=;mcp=;status=;page=0');
             expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
+                    appId: undefined,
                     environmentId,
                     mcpServerId: undefined,
                     page: 0,
@@ -209,6 +230,30 @@ describe('AutomationExternalInvocations', () => {
         ]);
     });
 
+    it('offers the apps of the current workspace as filter options', () => {
+        hoisted.useAppsQueryMock.mockReturnValue({
+            data: {
+                apps: [
+                    {id: '5', name: 'Support'},
+                    {id: '6', name: 'CRM'},
+                ],
+            },
+        });
+
+        renderPage();
+
+        expect(hoisted.useAppsQueryMock).toHaveBeenCalledWith({workspaceId: '7'}, {enabled: true});
+        expect(screen.getAllByTestId('app-option').map((option) => option.textContent)).toEqual(['5:Support', '6:CRM']);
+    });
+
+    it('does not query the apps a user without the APP_VIEW scope may not view', () => {
+        hoisted.grantedScopes.delete('APP_VIEW');
+
+        renderPage();
+
+        expect(hoisted.useAppsQueryMock).toHaveBeenCalledWith({workspaceId: '7'}, {enabled: false});
+    });
+
     it.each([
         ['A2A_VIEW', () => hoisted.useA2aServersQueryMock, () => hoisted.useWorkspaceMcpServersQueryMock],
         ['MCP_VIEW', () => hoisted.useWorkspaceMcpServersQueryMock, () => hoisted.useA2aServersQueryMock],
@@ -229,7 +274,7 @@ describe('AutomationExternalInvocations', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'pick a2a server'}));
 
-        expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;mcp=;status=;page=0');
+        expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;app=;mcp=;status=;page=0');
         expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({a2aServerId: 4, mcpServerId: undefined, type: 'AUTOMATION'}),
             {enabled: true}

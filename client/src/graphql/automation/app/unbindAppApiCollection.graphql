@@ -1,0 +1,3 @@
+mutation unbindAppApiCollection($appInstanceId: ID!, $apiCollectionId: ID!) {
+    unbindAppApiCollection(appInstanceId: $appInstanceId, apiCollectionId: $apiCollectionId)
+}

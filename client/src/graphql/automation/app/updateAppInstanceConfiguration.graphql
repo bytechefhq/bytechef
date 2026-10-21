@@ -1,0 +1,6 @@
+mutation updateAppInstanceConfiguration($id: ID!, $configuration: Map!) {
+    updateAppInstanceConfiguration(id: $id, configuration: $configuration) {
+        id
+        configuration
+    }
+}

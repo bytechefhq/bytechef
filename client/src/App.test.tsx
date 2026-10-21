@@ -1,6 +1,7 @@
 import App from '@/App';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render} from '@/shared/util/test-utils';
@@ -99,6 +100,7 @@ describe('App', () => {
         hoisted.enabledFeatureFlags = [];
         hoisted.isTenantAdmin = false;
 
+        applicationInfoStore.setState({application: null});
         useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
     });
 
@@ -193,5 +195,27 @@ describe('App', () => {
 
         expect(queryByText('Automations')).not.toBeInTheDocument();
         expect(queryByText('Integrations')).not.toBeInTheDocument();
+    });
+
+    it('keeps the App Portal out of the sidebar in EE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}});
+        authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
+
+        const {getAllByText} = renderAppAt('/automation/deployments');
+
+        const navNames = getAllByText(/.+/, {selector: 'nav > span'}).map((navEntry) => navEntry.textContent);
+
+        expect(navNames).toContain('Apps');
+        expect(navNames).not.toContain('App Portal');
+    });
+
+    it('shows no App Portal row in CE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.CE}});
+        authenticationStore.setState({account: {authorities: ['ROLE_ADMIN'], id: 1} as never, authenticated: true});
+
+        const {queryByText} = renderAppAt('/automation/deployments');
+
+        expect(queryByText('App Portal')).not.toBeInTheDocument();
+        expect(queryByText('Apps')).not.toBeInTheDocument();
     });
 });

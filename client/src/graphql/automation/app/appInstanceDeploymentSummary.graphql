@@ -1,0 +1,21 @@
+query appInstanceDeploymentSummary($id: ID!) {
+    appInstance(id: $id) {
+        id
+        currentDeployment {
+            id
+            appVersion {
+                id
+                name
+            }
+            status
+            createdDate
+            finishedDate
+        }
+        deployments(limit: 1) {
+            id
+            status
+            createdDate
+            finishedDate
+        }
+    }
+}

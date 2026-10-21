@@ -1,0 +1,9 @@
+query appBindableConnections($appInstanceId: ID!) {
+    appBindableConnections(appInstanceId: $appInstanceId) {
+        id
+        name
+        componentName
+        connectionVersion
+        componentVersion
+    }
+}

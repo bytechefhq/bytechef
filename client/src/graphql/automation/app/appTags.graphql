@@ -1,0 +1,6 @@
+query appTags($workspaceId: ID!) {
+    appTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

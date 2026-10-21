@@ -1,0 +1,3 @@
+query appInstanceGrants($workspaceId: ID!, $appInstanceId: ID!) {
+    appInstanceGrants(workspaceId: $workspaceId, appInstanceId: $appInstanceId)
+}

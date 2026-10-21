@@ -1,0 +1,3 @@
+query appUserAuthAvailable($workspaceId: ID!) {
+    appUserAuthAvailable(workspaceId: $workspaceId)
+}

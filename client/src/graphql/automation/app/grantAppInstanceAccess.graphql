@@ -1,0 +1,3 @@
+mutation grantAppInstanceAccess($workspaceId: ID!, $appInstanceId: ID!, $userId: ID!) {
+    grantAppInstanceAccess(workspaceId: $workspaceId, appInstanceId: $appInstanceId, userId: $userId)
+}

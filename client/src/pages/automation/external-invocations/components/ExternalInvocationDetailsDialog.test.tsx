@@ -6,6 +6,7 @@ import ExternalInvocationDetailsDialog from './ExternalInvocationDetailsDialog';
 
 const baseLog = {
     a2aServerId: null,
+    appId: null,
     componentName: 'slack',
     componentVersion: 1,
     connectedUserId: 7,

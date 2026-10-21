@@ -1,4 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import {parseAppId} from '@/pages/automation/external-invocations/utils/parseAppId';
 import {sourceHasA2aServer, sourceHasMcpServer} from '@/pages/automation/external-invocations/utils/sourceServers';
 import {
     ExternalInvocationLogsQuery,
@@ -9,6 +10,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {endOfDay} from 'date-fns';
 import {useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 type ExternalInvocationLogItemType = ExternalInvocationLogsQuery['externalInvocationLogs']['content'][number];
 
@@ -25,6 +27,7 @@ export interface UseExternalInvocationsOptionsI {
 
 interface ExternalInvocationsFiltersI {
     a2aServerId: string | undefined;
+    appId: string | undefined;
     endDate: Date | undefined;
     mcpServerId: string | undefined;
     status: string | undefined;
@@ -35,6 +38,7 @@ interface ExternalInvocationsFiltersI {
 
 interface UseExternalInvocationsI {
     filterA2aServerId: string | undefined;
+    filterAppId: string | undefined;
     filterEndDate: Date | undefined;
     filterMcpServerId: string | undefined;
     filterStatus: string | undefined;
@@ -42,6 +46,7 @@ interface UseExternalInvocationsI {
     filterSource: string | undefined;
     filterStartDate: Date | undefined;
     handleA2aServerChange: (item?: ComboBoxItemType) => void;
+    handleAppChange: (item?: ComboBoxItemType) => void;
     handleEndDateChange: (date: Date | undefined) => void;
     handleMcpServerChange: (item?: ComboBoxItemType) => void;
     handleStatusChange: (item?: ComboBoxItemType) => void;
@@ -62,6 +67,7 @@ const toFilterVariables = (
     environmentId?: number
 ): ExternalInvocationLogsQueryVariables => ({
     a2aServerId: filters.a2aServerId ? Number(filters.a2aServerId) : undefined,
+    appId: parseAppId(filters.appId),
     environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
@@ -77,7 +83,14 @@ export const useExternalInvocations = ({
     type,
     workspaceScope,
 }: UseExternalInvocationsOptionsI): UseExternalInvocationsI => {
+    const [searchParams] = useSearchParams();
+
     const [filterA2aServerId, setFilterA2aServerId] = useState<string | undefined>(undefined);
+    const [filterAppId, setFilterAppId] = useState<string | undefined>(() => {
+        const appId = parseAppId(searchParams.get('appId'));
+
+        return appId === undefined ? undefined : String(appId);
+    });
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
     const [filterStatus, setFilterStatus] = useState<string | undefined>(undefined);
@@ -88,6 +101,7 @@ export const useExternalInvocations = ({
     const filterVariables = toFilterVariables(
         {
             a2aServerId: filterA2aServerId,
+            appId: filterAppId,
             endDate: filterEndDate,
             mcpServerId: filterMcpServerId,
             pageNumber: filterPageNumber,
@@ -118,6 +132,13 @@ export const useExternalInvocations = ({
 
     const handleA2aServerChange = (item?: ComboBoxItemType) => {
         setFilterA2aServerId(item?.value ? String(item.value) : undefined);
+        setFilterPageNumber(0);
+    };
+
+    const handleAppChange = (item?: ComboBoxItemType) => {
+        const appId = parseAppId(item?.value ? String(item.value) : undefined);
+
+        setFilterAppId(appId === undefined ? undefined : String(appId));
         setFilterPageNumber(0);
     };
 
@@ -166,6 +187,7 @@ export const useExternalInvocations = ({
         externalInvocationLogsIsFetching: activeQuery.isFetching,
         externalInvocationLogsIsLoading: activeQuery.isLoading,
         filterA2aServerId,
+        filterAppId,
         filterEndDate,
         filterMcpServerId,
         filterPageNumber,
@@ -173,6 +195,7 @@ export const useExternalInvocations = ({
         filterStartDate,
         filterStatus,
         handleA2aServerChange,
+        handleAppChange,
         handleEndDateChange,
         handleMcpServerChange,
         handlePaginationClick,

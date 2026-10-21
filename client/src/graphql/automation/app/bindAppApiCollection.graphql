@@ -1,0 +1,13 @@
+mutation bindAppApiCollection($appInstanceId: ID!, $apiCollectionId: ID!) {
+    bindAppApiCollection(appInstanceId: $appInstanceId, apiCollectionId: $apiCollectionId) {
+        id
+        appInstanceId
+        apiCollectionId
+        name
+        contextPath
+        collectionVersion
+        projectId
+        projectName
+        available
+    }
+}

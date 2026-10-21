@@ -38,7 +38,8 @@ function handlesErrorInline(url: string): boolean {
         url.includes('/component-operations/') ||
         isInlineTestOutputUrl(url) ||
         url.includes('/ai/chat/ai_hub/status') ||
-        /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url)
+        /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url) ||
+        /\/automation\/internal\/apps\/[^/]+\/icon(\?|$)/.test(url)
     );
 }
 

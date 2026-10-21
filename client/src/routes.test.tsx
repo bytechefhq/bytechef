@@ -1,5 +1,6 @@
 import {getRouter, loadEnvironments, loadProjectWorkflowEditor} from '@/routes';
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
+import EEVersion from '@/shared/edition/EEVersion';
 import EmbeddedEnvironmentAccessGuard from '@/shared/layout/EmbeddedEnvironmentAccessGuard';
 import Settings, {SettingsNavItemI} from '@/shared/layout/Settings';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -366,6 +367,22 @@ describe('settings route authorities', () => {
         const [embeddedRoute] = findRoutesByPath(router.routes as RouteObject[], 'embedded');
 
         expect((embeddedRoute.element as ReactElement).type).toBe(EmbeddedEnvironmentAccessGuard);
+    });
+
+    it('lets any member open the App Portal, in EE only', () => {
+        const router = getRouter(new QueryClient());
+
+        const portalRoutes = findRoutesByPath(router.routes as RouteObject[], 'portal');
+
+        expect(portalRoutes).toHaveLength(1);
+
+        const privateRouteElement = portalRoutes[0].element as ReactElement<{
+            children: ReactElement;
+            hasAnyAuthorities?: string[];
+        }>;
+
+        expect(privateRouteElement.props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN, AUTHORITIES.USER]);
+        expect(privateRouteElement.props.children.type).toBe(EEVersion);
     });
 
     it('lets only a tenant admin open the API Clients page', () => {

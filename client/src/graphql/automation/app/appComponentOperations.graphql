@@ -1,0 +1,6 @@
+query appComponentOperations($componentName: String!, $componentVersion: Int!) {
+    appComponentOperations(componentName: $componentName, componentVersion: $componentVersion) {
+        actionNames
+        toolNames
+    }
+}

@@ -1,0 +1,7 @@
+mutation deployAppInstance($appInstanceId: ID!, $appVersionId: ID!) {
+    deployAppInstance(appInstanceId: $appInstanceId, appVersionId: $appVersionId) {
+        id
+        appInstanceId
+        status
+    }
+}

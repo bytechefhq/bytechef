@@ -1,0 +1,19 @@
+query appDeployments($appInstanceId: ID!, $limit: Int) {
+    appDeployments(appInstanceId: $appInstanceId, limit: $limit) {
+        id
+        appInstanceId
+        appVersion {
+            id
+            name
+            gitCommitSha
+        }
+        provider
+        url
+        status
+        errorMessage
+        current
+        createdBy
+        createdDate
+        finishedDate
+    }
+}

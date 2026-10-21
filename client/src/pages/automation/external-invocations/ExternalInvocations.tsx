@@ -40,6 +40,11 @@ const sourceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
     [PlatformType.Automation]: [
         {label: 'MCP Servers', value: 'MCP_SERVER'},
         {label: 'A2A Servers', value: 'A2A_SERVER'},
+        {label: 'App (Action)', value: 'APP_ACTION'},
+        {label: 'App (API)', value: 'APP_API'},
+        {label: 'App (Tool)', value: 'APP_TOOL'},
+        {label: 'App (Proxy)', value: 'APP_PROXY'},
+        {label: 'App (Workflow)', value: 'APP_WORKFLOW'},
     ],
     [PlatformType.Embedded]: [
         {label: 'MCP Servers', value: 'MCP_SERVER'},
@@ -50,6 +55,7 @@ const sourceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
 
 interface ExternalInvocationsProps {
     a2aServerOptions?: Array<ComboBoxItemType>;
+    appOptions?: Array<ComboBoxItemType>;
     environmentId?: number;
     /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
     firstRunEmptyState: ReactNode;
@@ -62,6 +68,7 @@ interface ExternalInvocationsProps {
 
 export const ExternalInvocations = ({
     a2aServerOptions,
+    appOptions,
     environmentId,
     firstRunEmptyState,
     mcpServerOptions,
@@ -81,6 +88,7 @@ export const ExternalInvocations = ({
         externalInvocationLogsIsFetching,
         externalInvocationLogsIsLoading,
         filterA2aServerId,
+        filterAppId,
         filterEndDate,
         filterMcpServerId,
         filterPageNumber,
@@ -88,6 +96,7 @@ export const ExternalInvocations = ({
         filterStartDate,
         filterStatus,
         handleA2aServerChange,
+        handleAppChange,
         handleEndDateChange,
         handleMcpServerChange,
         handlePaginationClick,
@@ -117,6 +126,7 @@ export const ExternalInvocations = ({
 
     const hasActiveFilters =
         !!filterA2aServerId ||
+        !!filterAppId ||
         !!filterEndDate ||
         !!filterMcpServerId ||
         !!filterStatus ||
@@ -213,6 +223,19 @@ export const ExternalInvocations = ({
                                 items={[ANY_FILTER_OPTION, ...a2aServerOptions]}
                                 onChange={handleA2aServerChange}
                                 value={filterA2aServerId}
+                            />
+                        </div>
+                    )}
+
+                    {appOptions && appOptions.length > 0 && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>App</Label>
+
+                            <ComboBox
+                                aria-label="App"
+                                items={[ANY_FILTER_OPTION, ...appOptions]}
+                                onChange={handleAppChange}
+                                value={filterAppId}
                             />
                         </div>
                     )}
