@@ -11,12 +11,14 @@ interface MutationOptionsI {
 }
 
 const hoisted = vi.hoisted(() => ({
+    createResponse: 'sk_created_full_secret_value' as string | null,
     createVariables: [] as unknown[],
     deleteVariables: [] as unknown[],
     embeddedApiKeysQuery: vi.fn(),
     grants: {} as Record<number, string[]>,
     invalidateQueries: vi.fn(),
     sharedOperation: vi.fn(),
+    toastError: vi.fn(),
     updateVariables: [] as unknown[],
     useRealScopeHook: false,
 }));
@@ -47,7 +49,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
             mutate: (variables: unknown) => {
                 hoisted.createVariables.push(variables);
 
-                options.onSuccess?.({createEmbeddedApiKey: 'sk_created_full_secret_value'});
+                options.onSuccess?.({createEmbeddedApiKey: hoisted.createResponse});
             },
         }),
         useDeleteApiKeyMutation: hoisted.sharedOperation,
@@ -68,6 +70,15 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
                 options.onSuccess?.({updateEmbeddedApiKey: {id: '1', name: 'Renamed key'}});
             },
         }),
+    };
+});
+
+vi.mock('sonner', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('sonner')>();
+
+    return {
+        ...actual,
+        toast: Object.assign(vi.fn(), {...actual.toast, error: hoisted.toastError}),
     };
 });
 
@@ -131,7 +142,9 @@ describe('embedded ApiKeys', () => {
     beforeEach(() => {
         windowResizeObserver();
 
+        hoisted.createResponse = 'sk_created_full_secret_value';
         hoisted.createVariables = [];
+        hoisted.toastError.mockReset();
         hoisted.deleteVariables = [];
         hoisted.embeddedApiKeysQuery.mockReset();
         hoisted.embeddedApiKeysQuery.mockReturnValue({
@@ -204,6 +217,21 @@ describe('embedded ApiKeys', () => {
         await waitFor(() => expect(hoisted.deleteVariables).toEqual([{id: '1'}]));
         expect(hoisted.invalidateQueries).toHaveBeenCalledTimes(3);
         expect(hoisted.sharedOperation).not.toHaveBeenCalled();
+    });
+
+    it('testANullCreateResponseShowsAnErrorInsteadOfAnEmptySecret', async () => {
+        grantInProduction(['API_KEY_CREATE', 'API_KEY_DELETE', 'API_KEY_VIEW']);
+        hoisted.createResponse = null;
+
+        render(<ApiKeys />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'New API Key'}));
+        await userEvent.type(await screen.findByRole('textbox'), 'CI key');
+        await userEvent.click(screen.getByRole('button', {name: 'Create API Key'}));
+
+        await waitFor(() => expect(hoisted.toastError).toHaveBeenCalledTimes(1));
+        expect(screen.queryByRole('heading', {name: 'Save your API Key'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Done'})).not.toBeInTheDocument();
     });
 
     it('testAViewerHasNoApiKeysPage', () => {
