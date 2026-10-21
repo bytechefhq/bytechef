@@ -93,6 +93,49 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
                 .doesNotThrowAnyException();
     }
 
+    @Test
+    void testAllowsAnEmbeddedMemberWithMcpEditWhoMayUseTheEmbeddedConnection() {
+        givenEmbeddedServer();
+
+        when(permissionService.hasEmbeddedScope("MCP_EDIT", Environment.PRODUCTION)).thenReturn(true);
+        when(permissionService.canUseEmbeddedConnection(CONNECTION_ID, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatCode(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testRefusesAnEmbeddedMemberWithoutMcpEdit() {
+        givenEmbeddedServer();
+
+        when(permissionService.canUseEmbeddedConnection(CONNECTION_ID, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRefusesAnEmbeddedMemberWhoMayNotUseTheEmbeddedConnection() {
+        givenEmbeddedServer();
+
+        when(permissionService.hasEmbeddedScope("MCP_EDIT", Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    private void givenEmbeddedServer() {
+        McpServer mcpServer = new McpServer("server", PlatformType.EMBEDDED, Environment.PRODUCTION);
+
+        mcpServer.setId(MCP_SERVER_ID);
+
+        when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(mcpServer));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
+    }
+
     private void givenServerInWorkspace() {
         when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID))

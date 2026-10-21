@@ -57,6 +57,7 @@ import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.security.AiSkillOwnershipResolver;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -1383,6 +1384,32 @@ class PermissionServiceTest {
         }
 
         @Test
+        void testAnIntegrationWorkflowRefusesAConnectionOwnedByAConnectedUser() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+                .thenReturn(Set.of("CONNECTION_VIEW"));
+            when(embeddedResourceResolver.isConnectedUserConnection(7L)).thenReturn(true);
+
+            PermissionServiceImpl service = createService(
+                embeddedResourceResolver, embeddedConnectionServiceBeanFactory(7L));
+
+            assertThat(service.canUseConnectionInWorkflow(7L, INTEGRATION_WORKFLOW_ID, Environment.DEVELOPMENT))
+                .isFalse();
+        }
+
+        @Test
+        void testAnIntegrationWorkflowGrantsAnEmbeddedConnectionNoConnectedUserOwns() {
+            when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+                .thenReturn(Set.of("CONNECTION_VIEW"));
+            when(embeddedResourceResolver.isConnectedUserConnection(7L)).thenReturn(false);
+
+            PermissionServiceImpl service = createService(
+                embeddedResourceResolver, embeddedConnectionServiceBeanFactory(7L));
+
+            assertThat(service.canUseConnectionInWorkflow(7L, INTEGRATION_WORKFLOW_ID, Environment.DEVELOPMENT))
+                .isTrue();
+        }
+
+        @Test
         void testAnIntegrationWorkflowWithoutTheScopeIsDeniedEvenForAWorkspaceEditor() {
             givenProjectWorkflowInWorkspace(INTEGRATION_WORKFLOW_ID);
 
@@ -1564,6 +1591,12 @@ class PermissionServiceTest {
         }
 
         private PermissionServiceImpl createService(EmbeddedResourceResolver resolver) {
+            return createService(resolver, new StaticListableBeanFactory());
+        }
+
+        private PermissionServiceImpl createService(
+            EmbeddedResourceResolver resolver, StaticListableBeanFactory connectionServiceBeanFactory) {
+
             StaticListableBeanFactory beanFactory = resolver == null
                 ? new StaticListableBeanFactory()
                 : new StaticListableBeanFactory(Map.of("embeddedResourceResolver", resolver));
@@ -1574,7 +1607,21 @@ class PermissionServiceTest {
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
                 embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
                 beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
-                new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+                connectionServiceBeanFactory.getBeanProvider(ConnectionService.class));
+        }
+
+        private StaticListableBeanFactory embeddedConnectionServiceBeanFactory(long connectionId) {
+            Connection connection = new Connection();
+
+            connection.setEnvironmentId(Environment.DEVELOPMENT.ordinal());
+            connection.setId(connectionId);
+            connection.setType(PlatformType.EMBEDDED);
+
+            ConnectionService connectionService = mock(ConnectionService.class);
+
+            when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
+
+            return new StaticListableBeanFactory(Map.of("connectionService", connectionService));
         }
     }
 

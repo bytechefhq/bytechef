@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.security;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.service.McpComponentConnectionUsageChecker;
@@ -36,6 +37,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AutomationMcpComponentConnectionUsageChecker implements McpComponentConnectionUsageChecker {
+
+    private static final String MCP_EDIT = "MCP_EDIT";
 
     private final McpServerRepository mcpServerRepository;
     private final PermissionService permissionService;
@@ -60,14 +63,28 @@ public class AutomationMcpComponentConnectionUsageChecker implements McpComponen
     }
 
     private boolean canUseConnection(long mcpServerId, long connectionId) {
-        Optional<Environment> environment = mcpServerRepository.findById(mcpServerId)
-            .map(McpServer::getEnvironment);
-        Optional<Long> workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
+        Optional<McpServer> mcpServer = mcpServerRepository.findById(mcpServerId);
 
-        if (environment.isEmpty() || workspaceId.isEmpty()) {
+        if (mcpServer.isEmpty() || mcpServer.get()
+            .getEnvironment() == null) {
+
             return permissionService.isTenantAdmin();
         }
 
-        return permissionService.canUseConnectionInWorkspace(connectionId, workspaceId.get(), environment.get());
+        McpServer existingMcpServer = mcpServer.get();
+
+        Environment environment = existingMcpServer.getEnvironment();
+        Optional<Long> workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId);
+
+        if (workspaceId.isPresent()) {
+            return permissionService.canUseConnectionInWorkspace(connectionId, workspaceId.get(), environment);
+        }
+
+        if (existingMcpServer.getType() == PlatformType.EMBEDDED) {
+            return permissionService.hasEmbeddedScope(MCP_EDIT, environment) &&
+                permissionService.canUseEmbeddedConnection(connectionId, environment);
+        }
+
+        return permissionService.isTenantAdmin();
     }
 }

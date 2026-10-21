@@ -45,6 +45,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -133,7 +134,8 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
-            mock(ContextService.class), mock(Evaluator.class),
+            mock(ContextService.class), new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            mock(Evaluator.class),
             mock(EnvironmentService.class), workflowExecutionRowService, jobService, permissionService,
             mock(PrincipalJobService.class), mock(ProjectFacade.class), projectDeploymentService, projectService,
             projectWorkflowService, mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),

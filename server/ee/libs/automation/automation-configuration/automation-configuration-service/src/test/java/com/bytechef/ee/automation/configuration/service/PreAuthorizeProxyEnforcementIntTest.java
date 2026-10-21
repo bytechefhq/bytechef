@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -234,12 +235,27 @@ class PreAuthorizeProxyEnforcementIntTest {
     @Test
     void testEmbeddedOnlyMemberListsEmbeddedExecutionsWithoutTheWorkspaceGate() {
         when(permissionService.hasEmbeddedScope(eq("EXECUTION_VIEW"), any(Environment.class))).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
 
         projectWorkflowExecutionFacade.getWorkflowExecutions(
             true, 0L, null, null, null, null, null, null, null, 2L, 0);
 
         verify(permissionService).hasEmbeddedScope("EXECUTION_VIEW", Environment.values()[0]);
+        verify(permissionService).hasEmbeddedScope("CONNECTED_USER_VIEW", Environment.values()[0]);
         verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
+    void testEmbeddedRunsAreDeniedWithoutConnectedUserView() {
+        when(permissionService.hasEmbeddedScope(eq("EXECUTION_VIEW"), any(Environment.class))).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> projectWorkflowExecutionFacade.getWorkflowExecutions(
+                true, 0L, null, null, null, null, null, null, null, 2L, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasEmbeddedScope("CONNECTED_USER_VIEW", Environment.values()[0]);
         verifyNoInteractions(projectFacade);
     }
 
@@ -410,7 +426,9 @@ class PreAuthorizeProxyEnforcementIntTest {
                 mock(ComponentDefinitionService.class),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
-                mock(ContextService.class), mock(Evaluator.class), mock(EnvironmentService.class),
+                mock(ContextService.class),
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), mock(Evaluator.class),
+                mock(EnvironmentService.class),
                 mock(WorkflowExecutionRowService.class), mock(JobService.class), permissionService,
                 mock(PrincipalJobService.class), projectFacade, mock(ProjectDeploymentService.class),
                 mock(ProjectService.class), mock(ProjectWorkflowService.class),
