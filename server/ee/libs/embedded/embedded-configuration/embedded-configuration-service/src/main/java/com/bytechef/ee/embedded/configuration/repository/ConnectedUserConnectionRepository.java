@@ -32,18 +32,18 @@ public interface ConnectedUserConnectionRepository extends ListCrudRepository<Co
     void deleteByConnectionId(@Param("connectionId") long connectionId);
 
     @Query("""
-        SELECT connected_user_connection.*
-        FROM connected_user_connection
-        WHERE connected_user_id = :connectedUserId
-        """)
-    List<ConnectedUserConnection> findAllByConnectedUserId(@Param("connectedUserId") long connectedUserId);
-
-    @Query("""
         SELECT COUNT(*) > 0
         FROM connected_user_connection
         WHERE connection_id = :connectionId
         """)
     boolean existsByConnectionId(@Param("connectionId") long connectionId);
+
+    @Query("""
+        SELECT connected_user_connection.*
+        FROM connected_user_connection
+        WHERE connected_user_id = :connectedUserId
+        """)
+    List<ConnectedUserConnection> findAllByConnectedUserId(@Param("connectedUserId") long connectedUserId);
 
     @Query("""
         SELECT connection_id
