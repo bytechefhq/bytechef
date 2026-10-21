@@ -33,6 +33,7 @@ import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -142,7 +143,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
-        validateOwnerOrAdmin(connectionService.getConnection(id));
+        validateSecretOwner(connectionService.getConnection(id));
 
         connectionService.replaceConnectionParameters(
             id, getResolvedAuthorizationParameters(id, parameters));
@@ -411,6 +412,32 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
             throw new AccessDeniedException(
                 "Only the connection creator or an admin can modify connection " + connection.getId());
+        }
+    }
+
+    private void validateSecretOwner(Connection connection) {
+        if (!SecurityUtils.isAuthenticated()) {
+            throw new AccessDeniedException(
+                "Authentication required to replace the credentials of connection " + connection.getId());
+        }
+
+        if (isConnectedUserOwned(connection)) {
+            ConnectionOwnershipExemption connectionOwnershipExemption =
+                connectionOwnershipExemptionProvider.getObject();
+
+            if (connectionOwnershipExemption.isOwnedByCurrentConnectedUser(
+                Validate.notNull(connection.getId(), "id"))) {
+
+                return;
+            }
+
+            throw new AccessDeniedException(
+                "Only the owning connected user can replace the credentials of connection " + connection.getId());
+        }
+
+        if (!ConnectionSecrets.isCurrentUserCreator(connection.getCreatedBy())) {
+            throw new AccessDeniedException(
+                "Only the connection creator can replace the credentials of connection " + connection.getId());
         }
     }
 

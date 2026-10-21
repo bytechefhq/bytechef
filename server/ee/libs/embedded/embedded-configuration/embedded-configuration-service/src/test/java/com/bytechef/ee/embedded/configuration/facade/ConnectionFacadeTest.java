@@ -13,11 +13,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -46,8 +57,14 @@ class ConnectionFacadeTest {
 
         connectionFacade = new ConnectionFacadeImpl(
             mock(ConnectedUserConnectionMembership.class), mock(ConnectedUserConnectionService.class),
-            mock(com.bytechef.platform.connection.facade.ConnectionFacade.class), connectionService, permissionService,
-            tagService);
+            mock(ConnectedUserProjectService.class), mock(ConnectedUserService.class),
+            mock(com.bytechef.platform.connection.facade.ConnectionFacade.class),
+            mock(ConnectionOwnershipExemption.class), connectionService,
+            mock(IntegrationInstanceConfigurationService.class),
+            mock(IntegrationInstanceConfigurationWorkflowService.class), mock(IntegrationService.class),
+            mock(IntegrationWorkflowService.class), permissionService, mock(ProjectDeploymentWorkflowService.class),
+            mock(ProjectWorkflowService.class), tagService, mock(WorkflowService.class),
+            mock(WorkflowTestConfigurationService.class));
 
         when(connectionService.getConnections(PlatformType.EMBEDDED)).thenReturn(
             List.of(

@@ -39,6 +39,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -81,6 +83,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserService connectedUserService;
     private final com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade;
+    private final ConnectionOwnershipExemption connectionOwnershipExemption;
     private final ConnectionService connectionService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -99,7 +102,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ConnectedUserConnectionService connectedUserConnectionService,
         ConnectedUserProjectService connectedUserProjectService, ConnectedUserService connectedUserService,
         com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade,
-        ConnectionService connectionService,
+        ConnectionOwnershipExemption connectionOwnershipExemption, ConnectionService connectionService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
@@ -113,6 +116,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserService = connectedUserService;
         this.connectionFacade = connectionFacade;
+        this.connectionOwnershipExemption = connectionOwnershipExemption;
         this.connectionService = connectionService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -164,8 +168,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         ConnectionDTO connectionDTO = connectionFacade.getConnection(id);
 
-        return permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT)
-            ? connectionDTO : connectionDTO.withoutCredentials();
+        return canSeeCredentials(connectionDTO,
+            permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT))
+                ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -197,7 +202,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 connectionEnvironmentId -> permissionService.hasResourceScope(
                     connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
 
-            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+            redactedConnectionDTOs.add(
+                canSeeCredentials(connectionDTO, canEdit) ? connectionDTO : connectionDTO.withoutCredentials());
         }
 
         return redactedConnectionDTOs;
@@ -377,6 +383,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         requireAdminConnection(id);
 
         connectionFacade.update(id, tags);
+    }
+
+    private boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
+        return canEdit && ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy()) &&
+            !connectionOwnershipExemption.isConnectedUserOwned(connectionDTO.id());
     }
 
     private Map<Long, ConnectedUserProject> getConnectedUserProjectMap(List<Long> projectIds) {

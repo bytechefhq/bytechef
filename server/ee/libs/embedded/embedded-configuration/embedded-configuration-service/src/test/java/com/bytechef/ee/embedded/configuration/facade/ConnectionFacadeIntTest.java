@@ -202,6 +202,7 @@ class ConnectionFacadeIntTest {
         }).when(platformConnectionFacade)
             .delete(eq(7L), any());
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
+        when(platformConnectionFacade.getConnection(7L)).thenReturn(connectionDTO);
 
         assertThat(connectionFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 
@@ -645,6 +646,8 @@ class ConnectionFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
+            grantEveryEmbeddedScope();
+
             when(permissionService.isTenantAdmin()).thenReturn(true);
             when(connectionService.fetchConnection(CONNECTION_ID))
                 .thenReturn(Optional.of(connection(CONNECTION_ID, PlatformType.EMBEDDED)));
@@ -774,12 +777,14 @@ class ConnectionFacadeIntTest {
         }
 
         @Test
-        void testGetConnectionWorkflowsIsTenantAdminOnly() {
+        void testGetConnectionWorkflowsRequiresTheConnectionViewScope() {
             authenticate(
                 new UsernamePasswordAuthenticationToken("user", "n/a",
                     List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
             when(permissionService.isTenantAdmin()).thenReturn(false);
+            when(permissionService.hasResourceScope(CONNECTION_ID, "Connection", "CONNECTION_VIEW"))
+                .thenReturn(false);
 
             assertThatThrownBy(() -> connectionFacade.getConnectionWorkflows(CONNECTION_ID))
                 .isInstanceOf(AccessDeniedException.class);
