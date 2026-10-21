@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,7 @@ class WorkflowValidatorInvalidExpressionTest {
         assertEquals("", warnings.toString());
     }
 
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private static String loopItems(String items) {
         return """
             [
