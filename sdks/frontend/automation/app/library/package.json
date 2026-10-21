@@ -1,0 +1,106 @@
+{
+    "name": "@bytechef/app",
+    "version": "0.1.0",
+    "description": "ByteChef App SDK - call ByteChef actions, tools, workflows and connections from an app with its app key.",
+    "type": "module",
+    "sideEffects": false,
+    "scripts": {
+        "build": "tsc --noEmit -p tsconfig.json && vite build",
+        "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p tsconfig.node.json",
+        "lint": "eslint 'src/**/*.ts' vite.config.ts",
+        "lint:fix": "eslint 'src/**/*.ts' vite.config.ts --fix",
+        "format": "prettier --check .",
+        "format:fix": "prettier --write \"**/*.{js,ts,md,json}\"",
+        "test": "vitest run",
+        "test:watch": "vitest --watch",
+        "coverage": "vitest run --coverage",
+        "generate:api": "openapi-typescript ../../../../../server/ee/libs/automation/automation-app/automation-app-public-rest/openapi.yaml -o src/generated/openapi.ts --alphabetize --immutable --export-type --empty-objects-unknown",
+        "check:api": "openapi-typescript ../../../../../server/ee/libs/automation/automation-app/automation-app-public-rest/openapi.yaml -o src/generated/openapi.ts --alphabetize --immutable --export-type --empty-objects-unknown --check",
+        "check": "npm run check:api && npm run lint && npm run format && npm run typecheck && npm run test",
+        "watch": "vite build --watch",
+        "publish:local": "npm publish --registry http://localhost:4873",
+        "link:local": "npm link",
+        "unlink:local": "npm unlink -g @bytechef/app"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./tanstack-start": {
+            "types": "./dist/tanstack-start.d.ts",
+            "import": "./dist/tanstack-start.js"
+        },
+        "./tanstack-start/server-fns": {
+            "types": "./dist/server-fns.d.ts",
+            "import": "./dist/server-fns.js"
+        },
+        "./ai-sdk": {
+            "types": "./dist/ai-sdk.d.ts",
+            "import": "./dist/ai-sdk.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    },
+    "peerDependencies": {
+        "@tanstack/react-start": "^1.168.0",
+        "ai": "^7.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@tanstack/react-start": {
+            "optional": true
+        },
+        "ai": {
+            "optional": true
+        }
+    },
+    "devDependencies": {
+        "@eslint/js": "10.0.1",
+        "@tanstack/react-start": "1.168.60",
+        "@types/node": "25.9.1",
+        "@vitest/coverage-v8": "4.1.7",
+        "ai": "^7.0.128",
+        "eslint": "10.4.0",
+        "eslint-config-prettier": "10.1.8",
+        "globals": "17.6.0",
+        "jsdom": "29.1.1",
+        "openapi-typescript": "^7.13.0",
+        "prettier": "3.8.3",
+        "react": "19.2.6",
+        "react-dom": "19.2.6",
+        "typescript": "5.7.3",
+        "typescript-eslint": "8.60.0",
+        "vite": "^8.0.14",
+        "vite-plugin-dts": "5.0.1",
+        "vitest": "4.1.7",
+        "zod": "^4.1.8"
+    },
+    "author": "ByteChef <support@bytechef.io>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bytechefhq/bytechef.git",
+        "directory": "sdks/frontend/automation/app/library"
+    },
+    "bugs": {
+        "url": "https://github.com/bytechefhq/bytechef/issues"
+    },
+    "homepage": "https://github.com/bytechefhq/bytechef#readme",
+    "keywords": [
+        "bytechef",
+        "automation",
+        "sdk",
+        "apps",
+        "tanstack-start",
+        "ai-sdk"
+    ]
+}

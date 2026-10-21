@@ -1,0 +1,11 @@
+# Build output
+coverage
+dist
+# Generated: the OpenAPI types and the TanStack Router route trees
+**/src/generated
+**/routeTree.gen.ts
+# Template files that are generated, starter-only, or not prettier-checked by design; the rest of the template is checked
+create/template/package-lock.json
+create/template/src/components/ui
+create/template/*.json
+create/template/*.md

@@ -1,0 +1,49 @@
+{
+    "name": "create-bytechef-app",
+    "version": "0.1.0",
+    "description": "Scaffold a ByteChef app: a TanStack Start starter that calls ByteChef through @bytechef/app.",
+    "keywords": [
+        "bytechef",
+        "create-bytechef-app",
+        "scaffold",
+        "tanstack-start"
+    ],
+    "type": "module",
+    "private": false,
+    "bin": {
+        "create-bytechef-app": "bin/create-bytechef-app.mjs"
+    },
+    "files": [
+        "bin",
+        "src",
+        "template",
+        "!template/node_modules",
+        "!template/.output",
+        "!template/dist",
+        "!template/.tanstack",
+        "!template/.vercel",
+        "!template/.nitro",
+        "!template/.env",
+        "!template/.env.local",
+        "!template/.env.*.local"
+    ],
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest --watch"
+    },
+    "devDependencies": {
+        "vitest": "4.1.7"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bytechefhq/bytechef.git",
+        "directory": "sdks/frontend/automation/app/create"
+    },
+    "engines": {
+        "node": ">=22.12.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "license": "MIT"
+}

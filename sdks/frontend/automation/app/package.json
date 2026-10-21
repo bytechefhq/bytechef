@@ -1,0 +1,32 @@
+{
+    "name": "@bytechef/app-workspace",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Workspace for the ByteChef App SDK (@bytechef/app) development",
+    "scripts": {
+        "format": "prettier --check .",
+        "format:fix": "prettier --write .",
+        "registry:start": "verdaccio --config verdaccio.config.yaml",
+        "registry:stop": "pkill -f verdaccio",
+        "build:all": "cd library && npm run build",
+        "check:all": "cd library && npm run check && cd .. && npm run test:create",
+        "test:create": "cd create && npm test",
+        "publish:library": "cd library && npm run build && npm run publish:local",
+        "clean": "rm -rf library/dist library/node_modules test-app/dist test-app/.output test-app/node_modules verdaccio-storage",
+        "check:test-app": "cd test-app && npm run build && npx tsc --noEmit -p tsconfig.json && node scripts/check-bundle.mjs",
+        "check:template": "node scripts/check-template.mjs",
+        "template:lock": "node scripts/template-lock.mjs"
+    },
+    "devDependencies": {
+        "prettier": "3.8.3",
+        "verdaccio": "^6.2.4"
+    },
+    "workspaces": [
+        "library",
+        "test-app",
+        "create"
+    ],
+    "engines": {
+        "node": ">=22.12.0"
+    }
+}
