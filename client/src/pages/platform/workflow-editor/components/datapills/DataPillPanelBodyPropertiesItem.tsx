@@ -104,27 +104,32 @@ const DataPillPanelBodyPropertiesItem = ({
                 className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b"
                 key={`accordion-trigger-${workflowNodeName}`}
             >
-                <div className="flex items-center space-x-4">
+                <div className="flex min-w-0 flex-1 items-center space-x-4">
                     {icon && (
-                        <div className="flex items-center">
+                        <div className="flex shrink-0 items-center">
                             <InlineSVG className="size-5" src={icon} />
                         </div>
                     )}
 
-                    <h3 className="flex flex-col items-start text-sm">
-                        {workflowNodeLabel || title}
+                    <h3 className="flex min-w-0 flex-col items-start text-left text-sm">
+                        <span className="w-full truncate" title={workflowNodeLabel || title}>
+                            {workflowNodeLabel || title}
+                        </span>
 
-                        <span className="truncate text-xs text-gray-400">({workflowNodeName})</span>
+                        <span className="w-full truncate text-xs text-gray-400">({workflowNodeName})</span>
                     </h3>
                 </div>
 
                 {currentWorkflowNode?.operationName && (
-                    <span className="mr-4 ml-auto max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
-                        {currentWorkflowNode?.operationName}
+                    <span
+                        className="mx-4 max-w-36 shrink-0 truncate rounded bg-muted px-2 py-1 text-xs"
+                        title={currentWorkflowNode.operationName}
+                    >
+                        {currentWorkflowNode.operationName}
                     </span>
                 )}
 
-                <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 shrink-0 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent
