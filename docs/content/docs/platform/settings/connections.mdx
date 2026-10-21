@@ -111,7 +111,14 @@ Both rules are applied on the server and ignore the request body.
 
 ### What sharing exposes
 
-`WORKSPACE` visibility lets members **use** a connection and see that it exists. It does not let them read or change the credential:
+`WORKSPACE` grants **use plus existence**, not read plus write. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else. Only the member who created a connection sees its secret values and can replace them. Organization connections are the exception: every organization admin can view and replace their secrets. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null; see [Replacing credentials](#replacing-credentials) and [Editing connection properties](#editing-connection-properties).
+
+| Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
+|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
+| An organization connection | Every organization admin | Every member | Organization admins |
+| An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
 - The connection APIs obfuscate `authorizationParameters` and return `parameters` as null.
 - Only the connection's owner and tenant admins can replace credentials or edit connection properties.
