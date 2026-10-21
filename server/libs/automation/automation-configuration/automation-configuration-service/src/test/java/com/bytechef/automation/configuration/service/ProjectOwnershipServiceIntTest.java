@@ -196,6 +196,43 @@ public class ProjectOwnershipServiceIntTest {
     }
 
     @Test
+    public void testContributorsSharingAnOwnerAreCombinedWithOr() {
+        long projectId = saveProject("p1");
+
+        long connectedUserDeploymentId = saveDeployment(projectId, "d1");
+        long referenceDeploymentId = saveDeployment(projectId, "d2");
+        long plainDeploymentId = saveDeployment(projectId, "d3");
+
+        ProjectOwnershipService service = new ProjectOwnershipServiceImpl(
+            jdbcClient,
+            List.of(
+                ProjectDeploymentOwnerContributor.of(
+                    ProjectDeploymentOwner.EMBEDDED, "%1$s = " + connectedUserDeploymentId),
+                ProjectDeploymentOwnerContributor.of(
+                    ProjectDeploymentOwner.EMBEDDED, "%1$s = " + referenceDeploymentId)),
+            List.of());
+
+        List<Long> embeddedDeploymentIds = jdbcClient
+            .sql(
+                "SELECT id FROM project_deployment WHERE " +
+                    service.getSelectProjectDeploymentsCondition(
+                        ProjectDeploymentOwner.EMBEDDED, "project_deployment.id"))
+            .query(Long.class)
+            .list();
+        List<Long> unownedDeploymentIds = jdbcClient
+            .sql(
+                "SELECT id FROM project_deployment WHERE " +
+                    service.getExcludeProjectDeploymentsCondition(
+                        EnumSet.of(ProjectDeploymentOwner.EMBEDDED), "project_deployment.id"))
+            .query(Long.class)
+            .list();
+
+        assertThat(embeddedDeploymentIds)
+            .containsExactlyInAnyOrder(connectedUserDeploymentId, referenceDeploymentId);
+        assertThat(unownedDeploymentIds).containsExactly(plainDeploymentId);
+    }
+
+    @Test
     public void testSelectWithoutContributorMatchesNothing() {
         ProjectOwnershipService emptyService = new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of());
 
