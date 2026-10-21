@@ -6,14 +6,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 const hoisted = vi.hoisted(() => ({
-    canOpenInProject: true,
     deleteProjectDeploymentMock: vi.fn(),
     openProjectMock: vi.fn(),
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
     default: () => ({
-        canOpenInProject: hoisted.canOpenInProject,
         openProject: hoisted.openProjectMock,
         openProjectWorkflow: vi.fn(),
     }),
@@ -79,7 +77,6 @@ const projectDeployment: ProjectDeployment = {
 
 describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
-        hoisted.canOpenInProject = true;
         hoisted.deleteProjectDeploymentMock.mockReset();
         hoisted.openProjectMock.mockReset();
     });
@@ -126,10 +123,8 @@ describe('ProjectDeploymentListItem', () => {
         expect(hoisted.openProjectMock).toHaveBeenLastCalledWith(7);
     });
 
-    it('hides the open project controls where the project editor is unreachable', () => {
-        hoisted.canOpenInProject = false;
-
-        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+    it('hides the open project controls when the deployment has no project', () => {
+        render(<ProjectDeploymentListItem projectDeployment={{...projectDeployment, projectId: undefined}} />);
 
         expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();

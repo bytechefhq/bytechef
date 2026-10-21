@@ -63,7 +63,7 @@ const ProjectDeploymentWorkflowListItem = ({
         (state) => state.setWorkflowExecutionSheetOpen
     );
 
-    const {canOpenInProject, openProjectWorkflow} = useOpenInProject();
+    const {openProjectWorkflow} = useOpenInProject();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -100,7 +100,7 @@ const ProjectDeploymentWorkflowListItem = ({
         }
     };
 
-    const showOpenInProject = canOpenInProject && projectId != null;
+    const showOpenInProject = projectId != null;
 
     const handleOpenInProjectClick = () => {
         if (projectId != null) {

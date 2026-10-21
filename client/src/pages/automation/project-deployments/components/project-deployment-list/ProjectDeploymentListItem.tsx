@@ -42,7 +42,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
-    const {canOpenInProject, openProject} = useOpenInProject();
+    const {openProject} = useOpenInProject();
 
     const queryClient = useQueryClient();
 
@@ -112,7 +112,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     const isDeploymentSwitchDisabled =
         enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
-    const showOpenProject = canOpenInProject && projectDeployment.projectId != null;
+    const showOpenProject = projectDeployment.projectId != null;
 
     const handleOpenProjectClick = () => {
         if (projectDeployment.projectId != null) {
