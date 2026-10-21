@@ -161,7 +161,7 @@ interface ProjectDeploymentDialogProps {
     filterWorkflowUuids?: string[];
     onClose?: () => void;
     onOpenChange?: (isOpen: boolean) => void;
-    onSuccess?: (deploymentId: number) => void;
+    onSuccess?: (deploymentId: number, environmentId?: number) => void;
     projectDeployment?: ProjectDeployment;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
@@ -302,8 +302,10 @@ const ProjectDeploymentDialog = ({
         const submittedEnvironmentId = getValues().environmentId;
         const submittedProjectId = getValues().projectId;
 
-        if (onSuccess && deploymentId) {
-            onSuccess(deploymentId);
+        const savedDeploymentId = deploymentId || effectiveProjectDeployment?.id;
+
+        if (onSuccess && savedDeploymentId) {
+            onSuccess(savedDeploymentId, submittedEnvironmentId ?? undefined);
         }
 
         closeDialog();
@@ -316,7 +318,7 @@ const ProjectDeploymentDialog = ({
             const search = submittedProjectId != null ? `?projectId=${submittedProjectId}` : '';
 
             navigate(`/automation/deployments${search}`, {
-                state: {projectDeploymentId: deploymentId || effectiveProjectDeployment?.id},
+                state: {projectDeploymentId: savedDeploymentId},
             });
         }
     };

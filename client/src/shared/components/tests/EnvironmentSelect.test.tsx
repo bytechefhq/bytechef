@@ -87,4 +87,24 @@ describe('EnvironmentSelect', () => {
         expect(await screen.findByText('STAGING')).toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
     });
+
+    it('should show the given environment and leave the current environment alone when controlled', async () => {
+        const onChange = vi.fn();
+
+        hoisted.mockSetCurrentEnvironmentId.mockReset();
+
+        render(
+            <MemoryRouter>
+                <EnvironmentSelect environmentId={2} onChange={onChange} />
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button'));
+        await userEvent.click(await screen.findByText('STAGING'));
+
+        expect(onChange).toHaveBeenCalledWith(1);
+        expect(hoisted.mockSetCurrentEnvironmentId).not.toHaveBeenCalled();
+    });
 });
