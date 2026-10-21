@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
+import com.bytechef.platform.audit.AuditOutcome;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
@@ -111,6 +112,17 @@ public class EmbeddedUserAuditMapper implements AuditMapper {
         }
 
         return data;
+    }
+
+    @Override
+    public boolean shouldRecord(AuditInvocation auditInvocation) {
+        if (!EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED.equals(auditInvocation.event())
+            || auditInvocation.outcome() != AuditOutcome.SUCCESS) {
+
+            return true;
+        }
+
+        return auditInvocation.captured() instanceof String previousRoles && !previousRoles.isEmpty();
     }
 
     private static @Nullable Object resolveUserId(AuditInvocation auditInvocation) {
