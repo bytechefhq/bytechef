@@ -56,19 +56,27 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
     }
 
     return (
-        <ProjectDeploymentDialog
-            environmentEditable={true}
-            onSuccess={onDeploymentSaved}
-            projectDeployment={{
-                name: project.name,
-                projectId: project.id,
-            }}
-            projectDeployments={projectDeploymentsQuery.data}
-            projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
-            redirectOnSubmit={false}
-            showTabs
-            triggerNode={<Button icon={<RocketIcon />} label="Deploy" onClick={handleDeployClick} variant="outline" />}
-        />
+        <Tooltip>
+            <ProjectDeploymentDialog
+                environmentEditable={true}
+                onSuccess={onDeploymentSaved}
+                projectDeployment={{
+                    name: project.name,
+                    projectId: project.id,
+                }}
+                projectDeployments={projectDeploymentsQuery.data}
+                projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                redirectOnSubmit={false}
+                showTabs
+                triggerNode={
+                    <TooltipTrigger asChild>
+                        <Button icon={<RocketIcon />} label="Deploy" onClick={handleDeployClick} variant="outline" />
+                    </TooltipTrigger>
+                }
+            />
+
+            <TooltipContent>Deploy the published project version</TooltipContent>
+        </Tooltip>
     );
 };
 
