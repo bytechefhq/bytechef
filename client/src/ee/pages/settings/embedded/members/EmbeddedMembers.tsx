@@ -286,8 +286,8 @@ const EmbeddedMembers = () => {
                                                                 </Select>
 
                                                                 <p className="text-xs text-muted-foreground">
-                                                                    They will lose access to every other environment
-                                                                    until you grant it.
+                                                                    They keep this role in every other environment.
+                                                                    Change or remove each environment separately.
                                                                 </p>
                                                             </div>
                                                         ) : (
