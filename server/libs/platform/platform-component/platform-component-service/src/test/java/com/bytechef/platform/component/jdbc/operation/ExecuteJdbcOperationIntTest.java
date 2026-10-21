@@ -59,8 +59,11 @@ public class ExecuteJdbcOperationIntTest {
                     )
                 """);
 
-        new ExecuteJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
+
+            new ExecuteJdbcOperation().execute(inputParameters, singleConnectionDataSource);
+        }
 
         Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
 
@@ -68,8 +71,11 @@ public class ExecuteJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "id1", "name", "name1"),
             JdbcConstants.EXECUTE, "INSERT INTO test VALUES(:id, :name)");
 
-        new ExecuteJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
+
+            new ExecuteJdbcOperation().execute(inputParameters, singleConnectionDataSource);
+        }
 
         Assertions.assertEquals(1, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
     }

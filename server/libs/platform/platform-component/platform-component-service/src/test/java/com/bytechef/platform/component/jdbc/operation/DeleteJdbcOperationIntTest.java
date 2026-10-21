@@ -71,9 +71,13 @@ public class DeleteJdbcOperationIntTest {
             TABLE, "test",
             CONDITION, "name = 'name1'");
 
-        Map<String, Integer> result = new DeleteJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        assertEquals(2, result.get(ROWS));
+            Map<String, Integer> result = new DeleteJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            assertEquals(2, result.get(ROWS));
+        }
     }
 }
