@@ -1,8 +1,10 @@
 import {ButtonGroup} from '@/components/ui/button-group';
+import ProjectDeploymentsSheet from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
+import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
@@ -17,7 +19,7 @@ import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilo
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
-import {RefObject, useSyncExternalStore} from 'react';
+import {RefObject, useState, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -25,6 +27,11 @@ import {useShallow} from 'zustand/react/shallow';
 const getOnlineStatus = () => onlineManager.isOnline();
 
 const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
+
+interface ProjectDeploymentsSheetStateI {
+    environmentId?: number;
+    expandedProjectDeploymentId?: number;
+}
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -45,6 +52,10 @@ const ProjectHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: ProjectHeaderProps) => {
+    const [projectDeploymentsSheetState, setProjectDeploymentsSheetState] = useState<
+        ProjectDeploymentsSheetStateI | undefined
+    >();
+
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
     useCopilotCompactHeader();
@@ -135,7 +146,17 @@ const ProjectHeader = ({
                         onPublishProjectSubmit={handlePublishProjectSubmit}
                     />
 
-                    <DeployButton project={project} />
+                    <DeployButton
+                        onDeploymentSaved={(projectDeploymentId, environmentId) =>
+                            setProjectDeploymentsSheetState({
+                                environmentId,
+                                expandedProjectDeploymentId: projectDeploymentId,
+                            })
+                        }
+                        project={project}
+                    />
+
+                    <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
                 </ButtonGroup>
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
@@ -147,6 +168,16 @@ const ProjectHeader = ({
                     workflow={workflow}
                 />
             </div>
+
+            {projectDeploymentsSheetState && (
+                <ProjectDeploymentsSheet
+                    environmentId={projectDeploymentsSheetState.environmentId}
+                    expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
+                    onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
+                    project={project}
+                    sheetOpen
+                />
+            )}
         </header>
     );
 };

@@ -308,6 +308,7 @@ module.exports = {
                 'workflow-node-details-panel-width': '460px',
                 'workflow-outputs-sheet-width': '700px',
                 'workflow-read-only-project-deployment-workflow-sheet-width': '780px',
+                'workflow-sidebar-project-deployments-sheet-width': '960px',
                 'workflow-sidebar-project-version-history-sheet-width': '600px',
             },
             minHeight: {

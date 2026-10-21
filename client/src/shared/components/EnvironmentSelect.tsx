@@ -22,11 +22,18 @@ interface EnvironmentOptionI {
 }
 
 interface EnvironmentSelectPropsI {
+    align?: 'center' | 'end' | 'start';
+    environmentId?: number;
     onChange?: (environmentId: number) => void;
     variant?: 'compact' | 'default' | 'icon';
 }
 
-const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPropsI = {}) => {
+const EnvironmentSelect = ({
+    align = 'start',
+    environmentId,
+    onChange,
+    variant = 'default',
+}: EnvironmentSelectPropsI = {}) => {
     const application = useApplicationInfoStore((state) => state.application);
 
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -62,7 +69,9 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
         return null;
     }
 
-    const currentConfig = ENVIRONMENT_CONFIGS[currentEnvironmentId];
+    const selectedEnvironmentId = environmentId ?? currentEnvironmentId;
+
+    const currentConfig = ENVIRONMENT_CONFIGS[selectedEnvironmentId];
 
     if (!currentConfig) {
         return null;
@@ -108,20 +117,22 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" className="w-72">
+            <DropdownMenuContent align={align} className="w-72">
                 <DropdownMenuRadioGroup
                     onValueChange={(value) => {
                         const nextEnvironmentId = +value;
 
-                        setCurrentEnvironmentId(nextEnvironmentId);
+                        if (environmentId === undefined) {
+                            setCurrentEnvironmentId(nextEnvironmentId);
+                        }
 
                         onChange?.(nextEnvironmentId);
                     }}
-                    value={currentEnvironmentId.toString()}
+                    value={selectedEnvironmentId.toString()}
                 >
                     {environmentOptions.map(({config, id}) => {
                         const Icon = config.icon;
-                        const isSelected = +id === currentEnvironmentId;
+                        const isSelected = +id === selectedEnvironmentId;
 
                         return (
                             <DropdownMenuRadioItem

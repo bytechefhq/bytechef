@@ -367,6 +367,7 @@
         --sidebar: 220 14.3% 95.9%;
         --sidebar-accent: 220 13% 91%;
         --sidebar-border: 220 13% 89%;
+        --sidebar-ring: 220 9% 46%;
     }
 
     [data-environment='staging'] {
@@ -390,6 +391,7 @@
         --sidebar: 215 27.9% 16.9%;
         --sidebar-accent: 215 27.9% 22%;
         --sidebar-border: 215 27.9% 25%;
+        --sidebar-ring: 218 11% 65%;
     }
 
     .dark [data-environment='staging'],
