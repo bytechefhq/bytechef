@@ -10,7 +10,7 @@ import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface McpToolActionsMenuProps {
     label: string;
-    onDeleteClick: () => void;
+    onDeleteClick?: () => void;
     onEditClick?: () => void;
 }
 
@@ -27,15 +27,13 @@ const McpToolActionsMenu = ({label, onDeleteClick, onEditClick}: McpToolActionsM
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
-            {onEditClick && (
-                <>
-                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onEditClick} />
+            {onEditClick && <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onEditClick} />}
 
-                    <DropdownMenuSeparator />
-                </>
+            {onEditClick && onDeleteClick && <DropdownMenuSeparator />}
+
+            {onDeleteClick && (
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onSelect={onDeleteClick} variant="destructive" />
             )}
-
-            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onSelect={onDeleteClick} variant="destructive" />
         </DropdownMenuContent>
     </DropdownMenu>
 );
