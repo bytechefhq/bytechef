@@ -339,6 +339,11 @@ class CustomRoleServiceIntTest {
             return mock(CustomRoleRepository.class);
         }
 
+        @Bean
+        EmbeddedUserService embeddedUserService() {
+            return mock(EmbeddedUserService.class);
+        }
+
         // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — a denial fires the
         // @PreAuthorize check before any of them is touched, and the positive controls only need Mockito's defaults.
         @Bean
@@ -466,6 +471,11 @@ class CustomRoleServiceIntTest {
             @Bean
             CustomRoleRepository customRoleRepository() {
                 return mock(CustomRoleRepository.class);
+            }
+
+            @Bean
+            EmbeddedUserService embeddedUserService() {
+                return mock(EmbeddedUserService.class);
             }
 
             @Bean("permissionService")
