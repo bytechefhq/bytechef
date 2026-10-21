@@ -8,10 +8,7 @@
 package com.bytechef.ee.embedded.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -19,7 +16,6 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -56,9 +52,6 @@ class EmbeddedResourceResolverIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private ProjectWorkflowService projectWorkflowService;
-
     @AfterEach
     void afterEach() {
         integrationWorkflowRepository.deleteAll();
@@ -66,6 +59,7 @@ class EmbeddedResourceResolverIntTest {
 
         jdbcTemplate.update("DELETE FROM automation_workflow_project");
         jdbcTemplate.update("DELETE FROM connected_user_project");
+        jdbcTemplate.update("DELETE FROM project_workflow");
         jdbcTemplate.update("DELETE FROM project");
         jdbcTemplate.update("DELETE FROM workspace");
     }
@@ -99,10 +93,8 @@ class EmbeddedResourceResolverIntTest {
         jdbcTemplate.update(
             "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)", hubProjectId);
 
-        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("hub-workflow")))
-            .thenReturn(List.of(new ProjectWorkflow(hubProjectId, 1, "hub-workflow")));
-        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("workspace-workflow")))
-            .thenReturn(List.of(new ProjectWorkflow(workspaceProjectId, 1, "workspace-workflow")));
+        insertProjectWorkflow(hubProjectId, "hub-workflow");
+        insertProjectWorkflow(workspaceProjectId, "workspace-workflow");
 
         assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("hub-workflow")).isTrue();
         assertThat(embeddedResourceResolver.isIntegrationWorkflow("hub-workflow")).isFalse();
@@ -134,10 +126,8 @@ class EmbeddedResourceResolverIntTest {
             "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)",
             connectedUserProjectId);
 
-        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("automation-hub-workflow")))
-            .thenReturn(List.of(new ProjectWorkflow(automationHubProjectId, 1, "automation-hub-workflow")));
-        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of("connected-user-workflow")))
-            .thenReturn(List.of(new ProjectWorkflow(connectedUserProjectId, 1, "connected-user-workflow")));
+        insertProjectWorkflow(automationHubProjectId, "automation-hub-workflow");
+        insertProjectWorkflow(connectedUserProjectId, "connected-user-workflow");
 
         assertThat(embeddedResourceResolver.isHubProject(automationHubProjectId)).isTrue();
         assertThat(embeddedResourceResolver.isEmbeddedProject(automationHubProjectId)).isTrue();
@@ -146,6 +136,17 @@ class EmbeddedResourceResolverIntTest {
         assertThat(embeddedResourceResolver.isHubProjectWorkflow("automation-hub-workflow")).isTrue();
         assertThat(embeddedResourceResolver.isHubProjectWorkflow("connected-user-workflow")).isFalse();
         assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("connected-user-workflow")).isTrue();
+    }
+
+    private void insertProjectWorkflow(long projectId, String workflowId) {
+        jdbcTemplate.update(
+            """
+                INSERT INTO project_workflow
+                    (project_id, project_version, workflow_id, uuid, created_date, created_by, last_modified_date,
+                     last_modified_by, version)
+                VALUES (?, 1, ?, gen_random_uuid(), now(), 'test', now(), 'test', 0)
+                """,
+            projectId, workflowId);
     }
 
     private long insertWorkspace() {
