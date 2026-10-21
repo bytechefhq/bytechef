@@ -14,6 +14,8 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -44,17 +46,24 @@ class IntegrationInstanceConfigurationServiceIntTest {
     @Autowired
     private JdbcClient jdbcClient;
 
+    @Autowired
+    private TagRepository tagRepository;
+
     @AfterEach
     void afterEach() {
         jdbcClient.sql("DELETE FROM mcp_integration_instance_configuration")
             .update();
         jdbcClient.sql("DELETE FROM mcp_server")
             .update();
+        jdbcClient.sql("DELETE FROM integration_instance_configuration_tag")
+            .update();
         jdbcClient.sql("DELETE FROM integration_instance_configuration")
             .update();
         jdbcClient.sql("DELETE FROM integration_version")
             .update();
         jdbcClient.sql("DELETE FROM integration")
+            .update();
+        jdbcClient.sql("DELETE FROM tag")
             .update();
     }
 
@@ -84,16 +93,128 @@ class IntegrationInstanceConfigurationServiceIntTest {
             .containsExactlyInAnyOrder(plainConfiguration.getId(), linkedConfiguration.getId());
     }
 
+    @Test
+    void testGetIntegrationInstanceConfigurationsFiltersByEnvironmentIntegrationIdAndTagId() {
+        long integrationId = createIntegration("componentName");
+        long otherIntegrationId = createIntegration("otherComponentName");
+        long tagId = createTag("tag");
+        long otherTagId = createTag("otherTag");
+
+        IntegrationInstanceConfiguration matchingConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "matching", Environment.PRODUCTION, List.of(tagId));
+
+        createIntegrationInstanceConfiguration(
+            integrationId, "otherEnvironment", Environment.STAGING, List.of(tagId));
+        createIntegrationInstanceConfiguration(
+            otherIntegrationId, "otherIntegration", Environment.PRODUCTION, List.of(tagId));
+        createIntegrationInstanceConfiguration(
+            integrationId, "otherTag", Environment.PRODUCTION, List.of(otherTagId));
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                Environment.PRODUCTION, integrationId, tagId);
+
+        assertThat(integrationInstanceConfigurations)
+            .extracting(IntegrationInstanceConfiguration::getId)
+            .containsExactly(matchingConfiguration.getId());
+    }
+
+    @Test
+    void testGetIntegrationInstanceConfigurationsFiltersByEnvironment() {
+        long integrationId = createIntegration("componentName");
+
+        IntegrationInstanceConfiguration productionConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "production", Environment.PRODUCTION, List.of());
+
+        createIntegrationInstanceConfiguration(integrationId, "staging", Environment.STAGING, List.of());
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                Environment.PRODUCTION, null, null);
+
+        assertThat(integrationInstanceConfigurations)
+            .extracting(IntegrationInstanceConfiguration::getId)
+            .containsExactly(productionConfiguration.getId());
+    }
+
+    @Test
+    void testGetIntegrationInstanceConfigurationsFiltersByIntegrationId() {
+        long integrationId = createIntegration("componentName");
+        long otherIntegrationId = createIntegration("otherComponentName");
+
+        IntegrationInstanceConfiguration productionConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "production", Environment.PRODUCTION, List.of());
+        IntegrationInstanceConfiguration stagingConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "staging", Environment.STAGING, List.of());
+
+        createIntegrationInstanceConfiguration(
+            otherIntegrationId, "otherIntegration", Environment.PRODUCTION, List.of());
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, integrationId, null);
+
+        assertThat(integrationInstanceConfigurations)
+            .extracting(IntegrationInstanceConfiguration::getId)
+            .containsExactlyInAnyOrder(productionConfiguration.getId(), stagingConfiguration.getId());
+    }
+
+    @Test
+    void testGetIntegrationInstanceConfigurationsFiltersByTagId() {
+        long integrationId = createIntegration("componentName");
+        long otherIntegrationId = createIntegration("otherComponentName");
+        long tagId = createTag("tag");
+        long otherTagId = createTag("otherTag");
+
+        IntegrationInstanceConfiguration taggedConfiguration = createIntegrationInstanceConfiguration(
+            integrationId, "tagged", Environment.PRODUCTION, List.of(tagId));
+        IntegrationInstanceConfiguration otherIntegrationTaggedConfiguration = createIntegrationInstanceConfiguration(
+            otherIntegrationId, "otherIntegrationTagged", Environment.STAGING, List.of(tagId, otherTagId));
+
+        createIntegrationInstanceConfiguration(integrationId, "otherTag", Environment.PRODUCTION, List.of(otherTagId));
+        createIntegrationInstanceConfiguration(integrationId, "untagged", Environment.PRODUCTION, List.of());
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, null, tagId);
+
+        assertThat(integrationInstanceConfigurations)
+            .extracting(IntegrationInstanceConfiguration::getId)
+            .containsExactlyInAnyOrder(taggedConfiguration.getId(), otherIntegrationTaggedConfiguration.getId());
+    }
+
+    private long createIntegration(String componentName) {
+        Integration integration = new Integration();
+
+        integration.setComponentName(componentName);
+        integration.setName(componentName);
+
+        integration = integrationService.create(integration);
+
+        return Objects.requireNonNull(integration.getId());
+    }
+
     private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(long integrationId, String name) {
+        return createIntegrationInstanceConfiguration(integrationId, name, Environment.PRODUCTION, List.of());
+    }
+
+    private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(
+        long integrationId, String name, Environment environment, List<Long> tagIds) {
+
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setConnectionParameters(Map.of());
-        integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
+        integrationInstanceConfiguration.setEnvironment(environment);
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName(name);
+        integrationInstanceConfiguration.setTagIds(tagIds);
 
         return integrationInstanceConfigurationService.create(integrationInstanceConfiguration);
+    }
+
+    private long createTag(String name) {
+        Tag tag = tagRepository.save(new Tag(name));
+
+        return Objects.requireNonNull(tag.getId());
     }
 
     private void linkToMcpServer(long integrationInstanceConfigurationId) {

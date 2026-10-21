@@ -94,16 +94,12 @@ public class ProjectOwnershipServiceIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        testOwnerContributors.clear();
-
         category = categoryRepository.save(new Category("name"));
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
     @AfterEach
     public void afterEach() {
-        testOwnerContributors.clear();
-
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();

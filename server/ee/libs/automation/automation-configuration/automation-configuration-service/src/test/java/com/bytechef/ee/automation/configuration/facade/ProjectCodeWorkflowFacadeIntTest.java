@@ -10,12 +10,19 @@ package com.bytechef.ee.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
@@ -26,13 +33,17 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
+import com.bytechef.automation.project.ProjectHandler;
+import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
@@ -52,10 +63,13 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -93,10 +107,19 @@ class ProjectCodeWorkflowFacadeIntTest {
     private static final long WORKSPACE_ID = 21L;
 
     @Autowired
+    private CodeWorkflowContainerFacade codeWorkflowContainerFacade;
+
+    @Autowired
     private PermissionService permissionService;
 
     @Autowired
     private ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade;
+
+    @Autowired
+    private ProjectCodeWorkflowService projectCodeWorkflowService;
+
+    @Autowired
+    private ProjectService projectService;
 
     @BeforeEach
     void beforeEach() {
@@ -113,6 +136,70 @@ class ProjectCodeWorkflowFacadeIntTest {
     @Test
     void testSaveIsAdminOnly() {
         assertRequiresAdminAuthority(() -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA));
+    }
+
+    @Test
+    void testSaveUpdatesTheSameNamedProjectOfTheCallerWorkspace() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setName("Orders");
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectService.fetchProject("Orders", WORKSPACE_ID)).thenReturn(Optional.of(project));
+        when(projectService.update(project)).thenReturn(project);
+
+        saveProjectNamed("Orders");
+
+        verify(projectService).update(project);
+        verify(projectService, never()).create(any());
+        verify(projectCodeWorkflowService).create(any(), eq(project));
+    }
+
+    @Test
+    void testSaveCreatesAProjectInTheCallerWorkspaceWhenItHasNoProjectOfThatName() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project createdProject = new Project();
+
+        createdProject.setId(6L);
+
+        when(projectService.fetchProject("Orders", WORKSPACE_ID)).thenReturn(Optional.empty());
+        when(projectService.create(any())).thenReturn(createdProject);
+
+        saveProjectNamed("Orders");
+
+        ArgumentCaptor<Project> projectArgumentCaptor = ArgumentCaptor.forClass(Project.class);
+
+        verify(projectService).create(projectArgumentCaptor.capture());
+        verify(projectService, never()).update(any());
+
+        Project project = projectArgumentCaptor.getValue();
+
+        assertThat(project.getName()).isEqualTo("Orders");
+        assertThat(project.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
+    }
+
+    private void saveProjectNamed(String name) {
+        ProjectDefinition projectDefinition = mock(ProjectDefinition.class);
+
+        when(projectDefinition.getName()).thenReturn(name);
+
+        ProjectHandler projectHandler = mock(ProjectHandler.class);
+
+        when(projectHandler.getDefinition()).thenReturn(projectDefinition);
+        when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any()))
+            .thenReturn(mock(CodeWorkflowContainer.class));
+
+        try (MockedStatic<ProjectHandlerLoader> projectHandlerLoader = mockStatic(ProjectHandlerLoader.class)) {
+            projectHandlerLoader
+                .when(() -> ProjectHandlerLoader.loadProjectHandler(any(), any(), any(), any()))
+                .thenReturn(projectHandler);
+
+            projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
+        }
     }
 
     private void assertRequiresAdminAuthority(ThrowingCallable call) {
