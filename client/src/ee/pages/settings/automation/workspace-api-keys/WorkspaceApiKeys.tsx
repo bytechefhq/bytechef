@@ -113,6 +113,7 @@ const WorkspaceApiKeys = () => {
             <ApiKeysContent
                 canCreate={canCreateApiKey}
                 canDelete={canDeleteApiKey}
+                canEdit={canCreateApiKey}
                 description="Do not share your API key with others or expose it in the browser or other client-side code."
                 title="API Keys"
             />

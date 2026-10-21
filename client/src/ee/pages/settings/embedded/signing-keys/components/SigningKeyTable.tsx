@@ -64,6 +64,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                     cell: (info) => (
                         <>
                             <Button
+                                aria-label="Edit Signing Key"
                                 icon={<EditIcon className="size-4" />}
                                 onClick={() => {
                                     setCurrentSigningKey(info.row.original);
@@ -74,6 +75,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                             />
 
                             <Button
+                                aria-label="Delete Signing Key"
                                 icon={<Trash2Icon className="h-4 text-destructive" />}
                                 onClick={() => {
                                     setCurrentSigningKey(info.row.original);

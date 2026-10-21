@@ -11,6 +11,10 @@ const hoisted = vi.hoisted(() => ({
     setShowEditWorkflowDialog: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('../hooks/useMcpIntegrationInstanceConfigurationWorkflowListItem', () => ({
     default: () => ({
         handleCloseEditDialog: vi.fn(),
