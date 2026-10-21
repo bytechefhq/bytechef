@@ -34,6 +34,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
@@ -85,6 +86,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const defaultedAuthorizationsRef = useRef<Authorization[]>(undefined);
     const initializedConfigKeyRef = useRef<string>('');
 
+    const account = useAuthenticationStore((state) => state.account);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
@@ -116,7 +118,10 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
 
-    const credentialsHidden = !!integrationInstanceConfiguration?.id && !canEditConfiguration;
+    const isConfigurationCreator = !!account?.login && account.login === integrationInstanceConfiguration?.createdBy;
+
+    const credentialsHidden =
+        !!integrationInstanceConfiguration?.id && (!canEditConfiguration || !isConfigurationCreator);
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,

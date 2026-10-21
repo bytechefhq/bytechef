@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -78,7 +79,8 @@ vi.mock('@tanstack/react-query', async () => {
 
 const DEVELOPMENT = 0;
 const PRODUCTION = 2;
-const HIDDEN_HINT = 'Only members who can edit this connection can see its credentials.';
+const CREATOR_LOGIN = 'creator@localhost.com';
+const HIDDEN_HINT = 'Only the member who created this connection can see or replace its credentials.';
 const WORKSPACE_ID = 1049;
 
 const CONNECTION_DEFINITION = {
@@ -100,6 +102,7 @@ const CONNECTION = {
     componentName: 'slack',
     connectionParameters: {subdomain: 'acme-subdomain'},
     connectionVersion: 1,
+    createdBy: CREATOR_LOGIN,
     environmentId: PRODUCTION,
     id: 5,
     name: 'Slack',
@@ -137,6 +140,9 @@ const renderEditDialog = (platformType?: PlatformType) => {
     return {credentialsMutateAsync, unmount, updateConnectionMutate};
 };
 
+const authenticateAs = (login: string, authorities: string[]) =>
+    authenticationStore.setState({account: {authorities, login} as never, authenticated: true});
+
 const saveAndGetPayload = async (updateConnectionMutate: ReturnType<typeof vi.fn>) => {
     await userEvent.setup({pointerEventsCheck: 0}).click(screen.getByRole('button', {name: 'Save'}));
 
@@ -172,6 +178,7 @@ describe('ConnectionDialog withheld credentials', () => {
         } as never);
 
         act(() => {
+            authenticateAs(CREATOR_LOGIN, ['ROLE_USER']);
             environmentStore.setState({currentEnvironmentId: DEVELOPMENT});
             usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
         });
@@ -179,6 +186,7 @@ describe('ConnectionDialog withheld credentials', () => {
 
     afterEach(() => {
         act(() => {
+            authenticationStore.setState({account: undefined, authenticated: false});
             environmentStore.setState({currentEnvironmentId: DEVELOPMENT});
             usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
         });
@@ -230,6 +238,33 @@ describe('ConnectionDialog withheld credentials', () => {
 
         await waitFor(() => expect(credentialsMutateAsync).toHaveBeenCalledTimes(1));
         expect(credentialsMutateAsync.mock.calls[0][0]).toMatchObject({id: 5, version: 3});
+    });
+
+    it('testAnAdminWhoDidNotCreateTheConnectionSeesHiddenCredentialsInBothPlatforms', async () => {
+        act(() => {
+            authenticateAs('admin@localhost.com', ['ROLE_ADMIN']);
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.embeddedGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        for (const platformType of [PlatformType.EMBEDDED, PlatformType.AUTOMATION]) {
+            const {credentialsMutateAsync, unmount, updateConnectionMutate} = renderEditDialog(platformType);
+
+            expect(screen.getAllByText('Hidden')).toHaveLength(3);
+            expect(screen.getByText(HIDDEN_HINT)).toBeInTheDocument();
+            expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+
+            const payload = await saveAndGetPayload(updateConnectionMutate);
+
+            CREDENTIAL_KEYS.forEach((credentialKey) => expect(payload).not.toHaveProperty(credentialKey));
+            expect(payload).toMatchObject({id: 5, name: 'Slack', version: 3});
+            expect(credentialsMutateAsync).not.toHaveBeenCalled();
+
+            unmount();
+        }
     });
 
     it('testAutomationConnectionDialogAlsoShowsHiddenCredentials', async () => {
