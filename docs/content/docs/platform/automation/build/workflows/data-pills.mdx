@@ -134,7 +134,7 @@ by category.
 | `range` | Build a list of integers between two bounds | `=range(1, 10)` |
 | `remove` | Remove an element from a list | `=remove(${trigger_1.body.tags}, 'draft')` |
 | `set` | Replace the element at an index | `=set(${trigger_1.body.items}, 0, 'first')` |
-| `size` | Number of elements in a list | `=size(${trigger_1.body.items})` |
+| `size` | Number of elements in a list, array or map; `-1` if null | `=size(${trigger_1.body.items})` |
 | `sort` | Sort a list in natural order | `=sort(${trigger_1.body.scores})` |
 | `toMap` | Build a map from a list of key/value pairs | `=toMap(${step_1.entries})` |
 
