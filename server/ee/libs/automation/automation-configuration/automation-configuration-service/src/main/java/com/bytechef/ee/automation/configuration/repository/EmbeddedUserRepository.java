@@ -26,6 +26,13 @@ public interface EmbeddedUserRepository extends ListCrudRepository<EmbeddedUser,
 
     long countByCustomRoleId(long customRoleId);
 
+    @Query("""
+        SELECT COUNT(DISTINCT user_id) FROM embedded_user
+        WHERE embedded_role = :embeddedRole
+          AND (environment = :environment OR environment IS NULL)
+        """)
+    long countUsersWithRoleForEnvironment(int embeddedRole, int environment);
+
     void deleteByUserId(long userId);
 
     boolean existsByUserId(long userId);
@@ -40,4 +47,7 @@ public interface EmbeddedUserRepository extends ListCrudRepository<EmbeddedUser,
 
     @Query("SELECT id FROM embedded_user WHERE user_id = :userId FOR UPDATE")
     List<Long> lockEmbeddedUsers(long userId);
+
+    @Query("SELECT id FROM embedded_user WHERE embedded_role = :embeddedRole ORDER BY id FOR UPDATE")
+    List<Long> lockEmbeddedUsersWithRole(int embeddedRole);
 }

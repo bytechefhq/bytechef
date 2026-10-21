@@ -203,10 +203,11 @@ class EmbeddedUserServiceIntTest {
     }
 
     @Test
-    void testAnEmbeddedAdminMayRemoveThemselves() {
+    void testAnEmbeddedAdminMayRemoveThemselvesWhileAnotherAdminRemains() {
         authenticate(ADMIN, true);
 
         embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.ADMIN);
 
         authenticate(EMBEDDED_ADMIN, false);
 
@@ -237,10 +238,42 @@ class EmbeddedUserServiceIntTest {
     }
 
     @Test
-    void testAnEmbeddedAdminCanDemoteThemselves() {
+    void testTheLastEmbeddedAdminCannotRemoveOrDemoteThemselves() {
+        embeddedUserRepository.deleteAll();
+
         authenticate(ADMIN, true);
 
         embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(() -> embeddedUserService.removeEmbeddedUser(userId(EMBEDDED_ADMIN)))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("last embedded admin");
+        assertThatThrownBy(
+            () -> embeddedUserService.updateEmbeddedUserRole(userId(EMBEDDED_ADMIN), WorkspaceRole.EDITOR))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("last embedded admin");
+        assertThatThrownBy(
+            () -> embeddedUserService.setEnvironmentRole(
+                userId(EMBEDDED_ADMIN), Environment.PRODUCTION, WorkspaceRole.VIEWER))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("last embedded admin");
+
+        assertThat(embeddedUserService.getUserEmbeddedUsers(userId(EMBEDDED_ADMIN)))
+            .singleElement()
+            .satisfies(embeddedUser -> {
+                assertThat(embeddedUser.getEnvironment()).isNull();
+                assertThat(embeddedUser.getEmbeddedRole()).isEqualTo(WorkspaceRole.ADMIN);
+            });
+    }
+
+    @Test
+    void testAnEmbeddedAdminCanDemoteThemselvesWhileAnotherAdminRemains() {
+        authenticate(ADMIN, true);
+
+        embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.ADMIN);
 
         authenticate(EMBEDDED_ADMIN, false);
 
