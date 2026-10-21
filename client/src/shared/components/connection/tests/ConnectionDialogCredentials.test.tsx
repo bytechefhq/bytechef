@@ -11,7 +11,7 @@ import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest
 
 const hoisted = vi.hoisted(() => ({
     embeddedGrants: {} as Record<number, string[]>,
-    workspaceGrants: [] as string[],
+    workspaceGrants: {} as Record<number, string[]>,
 }));
 
 vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => {
@@ -27,10 +27,17 @@ vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => {
     };
 });
 
-vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
-    useHasWorkspaceScope: (workspaceId: number | undefined, scope: string) =>
-        workspaceId !== undefined && hoisted.workspaceGrants.includes(scope),
-}));
+vi.mock('@/shared/hooks/useHasWorkspaceScope', async () => {
+    const {environmentStore: mockedEnvironmentStore} = await import('@/shared/stores/useEnvironmentStore');
+
+    return {
+        useHasWorkspaceScope: (workspaceId: number | undefined, scope: string, environmentId?: number) =>
+            workspaceId !== undefined &&
+            (
+                hoisted.workspaceGrants[environmentId ?? mockedEnvironmentStore.getState().currentEnvironmentId] ?? []
+            ).includes(scope),
+    };
+});
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(),
@@ -103,7 +110,7 @@ const CONNECTION = {
 
 const CREDENTIAL_KEYS = ['authorizationParameters', 'connectionParameters', 'parameters'];
 
-const renderEditDialog = () => {
+const renderEditDialog = (platformType?: PlatformType) => {
     const credentialsMutateAsync = vi.fn().mockResolvedValue(undefined);
     const updateConnectionMutate = vi.fn();
 
@@ -114,6 +121,7 @@ const renderEditDialog = () => {
                 connection={CONNECTION as never}
                 connectionTagsQueryKey={['connectionTags']}
                 connectionsQueryKey={['connections']}
+                platformType={platformType}
                 showSharedOption
                 useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
                 useUpdateConnectionCredentialsMutation={
@@ -155,7 +163,7 @@ describe('ConnectionDialog withheld credentials', () => {
 
     beforeEach(() => {
         hoisted.embeddedGrants = {};
-        hoisted.workspaceGrants = [];
+        hoisted.workspaceGrants = {};
 
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
             data: CONNECTION_DEFINITION,
@@ -231,7 +239,10 @@ describe('ConnectionDialog withheld credentials', () => {
         });
 
         hoisted.embeddedGrants = {[DEVELOPMENT]: ['CONNECTION_EDIT'], [PRODUCTION]: ['CONNECTION_EDIT']};
-        hoisted.workspaceGrants = ['CONNECTION_VIEW'];
+        hoisted.workspaceGrants = {
+            [DEVELOPMENT]: ['CONNECTION_EDIT', 'CONNECTION_VIEW'],
+            [PRODUCTION]: ['CONNECTION_VIEW'],
+        };
 
         const viewerRender = renderEditDialog();
 
@@ -245,9 +256,35 @@ describe('ConnectionDialog withheld credentials', () => {
 
         viewerRender.unmount();
 
-        hoisted.workspaceGrants = ['CONNECTION_EDIT', 'CONNECTION_VIEW'];
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
 
         renderEditDialog();
+
+        expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+        expect(screen.getByText('secret-api-key-value')).toBeInTheDocument();
+    });
+
+    it('testAnExplicitPlatformTypeWinsOverAStaleStoredType', () => {
+        act(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.embeddedGrants = {[PRODUCTION]: ['CONNECTION_VIEW']};
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        const embeddedRender = renderEditDialog(PlatformType.EMBEDDED);
+
+        expect(screen.getAllByText('Hidden')).toHaveLength(3);
+        expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
+
+        embeddedRender.unmount();
+
+        act(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+        });
+
+        renderEditDialog(PlatformType.AUTOMATION);
 
         expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
         expect(screen.getByText('secret-api-key-value')).toBeInTheDocument();

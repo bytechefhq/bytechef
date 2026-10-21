@@ -43,6 +43,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
+import {omitCredentials} from './utils/omitCredentials';
 
 const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
     AuthorizationType.Oauth2AuthorizationCode,
@@ -287,17 +288,8 @@ const IntegrationInstanceConfigurationDialog = ({
         }
 
         if (integrationInstanceConfiguration?.id) {
-            const {
-                /* eslint-disable @typescript-eslint/no-unused-vars */
-                connectionAuthorizationParameters: _connectionAuthorizationParameters,
-                connectionConnectionParameters: _connectionConnectionParameters,
-                connectionParameters: _connectionParameters,
-                /* eslint-enable @typescript-eslint/no-unused-vars */
-                ...integrationInstanceConfigurationWithoutCredentials
-            } = integrationInstanceConfiguration;
-
             updateIntegrationInstanceConfigurationMutation.mutate({
-                ...integrationInstanceConfigurationWithoutCredentials,
+                ...omitCredentials(integrationInstanceConfiguration),
                 ...formData,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
