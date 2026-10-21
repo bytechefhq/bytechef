@@ -16,6 +16,7 @@ const KnowledgeBasesFilterTitle = ({allTags, tagsByKnowledgeBaseData}: Knowledge
 
             {tagId ? (
                 <Badge
+                    className="border-transparent"
                     label={`Tags: ${typeof pageTitle === 'string' ? pageTitle : 'Unknown Tag'}`}
                     styleType="primary-outline"
                     weight="semibold"
