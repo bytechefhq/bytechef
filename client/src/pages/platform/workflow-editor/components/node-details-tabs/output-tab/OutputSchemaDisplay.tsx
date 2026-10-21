@@ -1,13 +1,13 @@
 import Button from '@/components/Button/Button';
-import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {ButtonGroup} from '@/components/ui/button-group';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import {ButtonGroup} from '@/components/ui/button-group';
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
@@ -131,19 +131,12 @@ const OutputSchemaDisplay = ({
                                     <DropdownMenuGroup>
                                         {testable && !isClusterElement && (
                                             <DropdownMenuItem
-                                                className="cursor-pointer"
+                                                label="Upload Sample Output"
                                                 onClick={() => setShowUploadDialog(true)}
-                                            >
-                                                Upload Sample Output
-                                            </DropdownMenuItem>
+                                            />
                                         )}
 
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={handlePredefinedOutputSchemaClick}
-                                        >
-                                            Reset
-                                        </DropdownMenuItem>
+                                        <DropdownMenuItem label="Reset" onClick={handlePredefinedOutputSchemaClick} />
                                     </DropdownMenuGroup>
                                 </DropdownMenuContent>
                             </DropdownMenu>

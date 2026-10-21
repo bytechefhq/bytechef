@@ -1,6 +1,6 @@
 import {NodeDataType, PropertyAllType} from '@/shared/types';
-import {render, resetAll, screen} from '@/shared/util/test-utils';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import OutputSchemaDisplay from './OutputSchemaDisplay';
 
@@ -52,6 +52,14 @@ const renderOutputSchemaDisplay = (props: Partial<Parameters<typeof OutputSchema
             {...props}
         />
     );
+
+const openMoreOptionsMenu = async () => {
+    await userEvent.click(screen.getByRole('button', {name: 'More Options'}));
+};
+
+beforeEach(() => {
+    windowResizeObserver();
+});
 
 afterEach(() => {
     resetAll();
@@ -137,5 +145,59 @@ describe('OutputSchemaDisplay', () => {
         renderOutputSchemaDisplay({resumePerformFunctionDefined: true, testOutputResponse: false});
 
         expect(screen.getByText(/Upload a sample output to get real data first/)).toBeInTheDocument();
+    });
+
+    it('should render the more options menu with the design-system DropdownMenu', async () => {
+        renderOutputSchemaDisplay();
+
+        await openMoreOptionsMenu();
+
+        expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+            'Upload Sample Output',
+            'Reset',
+        ]);
+        expect(screen.getByRole('menuitem', {name: 'Reset'})).toHaveClass('text-content-neutral-primary');
+    });
+
+    it('should open the upload dialog when clicking Upload Sample Output in the menu', async () => {
+        const setShowUploadDialog = vi.fn();
+
+        renderOutputSchemaDisplay({setShowUploadDialog});
+
+        await openMoreOptionsMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Upload Sample Output'}));
+
+        expect(setShowUploadDialog).toHaveBeenCalledTimes(1);
+        expect(setShowUploadDialog).toHaveBeenCalledWith(true);
+    });
+
+    it('should reset the output schema when clicking Reset in the menu', async () => {
+        const handlePredefinedOutputSchemaClick = vi.fn();
+
+        renderOutputSchemaDisplay({handlePredefinedOutputSchemaClick});
+
+        await openMoreOptionsMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Reset'}));
+
+        expect(handlePredefinedOutputSchemaClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('should only offer Reset in the menu for a cluster element', async () => {
+        renderOutputSchemaDisplay({isClusterElement: true});
+
+        await openMoreOptionsMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual(['Reset']);
+    });
+
+    it('should only offer Reset in the menu when Upload Sample Output is already a header button', async () => {
+        renderOutputSchemaDisplay({currentNode: {...currentNode, taskDispatcher: true}});
+
+        await openMoreOptionsMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual(['Reset']);
     });
 });
