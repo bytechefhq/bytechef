@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectDeploymentList from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -13,7 +15,7 @@ import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/proj
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ExternalLinkIcon, RocketIcon} from 'lucide-react';
+import {ExternalLinkIcon, Layers3Icon, RocketIcon, SendIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -33,7 +35,7 @@ interface ProjectDeploymentsSheetProps {
 
 const ProjectDeploymentsSheet = ({
     environmentId: initialEnvironmentId,
-    expandedProjectDeploymentId,
+    expandedProjectDeploymentId: initialExpandedProjectDeploymentId,
     onSheetOpenChange,
     project,
     sheetOpen,
@@ -47,6 +49,9 @@ const ProjectDeploymentsSheet = ({
     );
 
     const [environmentId, setEnvironmentId] = useState<number>(initialEnvironmentId ?? currentEnvironmentId);
+    const [expandedProjectDeploymentId, setExpandedProjectDeploymentId] = useState<number | undefined>(
+        initialExpandedProjectDeploymentId
+    );
 
     const navigate = useNavigate();
 
@@ -77,6 +82,16 @@ const ProjectDeploymentsSheet = ({
                 .sort((deployment, otherDeployment) => deployment.name.localeCompare(otherDeployment.name)),
         [environmentId, projectDeployments]
     );
+
+    const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
+
+    const handleDeploymentSaved = (projectDeploymentId: number, savedEnvironmentId?: number) => {
+        if (savedEnvironmentId !== undefined) {
+            setEnvironmentId(savedEnvironmentId);
+        }
+
+        setExpandedProjectDeploymentId(projectDeploymentId);
+    };
 
     const handleOpenInDeploymentsClick = () => {
         setCurrentEnvironmentId(environmentId);
@@ -117,11 +132,36 @@ const ProjectDeploymentsSheet = ({
                         </div>
                     )}
 
-                    {!projectDeploymentsIsLoading && environmentProjectDeployments.length === 0 && (
-                        <p className="py-6 text-center text-sm text-muted-foreground">
-                            No deployments in this environment.
-                        </p>
-                    )}
+                    {!projectDeploymentsIsLoading &&
+                        environmentProjectDeployments.length === 0 &&
+                        (isPublished ? (
+                            <EmptyState
+                                actions={
+                                    <ProjectDeploymentDialog
+                                        environmentEditable
+                                        onSuccess={handleDeploymentSaved}
+                                        projectDeployment={{
+                                            environmentId,
+                                            name: project.name,
+                                            projectId: project.id,
+                                        }}
+                                        projectDeployments={projectDeployments}
+                                        redirectOnSubmit={false}
+                                        showTabs
+                                        triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
+                                    />
+                                }
+                                description="Deploy a published version of this project to run its workflows in this environment."
+                                icon={<Layers3Icon />}
+                                title={`No deployments in ${ENVIRONMENT_CONFIGS[environmentId]?.label ?? 'this environment'}`}
+                            />
+                        ) : (
+                            <EmptyState
+                                description="Deployments run a published, read-only version of a project. Publish this project to create its first version."
+                                icon={<SendIcon />}
+                                title="Publish the project to deploy it"
+                            />
+                        ))}
 
                     {environmentProjectDeployments.length > 0 && (
                         <WorkflowReadOnlyProvider

@@ -32,10 +32,20 @@ vi.mock('@/shared/queries/platform/taskDispatcherDefinitions.queries', () => ({
 }));
 
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList', () => ({
-    default: ({projectDeployments}: {projectDeployments: ProjectDeployment[]}) => (
+    default: ({
+        newlyCreatedDeploymentId,
+        projectDeployments,
+    }: {
+        newlyCreatedDeploymentId?: number;
+        projectDeployments: ProjectDeployment[];
+    }) => (
         <ul>
             {projectDeployments.map((projectDeployment) => (
-                <li key={projectDeployment.id}>{projectDeployment.name}</li>
+                <li key={projectDeployment.id}>
+                    {projectDeployment.id === newlyCreatedDeploymentId
+                        ? `${projectDeployment.name} expanded`
+                        : projectDeployment.name}
+                </li>
             ))}
         </ul>
     ),
@@ -47,6 +57,37 @@ vi.mock(
         default: () => <div>Workflow Executions Sheet</div>,
     })
 );
+
+vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
+    default: ({
+        onSuccess,
+        projectDeployment,
+        triggerNode,
+    }: {
+        onSuccess: (deploymentId: number, environmentId?: number) => void;
+        projectDeployment: ProjectDeployment;
+        triggerNode: React.ReactNode;
+    }) => (
+        <>
+            {triggerNode}
+
+            <span>{`Deploy dialog for environment ${projectDeployment.environmentId}`}</span>
+
+            <button
+                onClick={() => {
+                    hoisted.projectDeployments = [
+                        ...hoisted.projectDeployments,
+                        {enabled: true, environmentId: 1, id: 3, name: 'Orders Staging', projectVersion: 2},
+                    ];
+
+                    onSuccess(3, 1);
+                }}
+            >
+                Save deployment
+            </button>
+        </>
+    ),
+}));
 
 vi.mock('@/shared/components/EnvironmentSelect', () => ({
     default: ({environmentId, onChange}: {environmentId: number; onChange: (environmentId: number) => void}) => (
@@ -62,7 +103,7 @@ vi.mock('@/shared/components/EnvironmentSelect', () => ({
 
 const onSheetOpenChange = vi.fn();
 
-const project = {id: 7, name: 'Orders'} as Project;
+const project = {id: 7, lastProjectVersion: 3, lastPublishedDate: new Date(), name: 'Orders'} as Project;
 
 const renderProjectDeploymentsSheet = () =>
     render(<ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />);
@@ -102,7 +143,9 @@ describe('ProjectDeploymentsSheet', () => {
 
         fireEvent.click(screen.getByText('Staging'));
 
-        expect(screen.getByText('No deployments in this environment.')).toBeInTheDocument();
+        expect(screen.getByText('No deployments in STAGING')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
+        expect(screen.getByText('Deploy dialog for environment 1')).toBeInTheDocument();
     });
 
     it('opens the deployments page in the selected environment', () => {
@@ -128,7 +171,34 @@ describe('ProjectDeploymentsSheet', () => {
         );
 
         expect(screen.getByText('Selected environment 2')).toBeInTheDocument();
-        expect(screen.getByText('Orders Prod')).toBeInTheDocument();
+        expect(screen.getByText('Orders Prod expanded')).toBeInTheDocument();
         expect(screen.queryByText('Orders Dev')).not.toBeInTheDocument();
+    });
+
+    it('expands the deployment created from the empty state', () => {
+        const {rerender} = renderProjectDeploymentsSheet();
+
+        fireEvent.click(screen.getByText('Staging'));
+        fireEvent.click(screen.getByText('Save deployment'));
+
+        rerender(<ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />);
+
+        expect(screen.getByText('Selected environment 1')).toBeInTheDocument();
+        expect(screen.getByText('Orders Staging expanded')).toBeInTheDocument();
+    });
+
+    it('asks to publish an unpublished project instead of offering to deploy it', () => {
+        render(
+            <ProjectDeploymentsSheet
+                onSheetOpenChange={onSheetOpenChange}
+                project={{id: 7, name: 'Orders'} as Project}
+                sheetOpen
+            />
+        );
+
+        fireEvent.click(screen.getByText('Staging'));
+
+        expect(screen.getByText('Publish the project to deploy it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
     });
 });
