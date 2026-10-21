@@ -1,11 +1,15 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {Project} from '@/shared/middleware/automation/configuration';
-import {render, screen} from '@/shared/util/test-utils';
+import {Project, ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
-import {MemoryRouter} from 'react-router-dom';
-import {describe, expect, it, vi} from 'vitest';
+import {InitialEntry, MemoryRouter} from 'react-router-dom';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeployments from './ProjectDeployments';
+
+const hoisted = vi.hoisted(() => ({
+    projectDeployments: [] as ProjectDeployment[],
+}));
 
 const publishedProject: Project = {
     id: 4,
@@ -37,7 +41,7 @@ vi.mock('@/shared/queries/automation/projects.queries', async (importOriginal) =
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/queries/automation/projectDeployments.queries')>()),
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: [], error: null, isLoading: false}),
+    useGetWorkspaceProjectDeploymentsQuery: () => ({data: hoisted.projectDeployments, error: null, isLoading: false}),
 }));
 
 vi.mock('@/shared/queries/automation/projectDeploymentTags.queries', () => ({
@@ -53,10 +57,29 @@ vi.mock('@/shared/queries/platform/taskDispatcherDefinitions.queries', () => ({
 }));
 
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
-    default: ({triggerNode}: {triggerNode: ReactNode}) => triggerNode,
+    default: ({onSuccess, triggerNode}: {onSuccess?: (deploymentId: number) => void; triggerNode: ReactNode}) => (
+        <>
+            {triggerNode}
+
+            <button onClick={() => onSuccess?.(9)}>Finish deployment dialog</button>
+        </>
+    ),
 }));
 
-const renderProjectDeployments = (initialEntries: string[] = ['/']) =>
+vi.mock('@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList', () => ({
+    default: ({newlyCreatedDeploymentId}: {newlyCreatedDeploymentId?: number}) => (
+        <div>{`Expanded deployment: ${newlyCreatedDeploymentId ?? 'none'}`}</div>
+    ),
+}));
+
+vi.mock(
+    '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet',
+    () => ({
+        default: () => null,
+    })
+);
+
+const renderProjectDeployments = (initialEntries: InitialEntry[] = ['/']) =>
     render(
         <MemoryRouter initialEntries={initialEntries}>
             <TooltipProvider>
@@ -66,6 +89,10 @@ const renderProjectDeployments = (initialEntries: string[] = ['/']) =>
     );
 
 describe('ProjectDeployments empty states', () => {
+    beforeEach(() => {
+        hoisted.projectDeployments = [];
+    });
+
     it('guides a first deployment and hides the project and tag sidebar', () => {
         renderProjectDeployments();
 
@@ -80,5 +107,41 @@ describe('ProjectDeployments empty states', () => {
         expect(screen.getByText('No Matching Project Deployments')).toBeInTheDocument();
         expect(screen.queryByText('Create your first deployment')).not.toBeInTheDocument();
         expect(screen.getByText('All Projects')).toBeInTheDocument();
+    });
+});
+
+describe('ProjectDeployments expanded deployment', () => {
+    beforeEach(() => {
+        hoisted.projectDeployments = [
+            {
+                enabled: true,
+                environmentId: 0,
+                id: 2,
+                name: 'Order alerts deployment',
+                project: publishedProject,
+                projectId: publishedProject.id,
+                projectVersion: 1,
+            },
+        ];
+    });
+
+    it('should expand nothing when no deployment is handed over', () => {
+        renderProjectDeployments();
+
+        expect(screen.getByText('Expanded deployment: none')).toBeInTheDocument();
+    });
+
+    it('should expand the deployment the workflow editor redirected to', () => {
+        renderProjectDeployments([{pathname: '/', state: {projectDeploymentId: 2}}]);
+
+        expect(screen.getByText('Expanded deployment: 2')).toBeInTheDocument();
+    });
+
+    it('should expand a deployment created from the header dialog over the redirected one', async () => {
+        renderProjectDeployments([{pathname: '/', state: {projectDeploymentId: 2}}]);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Finish deployment dialog'}));
+
+        expect(screen.getByText('Expanded deployment: 9')).toBeInTheDocument();
     });
 });
