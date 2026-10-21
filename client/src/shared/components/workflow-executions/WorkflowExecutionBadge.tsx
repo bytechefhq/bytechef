@@ -12,7 +12,7 @@ const WorkflowExecutionBadge = ({status}: {status: string}) => {
     return (
         <div className="flex items-center">
             <Badge
-                className="uppercase"
+                className="border-transparent uppercase"
                 label={status ?? ''}
                 styleType={STYLE_MAP[status] ?? 'secondary-filled'}
                 weight="semibold"

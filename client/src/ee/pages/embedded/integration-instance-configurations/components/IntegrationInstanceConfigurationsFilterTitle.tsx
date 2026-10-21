@@ -27,7 +27,7 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
-            <Badge styleType="primary-outline" weight="semibold">
+            <Badge className="border-transparent" styleType="primary-outline" weight="semibold">
                 <span className="text-sm">{`${searchParams.get('tagId') ? 'Tags' : 'Integrations'}: ${pageTitle ?? 'All Integrations'}`}</span>
             </Badge>
         </div>

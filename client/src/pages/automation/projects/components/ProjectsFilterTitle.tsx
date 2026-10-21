@@ -28,6 +28,7 @@ const ProjectsFilterTitle = ({
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             <Badge
+                className="border-transparent"
                 label={`${searchParams.get('tagId') ? 'Tags' : 'Categories'}: ${pageTitle ?? 'All Categories'}`}
                 styleType="primary-outline"
                 weight="semibold"

@@ -31,6 +31,7 @@ const ConnectionsFilterTitle = ({
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             <Badge
+                className="border-transparent"
                 label={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${typeof pageTitle === 'string' ? pageTitle : 'All Components'}`}
                 styleType="primary-outline"
                 weight="semibold"
