@@ -1,5 +1,11 @@
 import Button from '@/components/Button/Button';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
+import {
     Breadcrumb,
     BreadcrumbEllipsis,
     BreadcrumbItem,
@@ -7,7 +13,6 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronLeftIcon, WorkflowIcon} from 'lucide-react';
 import {CSSProperties, useEffect, useRef, useState} from 'react';
@@ -136,9 +141,11 @@ const SubflowExecutionBreadcrumb = ({items, onBackClick}: {items: BreadcrumbEntr
 
                                     <DropdownMenuContent align="start">
                                         {middleItems.map((item) => (
-                                            <DropdownMenuItem key={item.label} onClick={item.onNavigate}>
-                                                {item.label}
-                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                key={item.label}
+                                                label={item.label}
+                                                onClick={item.onNavigate}
+                                            />
                                         ))}
                                     </DropdownMenuContent>
                                 </DropdownMenu>

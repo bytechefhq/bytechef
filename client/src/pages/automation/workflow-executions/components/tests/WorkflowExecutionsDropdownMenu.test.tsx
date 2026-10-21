@@ -102,6 +102,39 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         expect(restartJobMutateMock).toHaveBeenCalledWith(9);
     });
 
+    it('renders with the design-system DropdownMenu', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'View'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Stop'})).toHaveClass('text-content-destructive-primary');
+    });
+
+    it('stops a started job', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+        await user.click(await screen.findByRole('menuitem', {name: 'Stop'}));
+
+        expect(stopJobMutateMock).toHaveBeenCalledWith(5);
+    });
+
+    it('disables Stop for a job that is not running', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(failedJobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menuitem', {name: 'Stop'})).toHaveAttribute('data-disabled');
+    });
+
     it('disables Restart for a job that has not failed', async () => {
         const user = userEvent.setup();
 
