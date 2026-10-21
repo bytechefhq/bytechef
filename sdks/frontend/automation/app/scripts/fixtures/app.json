@@ -1,0 +1,84 @@
+{
+    "actions": [
+        {
+            "actionName": "createContact",
+            "bindingKey": "crm",
+            "componentName": "hubspot",
+            "description": "Creates a contact",
+            "inputSchema": {
+                "additionalProperties": false,
+                "properties": {"email": {"type": "string"}, "name": {"type": "string"}},
+                "required": ["email"],
+                "type": "object"
+            }
+        }
+    ],
+    "apiCollections": [
+        {
+            "apiCollectionId": 9,
+            "available": true,
+            "collectionVersion": 1,
+            "contextPath": "orders",
+            "endpoints": [
+                {
+                    "httpMethod": "GET",
+                    "name": "listOrders",
+                    "path": "/orders",
+                    "requestSchema": null,
+                    "responseSchema": null
+                }
+            ],
+            "name": "Orders"
+        },
+        {
+            "apiCollectionId": 10,
+            "available": false,
+            "collectionVersion": 1,
+            "contextPath": null,
+            "endpoints": [],
+            "name": "#10"
+        }
+    ],
+    "connections": [
+        {
+            "actionNames": ["createContact"],
+            "bindingKey": "crm",
+            "componentName": "hubspot",
+            "componentVersion": 3,
+            "connectionVersion": 1,
+            "proxyAllowedMethods": ["GET"],
+            "proxyEnabled": true,
+            "toolNames": ["searchContacts"]
+        },
+        {
+            "actionNames": ["send"],
+            "bindingKey": "mail",
+            "componentName": "gone-component",
+            "componentVersion": null,
+            "connectionVersion": 1,
+            "proxyAllowedMethods": [],
+            "proxyEnabled": false,
+            "toolNames": ["sendMessage"]
+        }
+    ],
+    "tools": [
+        {
+            "bindingKey": "crm",
+            "componentName": "hubspot",
+            "description": "Search contacts",
+            "name": "CRM__SEARCH_CONTACTS",
+            "parameters": "{\"type\":\"object\",\"properties\":{\"q\":{\"type\":\"string\"}}}",
+            "toolName": "searchContacts"
+        }
+    ],
+    "workflows": [
+        {
+            "available": true,
+            "description": null,
+            "inputSchema": {"properties": {"email": {"type": "string"}}, "type": "object"},
+            "name": "Onboard customer",
+            "outputSchema": null,
+            "workflowKey": "onboard-customer"
+        }
+    ]
+}
