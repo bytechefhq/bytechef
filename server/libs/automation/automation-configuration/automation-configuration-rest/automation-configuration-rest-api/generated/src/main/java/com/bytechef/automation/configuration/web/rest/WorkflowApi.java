@@ -7,6 +7,7 @@ package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -247,6 +248,49 @@ public interface WorkflowApi {
     }
 
 
+    String PATH_GET_PROJECT_WORKFLOW_VERSIONS = "/projects/{id}/workflows/{workflowUuid}/versions";
+    /**
+     * GET /projects/{id}/workflows/{workflowUuid}/versions : Get published project versions that contain a workflow.
+     * Get published project versions that contain a workflow.
+     *
+     * @param id The id of a project. (required)
+     * @param workflowUuid The uuid of a workflow. (required)
+     * @return The list of project version objects. (status code 200)
+     */
+    @Operation(
+        operationId = "getProjectWorkflowVersions",
+        summary = "Get published project versions that contain a workflow.",
+        description = "Get published project versions that contain a workflow.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of project version objects.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectVersionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = WorkflowApi.PATH_GET_PROJECT_WORKFLOW_VERSIONS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<ProjectVersionModel>> getProjectWorkflowVersions(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowUuid", description = "The uuid of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"description\" : \"description\", \"publishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"version\" : 0, \"status\" : \"DRAFT\" }, { \"description\" : \"description\", \"publishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"version\" : 0, \"status\" : \"DRAFT\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_GET_PROJECT_WORKFLOWS = "/projects/{id}/workflows";
     /**
      * GET /projects/{id}/workflows : Get workflows for particular project.
@@ -364,6 +408,39 @@ public interface WorkflowApi {
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_RESTORE_PROJECT_VERSION_WORKFLOW = "/projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore";
+    /**
+     * POST /projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore : Loads a workflow of a published project version into the draft.
+     * Loads a workflow of a published project version into the draft.
+     *
+     * @param id The id of a project. (required)
+     * @param projectVersion The version of a project. (required)
+     * @param workflowUuid The uuid of a workflow. (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "restoreProjectVersionWorkflow",
+        summary = "Loads a workflow of a published project version into the draft.",
+        description = "Loads a workflow of a published project version into the draft.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = WorkflowApi.PATH_RESTORE_PROJECT_VERSION_WORKFLOW
+    )
+    default ResponseEntity<Void> restoreProjectVersionWorkflow(
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectVersion", description = "The version of a project.", required = true, in = ParameterIn.PATH) @PathVariable("projectVersion") Integer projectVersion,
+        @Parameter(name = "workflowUuid", description = "The uuid of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
