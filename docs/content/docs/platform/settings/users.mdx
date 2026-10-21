@@ -85,6 +85,8 @@ The workspace role model below - roles, permission scopes and per-workspace memb
     Role-based access control is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 </Callout>
 
+This section covers automation workspaces. Access to the embedded side is managed separately; see [Embedded Users and Roles](/platform/embedded/administration/users-and-roles).
+
 ByteChef separates two things that are easy to confuse:
 
 - The **organization role** (`ROLE_ADMIN` / `ROLE_USER`) - the authority assigned on this page. It governs the administrative surfaces: Settings pages, user management, licensing.
@@ -232,6 +234,7 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Delete a data table | `DATA_TABLE_DELETE` | Admin |
 | Delete a knowledge base | `KNOWLEDGE_BASE_DELETE` | Admin |
 | Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE` | Editor |
+| View a connection's credentials | `CONNECTION_EDIT` | Editor |
 | Enable, disable or update a deployment; stop or restart a job | `DEPLOYMENT_EDIT` | Editor |
 | Create or import a workflow | `WORKFLOW_CREATE` in Development | Editor |
 | Duplicate a workflow | `WORKFLOW_CREATE` and `WORKFLOW_VIEW` in Development | Editor |
@@ -274,5 +277,6 @@ Membership and role changes are recorded in the [audit log](/platform/settings/a
 
 ## See also
 
+- [Embedded Users and Roles](/platform/embedded/administration/users-and-roles) - roles for the embedded side.
 - [Workspace Users](/platform/automation/settings/users) - the per-workspace membership view.
 - [Identity Providers](/platform/settings/identity-providers) - federating identities instead of inviting local accounts one by one.
