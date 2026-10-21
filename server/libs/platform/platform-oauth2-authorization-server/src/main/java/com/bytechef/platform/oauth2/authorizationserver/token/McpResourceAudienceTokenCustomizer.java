@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.token;
 
+import com.bytechef.platform.oauth2.authorizationserver.registration.AppClients;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -41,7 +42,8 @@ public class McpResourceAudienceTokenCustomizer implements OAuth2TokenCustomizer
     public void customize(JwtEncodingContext context) {
         if (!OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType()) ||
             context.getAuthorizedScopes()
-                .contains(OidcScopes.OPENID)) {
+                .contains(OidcScopes.OPENID)
+            || AppClients.isAppClient(context.getRegisteredClient())) {
 
             return;
         }

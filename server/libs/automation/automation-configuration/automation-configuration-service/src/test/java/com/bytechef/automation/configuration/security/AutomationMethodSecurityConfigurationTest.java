@@ -295,6 +295,39 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry(
             "ApiPlatformHandlerController#getSearchableApiCollections",
             "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#doHandle",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppApiEndpointController#executeEndpoint",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppApiEndpointController#getBasePath",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#getEnvironment",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#getSearchableApiCollections",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#notFound",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#unavailable",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppConnectionApiController#executeAction",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppProxyApiController#proxy",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppToolApiController#executeTool",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppWorkflowApiController#executeWorkflow",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
         Map.entry("ApprovalController#approve", "permit-all inbound callback addressed by an approval id"),
         Map.entry(
             "ApprovalController#approveFromConfirmationPage",

@@ -110,6 +110,7 @@ management:
 openapi:
   openAPIDefinition:
     base-path:
+      app: /api/app
       automation: /api/automation
       embedded: /api/embedded
       platform: /api/platform

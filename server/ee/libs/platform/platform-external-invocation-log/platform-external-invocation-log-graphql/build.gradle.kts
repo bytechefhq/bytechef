@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-service"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

@@ -33,7 +33,6 @@ public interface ExternalInvocationLogFacade {
         PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
-        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Instant startDate,
-        @Nullable Instant endDate,
-        int pageNumber);
+        @Nullable Long integrationInstanceId, @Nullable Long appId, @Nullable Long appInstanceId,
+        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 }

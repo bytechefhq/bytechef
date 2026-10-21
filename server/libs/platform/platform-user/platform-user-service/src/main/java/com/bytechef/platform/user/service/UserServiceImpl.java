@@ -43,6 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -659,6 +660,16 @@ public class UserServiceImpl implements UserService {
     public User getUser(String login) {
         return userRepository.findByLogin(login)
             .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsers(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return userRepository.findAllById(ids);
     }
 
     @Override
