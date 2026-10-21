@@ -543,11 +543,12 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
 
     static final EvaluatorFunctionDefinition SIZE = function(EvaluatorFunctionName.SIZE)
         .title("Size")
-        .description("Returns the number of elements in a list. Returns -1 if the list is null, 0 if no argument.")
+        .description(
+            "Returns the number of elements in a list, array or map. Returns -1 if the value is null, 0 if no argument.")
         .category(EvaluatorFunctionCategory.COLLECTION)
         .parameters(
             parameter("list")
-                .description("The list to measure")
+                .description("The list, array or map to measure")
                 .type(LIST)
                 .required(true))
         .returnType(INTEGER)
