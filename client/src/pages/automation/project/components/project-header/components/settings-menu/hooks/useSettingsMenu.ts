@@ -6,8 +6,14 @@ import {
     ProjectGitConfigurationKeys,
     useGetProjectGitConfigurationQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
-import {Project, Workflow} from '@/shared/middleware/automation/configuration';
-import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
+import {clearWorkflowHistory} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {Project, ProjectApi, Workflow} from '@/shared/middleware/automation/configuration';
+import {
+    useDeleteProjectMutation,
+    useDeleteProjectVersionMutation,
+    useDuplicateProjectMutation,
+    useRestoreProjectVersionMutation,
+} from '@/shared/mutations/automation/projects.mutations';
 import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
@@ -92,6 +98,50 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
+    const deleteProjectVersionMutation = useDeleteProjectVersionMutation({
+        onSuccess: (_, {projectVersion}) => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
+            });
+
+            toast(`Version V${projectVersion} deleted.`);
+        },
+    });
+
+    const restoreProjectVersionMutation = useRestoreProjectVersionMutation({
+        onSuccess: async (_, {id, projectVersion}) => {
+            const restoredProject = await queryClient.fetchQuery({
+                queryFn: () => new ProjectApi().getProject({id}),
+                queryKey: ProjectKeys.project(id),
+                staleTime: 0,
+            });
+
+            const currentProjectWorkflowId = workflow.projectWorkflowId;
+            const restoredProjectWorkflowIds = restoredProject.projectWorkflowIds ?? [];
+
+            if (currentProjectWorkflowId && !restoredProjectWorkflowIds.includes(currentProjectWorkflowId)) {
+                const firstProjectWorkflowId = restoredProjectWorkflowIds[0];
+
+                navigate(
+                    firstProjectWorkflowId
+                        ? `/automation/projects/${id}/project-workflows/${firstProjectWorkflowId}?${searchParams}`
+                        : '/automation/projects'
+                );
+
+                queryClient.removeQueries({
+                    queryKey: ProjectWorkflowKeys.projectWorkflow(id, currentProjectWorkflowId),
+                });
+            }
+
+            clearWorkflowHistory();
+
+            queryClient.invalidateQueries({queryKey: ProjectKeys.project(id)});
+            queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(id)});
+
+            toast(`Version V${projectVersion} applied to the draft.`);
+        },
+    });
+
     const handleDeleteProjectAlertDialogClick = () => {
         if (project.id) {
             deleteProjectMutation.mutate(project.id);
@@ -146,6 +196,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         }
     };
 
+    const handleDeleteProjectVersion = (projectVersion: number, onSuccess: () => void) => {
+        deleteProjectVersionMutation.mutate({id: project.id!, projectVersion}, {onSuccess});
+    };
+
     const handleDuplicateProjectClick = () => {
         duplicateProjectMutation.mutate(project.id!);
     };
@@ -159,6 +213,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const handlePullProjectFromGitClick = () => {
         pullProjectFromGitMutation.mutate({id: project.id!});
+    };
+
+    const handleRestoreProjectVersion = (projectVersion: number, onSuccess: () => void) => {
+        restoreProjectVersionMutation.mutate({id: project.id!, projectVersion}, {onSuccess});
     };
 
     const handleUpdateProjectGitConfigurationSubmit = ({
@@ -180,13 +238,17 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     };
 
     return {
+        deleteProjectVersionPending: deleteProjectVersionMutation.isPending,
         handleDeleteProjectAlertDialogClick,
+        handleDeleteProjectVersion,
         handleDeleteWorkflowAlertDialogClick,
         handleDuplicateProjectClick,
         handleDuplicateWorkflowClick,
         handlePullProjectFromGitClick,
+        handleRestoreProjectVersion,
         handleUpdateProjectGitConfigurationSubmit,
         projectGitConfiguration,
         projectVersions,
+        restoreProjectVersionPending: restoreProjectVersionMutation.isPending,
     };
 };

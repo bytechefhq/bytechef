@@ -1,8 +1,10 @@
 import {
+    DeleteProjectVersionRequest,
     ImportProjectRequest,
     Project,
     ProjectApi,
     PublishProjectOperationRequest,
+    RestoreProjectVersionRequest,
 } from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -50,6 +52,20 @@ export const useDeleteProjectMutation = (mutationProps?: DeleteProjectMutationPr
         onSuccess: mutationProps?.onSuccess,
     });
 
+interface DeleteProjectVersionMutationProps {
+    onSuccess?: (result: void, variables: DeleteProjectVersionRequest) => void;
+    onError?: (error: Error, variables: DeleteProjectVersionRequest) => void;
+}
+
+export const useDeleteProjectVersionMutation = (mutationProps?: DeleteProjectVersionMutationProps) =>
+    useMutation({
+        mutationFn: (request: DeleteProjectVersionRequest) => {
+            return new ProjectApi().deleteProjectVersion(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 interface DuplicateProjectMutationProps {
     onSuccess?: (result: Project, variables: number) => void;
     onError?: (error: Error, variables: number) => void;
@@ -75,6 +91,20 @@ export const usePublishProjectMutation = (mutationProps?: PublishProjectMutation
     useMutation({
         mutationFn: (request: PublishProjectOperationRequest) => {
             return new ProjectApi().publishProject(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface RestoreProjectVersionMutationProps {
+    onSuccess?: (result: void, variables: RestoreProjectVersionRequest) => void;
+    onError?: (error: Error, variables: RestoreProjectVersionRequest) => void;
+}
+
+export const useRestoreProjectVersionMutation = (mutationProps?: RestoreProjectVersionMutationProps) =>
+    useMutation({
+        mutationFn: (request: RestoreProjectVersionRequest) => {
+            return new ProjectApi().restoreProjectVersion(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
