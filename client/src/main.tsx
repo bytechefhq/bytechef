@@ -84,7 +84,9 @@ async function renderApp() {
                             </TooltipProvider>
                         </ConditionalPostHogProvider>
 
-                        <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+                        {import.meta.env.VITE_REACT_QUERY_DEVTOOLS === 'true' && (
+                            <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+                        )}
                     </QueryClientProvider>
                 </ThemeProvider>
             </I18n>

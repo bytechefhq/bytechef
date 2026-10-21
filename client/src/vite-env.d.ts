@@ -3,6 +3,7 @@
 
 interface ImportMetaEnvI {
     readonly VITE_FF_EMBEDDED_TYPE_ENABLED: string;
+    readonly VITE_REACT_QUERY_DEVTOOLS: string;
 }
 
 interface ImportMetaI {
