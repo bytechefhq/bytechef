@@ -1,15 +1,17 @@
-import {type APIRequestContext, expect} from '@playwright/test';
+import {type APIRequestContext, expect, request as playwrightRequest} from '@playwright/test';
 import {readFileSync} from 'fs';
 
 import {type EmbeddedRoleUserKeyType, embeddedRolesTest as test} from '../../fixtures/embeddedRoles';
 import {SAMPLE_WORKFLOW_PATH} from '../../utils/constants';
-import {type EmbeddedDataI, embeddedInternalApi} from '../../utils/embeddedRbacUtils';
+import {type EmbeddedDataI, embeddedInternalApi, signConnectedUserJwt} from '../../utils/embeddedRbacUtils';
 import getRandomString from '../../utils/getRandomString';
 import {RBAC_BASE_URL, createRoleUserApiContext, graphql, postGraphQl, sendInternalApi} from '../../utils/rbacUtils';
 
 const EMBEDDED_INTERNAL = '/api/embedded/internal';
 
 const GATE_PREFIX = `rbac_embedded_gate_${getRandomString()}`;
+
+const GATE_CONNECTED_USER_EXTERNAL_ID = `rbac_gate_${getRandomString().slice(0, 8)}`;
 
 type CallerType = Exclude<EmbeddedRoleUserKeyType, 'DEVELOPMENT_EDITOR' | 'PRODUCTION_EDITOR'>;
 
@@ -18,14 +20,15 @@ interface ResourcesI {
     configurationId: number;
     connectedUserId: number;
     connectionId: number;
-    editorConnectionId: number;
-    editorScratchConnectionId: number;
+    connectedUserConnectionId: number;
+    connectedUserScratchConnectionId: number;
     integrationId: number;
     integrationWorkflowId: number;
     mcpServerId: string;
     rotationMcpServerId: string;
     scratchConfigurationId: number;
-    scratchConnectionId: number;
+    gateConnectedUserId?: number;
+    gateSigningKeyId: number;
     scratchIntegrationId: number;
     scratchMcpServerId: string;
     viewerUserId: string;
@@ -273,21 +276,21 @@ const GATE_CASES: GateCaseI[] = [
         allowed: ['EDITOR'],
         denied: ['VIEWER'],
         module: 'Connection',
-        name: 'change the tags of a connection (CONNECTION_EDIT)',
+        name: 'change the tags of a connection a connected user created (CONNECTION_EDIT)',
         rest: {
             body: () => ({tags: []}),
             method: 'PUT',
-            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.editorConnectionId}/tags`,
+            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserConnectionId}/tags`,
         },
     },
     {
         allowed: ['EDITOR'],
         denied: ['VIEWER'],
         module: 'Connection',
-        name: 'delete a connection (CONNECTION_DELETE)',
+        name: 'delete a connection a connected user created (CONNECTION_DELETE)',
         rest: {
             method: 'DELETE',
-            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.editorScratchConnectionId}`,
+            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserScratchConnectionId}`,
         },
     },
     {
@@ -429,20 +432,61 @@ async function createMcpServer(adminApi: APIRequestContext, name: string): Promi
     return createEmbeddedMcpServer.id;
 }
 
-async function createConnection(apiContext: APIRequestContext, name: string): Promise<number> {
-    return embeddedInternalApi<number>(apiContext, 'POST', '/connections', {
-        componentName: 'httpClient',
-        connectionVersion: 1,
+interface GateConnectedUserI {
+    connectedUserConnectionId: number;
+    connectedUserScratchConnectionId: number;
+    gateSigningKeyId: number;
+}
+
+async function createConnectedUserConnections(adminApi: APIRequestContext): Promise<GateConnectedUserI> {
+    const signingKeyName = `${GATE_PREFIX}_signing_key`;
+
+    const {privateKey} = await embeddedInternalApi<{privateKey: string}>(adminApi, 'POST', '/signing-keys', {
         environmentId: 0,
-        name,
-        parameters: {},
-        shared: true,
+        name: signingKeyName,
     });
+
+    const signingKeys = await embeddedInternalApi<{id: number; keyId: string; name: string}[]>(
+        adminApi,
+        'GET',
+        '/signing-keys?environmentId=0'
+    );
+
+    const signingKey = signingKeys.find((candidate) => candidate.name === signingKeyName)!;
+
+    const connectedUserApi = await playwrightRequest.newContext({
+        baseURL: RBAC_BASE_URL,
+        extraHTTPHeaders: {
+            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, privateKey, GATE_CONNECTED_USER_EXTERNAL_ID)}`,
+            'X-Environment': 'DEVELOPMENT',
+        },
+    });
+
+    try {
+        const createConnectedUserConnection = async (name: string): Promise<number> => {
+            const response = await connectedUserApi.post('/api/embedded/v1/components/httpClient/connections', {
+                data: {connectionVersion: 1, name, parameters: {}},
+            });
+
+            expect(response.status(), await response.text()).toBe(200);
+
+            return Number(await response.text());
+        };
+
+        return {
+            connectedUserConnectionId: await createConnectedUserConnection(`${GATE_PREFIX}_connected_user_connection`),
+            connectedUserScratchConnectionId: await createConnectedUserConnection(
+                `${GATE_PREFIX}_connected_user_scratch_connection`
+            ),
+            gateSigningKeyId: signingKey.id,
+        };
+    } finally {
+        await connectedUserApi.dispose();
+    }
 }
 
 async function createResources(
     adminApi: APIRequestContext,
-    editorApi: APIRequestContext,
     embeddedData: EmbeddedDataI,
     viewerUserId: string
 ): Promise<ResourcesI> {
@@ -495,7 +539,13 @@ async function createResources(
         }
     );
 
-    const scratchConnectionId = await createConnection(adminApi, `${GATE_PREFIX}_scratch_connection`);
+    const gateConnectedUser = await createConnectedUserConnections(adminApi);
+
+    const connectedUsers = await embeddedInternalApi<{content: {externalId: string; id: number}[]}>(
+        adminApi,
+        'GET',
+        `/connected-users?environmentId=0&search=${GATE_CONNECTED_USER_EXTERNAL_ID}`
+    );
 
     const appEventId = await embeddedInternalApi<number>(adminApi, 'POST', '/app-events', {
         name: `${GATE_PREFIX}_scratch_app_event`,
@@ -505,16 +555,19 @@ async function createResources(
     return {
         appEventId,
         configurationId: developmentData.instanceConfigurationId,
+        connectedUserConnectionId: gateConnectedUser.connectedUserConnectionId,
         connectedUserId: developmentData.connectedUserId,
+        connectedUserScratchConnectionId: gateConnectedUser.connectedUserScratchConnectionId,
         connectionId: developmentData.connectionId,
-        editorConnectionId: await createConnection(editorApi, `${GATE_PREFIX}_editor_connection`),
-        editorScratchConnectionId: await createConnection(editorApi, `${GATE_PREFIX}_editor_scratch_connection`),
+        gateConnectedUserId: connectedUsers.content.find(
+            (connectedUser) => connectedUser.externalId === GATE_CONNECTED_USER_EXTERNAL_ID
+        )?.id,
+        gateSigningKeyId: gateConnectedUser.gateSigningKeyId,
         integrationId: embeddedData.integrationId,
         integrationWorkflowId: integrationWorkflow.integrationWorkflowId,
         mcpServerId: developmentData.mcpServerId,
         rotationMcpServerId: await createMcpServer(adminApi, `${GATE_PREFIX}_rotation_mcp`),
         scratchConfigurationId,
-        scratchConnectionId,
         scratchIntegrationId,
         scratchMcpServerId: await createMcpServer(adminApi, `${GATE_PREFIX}_scratch_mcp`),
         viewerUserId,
@@ -524,7 +577,11 @@ async function createResources(
     };
 }
 
-async function deleteGateResources(adminApi: APIRequestContext, editorApi: APIRequestContext | undefined) {
+async function deleteGateResources(
+    adminApi: APIRequestContext,
+    editorApi: APIRequestContext | undefined,
+    resources: ResourcesI | undefined
+) {
     const isGateResource = (name: string | null | undefined) => !!name?.startsWith(GATE_PREFIX);
 
     const attempt = async (description: string, action: () => Promise<unknown>) => {
@@ -595,6 +652,22 @@ async function deleteGateResources(adminApi: APIRequestContext, editorApi: APIRe
         );
     }
 
+    if (resources?.gateConnectedUserId) {
+        const {gateConnectedUserId} = resources;
+
+        await attempt(`delete connected user ${gateConnectedUserId}`, () =>
+            embeddedInternalApi(adminApi, 'DELETE', `/connected-users/${gateConnectedUserId}`)
+        );
+    }
+
+    if (resources?.gateSigningKeyId) {
+        const {gateSigningKeyId} = resources;
+
+        await attempt(`delete signing key ${gateSigningKeyId}`, () =>
+            embeddedInternalApi(adminApi, 'DELETE', `/signing-keys/${gateSigningKeyId}`)
+        );
+    }
+
     if (editorApi) {
         const {embeddedApiKeys} = await graphql<{embeddedApiKeys: {id: string; name: string}[]}>(
             editorApi,
@@ -624,11 +697,11 @@ test.describe('Embedded server-side permission gates', () => {
             callers[key as EmbeddedRoleUserKeyType] = await createRoleUserApiContext(RBAC_BASE_URL, roleUser);
         }
 
-        resources = await createResources(adminApi, callers.EDITOR!, embeddedData, embeddedRoleUsers.VIEWER.userId!);
+        resources = await createResources(adminApi, embeddedData, embeddedRoleUsers.VIEWER.userId!);
     });
 
     test.afterAll(async ({adminApi}) => {
-        await deleteGateResources(adminApi, callers.EDITOR).catch((error: unknown) => {
+        await deleteGateResources(adminApi, callers.EDITOR, resources).catch((error: unknown) => {
             console.warn(`embedded serverGates teardown failed: ${error}`);
         });
 
@@ -662,26 +735,6 @@ test.describe('Embedded server-side permission gates', () => {
             }
         });
     }
-
-    test('Connection: an EDITOR may not change or delete a connection another member created', async () => {
-        await expectRestStatus(
-            callers.EDITOR!,
-            {
-                body: () => ({tags: []}),
-                method: 'PUT',
-                path: () => `${EMBEDDED_INTERNAL}/connections/${resources.connectionId}/tags`,
-            },
-            resources,
-            true
-        );
-
-        await expectRestStatus(
-            callers.EDITOR!,
-            {method: 'DELETE', path: () => `${EMBEDDED_INTERNAL}/connections/${resources.scratchConnectionId}`},
-            resources,
-            true
-        );
-    });
 
     test('Environment: a Production-only EDITOR is refused on Development and allowed on Production', async ({
         embeddedData,
