@@ -9,9 +9,14 @@ package com.bytechef.ee.embedded.configuration.security;
 
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +29,20 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectedUserConnectionOwnershipExemption implements ConnectionOwnershipExemption {
 
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserConnectionRepository connectedUserConnectionRepository;
+    private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceRepository integrationInstanceRepository;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionOwnershipExemption(
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionRepository connectedUserConnectionRepository,
-        IntegrationInstanceRepository integrationInstanceRepository) {
+        ConnectedUserService connectedUserService, IntegrationInstanceRepository integrationInstanceRepository) {
 
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionRepository = connectedUserConnectionRepository;
+        this.connectedUserService = connectedUserService;
         this.integrationInstanceRepository = integrationInstanceRepository;
     }
 
@@ -41,5 +51,23 @@ public class ConnectedUserConnectionOwnershipExemption implements ConnectionOwne
     public boolean isConnectedUserOwned(long connectionId) {
         return connectedUserConnectionRepository.existsByConnectionId(connectionId) ||
             integrationInstanceRepository.existsByConnectionId(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isOwnedByCurrentConnectedUser(long connectionId) {
+        return ConnectedUserAuthentications.fetchCurrent()
+            .map(connectedUserAuthentication -> isOwnedBy(connectedUserAuthentication, connectionId))
+            .orElse(false);
+    }
+
+    private boolean isOwnedBy(ConnectedUserAuthentication connectedUserAuthentication, long connectionId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            connectedUserAuthentication.connectedUserId());
+
+        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getOwnedConnectionIds(
+            connectedUser.getId(), connectedUser.getEnvironment());
+
+        return ownedConnectionIds.contains(connectionId);
     }
 }

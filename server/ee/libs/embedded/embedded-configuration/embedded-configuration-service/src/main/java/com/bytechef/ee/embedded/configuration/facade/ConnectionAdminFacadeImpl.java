@@ -17,6 +17,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -52,6 +54,7 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
+    private final ConnectionOwnershipExemption connectionOwnershipExemption;
     private final ConnectionService connectionService;
     private final PermissionService permissionService;
     private final TagService tagService;
@@ -59,10 +62,12 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService, @Lazy PermissionService permissionService, TagService tagService) {
+        ConnectionOwnershipExemption connectionOwnershipExemption, ConnectionService connectionService,
+        @Lazy PermissionService permissionService, TagService tagService) {
 
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
+        this.connectionOwnershipExemption = connectionOwnershipExemption;
         this.connectionService = connectionService;
         this.permissionService = permissionService;
         this.tagService = tagService;
@@ -106,8 +111,9 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
         ConnectionDTO connectionDTO = connectionFacade.getConnection(id);
 
-        return permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT)
-            ? connectionDTO : connectionDTO.withoutCredentials();
+        return canSeeCredentials(connectionDTO,
+            permissionService.hasResourceScope(id, CONNECTION_TYPE, CONNECTION_EDIT))
+                ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -146,7 +152,8 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
                 connectionEnvironmentId -> permissionService.hasResourceScope(
                     connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
 
-            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+            redactedConnectionDTOs.add(
+                canSeeCredentials(connectionDTO, canEdit) ? connectionDTO : connectionDTO.withoutCredentials());
         }
 
         return redactedConnectionDTOs;
@@ -183,6 +190,11 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         requireEmbedded(id);
 
         connectionFacade.update(id, tags);
+    }
+
+    private boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
+        return canEdit && ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy()) &&
+            !connectionOwnershipExemption.isConnectedUserOwned(connectionDTO.id());
     }
 
     private void requireEmbedded(long id) {

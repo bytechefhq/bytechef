@@ -18,11 +18,14 @@ package com.bytechef.platform.connection.security;
 
 /**
  * Tells the connection facade which embedded connections belong to a connected user rather than to the member who
- * created them, so that the creator-or-tenant-admin rule does not apply to them.
+ * created them, so that the creator-or-tenant-admin rule does not apply to them, and which of those belong to the
+ * connected user making the current request, the only actor allowed to replace their secrets.
  *
  * @author Ivica Cardic
  */
 public interface ConnectionOwnershipExemption {
 
     boolean isConnectedUserOwned(long connectionId);
+
+    boolean isOwnedByCurrentConnectedUser(long connectionId);
 }
