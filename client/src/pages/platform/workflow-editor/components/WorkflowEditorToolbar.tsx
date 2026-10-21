@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
 import useClusterElementsViewModeStore from '@/pages/platform/workflow-editor/stores/useClusterElementsViewModeStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {NodeDataType} from '@/shared/types';
@@ -9,6 +10,7 @@ import {
     ArrowRightIcon,
     BoxIcon,
     BrushCleaningIcon,
+    EyeOffIcon,
     FocusIcon,
     InfoIcon,
     LockIcon,
@@ -73,6 +75,7 @@ const WorkflowEditorToolbar = ({
     const {fitView, zoomIn, zoomOut} = useReactFlow();
     const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
     const {updateWorkflowMutation} = useWorkflowEditor();
+    const userGuidingLauncher = useUserGuidingLauncher();
 
     const taskCount = nodes.filter(
         (node) => (node.type === 'workflow' || node.type === 'readonly') && !(node.data as NodeDataType).taskDispatcher
@@ -332,6 +335,27 @@ const WorkflowEditorToolbar = ({
                                     side="top"
                                 >
                                     {nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
+
+                        {userGuidingLauncher.available && !userGuidingLauncher.launcherHidden && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Hide guide"
+                                        icon={<EyeOffIcon />}
+                                        onClick={userGuidingLauncher.hideLauncher}
+                                        size="icon"
+                                        variant="outline"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent
+                                    className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                    side="top"
+                                >
+                                    Hide guide (show it again from Help & Feedback)
                                 </TooltipContent>
                             </Tooltip>
                         )}

@@ -1,4 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useUserGuidingStore} from '@/shared/stores/useUserGuidingStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactFlowProvider} from '@xyflow/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -251,5 +253,43 @@ describe('WorkflowEditorToolbar - reset layout button', () => {
         await user.hover(screen.getByLabelText('Reset layout'));
 
         expect(await screen.findByRole('tooltip')).toHaveTextContent('Reset layout');
+    });
+});
+
+describe('WorkflowEditorToolbar - hide guide button', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({edges: [], nodes: []});
+        useUserGuidingStore.setState({launcherHidden: false});
+    });
+
+    it('is not rendered when UserGuiding is disabled', () => {
+        applicationInfoStore.setState({userGuiding: {containerId: undefined, enabled: false}});
+
+        renderToolbar();
+
+        expect(screen.queryByLabelText('Hide guide')).not.toBeInTheDocument();
+    });
+
+    it('hides the guide launcher and removes itself', async () => {
+        applicationInfoStore.setState({userGuiding: {containerId: 'container', enabled: true}});
+
+        const hideChecklist = vi.fn();
+        const hideResourceCenter = vi.fn();
+
+        window.userGuiding = {hideChecklist, hideResourceCenter} as unknown as Window['userGuiding'];
+
+        const user = userEvent.setup();
+
+        renderToolbar();
+
+        await user.click(screen.getByLabelText('Hide guide'));
+
+        expect(hideResourceCenter).toHaveBeenCalled();
+        expect(hideChecklist).toHaveBeenCalled();
+        expect(useUserGuidingStore.getState().launcherHidden).toBe(true);
+        expect(screen.queryByLabelText('Hide guide')).not.toBeInTheDocument();
+
+        window.userGuiding = undefined;
+        applicationInfoStore.setState({userGuiding: {containerId: undefined, enabled: false}});
     });
 });
