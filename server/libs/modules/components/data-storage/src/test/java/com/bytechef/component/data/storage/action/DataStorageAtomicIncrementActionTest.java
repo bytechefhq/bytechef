@@ -19,10 +19,12 @@ package com.bytechef.component.data.storage.action;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE_TO_ADD;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,8 +36,12 @@ import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -116,6 +122,52 @@ class DataStorageAtomicIncrementActionTest {
                 .hasMessageContaining("'counter'");
 
         verify(mockedData, never()).put(any(), any(), any());
+    }
+
+    @Test
+    void testPerformIncrementsWithoutLostUpdatesWhenCalledConcurrently() throws Exception {
+        int callCount = 3;
+
+        Map<String, Object> storedValues = new ConcurrentHashMap<>();
+
+        when(mockedData.fetch(Scope.WORKFLOW, "counter")).thenAnswer(
+            invocation -> Optional.ofNullable(storedValues.get("counter")));
+        when(mockedData.put(eq(Scope.WORKFLOW), eq("counter"), any())).thenAnswer(
+            invocation -> {
+                Thread.sleep(50);
+
+                storedValues.put("counter", invocation.getArgument(2));
+
+                return null;
+            });
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        ExecutorService executorService = Executors.newFixedThreadPool(callCount);
+
+        try {
+            List<Future<Integer>> futures = new ArrayList<>();
+
+            for (int index = 0; index < callCount; index++) {
+                futures.add(executorService.submit(() -> {
+                    startLatch.await();
+
+                    return DataStorageAtomicIncrementAction.perform(mockedParameters, null, mockedActionContext);
+                }));
+            }
+
+            startLatch.countDown();
+
+            List<Integer> results = new ArrayList<>();
+
+            for (Future<Integer> future : futures) {
+                results.add(future.get(5, TimeUnit.SECONDS));
+            }
+
+            assertThat(results).containsExactlyInAnyOrder(5, 10, 15);
+            assertEquals(15, storedValues.get("counter"));
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Test
