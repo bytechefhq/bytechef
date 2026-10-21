@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
@@ -50,11 +51,15 @@ public interface ProjectWorkflowFacade {
 
     List<ProjectWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion, boolean includeAllFields);
 
+    List<ProjectVersion> getProjectWorkflowVersions(long projectId, String workflowUuid);
+
     SharedWorkflowDTO getSharedWorkflow(String workflowUuid);
 
     WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow);
 
     long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow);
+
+    void restoreProjectVersionWorkflow(long projectId, int projectVersion, String workflowUuid);
 
     ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
 }

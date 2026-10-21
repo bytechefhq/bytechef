@@ -750,6 +750,66 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Workflow"
+  /projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore:
+    post:
+      description: "Loads a workflow of a published project version into the draft."
+      summary: "Loads a workflow of a published project version into the draft."
+      tags:
+        - "workflow"
+      operationId: "restoreProjectVersionWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "workflowUuid"
+          description: "The uuid of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+  /projects/{id}/workflows/{workflowUuid}/versions:
+    get:
+      description: "Get published project versions that contain a workflow."
+      summary: "Get published project versions that contain a workflow."
+      tags:
+        - "workflow"
+      operationId: "getProjectWorkflowVersions"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowUuid"
+          description: "The uuid of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of project version objects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectVersion"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
