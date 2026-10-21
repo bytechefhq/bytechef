@@ -151,9 +151,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public void deleteConnection(long id) {
         requireAdminConnection(id);
 
-        connectedUserConnectionService.deleteByConnectionId(id);
-
-        connectionFacade.delete(id);
+        connectionFacade.delete(id, () -> connectedUserConnectionService.deleteByConnectionId(id));
     }
 
     @Override

@@ -32,6 +32,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +70,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private static final Logger log = LoggerFactory.getLogger(ConnectionFacadeImpl.class);
 
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final ObjectProvider<ConnectionOwnershipExemption> connectionOwnershipExemptionProvider;
     private final ConnectionService connectionService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final OAuth2Service oAuth2Service;
@@ -76,11 +79,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
+        ConnectionDefinitionService connectionDefinitionService,
+        ObjectProvider<ConnectionOwnershipExemption> connectionOwnershipExemptionProvider,
+        ConnectionService connectionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionOwnershipExemptionProvider = connectionOwnershipExemptionProvider;
         this.connectionService = connectionService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
@@ -115,6 +121,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     public void delete(Long id) {
+        delete(id, () -> {});
+    }
+
+    @Override
+    public void delete(Long id, Runnable releaseReferences) {
         Connection connection = connectionService.getConnection(id);
 
         validateOwnerOrAdmin(connection);
@@ -123,6 +134,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             throw new ConfigurationException(
                 "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
         }
+
+        releaseReferences.run();
 
         connectionService.delete(id);
     }
@@ -370,12 +383,24 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), replacedParameters, version);
     }
 
-    private static void validateOwnerOrAdmin(Connection connection) {
+    private boolean isConnectedUserOwned(Connection connection) {
+        if (connection.getType() != PlatformType.EMBEDDED) {
+            return false;
+        }
+
+        ConnectionOwnershipExemption connectionOwnershipExemption =
+            connectionOwnershipExemptionProvider.getIfAvailable();
+
+        return connectionOwnershipExemption != null &&
+            connectionOwnershipExemption.isConnectedUserOwned(Validate.notNull(connection.getId(), "id"));
+    }
+
+    private void validateOwnerOrAdmin(Connection connection) {
         if (!SecurityUtils.isAuthenticated()) {
             throw new AccessDeniedException("Authentication required to modify connection " + connection.getId());
         }
 
-        if (connection.getType() == PlatformType.EMBEDDED) {
+        if (isConnectedUserOwned(connection)) {
             return;
         }
 

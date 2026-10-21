@@ -31,6 +31,8 @@ public interface ConnectionFacade {
 
     void delete(Long id);
 
+    void delete(Long id, Runnable releaseReferences);
+
     Integer executeConnectionRefresh(Long connectionId);
 
     ConnectionDTO getConnection(Long id);

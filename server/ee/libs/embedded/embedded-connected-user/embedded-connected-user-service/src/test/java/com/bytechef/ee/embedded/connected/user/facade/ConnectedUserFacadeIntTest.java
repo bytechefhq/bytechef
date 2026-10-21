@@ -10,8 +10,10 @@ package com.bytechef.ee.embedded.connected.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -360,9 +362,9 @@ class ConnectedUserFacadeIntTest {
         deleteOrder.verify(connectedUserConnectionService)
             .getConnectionIds(connectedUser.getId());
         deleteOrder.verify(connectionFacade)
-            .delete(8L);
+            .delete(eq(8L), any());
 
-        verify(connectionFacade, never()).delete(7L);
+        verify(connectionFacade, never()).delete(eq(7L), any());
 
         assertThat(connectedUserRepository.findById(connectedUser.getId())).isEmpty();
     }
