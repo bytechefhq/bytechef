@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PermissionService.UserWorkspacePair;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
-import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
@@ -40,7 +39,7 @@ class WorkspaceMembershipAssignerTest {
 
     private static final long USER_ID = 42L;
 
-    private EmbeddedUserRepository embeddedUserRepository;
+    private EmbeddedUserService embeddedUserService;
     private PermissionService permissionService;
     private WorkspaceService workspaceService;
     private WorkspaceUserRepository workspaceUserRepository;
@@ -49,14 +48,14 @@ class WorkspaceMembershipAssignerTest {
 
     @BeforeEach
     void setUp() {
-        embeddedUserRepository = mock(EmbeddedUserRepository.class);
+        embeddedUserService = mock(EmbeddedUserService.class);
         permissionService = mock(PermissionService.class);
         workspaceService = mock(WorkspaceService.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
         workspaceUserService = mock(WorkspaceUserService.class);
 
         workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserRepository, permissionService, workspaceService, workspaceUserRepository,
+            embeddedUserService, permissionService, workspaceService, workspaceUserRepository,
             workspaceUserService);
     }
 
@@ -173,10 +172,9 @@ class WorkspaceMembershipAssignerTest {
     }
 
     @Test
-    void testRemoveMembershipsDeletesEmbeddedRowsAndEvictsTheEmbeddedCache() {
+    void testRemoveMembershipsDeletesEmbeddedRowsThroughTheAuditedEmbeddedService() {
         workspaceMembershipAssigner.removeMemberships(USER_ID);
 
-        verify(embeddedUserRepository).deleteByUserId(USER_ID);
-        verify(permissionService).evictEmbeddedScopeCache(USER_ID);
+        verify(embeddedUserService).deleteEmbeddedMemberships(USER_ID);
     }
 }

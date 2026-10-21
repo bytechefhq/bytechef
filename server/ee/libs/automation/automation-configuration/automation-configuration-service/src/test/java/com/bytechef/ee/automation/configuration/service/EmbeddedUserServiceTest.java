@@ -21,11 +21,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -61,6 +64,26 @@ class EmbeddedUserServiceTest {
 
         embeddedUserService = new EmbeddedUserServiceImpl(
             embeddedUserRepository, mock(PermissionScopeRegistry.class), permissionService, mock(UserService.class));
+    }
+
+    @Test
+    void testDeleteEmbeddedMembershipsDeletesTheLastAdminAndEvictsTheCache() {
+        givenRows(EmbeddedUser.forRole(USER_ID, WorkspaceRole.ADMIN));
+        givenAdminCount(Environment.DEVELOPMENT, 1);
+
+        embeddedUserService.deleteEmbeddedMemberships(USER_ID);
+
+        verify(embeddedUserRepository).deleteByUserId(USER_ID);
+        verify(permissionService).evictEmbeddedScopeCache(USER_ID);
+    }
+
+    @Test
+    void testDeleteEmbeddedMembershipsIsAuditedAsAnEmbeddedRemoval() throws NoSuchMethodException {
+        Audited audited = EmbeddedUserServiceImpl.class.getMethod("deleteEmbeddedMemberships", long.class)
+            .getAnnotation(Audited.class);
+
+        assertThat(audited.event()).isEqualTo(EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED);
+        assertThat(audited.mapper()).isEqualTo(EmbeddedUserAuditMapper.class);
     }
 
     @Test
