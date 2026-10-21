@@ -125,7 +125,7 @@ const ProjectDeploymentsSheet = ({
                     </div>
                 </header>
 
-                <div className="min-h-0 flex-1 overflow-y-auto bg-surface-neutral-primary p-3">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-neutral-primary p-3">
                     {projectDeploymentsIsLoading && (
                         <div className="flex items-center justify-center py-6">
                             <LoadingIcon />
@@ -151,7 +151,7 @@ const ProjectDeploymentsSheet = ({
                                         triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
                                     />
                                 }
-                                description="Deploy a published version of this project to run its workflows in this environment."
+                                description="Deploy this project to run its workflows here."
                                 icon={<Layers3Icon />}
                                 title={`No deployments in ${ENVIRONMENT_CONFIGS[environmentId]?.label ?? 'this environment'}`}
                             />
