@@ -100,7 +100,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const deleteProjectVersionMutation = useDeleteProjectVersionMutation({
         onSuccess: (_, {projectVersion}) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
             });
 
@@ -122,7 +122,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
             if (currentProjectWorkflowId && !restoredProjectWorkflowIds.includes(currentProjectWorkflowId)) {
                 const firstProjectWorkflowId = restoredProjectWorkflowIds[0];
 
-                navigate(
+                void navigate(
                     firstProjectWorkflowId
                         ? `/automation/projects/${id}/project-workflows/${firstProjectWorkflowId}?${searchParams}`
                         : '/automation/projects'
@@ -135,8 +135,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
             clearWorkflowHistory();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(id)});
-            queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(id)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(id)});
+            void queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(id)});
 
             toast(`Version V${projectVersion} applied to the draft.`);
         },
