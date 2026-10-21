@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * @version ee
@@ -63,7 +64,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Optional<Connection> fetchConnection(long id) {
-        return Optional.ofNullable(getConnection(id));
+        try {
+            return Optional.ofNullable(getConnection(id));
+        } catch (HttpClientErrorException.NotFound notFoundException) {
+            return Optional.empty();
+        }
     }
 
     @Override
