@@ -422,6 +422,299 @@ export type ApiKey = {
   secretKey?: Maybe<Scalars['String']['output']>;
 };
 
+export type App = {
+  __typename?: 'App';
+  categoryId?: Maybe<Scalars['ID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  foreignInstances: Array<ForeignAppInstance>;
+  hasIcon: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  instances: Array<AppInstance>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  ownerUserId: Scalars['ID']['output'];
+  portalDiscoverable: Scalars['Boolean']['output'];
+  status: AppStatus;
+  tagIds: Array<Scalars['ID']['output']>;
+  uuid: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+  versions: Array<AppVersion>;
+  visibility: Scalars['String']['output'];
+  workspaceId: Scalars['ID']['output'];
+};
+
+
+export type AppVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type AppApiCollectionBinding = {
+  __typename?: 'AppApiCollectionBinding';
+  apiCollectionId: Scalars['ID']['output'];
+  appInstanceId: Scalars['ID']['output'];
+  available: Scalars['Boolean']['output'];
+  collectionVersion: Scalars['Int']['output'];
+  contextPath?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  projectDeploymentId?: Maybe<Scalars['ID']['output']>;
+  projectId?: Maybe<Scalars['ID']['output']>;
+  projectName?: Maybe<Scalars['String']['output']>;
+  projectVersion?: Maybe<Scalars['Int']['output']>;
+};
+
+export type AppBindableApiCollection = {
+  __typename?: 'AppBindableApiCollection';
+  apiCollectionId: Scalars['ID']['output'];
+  available: Scalars['Boolean']['output'];
+  collectionVersion: Scalars['Int']['output'];
+  contextPath?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectName?: Maybe<Scalars['String']['output']>;
+};
+
+export type AppBindableConnection = {
+  __typename?: 'AppBindableConnection';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  connectionVersion: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AppBindableWorkflow = {
+  __typename?: 'AppBindableWorkflow';
+  description?: Maybe<Scalars['String']['output']>;
+  projectDeploymentId: Scalars['ID']['output'];
+  projectDeploymentName: Scalars['String']['output'];
+  projectName: Scalars['String']['output'];
+  workflowName: Scalars['String']['output'];
+  workflowUuid: Scalars['String']['output'];
+};
+
+export type AppBinding = {
+  __typename?: 'AppBinding';
+  actionNames: Array<Scalars['String']['output']>;
+  appInstanceId: Scalars['ID']['output'];
+  bindingKey: Scalars['String']['output'];
+  componentName: Scalars['String']['output'];
+  componentVersion?: Maybe<Scalars['Int']['output']>;
+  connectionId: Scalars['ID']['output'];
+  connectionName: Scalars['String']['output'];
+  connectionVersion: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  proxyAllowedMethods: Array<Scalars['String']['output']>;
+  proxyEnabled: Scalars['Boolean']['output'];
+  toolNames: Array<Scalars['String']['output']>;
+};
+
+export type AppBindingInput = {
+  actionNames: Array<Scalars['String']['input']>;
+  bindingKey: Scalars['String']['input'];
+  connectionId: Scalars['ID']['input'];
+  proxyAllowedMethods: Array<Scalars['String']['input']>;
+  proxyEnabled: Scalars['Boolean']['input'];
+  toolNames: Array<Scalars['String']['input']>;
+};
+
+export type AppCategoryInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AppComponentOperations = {
+  __typename?: 'AppComponentOperations';
+  actionNames: Array<Scalars['String']['output']>;
+  toolNames: Array<Scalars['String']['output']>;
+};
+
+export type AppDeployment = {
+  __typename?: 'AppDeployment';
+  appInstanceId: Scalars['ID']['output'];
+  appVersion: AppVersion;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  current: Scalars['Boolean']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  finishedDate?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  provider: AppDeploymentProviderType;
+  providerDeploymentId?: Maybe<Scalars['String']['output']>;
+  status: AppDeploymentStatus;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export enum AppDeploymentProviderType {
+  DeployHook = 'DEPLOY_HOOK',
+  External = 'EXTERNAL',
+  Vercel = 'VERCEL'
+}
+
+export type AppDeploymentRecordInput = {
+  gitCommitSha?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+  versionName: Scalars['String']['input'];
+};
+
+export enum AppDeploymentStatus {
+  Building = 'BUILDING',
+  Canceled = 'CANCELED',
+  Failed = 'FAILED',
+  Queued = 'QUEUED',
+  Ready = 'READY'
+}
+
+export enum AppHostingTarget {
+  SelfHosted = 'SELF_HOSTED',
+  Vercel = 'VERCEL'
+}
+
+export type AppInput = {
+  category?: InputMaybe<AppCategoryInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  hostingTarget: AppHostingTarget;
+  name: Scalars['String']['input'];
+  portalDiscoverable?: InputMaybe<Scalars['Boolean']['input']>;
+  userAuthMode?: InputMaybe<AppUserAuthMode>;
+  visibility?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AppInstance = {
+  __typename?: 'AppInstance';
+  app: AppSummary;
+  configuration: Scalars['Map']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  currentAppDeploymentId?: Maybe<Scalars['ID']['output']>;
+  currentDeployment?: Maybe<AppDeployment>;
+  deploymentConnectionId?: Maybe<Scalars['ID']['output']>;
+  deploymentProviderAvailable: Scalars['Boolean']['output'];
+  deploymentSettings: Scalars['Map']['output'];
+  deployments: Array<AppDeployment>;
+  environmentId: Scalars['ID']['output'];
+  hostingTarget: AppHostingTarget;
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  ownerUserId: Scalars['ID']['output'];
+  secretKeyHint?: Maybe<Scalars['String']['output']>;
+  secretKeyLastUsedDate?: Maybe<Scalars['String']['output']>;
+  status: AppInstanceStatus;
+  url?: Maybe<Scalars['String']['output']>;
+  userAuthMode: AppUserAuthMode;
+  uuid: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+  visibility: Scalars['String']['output'];
+  workspaceId: Scalars['ID']['output'];
+};
+
+
+export type AppInstanceDeploymentsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type AppInstanceDeploymentSettingsInput = {
+  deploymentConnectionId?: InputMaybe<Scalars['ID']['input']>;
+  deploymentSettings?: InputMaybe<Scalars['Map']['input']>;
+};
+
+export type AppInstanceInput = {
+  hostingTarget: AppHostingTarget;
+  name: Scalars['String']['input'];
+  userAuthMode?: InputMaybe<AppUserAuthMode>;
+  visibility?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AppInstanceSecretKey = {
+  __typename?: 'AppInstanceSecretKey';
+  appInstance: AppInstance;
+  secretKey: Scalars['String']['output'];
+};
+
+export enum AppInstanceStatus {
+  Active = 'ACTIVE',
+  Suspended = 'SUSPENDED',
+  Terminated = 'TERMINATED'
+}
+
+export type AppInstanceUpdateInput = {
+  hostingTarget?: InputMaybe<AppHostingTarget>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum AppStatus {
+  Active = 'ACTIVE',
+  Archived = 'ARCHIVED',
+  Draft = 'DRAFT',
+  Suspended = 'SUSPENDED'
+}
+
+export type AppSummary = {
+  __typename?: 'AppSummary';
+  categoryId?: Maybe<Scalars['ID']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  hasIcon: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  status: AppStatus;
+};
+
+export type AppUpdateInput = {
+  category?: InputMaybe<AppCategoryInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  portalDiscoverable?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export enum AppUserAuthMode {
+  None = 'NONE',
+  Optional = 'OPTIONAL',
+  Required = 'REQUIRED'
+}
+
+export type AppVersion = {
+  __typename?: 'AppVersion';
+  appId: Scalars['ID']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  gitCommitSha?: Maybe<Scalars['String']['output']>;
+  gitRef?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AppVersionInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  gitCommitSha?: InputMaybe<Scalars['String']['input']>;
+  gitRef?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
+export type AppWorkflowBinding = {
+  __typename?: 'AppWorkflowBinding';
+  appInstanceId: Scalars['ID']['output'];
+  available: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  projectDeploymentId: Scalars['ID']['output'];
+  projectDeploymentName?: Maybe<Scalars['String']['output']>;
+  workflowKey: Scalars['String']['output'];
+  workflowName?: Maybe<Scalars['String']['output']>;
+  workflowUuid: Scalars['String']['output'];
+};
+
+export type AppWorkflowBindingInput = {
+  projectDeploymentId: Scalars['ID']['input'];
+  workflowKey: Scalars['String']['input'];
+  workflowUuid: Scalars['String']['input'];
+};
+
 export type ApprovalTask = {
   __typename?: 'ApprovalTask';
   assigneeId?: Maybe<Scalars['ID']['output']>;
@@ -1687,6 +1980,8 @@ export type ExternalInvocationLogPageType = {
 export type ExternalInvocationLogType = {
   __typename?: 'ExternalInvocationLogType';
   a2aServerId?: Maybe<Scalars['Long']['output']>;
+  appId?: Maybe<Scalars['Long']['output']>;
+  appInstanceId?: Maybe<Scalars['Long']['output']>;
   componentName?: Maybe<Scalars['String']['output']>;
   componentVersion?: Maybe<Scalars['Int']['output']>;
   connectedUserId?: Maybe<Scalars['Long']['output']>;
@@ -1706,6 +2001,8 @@ export type ExternalInvocationLogType = {
   operationName?: Maybe<Scalars['String']['output']>;
   source: Scalars['String']['output'];
   status: Scalars['String']['output'];
+  userId?: Maybe<Scalars['Long']['output']>;
+  userName?: Maybe<Scalars['String']['output']>;
   workflowName?: Maybe<Scalars['String']['output']>;
   workspaceId?: Maybe<Scalars['Long']['output']>;
 };
@@ -1733,6 +2030,16 @@ export type FileEntryProperty = Property & {
   placeholder?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
+};
+
+export type ForeignAppInstance = {
+  __typename?: 'ForeignAppInstance';
+  currentAppDeploymentId?: Maybe<Scalars['ID']['output']>;
+  environmentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  status: AppInstanceStatus;
+  workspaceId: Scalars['ID']['output'];
 };
 
 export type GenerateForEndpointsInput = {
@@ -2295,7 +2602,11 @@ export type Mutation = {
    * environment of the workspace.
    */
   assignWorkspaceUserCustomRole: WorkspaceUser;
+  bindAppApiCollection: AppApiCollectionBinding;
+  bindAppConnection: AppBinding;
+  bindAppWorkflow: AppWorkflowBinding;
   cancelAiAgentEvalRun: AiAgentEvalRun;
+  cancelAppDeployment: AppDeployment;
   cancelGenerationJob: Scalars['Boolean']['output'];
   changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
@@ -2310,6 +2621,9 @@ export type Mutation = {
   createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
+  createApp: AppInstanceSecretKey;
+  createAppInstance: AppInstanceSecretKey;
+  createAppVersion: AppVersion;
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationProject: Scalars['ID']['output'];
   createAutomationProjectCodeWorkflow: Scalars['ID']['output'];
@@ -2355,6 +2669,8 @@ export type Mutation = {
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
+  deleteApp: Scalars['Boolean']['output'];
+  deleteAppInstance: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
   deleteAutomationProject: Scalars['Boolean']['output'];
   deleteAutomationProjectConfiguration: Scalars['Boolean']['output'];
@@ -2396,6 +2712,7 @@ export type Mutation = {
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  deployAppInstance: AppDeployment;
   /** Unlink a connection from all deployed workflows and test configurations, without deleting the connection itself. */
   disconnectConnection: Scalars['Boolean']['output'];
   /** Remove a connection from one workflow that uses it. The id is the one returned by connectionWorkflows. */
@@ -2418,6 +2735,8 @@ export type Mutation = {
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
   generateSpecification: GenerateSpecificationResponse;
+  grantAppAccess: Scalars['Boolean']['output'];
+  grantAppInstanceAccess: Scalars['Boolean']['output'];
   /** Grant a named workspace member access to a connection its owner has withheld. Idempotent. (owner or admin, EE only) */
   grantConnectionAccess: Scalars['Boolean']['output'];
   /** Grant a named workspace member access to a project its owner has withheld. Idempotent. (owner or admin, EE only) */
@@ -2450,6 +2769,8 @@ export type Mutation = {
   reassignAllConnections: Scalars['Boolean']['output'];
   /** Reassign a single connection to a new owner. Resets status to ACTIVE if pending. (admin only) */
   reassignConnection: Scalars['Boolean']['output'];
+  recordAppDeployment: AppDeployment;
+  recordAppLaunch: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   /** Remove a user from the embedded members. */
   removeEmbeddedUser: Scalars['Boolean']['output'];
@@ -2473,15 +2794,22 @@ export type Mutation = {
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
   restoreAutomationProjectVersion: Scalars['Boolean']['output'];
+  revokeAppAccess: Scalars['Boolean']['output'];
+  revokeAppInstanceAccess: Scalars['Boolean']['output'];
   /** Revoke a grant. Silent when no grant exists. (owner or admin, EE only) */
   revokeConnectionAccess: Scalars['Boolean']['output'];
   /** Revoke a grant. Silent when no grant exists. (owner or admin, EE only) */
   revokeProjectAccess: Scalars['Boolean']['output'];
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
+  rollbackAppInstance: AppDeployment;
+  rotateAppInstanceSecretKey: AppInstanceSecretKey;
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  setAppFavorite: Scalars['Boolean']['output'];
+  setAppInstanceVisibility: Scalars['Boolean']['output'];
+  setAppVisibility: Scalars['Boolean']['output'];
   /** Set a connection's reach. PRIVATE withholds it from the workspace; WORKSPACE shares it. ORGANIZATION is set through createOrganizationConnection instead and is rejected here. Narrowing to PRIVATE fails while any deployment references the connection. (owner or admin, EE only) */
   setConnectionVisibility: Scalars['Boolean']['output'];
   /** Give an embedded member a role in one environment. */
@@ -2503,6 +2831,9 @@ export type Mutation = {
   stopScriptTest: Scalars['Boolean']['output'];
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  unbindAppApiCollection: Scalars['Boolean']['output'];
+  unbindAppConnection: Scalars['Boolean']['output'];
+  unbindAppWorkflow: Scalars['Boolean']['output'];
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2527,6 +2858,14 @@ export type Mutation = {
   updateAiSkillTags: AiSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
+  updateApp: App;
+  updateAppInstance: AppInstance;
+  updateAppInstanceConfiguration: AppInstance;
+  updateAppInstanceDeploymentSettings: AppInstance;
+  updateAppInstanceStatus: AppInstance;
+  updateAppInstanceUserAuth: AppInstance;
+  updateAppStatus: App;
+  updateAppTags: App;
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateAutomationProject: Scalars['Boolean']['output'];
   updateAutomationProjectCodeWorkflowSource: Scalars['Boolean']['output'];
@@ -2625,8 +2964,32 @@ export type MutationAssignWorkspaceUserCustomRoleArgs = {
 };
 
 
+export type MutationBindAppApiCollectionArgs = {
+  apiCollectionId: Scalars['ID']['input'];
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type MutationBindAppConnectionArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  input: AppBindingInput;
+};
+
+
+export type MutationBindAppWorkflowArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  input: AppWorkflowBindingInput;
+};
+
+
 export type MutationCancelAiAgentEvalRunArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCancelAppDeploymentArgs = {
+  appDeploymentId: Scalars['ID']['input'];
+  appInstanceId: Scalars['ID']['input'];
 };
 
 
@@ -2729,6 +3092,27 @@ export type MutationCreateApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   type?: InputMaybe<PlatformType>;
+};
+
+
+export type MutationCreateAppArgs = {
+  environmentId: Scalars['ID']['input'];
+  input: AppInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAppInstanceArgs = {
+  appId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+  input: AppInstanceInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAppVersionArgs = {
+  appId: Scalars['ID']['input'];
+  input: AppVersionInput;
 };
 
 
@@ -2954,6 +3338,16 @@ export type MutationDeleteApiKeyArgs = {
 };
 
 
+export type MutationDeleteAppArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAppInstanceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteApprovalTaskArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3133,6 +3527,12 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 };
 
 
+export type MutationDeployAppInstanceArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  appVersionId: Scalars['ID']['input'];
+};
+
+
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
 };
@@ -3251,6 +3651,20 @@ export type MutationGenerateSpecificationArgs = {
 };
 
 
+export type MutationGrantAppAccessArgs = {
+  appId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationGrantAppInstanceAccessArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationGrantConnectionAccessArgs = {
   connectionId: Scalars['ID']['input'];
   userId: Scalars['ID']['input'];
@@ -3361,6 +3775,17 @@ export type MutationReassignConnectionArgs = {
 };
 
 
+export type MutationRecordAppDeploymentArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  input: AppDeploymentRecordInput;
+};
+
+
+export type MutationRecordAppLaunchArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -3412,6 +3837,20 @@ export type MutationRestoreAutomationProjectVersionArgs = {
 };
 
 
+export type MutationRevokeAppAccessArgs = {
+  appId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeAppInstanceAccessArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationRevokeConnectionAccessArgs = {
   connectionId: Scalars['ID']['input'];
   userId: Scalars['ID']['input'];
@@ -3434,6 +3873,17 @@ export type MutationRevokeRegisteredClientGrantArgs = {
 
 export type MutationRevokeRegisteredClientGrantsArgs = {
   registeredClientId: Scalars['ID']['input'];
+};
+
+
+export type MutationRollbackAppInstanceArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  appVersionId: Scalars['ID']['input'];
+};
+
+
+export type MutationRotateAppInstanceSecretKeyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3464,6 +3914,26 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetAppFavoriteArgs = {
+  appId: Scalars['ID']['input'];
+  favorite: Scalars['Boolean']['input'];
+};
+
+
+export type MutationSetAppInstanceVisibilityArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  visibility: ResourceVisibility;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAppVisibilityArgs = {
+  appId: Scalars['ID']['input'];
+  visibility: ResourceVisibility;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3543,6 +4013,24 @@ export type MutationTestWorkflowNodeScriptArgs = {
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationUnbindAppApiCollectionArgs = {
+  apiCollectionId: Scalars['ID']['input'];
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnbindAppConnectionArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  bindingKey: Scalars['String']['input'];
+};
+
+
+export type MutationUnbindAppWorkflowArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  workflowKey: Scalars['String']['input'];
 };
 
 
@@ -3650,6 +4138,54 @@ export type MutationUpdateApiConnectorArgs = {
 export type MutationUpdateApiKeyArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateAppArgs = {
+  id: Scalars['ID']['input'];
+  input: AppUpdateInput;
+};
+
+
+export type MutationUpdateAppInstanceArgs = {
+  id: Scalars['ID']['input'];
+  input: AppInstanceUpdateInput;
+};
+
+
+export type MutationUpdateAppInstanceConfigurationArgs = {
+  configuration: Scalars['Map']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateAppInstanceDeploymentSettingsArgs = {
+  id: Scalars['ID']['input'];
+  input: AppInstanceDeploymentSettingsInput;
+};
+
+
+export type MutationUpdateAppInstanceStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: AppInstanceStatus;
+};
+
+
+export type MutationUpdateAppInstanceUserAuthArgs = {
+  id: Scalars['ID']['input'];
+  userAuthMode: AppUserAuthMode;
+};
+
+
+export type MutationUpdateAppStatusArgs = {
+  id: Scalars['ID']['input'];
+  status: AppStatus;
+};
+
+
+export type MutationUpdateAppTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<TagInput>;
 };
 
 
@@ -4089,6 +4625,30 @@ export enum PlatformType {
   Embedded = 'EMBEDDED'
 }
 
+export type PortalApp = {
+  __typename?: 'PortalApp';
+  categoryId?: Maybe<Scalars['ID']['output']>;
+  categoryName?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  favorite: Scalars['Boolean']['output'];
+  hasIcon: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  instances: Array<PortalAppInstance>;
+  lastUsedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+};
+
+export type PortalAppInstance = {
+  __typename?: 'PortalAppInstance';
+  id: Scalars['ID']['output'];
+  lastUsedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+  useCount: Scalars['Int']['output'];
+  workspaceId: Scalars['ID']['output'];
+  workspaceName: Scalars['String']['output'];
+};
+
 export type Project = {
   __typename?: 'Project';
   category?: Maybe<Category>;
@@ -4356,9 +4916,29 @@ export type Query = {
   apiConnectors: Array<ApiConnector>;
   apiKey?: Maybe<ApiKey>;
   apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  app: App;
+  appApiCollections: Array<AppApiCollectionBinding>;
+  appBindableApiCollections: Array<AppBindableApiCollection>;
+  appBindableConnections: Array<AppBindableConnection>;
+  appBindableWorkflows: Array<AppBindableWorkflow>;
+  appBindings: Array<AppBinding>;
+  appCategories: Array<Category>;
+  appComponentOperations: AppComponentOperations;
+  appDeployment: AppDeployment;
+  appDeployments: Array<AppDeployment>;
+  appGrants: Array<Scalars['Long']['output']>;
+  appInstance: AppInstance;
+  appInstanceGrants: Array<Scalars['Long']['output']>;
+  appInstanceVersions: Array<AppVersion>;
+  appInstances: Array<AppInstance>;
+  appTags: Array<Tag>;
+  appUserAuthAvailable: Scalars['Boolean']['output'];
+  appVersions: Array<AppVersion>;
+  appWorkflows: Array<AppWorkflowBinding>;
   approvalTask?: Maybe<ApprovalTask>;
   approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
+  apps: Array<App>;
   auditEventTypes: Array<Scalars['String']['output']>;
   auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
@@ -4462,6 +5042,7 @@ export type Query = {
   exportDataTableCsv: Scalars['String']['output'];
   externalInvocationLogs: ExternalInvocationLogPageType;
   generationJobStatus?: Maybe<GenerationJobStatus>;
+  hostedAppInstances: Array<AppInstance>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
   integrationCodeWorkflowSource: Scalars['String']['output'];
@@ -4533,6 +5114,7 @@ export type Query = {
    * identical for every tenant.
    */
   permissionScopeGroups: Array<PermissionScopeGroup>;
+  portalApps: Array<PortalApp>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
@@ -4744,6 +5326,108 @@ export type QueryApiKeysArgs = {
 };
 
 
+export type QueryAppArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAppApiCollectionsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppBindableApiCollectionsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppBindableConnectionsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppBindableWorkflowsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppBindingsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppCategoriesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppComponentOperationsArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryAppDeploymentArgs = {
+  appDeploymentId: Scalars['ID']['input'];
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppDeploymentsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAppGrantsArgs = {
+  appId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppInstanceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAppInstanceGrantsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppInstanceVersionsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAppInstancesArgs = {
+  appId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppUserAuthAvailableArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAppVersionsArgs = {
+  appId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAppWorkflowsArgs = {
+  appInstanceId: Scalars['ID']['input'];
+};
+
+
 export type QueryApprovalTaskArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4756,6 +5440,11 @@ export type QueryApprovalTasksArgs = {
 
 export type QueryApprovalTasksByIdsArgs = {
   ids: Array<Scalars['ID']['input']>;
+};
+
+
+export type QueryAppsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5211,6 +5900,7 @@ export type QueryExportDataTableCsvArgs = {
 
 export type QueryExternalInvocationLogsArgs = {
   a2aServerId?: InputMaybe<Scalars['Long']['input']>;
+  appId?: InputMaybe<Scalars['Long']['input']>;
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
   fromDate?: InputMaybe<Scalars['Long']['input']>;
@@ -5226,6 +5916,12 @@ export type QueryExternalInvocationLogsArgs = {
 
 export type QueryGenerationJobStatusArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type QueryHostedAppInstancesArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5449,6 +6145,11 @@ export type QueryOrganizationConnectionsArgs = {
 
 export type QueryPendingApprovalsArgs = {
   environmentId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryPortalAppsArgs = {
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -5683,6 +6384,8 @@ export type QueryWorkspaceChatWorkflowsArgs = {
 
 export type QueryWorkspaceExternalInvocationLogsArgs = {
   a2aServerId?: InputMaybe<Scalars['Long']['input']>;
+  appId?: InputMaybe<Scalars['Long']['input']>;
+  appInstanceId?: InputMaybe<Scalars['Long']['input']>;
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
   environmentId: Scalars['ID']['input'];
   fromDate?: InputMaybe<Scalars['Long']['input']>;
