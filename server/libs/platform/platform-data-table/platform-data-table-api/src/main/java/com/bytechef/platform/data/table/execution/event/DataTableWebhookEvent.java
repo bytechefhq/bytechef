@@ -18,11 +18,13 @@ package com.bytechef.platform.data.table.execution.event;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -61,8 +63,7 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
         this.environmentId = environmentId;
         this.type = Objects.requireNonNull(type, "type must not be null");
         this.payloads = payloads.stream()
-            .map(payload -> Collections.unmodifiableMap(
-                new LinkedHashMap<>(Objects.requireNonNull(payload, "payload must not be null"))))
+            .map(payload -> copy(Objects.requireNonNull(payload, "payload must not be null")))
             .toList();
     }
 
@@ -88,8 +89,34 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
         return "DataTableWebhookEvent{" +
             "baseName='" + baseName + '\'' +
             ", environmentId=" + environmentId +
-            ", payloads=" + payloads +
+            ", payloadCount=" + payloads.size() +
             ", type=" + type +
             "} " + super.toString();
+    }
+
+    private static Map<String, Object> copy(Map<?, ?> map) {
+        Map<String, Object> copy = new LinkedHashMap<>();
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            copy.put(
+                String.valueOf(Objects.requireNonNull(entry.getKey(), "payload keys must not be null")),
+                copyValue(entry.getValue()));
+        }
+
+        return Collections.unmodifiableMap(copy);
+    }
+
+    private static @Nullable Object copyValue(@Nullable Object value) {
+        if (value instanceof Map<?, ?> map) {
+            return copy(map);
+        }
+
+        if (value instanceof Collection<?> collection) {
+            return collection.stream()
+                .map(DataTableWebhookEvent::copyValue)
+                .toList();
+        }
+
+        return value;
     }
 }

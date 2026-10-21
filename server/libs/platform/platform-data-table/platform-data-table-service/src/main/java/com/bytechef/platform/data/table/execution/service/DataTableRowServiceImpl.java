@@ -314,6 +314,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         CsvReader.CsvReaderBuilder csvReaderBuilder = CsvReader.builder();
 
+        List<DataTableRow> insertedDataTableRows = new ArrayList<>();
+
         try (CsvReader csvReader = csvReaderBuilder.build(new StringReader(csv))) {
             List<String> headers = null;
             List<String> mappedColumnNames = null;
@@ -381,7 +383,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 }
 
                 try {
-                    insertRow(baseName, values, environmentId);
+                    insertedDataTableRows.add(
+                        insertRowWithoutEvent(baseName, physicalName, columnSpecs, values, environmentId));
                 } catch (IllegalArgumentException exception) {
                     throw new IllegalArgumentException(
                         "CSV line %d: %s; no row was imported".formatted(
@@ -392,6 +395,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         } catch (IOException exception) {
             throw new RuntimeException("Failed to import CSV", exception);
         }
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
     }
 
     /**
@@ -411,7 +416,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        DataTableRow dataTableRow = insertRowWithoutEvent(
+            baseName, physicalName, listColumns(physicalName), values, environmentId);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, List.of(dataTableRow), environmentId);
+
+        return dataTableRow;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow insertRowWithoutEvent(
+        String baseName, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
+        long environmentId) {
 
         List<String> allColumnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
@@ -446,15 +462,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         if (result == null) {
             throw new IllegalStateException("Failed to insert row");
         }
-
-        // Dispatch event for webhooks
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", result.id());
-        payload.put("values", result.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, payload, environmentId));
 
         return result;
     }
