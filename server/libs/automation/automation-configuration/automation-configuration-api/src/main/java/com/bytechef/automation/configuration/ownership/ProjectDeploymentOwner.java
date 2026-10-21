@@ -16,9 +16,25 @@
 
 package com.bytechef.automation.configuration.ownership;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
 public enum ProjectDeploymentOwner {
-    API_COLLECTION, A2A_SERVER, EMBEDDED, MCP_SERVER
+
+    API_COLLECTION("api_collection"),
+    A2A_SERVER("a2a_project"),
+    EMBEDDED("connected_user_project", "connected_user_reference_deployment"),
+    MCP_SERVER("mcp_project");
+
+    private final List<String> ownerTables;
+
+    ProjectDeploymentOwner(String... ownerTables) {
+        this.ownerTables = List.of(ownerTables);
+    }
+
+    public List<String> getOwnerTables() {
+        return ownerTables;
+    }
 }

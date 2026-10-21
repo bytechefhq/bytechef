@@ -8,12 +8,16 @@
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfiguration;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfigurationSharedMocks;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
@@ -28,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
  * @version ee
@@ -49,6 +54,9 @@ class ApiCollectionFacadeIntTest {
 
     @Autowired
     private ApiCollectionService apiCollectionService;
+
+    @Autowired
+    private JdbcClient jdbcClient;
 
     @Autowired
     private ProjectDeploymentRepository projectDeploymentRepository;
@@ -113,6 +121,20 @@ class ApiCollectionFacadeIntTest {
         assertThat(projectDeploymentService.getProjectDeployments(null, null, null, null, null))
             .extracting(ProjectDeployment::getId)
             .containsExactly(plainProjectDeployment.getId());
+    }
+
+    @Test
+    void testStartupCheckFindsTheApiCollectionRowsInTheOwnerTable() {
+        apiCollectionFacade.createApiCollection(getApiCollectionDTO("test-collection"));
+
+        ProjectOwnershipServiceImpl projectOwnershipService = new ProjectOwnershipServiceImpl(
+            jdbcClient, List.of(), List.of());
+
+        assertThatThrownBy(projectOwnershipService::afterSingletonsInstantiated)
+            .isInstanceOfSatisfying(
+                OwnerContributorMissingException.class,
+                exception -> assertThat(exception.getProjectDeploymentOwners())
+                    .contains(ProjectDeploymentOwner.API_COLLECTION));
     }
 
     private ApiCollectionDTO getApiCollectionDTO(String name) {
