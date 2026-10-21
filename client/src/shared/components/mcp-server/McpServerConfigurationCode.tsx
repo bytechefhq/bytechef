@@ -6,7 +6,12 @@ import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-reac
 import {useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh?: () => void}) => {
+interface McpServerConfigurationCodeProps {
+    codeSnippet: string;
+    onRefresh?: () => void;
+}
+
+const McpServerConfigurationCode = ({codeSnippet, onRefresh}: McpServerConfigurationCodeProps) => {
     const [copied, setCopied] = useState(false);
     const [refreshed, setRefreshed] = useState(false);
     const [showRefreshDialog, setShowRefreshDialog] = useState(false);

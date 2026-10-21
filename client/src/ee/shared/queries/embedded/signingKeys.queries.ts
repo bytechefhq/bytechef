@@ -8,14 +8,15 @@ export const SigningKeyKeys = {
     signingKeys: ['signingKeys'] as const,
 };
 
-export const useGeSigningKeysQuery = () => {
+export const useGeSigningKeysQuery = (enabled?: boolean) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     return useQuery<SigningKey[], Error>({
-        queryKey: SigningKeyKeys.signingKeys,
+        queryKey: [...SigningKeyKeys.signingKeys, currentEnvironmentId],
         queryFn: () =>
             new SigningKeyApi().getSigningKeys({
                 environmentId: currentEnvironmentId,
             }),
+        enabled: enabled === undefined ? true : enabled,
     });
 };
