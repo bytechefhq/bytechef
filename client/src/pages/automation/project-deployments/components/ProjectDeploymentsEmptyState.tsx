@@ -16,10 +16,6 @@ import {Project, ProjectDeployment} from '@/shared/middleware/automation/configu
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Layers3Icon, SendIcon} from 'lucide-react';
 
-interface ProjectDeploymentsEmptyStateProps {
-    onDeploymentCreated: (deploymentId: number) => void;
-}
-
 const getPublishDescription = (nextProject?: Project) =>
     `Deployments run a published, read-only version of a project. Open ${nextProject ? nextProject.name : 'a project'} and click Publish to create its first version.`;
 
@@ -27,7 +23,7 @@ const getPublishDescription = (nextProject?: Project) =>
  * Points an empty Deployments page at the next step the user can finish. The deployment dialog only lists published
  * versions, so it is offered only once one exists; earlier stages send the user to their projects instead.
  */
-const ProjectDeploymentsEmptyState = ({onDeploymentCreated}: ProjectDeploymentsEmptyStateProps) => {
+const ProjectDeploymentsEmptyState = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {captureEmptyStateAction} = useAnalytics();
@@ -90,7 +86,6 @@ const ProjectDeploymentsEmptyState = ({onDeploymentCreated}: ProjectDeploymentsE
             {...sharedProps}
             actions={
                 <ProjectDeploymentDialog
-                    onSuccess={onDeploymentCreated}
                     projectDeployment={{environmentId: currentEnvironmentId} as ProjectDeployment}
                     redirectOnSubmit={false}
                     triggerNode={
