@@ -13,8 +13,11 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import tools.jackson.databind.ObjectMapper;
 
@@ -107,12 +110,17 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
                         rs.getString("connection_parameters"));
 
                     integrationInstanceConfiguration.setConnectionParameters(encryptedMapWrapper.getMap());
+                    integrationInstanceConfiguration.setCreatedBy(rs.getString("created_by"));
+                    integrationInstanceConfiguration.setCreatedDate(toInstant(rs.getTimestamp("created_date")));
                     integrationInstanceConfiguration.setDescription(rs.getString("description"));
                     integrationInstanceConfiguration.setEnabled(rs.getBoolean("enabled"));
                     integrationInstanceConfiguration.setEnvironment(Environment.values()[rs.getInt("environment")]);
                     integrationInstanceConfiguration.setId(rs.getLong("id"));
                     integrationInstanceConfiguration.setIntegrationId(rs.getLong("integration_id"));
                     integrationInstanceConfiguration.setIntegrationVersion(rs.getInt("integration_version"));
+                    integrationInstanceConfiguration.setLastModifiedBy(rs.getString("last_modified_by"));
+                    integrationInstanceConfiguration.setLastModifiedDate(
+                        toInstant(rs.getTimestamp("last_modified_date")));
                     integrationInstanceConfiguration.setName(rs.getString("name"));
                     integrationInstanceConfiguration.setVersion(rs.getInt("version"));
 
@@ -133,5 +141,9 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
         }
 
         return integrationInstanceConfigurations;
+    }
+
+    private static @Nullable Instant toInstant(@Nullable Timestamp timestamp) {
+        return timestamp == null ? null : timestamp.toInstant();
     }
 }
