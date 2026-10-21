@@ -97,7 +97,7 @@ describe('WorkflowIssuesSidebar', () => {
 
         fireEvent.click(screen.getByText('Missing required connection: OpenAI'));
 
-        expect(hoisted.openNodeDetails).toHaveBeenCalledWith(agentNodeData, 'properties');
+        expect(hoisted.openNodeDetails).toHaveBeenCalledWith(agentNodeData, 'connection');
     });
 
     it('draws error and warning icons in colours meant for the neutral row background', () => {

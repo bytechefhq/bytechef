@@ -11,6 +11,8 @@ import describeWorkflowIssueCounts from '../utils/describeWorkflowIssueCounts';
 import findClusterElementRootTaskName from '../utils/findClusterElementRootTaskName';
 import openNodeDetails from '../utils/openNodeDetails';
 
+const CONNECTION_ISSUE_KINDS = new Set<WorkflowIssueI['kind']>(['INVALID_CONNECTION', 'MISSING_CONNECTION']);
+
 interface WorkflowIssuesSidebarProps {
     visible: boolean;
 }
@@ -44,13 +46,16 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
     }, [issues]);
 
     const handleIssueClick = useCallback(
-        (nodeName: string) => {
-            const targetNodeName = findClusterElementRootTaskName(workflow.tasks, nodeName) ?? nodeName;
+        (issue: WorkflowIssueI) => {
+            const targetNodeName = findClusterElementRootTaskName(workflow.tasks, issue.nodeName) ?? issue.nodeName;
 
             const node = nodes.find((currentNode) => (currentNode.data as NodeDataType).name === targetNodeName);
 
             if (node) {
-                openNodeDetails(node.data as NodeDataType, 'properties');
+                openNodeDetails(
+                    node.data as NodeDataType,
+                    CONNECTION_ISSUE_KINDS.has(issue.kind) ? 'connection' : 'properties'
+                );
             }
         },
         [nodes, workflow.tasks]
@@ -77,7 +82,7 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
                             <button
                                 className="flex items-start gap-2 rounded-md border-2 border-transparent bg-white px-2 py-1.5 text-left text-sm hover:border-blue-200"
                                 key={getWorkflowIssueKey(issue)}
-                                onClick={() => handleIssueClick(nodeName)}
+                                onClick={() => handleIssueClick(issue)}
                                 type="button"
                             >
                                 <AlertTriangleIcon

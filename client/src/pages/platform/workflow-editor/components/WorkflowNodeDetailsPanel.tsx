@@ -17,9 +17,9 @@ import {
     ComponentDefinitionBasic,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
-import {UpdateWorkflowMutationType} from '@/shared/types';
+import {TabNameType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ExternalLinkIcon, InfoIcon, TriangleAlertIcon, XIcon} from 'lucide-react';
-import {ReactNode, useMemo} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -40,6 +40,18 @@ const ERROR_KIND_LABELS: Record<Exclude<WorkflowNodeDetailsErrorI['kind'], 'ISSU
     PROPERTY: 'Missing required property:',
 };
 
+function getErrorTabName(error: WorkflowNodeDetailsErrorI): TabNameType | undefined {
+    if (error.kind === 'CONNECTION') {
+        return 'connection';
+    }
+
+    if (error.kind === 'PROPERTY' || error.propertyLabel) {
+        return 'properties';
+    }
+
+    return undefined;
+}
+
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
     closeButton?: ReactNode;
@@ -59,6 +71,8 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: WorkflowNodeDetailsPanelProps) => {
+    const [errorsPopoverOpen, setErrorsPopoverOpen] = useState(false);
+
     const copilotLayoutShifted = useCopilotLayoutShifted();
     const {
         activeDisplayConditionsQuery,
@@ -195,7 +209,7 @@ const WorkflowNodeDetailsPanel = ({
                             </div>
 
                             {errors.length > 0 && (
-                                <Popover>
+                                <Popover onOpenChange={setErrorsPopoverOpen} open={errorsPopoverOpen}>
                                     <PopoverTrigger asChild>
                                         <Button
                                             aria-busy={errorsLoading}
@@ -247,31 +261,58 @@ const WorkflowNodeDetailsPanel = ({
 
                                         <ScrollArea className="max-h-60">
                                             <ul className="flex flex-col gap-2 px-3 pb-3">
-                                                {errors.map((error, index) => (
-                                                    <li
-                                                        className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm dark:bg-surface-neutral-secondary"
-                                                        key={`${error.kind}_${error.name}_${index}`}
-                                                    >
-                                                        {error.severity === 'WARNING' && (
-                                                            <TriangleAlertIcon
-                                                                aria-label="Warning"
-                                                                className="mb-0.5 inline size-3.5 text-content-warning-primary"
-                                                            />
-                                                        )}
+                                                {errors.map((error, index) => {
+                                                    const errorTabName = getErrorTabName(error);
+                                                    const errorTabAvailable =
+                                                        !!errorTabName &&
+                                                        nodeTabs.some((tab) => tab.name === errorTabName);
 
-                                                        {error.kind !== 'ISSUE' && (
-                                                            <span className="font-light">
-                                                                {ERROR_KIND_LABELS[error.kind]}
-                                                            </span>
-                                                        )}
+                                                    const errorContent = (
+                                                        <>
+                                                            {error.severity === 'WARNING' && (
+                                                                <TriangleAlertIcon
+                                                                    aria-label="Warning"
+                                                                    className="mb-0.5 inline size-3.5 text-content-warning-primary"
+                                                                />
+                                                            )}
 
-                                                        {error.propertyLabel && (
-                                                            <span className="font-light">{error.propertyLabel}:</span>
-                                                        )}
+                                                            {error.kind !== 'ISSUE' && (
+                                                                <span className="font-light">
+                                                                    {ERROR_KIND_LABELS[error.kind]}
+                                                                </span>
+                                                            )}
 
-                                                        <span>{error.name}</span>
-                                                    </li>
-                                                ))}
+                                                            {error.propertyLabel && (
+                                                                <span className="font-light">
+                                                                    {error.propertyLabel}:
+                                                                </span>
+                                                            )}
+
+                                                            <span>{error.name}</span>
+                                                        </>
+                                                    );
+
+                                                    return (
+                                                        <li key={`${error.kind}_${error.name}_${index}`}>
+                                                            {errorTabAvailable ? (
+                                                                <button
+                                                                    className="w-full space-x-1 rounded-md border-2 border-transparent bg-surface-neutral-primary px-3 py-1.5 text-left text-sm hover:border-blue-200 dark:bg-surface-neutral-secondary"
+                                                                    onClick={() => {
+                                                                        setActiveTab(errorTabName);
+                                                                        setErrorsPopoverOpen(false);
+                                                                    }}
+                                                                    type="button"
+                                                                >
+                                                                    {errorContent}
+                                                                </button>
+                                                            ) : (
+                                                                <div className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm dark:bg-surface-neutral-secondary">
+                                                                    {errorContent}
+                                                                </div>
+                                                            )}
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </ScrollArea>
                                     </PopoverContent>
