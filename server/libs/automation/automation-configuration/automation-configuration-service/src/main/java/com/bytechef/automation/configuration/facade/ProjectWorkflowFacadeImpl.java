@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -39,6 +40,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
@@ -69,7 +71,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -395,6 +399,22 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public List<ProjectVersion> getProjectWorkflowVersions(long projectId, String workflowUuid) {
+        Set<Integer> workflowProjectVersions = projectWorkflowService.getProjectWorkflows(projectId, workflowUuid)
+            .stream()
+            .map(ProjectWorkflow::getProjectVersion)
+            .collect(Collectors.toSet());
+
+        return projectService.getProjectVersions(projectId)
+            .stream()
+            .filter(projectVersion -> projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED)
+            .filter(projectVersion -> workflowProjectVersions.contains(projectVersion.getVersion()))
+            .toList();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public SharedWorkflowDTO getSharedWorkflow(String workflowUuid) {
         SharedWorkflowDTO sharedWorkflowDTO = null;
@@ -490,6 +510,41 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         ProjectWorkflow projectWorkflow = addWorkflow(projectId, templateFiles.workflowJson);
 
         return projectWorkflow.getId();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_EDIT')")
+    public void restoreProjectVersionWorkflow(long projectId, int projectVersion, String workflowUuid) {
+        projectService.getPublishedProjectVersion(projectId, projectVersion);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowService
+            .fetchProjectWorkflow(projectId, projectVersion, workflowUuid)
+            .orElseThrow(() -> new ConfigurationException(
+                "Workflow uuid=%s not found in project version v=%s".formatted(workflowUuid, projectVersion),
+                ProjectErrorType.PROJECT_VERSION_WORKFLOW_NOT_FOUND));
+
+        Project project = projectService.getProject(projectId);
+
+        int draftProjectVersion = project.getLastProjectVersion();
+
+        Optional<ProjectWorkflow> draftProjectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+            projectId, draftProjectVersion, workflowUuid);
+
+        if (draftProjectWorkflowOptional.isEmpty()) {
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(publishedProjectWorkflow.getWorkflowId());
+
+            projectWorkflowService.addWorkflow(
+                projectId, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
+
+            return;
+        }
+
+        ProjectWorkflow draftProjectWorkflow = draftProjectWorkflowOptional.get();
+
+        Workflow publishedWorkflow = workflowService.getWorkflow(publishedProjectWorkflow.getWorkflowId());
+        Workflow draftWorkflow = workflowService.getWorkflow(draftProjectWorkflow.getWorkflowId());
+
+        updateWorkflow(draftWorkflow.getId(), publishedWorkflow.getDefinition(), draftWorkflow.getVersion());
     }
 
     @Override

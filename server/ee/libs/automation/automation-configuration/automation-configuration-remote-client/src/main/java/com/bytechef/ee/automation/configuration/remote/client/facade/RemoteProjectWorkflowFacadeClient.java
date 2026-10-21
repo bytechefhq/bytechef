@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
@@ -79,6 +80,16 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     public List<ProjectWorkflowDTO> getProjectVersionWorkflows(
         long projectId, int projectVersion, boolean includeAllFields) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectVersion> getProjectWorkflowVersions(long projectId, String workflowUuid) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void restoreProjectVersionWorkflow(long projectId, int projectVersion, String workflowUuid) {
         throw new UnsupportedOperationException();
     }
 

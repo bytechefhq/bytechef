@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
@@ -116,6 +117,14 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    public ResponseEntity<List<ProjectVersionModel>> getProjectWorkflowVersions(Long id, String workflowUuid) {
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                projectWorkflowFacade.getProjectWorkflowVersions(id, workflowUuid),
+                projectVersion -> conversionService.convert(projectVersion, ProjectVersionModel.class)));
+    }
+
+    @Override
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         // TODO Add check regarding platform type
 
@@ -129,6 +138,14 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
             CollectionUtils.map(
                 projectWorkflowFacade.getProjectWorkflows(),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<Void> restoreProjectVersionWorkflow(Long id, Integer projectVersion, String workflowUuid) {
+        projectWorkflowFacade.restoreProjectVersionWorkflow(id, projectVersion, workflowUuid);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

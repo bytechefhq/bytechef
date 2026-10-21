@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
@@ -193,9 +192,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
     public void deleteProjectVersion(long id, int projectVersion) {
-        Project project = projectService.getProject(id);
-
-        checkPublishedProjectVersion(project, projectVersion);
+        projectService.getPublishedProjectVersion(id, projectVersion);
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getAllProjectDeployments(id);
 
@@ -490,7 +487,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void restoreProjectVersion(long id, int projectVersion) {
         Project project = projectService.getProject(id);
 
-        checkPublishedProjectVersion(project, projectVersion);
+        projectService.getPublishedProjectVersion(id, projectVersion);
 
         int draftProjectVersion = project.getLastProjectVersion();
 
@@ -551,19 +548,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setTags(tags);
 
         projectService.update(project);
-    }
-
-    private static void checkPublishedProjectVersion(Project project, int projectVersion) {
-        ProjectVersion selectedProjectVersion = project.fetchProjectVersion(projectVersion)
-            .orElseThrow(() -> new ConfigurationException(
-                "Project version v=%s not found".formatted(projectVersion),
-                ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
-
-        if (selectedProjectVersion.getStatus() != Status.PUBLISHED) {
-            throw new ConfigurationException(
-                "Project version v=%s is not published".formatted(projectVersion),
-                ProjectErrorType.PROJECT_VERSION_NOT_PUBLISHED);
-        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
