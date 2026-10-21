@@ -324,6 +324,11 @@ class EmbeddedConnectedUserGatesIntTest {
             });
         when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
             .thenReturn(OWN_CONNECTION_ID);
+        when(connectionFacade.getConnection(anyLong()))
+            .thenAnswer(invocation -> ConnectionDTO.builder()
+                .componentName("slack")
+                .id(invocation.getArgument(0))
+                .build());
         when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
             .thenAnswer(invocation -> {
                 List<Long> connectionIds = invocation.getArgument(0);
@@ -575,13 +580,13 @@ class EmbeddedConnectedUserGatesIntTest {
         authenticate(VIEWER_IN_PRODUCTION, false);
 
         assertThatThrownBy(
-            () -> connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of()))
+            () -> embeddedConnectionFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of()))
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
-            () -> connectionAdminFacade.updateConnection(
+            () -> embeddedConnectionFacade.updateConnection(
                 CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), null, 0))
                     .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID))
+        assertThatThrownBy(() -> embeddedConnectionFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
@@ -589,9 +594,9 @@ class EmbeddedConnectedUserGatesIntTest {
 
         authenticate(EDITOR_IN_PRODUCTION, false);
 
-        connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
-        connectionAdminFacade.updateConnection(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), null, 0);
-        connectionAdminFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID);
+        embeddedConnectionFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
+        embeddedConnectionFacade.updateConnection(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), null, 0);
+        embeddedConnectionFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID);
 
         verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
         verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), 0);
@@ -795,24 +800,21 @@ class EmbeddedConnectedUserGatesIntTest {
     }
 
     @Test
-    void testOnlyAnEditorOfTheConnectionSeesItsCredentials() {
+    void testOnlyTheCreatorWithTheEditScopeSeesConnectionCredentials() {
         createInstance(productionConnectedUser.getId());
 
         when(connectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
-            .thenReturn(credentialedConnectionDTO(EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION));
+            .thenReturn(
+                credentialedConnectionDTO(
+                    EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION, EDITOR_IN_PRODUCTION));
         when(connectionFacade.getConnections(any(), any(), anyList(), any(), any(), eq(PlatformType.EMBEDDED)))
             .thenReturn(
                 List.of(
-                    credentialedConnectionDTO(EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION),
-                    credentialedConnectionDTO(EMBEDDED_DEVELOPMENT_CONNECTION_ID, Environment.DEVELOPMENT)));
-        when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
-            .thenAnswer(invocation -> {
-                List<Long> connectionIds = invocation.getArgument(0);
-
-                return connectionIds.stream()
-                    .map(connectionId -> credentialedConnectionDTO(connectionId, Environment.PRODUCTION))
-                    .toList();
-            });
+                    credentialedConnectionDTO(
+                        EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION, EDITOR_IN_PRODUCTION),
+                    credentialedConnectionDTO(
+                        EMBEDDED_DEVELOPMENT_CONNECTION_ID, Environment.DEVELOPMENT, EDITOR_IN_DEVELOPMENT)));
+        stubConnectedUserConnectionsCreatedBy(TENANT_ADMIN);
 
         long productionConnectedUserId = productionConnectedUser.getId();
         long productionEnvironmentId = Environment.PRODUCTION.ordinal();
@@ -834,7 +836,7 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThat(
             connectedUserConnectionFacade.getConnectedUserConnections(productionConnectedUserId, null, List.of()))
                 .hasSize(1)
-                .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, true));
+                .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, false));
 
         authenticate(EDITOR_IN_DEVELOPMENT, false);
 
@@ -850,14 +852,14 @@ class EmbeddedConnectedUserGatesIntTest {
 
         authenticate(TENANT_ADMIN, true);
 
-        assertCredentials(embeddedConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID), true);
+        assertCredentials(embeddedConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID), false);
         assertThat(embeddedConnectionFacade.getConnections(null, null, null, null))
             .hasSize(2)
-            .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, true));
+            .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, false));
         assertThat(
             connectedUserConnectionFacade.getConnectedUserConnections(productionConnectedUserId, null, List.of()))
                 .hasSize(1)
-                .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, true));
+                .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, false));
 
         authenticateConnectedUser(productionConnectedUser);
 
@@ -868,6 +870,60 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThat(connectedUserConnectionFacade.getConnections(productionConnectedUserId, null, List.of()))
             .hasSize(1)
             .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, true));
+    }
+
+    @Test
+    void testATenantAdminSeesCredentialsOnlyOfAMemberConnectionItCreated() {
+        when(connectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
+            .thenReturn(
+                credentialedConnectionDTO(EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION, TENANT_ADMIN));
+        when(connectionFacade.getConnections(any(), any(), anyList(), any(), any(), eq(PlatformType.EMBEDDED)))
+            .thenReturn(
+                List.of(
+                    credentialedConnectionDTO(EMBEDDED_PRODUCTION_CONNECTION_ID, Environment.PRODUCTION, TENANT_ADMIN),
+                    credentialedConnectionDTO(
+                        EMBEDDED_DEVELOPMENT_CONNECTION_ID, Environment.DEVELOPMENT, EDITOR_IN_DEVELOPMENT)));
+
+        authenticate(TENANT_ADMIN, true);
+
+        assertCredentials(embeddedConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID), true);
+
+        for (ConnectionDTO connectionDTO : embeddedConnectionFacade.getConnections(null, null, null, null)) {
+            assertCredentials(connectionDTO, connectionDTO.id() == EMBEDDED_PRODUCTION_CONNECTION_ID);
+        }
+    }
+
+    @Test
+    void testAMemberWhoCreatedAConnectionForAConnectedUserDoesNotSeeItsCredentials() {
+        createInstance(productionConnectedUser.getId());
+
+        when(connectionFacade.getConnection(INSTANCE_CONNECTION_ID))
+            .thenReturn(
+                credentialedConnectionDTO(INSTANCE_CONNECTION_ID, Environment.PRODUCTION, EDITOR_IN_PRODUCTION));
+        when(connectionService.fetchConnection(INSTANCE_CONNECTION_ID))
+            .thenReturn(Optional.of(connection(INSTANCE_CONNECTION_ID, PlatformType.EMBEDDED, Environment.PRODUCTION)));
+        stubConnectedUserConnectionsCreatedBy(EDITOR_IN_PRODUCTION);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        assertThatThrownBy(() -> embeddedConnectionFacade.getConnection(INSTANCE_CONNECTION_ID))
+            .isInstanceOf(NoSuchElementException.class);
+        assertThat(
+            connectedUserConnectionFacade.getConnectedUserConnections(
+                productionConnectedUser.getId(), null, List.of()))
+                    .hasSize(1)
+                    .allSatisfy(connectionDTO -> assertCredentials(connectionDTO, false));
+    }
+
+    private void stubConnectedUserConnectionsCreatedBy(String createdBy) {
+        when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
+            .thenAnswer(invocation -> {
+                List<Long> connectionIds = invocation.getArgument(0);
+
+                return connectionIds.stream()
+                    .map(connectionId -> credentialedConnectionDTO(connectionId, Environment.PRODUCTION, createdBy))
+                    .toList();
+            });
     }
 
     private static void assertCredentials(ConnectionDTO connectionDTO, boolean expected) {
@@ -884,11 +940,12 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThat(connectionDTO.componentName()).isEqualTo("slack");
     }
 
-    private static ConnectionDTO credentialedConnectionDTO(long id, Environment environment) {
+    private static ConnectionDTO credentialedConnectionDTO(long id, Environment environment, String createdBy) {
         return ConnectionDTO.builder()
             .authorizationParameters(Map.of("access_token", "t0k3n"))
             .componentName("slack")
             .connectionParameters(Map.of("client_secret", "s3cret"))
+            .createdBy(createdBy)
             .environmentId(environment.ordinal())
             .id(id)
             .parameters(Map.of("api_key", "k3y"))

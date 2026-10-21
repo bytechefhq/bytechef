@@ -168,6 +168,7 @@ class ConnectionFacadeIntTest {
         }).when(platformConnectionFacade)
             .delete(eq(7L), any());
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
+        when(platformConnectionFacade.getConnection(7L)).thenReturn(connectionDTO);
 
         assertThat(connectionFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 
