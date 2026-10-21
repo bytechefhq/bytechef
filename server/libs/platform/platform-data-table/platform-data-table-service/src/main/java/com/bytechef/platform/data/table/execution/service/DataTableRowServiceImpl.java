@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -41,15 +42,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
+import java.time.temporal.TemporalQuery;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,6 +66,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,6 +91,12 @@ import org.springframework.util.Assert;
 public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
+
+    private static final int MAX_ARRAY_PARAMETER_LENGTH = 50_000;
+
+    private static final long MIN_EPOCH_MILLISECONDS = 100_000_000_000L;
+
+    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone(ZoneOffset.UTC);
 
     private static final Pattern EPOCH_PATTERN = Pattern.compile("-?\\d+");
 
@@ -128,7 +140,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         DataTableRow deletedDataTableRow;
 
@@ -169,7 +181,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -197,7 +209,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
             if (!ids.isEmpty()) {
                 jdbcTemplate.update(
-                    "DELETE FROM " + tableName + " WHERE \"id\" IN (" + buildPlaceholders(ids.size()) + ")",
+                    "DELETE FROM " + tableName + " WHERE " + buildAnyCondition("\"id\"", ids.size()),
                     (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, ids));
             }
         }
@@ -224,7 +236,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<String> columnNames = listColumns(physicalName).stream()
             .map(ColumnSpec::name)
@@ -250,7 +262,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<String> columnNames = columnSpecs.stream()
@@ -300,7 +312,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         if (csv == null) {
             return;
@@ -414,7 +426,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         DataTableRow dataTableRow = insertRowWithoutEvent(
             baseName, physicalName, listColumns(physicalName), values, environmentId);
@@ -494,7 +506,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -530,7 +542,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -601,7 +613,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -638,7 +650,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 return List.of();
             }
 
-            String idsClause = " WHERE \"id\" IN (" + buildPlaceholders(ids.size()) + ")";
+            String idsClause = " WHERE " + buildAnyCondition("\"id\"", ids.size());
 
             jdbcTemplate.update("UPDATE " + tableName + " SET " + setClause + idsClause,
                 (PreparedStatementSetter) preparedStatement -> {
@@ -666,7 +678,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         if (value instanceof Timestamp timestamp) {
-            LocalDateTime localDateTime = timestamp.toLocalDateTime();
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
 
             return localDateTime.toString();
         }
@@ -763,7 +775,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                                 "Column '%s' is given more than once".formatted(columnSpec.name()));
                         }
 
-                        columnValues.add(new ColumnValue(columnSpec, coerceValueStrictly(columnSpec, value)));
+                        columnValues.add(new ColumnValue(columnSpec, coerceValueStrictly(columnSpec, value, true)));
                     },
                     () -> unknownColumnNames.add(columnName));
         }
@@ -828,36 +840,100 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     private int setColumnValues(PreparedStatement preparedStatement, int index, List<ColumnValue> columnValues)
         throws SQLException {
 
-        int curIndex = index;
+        int parameterIndex = index;
 
         for (ColumnValue columnValue : columnValues) {
             ColumnSpec columnSpec = columnValue.columnSpec();
 
-            setParam(preparedStatement, curIndex++, columnSpec.type(), columnValue.value());
+            setParam(preparedStatement, parameterIndex++, columnSpec.type(), columnValue.value());
         }
 
-        return curIndex;
+        return parameterIndex;
     }
 
     private int
         setFilterParameters(PreparedStatement preparedStatement, int index, List<FilterParameter> filterParameters)
             throws SQLException {
 
-        int curIndex = index;
+        int parameterIndex = index;
 
         for (FilterParameter filterParameter : filterParameters) {
-            setParam(preparedStatement, curIndex++, filterParameter.columnType(), filterParameter.value());
+            if (filterParameter.value() instanceof Object[] values) {
+                setArrayParam(preparedStatement, parameterIndex++, filterParameter.columnType(), values);
+            } else {
+                setParam(preparedStatement, parameterIndex++, filterParameter.columnType(), filterParameter.value());
+            }
         }
 
-        return curIndex;
+        return parameterIndex;
+    }
+
+    private static void setArrayParam(PreparedStatement preparedStatement, int index, ColumnType type, Object[] values)
+        throws SQLException {
+
+        Object[] elements = new Object[values.length];
+
+        for (int elementIndex = 0; elementIndex < values.length; elementIndex++) {
+            elements[elementIndex] = toArrayElement(type, values[elementIndex]);
+        }
+
+        Connection connection = preparedStatement.getConnection();
+
+        Array array = connection.createArrayOf(getArrayElementTypeName(type), elements);
+
+        preparedStatement.setArray(index, array);
     }
 
     private static void setIds(PreparedStatement preparedStatement, int index, List<Long> ids) throws SQLException {
-        int curIndex = index;
+        int parameterIndex = index;
 
-        for (long id : ids) {
-            preparedStatement.setLong(curIndex++, id);
+        for (List<Long> chunk : partition(ids)) {
+            setArrayParam(preparedStatement, parameterIndex++, ColumnType.INTEGER, chunk.toArray());
         }
+    }
+
+    private static String buildAnyCondition(String column, int valueCount) {
+        int chunkCount = Math.max(1, (valueCount + MAX_ARRAY_PARAMETER_LENGTH - 1) / MAX_ARRAY_PARAMETER_LENGTH);
+
+        String condition = String.join(" OR ", Collections.nCopies(chunkCount, column + " = ANY(?)"));
+
+        return chunkCount == 1 ? condition : "(" + condition + ")";
+    }
+
+    private static <T> List<List<T>> partition(List<T> values) {
+        List<List<T>> chunks = new ArrayList<>();
+
+        for (int start = 0; start < values.size(); start += MAX_ARRAY_PARAMETER_LENGTH) {
+            chunks.add(values.subList(start, Math.min(start + MAX_ARRAY_PARAMETER_LENGTH, values.size())));
+        }
+
+        return chunks;
+    }
+
+    private static String getArrayElementTypeName(ColumnType type) {
+        return switch (type) {
+            case STRING -> "varchar";
+            case NUMBER -> "numeric";
+            case INTEGER -> "bigint";
+            case DATE -> "date";
+            case DATE_TIME -> "timestamp";
+            case BOOLEAN -> "boolean";
+        };
+    }
+
+    private static Object toArrayElement(ColumnType type, Object value) {
+        return switch (type) {
+            case STRING -> String.valueOf(value);
+            case NUMBER -> toBigDecimal((Number) value);
+            case INTEGER -> ((Number) value).longValue();
+            case DATE -> value instanceof java.sql.Date date ? date : new java.sql.Date(((Date) value).getTime());
+            case DATE_TIME -> switch (value) {
+                case LocalDateTime localDateTime -> localDateTime.toString();
+                case Timestamp timestamp -> timestamp;
+                default -> new Timestamp(((Date) value).getTime());
+            };
+            case BOOLEAN -> value;
+        };
     }
 
     private static List<DataTableRow> sortById(List<DataTableRow> dataTableRows) {
@@ -914,13 +990,15 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case IN -> {
                 List<Object> values = filter.values();
 
-                for (Object value : values) {
-                    filterParameters.add(new FilterParameter(columnType, coerceFilterValue(columnSpec, value)));
+                List<Object> coercedValues = values.stream()
+                    .map(value -> coerceFilterValue(columnSpec, value))
+                    .toList();
+
+                for (List<Object> chunk : partition(coercedValues)) {
+                    filterParameters.add(new FilterParameter(columnType, chunk.toArray()));
                 }
 
-                yield column + " IN (" + values.stream()
-                    .map(value -> "?")
-                    .collect(Collectors.joining(", ")) + ")";
+                yield buildAnyCondition(column, coercedValues.size());
             }
             case BETWEEN -> {
                 List<Object> values = filter.values();
@@ -967,10 +1045,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private Object coerceFilterValue(ColumnSpec columnSpec, @Nullable Object rawValue) {
         return Objects.requireNonNull(
-            coerceValueStrictly(columnSpec, rawValue), "filter values are checked by DataTableRowFilter");
+            coerceValueStrictly(columnSpec, rawValue, false), "filter values are checked by DataTableRowFilter");
     }
 
-    private @Nullable Object coerceValueStrictly(ColumnSpec columnSpec, @Nullable Object rawValue) {
+    private @Nullable Object coerceValueStrictly(
+        ColumnSpec columnSpec, @Nullable Object rawValue, boolean epochMillisecondsAllowed) {
+
         if (rawValue == null) {
             return null;
         }
@@ -989,6 +1069,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         boolean dateColumn = columnType == ColumnType.DATE || columnType == ColumnType.DATE_TIME;
 
         if (dateColumn && isEpochLike(rawValue)) {
+            Object dateValue = epochMillisecondsAllowed ? fromEpochMilliseconds(columnType, rawValue) : null;
+
+            if (dateValue != null) {
+                return dateValue;
+            }
+
             throw new IllegalArgumentException(
                 "Value '%s' is not a valid %s for column '%s'; use an ISO format such as %s".formatted(
                     rawValue, columnType == ColumnType.DATE ? "date" : "date_time", columnSpec.name(),
@@ -1029,29 +1115,72 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
     }
 
+    private static @Nullable Object fromEpochMilliseconds(ColumnType columnType, Object rawValue) {
+        if (rawValue instanceof Boolean) {
+            return null;
+        }
+
+        Long epochMilliseconds = toLong(rawValue);
+
+        if (epochMilliseconds == null || Math.abs(epochMilliseconds) < MIN_EPOCH_MILLISECONDS) {
+            return null;
+        }
+
+        LocalDateTime dateTime;
+
+        try {
+            dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilliseconds), ZoneOffset.UTC);
+        } catch (DateTimeException dateTimeException) {
+            return null;
+        }
+
+        return columnType == ColumnType.DATE ? java.sql.Date.valueOf(dateTime.toLocalDate()) : dateTime;
+    }
+
+    private static Instant toInstant(Date date) {
+        if (date instanceof Timestamp timestamp) {
+            return timestamp.toInstant();
+        }
+
+        return Instant.ofEpochMilli(date.getTime());
+    }
+
     private @Nullable Object toDate(Object rawValue) {
-        if (rawValue instanceof Date) {
-            return coerceValue(ColumnType.DATE, rawValue);
+        if (rawValue instanceof java.sql.Date sqlDate) {
+            return sqlDate;
+        }
+
+        if (rawValue instanceof Date date) {
+            return java.sql.Date.valueOf(LocalDate.ofInstant(toInstant(date), ZoneOffset.UTC));
         }
 
         String value = String.valueOf(rawValue)
             .trim();
 
         for (DateTimeFormatter dateTimeFormatter : STRICT_DATE_FORMATTERS) {
-            try {
-                return java.sql.Date.valueOf(LocalDate.parse(value, dateTimeFormatter));
-            } catch (DateTimeParseException ignored) {
+            LocalDate localDate = parseOrNull(value, dateTimeFormatter, LocalDate::from);
+
+            if (localDate != null) {
+                return java.sql.Date.valueOf(localDate);
             }
         }
 
         TemporalAccessor dateTime = parseDateTimeStrictly(value);
 
-        return dateTime == null ? null : java.sql.Date.valueOf(LocalDate.from(dateTime));
+        if (dateTime == null) {
+            return null;
+        }
+
+        if (dateTime.query(TemporalQueries.zone()) != null) {
+            return java.sql.Date.valueOf(LocalDate.ofInstant(Instant.from(dateTime), ZoneOffset.UTC));
+        }
+
+        return java.sql.Date.valueOf(LocalDate.from(dateTime));
     }
 
     private @Nullable Object toTimestamp(Object rawValue) {
-        if (rawValue instanceof Date) {
-            return coerceValue(ColumnType.DATE_TIME, rawValue);
+        if (rawValue instanceof Date date) {
+            return LocalDateTime.ofInstant(toInstant(date), ZoneOffset.UTC);
         }
 
         TemporalAccessor dateTime = parseDateTimeStrictly(
@@ -1063,21 +1192,30 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         if (dateTime.query(TemporalQueries.zone()) != null) {
-            return Timestamp.from(Instant.from(dateTime));
+            return LocalDateTime.ofInstant(Instant.from(dateTime), ZoneOffset.UTC);
         }
 
-        return Timestamp.valueOf(LocalDateTime.from(dateTime));
+        return LocalDateTime.from(dateTime);
     }
 
     private static @Nullable TemporalAccessor parseDateTimeStrictly(String value) {
         for (DateTimeFormatter dateTimeFormatter : STRICT_DATE_TIME_FORMATTERS) {
-            try {
-                return dateTimeFormatter.parse(value);
-            } catch (DateTimeParseException ignored) {
+            TemporalAccessor dateTime = parseOrNull(value, dateTimeFormatter, temporalAccessor -> temporalAccessor);
+
+            if (dateTime != null) {
+                return dateTime;
             }
         }
 
         return null;
+    }
+
+    private static <T> @Nullable T parseOrNull(String value, DateTimeFormatter formatter, TemporalQuery<T> query) {
+        try {
+            return formatter.parse(value, query);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
     }
 
     private static boolean isEpochLike(Object rawValue) {
@@ -1142,17 +1280,25 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     columnName, String.join(", ", getColumnNames(columnSpecs)))));
     }
 
-    private void checkHasId(String physical) {
+    private void checkHasId(String baseName, String physicalName) {
         String sql =
             "SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = ? AND " +
                 "column_name = 'id'";
 
-        List<Integer> exists =
-            jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, physical), (rs, rowNum) -> 1);
+        List<Integer> exists = jdbcTemplate.query(
+            sql, preparedStatement -> preparedStatement.setString(1, physicalName), (resultSet, rowNum) -> 1);
 
-        if (exists.isEmpty()) {
-            throw new IllegalStateException("Table does not have primary key column 'id': " + physical);
+        if (!exists.isEmpty()) {
+            return;
         }
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+
+        if (columnSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Table '%s' not found".formatted(baseName));
+        }
+
+        throw new IllegalStateException("Table does not have primary key column 'id': " + physicalName);
     }
 
     private Object coerceValue(ColumnType type, Object rawValue) {
@@ -1212,7 +1358,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         Map<String, Object> values = new HashMap<>();
 
         for (String columnName : columnNames) {
-            values.put(columnName, resultSet.getObject(columnName));
+            Object value = resultSet.getObject(columnName);
+
+            if (value instanceof Timestamp) {
+                value = resultSet.getTimestamp(columnName, Calendar.getInstance(UTC_TIME_ZONE));
+            }
+
+            values.put(columnName, value);
         }
 
         return new DataTableRow(resultSet.getLong("id"), values);
@@ -1223,9 +1375,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             "WHERE table_schema = current_schema() AND table_name = ? ORDER BY ordinal_position";
 
         return jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, physicalName),
-            (rs, rowNum) -> {
-                String name = rs.getString("column_name");
-                String dataType = rs.getString("data_type");
+            (resultSet, rowNum) -> {
+                String name = resultSet.getString("column_name");
+                String dataType = resultSet.getString("data_type");
 
                 return new ColumnSpec(name, mapType(dataType));
             });
@@ -1281,38 +1433,41 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case STRING -> preparedStatement.setString(index, String.valueOf(value));
             case NUMBER ->
                 preparedStatement.setBigDecimal(index,
-                    (value instanceof BigDecimal bd) ? bd : toBigDecimal((Number) value));
+                    (value instanceof BigDecimal bigDecimal) ? bigDecimal : toBigDecimal((Number) value));
             case INTEGER -> {
                 switch (value) {
                     case Integer integer -> preparedStatement.setInt(index, integer);
-                    case Long aLong -> preparedStatement.setLong(index, aLong);
+                    case Long longValue -> preparedStatement.setLong(index, longValue);
                     case Number number -> preparedStatement.setLong(index, number.longValue());
                     default -> preparedStatement.setObject(index, value, Types.BIGINT);
                 }
             }
             case DATE -> {
-                if (value instanceof java.sql.Date d)
-                    preparedStatement.setDate(index, d);
-                else if (value instanceof Date d)
-                    preparedStatement.setDate(index, new java.sql.Date(d.getTime()));
-                else
+                if (value instanceof java.sql.Date sqlDate) {
+                    preparedStatement.setDate(index, sqlDate);
+                } else if (value instanceof Date date) {
+                    preparedStatement.setDate(index, new java.sql.Date(date.getTime()));
+                } else {
                     preparedStatement.setDate(index, DateUtils.parseSqlDate(String.valueOf(value)));
+                }
             }
             case DATE_TIME -> {
-                if (value instanceof Timestamp t)
-                    preparedStatement.setTimestamp(index, t);
-                else if (value instanceof Date d)
-                    preparedStatement.setTimestamp(index, new Timestamp(d.getTime()));
-                else
-                    preparedStatement.setTimestamp(
-                        index,
-                        DateUtils.parseSqlTimestamp(String.valueOf(value)));
+                if (value instanceof LocalDateTime localDateTime) {
+                    preparedStatement.setObject(index, localDateTime);
+                } else if (value instanceof Timestamp timestamp) {
+                    preparedStatement.setTimestamp(index, timestamp);
+                } else if (value instanceof Date date) {
+                    preparedStatement.setTimestamp(index, new Timestamp(date.getTime()));
+                } else {
+                    preparedStatement.setTimestamp(index, DateUtils.parseSqlTimestamp(String.valueOf(value)));
+                }
             }
             case BOOLEAN -> {
-                if (value instanceof Boolean b)
-                    preparedStatement.setBoolean(index, b);
-                else
+                if (value instanceof Boolean booleanValue) {
+                    preparedStatement.setBoolean(index, booleanValue);
+                } else {
                     preparedStatement.setBoolean(index, Boolean.parseBoolean(String.valueOf(value)));
+                }
             }
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         }
