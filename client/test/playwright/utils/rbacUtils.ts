@@ -381,7 +381,7 @@ export async function createCustomRoleUser(
 
 export type EnvironmentType = 'DEVELOPMENT' | 'PRODUCTION' | 'STAGING';
 
-const ENVIRONMENT_IDS: Record<EnvironmentType, number> = {
+export const ENVIRONMENT_IDS: Record<EnvironmentType, number> = {
     DEVELOPMENT: 0,
     PRODUCTION: 2,
     STAGING: 1,
