@@ -384,6 +384,370 @@ export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuditEventTypesQuery = { auditEventTypes: Array<string> };
 
+export type AppQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppQuery = { app: { id: string, uuid: string, name: string, description: string | null, categoryId: string | null, hasIcon: boolean, portalDiscoverable: boolean, workspaceId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, instances: Array<{ id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, deploymentConnectionId: string | null, deploymentProviderAvailable: boolean, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } }>, foreignInstances: Array<{ id: string, name: string, workspaceId: string, environmentId: string, status: Types.AppInstanceStatus, currentAppDeploymentId: string | null }> } };
+
+export type AppApiCollectionsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppApiCollectionsQuery = { appApiCollections: Array<{ id: string, appInstanceId: string, apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string | null, projectName: string | null, available: boolean }> };
+
+export type AppBindableApiCollectionsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppBindableApiCollectionsQuery = { appBindableApiCollections: Array<{ apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string, projectName: string | null, available: boolean }> };
+
+export type AppBindableConnectionsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppBindableConnectionsQuery = { appBindableConnections: Array<{ id: string, name: string, componentName: string, connectionVersion: number, componentVersion: number }> };
+
+export type AppBindableWorkflowsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppBindableWorkflowsQuery = { appBindableWorkflows: Array<{ projectDeploymentId: string, projectDeploymentName: string, projectName: string, workflowUuid: string, workflowName: string, description: string | null }> };
+
+export type AppBindingsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppBindingsQuery = { appBindings: Array<{ id: string, appInstanceId: string, bindingKey: string, connectionId: string, connectionName: string, componentName: string, connectionVersion: number, componentVersion: number | null, actionNames: Array<string>, toolNames: Array<string>, proxyEnabled: boolean, proxyAllowedMethods: Array<string> }> };
+
+export type AppCategoriesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AppCategoriesQuery = { appCategories: Array<{ id: string | null, name: string | null }> };
+
+export type AppComponentOperationsQueryVariables = Exact<{
+  componentName: string;
+  componentVersion: number;
+}>;
+
+
+export type AppComponentOperationsQuery = { appComponentOperations: { actionNames: Array<string>, toolNames: Array<string> } };
+
+export type AppDeploymentsQueryVariables = Exact<{
+  appInstanceId: string | number;
+  limit?: number | null | undefined;
+}>;
+
+
+export type AppDeploymentsQuery = { appDeployments: Array<{ id: string, appInstanceId: string, provider: Types.AppDeploymentProviderType, url: string | null, status: Types.AppDeploymentStatus, errorMessage: string | null, current: boolean, createdBy: string | null, createdDate: string | null, finishedDate: string | null, appVersion: { id: string, name: string, gitCommitSha: string | null } }> };
+
+export type AppInstanceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppInstanceQuery = { appInstance: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, deploymentConnectionId: string | null, deploymentProviderAvailable: boolean, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } };
+
+export type AppInstanceConfigurationQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppInstanceConfigurationQuery = { appInstance: { id: string, configuration: any } };
+
+export type AppInstanceDeploymentSettingsQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppInstanceDeploymentSettingsQuery = { appInstance: { id: string, environmentId: string, hostingTarget: Types.AppHostingTarget, deploymentConnectionId: string | null, deploymentProviderAvailable: boolean, deploymentSettings: any } };
+
+export type AppInstanceDeploymentSummaryQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppInstanceDeploymentSummaryQuery = { appInstance: { id: string, currentDeployment: { id: string, status: Types.AppDeploymentStatus, createdDate: string | null, finishedDate: string | null, appVersion: { id: string, name: string } } | null, deployments: Array<{ id: string, status: Types.AppDeploymentStatus, createdDate: string | null, finishedDate: string | null }> } };
+
+export type AppInstanceGrantsQueryVariables = Exact<{
+  workspaceId: string | number;
+  appInstanceId: string | number;
+}>;
+
+
+export type AppInstanceGrantsQuery = { appInstanceGrants: Array<any> };
+
+export type AppInstanceVersionsQueryVariables = Exact<{
+  appInstanceId: string | number;
+  limit?: number | null | undefined;
+}>;
+
+
+export type AppInstanceVersionsQuery = { appInstanceVersions: Array<{ id: string, appId: string, name: string, gitRef: string | null, gitCommitSha: string | null, description: string | null, createdBy: string | null, createdDate: string | null }> };
+
+export type AppUserAuthAvailableQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AppUserAuthAvailableQuery = { appUserAuthAvailable: boolean };
+
+export type AppWorkflowsQueryVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type AppWorkflowsQuery = { appWorkflows: Array<{ id: string, appInstanceId: string, workflowKey: string, projectDeploymentId: string, projectDeploymentName: string | null, workflowUuid: string, workflowName: string | null, available: boolean }> };
+
+export type AppsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AppsQuery = { apps: Array<{ id: string, uuid: string, name: string, description: string | null, categoryId: string | null, hasIcon: boolean, portalDiscoverable: boolean, workspaceId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, instances: Array<{ id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } }>, foreignInstances: Array<{ id: string, name: string, workspaceId: string, environmentId: string, status: Types.AppInstanceStatus, currentAppDeploymentId: string | null }> }> };
+
+export type BindAppApiCollectionMutationVariables = Exact<{
+  appInstanceId: string | number;
+  apiCollectionId: string | number;
+}>;
+
+
+export type BindAppApiCollectionMutation = { bindAppApiCollection: { id: string, appInstanceId: string, apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string | null, projectName: string | null, available: boolean } };
+
+export type BindAppConnectionMutationVariables = Exact<{
+  appInstanceId: string | number;
+  input: Types.AppBindingInput;
+}>;
+
+
+export type BindAppConnectionMutation = { bindAppConnection: { id: string, appInstanceId: string, bindingKey: string, connectionId: string, connectionName: string, componentName: string, connectionVersion: number, componentVersion: number | null, actionNames: Array<string>, toolNames: Array<string>, proxyEnabled: boolean, proxyAllowedMethods: Array<string> } };
+
+export type BindAppWorkflowMutationVariables = Exact<{
+  appInstanceId: string | number;
+  input: Types.AppWorkflowBindingInput;
+}>;
+
+
+export type BindAppWorkflowMutation = { bindAppWorkflow: { id: string, appInstanceId: string, workflowKey: string, projectDeploymentId: string, projectDeploymentName: string | null, workflowUuid: string, workflowName: string | null, available: boolean } };
+
+export type CancelAppDeploymentMutationVariables = Exact<{
+  appInstanceId: string | number;
+  appDeploymentId: string | number;
+}>;
+
+
+export type CancelAppDeploymentMutation = { cancelAppDeployment: { id: string, appInstanceId: string, status: Types.AppDeploymentStatus } };
+
+export type CreateAppMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  input: Types.AppInput;
+}>;
+
+
+export type CreateAppMutation = { createApp: { secretKey: string, appInstance: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } } };
+
+export type CreateAppInstanceMutationVariables = Exact<{
+  appId: string | number;
+  workspaceId: string | number;
+  environmentId: string | number;
+  input: Types.AppInstanceInput;
+}>;
+
+
+export type CreateAppInstanceMutation = { createAppInstance: { secretKey: string, appInstance: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } } };
+
+export type DeleteAppMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAppMutation = { deleteApp: boolean };
+
+export type DeleteAppInstanceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAppInstanceMutation = { deleteAppInstance: boolean };
+
+export type DeployAppInstanceMutationVariables = Exact<{
+  appInstanceId: string | number;
+  appVersionId: string | number;
+}>;
+
+
+export type DeployAppInstanceMutation = { deployAppInstance: { id: string, appInstanceId: string, status: Types.AppDeploymentStatus } };
+
+export type GrantAppInstanceAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  appInstanceId: string | number;
+  userId: string | number;
+}>;
+
+
+export type GrantAppInstanceAccessMutation = { grantAppInstanceAccess: boolean };
+
+export type HostedAppInstancesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type HostedAppInstancesQuery = { hostedAppInstances: Array<{ id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } }> };
+
+export type PortalAppsQueryVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type PortalAppsQuery = { portalApps: Array<{ id: string, name: string, description: string | null, categoryId: string | null, categoryName: string | null, hasIcon: boolean, favorite: boolean, lastUsedDate: string | null, instances: Array<{ id: string, name: string, workspaceId: string, workspaceName: string, url: string, lastUsedDate: string | null, useCount: number }> }> };
+
+export type RecordAppLaunchMutationVariables = Exact<{
+  appInstanceId: string | number;
+}>;
+
+
+export type RecordAppLaunchMutation = { recordAppLaunch: boolean };
+
+export type RevokeAppInstanceAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  appInstanceId: string | number;
+  userId: string | number;
+}>;
+
+
+export type RevokeAppInstanceAccessMutation = { revokeAppInstanceAccess: boolean };
+
+export type RollbackAppInstanceMutationVariables = Exact<{
+  appInstanceId: string | number;
+  appVersionId: string | number;
+}>;
+
+
+export type RollbackAppInstanceMutation = { rollbackAppInstance: { id: string, appInstanceId: string, status: Types.AppDeploymentStatus } };
+
+export type RotateAppInstanceSecretKeyMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RotateAppInstanceSecretKeyMutation = { rotateAppInstanceSecretKey: { secretKey: string, appInstance: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } } };
+
+export type SetAppFavoriteMutationVariables = Exact<{
+  appId: string | number;
+  favorite: boolean;
+}>;
+
+
+export type SetAppFavoriteMutation = { setAppFavorite: boolean };
+
+export type SetAppInstanceVisibilityMutationVariables = Exact<{
+  workspaceId: string | number;
+  appInstanceId: string | number;
+  visibility: Types.ResourceVisibility;
+}>;
+
+
+export type SetAppInstanceVisibilityMutation = { setAppInstanceVisibility: boolean };
+
+export type SetAppVisibilityMutationVariables = Exact<{
+  workspaceId: string | number;
+  appId: string | number;
+  visibility: Types.ResourceVisibility;
+}>;
+
+
+export type SetAppVisibilityMutation = { setAppVisibility: boolean };
+
+export type UnbindAppApiCollectionMutationVariables = Exact<{
+  appInstanceId: string | number;
+  apiCollectionId: string | number;
+}>;
+
+
+export type UnbindAppApiCollectionMutation = { unbindAppApiCollection: boolean };
+
+export type UnbindAppConnectionMutationVariables = Exact<{
+  appInstanceId: string | number;
+  bindingKey: string;
+}>;
+
+
+export type UnbindAppConnectionMutation = { unbindAppConnection: boolean };
+
+export type UnbindAppWorkflowMutationVariables = Exact<{
+  appInstanceId: string | number;
+  workflowKey: string;
+}>;
+
+
+export type UnbindAppWorkflowMutation = { unbindAppWorkflow: boolean };
+
+export type UpdateAppMutationVariables = Exact<{
+  id: string | number;
+  input: Types.AppUpdateInput;
+}>;
+
+
+export type UpdateAppMutation = { updateApp: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, instances: Array<{ id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } }>, foreignInstances: Array<{ id: string, name: string, workspaceId: string, environmentId: string, status: Types.AppInstanceStatus, currentAppDeploymentId: string | null }> } };
+
+export type UpdateAppInstanceMutationVariables = Exact<{
+  id: string | number;
+  input: Types.AppInstanceUpdateInput;
+}>;
+
+
+export type UpdateAppInstanceMutation = { updateAppInstance: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } };
+
+export type UpdateAppInstanceConfigurationMutationVariables = Exact<{
+  id: string | number;
+  configuration: any;
+}>;
+
+
+export type UpdateAppInstanceConfigurationMutation = { updateAppInstanceConfiguration: { id: string, configuration: any } };
+
+export type UpdateAppInstanceDeploymentSettingsMutationVariables = Exact<{
+  id: string | number;
+  input: Types.AppInstanceDeploymentSettingsInput;
+}>;
+
+
+export type UpdateAppInstanceDeploymentSettingsMutation = { updateAppInstanceDeploymentSettings: { id: string, deploymentConnectionId: string | null, deploymentSettings: any } };
+
+export type UpdateAppInstanceStatusMutationVariables = Exact<{
+  id: string | number;
+  status: Types.AppInstanceStatus;
+}>;
+
+
+export type UpdateAppInstanceStatusMutation = { updateAppInstanceStatus: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } };
+
+export type UpdateAppInstanceUserAuthMutationVariables = Exact<{
+  id: string | number;
+  userAuthMode: Types.AppUserAuthMode;
+}>;
+
+
+export type UpdateAppInstanceUserAuthMutation = { updateAppInstanceUserAuth: { id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } } };
+
+export type UpdateAppStatusMutationVariables = Exact<{
+  id: string | number;
+  status: Types.AppStatus;
+}>;
+
+
+export type UpdateAppStatusMutation = { updateAppStatus: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, instances: Array<{ id: string, uuid: string, workspaceId: string, environmentId: string, name: string, ownerUserId: string, status: Types.AppInstanceStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, secretKeyHint: string | null, secretKeyLastUsedDate: string | null, userAuthMode: Types.AppUserAuthMode, currentAppDeploymentId: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, version: number, app: { id: string, name: string, description: string | null, status: Types.AppStatus } }>, foreignInstances: Array<{ id: string, name: string, workspaceId: string, environmentId: string, status: Types.AppInstanceStatus, currentAppDeploymentId: string | null }> } };
+
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -997,6 +1361,7 @@ export type ToolEligibleWorkflowPropertiesQuery = { toolEligibleWorkflowProperti
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
+
 export type UnresolvedConnectionsQueryVariables = Exact<{
   workspaceId: string | number;
   userLogin: string;
@@ -2309,6 +2674,15 @@ export type RestoreAutomationProjectVersionMutationVariables = Exact<{
 
 export type RestoreAutomationProjectVersionMutation = { restoreAutomationProjectVersion: boolean };
 
+export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
+
 export type ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQueryVariables = Exact<{
   automationProjectConfigurationId: string | number;
   workflowUuid: string;
@@ -2402,14 +2776,6 @@ export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery 
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
-export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
-  userId: string | number;
-  environment: Types.EnvironmentEnum;
-  role: Types.WorkspaceRole;
-}>;
-
-
-export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -2577,13 +2943,14 @@ export type ExternalInvocationLogsQueryVariables = Exact<{
   a2aServerId?: any;
   connectedUserId?: any;
   integrationInstanceId?: any;
+  appId?: any;
   fromDate?: any;
   toDate?: any;
   page?: number | null | undefined;
 }>;
 
 
-export type ExternalInvocationLogsQuery = { externalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, source: string, kind: string, invocationName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, status: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type ExternalInvocationLogsQuery = { externalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, source: string, kind: string, invocationName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, appId: any, workflowName: string | null, status: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 export type WorkspaceExternalInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
@@ -2595,13 +2962,15 @@ export type WorkspaceExternalInvocationLogsQueryVariables = Exact<{
   a2aServerId?: any;
   connectedUserId?: any;
   integrationInstanceId?: any;
+  appId?: any;
+  appInstanceId?: any;
   fromDate?: any;
   toDate?: any;
   page?: number | null | undefined;
 }>;
 
 
-export type WorkspaceExternalInvocationLogsQuery = { workspaceExternalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, source: string, kind: string, invocationName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, status: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type WorkspaceExternalInvocationLogsQuery = { workspaceExternalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, source: string, kind: string, invocationName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, appId: any, appInstanceId: any, userId: any, userName: string | null, workflowName: string | null, status: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 export type CreateIntegrationCodeWorkflowMutationVariables = Exact<{
   componentName: string;
@@ -4756,6 +5125,1600 @@ export const useAuditEventTypesQuery = <
   }
     )};
 
+export const AppDocument = new TypedDocumentString(`
+    query app($id: ID!) {
+  app(id: $id) {
+    id
+    uuid
+    name
+    description
+    categoryId
+    hasIcon
+    portalDiscoverable
+    workspaceId
+    ownerUserId
+    status
+    visibility
+    instances {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      deploymentConnectionId
+      deploymentProviderAvailable
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+    foreignInstances {
+      id
+      name
+      workspaceId
+      environmentId
+      status
+      currentAppDeploymentId
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useAppQuery = <
+      TData = AppQuery,
+      TError = unknown
+    >(
+      variables: AppQueryVariables,
+      options?: Omit<UseQueryOptions<AppQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppQuery, TError, TData>(
+      {
+    queryKey: ['app', variables],
+    queryFn: fetcher<AppQuery, AppQueryVariables>(AppDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppApiCollectionsDocument = new TypedDocumentString(`
+    query appApiCollections($appInstanceId: ID!) {
+  appApiCollections(appInstanceId: $appInstanceId) {
+    id
+    appInstanceId
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useAppApiCollectionsQuery = <
+      TData = AppApiCollectionsQuery,
+      TError = unknown
+    >(
+      variables: AppApiCollectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppApiCollectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppApiCollectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppApiCollectionsQuery, TError, TData>(
+      {
+    queryKey: ['appApiCollections', variables],
+    queryFn: fetcher<AppApiCollectionsQuery, AppApiCollectionsQueryVariables>(AppApiCollectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableApiCollectionsDocument = new TypedDocumentString(`
+    query appBindableApiCollections($appInstanceId: ID!) {
+  appBindableApiCollections(appInstanceId: $appInstanceId) {
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useAppBindableApiCollectionsQuery = <
+      TData = AppBindableApiCollectionsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableApiCollectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableApiCollectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableApiCollectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableApiCollectionsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableApiCollections', variables],
+    queryFn: fetcher<AppBindableApiCollectionsQuery, AppBindableApiCollectionsQueryVariables>(AppBindableApiCollectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableConnectionsDocument = new TypedDocumentString(`
+    query appBindableConnections($appInstanceId: ID!) {
+  appBindableConnections(appInstanceId: $appInstanceId) {
+    id
+    name
+    componentName
+    connectionVersion
+    componentVersion
+  }
+}
+    `);
+
+export const useAppBindableConnectionsQuery = <
+      TData = AppBindableConnectionsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableConnections', variables],
+    queryFn: fetcher<AppBindableConnectionsQuery, AppBindableConnectionsQueryVariables>(AppBindableConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableWorkflowsDocument = new TypedDocumentString(`
+    query appBindableWorkflows($appInstanceId: ID!) {
+  appBindableWorkflows(appInstanceId: $appInstanceId) {
+    projectDeploymentId
+    projectDeploymentName
+    projectName
+    workflowUuid
+    workflowName
+    description
+  }
+}
+    `);
+
+export const useAppBindableWorkflowsQuery = <
+      TData = AppBindableWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableWorkflows', variables],
+    queryFn: fetcher<AppBindableWorkflowsQuery, AppBindableWorkflowsQueryVariables>(AppBindableWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindingsDocument = new TypedDocumentString(`
+    query appBindings($appInstanceId: ID!) {
+  appBindings(appInstanceId: $appInstanceId) {
+    id
+    appInstanceId
+    bindingKey
+    connectionId
+    connectionName
+    componentName
+    connectionVersion
+    componentVersion
+    actionNames
+    toolNames
+    proxyEnabled
+    proxyAllowedMethods
+  }
+}
+    `);
+
+export const useAppBindingsQuery = <
+      TData = AppBindingsQuery,
+      TError = unknown
+    >(
+      variables: AppBindingsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindingsQuery, TError, TData>(
+      {
+    queryKey: ['appBindings', variables],
+    queryFn: fetcher<AppBindingsQuery, AppBindingsQueryVariables>(AppBindingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppCategoriesDocument = new TypedDocumentString(`
+    query appCategories($workspaceId: ID!) {
+  appCategories(workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `);
+
+export const useAppCategoriesQuery = <
+      TData = AppCategoriesQuery,
+      TError = unknown
+    >(
+      variables: AppCategoriesQueryVariables,
+      options?: Omit<UseQueryOptions<AppCategoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppCategoriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppCategoriesQuery, TError, TData>(
+      {
+    queryKey: ['appCategories', variables],
+    queryFn: fetcher<AppCategoriesQuery, AppCategoriesQueryVariables>(AppCategoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppComponentOperationsDocument = new TypedDocumentString(`
+    query appComponentOperations($componentName: String!, $componentVersion: Int!) {
+  appComponentOperations(
+    componentName: $componentName
+    componentVersion: $componentVersion
+  ) {
+    actionNames
+    toolNames
+  }
+}
+    `);
+
+export const useAppComponentOperationsQuery = <
+      TData = AppComponentOperationsQuery,
+      TError = unknown
+    >(
+      variables: AppComponentOperationsQueryVariables,
+      options?: Omit<UseQueryOptions<AppComponentOperationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppComponentOperationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppComponentOperationsQuery, TError, TData>(
+      {
+    queryKey: ['appComponentOperations', variables],
+    queryFn: fetcher<AppComponentOperationsQuery, AppComponentOperationsQueryVariables>(AppComponentOperationsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppDeploymentsDocument = new TypedDocumentString(`
+    query appDeployments($appInstanceId: ID!, $limit: Int) {
+  appDeployments(appInstanceId: $appInstanceId, limit: $limit) {
+    id
+    appInstanceId
+    appVersion {
+      id
+      name
+      gitCommitSha
+    }
+    provider
+    url
+    status
+    errorMessage
+    current
+    createdBy
+    createdDate
+    finishedDate
+  }
+}
+    `);
+
+export const useAppDeploymentsQuery = <
+      TData = AppDeploymentsQuery,
+      TError = unknown
+    >(
+      variables: AppDeploymentsQueryVariables,
+      options?: Omit<UseQueryOptions<AppDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppDeploymentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppDeploymentsQuery, TError, TData>(
+      {
+    queryKey: ['appDeployments', variables],
+    queryFn: fetcher<AppDeploymentsQuery, AppDeploymentsQueryVariables>(AppDeploymentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceDocument = new TypedDocumentString(`
+    query appInstance($id: ID!) {
+  appInstance(id: $id) {
+    id
+    uuid
+    app {
+      id
+      name
+      description
+      status
+    }
+    workspaceId
+    environmentId
+    name
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    secretKeyHint
+    secretKeyLastUsedDate
+    userAuthMode
+    currentAppDeploymentId
+    deploymentConnectionId
+    deploymentProviderAvailable
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useAppInstanceQuery = <
+      TData = AppInstanceQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceQuery, TError, TData>(
+      {
+    queryKey: ['appInstance', variables],
+    queryFn: fetcher<AppInstanceQuery, AppInstanceQueryVariables>(AppInstanceDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceConfigurationDocument = new TypedDocumentString(`
+    query appInstanceConfiguration($id: ID!) {
+  appInstance(id: $id) {
+    id
+    configuration
+  }
+}
+    `);
+
+export const useAppInstanceConfigurationQuery = <
+      TData = AppInstanceConfigurationQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceConfigurationQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceConfigurationQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceConfigurationQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceConfigurationQuery, TError, TData>(
+      {
+    queryKey: ['appInstanceConfiguration', variables],
+    queryFn: fetcher<AppInstanceConfigurationQuery, AppInstanceConfigurationQueryVariables>(AppInstanceConfigurationDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceDeploymentSettingsDocument = new TypedDocumentString(`
+    query appInstanceDeploymentSettings($id: ID!) {
+  appInstance(id: $id) {
+    id
+    environmentId
+    hostingTarget
+    deploymentConnectionId
+    deploymentProviderAvailable
+    deploymentSettings
+  }
+}
+    `);
+
+export const useAppInstanceDeploymentSettingsQuery = <
+      TData = AppInstanceDeploymentSettingsQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceDeploymentSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceDeploymentSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceDeploymentSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceDeploymentSettingsQuery, TError, TData>(
+      {
+    queryKey: ['appInstanceDeploymentSettings', variables],
+    queryFn: fetcher<AppInstanceDeploymentSettingsQuery, AppInstanceDeploymentSettingsQueryVariables>(AppInstanceDeploymentSettingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceDeploymentSummaryDocument = new TypedDocumentString(`
+    query appInstanceDeploymentSummary($id: ID!) {
+  appInstance(id: $id) {
+    id
+    currentDeployment {
+      id
+      appVersion {
+        id
+        name
+      }
+      status
+      createdDate
+      finishedDate
+    }
+    deployments(limit: 1) {
+      id
+      status
+      createdDate
+      finishedDate
+    }
+  }
+}
+    `);
+
+export const useAppInstanceDeploymentSummaryQuery = <
+      TData = AppInstanceDeploymentSummaryQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceDeploymentSummaryQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceDeploymentSummaryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceDeploymentSummaryQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceDeploymentSummaryQuery, TError, TData>(
+      {
+    queryKey: ['appInstanceDeploymentSummary', variables],
+    queryFn: fetcher<AppInstanceDeploymentSummaryQuery, AppInstanceDeploymentSummaryQueryVariables>(AppInstanceDeploymentSummaryDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceGrantsDocument = new TypedDocumentString(`
+    query appInstanceGrants($workspaceId: ID!, $appInstanceId: ID!) {
+  appInstanceGrants(workspaceId: $workspaceId, appInstanceId: $appInstanceId)
+}
+    `);
+
+export const useAppInstanceGrantsQuery = <
+      TData = AppInstanceGrantsQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceGrantsQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceGrantsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceGrantsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceGrantsQuery, TError, TData>(
+      {
+    queryKey: ['appInstanceGrants', variables],
+    queryFn: fetcher<AppInstanceGrantsQuery, AppInstanceGrantsQueryVariables>(AppInstanceGrantsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppInstanceVersionsDocument = new TypedDocumentString(`
+    query appInstanceVersions($appInstanceId: ID!, $limit: Int) {
+  appInstanceVersions(appInstanceId: $appInstanceId, limit: $limit) {
+    id
+    appId
+    name
+    gitRef
+    gitCommitSha
+    description
+    createdBy
+    createdDate
+  }
+}
+    `);
+
+export const useAppInstanceVersionsQuery = <
+      TData = AppInstanceVersionsQuery,
+      TError = unknown
+    >(
+      variables: AppInstanceVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppInstanceVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppInstanceVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppInstanceVersionsQuery, TError, TData>(
+      {
+    queryKey: ['appInstanceVersions', variables],
+    queryFn: fetcher<AppInstanceVersionsQuery, AppInstanceVersionsQueryVariables>(AppInstanceVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppUserAuthAvailableDocument = new TypedDocumentString(`
+    query appUserAuthAvailable($workspaceId: ID!) {
+  appUserAuthAvailable(workspaceId: $workspaceId)
+}
+    `);
+
+export const useAppUserAuthAvailableQuery = <
+      TData = AppUserAuthAvailableQuery,
+      TError = unknown
+    >(
+      variables: AppUserAuthAvailableQueryVariables,
+      options?: Omit<UseQueryOptions<AppUserAuthAvailableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppUserAuthAvailableQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppUserAuthAvailableQuery, TError, TData>(
+      {
+    queryKey: ['appUserAuthAvailable', variables],
+    queryFn: fetcher<AppUserAuthAvailableQuery, AppUserAuthAvailableQueryVariables>(AppUserAuthAvailableDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppWorkflowsDocument = new TypedDocumentString(`
+    query appWorkflows($appInstanceId: ID!) {
+  appWorkflows(appInstanceId: $appInstanceId) {
+    id
+    appInstanceId
+    workflowKey
+    projectDeploymentId
+    projectDeploymentName
+    workflowUuid
+    workflowName
+    available
+  }
+}
+    `);
+
+export const useAppWorkflowsQuery = <
+      TData = AppWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: AppWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<AppWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['appWorkflows', variables],
+    queryFn: fetcher<AppWorkflowsQuery, AppWorkflowsQueryVariables>(AppWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppsDocument = new TypedDocumentString(`
+    query apps($workspaceId: ID!) {
+  apps(workspaceId: $workspaceId) {
+    id
+    uuid
+    name
+    description
+    categoryId
+    hasIcon
+    portalDiscoverable
+    workspaceId
+    ownerUserId
+    status
+    visibility
+    instances {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+    foreignInstances {
+      id
+      name
+      workspaceId
+      environmentId
+      status
+      currentAppDeploymentId
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useAppsQuery = <
+      TData = AppsQuery,
+      TError = unknown
+    >(
+      variables: AppsQueryVariables,
+      options?: Omit<UseQueryOptions<AppsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppsQuery, TError, TData>(
+      {
+    queryKey: ['apps', variables],
+    queryFn: fetcher<AppsQuery, AppsQueryVariables>(AppsDocument, variables),
+    ...options
+  }
+    )};
+
+export const BindAppApiCollectionDocument = new TypedDocumentString(`
+    mutation bindAppApiCollection($appInstanceId: ID!, $apiCollectionId: ID!) {
+  bindAppApiCollection(
+    appInstanceId: $appInstanceId
+    apiCollectionId: $apiCollectionId
+  ) {
+    id
+    appInstanceId
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useBindAppApiCollectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppApiCollectionMutation, TError, BindAppApiCollectionMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppApiCollectionMutation, TError, BindAppApiCollectionMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppApiCollection'],
+    mutationFn: (variables?: BindAppApiCollectionMutationVariables) => fetcher<BindAppApiCollectionMutation, BindAppApiCollectionMutationVariables>(BindAppApiCollectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const BindAppConnectionDocument = new TypedDocumentString(`
+    mutation bindAppConnection($appInstanceId: ID!, $input: AppBindingInput!) {
+  bindAppConnection(appInstanceId: $appInstanceId, input: $input) {
+    id
+    appInstanceId
+    bindingKey
+    connectionId
+    connectionName
+    componentName
+    connectionVersion
+    componentVersion
+    actionNames
+    toolNames
+    proxyEnabled
+    proxyAllowedMethods
+  }
+}
+    `);
+
+export const useBindAppConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppConnectionMutation, TError, BindAppConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppConnectionMutation, TError, BindAppConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppConnection'],
+    mutationFn: (variables?: BindAppConnectionMutationVariables) => fetcher<BindAppConnectionMutation, BindAppConnectionMutationVariables>(BindAppConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const BindAppWorkflowDocument = new TypedDocumentString(`
+    mutation bindAppWorkflow($appInstanceId: ID!, $input: AppWorkflowBindingInput!) {
+  bindAppWorkflow(appInstanceId: $appInstanceId, input: $input) {
+    id
+    appInstanceId
+    workflowKey
+    projectDeploymentId
+    projectDeploymentName
+    workflowUuid
+    workflowName
+    available
+  }
+}
+    `);
+
+export const useBindAppWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppWorkflowMutation, TError, BindAppWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppWorkflowMutation, TError, BindAppWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppWorkflow'],
+    mutationFn: (variables?: BindAppWorkflowMutationVariables) => fetcher<BindAppWorkflowMutation, BindAppWorkflowMutationVariables>(BindAppWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CancelAppDeploymentDocument = new TypedDocumentString(`
+    mutation cancelAppDeployment($appInstanceId: ID!, $appDeploymentId: ID!) {
+  cancelAppDeployment(
+    appInstanceId: $appInstanceId
+    appDeploymentId: $appDeploymentId
+  ) {
+    id
+    appInstanceId
+    status
+  }
+}
+    `);
+
+export const useCancelAppDeploymentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CancelAppDeploymentMutation, TError, CancelAppDeploymentMutationVariables, TContext>) => {
+    
+    return useMutation<CancelAppDeploymentMutation, TError, CancelAppDeploymentMutationVariables, TContext>(
+      {
+    mutationKey: ['cancelAppDeployment'],
+    mutationFn: (variables?: CancelAppDeploymentMutationVariables) => fetcher<CancelAppDeploymentMutation, CancelAppDeploymentMutationVariables>(CancelAppDeploymentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAppDocument = new TypedDocumentString(`
+    mutation createApp($workspaceId: ID!, $environmentId: ID!, $input: AppInput!) {
+  createApp(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    input: $input
+  ) {
+    secretKey
+    appInstance {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+  }
+}
+    `);
+
+export const useCreateAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAppMutation, TError, CreateAppMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAppMutation, TError, CreateAppMutationVariables, TContext>(
+      {
+    mutationKey: ['createApp'],
+    mutationFn: (variables?: CreateAppMutationVariables) => fetcher<CreateAppMutation, CreateAppMutationVariables>(CreateAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAppInstanceDocument = new TypedDocumentString(`
+    mutation createAppInstance($appId: ID!, $workspaceId: ID!, $environmentId: ID!, $input: AppInstanceInput!) {
+  createAppInstance(
+    appId: $appId
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    input: $input
+  ) {
+    secretKey
+    appInstance {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+  }
+}
+    `);
+
+export const useCreateAppInstanceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAppInstanceMutation, TError, CreateAppInstanceMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAppInstanceMutation, TError, CreateAppInstanceMutationVariables, TContext>(
+      {
+    mutationKey: ['createAppInstance'],
+    mutationFn: (variables?: CreateAppInstanceMutationVariables) => fetcher<CreateAppInstanceMutation, CreateAppInstanceMutationVariables>(CreateAppInstanceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAppDocument = new TypedDocumentString(`
+    mutation deleteApp($id: ID!) {
+  deleteApp(id: $id)
+}
+    `);
+
+export const useDeleteAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAppMutation, TError, DeleteAppMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAppMutation, TError, DeleteAppMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteApp'],
+    mutationFn: (variables?: DeleteAppMutationVariables) => fetcher<DeleteAppMutation, DeleteAppMutationVariables>(DeleteAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAppInstanceDocument = new TypedDocumentString(`
+    mutation deleteAppInstance($id: ID!) {
+  deleteAppInstance(id: $id)
+}
+    `);
+
+export const useDeleteAppInstanceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAppInstanceMutation, TError, DeleteAppInstanceMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAppInstanceMutation, TError, DeleteAppInstanceMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAppInstance'],
+    mutationFn: (variables?: DeleteAppInstanceMutationVariables) => fetcher<DeleteAppInstanceMutation, DeleteAppInstanceMutationVariables>(DeleteAppInstanceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeployAppInstanceDocument = new TypedDocumentString(`
+    mutation deployAppInstance($appInstanceId: ID!, $appVersionId: ID!) {
+  deployAppInstance(appInstanceId: $appInstanceId, appVersionId: $appVersionId) {
+    id
+    appInstanceId
+    status
+  }
+}
+    `);
+
+export const useDeployAppInstanceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeployAppInstanceMutation, TError, DeployAppInstanceMutationVariables, TContext>) => {
+    
+    return useMutation<DeployAppInstanceMutation, TError, DeployAppInstanceMutationVariables, TContext>(
+      {
+    mutationKey: ['deployAppInstance'],
+    mutationFn: (variables?: DeployAppInstanceMutationVariables) => fetcher<DeployAppInstanceMutation, DeployAppInstanceMutationVariables>(DeployAppInstanceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GrantAppInstanceAccessDocument = new TypedDocumentString(`
+    mutation grantAppInstanceAccess($workspaceId: ID!, $appInstanceId: ID!, $userId: ID!) {
+  grantAppInstanceAccess(
+    workspaceId: $workspaceId
+    appInstanceId: $appInstanceId
+    userId: $userId
+  )
+}
+    `);
+
+export const useGrantAppInstanceAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GrantAppInstanceAccessMutation, TError, GrantAppInstanceAccessMutationVariables, TContext>) => {
+    
+    return useMutation<GrantAppInstanceAccessMutation, TError, GrantAppInstanceAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['grantAppInstanceAccess'],
+    mutationFn: (variables?: GrantAppInstanceAccessMutationVariables) => fetcher<GrantAppInstanceAccessMutation, GrantAppInstanceAccessMutationVariables>(GrantAppInstanceAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const HostedAppInstancesDocument = new TypedDocumentString(`
+    query hostedAppInstances($workspaceId: ID!, $environmentId: ID!) {
+  hostedAppInstances(workspaceId: $workspaceId, environmentId: $environmentId) {
+    id
+    uuid
+    app {
+      id
+      name
+      description
+      status
+    }
+    workspaceId
+    environmentId
+    name
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    secretKeyHint
+    secretKeyLastUsedDate
+    userAuthMode
+    currentAppDeploymentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useHostedAppInstancesQuery = <
+      TData = HostedAppInstancesQuery,
+      TError = unknown
+    >(
+      variables: HostedAppInstancesQueryVariables,
+      options?: Omit<UseQueryOptions<HostedAppInstancesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<HostedAppInstancesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<HostedAppInstancesQuery, TError, TData>(
+      {
+    queryKey: ['hostedAppInstances', variables],
+    queryFn: fetcher<HostedAppInstancesQuery, HostedAppInstancesQueryVariables>(HostedAppInstancesDocument, variables),
+    ...options
+  }
+    )};
+
+export const PortalAppsDocument = new TypedDocumentString(`
+    query portalApps($environmentId: ID!) {
+  portalApps(environmentId: $environmentId) {
+    id
+    name
+    description
+    categoryId
+    categoryName
+    hasIcon
+    favorite
+    lastUsedDate
+    instances {
+      id
+      name
+      workspaceId
+      workspaceName
+      url
+      lastUsedDate
+      useCount
+    }
+  }
+}
+    `);
+
+export const usePortalAppsQuery = <
+      TData = PortalAppsQuery,
+      TError = unknown
+    >(
+      variables: PortalAppsQueryVariables,
+      options?: Omit<UseQueryOptions<PortalAppsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PortalAppsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<PortalAppsQuery, TError, TData>(
+      {
+    queryKey: ['portalApps', variables],
+    queryFn: fetcher<PortalAppsQuery, PortalAppsQueryVariables>(PortalAppsDocument, variables),
+    ...options
+  }
+    )};
+
+export const RecordAppLaunchDocument = new TypedDocumentString(`
+    mutation recordAppLaunch($appInstanceId: ID!) {
+  recordAppLaunch(appInstanceId: $appInstanceId)
+}
+    `);
+
+export const useRecordAppLaunchMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RecordAppLaunchMutation, TError, RecordAppLaunchMutationVariables, TContext>) => {
+    
+    return useMutation<RecordAppLaunchMutation, TError, RecordAppLaunchMutationVariables, TContext>(
+      {
+    mutationKey: ['recordAppLaunch'],
+    mutationFn: (variables?: RecordAppLaunchMutationVariables) => fetcher<RecordAppLaunchMutation, RecordAppLaunchMutationVariables>(RecordAppLaunchDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RevokeAppInstanceAccessDocument = new TypedDocumentString(`
+    mutation revokeAppInstanceAccess($workspaceId: ID!, $appInstanceId: ID!, $userId: ID!) {
+  revokeAppInstanceAccess(
+    workspaceId: $workspaceId
+    appInstanceId: $appInstanceId
+    userId: $userId
+  )
+}
+    `);
+
+export const useRevokeAppInstanceAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeAppInstanceAccessMutation, TError, RevokeAppInstanceAccessMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeAppInstanceAccessMutation, TError, RevokeAppInstanceAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['revokeAppInstanceAccess'],
+    mutationFn: (variables?: RevokeAppInstanceAccessMutationVariables) => fetcher<RevokeAppInstanceAccessMutation, RevokeAppInstanceAccessMutationVariables>(RevokeAppInstanceAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RollbackAppInstanceDocument = new TypedDocumentString(`
+    mutation rollbackAppInstance($appInstanceId: ID!, $appVersionId: ID!) {
+  rollbackAppInstance(appInstanceId: $appInstanceId, appVersionId: $appVersionId) {
+    id
+    appInstanceId
+    status
+  }
+}
+    `);
+
+export const useRollbackAppInstanceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RollbackAppInstanceMutation, TError, RollbackAppInstanceMutationVariables, TContext>) => {
+    
+    return useMutation<RollbackAppInstanceMutation, TError, RollbackAppInstanceMutationVariables, TContext>(
+      {
+    mutationKey: ['rollbackAppInstance'],
+    mutationFn: (variables?: RollbackAppInstanceMutationVariables) => fetcher<RollbackAppInstanceMutation, RollbackAppInstanceMutationVariables>(RollbackAppInstanceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RotateAppInstanceSecretKeyDocument = new TypedDocumentString(`
+    mutation rotateAppInstanceSecretKey($id: ID!) {
+  rotateAppInstanceSecretKey(id: $id) {
+    secretKey
+    appInstance {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+  }
+}
+    `);
+
+export const useRotateAppInstanceSecretKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RotateAppInstanceSecretKeyMutation, TError, RotateAppInstanceSecretKeyMutationVariables, TContext>) => {
+    
+    return useMutation<RotateAppInstanceSecretKeyMutation, TError, RotateAppInstanceSecretKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['rotateAppInstanceSecretKey'],
+    mutationFn: (variables?: RotateAppInstanceSecretKeyMutationVariables) => fetcher<RotateAppInstanceSecretKeyMutation, RotateAppInstanceSecretKeyMutationVariables>(RotateAppInstanceSecretKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAppFavoriteDocument = new TypedDocumentString(`
+    mutation setAppFavorite($appId: ID!, $favorite: Boolean!) {
+  setAppFavorite(appId: $appId, favorite: $favorite)
+}
+    `);
+
+export const useSetAppFavoriteMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAppFavoriteMutation, TError, SetAppFavoriteMutationVariables, TContext>) => {
+    
+    return useMutation<SetAppFavoriteMutation, TError, SetAppFavoriteMutationVariables, TContext>(
+      {
+    mutationKey: ['setAppFavorite'],
+    mutationFn: (variables?: SetAppFavoriteMutationVariables) => fetcher<SetAppFavoriteMutation, SetAppFavoriteMutationVariables>(SetAppFavoriteDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAppInstanceVisibilityDocument = new TypedDocumentString(`
+    mutation setAppInstanceVisibility($workspaceId: ID!, $appInstanceId: ID!, $visibility: ResourceVisibility!) {
+  setAppInstanceVisibility(
+    workspaceId: $workspaceId
+    appInstanceId: $appInstanceId
+    visibility: $visibility
+  )
+}
+    `);
+
+export const useSetAppInstanceVisibilityMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAppInstanceVisibilityMutation, TError, SetAppInstanceVisibilityMutationVariables, TContext>) => {
+    
+    return useMutation<SetAppInstanceVisibilityMutation, TError, SetAppInstanceVisibilityMutationVariables, TContext>(
+      {
+    mutationKey: ['setAppInstanceVisibility'],
+    mutationFn: (variables?: SetAppInstanceVisibilityMutationVariables) => fetcher<SetAppInstanceVisibilityMutation, SetAppInstanceVisibilityMutationVariables>(SetAppInstanceVisibilityDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAppVisibilityDocument = new TypedDocumentString(`
+    mutation setAppVisibility($workspaceId: ID!, $appId: ID!, $visibility: ResourceVisibility!) {
+  setAppVisibility(
+    workspaceId: $workspaceId
+    appId: $appId
+    visibility: $visibility
+  )
+}
+    `);
+
+export const useSetAppVisibilityMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAppVisibilityMutation, TError, SetAppVisibilityMutationVariables, TContext>) => {
+    
+    return useMutation<SetAppVisibilityMutation, TError, SetAppVisibilityMutationVariables, TContext>(
+      {
+    mutationKey: ['setAppVisibility'],
+    mutationFn: (variables?: SetAppVisibilityMutationVariables) => fetcher<SetAppVisibilityMutation, SetAppVisibilityMutationVariables>(SetAppVisibilityDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppApiCollectionDocument = new TypedDocumentString(`
+    mutation unbindAppApiCollection($appInstanceId: ID!, $apiCollectionId: ID!) {
+  unbindAppApiCollection(
+    appInstanceId: $appInstanceId
+    apiCollectionId: $apiCollectionId
+  )
+}
+    `);
+
+export const useUnbindAppApiCollectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppApiCollectionMutation, TError, UnbindAppApiCollectionMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppApiCollectionMutation, TError, UnbindAppApiCollectionMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppApiCollection'],
+    mutationFn: (variables?: UnbindAppApiCollectionMutationVariables) => fetcher<UnbindAppApiCollectionMutation, UnbindAppApiCollectionMutationVariables>(UnbindAppApiCollectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppConnectionDocument = new TypedDocumentString(`
+    mutation unbindAppConnection($appInstanceId: ID!, $bindingKey: String!) {
+  unbindAppConnection(appInstanceId: $appInstanceId, bindingKey: $bindingKey)
+}
+    `);
+
+export const useUnbindAppConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppConnectionMutation, TError, UnbindAppConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppConnectionMutation, TError, UnbindAppConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppConnection'],
+    mutationFn: (variables?: UnbindAppConnectionMutationVariables) => fetcher<UnbindAppConnectionMutation, UnbindAppConnectionMutationVariables>(UnbindAppConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppWorkflowDocument = new TypedDocumentString(`
+    mutation unbindAppWorkflow($appInstanceId: ID!, $workflowKey: String!) {
+  unbindAppWorkflow(appInstanceId: $appInstanceId, workflowKey: $workflowKey)
+}
+    `);
+
+export const useUnbindAppWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppWorkflowMutation, TError, UnbindAppWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppWorkflowMutation, TError, UnbindAppWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppWorkflow'],
+    mutationFn: (variables?: UnbindAppWorkflowMutationVariables) => fetcher<UnbindAppWorkflowMutation, UnbindAppWorkflowMutationVariables>(UnbindAppWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppDocument = new TypedDocumentString(`
+    mutation updateApp($id: ID!, $input: AppUpdateInput!) {
+  updateApp(id: $id, input: $input) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    ownerUserId
+    status
+    visibility
+    instances {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+    foreignInstances {
+      id
+      name
+      workspaceId
+      environmentId
+      status
+      currentAppDeploymentId
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppMutation, TError, UpdateAppMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppMutation, TError, UpdateAppMutationVariables, TContext>(
+      {
+    mutationKey: ['updateApp'],
+    mutationFn: (variables?: UpdateAppMutationVariables) => fetcher<UpdateAppMutation, UpdateAppMutationVariables>(UpdateAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppInstanceDocument = new TypedDocumentString(`
+    mutation updateAppInstance($id: ID!, $input: AppInstanceUpdateInput!) {
+  updateAppInstance(id: $id, input: $input) {
+    id
+    uuid
+    app {
+      id
+      name
+      description
+      status
+    }
+    workspaceId
+    environmentId
+    name
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    secretKeyHint
+    secretKeyLastUsedDate
+    userAuthMode
+    currentAppDeploymentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateAppInstanceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppInstanceMutation, TError, UpdateAppInstanceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppInstanceMutation, TError, UpdateAppInstanceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppInstance'],
+    mutationFn: (variables?: UpdateAppInstanceMutationVariables) => fetcher<UpdateAppInstanceMutation, UpdateAppInstanceMutationVariables>(UpdateAppInstanceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppInstanceConfigurationDocument = new TypedDocumentString(`
+    mutation updateAppInstanceConfiguration($id: ID!, $configuration: Map!) {
+  updateAppInstanceConfiguration(id: $id, configuration: $configuration) {
+    id
+    configuration
+  }
+}
+    `);
+
+export const useUpdateAppInstanceConfigurationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppInstanceConfigurationMutation, TError, UpdateAppInstanceConfigurationMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppInstanceConfigurationMutation, TError, UpdateAppInstanceConfigurationMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppInstanceConfiguration'],
+    mutationFn: (variables?: UpdateAppInstanceConfigurationMutationVariables) => fetcher<UpdateAppInstanceConfigurationMutation, UpdateAppInstanceConfigurationMutationVariables>(UpdateAppInstanceConfigurationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppInstanceDeploymentSettingsDocument = new TypedDocumentString(`
+    mutation updateAppInstanceDeploymentSettings($id: ID!, $input: AppInstanceDeploymentSettingsInput!) {
+  updateAppInstanceDeploymentSettings(id: $id, input: $input) {
+    id
+    deploymentConnectionId
+    deploymentSettings
+  }
+}
+    `);
+
+export const useUpdateAppInstanceDeploymentSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppInstanceDeploymentSettingsMutation, TError, UpdateAppInstanceDeploymentSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppInstanceDeploymentSettingsMutation, TError, UpdateAppInstanceDeploymentSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppInstanceDeploymentSettings'],
+    mutationFn: (variables?: UpdateAppInstanceDeploymentSettingsMutationVariables) => fetcher<UpdateAppInstanceDeploymentSettingsMutation, UpdateAppInstanceDeploymentSettingsMutationVariables>(UpdateAppInstanceDeploymentSettingsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppInstanceStatusDocument = new TypedDocumentString(`
+    mutation updateAppInstanceStatus($id: ID!, $status: AppInstanceStatus!) {
+  updateAppInstanceStatus(id: $id, status: $status) {
+    id
+    uuid
+    app {
+      id
+      name
+      description
+      status
+    }
+    workspaceId
+    environmentId
+    name
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    secretKeyHint
+    secretKeyLastUsedDate
+    userAuthMode
+    currentAppDeploymentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateAppInstanceStatusMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppInstanceStatusMutation, TError, UpdateAppInstanceStatusMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppInstanceStatusMutation, TError, UpdateAppInstanceStatusMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppInstanceStatus'],
+    mutationFn: (variables?: UpdateAppInstanceStatusMutationVariables) => fetcher<UpdateAppInstanceStatusMutation, UpdateAppInstanceStatusMutationVariables>(UpdateAppInstanceStatusDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppInstanceUserAuthDocument = new TypedDocumentString(`
+    mutation updateAppInstanceUserAuth($id: ID!, $userAuthMode: AppUserAuthMode!) {
+  updateAppInstanceUserAuth(id: $id, userAuthMode: $userAuthMode) {
+    id
+    uuid
+    app {
+      id
+      name
+      description
+      status
+    }
+    workspaceId
+    environmentId
+    name
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    secretKeyHint
+    secretKeyLastUsedDate
+    userAuthMode
+    currentAppDeploymentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateAppInstanceUserAuthMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppInstanceUserAuthMutation, TError, UpdateAppInstanceUserAuthMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppInstanceUserAuthMutation, TError, UpdateAppInstanceUserAuthMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppInstanceUserAuth'],
+    mutationFn: (variables?: UpdateAppInstanceUserAuthMutationVariables) => fetcher<UpdateAppInstanceUserAuthMutation, UpdateAppInstanceUserAuthMutationVariables>(UpdateAppInstanceUserAuthDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppStatusDocument = new TypedDocumentString(`
+    mutation updateAppStatus($id: ID!, $status: AppStatus!) {
+  updateAppStatus(id: $id, status: $status) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    ownerUserId
+    status
+    visibility
+    instances {
+      id
+      uuid
+      app {
+        id
+        name
+        description
+        status
+      }
+      workspaceId
+      environmentId
+      name
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      secretKeyHint
+      secretKeyLastUsedDate
+      userAuthMode
+      currentAppDeploymentId
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+      version
+    }
+    foreignInstances {
+      id
+      name
+      workspaceId
+      environmentId
+      status
+      currentAppDeploymentId
+    }
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+    version
+  }
+}
+    `);
+
+export const useUpdateAppStatusMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppStatusMutation, TError, UpdateAppStatusMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppStatusMutation, TError, UpdateAppStatusMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppStatus'],
+    mutationFn: (variables?: UpdateAppStatusMutationVariables) => fetcher<UpdateAppStatusMutation, UpdateAppStatusMutationVariables>(UpdateAppStatusDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ApprovalTaskDocument = new TypedDocumentString(`
     query approvalTask($id: ID!) {
   approvalTask(id: $id) {
@@ -6884,18 +8847,6 @@ export const ToolEligibleWorkflowPropertiesDocument = new TypedDocumentString(`
 }
     `);
 
-export const UnresolvedConnectionsDocument = new TypedDocumentString(`
-    query unresolvedConnections($workspaceId: ID!, $userLogin: String!) {
-  unresolvedConnections(workspaceId: $workspaceId, userLogin: $userLogin) {
-    connectionId
-    connectionName
-    visibility
-    environmentId
-    dependentWorkflowCount
-  }
-}
-    `);
-
 export const useToolEligibleWorkflowPropertiesQuery = <
       TData = ToolEligibleWorkflowPropertiesQuery,
       TError = unknown
@@ -6908,6 +8859,22 @@ export const useToolEligibleWorkflowPropertiesQuery = <
       {
     queryKey: ['toolEligibleWorkflowProperties', variables],
     queryFn: fetcher<ToolEligibleWorkflowPropertiesQuery, ToolEligibleWorkflowPropertiesQueryVariables>(ToolEligibleWorkflowPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const UnresolvedConnectionsDocument = new TypedDocumentString(`
+    query unresolvedConnections($workspaceId: ID!, $userLogin: String!) {
+  unresolvedConnections(workspaceId: $workspaceId, userLogin: $userLogin) {
+    connectionId
+    connectionName
+    visibility
+    environmentId
+    dependentWorkflowCount
+  }
+}
+    `);
+
 export const useUnresolvedConnectionsQuery = <
       TData = UnresolvedConnectionsQuery,
       TError = unknown
@@ -8624,22 +10591,6 @@ export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
 }
     `);
 
-export const AddEmbeddedUserDocument = new TypedDocumentString(`
-    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
-  addEmbeddedUser(userId: $userId, role: $role) {
-    id
-    userId
-    embeddedRole
-    customRoleId
-    user {
-      email
-      firstName
-      lastName
-    }
-  }
-}
-    `);
-
 export const useEmbeddedAiAutoMemoriesQuery = <
       TData = EmbeddedAiAutoMemoriesQuery,
       TError = unknown
@@ -8705,6 +10656,22 @@ export const useUpdateEmbeddedAiAutoMemoryMutation = <
     ...options
   }
     )};
+
+export const AddEmbeddedUserDocument = new TypedDocumentString(`
+    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
+  addEmbeddedUser(userId: $userId, role: $role) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
 
 export const useAddEmbeddedUserMutation = <
       TError = unknown,
@@ -11582,6 +13549,35 @@ export const useRestoreAutomationProjectVersionMutation = <
   }
     )};
 
+export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
+  setEmbeddedUserEnvironmentRole(
+    userId: $userId
+    environment: $environment
+    role: $role
+  ) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    environment
+  }
+}
+    `);
+
+export const useSetEmbeddedUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['SetEmbeddedUserEnvironmentRole'],
+    mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
     query toolEligibleAutomationProjectConfigurationWorkflowProperties($automationProjectConfigurationId: ID!, $workflowUuid: String!) {
   toolEligibleAutomationProjectConfigurationWorkflowProperties(
@@ -11727,22 +13723,6 @@ export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocumen
         }
       }
     }
-  }
-}
-    `);
-
-export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
-    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
-  setEmbeddedUserEnvironmentRole(
-    userId: $userId
-    environment: $environment
-    role: $role
-  ) {
-    id
-    userId
-    embeddedRole
-    customRoleId
-    environment
   }
 }
     `);
@@ -11924,19 +13904,6 @@ export const useToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQu
       {
     queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflowProperties', variables],
     queryFn: fetcher<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables>(ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
-export const useSetEmbeddedUserEnvironmentRoleMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
-    
-    return useMutation<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
-      {
-    mutationKey: ['SetEmbeddedUserEnvironmentRole'],
-    mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
     ...options
   }
     )};
@@ -12432,7 +14399,7 @@ export const useUpgradeAutomationProjectConfigurationConnectedUsersMutation = <
     )};
 
 export const ExternalInvocationLogsDocument = new TypedDocumentString(`
-    query ExternalInvocationLogs($type: PlatformType!, $environmentId: ID, $source: String, $status: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+    query ExternalInvocationLogs($type: PlatformType!, $environmentId: ID, $source: String, $status: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $appId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
   externalInvocationLogs(
     type: $type
     environmentId: $environmentId
@@ -12442,6 +14409,7 @@ export const ExternalInvocationLogsDocument = new TypedDocumentString(`
     a2aServerId: $a2aServerId
     connectedUserId: $connectedUserId
     integrationInstanceId: $integrationInstanceId
+    appId: $appId
     fromDate: $fromDate
     toDate: $toDate
     page: $page
@@ -12462,6 +14430,7 @@ export const ExternalInvocationLogsDocument = new TypedDocumentString(`
       mcpServerId
       a2aServerId
       jobId
+      appId
       workflowName
       status
       errorType
@@ -12494,7 +14463,7 @@ export const useExternalInvocationLogsQuery = <
     )};
 
 export const WorkspaceExternalInvocationLogsDocument = new TypedDocumentString(`
-    query WorkspaceExternalInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $source: String, $status: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+    query WorkspaceExternalInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $source: String, $status: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $appId: Long, $appInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
   workspaceExternalInvocationLogs(
     type: $type
     workspaceId: $workspaceId
@@ -12505,6 +14474,8 @@ export const WorkspaceExternalInvocationLogsDocument = new TypedDocumentString(`
     a2aServerId: $a2aServerId
     connectedUserId: $connectedUserId
     integrationInstanceId: $integrationInstanceId
+    appId: $appId
+    appInstanceId: $appInstanceId
     fromDate: $fromDate
     toDate: $toDate
     page: $page
@@ -12525,6 +14496,10 @@ export const WorkspaceExternalInvocationLogsDocument = new TypedDocumentString(`
       mcpServerId
       a2aServerId
       jobId
+      appId
+      appInstanceId
+      userId
+      userName
       workflowName
       status
       errorType
