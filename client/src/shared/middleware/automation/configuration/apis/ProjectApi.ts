@@ -48,6 +48,11 @@ export interface DeleteProjectRequest {
     id: number;
 }
 
+export interface DeleteProjectVersionRequest {
+    id: number;
+    projectVersion: number;
+}
+
 export interface DuplicateProjectRequest {
     /**
      * The id of a project.
@@ -127,6 +132,11 @@ export interface PublishProjectOperationRequest {
      * 
      */
     publishProjectRequest?: PublishProjectRequest;
+}
+
+export interface RestoreProjectVersionRequest {
+    id: number;
+    projectVersion: number;
 }
 
 export interface UpdateProjectRequest {
@@ -242,6 +252,60 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async deleteProject(requestParameters: DeleteProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteProjectRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for deleteProjectVersion without sending the request
+     */
+    async deleteProjectVersionRequestOpts(requestParameters: DeleteProjectVersionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteProjectVersion().'
+            );
+        }
+
+        if (requestParameters['projectVersion'] == null) {
+            throw new runtime.RequiredError(
+                'projectVersion',
+                'Required parameter "projectVersion" was null or undefined when calling deleteProjectVersion().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/projects/{id}/versions/{projectVersion}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{projectVersion}', encodeURIComponent(String(requestParameters['projectVersion'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Deletes a published project version.
+     * Deletes a published project version.
+     */
+    async deleteProjectVersionRaw(requestParameters: DeleteProjectVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteProjectVersionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deletes a published project version.
+     * Deletes a published project version.
+     */
+    async deleteProjectVersion(requestParameters: DeleteProjectVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteProjectVersionRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -629,6 +693,60 @@ export class ProjectApi extends runtime.BaseAPI {
      */
     async publishProject(requestParameters: PublishProjectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.publishProjectRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for restoreProjectVersion without sending the request
+     */
+    async restoreProjectVersionRequestOpts(requestParameters: RestoreProjectVersionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling restoreProjectVersion().'
+            );
+        }
+
+        if (requestParameters['projectVersion'] == null) {
+            throw new runtime.RequiredError(
+                'projectVersion',
+                'Required parameter "projectVersion" was null or undefined when calling restoreProjectVersion().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/projects/{id}/versions/{projectVersion}/restore`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{projectVersion}', encodeURIComponent(String(requestParameters['projectVersion'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Replaces the draft workflows of a project with the workflows of a published project version.
+     * Restores a published project version into the draft.
+     */
+    async restoreProjectVersionRaw(requestParameters: RestoreProjectVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.restoreProjectVersionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the draft workflows of a project with the workflows of a published project version.
+     * Restores a published project version into the draft.
+     */
+    async restoreProjectVersion(requestParameters: RestoreProjectVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.restoreProjectVersionRaw(requestParameters, initOverrides);
     }
 
     /**
