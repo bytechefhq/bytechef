@@ -12,7 +12,21 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {KeyIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
-const ApiKeysContent = ({description, title}: {description: string; title: string}) => {
+interface ApiKeysContentProps {
+    canCreate?: boolean;
+    canDelete?: boolean;
+    canEdit?: boolean;
+    description: string;
+    title: string;
+}
+
+const ApiKeysContent = ({
+    canCreate: canCreateProp = true,
+    canDelete: canDeleteProp = true,
+    canEdit: canEditProp = true,
+    description,
+    title,
+}: ApiKeysContentProps) => {
     const {setShowEditDialog, showDeleteDialog, showEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setShowEditDialog: state.setShowEditDialog,
@@ -25,9 +39,12 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
 
     const {permissions} = useApiKeysProvider();
 
-    const canCreate = permissions?.canCreate ?? true;
+    const canCreate = (permissions?.canCreate ?? true) && canCreateProp;
     const canManage = permissions?.canManage ?? true;
     const canView = permissions?.canView ?? true;
+
+    const canDelete = canManage && canDeleteProp;
+    const canEdit = canManage && canEditProp;
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading || !!permissions?.loading}>
@@ -54,7 +71,7 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                         title="No Access"
                     />
                 ) : apiKeys && apiKeys.length > 0 ? (
-                    <ApiKeyTable apiKeys={apiKeys} canManage={canManage} />
+                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} canEdit={canEdit} />
                 ) : (
                     <EmptyList
                         button={

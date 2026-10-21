@@ -12,6 +12,7 @@ import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useMemo} from 'react';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
@@ -30,6 +31,9 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
     integrationVersion,
     mcpIntegrationInstanceConfigurationWorkflow,
 }: McpIntegrationInstanceConfigurationWorkflowListItemProps) => {
+    const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
@@ -93,21 +97,25 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
                             workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                         />
 
-                        <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
+                        {canEditConfiguration && (
+                            <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
+                        )}
 
                         <Switch
                             aria-label={`Enable ${workflowLabel}`}
                             checked={mcpIntegrationInstanceConfigurationWorkflow.enabled}
                             className="mr-2"
-                            disabled={isEnablePending}
+                            disabled={!canEditConfiguration || isEnablePending}
                             onCheckedChange={handleEnabledChange}
                         />
 
-                        <McpToolActionsMenu
-                            label={workflowLabel}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                        />
+                        {(canEditConfiguration || canDeleteConfiguration) && (
+                            <McpToolActionsMenu
+                                label={workflowLabel}
+                                onDeleteClick={canDeleteConfiguration ? () => setShowDeleteDialog(true) : undefined}
+                                onEditClick={canEditConfiguration ? () => setShowEditWorkflowDialog(true) : undefined}
+                            />
+                        )}
                     </div>
                 </PopoverAnchor>
 

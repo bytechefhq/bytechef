@@ -17,7 +17,7 @@ interface ConnectionListItemDropdownMenuProps {
 const ConnectionListItemDropdownMenu = ({children, onEditClick}: ConnectionListItemDropdownMenuProps) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
-            <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+            <Button aria-label="Connection actions" icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">

@@ -11,12 +11,24 @@ import {useShallow} from 'zustand/react/shallow';
 
 const columnHelper = createColumnHelper<typeof coreTableFeatures, ApiKey>();
 
+const OBFUSCATED_SECRET_KEY_PREFIX_LENGTH = 26;
+const VISIBLE_SECRET_KEY_LENGTH = 6;
+
+const getDisplayedSecretKey = (secretKey?: string | null) => {
+    if (!secretKey || secretKey.startsWith('.')) {
+        return secretKey ?? '';
+    }
+
+    return `${'.'.repeat(OBFUSCATED_SECRET_KEY_PREFIX_LENGTH)}${secretKey.slice(-VISIBLE_SECRET_KEY_LENGTH)}`;
+};
+
 interface ApiKeyTableProps {
     apiKeys: ApiKey[];
-    canManage?: boolean;
+    canDelete?: boolean;
+    canEdit?: boolean;
 }
 
-const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
+const ApiKeyTable = ({apiKeys, canDelete = true, canEdit = true}: ApiKeyTableProps) => {
     const {setCurrentApiKey, setShowDeleteDialog, setShowEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setCurrentApiKey: state.setCurrentApiKey,
@@ -33,7 +45,7 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                     header: 'Name',
                 }),
                 columnHelper.accessor('secretKey', {
-                    cell: (info) => info.getValue() ?? '',
+                    cell: (info) => getDisplayedSecretKey(info.getValue()),
                     header: 'Secret Key',
                 }),
                 columnHelper.accessor('createdDate', {
@@ -51,10 +63,11 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                     header: 'Created By',
                 }),
                 columnHelper.display({
-                    cell: (info) =>
-                        canManage && (
-                            <>
+                    cell: (info) => (
+                        <>
+                            {canEdit && (
                                 <Button
+                                    aria-label="Edit API Key"
                                     icon={<EditIcon className="size-4" />}
                                     onClick={() => {
                                         setCurrentApiKey(info.row.original);
@@ -63,8 +76,11 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                                     size="icon"
                                     variant="ghost"
                                 />
+                            )}
 
+                            {canDelete && (
                                 <Button
+                                    aria-label="Delete API Key"
                                     icon={<Trash2Icon className="h-4 text-destructive" />}
                                     onClick={() => {
                                         setCurrentApiKey(info.row.original);
@@ -73,13 +89,14 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                                     size="icon"
                                     variant="ghost"
                                 />
-                            </>
-                        ),
+                            )}
+                        </>
+                    ),
                     header: '',
                     id: 'actions',
                 }),
             ]),
-        [canManage, setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
+        [canDelete, canEdit, setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
     );
 
     const reactTable = useTable({

@@ -48,4 +48,33 @@ describe('ApiKeyTable', () => {
         expect(useApiKeysStore.getState().showDeleteDialog).toBe(true);
         expect(useApiKeysStore.getState().showEditDialog).toBe(false);
     });
+
+    it('hides the Edit button when canEdit is false', () => {
+        render(<ApiKeyTable apiKeys={[apiKey]} canEdit={false} />);
+
+        expect(screen.queryByRole('button', {name: 'Edit API Key'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Delete API Key'})).toBeInTheDocument();
+    });
+
+    it('hides the Delete button when canDelete is false', () => {
+        render(<ApiKeyTable apiKeys={[apiKey]} canDelete={false} />);
+
+        expect(screen.getByRole('button', {name: 'Edit API Key'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Delete API Key'})).not.toBeInTheDocument();
+    });
+
+    it('masks a secret key that arrives unobfuscated and keeps an obfuscated one as returned', () => {
+        render(
+            <ApiKeyTable
+                apiKeys={[
+                    {...apiKey, id: '1', secretKey: 'sk_live_plaintext_ab12cd'},
+                    {...apiKey, id: '2', name: 'Second key', secretKey: '....zz99yy'},
+                ]}
+            />
+        );
+
+        expect(screen.queryByText('sk_live_plaintext_ab12cd')).not.toBeInTheDocument();
+        expect(screen.getByText(`${'.'.repeat(26)}ab12cd`)).toBeInTheDocument();
+        expect(screen.getByText('....zz99yy')).toBeInTheDocument();
+    });
 });

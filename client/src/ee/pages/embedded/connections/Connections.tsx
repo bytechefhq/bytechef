@@ -16,6 +16,7 @@ import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -35,6 +36,8 @@ export const Connections = () => {
     const [searchParams] = useSearchParams();
 
     const environmentScopeNote = useEnvironmentScopeNote('Connections');
+
+    const canCreateConnection = useHasEmbeddedScope('CONNECTION_CREATE');
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
@@ -86,6 +89,7 @@ export const Connections = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateConnection &&
                         connections &&
                         connections.length > 0 &&
                         componentDefinitions && (
@@ -151,6 +155,7 @@ export const Connections = () => {
                 ) : (
                     <EmptyState
                         actions={
+                            canCreateConnection &&
                             componentDefinitions && (
                                 <ConnectionDialog
                                     componentDefinitions={componentDefinitions}

@@ -8,6 +8,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -32,6 +33,8 @@ const MCP_SERVER_STEPS = [
 ];
 
 const McpServers = () => {
+    const canCreateMcpServer = useHasEmbeddedScope('MCP_CREATE');
+
     const {
         allComponentNames,
         componentDefinitions,
@@ -62,6 +65,7 @@ const McpServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateMcpServer &&
                         validMcpServers.length > 0 && (
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
                         )
@@ -107,7 +111,12 @@ const McpServers = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
+                            canCreateMcpServer ? (
+                                <McpServerDialog
+                                    mcpServer={undefined}
+                                    triggerNode={<Button label="Create MCP Server" />}
+                                />
+                            ) : undefined
                         }
                         description="An MCP server lets AI assistants, like Claude or Cursor, call tools for your connected users. You choose which component actions and integration workflows it exposes as tools."
                         icon={<ServerIcon />}
