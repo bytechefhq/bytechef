@@ -1,17 +1,15 @@
-import '@/shared/styles/dropdownMenu.css';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import WorkflowNodeDeleteAlertDialog from '@/pages/platform/workflow-editor/components/WorkflowNodeDeleteAlertDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
 import {ReactNode, useCallback, useMemo, useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowNodeDropdownMenuProps {
@@ -116,21 +114,16 @@ const WorkflowNodeDropdownMenu = ({
 
                 <DropdownMenuContent
                     align="start"
-                    className="w-workflow-node-context-menu-width p-0"
+                    className="w-workflow-node-context-menu-width"
                     onCloseAutoFocus={(event) => event.preventDefault()}
                     side="right"
                 >
                     {menuItems.map((menuItem) =>
                         menuItem.type === 'separator' ? (
-                            <DropdownMenuSeparator className="m-0" key={menuItem.key} />
+                            <DropdownMenuSeparator key={menuItem.key} />
                         ) : (
                             <DropdownMenuItem
-                                className={twMerge(
-                                    menuItem.variant === 'destructive'
-                                        ? 'dropdown-menu-item-destructive'
-                                        : 'dropdown-menu-item',
-                                    menuItem.key === 'paste' ? 'w-full' : 'gap-2'
-                                )}
+                                className={menuItem.key === 'paste' ? 'w-full' : undefined}
                                 key={menuItem.key}
                                 onSelect={menuItem.onSelect}
                                 variant={menuItem.variant}
