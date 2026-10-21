@@ -70,8 +70,6 @@ public class ProjectDeploymentServiceIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        testOwnerContributors.clear();
-
         Category category = categoryRepository.save(new Category("name"));
         Workspace workspace = workspaceRepository.save(new Workspace("test"));
 
@@ -86,8 +84,6 @@ public class ProjectDeploymentServiceIntTest {
 
     @AfterEach
     public void afterEach() {
-        testOwnerContributors.clear();
-
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
