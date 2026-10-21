@@ -653,7 +653,8 @@ public class PermissionServiceImpl implements PermissionService {
         return canUseConnectionInWorkspace(connectionId, workspaceId, environment);
     }
 
-    private boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
+    @Override
+    public boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
         ConnectionService connectionService = connectionServiceProvider.getIfAvailable();
 
         if (connectionService == null) {
@@ -669,6 +670,12 @@ public class PermissionServiceImpl implements PermissionService {
         Connection connection = connectionOptional.get();
 
         if (connection.getType() != PlatformType.EMBEDDED) {
+            return false;
+        }
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver == null || embeddedResourceResolver.isConnectedUserConnection(connectionId)) {
             return false;
         }
 

@@ -118,6 +118,11 @@ public class RemotePermissionServiceClient implements PermissionService {
     }
 
     @Override
+    public boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
         throw new UnsupportedOperationException();
     }

@@ -26,7 +26,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.service.McpServerService;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
@@ -40,13 +40,13 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
     private static final long MCP_SERVER_ID = 5L;
     private static final long WORKSPACE_ID = 42L;
 
-    private final McpServerRepository mcpServerRepository = mock(McpServerRepository.class);
+    private final McpServerService mcpServerService = mock(McpServerService.class);
     private final PermissionService permissionService = mock(PermissionService.class);
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
     private final AutomationMcpComponentConnectionUsageChecker automationMcpComponentConnectionUsageChecker =
         new AutomationMcpComponentConnectionUsageChecker(
-            mcpServerRepository, permissionService, workspaceMcpServerService);
+            mcpServerService, permissionService, workspaceMcpServerService);
 
     @Test
     void testAllowsAConnectionUsableInTheServersWorkspaceAndEnvironment() {
@@ -74,7 +74,7 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
 
     @Test
     void testRefusesANonAdminForAServerOfNoWorkspace() {
-        when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
@@ -84,7 +84,7 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
 
     @Test
     void testAllowsATenantAdminForAServerOfNoWorkspace() {
-        when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
@@ -93,8 +93,51 @@ class AutomationMcpComponentConnectionUsageCheckerTest {
                 .doesNotThrowAnyException();
     }
 
+    @Test
+    void testAllowsAnEmbeddedMemberWithMcpEditWhoMayUseTheEmbeddedConnection() {
+        givenEmbeddedServer();
+
+        when(permissionService.hasEmbeddedScope("MCP_EDIT", Environment.PRODUCTION)).thenReturn(true);
+        when(permissionService.canUseEmbeddedConnection(CONNECTION_ID, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatCode(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testRefusesAnEmbeddedMemberWithoutMcpEdit() {
+        givenEmbeddedServer();
+
+        when(permissionService.canUseEmbeddedConnection(CONNECTION_ID, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRefusesAnEmbeddedMemberWhoMayNotUseTheEmbeddedConnection() {
+        givenEmbeddedServer();
+
+        when(permissionService.hasEmbeddedScope("MCP_EDIT", Environment.PRODUCTION)).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> automationMcpComponentConnectionUsageChecker.checkConnectionUsage(MCP_SERVER_ID, CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    private void givenEmbeddedServer() {
+        McpServer mcpServer = new McpServer("server", PlatformType.EMBEDDED, Environment.PRODUCTION);
+
+        mcpServer.setId(MCP_SERVER_ID);
+
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_ID)).thenReturn(Optional.of(mcpServer));
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID)).thenReturn(Optional.empty());
+    }
+
     private void givenServerInWorkspace() {
-        when(mcpServerRepository.findById(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
+        when(mcpServerService.fetchMcpServer(MCP_SERVER_ID)).thenReturn(Optional.of(createMcpServer()));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(MCP_SERVER_ID))
             .thenReturn(Optional.of(WORKSPACE_ID));
     }
