@@ -91,7 +91,7 @@ group conditions the same way the **Condition** task does. **OR Conditions** hol
 more **AND Condition** groups. A row matches when it meets every condition in at least one group,
 and **Find Records** with no conditions returns every row, up to **Limit** (100 by default). **Update Records** and
 **Delete Record(s)** by **Conditions** require at least one condition, so an empty list never rewrites or deletes
-the whole table - use **Clear Table** for that. **Update Records** and **Delete Record(s)**, by **Record IDs** or by
+the whole table - use **Clear Table** for that. **Update Records**, and **Delete Record(s)** by **Record IDs** or
 **Conditions**, change every selected row in one transaction, so either all of them change or none do. When no row
 matches, nothing changes and the step reports a count of 0. Each condition picks a **Column**, an
 **Operation** and the value to compare with:
@@ -109,12 +109,16 @@ matches, nothing changes and the step reports a count of 0. Each condition picks
 The text operations - **Equals Ignore Case**, **Contains**, **Not Contains**, **Starts With** and
 **Ends With** - work only on text columns. Values are converted to the column's type, so `10` in the
 **Value** field compares as a number against an integer column, and text values are trimmed - except for **Contains**,
-**Not Contains**, **Starts With** and **Ends With**, which use the text exactly as given, spaces included. A value
+**Not Contains**, **Starts With** and **Ends With**, which use the text exactly as given, spaces included (a value of only spaces counts as blank). A value
 that does not fit the column type stops the step with an error instead of matching other rows: for
 example `abc` or `10.5` for an integer column, `2025` for a date column, or `2026-02-30`, a date that does not
-exist. Date columns take a date such as `2026-01-31`; a date and time is accepted too and only its date, as written,
-is used. Date-time columns need a date and a time such as `2026-01-31T08:00:00`. A number such as a Unix timestamp is
-rejected for both. Every operation except **Empty** and **Not Empty** needs a
+exist. Date columns take a date such as `2026-01-31`; a date and time is accepted too and only its date is used, after
+converting it to UTC when it has a zone offset. Date-time columns need a date and a time such as `2026-01-31T08:00:00`; one with a zone offset, such as
+`2026-01-31T10:00:00+02:00` or `2026-01-31T08:00:00Z`, is converted to UTC, and one without is used as written. In
+a condition, a number such as a Unix timestamp is rejected for both. **Create Records**, **Update Record** and
+**Update Records** still accept a whole number for a date or date-time column and read it as Unix epoch milliseconds
+in UTC, so `1769846400000` is stored as `2026-01-31T08:00:00`. A number too small to be epoch milliseconds, such as
+epoch seconds or `20260131`, is rejected. Every operation except **Empty** and **Not Empty** needs a
 value: a blank **Value**, for example an expression that resolves to an empty string, or an **In** with
 no **Values**, stops the step instead of matching every row or none. Use **Empty** or **Not Empty** to
 match rows by whether a column has a value. An **Operation** left unset means **Equals**, but one that
@@ -138,8 +142,15 @@ A workflow can also start in response to a row change:
 - **Record Updated** - a row was changed
 - **Record Deleted** - a row was removed
 
-**Update Records** and **Delete Record(s)** send one trigger event for every row they change, after the
-change is saved.
+**Update Records**, **Delete Record(s)** and a CSV import send one trigger event for every row they change, after
+the change is saved. A slow or unreachable endpoint never holds up the step that changed the rows. Delivery is best
+effort: unreachable endpoints, server errors and rate-limit responses are retried with backoff, with retry waits adding
+up to about a minute per row on top of the request timeouts. If an endpoint answers that it does not exist or does not
+accept the request, redirects it elsewhere, or has an invalid URL, the remaining rows of that step are not sent to it.
+Other failures, such as refusing access or errors that persist after retries, do the same after 10 consecutive failed
+rows. After either stop, no rows are sent to that webhook for 5 minutes, or until its URL is changed. When too many
+deliveries to a webhook are already pending, none of the step's rows are sent to it. Failed and skipped rows are
+reported only in the server log, so check it when a trigger did not fire.
 
 This makes Data Tables a lightweight event source - for example, "when a row is added to the *Customers* table, send a welcome email."
 
@@ -180,7 +191,7 @@ right shape for some jobs and the wrong shape for others.
 | **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping, looked up with **Find Records** and an **Equals** condition on the key column. |
 | **Configuration data** - regional overrides, per-tenant knobs. | One row per configuration key. |
 | **Feature flags** - turn workflow behavior on and off without republishing. | A Boolean column keyed by flag name. |
-| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. Add conditions to consume only a slice of the queue. |
+| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Record(s)** on consume. Add conditions to consume only a slice of the queue. |
 | **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing with **Find Records** and an **Equals** condition on the ID column. |
 | **Reference data** - data too dynamic for static configuration. | One row per record, refreshed by a workflow when the upstream changes. |
 
