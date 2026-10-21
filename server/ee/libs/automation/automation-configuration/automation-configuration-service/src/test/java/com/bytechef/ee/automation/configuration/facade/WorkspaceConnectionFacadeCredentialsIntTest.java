@@ -125,6 +125,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
 
+    private long adminDevelopmentConnectionId;
     private long developmentConnectionId;
     private long otherDevelopmentConnectionId;
     private long productionConnectionId;
@@ -136,13 +137,15 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
 
         workspaceId = insertWorkspace("credentials-" + UUID.randomUUID());
 
-        developmentConnectionId = seedConnection(DEVELOPMENT);
-        otherDevelopmentConnectionId = seedConnection(DEVELOPMENT);
-        productionConnectionId = seedConnection(PRODUCTION);
+        adminDevelopmentConnectionId = seedConnection(DEVELOPMENT, TENANT_ADMIN);
+        developmentConnectionId = seedConnection(DEVELOPMENT, EDITOR);
+        otherDevelopmentConnectionId = seedConnection(DEVELOPMENT, DEVELOPMENT_EDITOR_PRODUCTION_VIEWER);
+        productionConnectionId = seedConnection(PRODUCTION, DEVELOPMENT_EDITOR_PRODUCTION_VIEWER);
 
         when(workspaceConnectionService.getWorkspaceConnections(workspaceId))
             .thenReturn(
                 List.of(
+                    new WorkspaceConnection(adminDevelopmentConnectionId, workspaceId),
                     new WorkspaceConnection(developmentConnectionId, workspaceId),
                     new WorkspaceConnection(otherDevelopmentConnectionId, workspaceId),
                     new WorkspaceConnection(productionConnectionId, workspaceId)));
@@ -151,9 +154,11 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
                 any(), any(), anyList(), any(), any(), eq(PlatformType.AUTOMATION)))
                     .thenReturn(
                         List.of(
-                            connectionDTO(developmentConnectionId, DEVELOPMENT),
-                            connectionDTO(otherDevelopmentConnectionId, DEVELOPMENT),
-                            connectionDTO(productionConnectionId, PRODUCTION)));
+                            connectionDTO(adminDevelopmentConnectionId, DEVELOPMENT, TENANT_ADMIN),
+                            connectionDTO(developmentConnectionId, DEVELOPMENT, EDITOR),
+                            connectionDTO(
+                                otherDevelopmentConnectionId, DEVELOPMENT, DEVELOPMENT_EDITOR_PRODUCTION_VIEWER),
+                            connectionDTO(productionConnectionId, PRODUCTION, DEVELOPMENT_EDITOR_PRODUCTION_VIEWER)));
 
         workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_IDS_BY_LOGIN.get(VIEWER), workspaceId, WorkspaceRole.VIEWER));
@@ -194,7 +199,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
             workspaceId, null, null, null, null);
 
-        assertThat(connectionDTOs).hasSize(3);
+        assertThat(connectionDTOs).hasSize(4);
 
         for (ConnectionDTO connectionDTO : connectionDTOs) {
             assertWithoutCredentials(connectionDTO, connectionDTO.id());
@@ -202,60 +207,82 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
     }
 
     @Test
-    void testEditorGetsCredentialsById() {
+    void testEditorGetsCredentialsByIdOnlyForAConnectionItCreated() {
         authenticate(EDITOR, "ROLE_USER");
-
-        ConnectionDTO connectionDTO = workspaceConnectionFacade.getConnection(developmentConnectionId);
-
-        assertWithCredentials(connectionDTO, developmentConnectionId);
-    }
-
-    @Test
-    void testEditorGetsCredentialsInAList() {
-        authenticate(EDITOR, "ROLE_USER");
-
-        List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
-            workspaceId, null, null, null, null);
-
-        assertThat(connectionDTOs).hasSize(3);
-
-        for (ConnectionDTO connectionDTO : connectionDTOs) {
-            assertWithCredentials(connectionDTO, connectionDTO.id());
-        }
-    }
-
-    @Test
-    void testTenantAdminGetsCredentialsByIdAndInAList() {
-        authenticate(TENANT_ADMIN, AuthorityConstants.ADMIN);
-
-        assertWithCredentials(workspaceConnectionFacade.getConnection(productionConnectionId), productionConnectionId);
-
-        List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
-            workspaceId, null, null, null, null);
-
-        assertThat(connectionDTOs).hasSize(3);
-
-        for (ConnectionDTO connectionDTO : connectionDTOs) {
-            assertWithCredentials(connectionDTO, connectionDTO.id());
-        }
-    }
-
-    @Test
-    void testMemberWhoEditsOnlyInDevelopmentGetsCredentialsOnlyForDevelopmentConnections() {
-        authenticate(DEVELOPMENT_EDITOR_PRODUCTION_VIEWER, "ROLE_USER");
 
         assertWithCredentials(workspaceConnectionFacade.getConnection(developmentConnectionId),
             developmentConnectionId);
         assertWithoutCredentials(
-            workspaceConnectionFacade.getConnection(productionConnectionId), productionConnectionId);
+            workspaceConnectionFacade.getConnection(otherDevelopmentConnectionId), otherDevelopmentConnectionId);
+    }
+
+    @Test
+    void testEditorGetsCredentialsInAListOnlyForConnectionsItCreated() {
+        authenticate(EDITOR, "ROLE_USER");
 
         List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
             workspaceId, null, null, null, null);
 
-        assertThat(connectionDTOs).hasSize(3);
+        assertThat(connectionDTOs).hasSize(4);
 
         for (ConnectionDTO connectionDTO : connectionDTOs) {
-            if (connectionDTO.environmentId() == DEVELOPMENT) {
+            if (connectionDTO.id() == developmentConnectionId) {
+                assertWithCredentials(connectionDTO, connectionDTO.id());
+            } else {
+                assertWithoutCredentials(connectionDTO, connectionDTO.id());
+            }
+        }
+    }
+
+    @Test
+    void testTenantAdminGetsNoCredentialsForAConnectionItDidNotCreate() {
+        authenticate(TENANT_ADMIN, AuthorityConstants.ADMIN);
+
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(productionConnectionId), productionConnectionId);
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(developmentConnectionId), developmentConnectionId);
+    }
+
+    @Test
+    void testTenantAdminGetsCredentialsOnlyForConnectionsItCreated() {
+        authenticate(TENANT_ADMIN, AuthorityConstants.ADMIN);
+
+        assertWithCredentials(
+            workspaceConnectionFacade.getConnection(adminDevelopmentConnectionId), adminDevelopmentConnectionId);
+
+        List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
+            workspaceId, null, null, null, null);
+
+        assertThat(connectionDTOs).hasSize(4);
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            if (connectionDTO.id() == adminDevelopmentConnectionId) {
+                assertWithCredentials(connectionDTO, connectionDTO.id());
+            } else {
+                assertWithoutCredentials(connectionDTO, connectionDTO.id());
+            }
+        }
+    }
+
+    @Test
+    void testCreatorGetsCredentialsOnlyWhereItHoldsTheEditScope() {
+        authenticate(DEVELOPMENT_EDITOR_PRODUCTION_VIEWER, "ROLE_USER");
+
+        assertWithCredentials(
+            workspaceConnectionFacade.getConnection(otherDevelopmentConnectionId), otherDevelopmentConnectionId);
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(productionConnectionId), productionConnectionId);
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(developmentConnectionId), developmentConnectionId);
+
+        List<ConnectionDTO> connectionDTOs = workspaceConnectionFacade.getConnections(
+            workspaceId, null, null, null, null);
+
+        assertThat(connectionDTOs).hasSize(4);
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            if (connectionDTO.id() == otherDevelopmentConnectionId) {
                 assertWithCredentials(connectionDTO, connectionDTO.id());
             } else {
                 assertWithoutCredentials(connectionDTO, connectionDTO.id());
@@ -287,11 +314,12 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
                 new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
-    private static ConnectionDTO connectionDTO(long connectionId, int environmentId) {
+    private static ConnectionDTO connectionDTO(long connectionId, int environmentId, String createdBy) {
         return ConnectionDTO.builder()
             .authorizationParameters(Map.of("access_token", "secret-token"))
             .componentName("slack")
             .connectionParameters(Map.of("apiKey", "secret-key"))
+            .createdBy(createdBy)
             .environmentId(environmentId)
             .id(connectionId)
             .name("connection-" + connectionId)
@@ -313,7 +341,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         return insertedWorkspaceId;
     }
 
-    private long seedConnection(int environmentId) {
+    private long seedConnection(int environmentId, String createdBy) {
         long connectionId = Math.abs(UUID.randomUUID()
             .getMostSignificantBits() % 1_000_000_000L);
 
@@ -324,7 +352,8 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         connection.setType(PlatformType.AUTOMATION);
 
         when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
-        when(connectionFacade.getConnection(connectionId)).thenReturn(connectionDTO(connectionId, environmentId));
+        when(connectionFacade.getConnection(connectionId))
+            .thenReturn(connectionDTO(connectionId, environmentId, createdBy));
 
         workspaceConnectionRepository.save(new WorkspaceConnection(connectionId, workspaceId));
 
