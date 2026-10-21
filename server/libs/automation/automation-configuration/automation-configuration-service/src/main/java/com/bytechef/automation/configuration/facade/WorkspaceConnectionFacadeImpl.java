@@ -54,6 +54,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -181,8 +182,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         ConnectionDTO connectionDTO = connectionFacade.getConnection(connectionId);
 
-        return canSeeCredentials(connectionDTO, canEditConnection(connectionId))
-            ? connectionDTO : connectionDTO.withoutCredentials();
+        return canSeeCredentials(connectionId, connectionDTO) ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -207,17 +207,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         return CollectionUtils.map(
             visibleConnectionDTOs,
-            connectionDTO -> canSeeCredentials(connectionDTO, canEditConnection(connectionDTO.id()))
+            connectionDTO -> canSeeCredentials(connectionDTO.id(), connectionDTO)
                 ? connectionDTO : connectionDTO.withoutCredentials());
-    }
-
-    private boolean canEditConnection(long connectionId) {
-        if (!permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)) {
-            return false;
-        }
-
-        return ConnectedUserAuthentications.isConnectedUser() ||
-            permissionService.isResourceOwner(CONNECTION_TYPE, connectionId) || permissionService.isTenantAdmin();
     }
 
     protected List<Long> getSharedConnectionIds() {
@@ -298,11 +289,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
+        "isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         requireAutomation(connectionId);
 
         Connection connection = connectionService.getConnection(connectionId);
+
+        validateSecretOwner(connection);
 
         if (connection.getStatus() != ConnectionStatus.ACTIVE) {
             throw new ConfigurationException(
@@ -328,13 +321,20 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         connectionFacade.update(connectionId, tags);
     }
 
-    private static boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
-        if (!canEdit) {
+    private boolean canSeeCredentials(long connectionId, ConnectionDTO connectionDTO) {
+        if (!permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)) {
             return false;
         }
 
         return ConnectedUserAuthentications.isConnectedUser() ||
-            ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy());
+            ConnectionSecrets.canCurrentUserAccessSecrets(connectionDTO.createdBy(), connectionDTO.visibility());
+    }
+
+    private void validateSecretOwner(Connection connection) {
+        if (!ConnectionSecrets.canCurrentUserAccessSecrets(connection.getCreatedBy(), connection.getVisibility())) {
+            throw new AccessDeniedException(
+                "Only the connection owner can replace the credentials of connection " + connection.getId());
+        }
     }
 
     private void rejectNonAutomation(long connectionId) {
