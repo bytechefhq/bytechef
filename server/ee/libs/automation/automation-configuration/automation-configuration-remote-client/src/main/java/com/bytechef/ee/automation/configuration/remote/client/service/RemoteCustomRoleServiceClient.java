@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.service.CustomRoleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,14 @@ public class RemoteCustomRoleServiceClient implements CustomRoleService {
 
         throw new UnsupportedOperationException(
             "CustomRoleService.deleteCustomRole is not available on this app variant");
+    }
+
+    @Override
+    public Optional<CustomRole> fetchCustomRole(long customRoleId) {
+        logError("fetchCustomRole");
+
+        throw new UnsupportedOperationException(
+            "CustomRoleService.fetchCustomRole is not available on this app variant");
     }
 
     @Override

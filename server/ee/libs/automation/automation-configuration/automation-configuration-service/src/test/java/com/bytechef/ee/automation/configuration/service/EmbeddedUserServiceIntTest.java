@@ -17,8 +17,11 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
@@ -46,6 +49,7 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Integrat
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -63,6 +67,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
@@ -104,6 +109,9 @@ class EmbeddedUserServiceIntTest {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -227,8 +235,8 @@ class EmbeddedUserServiceIntTest {
         embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
 
         WorkspaceMembershipAssignerImpl workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserService, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
-            mock(WorkspaceUserService.class));
+            mock(ApplicationEventPublisher.class), embeddedUserService, permissionService, userService,
+            mock(WorkspaceService.class), workspaceUserRepository, mock(WorkspaceUserService.class));
 
         workspaceMembershipAssigner.removeMemberships(userId(MEMBER));
 
@@ -386,7 +394,7 @@ class EmbeddedUserServiceIntTest {
     @Import({
         ApiKeyPermissionScopeProvider.class, ApiPlatformPermissionScopeProvider.class,
         AppEventPermissionScopeProvider.class, ConnectedUserPermissionScopeProvider.class,
-        ConnectionPermissionScopeProvider.class, CurrentUserResolver.class, CustomRoleScopeResolverImpl.class,
+        ConnectionPermissionScopeProvider.class, CurrentUserResolverImpl.class, CustomRoleScopeResolverImpl.class,
         DataTablePermissionScopeProvider.class, DeploymentPermissionScopeProvider.class,
         EmbeddedPermissionScopeProvider.class, EmbeddedScopeCacheService.class,
         EmbeddedSharedPermissionScopeProvider.class, EmbeddedUserServiceImpl.class,
@@ -395,6 +403,8 @@ class EmbeddedUserServiceIntTest {
         McpPermissionScopeProvider.class, PermissionScopeRegistry.class, PermissionServiceImpl.class,
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
+        ProjectServiceImpl.class,
+        ProjectVisibilityPolicy.class, ResourceVisibilityConfiguration.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
         WorkspaceScopeCache.class
     })

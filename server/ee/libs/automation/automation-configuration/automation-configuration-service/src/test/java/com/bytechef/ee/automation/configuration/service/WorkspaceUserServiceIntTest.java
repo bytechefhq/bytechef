@@ -500,9 +500,6 @@ class WorkspaceUserServiceIntTest {
         @Autowired
         private WorkspaceUserFacade workspaceUserFacade;
 
-        @Autowired
-        private WorkspaceUserService workspaceUserService;
-
         @BeforeEach
         void beforeEach() {
             reset(
@@ -575,7 +572,7 @@ class WorkspaceUserServiceIntTest {
             when(userService.fetchUserByEmail("someone@example.com")).thenReturn(Optional.empty());
             when(userInvitationFacade.inviteUser(anyString(), anyString())).thenReturn(invitedUser);
 
-            workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "someone@example.com", WorkspaceRole.VIEWER);
+            workspaceUserFacade.inviteWorkspaceUser(WORKSPACE_ID, "someone@example.com", WorkspaceRole.VIEWER, null);
 
             PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
 

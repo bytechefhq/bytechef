@@ -409,8 +409,8 @@ class PreAuthorizeProxyEnforcementIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        GuardedProjectMutations.class, GuardedProjectFacadeReads.class, GuardedResourceOwnerReads.class,
-        WorkspaceUserFacadeImpl.class, WorkspaceUserServiceImpl.class
+        CustomRoleServiceImpl.class, GuardedProjectMutations.class, GuardedProjectFacadeReads.class,
+        GuardedResourceOwnerReads.class, WorkspaceUserFacadeImpl.class, WorkspaceUserServiceImpl.class
     })
     static class Config {
 
@@ -453,12 +453,17 @@ class PreAuthorizeProxyEnforcementIntTest {
             return mock(WorkspaceUserRepository.class);
         }
 
-        // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — a denial fires the
+        // The remaining WorkspaceUserFacadeImpl collaborators, mocked like the ones above — a denial fires the
         // @PreAuthorize check before any of them is touched, and the positive controls only need them to answer
         // Mockito's defaults.
         @Bean
         CustomRoleRepository customRoleRepository() {
             return mock(CustomRoleRepository.class);
+        }
+
+        @Bean
+        EmbeddedUserService embeddedUserService() {
+            return mock(EmbeddedUserService.class);
         }
 
         @Bean

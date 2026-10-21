@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -25,6 +26,8 @@ public interface CustomRoleService {
      * assignable everywhere, so creating one is a tenant-wide act.
      */
     CustomRole createCustomRole(String name, String description, Set<String> scopeNames);
+
+    Optional<CustomRole> fetchCustomRole(long customRoleId);
 
     /**
      * The built-in workspace roles and the scopes each one grants, least privileged first.

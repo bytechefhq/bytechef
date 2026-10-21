@@ -22,6 +22,7 @@ import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -99,6 +100,12 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         }
 
         customRoleRepository.deleteById(roleId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<CustomRole> fetchCustomRole(long customRoleId) {
+        return customRoleRepository.findById(customRoleId);
     }
 
     @Override
