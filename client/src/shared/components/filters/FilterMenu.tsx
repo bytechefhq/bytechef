@@ -7,7 +7,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {CheckIcon, SlidersHorizontalIcon, XIcon} from 'lucide-react';
 
 export interface FilterOptionI {
@@ -74,9 +74,7 @@ const FilterMenu = ({groups, title}: FilterMenuPropsI) => {
                         <DropdownMenuSeparator />
 
                         <DropdownMenuGroup>
-                            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                                {group.label}
-                            </DropdownMenuLabel>
+                            <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
 
                             {group.options.map((option) => (
                                 <DropdownMenuItem
@@ -89,7 +87,9 @@ const FilterMenu = ({groups, title}: FilterMenuPropsI) => {
                                     {group.value === option.value && <CheckIcon className="size-4 shrink-0" />}
 
                                     {option.count !== undefined && (
-                                        <span className="ml-auto text-xs text-muted-foreground">({option.count})</span>
+                                        <span className="ml-auto text-xs text-content-neutral-secondary">
+                                            ({option.count})
+                                        </span>
                                     )}
                                 </DropdownMenuItem>
                             ))}
@@ -100,13 +100,11 @@ const FilterMenu = ({groups, title}: FilterMenuPropsI) => {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                    className="text-primary focus:text-primary"
                     disabled={!active}
+                    icon={<XIcon />}
+                    label="Clear all filters"
                     onClick={() => resetFilterGroups(groups)}
-                >
-                    <XIcon className="mr-2 size-4" />
-                    Clear all filters
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );

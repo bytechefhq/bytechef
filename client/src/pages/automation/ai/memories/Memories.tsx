@@ -1,14 +1,14 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
-import PageLoader from '@/components/PageLoader';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
+import EmptyList from '@/components/EmptyList';
+import PageLoader from '@/components/PageLoader';
 import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import FilterBadges from '@/shared/components/filters/FilterBadges';
@@ -126,20 +126,17 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
                             />
                         </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end" className="p-0" onClick={(event) => event.stopPropagation()}>
-                            <DropdownMenuItem className="dropdown-menu-item" onClick={() => onEdit(memory)}>
-                                <PencilIcon /> Edit
-                            </DropdownMenuItem>
+                        <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
+                            <DropdownMenuItem icon={<PencilIcon />} label="Edit" onClick={() => onEdit(memory)} />
 
-                            <DropdownMenuSeparator className="m-0" />
+                            <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                                className="dropdown-menu-item-destructive"
+                                icon={<Trash2Icon />}
+                                label="Delete"
                                 onClick={() => onDelete(memory)}
                                 variant="destructive"
-                            >
-                                <Trash2Icon /> Delete
-                            </DropdownMenuItem>
+                            />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}

@@ -297,6 +297,20 @@ describe('Memories page', () => {
         expect(screen.queryByRole('heading', {level: 2, name: /alice profile/i})).toBeNull();
     });
 
+    it('renders the row actions menu with the design-system DropdownMenu', async () => {
+        const memories = [makeMemory({id: 1, title: 'Alice profile'})];
+
+        mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: memories}));
+
+        wrap(<Memories />);
+
+        await openRowMenu('Alice profile');
+
+        expect(await screen.findByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('opens the edit dialog when Edit is clicked', async () => {
         const memories = [makeMemory({id: 1, title: 'Alice profile'})];
 
@@ -450,6 +464,16 @@ describe('Memories page', () => {
 
         await userEvent.click(await screen.findByRole('menuitem', {name: option}));
     };
+
+    it('renders the filter menu with the design-system DropdownMenu', async () => {
+        wrap(<Memories />);
+
+        await openFilterMenu();
+
+        expect(await screen.findByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Feedback'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Clear all filters'})).toHaveAttribute('data-disabled');
+    });
 
     it('says no memory matches the filters, rather than showing the onboarding empty state, when a filter empties the list', async () => {
         wrap(<Memories />);
