@@ -9,9 +9,13 @@ An embedded API Key is a bearer token for server-to-server calls from your backe
 
 An API Key acts on behalf of the connected user named in the request path. It is accepted only on the `/api/embedded/v1/{externalUserId}/…` routes. A request without an external user id in the path is rejected. If no connected user exists for that id, ByteChef creates one on the first request.
 
-API Keys are managed under **Embedded → Settings → API Keys**. Only tenant admins can open the page.
+API Keys are managed under **Embedded → Settings → API Keys**.
 
 <!-- TODO screenshot: Embedded → Settings → API Keys - the keys table and the New API Key button -->
+
+## Who can use API Keys
+
+In Enterprise Edition, API Keys are shared per environment. Members with `API_KEY_VIEW` (Editor and above) see every embedded API key in the environment, and `API_KEY_CREATE` and `API_KEY_DELETE` apply to all of them. Removing a member does not revoke the keys they created. See [Users and Roles](/platform/embedded/administration/users-and-roles).
 
 ## Creating an API Key
 
