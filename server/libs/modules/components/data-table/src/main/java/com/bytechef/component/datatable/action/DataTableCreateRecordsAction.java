@@ -67,7 +67,9 @@ public class DataTableCreateRecordsAction {
     private ModifiableActionDefinition build() {
         return action("createRecords")
             .title("Create Record(s)")
-            .description("Insert one or more new records to a table")
+            .description(
+                "Insert one or more new records to a table. The records are inserted together: a record that is not " +
+                    "valid stops the step and no record is inserted.")
             .properties(
                 string(TABLE)
                     .label("Table")
@@ -118,19 +120,24 @@ public class DataTableCreateRecordsAction {
         Map<String, Object> recordsMap = inputParameters.getRequiredMap(RECORDS, Object.class);
         Object valuesObj = recordsMap.get(VALUES);
 
-        List<DataTableRow> created = new ArrayList<>();
-
-        if (valuesObj instanceof List<?> valuesList) {
-            for (Object record : valuesList) {
-                if (record instanceof Map<?, ?> map) {
-                    created.add(
-                        dataTableRowService.insertRow(
-                            baseName, (Map<String, Object>) map,
-                            Objects.requireNonNull(actionContextAware.getEnvironmentId())));
-                }
-            }
+        if (!(valuesObj instanceof List<?> valuesList)) {
+            throw new IllegalArgumentException("Records must be a list of records; no record was inserted");
         }
 
-        return DataTableUtils.flattenRows(created);
+        List<Map<String, Object>> rowValues = new ArrayList<>();
+
+        for (int index = 0; index < valuesList.size(); index++) {
+            if (!(valuesList.get(index) instanceof Map<?, ?> map)) {
+                throw new IllegalArgumentException(
+                    "Record %d must be an object of column values; no record was inserted".formatted(index + 1));
+            }
+
+            rowValues.add((Map<String, Object>) map);
+        }
+
+        List<DataTableRow> createdDataTableRows = dataTableRowService.insertRows(
+            baseName, rowValues, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+
+        return DataTableUtils.flattenRows(createdDataTableRows);
     }
 }

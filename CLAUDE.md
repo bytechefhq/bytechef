@@ -372,9 +372,13 @@ public class ExampleComponentHandler implements ComponentHandler {
   or blocks on I/O goes on `workerExecutor`, never the default, unless it is handed off by a thread that must not
   wait on a remote endpoint: that work goes on an unbounded lane and bounds itself inside the task, as
   `DataTableWebhookEventListener` does with the `bytechef.webhook-delivery.*` limits. Its semaphore bounds concurrent
-  POSTs, but a delivery waiting for a permit still holds a thread; `max-pending-deliveries` caps those per webhook,
-  not across webhooks. Virtual threads change only the thread factory — they do not
-  lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
+  POSTs and each webhook runs one delivery at a time, so a slow endpoint cannot fill the semaphore's queue. A delivery
+  waiting for a permit still holds a thread and its rows; `max-pending-deliveries` caps those
+  per webhook and `max-pending-rows` across webhooks. On shutdown `webhookDeliveryExecutor` interrupts its tasks
+  and waits up to 10 s, so a delivery that stops in that time logs and counts its unsent rows. A POST blocked in its
+  read (up to 30 s; `SimpleClientHttpRequestFactory` ignores interrupts) is cut off, and only the listener's shutdown
+  warning with the pending delivery and row counts records it. Virtual threads change only the thread factory — they
+  do not lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
   because it only hands messages to the broker: starving it stalls every workflow, while the real work is already
   bounded at `workerExecutor` (and DB connections at Hikari's `maximum-pool-size`). Don't bound
   `AsyncMessageBroker`'s own dispatch executor either — it carries work-initiating and completion events together,

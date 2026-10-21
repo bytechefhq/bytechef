@@ -46,6 +46,17 @@ public interface DataTableRowService {
     boolean deleteRow(String baseName, long id, long environmentId);
 
     /**
+     * Deletes every row of the table in one transaction. One deleted event holding every deleted row is published;
+     * webhooks are called once the transaction commits. When the table is empty, nothing is published and an empty list
+     * is returned.
+     *
+     * @param baseName      the logical table base name
+     * @param environmentId the environment ID
+     * @return the deleted rows ordered by id
+     */
+    List<DataTableRow> deleteAllRows(String baseName, long environmentId);
+
+    /**
      * Deletes every row that satisfies the given conditions in one transaction. One deleted event holding every deleted
      * row is published; webhooks are called once the transaction commits. When no row matches, nothing is deleted and
      * an empty list is returned.
@@ -75,13 +86,26 @@ public interface DataTableRowService {
      * Inserts a row with provided values. Returns the created row including generated id.
      *
      * @param baseName      the logical table base name
-     * @param values        column name to value map; an id key is ignored, a null value stores null and a blank value
-     *                      stores an empty string in a text column and null otherwise
+     * @param values        column name to value map; an id key and keys naming no column are ignored, a null value
+     *                      stores null and a blank value stores an empty string in a text column and null otherwise
      * @param environmentId the environment ID
      * @return the created row with generated id
-     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type
+     * @throws IllegalArgumentException if a value is not valid for the column type, or there are keys other than id and
+     *                                  none of them names a column
      */
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
+
+    /**
+     * Inserts rows in one transaction: a row that is not valid stops the insert and no row is inserted. One created
+     * event holding every inserted row is published; webhooks are called once the transaction commits.
+     *
+     * @param baseName      the logical table base name
+     * @param rowValues     one column name to value map per row, with the same rules as {@link #insertRow}
+     * @param environmentId the environment ID
+     * @return the created rows with generated ids, in the given order
+     * @throws IllegalArgumentException if a value is not valid for the column type; the message names the row
+     */
+    List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId);
 
     /**
      * Lists rows of a dynamic table ordered by id ascending, with pagination.
@@ -132,7 +156,8 @@ public interface DataTableRowService {
      * @param baseName      the logical table base name
      * @param csv           CSV text with header row
      * @param environmentId the environment ID
-     * @throws IllegalArgumentException if a cell is not valid for its column type; the message names the CSV line
+     * @throws IllegalArgumentException if the header matches no column of the table, or a cell is not valid for its
+     *                                  column type; the message names the CSV line
      */
     void importCsv(String baseName, String csv, long environmentId);
 
@@ -141,13 +166,13 @@ public interface DataTableRowService {
      *
      * @param baseName      the logical table base name
      * @param id            the row id
-     * @param values        column name to value map (only provided columns will be updated); an id key is ignored, a
-     *                      null value sets the column to null and a blank value clears it, leaving an empty string in a
-     *                      text column and null otherwise
+     * @param values        column name to value map (only provided columns will be updated); an id key and keys naming
+     *                      no column are ignored, a null value sets the column to null and a blank value clears it,
+     *                      leaving an empty string in a text column and null otherwise
      * @param environmentId the environment ID
      * @return the updated row
-     * @throws IllegalArgumentException if a value names an unknown column or is not valid for the column type, or no
-     *                                  row with that id exists
+     * @throws IllegalArgumentException if a value is not valid for the column type, there are keys other than id and
+     *                                  none of them names a column, or no row with that id exists
      */
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
 

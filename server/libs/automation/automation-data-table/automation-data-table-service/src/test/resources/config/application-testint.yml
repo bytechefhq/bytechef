@@ -5,3 +5,4 @@ bytechef:
   webhook-delivery:
     concurrency-limit: 10
     max-pending-deliveries: 1000
+    max-pending-rows: 10000
