@@ -55,7 +55,7 @@ class ComponentInitCommandTest {
         String outputPath = tempDir.toAbsolutePath()
             .toString();
 
-        CliApplication.main(
+        CliApplication.execute(
             "component", "init", "--open-api-path", url.getFile(), "--output-path", outputPath, "--name", "petstore");
 
         Path componentDir = tempDir.resolve("petstore");
@@ -88,7 +88,7 @@ class ComponentInitCommandTest {
         String outputPath = tempDir.toAbsolutePath()
             .toString();
 
-        CliApplication.main(
+        CliApplication.execute(
             "component", "init", "--open-api-path", url.getFile(), "--output-path", outputPath, "--name", "petstore");
 
         Path componentDir = tempDir.resolve("petstore");

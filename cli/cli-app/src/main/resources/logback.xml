@@ -1,17 +1,19 @@
 <configuration>
+    <!-- A CLI should stay quiet: suppress logback's own status output and log only warnings/errors.
+         Command results go to stdout via the renderer; user-facing errors go to stderr directly. -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </layout>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
 
-    <logger name="com.bytechef" level="debug" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
+    <!-- execute() already prints a clean error message and exit code, so Spring's own
+         "Application run failed" ERROR log on a command failure is redundant noise. -->
+    <logger name="org.springframework.boot.SpringApplication" level="off"/>
 
-    <root level="error">
+    <root level="warn">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
