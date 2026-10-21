@@ -4,31 +4,35 @@ import {useUserGuidingStore} from '@/shared/stores/useUserGuidingStore';
 import {useCallback, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
-const LAUNCHER_HIDE_RETRY_INTERVAL = 500;
-const LAUNCHER_HIDE_RETRY_LIMIT = 40;
+const LAUNCHER_RETRY_INTERVAL = 500;
+const LAUNCHER_RETRY_LIMIT = 40;
 
 export function hideUserGuidingLauncher() {
     window.userGuiding?.hideResourceCenter?.();
     window.userGuiding?.hideChecklist();
 }
 
-export function showUserGuidingLauncher() {
+export function showUserGuidingLauncher(): boolean {
     const userGuiding = window.userGuiding;
     const appState = userGuiding?.getAppState?.();
 
     const resourceCenterId = appState?.api?.resourceCenters?.find((resourceCenter) => resourceCenter.id != null)?.id;
 
-    if (resourceCenterId != null) {
-        userGuiding?.launchResourceCenter?.(resourceCenterId);
+    if (resourceCenterId != null && userGuiding?.launchResourceCenter) {
+        userGuiding.launchResourceCenter(resourceCenterId);
 
-        return;
+        return true;
     }
 
     const checklistId = appState?.api?.assistants?.find((assistant) => assistant.id != null)?.id;
 
-    if (checklistId != null) {
-        userGuiding?.launchChecklist(checklistId);
+    if (checklistId != null && userGuiding) {
+        userGuiding.launchChecklist(checklistId);
+
+        return true;
     }
+
+    return false;
 }
 
 export function hideLauncherOnceSdkIsReady() {
@@ -47,12 +51,38 @@ export function hideLauncherOnceSdkIsReady() {
             hideUserGuidingLauncher();
         }
 
-        if (attempts >= LAUNCHER_HIDE_RETRY_LIMIT) {
+        if (attempts >= LAUNCHER_RETRY_LIMIT) {
             window.clearInterval(intervalId);
 
             hideUserGuidingLauncher();
         }
-    }, LAUNCHER_HIDE_RETRY_INTERVAL);
+    }, LAUNCHER_RETRY_INTERVAL);
+}
+
+export function showLauncherOnceSdkIsReady() {
+    let attempts = 0;
+
+    const intervalId = window.setInterval(() => {
+        attempts++;
+
+        if (useUserGuidingStore.getState().launcherHidden) {
+            window.clearInterval(intervalId);
+
+            return;
+        }
+
+        if (showUserGuidingLauncher() || attempts >= LAUNCHER_RETRY_LIMIT) {
+            window.clearInterval(intervalId);
+        }
+    }, LAUNCHER_RETRY_INTERVAL);
+}
+
+export function applyLauncherVisibilityOnceSdkIsReady() {
+    if (useUserGuidingStore.getState().launcherHidden) {
+        hideLauncherOnceSdkIsReady();
+    } else {
+        showLauncherOnceSdkIsReady();
+    }
 }
 
 export function initUserGuiding(containerId: string) {
@@ -92,9 +122,7 @@ export function initUserGuiding(containerId: string) {
 
     document.head.appendChild(script);
 
-    if (useUserGuidingStore.getState().launcherHidden) {
-        hideLauncherOnceSdkIsReady();
-    }
+    applyLauncherVisibilityOnceSdkIsReady();
 }
 
 export interface UserGuidingI {
@@ -127,9 +155,7 @@ export const useUserGuiding = (): UserGuidingI => {
                     name: `${account.firstName} ${account.lastName}`,
                 });
 
-                if (useUserGuidingStore.getState().launcherHidden) {
-                    hideLauncherOnceSdkIsReady();
-                }
+                applyLauncherVisibilityOnceSdkIsReady();
             }
         },
         shutdown: () => {
