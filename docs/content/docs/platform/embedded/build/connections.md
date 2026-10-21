@@ -52,6 +52,8 @@ A newly created connection shows **Not Active** until a workflow, integration in
 
 Only the user who created a connection, or an admin, can edit, tag, or delete it. Anyone else gets an access-denied error.
 
+A connection's credentials are shown only to the member who created it, and only while that member can edit connections in its environment. An admin who did not create the connection sees its credential fields as **Hidden**. No ByteChef member sees the credentials of a connection created for a connected user; only that connected user can replace them, through the [frontend endpoints](#frontend-endpoints). See [Users and Roles](/platform/embedded/administration/users-and-roles#credentials) for the full table.
+
 ### Shared connections
 
 Turn on **Shared Connection** in the create or edit dialog to make a connection available to every connected user in the current environment. Shared connections carry a **Shared** badge in the list.
