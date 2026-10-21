@@ -13,8 +13,11 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,6 +56,11 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public void exportSharedProject(long id, String description) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         throw new UnsupportedOperationException();
     }
 

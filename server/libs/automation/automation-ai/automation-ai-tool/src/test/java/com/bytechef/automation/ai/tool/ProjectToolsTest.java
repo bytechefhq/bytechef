@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,12 +34,15 @@ import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
 import com.bytechef.automation.ai.tool.model.ProjectInfo;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.service.TagService;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,7 +100,7 @@ class ProjectToolsTest {
 
             assertThat(projectInfos).extracting(ProjectInfo::id)
                 .containsExactly(OWN_PROJECT_ID);
-            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
+            verify(projectService, never()).getWorkspaceProjectIds(anyLong(), anySet());
             verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
         }
 
@@ -168,7 +172,8 @@ class ProjectToolsTest {
 
             Project project = project(7L, WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(7L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project));
 
             List<ProjectInfo> projectInfos = newTools().listProjects(null, toolContext);
@@ -189,7 +194,7 @@ class ProjectToolsTest {
                 .isInstanceOf(ExecutionException.class)
                 .hasMessageContaining("workspace_required");
 
-            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
+            verify(projectService, never()).getWorkspaceProjectIds(anyLong(), anySet());
             verify(projectService, never()).getProjects();
         }
 
@@ -197,7 +202,8 @@ class ProjectToolsTest {
         void testSearchProjectsSearchesOnlyTheResolvedWorkspaceProjects() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(7L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project(7L, WORKSPACE_ID)));
 
             List<ProjectInfo> projectInfos = newTools().searchProjects("project", null, toolContext);
@@ -316,7 +322,8 @@ class ProjectToolsTest {
         return new ProjectTools(
             categoryService, projectDeploymentService, projectFacade, projectService,
             new ScopedProjectGuard(
-                projectService, mock(ProjectWorkflowService.class), mock(ScopedConnectionGuard.class),
+                mock(ProjectOwnershipService.class), projectService, mock(ProjectWorkflowService.class),
+                mock(ScopedConnectionGuard.class),
                 workspaceScopeResolver),
             tagService);
     }

@@ -38,6 +38,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -107,6 +108,9 @@ public class ProjectDeploymentFacadeIntTest {
     private ProjectFacade projectFacade;
 
     @Autowired
+    private TestOwnerContributors testOwnerContributors;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -148,6 +152,15 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    private void renameProjectDeployment(long projectDeploymentId, String name) {
+        ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
+            .orElseThrow();
+
+        projectDeployment.setName(name);
+
+        projectDeploymentRepository.save(projectDeployment);
+    }
 
     @AfterEach
     public void afterEach() {
@@ -291,6 +304,29 @@ public class ProjectDeploymentFacadeIntTest {
             true);
 
         assertThat(workspaceProjectDeployments).hasSize(0);
+    }
+
+    @Test
+    public void testGetWorkspaceProjectDeploymentsHidesDeploymentsOfEmbeddedCatalogProjects() {
+        ProjectDTO catalogProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO catalogDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), catalogProjectDTO);
+        ProjectDeploymentDTO plainDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), plainProjectDTO);
+
+        renameProjectDeployment(catalogDeploymentDTO.id(), "admin");
+        renameProjectDeployment(plainDeploymentDTO.id(), "plain");
+
+        testOwnerContributors.addCatalogId(catalogProjectDTO.id());
+
+        List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            workspace.getId(), null, null, null, false);
+
+        assertThat(workspaceProjectDeployments).extracting(ProjectDeploymentDTO::name)
+            .contains("plain")
+            .doesNotContain("admin");
     }
 
     @Test

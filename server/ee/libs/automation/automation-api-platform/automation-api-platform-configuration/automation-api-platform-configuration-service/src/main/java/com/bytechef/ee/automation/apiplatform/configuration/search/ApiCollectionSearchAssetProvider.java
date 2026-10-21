@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.search;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 class ApiCollectionSearchAssetProvider implements SearchAssetProvider {
 
     private final ApiCollectionService apiCollectionService;

@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.domain;
+package com.bytechef.automation.configuration.ownership;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public final class SystemProjects {
+public enum ProjectDeploymentOwner {
 
-    public static final String EMBEDDED_AUTOMATION_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
+    API_COLLECTION("api_collection"),
+    A2A_SERVER("a2a_project"),
+    EMBEDDED("connected_user_project", "connected_user_reference_deployment"),
+    MCP_SERVER("mcp_project");
 
-    public static final String A2A_SERVER_DEPLOYMENT_NAME_PREFIX = "__A2A_SERVER__";
+    private final List<String> ownerTables;
 
-    private SystemProjects() {
+    ProjectDeploymentOwner(String... ownerTables) {
+        this.ownerTables = List.of(ownerTables);
     }
 
-    public static boolean isSystemProject(Project project) {
-        return project != null && isSystemProjectName(project.getName());
-    }
-
-    public static boolean isSystemProjectName(String name) {
-        if (name == null) {
-            return false;
-        }
-
-        return name.startsWith(EMBEDDED_AUTOMATION_NAME_PREFIX);
+    public List<String> getOwnerTables() {
+        return ownerTables;
     }
 }

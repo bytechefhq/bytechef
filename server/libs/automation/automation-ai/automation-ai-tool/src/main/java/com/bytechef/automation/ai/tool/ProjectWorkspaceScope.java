@@ -18,12 +18,16 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 
@@ -31,6 +35,8 @@ import org.springframework.ai.chat.model.ToolContext;
  * @author Ivica Cardic
  */
 final class ProjectWorkspaceScope {
+
+    static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER);
 
     static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional when the account has exactly one workspace or the conversation is already " +
@@ -54,12 +60,14 @@ final class ProjectWorkspaceScope {
     }
 
     static Project getWorkspaceProject(
-        ProjectService projectService, long projectId, long workspaceId, ErrorType errorType) {
+        ProjectService projectService, ProjectOwnershipService projectOwnershipService, long projectId,
+        long workspaceId, ErrorType errorType) {
 
         Project project = projectService.fetchProject(projectId)
             .orElse(null);
 
-        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId)) {
+        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId) ||
+            isOwned(projectOwnershipService, projectId)) {
             throw new ExecutionException(
                 "Project " + projectId + " not found in workspace " + workspaceId, errorType);
         }
@@ -68,12 +76,12 @@ final class ProjectWorkspaceScope {
     }
 
     static List<Project> getWorkspaceProjects(ProjectService projectService, long workspaceId) {
-        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId));
+        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId, HIDDEN_PROJECT_OWNERS));
     }
 
     static void checkWorkspaceWorkflow(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService, String workflowId,
-        long workspaceId, ErrorType errorType) {
+        ProjectOwnershipService projectOwnershipService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, String workflowId, long workspaceId, ErrorType errorType) {
 
         ProjectWorkflow projectWorkflow;
 
@@ -88,9 +96,18 @@ final class ProjectWorkspaceScope {
         Project project = projectService.fetchProject(projectWorkflow.getProjectId())
             .orElse(null);
 
-        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId)) {
+        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId) ||
+            isOwned(projectOwnershipService, projectWorkflow.getProjectId())) {
+
             throw new ExecutionException("Workflow " + workflowId + " not found in workspace " + workspaceId,
                 errorType);
         }
+    }
+
+    private static boolean isOwned(ProjectOwnershipService projectOwnershipService, long projectId) {
+        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            List.of(projectId), HIDDEN_PROJECT_OWNERS);
+
+        return !ownedProjectIds.isEmpty();
     }
 }

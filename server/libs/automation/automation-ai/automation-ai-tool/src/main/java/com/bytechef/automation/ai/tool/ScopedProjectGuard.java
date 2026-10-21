@@ -20,6 +20,7 @@ import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ErrorType;
@@ -51,6 +52,7 @@ public class ScopedProjectGuard {
 
     private static final Logger log = LoggerFactory.getLogger(ScopedProjectGuard.class);
 
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ScopedConnectionGuard scopedConnectionGuard;
@@ -58,9 +60,11 @@ public class ScopedProjectGuard {
 
     @SuppressFBWarnings("EI")
     public ScopedProjectGuard(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        ScopedConnectionGuard scopedConnectionGuard, WorkspaceScopeResolver workspaceScopeResolver) {
+        ProjectOwnershipService projectOwnershipService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, ScopedConnectionGuard scopedConnectionGuard,
+        WorkspaceScopeResolver workspaceScopeResolver) {
 
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedConnectionGuard = scopedConnectionGuard;
@@ -74,7 +78,7 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId == null) {
             ProjectWorkspaceScope.checkWorkspaceWorkflow(
-                projectService, projectWorkflowService, workflowId,
+                projectOwnershipService, projectService, projectWorkflowService, workflowId,
                 resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
 
             return;
@@ -106,7 +110,8 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId == null) {
             return ProjectWorkspaceScope.getWorkspaceProject(
-                projectService, projectId, resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
+                projectService, projectOwnershipService, projectId,
+                resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
         }
 
         if (projectId != scopedProjectId) {
@@ -125,7 +130,9 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId == null) {
             return Set.copyOf(
-                projectService.getWorkspaceProjectIds(resolveWorkspaceId(workspaceId, toolContext, errorType)));
+                projectService.getWorkspaceProjectIds(
+                    resolveWorkspaceId(workspaceId, toolContext, errorType),
+                    ProjectWorkspaceScope.HIDDEN_PROJECT_OWNERS));
         }
 
         return Set.of(scopedProjectId);

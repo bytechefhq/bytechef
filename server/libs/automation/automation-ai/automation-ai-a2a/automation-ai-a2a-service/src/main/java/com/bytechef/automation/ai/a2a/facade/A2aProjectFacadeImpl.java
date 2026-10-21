@@ -32,7 +32,6 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -134,7 +133,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectDeployment.setName(SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX + projectId + "_v" + projectVersion);
+        projectDeployment.setName(a2aServer.getName());
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
         projectDeployment.setEnvironment(a2aServer.getEnvironment());

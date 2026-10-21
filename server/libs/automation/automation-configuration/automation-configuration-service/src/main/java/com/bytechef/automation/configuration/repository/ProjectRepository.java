@@ -17,7 +17,6 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -40,10 +39,6 @@ public interface ProjectRepository
         """)
     Optional<Project> findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
-    Optional<Project> findByNameIgnoreCase(String name);
-
-    Optional<Project> findByNameIgnoreCaseAndWorkspaceId(String name, long workspaceId);
-
     Optional<Project> findByUuid(UUID uuid);
 
     @Query("""
@@ -52,10 +47,4 @@ public interface ProjectRepository
             WHERE project_workflow.workflow_id = :workflowId
         """)
     Optional<Project> findByWorkflowId(@Param("workflowId") String workflowId);
-
-    @Query("""
-            SELECT project.id FROM project
-            WHERE project.workspace_id = :workspaceId
-        """)
-    List<Long> findProjectIdsByWorkspaceId(@Param("workspaceId") Long workspaceId);
 }

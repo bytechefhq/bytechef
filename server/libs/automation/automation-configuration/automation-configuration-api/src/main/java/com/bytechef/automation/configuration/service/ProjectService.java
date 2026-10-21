@@ -19,8 +19,10 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
@@ -36,8 +38,6 @@ public interface ProjectService {
     void delete(long id);
 
     Optional<Project> fetchProject(long id);
-
-    Optional<Project> fetchProject(String name);
 
     Optional<Project> fetchProject(String name, long workspaceId);
 
@@ -60,6 +60,8 @@ public interface ProjectService {
     Project getWorkflowProject(String workflowId);
 
     List<Long> getWorkspaceProjectIds(long workspaceId);
+
+    List<Long> getWorkspaceProjectIds(long workspaceId, Set<ProjectOwner> excludedProjectOwners);
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 

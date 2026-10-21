@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.a2a.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -52,9 +53,10 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -62,6 +64,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -94,6 +97,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -207,6 +211,9 @@ class A2aProjectFacadeIntTest {
         private ConnectionService connectionService;
 
         @Autowired
+        private JdbcClient jdbcClient;
+
+        @Autowired
         private JobFacade jobFacade;
 
         @Autowired
@@ -214,6 +221,9 @@ class A2aProjectFacadeIntTest {
 
         @Autowired
         private ProjectDeploymentRepository projectDeploymentRepository;
+
+        @Autowired
+        private ProjectDeploymentService systemProjectDeploymentService;
 
         @MockitoSpyBean
         private ProjectDeploymentFacade systemProjectDeploymentFacade;
@@ -301,12 +311,46 @@ class A2aProjectFacadeIntTest {
 
         @Test
         void testCreateA2aProjectHidesItsSystemDeploymentFromTheProjectDeploymentList() {
-            a2aProjectFacade.createA2aProject(a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId));
 
-            assertThat(projectDeploymentRepository.findAll()).hasSize(1);
+            assertThat(projectDeploymentRepository.findById(a2aProject.getProjectDeploymentId()))
+                .hasValueSatisfying(
+                    projectDeployment -> assertThat(projectDeployment.getName()).isEqualTo(a2aServer.getName()));
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(null, null, project.getId(), null, null))
                     .isEmpty();
+        }
+
+        @Test
+        void testCreateA2aProjectNamesItsDeploymentAfterTheServerAndHidesIt() {
+            ProjectDeployment plainProjectDeployment = projectDeploymentRepository.save(
+                createProjectDeployment("plain", 1));
+
+            A2aProject a2aProject = a2aProjectFacade.createA2aProject(
+                a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+
+            ProjectDeployment a2aProjectDeployment = systemProjectDeploymentService.getProjectDeployment(
+                a2aProject.getProjectDeploymentId());
+
+            assertThat(a2aProjectDeployment.getName()).isEqualTo(a2aServer.getName());
+            assertThat(systemProjectDeploymentService.getProjectDeployments(null, null, null, null, null))
+                .extracting(ProjectDeployment::getId)
+                .containsExactly(plainProjectDeployment.getId());
+        }
+
+        @Test
+        void testStartupCheckFindsTheA2aServerRowsInTheOwnerTable() {
+            a2aProjectFacade.createA2aProject(a2aServer.getId(), project.getId(), 1, List.of(workflowId));
+
+            ProjectOwnershipServiceImpl projectOwnershipService = new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(), List.of());
+
+            assertThatThrownBy(projectOwnershipService::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(
+                    OwnerContributorMissingException.class,
+                    exception -> assertThat(exception.getProjectDeploymentOwners())
+                        .contains(ProjectDeploymentOwner.A2A_SERVER));
         }
 
         @Test
@@ -558,8 +602,7 @@ class A2aProjectFacadeIntTest {
             assertThat(projectDeploymentRepository.findById(a2aProject.getProjectDeploymentId()))
                 .hasValueSatisfying(projectDeployment -> {
                     assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
-                    assertThat(projectDeployment.getName()).startsWith(
-                        SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX);
+                    assertThat(projectDeployment.getName()).isEqualTo(productionA2aServer.getName());
                 });
         }
 
