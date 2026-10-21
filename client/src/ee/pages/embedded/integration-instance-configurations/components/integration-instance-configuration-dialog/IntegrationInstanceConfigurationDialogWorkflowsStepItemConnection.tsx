@@ -9,6 +9,7 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
@@ -153,6 +154,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowNewConnectionDialog(false)}
+                        platformType={PlatformType.EMBEDDED}
                         useCreateConnectionMutation={useCreateConnectionMutation}
                         useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     />
