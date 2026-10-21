@@ -39,6 +39,7 @@ export type WorkspaceScopeType =
     | 'CONNECTION_EDIT'
     | 'CONNECTION_DELETE'
     | 'A2A_VIEW'
+    | 'APP_VIEW'
     | 'API_KEY_CREATE'
     | 'API_KEY_DELETE'
     | 'API_KEY_VIEW'

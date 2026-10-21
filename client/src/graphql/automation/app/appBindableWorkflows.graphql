@@ -1,0 +1,10 @@
+query appBindableWorkflows($appInstanceId: ID!) {
+    appBindableWorkflows(appInstanceId: $appInstanceId) {
+        projectDeploymentId
+        projectDeploymentName
+        projectName
+        workflowUuid
+        workflowName
+        description
+    }
+}

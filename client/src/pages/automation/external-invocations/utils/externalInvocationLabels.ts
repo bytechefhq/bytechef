@@ -8,6 +8,11 @@ export const SOURCE_LABELS: Record<string, string> = {
     A2A_SERVER: 'A2A',
     API_ACTION: 'API (Action)',
     API_TOOL: 'API (Tool)',
+    APP_ACTION: 'App (Action)',
+    APP_API: 'App (API)',
+    APP_PROXY: 'App (Proxy)',
+    APP_TOOL: 'App (Tool)',
+    APP_WORKFLOW: 'App (Workflow)',
     MCP_SERVER: 'MCP',
 };
 

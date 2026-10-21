@@ -1,0 +1,10 @@
+query appInstanceDeploymentSettings($id: ID!) {
+    appInstance(id: $id) {
+        id
+        environmentId
+        hostingTarget
+        deploymentConnectionId
+        deploymentProviderAvailable
+        deploymentSettings
+    }
+}

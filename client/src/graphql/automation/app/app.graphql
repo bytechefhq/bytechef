@@ -1,0 +1,57 @@
+query app($id: ID!) {
+    app(id: $id) {
+        id
+        uuid
+        name
+        description
+        categoryId
+        hasIcon
+        portalDiscoverable
+        workspaceId
+        ownerUserId
+        status
+        visibility
+        instances {
+            id
+            uuid
+            app {
+                id
+                name
+                description
+                status
+            }
+            workspaceId
+            environmentId
+            name
+            ownerUserId
+            status
+            visibility
+            hostingTarget
+            url
+            secretKeyHint
+            secretKeyLastUsedDate
+            userAuthMode
+            currentAppDeploymentId
+            deploymentConnectionId
+            deploymentProviderAvailable
+            createdBy
+            createdDate
+            lastModifiedBy
+            lastModifiedDate
+            version
+        }
+        foreignInstances {
+            id
+            name
+            workspaceId
+            environmentId
+            status
+            currentAppDeploymentId
+        }
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

@@ -1,0 +1,16 @@
+mutation bindAppConnection($appInstanceId: ID!, $input: AppBindingInput!) {
+    bindAppConnection(appInstanceId: $appInstanceId, input: $input) {
+        id
+        appInstanceId
+        bindingKey
+        connectionId
+        connectionName
+        componentName
+        connectionVersion
+        componentVersion
+        actionNames
+        toolNames
+        proxyEnabled
+        proxyAllowedMethods
+    }
+}

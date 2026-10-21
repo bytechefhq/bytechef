@@ -1,0 +1,3 @@
+mutation setAppFavorite($appId: ID!, $favorite: Boolean!) {
+    setAppFavorite(appId: $appId, favorite: $favorite)
+}

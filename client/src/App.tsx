@@ -31,6 +31,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
+    AppWindowIcon,
     FolderIcon,
     HammerIcon,
     HistoryIcon,
@@ -108,6 +109,11 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/a2a-servers',
         icon: NetworkIcon,
         name: 'A2A Servers',
+    },
+    {
+        href: '/automation/apps',
+        icon: AppWindowIcon,
+        name: 'Apps',
     },
     {
         group: executionsNavigationGroup,
@@ -228,9 +234,7 @@ function App() {
     const platformMode = resolveShellPlatformMode(location.pathname, currentType);
 
     useFetchInterceptor();
-    useLoadWorkspaceScopes(
-        authenticated && platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
-    );
+    useLoadWorkspaceScopes(authenticated && platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined);
 
     useLoadEmbeddedScopes(authenticated && platformMode === PlatformType.EMBEDDED);
 
@@ -288,6 +292,10 @@ function App() {
 
         if (navItem.href === '/automation/api-platform') {
             return ff_1023;
+        }
+
+        if (navItem.href === '/automation/apps') {
+            return edition === EditionType.EE;
         }
 
         if (navItem.href === '/automation/knowledge-bases') {

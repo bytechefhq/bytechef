@@ -1,0 +1,6 @@
+query appCategories($workspaceId: ID!) {
+    appCategories(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}

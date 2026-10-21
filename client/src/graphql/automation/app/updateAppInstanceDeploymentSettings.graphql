@@ -1,0 +1,7 @@
+mutation updateAppInstanceDeploymentSettings($id: ID!, $input: AppInstanceDeploymentSettingsInput!) {
+    updateAppInstanceDeploymentSettings(id: $id, input: $input) {
+        id
+        deploymentConnectionId
+        deploymentSettings
+    }
+}

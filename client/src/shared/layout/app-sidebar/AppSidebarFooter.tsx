@@ -21,7 +21,7 @@ import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {resolvePlatformMode} from '@/shared/navigation/platformMode';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -34,6 +34,7 @@ import {
     EyeOffIcon,
     HelpCircleIcon,
     HistoryIcon,
+    LayoutGridIcon,
     MessagesSquareIcon,
     RocketIcon,
     SettingsIcon,
@@ -183,6 +184,19 @@ export function AppSidebarFooter() {
                                 <ClipboardCheckIcon className="size-5" />
 
                                 <span>Approval Tasks</span>
+                            </div>
+                        </DropdownMenuItem>
+                    )}
+
+                    {platformMode === PlatformType.AUTOMATION && edition === EditionType.EE && (
+                        <DropdownMenuItem
+                            className="cursor-pointer font-semibold"
+                            onClick={() => navigate('/automation/portal')}
+                        >
+                            <div className="flex items-center space-x-1">
+                                <LayoutGridIcon className="size-5" />
+
+                                <span>App Portal</span>
                             </div>
                         </DropdownMenuItem>
                     )}

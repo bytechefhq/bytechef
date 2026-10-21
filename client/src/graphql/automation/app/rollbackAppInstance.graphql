@@ -1,0 +1,7 @@
+mutation rollbackAppInstance($appInstanceId: ID!, $appVersionId: ID!) {
+    rollbackAppInstance(appInstanceId: $appInstanceId, appVersionId: $appVersionId) {
+        id
+        appInstanceId
+        status
+    }
+}

@@ -158,6 +158,60 @@ describe('AppSidebarFooter', () => {
         expect(screen.queryByText('Approval Tasks')).not.toBeInTheDocument();
     });
 
+    it('opens the App Portal from the user menu in EE automation mode', async () => {
+        hoisted.edition = 'EE';
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/automation/projects" />
+
+                    <Route element={<div>App Portal page</div>} path="/automation/portal" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('App Portal'));
+
+        expect(await screen.findByText('App Portal page')).toBeInTheDocument();
+    });
+
+    it('hides the App Portal in CE', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Approval Tasks')).toBeInTheDocument();
+        expect(screen.queryByText('App Portal')).not.toBeInTheDocument();
+    });
+
+    it('hides the App Portal in EE embedded mode', async () => {
+        hoisted.currentType = 1;
+        hoisted.edition = 'EE';
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Log Out')).toBeInTheDocument();
+        expect(screen.queryByText('App Portal')).not.toBeInTheDocument();
+    });
+
     it('opens the Automation settings from an Organization settings page after coming from Automation', async () => {
         const user = userEvent.setup();
 

@@ -1,0 +1,7 @@
+mutation cancelAppDeployment($appInstanceId: ID!, $appDeploymentId: ID!) {
+    cancelAppDeployment(appInstanceId: $appInstanceId, appDeploymentId: $appDeploymentId) {
+        id
+        appInstanceId
+        status
+    }
+}
