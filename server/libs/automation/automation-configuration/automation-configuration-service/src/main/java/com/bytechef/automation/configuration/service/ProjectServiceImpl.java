@@ -20,13 +20,16 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -156,7 +159,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Long> getWorkspaceProjectIds(long workspaceId) {
-        return projectRepository.findProjectIdsByWorkspaceIdExcludingOwned(workspaceId);
+        return getWorkspaceProjectIds(workspaceId, EnumSet.allOf(ProjectOwner.class));
+    }
+
+    @Override
+    public List<Long> getWorkspaceProjectIds(long workspaceId, Set<ProjectOwner> excludedProjectOwners) {
+        return projectRepository.findProjectIdsByWorkspaceIdExcludingOwned(workspaceId, excludedProjectOwners);
     }
 
     @Override

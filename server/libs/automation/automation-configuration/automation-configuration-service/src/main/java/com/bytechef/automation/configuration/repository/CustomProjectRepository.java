@@ -17,7 +17,9 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -30,5 +32,5 @@ public interface CustomProjectRepository {
 
     List<Long> findProjectIdsByNameIgnoreCaseExcludingOwned(String name, long workspaceId);
 
-    List<Long> findProjectIdsByWorkspaceIdExcludingOwned(long workspaceId);
+    List<Long> findProjectIdsByWorkspaceIdExcludingOwned(long workspaceId, Set<ProjectOwner> projectOwners);
 }
