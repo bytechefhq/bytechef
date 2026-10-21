@@ -40,7 +40,7 @@ Behavior:
 - The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
 - Managed connections do not offer **Update credentials**.
 
-Only the connection's owner (the user who created it) or a tenant admin can replace its credentials. The server rejects the request for anyone else. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` [audit event](/platform/settings/audit-events). The event holds the connection ID only. Credential values are never recorded.
+Only the connection's owner (the member who created it, or the member it was reassigned to) can replace its credentials; a tenant admin cannot replace the credentials of a connection they do not own. Organization connections are the exception: any organization admin can replace their credentials. The server rejects the request for anyone else. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` [audit event](/platform/settings/audit-events). The event holds the connection ID only. Credential values are never recorded.
 
 This applies to automation connections. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
 
@@ -66,7 +66,7 @@ The page is headed **Organization Connections**, described as "Manage organizati
 
 **New Connection** opens the standard connection dialog, with the same component picker, connection properties and OAuth2 flow as any other connection. Organization connections cannot be narrowed to a smaller visibility. To remove one, delete it.
 
-Organization connections are listed on every workspace's **Connections** page. Creating, renaming and deleting them is reserved for organization admins (the `ROLE_ADMIN` authority).
+Organization connections are listed on every workspace's **Connections** page. Creating, renaming and deleting them is reserved for organization admins (the `ROLE_ADMIN` authority). Every organization admin can also view and replace an organization connection's credentials, whoever created it; other members can only use it in workflows.
 
 {/* TODO screenshot: Settings → Connections - the Organization Connections table with Name / Component / Environment / Created By / Last Modified columns, and the New Connection button */}
 
@@ -118,15 +118,15 @@ Both rules are applied on the server and ignore the request body.
 `WORKSPACE` visibility lets members **use** a connection and see that it exists. It does not let them read or change the credential:
 
 - The connection APIs obfuscate `authorizationParameters` and return `parameters` as null.
-- Only the member who created a connection sees its secret values; the creator and organization admins can replace them. Organization connections are the exception: every organization admin can view and replace their secrets.
+- Only the connection's **owner** (the member who created it, or the member it was reassigned to) sees its secret values; the owner and organization admins can replace them. Organization connections are the exception: every organization admin can view and replace their secrets.
 - Only the connection's owner and tenant admins can edit connection properties.
 
 A colleague can run a workflow with a shared connection but cannot extract the credential or point it at another account.
 
 | Connection | View its secrets | Replace its secrets | Use it in workflows | Rename, tag and delete it |
 |---|---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even an organization admin | Its owner and organization admins | Yes, where you can reach it | Organization admins |
+| A connection you own (you created it, or it was reassigned to you) | You, with `CONNECTION_EDIT` | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Its owner and organization admins | Yes, where you can reach it | Organization admins, who can also reassign it to another member |
 | An organization connection | Every organization admin | Every organization admin | Every member | Organization admins |
 | An embedded connection created for a connected user | No ByteChef user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
@@ -134,12 +134,14 @@ Visibility is also a **precondition** of the permission check, not a filter runn
 
 ## Who can edit, delete or re-authorize a connection
 
-Each of these actions needs two things at once:
+Renaming, retagging and deleting a connection each need two things at once:
 
-1. the matching scope in the connection's workspace: `CONNECTION_EDIT` to rename, retag or replace credentials, `CONNECTION_DELETE` to delete; **and**
+1. the matching scope in the connection's workspace: `CONNECTION_EDIT` to rename or retag, `CONNECTION_DELETE` to delete; **and**
 2. being the connection's **owner** (the member who created it, or the member it was reassigned to) or an **organization admin** (the `ROLE_ADMIN` authority).
 
 With the built-in roles, `CONNECTION_EDIT` and `CONNECTION_DELETE` come with Editor, so an Editor or Admin can change the connections they own; a Viewer who owns a connection cannot change it, and neither an Editor nor a workspace Admin can change a connection someone else owns. A custom role can carry the scopes too. Organization admins pass both checks. The **Connections** list offers **Edit** and **Delete** only to those who may use them, and a request from anyone else is refused (HTTP 403, or a GraphQL `FORBIDDEN` error).
+
+Replacing credentials is stricter: it needs `CONNECTION_EDIT` **and** being the connection's owner. An organization admin who does not own a connection can rename, retag, delete or reassign it, but cannot view or replace its credentials. The exception is an organization connection, whose credentials every organization admin can view and replace.
 
 Replacing credentials keeps the connection's id, so every workflow and deployment that uses it follows the new credentials. The submitted authorization fields replace the stored ones as a whole, the connection's credentials are marked valid again, and the operation is refused for a connection that is not active. It is available in the edit dialog as **Update credentials**, and through the `updateConnectionCredentials` GraphQL mutation, which takes the connection's current version so a concurrent change is rejected rather than overwritten. See [Connections](/platform/automation/build/connections#replacing-a-connections-credentials).
 
@@ -150,7 +152,7 @@ Removing a member from a workspace does two things to the connections in that wo
 1. Every grant naming that member on the workspace's connections is revoked at once.
 2. Every connection the member owns moves to **Pending reassignment** (status `PENDING_REASSIGNMENT`). A former member no longer counts as the owner.
 
-A pending connection stays in place, but workflows cannot run on it (see the next section). An organization admin resolves it from the connection's menu with **Reassign owner**, choosing a new owner from the workspace; the connection becomes active again and the new owner can edit it. A connection whose status is `REVOKED` cannot be reassigned.
+A pending connection stays in place, but workflows cannot run on it (see the next section). An organization admin resolves it from the connection's menu with **Reassign owner**, choosing a new owner from the workspace; the connection becomes active again, and the new owner can edit it and, as its owner, view and replace its credentials. The previous owner loses that access. Reassigning an active connection hands over its credentials the same way. A connection whose status is `REVOKED` cannot be reassigned.
 
 ## Runs are blocked while a connection is not active
 
