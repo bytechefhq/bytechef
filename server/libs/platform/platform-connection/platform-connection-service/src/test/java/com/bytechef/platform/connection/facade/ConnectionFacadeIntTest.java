@@ -406,6 +406,64 @@ class ConnectionFacadeIntTest {
                 .isEqualTo("name"));
     }
 
+    @Test
+    void testUpdateAndDeleteOfAnEmbeddedConnectionByNonOwnerNonAdminSkipTheCreatorCheck() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+
+        ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version());
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
+                .isEqualTo("renamed"));
+
+        connectionFacade.update(connectionId, List.of());
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
+
+        connectionFacade.delete(connectionId);
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .isEmpty();
+    }
+
+    @Test
+    void testModifyingAnEmbeddedConnectionStillRequiresAuthentication() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+
+        SecurityContextHolder.clearContext();
+
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
     @ComponentScan(basePackages = {
         "com.bytechef.platform.configuration.accessor", "com.bytechef.platform.tag"
     })
@@ -414,53 +472,60 @@ class ConnectionFacadeIntTest {
 
         @Bean
         JobPrincipalAccessor jobPrincipalAccessor() {
-            return new JobPrincipalAccessor() {
+            return new TestJobPrincipalAccessor(PlatformType.AUTOMATION);
+        }
 
-                @Override
-                public boolean isConnectionUsed(long connectionId) {
-                    return false;
-                }
+        @Bean
+        JobPrincipalAccessor embeddedJobPrincipalAccessor() {
+            return new TestJobPrincipalAccessor(PlatformType.EMBEDDED);
+        }
+    }
 
-                @Override
-                public boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid) {
-                    return false;
-                }
+    private record TestJobPrincipalAccessor(PlatformType type) implements JobPrincipalAccessor {
 
-                @Override
-                public long getEnvironmentId(long jobPrincipalId) {
-                    return 0;
-                }
+        @Override
+        public boolean isConnectionUsed(long connectionId) {
+            return false;
+        }
 
-                @Override
-                public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
-                    return Map.of();
-                }
+        @Override
+        public boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid) {
+            return false;
+        }
 
-                @Override
-                public Map<String, ?> getMetadataMap(long jobPrincipalId) {
-                    return Map.of();
-                }
+        @Override
+        public long getEnvironmentId(long jobPrincipalId) {
+            return 0;
+        }
 
-                @Override
-                public PlatformType getType() {
-                    return PlatformType.AUTOMATION;
-                }
+        @Override
+        public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
+            return Map.of();
+        }
 
-                @Override
-                public String getWorkflowId(long jobPrincipalId, String workflowUuid) {
-                    return "";
-                }
+        @Override
+        public Map<String, ?> getMetadataMap(long jobPrincipalId) {
+            return Map.of();
+        }
 
-                @Override
-                public String getLastWorkflowId(String workflowUuid) {
-                    return "";
-                }
+        @Override
+        public PlatformType getType() {
+            return type;
+        }
 
-                @Override
-                public String getWorkflowUuid(String workflowId) {
-                    return "";
-                }
-            };
+        @Override
+        public String getWorkflowId(long jobPrincipalId, String workflowUuid) {
+            return "";
+        }
+
+        @Override
+        public String getLastWorkflowId(String workflowUuid) {
+            return "";
+        }
+
+        @Override
+        public String getWorkflowUuid(String workflowId) {
+            return "";
         }
     }
 

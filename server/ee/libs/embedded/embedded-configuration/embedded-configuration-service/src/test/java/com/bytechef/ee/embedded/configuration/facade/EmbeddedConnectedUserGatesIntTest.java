@@ -190,6 +190,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class EmbeddedConnectedUserGatesIntTest {
 
     private static final long AUTOMATION_CONNECTION_ID = 93003L;
+    private static final long CONNECTED_USER_CREATED_CONNECTION_ID = 93030L;
     private static final long EMBEDDED_DEVELOPMENT_CONNECTION_ID = 93002L;
     private static final long EMBEDDED_PRODUCTION_CONNECTION_ID = 93001L;
     private static final long INSTANCE_CONNECTION_ID = 93010L;
@@ -532,6 +533,42 @@ class EmbeddedConnectedUserGatesIntTest {
 
         verify(connectionFacade, never()).update(AUTOMATION_CONNECTION_ID, List.of());
         verify(connectionFacade, never()).delete(AUTOMATION_CONNECTION_ID);
+    }
+
+    @Test
+    void testAnEmbeddedEditorManagesAConnectionAConnectedUserCreatedAndAViewerIsRefused() {
+        Connection connectedUserConnection = connection(
+            CONNECTED_USER_CREATED_CONNECTION_ID, PlatformType.EMBEDDED, Environment.PRODUCTION);
+
+        connectedUserConnection.setCreatedBy(externalUserId);
+
+        when(connectionService.fetchConnection(CONNECTED_USER_CREATED_CONNECTION_ID))
+            .thenReturn(Optional.of(connectedUserConnection));
+
+        authenticate(VIEWER_IN_PRODUCTION, false);
+
+        assertThatThrownBy(
+            () -> connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> connectionAdminFacade.updateConnection(
+                CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), null, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
+        verify(connectionFacade, never()).delete(CONNECTED_USER_CREATED_CONNECTION_ID);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
+        connectionAdminFacade.updateConnection(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), null, 0);
+        connectionAdminFacade.deleteConnection(CONNECTED_USER_CREATED_CONNECTION_ID);
+
+        verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
+        verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), 0);
+        verify(connectionFacade).delete(CONNECTED_USER_CREATED_CONNECTION_ID);
     }
 
     @Test
