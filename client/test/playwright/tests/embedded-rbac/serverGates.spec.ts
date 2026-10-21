@@ -30,6 +30,7 @@ interface ResourcesI {
     integrationId: number;
     integrationWorkflowId: number;
     mcpServerId: string;
+    memberConnectionId: number;
     rotationMcpServerId: string;
     scratchConfigurationId: number;
     gateConnectedUserId?: number;
@@ -556,6 +557,13 @@ async function createResources(
         integrationId: embeddedData.integrationId,
         integrationWorkflowId: integrationWorkflow.integrationWorkflowId,
         mcpServerId: developmentData.mcpServerId,
+        memberConnectionId: await embeddedInternalApi<number>(adminApi, 'POST', '/connections', {
+            componentName: 'httpClient',
+            connectionVersion: 1,
+            environmentId: 0,
+            name: `${GATE_PREFIX}_member_connection`,
+            parameters: {},
+        }),
         rotationMcpServerId: await createMcpServer(adminApi, `${GATE_PREFIX}_rotation_mcp`),
         scratchConfigurationId,
         scratchIntegrationId,
@@ -785,6 +793,34 @@ test.describe('Embedded server-side permission gates', () => {
                 resources,
                 true
             );
+        });
+    });
+
+    test('Connection: an EDITOR edits a connection a connected user created but not one another member created', async ({
+        adminApi,
+    }) => {
+        const connectionTagsProbe = (connectionId: number): RestProbeI => ({
+            body: () => ({tags: []}),
+            method: 'PUT',
+            path: () => `${EMBEDDED_INTERNAL}/connections/${connectionId}/tags`,
+        });
+
+        await test.step('a connection a connected user created is allowed', async () => {
+            await expectRestStatus(
+                callers.EDITOR!,
+                connectionTagsProbe(resources.connectedUserConnectionId),
+                resources,
+                false
+            );
+        });
+
+        await test.step('a connection another member created is refused for EDITOR and ADMIN', async () => {
+            await expectRestStatus(callers.EDITOR!, connectionTagsProbe(resources.memberConnectionId), resources, true);
+            await expectRestStatus(callers.ADMIN!, connectionTagsProbe(resources.memberConnectionId), resources, true);
+        });
+
+        await test.step('the tenant admin who created it is allowed', async () => {
+            await expectRestStatus(adminApi, connectionTagsProbe(resources.memberConnectionId), resources, false);
         });
     });
 
