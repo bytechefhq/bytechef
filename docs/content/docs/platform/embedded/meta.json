@@ -32,6 +32,7 @@
     "monitor/failures-and-retries",
     "monitor/troubleshooting",
     "--- Administration ---",
+    "administration/users-and-roles",
     "administration/signing-keys",
     "administration/api-keys"
   ]

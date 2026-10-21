@@ -9,7 +9,9 @@ A Signing Key lets ByteChef verify that a JWT presented by the frontend SDK was 
 
 Your backend signs a short-lived JWT for each end user with the private key and passes it to the SDK (for example `useConnectDialog`) or sends it as a bearer token to the embedded API. The JWT subject (`sub`) is the user's external id, and ByteChef resolves or creates the matching connected user from it.
 
-Signing Keys are managed under **Embedded → Settings → Signing Keys**. Only tenant admins can open the page, and any tenant admin can view, rename or delete every key in the environment.
+Signing Keys are managed under **Embedded → Settings → Signing Keys**.
+
+In Enterprise Edition, tenant admins and members with the Admin role in the key's environment (`EMBEDDED_SETTINGS_MANAGE`) can open, create, edit and delete Signing Keys. Editors and Viewers cannot. See [Users and Roles](/platform/embedded/administration/users-and-roles).
 
 <!-- TODO screenshot: Embedded → Settings → Signing Keys - the signing-keys table with the New Signing Key button -->
 
