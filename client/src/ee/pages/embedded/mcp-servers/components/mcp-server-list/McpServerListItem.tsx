@@ -8,6 +8,7 @@ import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
 
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from '../mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
@@ -20,6 +21,9 @@ interface McpServerListItemProps {
 }
 
 const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+    const canDeleteMcpServer = useHasEmbeddedScope('MCP_DELETE');
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
+
     const {
         handleDeleteClick,
         handleMcpServerListItemClick,
@@ -73,6 +77,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                                             tags: tags || [],
                                         })}
                                         id={parseInt(mcpServer.id!)}
+                                        readOnly={!canEditMcpServer}
                                         remainingTags={tags
                                             ?.filter((tag) => !mcpServerTagIds?.includes(tag.id))
                                             .map((tag) => {
@@ -95,7 +100,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
 
                                 <Switch
                                     checked={mcpServer.enabled}
-                                    disabled={isEnablePending}
+                                    disabled={isEnablePending || !canEditMcpServer}
                                     onCheckedChange={handleOnCheckedChange}
                                 />
                             </div>
@@ -116,6 +121,8 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                         </div>
 
                         <McpServerListItemDropdownMenu
+                            canDelete={canDeleteMcpServer}
+                            canEdit={canEditMcpServer}
                             mcpServer={mcpServer}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}

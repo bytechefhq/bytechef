@@ -7,6 +7,7 @@ import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -32,6 +33,8 @@ const MCP_SERVER_STEPS = [
 ];
 
 const McpServers = () => {
+    const canCreateMcpServer = useHasEmbeddedScope('MCP_CREATE');
+
     const {
         allComponentNames,
         componentDefinitions,
@@ -62,6 +65,7 @@ const McpServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateMcpServer &&
                         validMcpServers.length > 0 && (
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
                         )
@@ -103,6 +107,12 @@ const McpServers = () => {
                         icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="No MCP servers match the selected filter."
                         title="No Matching MCP Servers"
+                    />
+                ) : !canCreateMcpServer ? (
+                    <EmptyList
+                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="There are no MCP servers yet."
+                        title="No MCP Servers"
                     />
                 ) : (
                     <EmptyState
