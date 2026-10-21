@@ -23,7 +23,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  *
  * @author Ivica Cardic
  */
-class CustomConnectedUserRepositoryTest {
+class CustomConnectedUserRepositoryIntTest {
 
     private static final PageRequest FIRST_PAGE = PageRequest.of(0, 20);
 
