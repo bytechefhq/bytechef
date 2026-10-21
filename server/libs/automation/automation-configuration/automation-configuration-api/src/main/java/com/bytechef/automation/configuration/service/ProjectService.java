@@ -63,6 +63,8 @@ public interface ProjectService {
 
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
+    void removeProjectVersion(long id, int projectVersion);
+
     Project update(long id, List<Long> tagIds);
 
     Project update(Project project);

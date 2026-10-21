@@ -77,6 +77,14 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
+    public ResponseEntity<Void> deleteProjectVersion(Long id, Integer projectVersion) {
+        projectFacade.deleteProjectVersion(id, projectVersion);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<ProjectModel> duplicateProject(Long id) {
         return ResponseEntity.ok(conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class));
     }
@@ -140,6 +148,14 @@ public class ProjectApiController implements ProjectApi {
     public ResponseEntity<Void> publishProject(Long id, PublishProjectRequestModel publishProjectRequestModel) {
         projectFacade.publishProject(
             id, publishProjectRequestModel == null ? null : publishProjectRequestModel.getDescription(), true);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> restoreProjectVersion(Long id, Integer projectVersion) {
+        projectFacade.restoreProjectVersion(id, projectVersion);
 
         return ResponseEntity.noContent()
             .build();

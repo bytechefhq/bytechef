@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
@@ -30,6 +31,7 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.ComponentDef
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -40,11 +42,13 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -57,7 +61,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -95,6 +101,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
@@ -106,7 +113,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
@@ -123,6 +131,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
     }
 
     @Override
@@ -179,6 +188,30 @@ public class ProjectFacadeImpl implements ProjectFacade {
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()
 //            .forEach(tagService::delete);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
+    public void deleteProjectVersion(long id, int projectVersion) {
+        Project project = projectService.getProject(id);
+
+        checkPublishedProjectVersion(project, projectVersion);
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getAllProjectDeployments(id);
+
+        if (CollectionUtils.anyMatch(
+            projectDeployments, projectDeployment -> projectDeployment.getProjectVersion() == projectVersion)) {
+
+            throw new ConfigurationException(
+                "Project version v=%s is used by a deployment".formatted(projectVersion),
+                ProjectErrorType.PROJECT_VERSION_DEPLOYED);
+        }
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(id, projectVersion)) {
+            deleteProjectWorkflow(projectWorkflow);
+        }
+
+        projectService.removeProjectVersion(id, projectVersion);
     }
 
     @Override
@@ -453,6 +486,55 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
+    public void restoreProjectVersion(long id, int projectVersion) {
+        Project project = projectService.getProject(id);
+
+        checkPublishedProjectVersion(project, projectVersion);
+
+        int draftProjectVersion = project.getLastProjectVersion();
+
+        Map<String, ProjectWorkflow> draftProjectWorkflowMap = new HashMap<>();
+
+        for (ProjectWorkflow draftProjectWorkflow : projectWorkflowService.getProjectWorkflows(
+            id, draftProjectVersion)) {
+
+            draftProjectWorkflowMap.put(draftProjectWorkflow.getUuidAsString(), draftProjectWorkflow);
+        }
+
+        for (ProjectWorkflow publishedProjectWorkflow : projectWorkflowService.getProjectWorkflows(
+            id, projectVersion)) {
+
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(publishedProjectWorkflow.getWorkflowId());
+
+            ProjectWorkflow draftProjectWorkflow = draftProjectWorkflowMap.remove(
+                publishedProjectWorkflow.getUuidAsString());
+
+            if (draftProjectWorkflow == null) {
+                projectWorkflowService.addWorkflow(
+                    id, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
+
+                continue;
+            }
+
+            String draftWorkflowId = draftProjectWorkflow.getWorkflowId();
+
+            draftProjectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+            projectWorkflowService.update(draftProjectWorkflow);
+
+            workflowTestConfigurationService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+            workflowNodeTestOutputService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+
+            deleteWorkflow(draftWorkflowId);
+        }
+
+        for (ProjectWorkflow draftProjectWorkflow : draftProjectWorkflowMap.values()) {
+            deleteProjectWorkflow(draftProjectWorkflow);
+        }
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#projectDTO.id, 'Project', 'WORKFLOW_EDIT')")
     public void updateProject(ProjectDTO projectDTO) {
         List<Tag> tags = checkTags(projectDTO.tags());
@@ -469,6 +551,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setTags(tags);
 
         projectService.update(project);
+    }
+
+    private static void checkPublishedProjectVersion(Project project, int projectVersion) {
+        ProjectVersion selectedProjectVersion = project.fetchProjectVersion(projectVersion)
+            .orElseThrow(() -> new ConfigurationException(
+                "Project version v=%s not found".formatted(projectVersion),
+                ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
+
+        if (selectedProjectVersion.getStatus() != Status.PUBLISHED) {
+            throw new ConfigurationException(
+                "Project version v=%s is not published".formatted(projectVersion),
+                ProjectErrorType.PROJECT_VERSION_NOT_PUBLISHED);
+        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -540,6 +635,22 @@ public class ProjectFacadeImpl implements ProjectFacade {
         } catch (IOException e) {
             throw new RuntimeException("Failed to export project", e);
         }
+    }
+
+    private void deleteProjectWorkflow(ProjectWorkflow projectWorkflow) {
+        projectWorkflowService.delete(List.of(Objects.requireNonNull(projectWorkflow.getId())));
+
+        deleteWorkflow(projectWorkflow.getWorkflowId());
+    }
+
+    private void deleteWorkflow(String workflowId) {
+        for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+            workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+        }
+
+        workflowTestConfigurationService.delete(workflowId);
+
+        workflowService.delete(workflowId);
     }
 
     private String generateName(String oldName) {

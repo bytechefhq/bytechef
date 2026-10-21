@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -26,6 +27,8 @@ import java.util.Optional;
 public interface ProjectWorkflowService {
 
     ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId);
+
+    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, UUID uuid);
 
     void delete(List<Long> ids);
 

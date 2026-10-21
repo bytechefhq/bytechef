@@ -143,6 +143,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public void removeProjectVersion(long id, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project update(long id, List<Long> tagIds) {
         throw new UnsupportedOperationException();
     }
