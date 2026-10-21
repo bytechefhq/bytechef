@@ -70,6 +70,59 @@ bytechef automation api-collection endpoint disable --id 9
   with the `Environment` schema inlined. When the server spec changes, copy it again, inline `Environment`, and run
   `./gradlew :cli:clients:automation-api-platform:generateClient`.
 
+## App commands (DEVELOPMENT only)
+
+For an app made from the `create-bytechef-app` template, usually run by a coding agent (the template's `AGENTS.md`
+describes the whole loop). Every `automation app` command and `automation connection list` refuses any environment
+but DEVELOPMENT, so use a profile whose token is an **automation API key created in DEVELOPMENT** (an automation API
+key works only in the environment it was created in).
+
+```bash
+bytechef configure --profile dev --host https://app.bytechef.io --token <automation-api-key> \
+  --environment DEVELOPMENT --workspace-id 1
+
+# In the app's directory
+bytechef automation app create --name my-app --profile dev
+# or, with the optional fields
+bytechef automation app create --name my-app --description "Order tracker" --hosting-target SELF_HOSTED --profile dev
+bytechef automation app link --app-id 42 --profile dev
+bytechef automation app list --profile dev
+bytechef automation app status --profile dev --output table
+bytechef automation connection list --component-name hubspot --profile dev
+bytechef automation app bind connection --binding-key crm --component-name hubspot \
+  --actions createContact,getContact --tools searchContacts --proxy GET --profile dev
+bytechef automation app bind workflow --workflow-key onboard-customer --deployment-id 7 \
+  --workflow-uuid 3f1c2a9e-0d4b-4c55-9a43-6a1f0e2b7c11 --profile dev
+bytechef automation app bind api-collection --api-collection-id 9 --profile dev
+bytechef automation app unbind connection --binding-key crm --profile dev
+bytechef automation app unbind workflow --workflow-key onboard-customer --profile dev
+bytechef automation app unbind api-collection --api-collection-id 9 --profile dev
+bytechef automation app key rotate --profile dev
+```
+
+- `create` writes `BYTECHEF_URL` and `BYTECHEF_APP_KEY` into `--env-file` (default `.env.local`) and
+  `.bytechef/app.json` (`id`, `uuid`, `workspaceId`, `environment`, `host`; no secret, commit it) in the current
+  directory. It never prints the key. Only the two `BYTECHEF_*` lines change; every other line stays. The file is
+  written to an owner-only (`600`) temporary file and renamed into place, and the CLI warns when git does not ignore
+  it. If a write fails after the app was created, the error names the app id: `automation app link --app-id <id>`
+  restores `.bytechef/app.json` and `automation app key rotate` writes a new key.
+- `--hosting-target` is `VERCEL` (the default) or `SELF_HOSTED`; `--description` is optional.
+- The other commands find the app through `.bytechef/app.json`, walking up from the current directory like git, or
+  take `--app-id`. `--env-file` is relative to the directory holding `.bytechef/` when the app is found through it, and
+  to the current directory otherwise. A `.bytechef/app.json` written for another host, environment or workspace than
+  the resolved profile is an error. `create` and `link` refuse to run where one already exists.
+- An app named by `--app-id` rather than by a matching `.bytechef/app.json` is fetched first: `status`, `key rotate`, `bind` and
+  `unbind` refuse it unless it is a DEVELOPMENT app of the profile's workspace. Inside a directory linked to another
+  app, `key rotate --app-id` also needs an explicit `--env-file`, so it cannot overwrite the linked app's key.
+- `bind connection` makes the binding exactly what it names: an omitted `--actions`, `--tools` or `--proxy` means
+  none. Without `--connection-id` the CLI uses the only usable connection of `--component-name` and otherwise lists
+  the candidates. Unknown action or tool names fail before anything is written, listing the allowed ones.
+- `status` shows each connection binding's component version as `none` (`null` in JSON output) when it cannot be resolved (the connection
+  can no longer be bound, or you are not a workspace admin).
+- `cli/clients/automation-app/openapi.yaml` is a copy of
+  `server/ee/libs/automation/automation-app/automation-app-public-rest/openapi-management.yaml` with the
+  `Environment` schema inlined (the server file's relative `$ref` does not resolve from the client). When the server
+  spec changes, copy it again, inline `Environment`, and run `./gradlew :cli:clients:automation-app:generateClient`.
 
 ## Embedded commands
 

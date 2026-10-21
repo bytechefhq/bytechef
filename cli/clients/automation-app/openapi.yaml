@@ -1,0 +1,1162 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Automation App Management Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/automation/v1"
+tags:
+  - name: "app"
+    description: "The Automation App Management Public API"
+  - name: "app-api-collection-binding"
+    description: "The Automation App API Collection Binding Management Public API"
+  - name: "app-workflow-binding"
+    description: "The Automation App Workflow Binding Management Public API"
+  - name: "workspace-connection"
+    description: "The Automation Workspace Connection Management Public API"
+paths:
+  /apps:
+    get:
+      description: "Get the apps of a workspace in an environment."
+      summary: "Get apps"
+      tags:
+        - "app"
+      operationId: "getApps"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "workspaceId"
+          description: "The id of a workspace."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "X-Environment"
+          description: "The environment. When omitted, PRODUCTION is used."
+          in: "header"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+      responses:
+        "200":
+          description: "The apps."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    post:
+      description: "Create an app. The response carries the app's secret key, which is shown only once."
+      summary: "Create an app"
+      tags:
+        - "app"
+      operationId: "createApp"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "workspaceId"
+          description: "The id of a workspace."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "X-Environment"
+          description: "The environment. When omitted, PRODUCTION is used."
+          in: "header"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppInput"
+      responses:
+        "201":
+          description: "The created app and its secret key."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSecretKey"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/component-operations:
+    get:
+      description: "Get the names of the actions and agent tools a component version offers: the values the allow-lists of a connection binding accept."
+      summary: "Get the operations of a component"
+      tags:
+        - "app"
+      operationId: "getAppComponentOperations"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "componentName"
+          description: "The name of a component."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of the component."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "The names of the component's actions and agent tools."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppComponentOperations"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}:
+    get:
+      description: "Get an app by id."
+      summary: "Get an app"
+      tags:
+        - "app"
+      operationId: "getApp"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The app."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    patch:
+      description: "Update an app. Fields that are absent keep their stored value; an empty description or url\
+        \ clears it. A given status enables or disables the app."
+      summary: "Update an app"
+      tags:
+        - "app"
+      operationId: "updateApp"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppUpdate"
+      responses:
+        "200":
+          description: "The updated app."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Delete an app together with its connection bindings."
+      summary: "Delete an app"
+      tags:
+        - "app"
+      operationId: "deleteApp"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "204":
+          description: "The app was deleted."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/secret-key:
+    post:
+      description: "Rotate the secret key of an app. The previous key stops working. The new key is shown only\
+        \ once."
+      summary: "Rotate the secret key of an app"
+      tags:
+        - "app"
+      operationId: "rotateAppSecretKey"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The app and its new secret key."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSecretKey"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/bindable-connections:
+    get:
+      description: "Get the connections that can be bound to an app: those of the app's workspace and environment that the caller can see. A connection is usable when its credentials are valid and the caller may use it."
+      summary: "Get the bindable connections of an app"
+      tags:
+        - "app"
+      operationId: "getAppBindableConnections"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - name: "componentName"
+          description: "Only connections of this component."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The bindable connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppBindableConnection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/connections:
+    get:
+      description: "Get the connection bindings of an app."
+      summary: "Get the connection bindings of an app"
+      tags:
+        - "app"
+      operationId: "getAppBindings"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The connection bindings."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/connections/{bindingKey}:
+    put:
+      description: "Bind a connection to an app under a binding key, replacing any binding that already uses\
+        \ the key."
+      summary: "Bind a connection to an app"
+      tags:
+        - "app"
+      operationId: "bindAppConnection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/bindingKey"
+        - $ref: "#/components/parameters/appEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppBindingInput"
+      responses:
+        "200":
+          description: "The connection binding."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Remove the connection binding of an app under a binding key."
+      summary: "Unbind a connection from an app"
+      tags:
+        - "app"
+      operationId: "unbindAppConnection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/bindingKey"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "204":
+          description: "The connection binding was removed."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/bindable-api-collections:
+    get:
+      description: "Get the API collections of the app's workspace and environment that can be bound to an app."
+      summary: "Get the bindable API collections of an app"
+      tags:
+        - "app-api-collection-binding"
+      operationId: "getAppBindableApiCollections"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The bindable API collections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppBindableApiCollection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/api-collections:
+    get:
+      description: "Get the API collection bindings of an app."
+      summary: "Get the API collection bindings of an app"
+      tags:
+        - "app-api-collection-binding"
+      operationId: "getAppApiCollectionBindings"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The API collection bindings."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppApiCollectionBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/api-collections/{apiCollectionId}:
+    put:
+      description: "Bind an API collection to an app; binding an already bound collection returns the existing\
+        \ binding."
+      summary: "Bind an API collection to an app"
+      tags:
+        - "app-api-collection-binding"
+      operationId: "bindAppApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The API collection binding."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppApiCollectionBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Remove the binding of an API collection to an app."
+      summary: "Unbind an API collection from an app"
+      tags:
+        - "app-api-collection-binding"
+      operationId: "unbindAppApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "204":
+          description: "The API collection binding was removed."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/bindable-workflows:
+    get:
+      description: "Get the deployed app-callable workflows that can be bound to an app."
+      summary: "Get the bindable workflows of an app"
+      tags:
+        - "app-workflow-binding"
+      operationId: "getAppBindableWorkflows"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The bindable workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppBindableWorkflow"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/workflows:
+    get:
+      description: "Get the workflow bindings of an app."
+      summary: "Get the workflow bindings of an app"
+      tags:
+        - "app-workflow-binding"
+      operationId: "getAppWorkflowBindings"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "200":
+          description: "The workflow bindings."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppWorkflowBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /apps/{id}/workflows/{workflowKey}:
+    put:
+      description: "Bind a deployed workflow to an app under a workflow key, replacing any binding that already\
+        \ uses the key."
+      summary: "Bind a workflow to an app"
+      tags:
+        - "app-workflow-binding"
+      operationId: "bindAppWorkflow"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/workflowKey"
+        - $ref: "#/components/parameters/appEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppWorkflowBindingInput"
+      responses:
+        "200":
+          description: "The workflow binding."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppWorkflowBinding"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Remove the workflow binding of an app under a workflow key."
+      summary: "Unbind a workflow from an app"
+      tags:
+        - "app-workflow-binding"
+      operationId: "unbindAppWorkflow"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/appId"
+        - $ref: "#/components/parameters/workflowKey"
+        - $ref: "#/components/parameters/appEnvironment"
+      responses:
+        "204":
+          description: "The workflow binding was removed."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /connections:
+    get:
+      description: "Get the connections of a workspace in an environment. A connection never carries its parameters or credentials."
+      summary: "Get the connections of a workspace"
+      tags:
+        - "workspace-connection"
+      operationId: "getWorkspaceConnections"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "workspaceId"
+          description: "The id of a workspace."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "componentName"
+          description: "Only connections of this component."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "X-Environment"
+          description: "The environment. When omitted, PRODUCTION is used."
+          in: "header"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Environment"
+      responses:
+        "200":
+          description: "The connections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppWorkspaceConnection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    appEnvironment:
+      name: "X-Environment"
+      description: "The environment the app must belong to; an app of another environment is not found. Defaults\
+        \ to PRODUCTION."
+      in: "header"
+      required: false
+      schema:
+        $ref: "#/components/schemas/Environment"
+    apiCollectionId:
+      name: "apiCollectionId"
+      description: "The id of an API collection."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    appId:
+      name: "id"
+      description: "The id of an app."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    bindingKey:
+      name: "bindingKey"
+      description: "The binding key, matching ^[a-z][a-z0-9_-]{0,63}$."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+    workflowKey:
+      name: "workflowKey"
+      description: "The workflow key, matching ^[a-z][a-z0-9_-]{0,63}$."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+  responses:
+    badRequest:
+      description: "Bad request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    notFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    conflict:
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    internalServerError:
+      description: "Internal server error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Environment:
+      description: "The environment."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
+    Error:
+      description: "An error. The code names the error; the message describes it."
+      type: "object"
+      properties:
+        code:
+          description: "The name of the error."
+          type: "string"
+        message:
+          description: "A description of the error."
+          type: "string"
+    AppStatus:
+      description: "The status of an app. A disabled app rejects every call made with its secret key."
+      type: "string"
+      enum:
+        - "ENABLED"
+        - "DISABLED"
+    AppHostingTarget:
+      description: "Where the app is hosted."
+      type: "string"
+      enum:
+        - "VERCEL"
+        - "SELF_HOSTED"
+    AppVisibility:
+      description: "Who can see the app. Apps do not support every visibility."
+      type: "string"
+      enum:
+        - "PRIVATE"
+        - "WORKSPACE"
+        - "ORGANIZATION"
+    App:
+      description: "An app. It never carries the secret key, only a hint (the key's last characters)."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        uuid:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        workspaceId:
+          type: "integer"
+          format: "int64"
+        environment:
+          $ref: "#/components/schemas/Environment"
+        ownerUserId:
+          type: "integer"
+          format: "int64"
+        status:
+          $ref: "#/components/schemas/AppStatus"
+        visibility:
+          $ref: "#/components/schemas/AppVisibility"
+        hostingTarget:
+          $ref: "#/components/schemas/AppHostingTarget"
+        url:
+          type: "string"
+        lastDeployedDate:
+          type: "string"
+          format: "date-time"
+        secretKeyHint:
+          type: "string"
+        secretKeyLastUsedDate:
+          type: "string"
+          format: "date-time"
+        createdBy:
+          type: "string"
+        createdDate:
+          type: "string"
+          format: "date-time"
+        lastModifiedBy:
+          type: "string"
+        lastModifiedDate:
+          type: "string"
+          format: "date-time"
+        version:
+          type: "integer"
+          format: "int32"
+    AppSecretKey:
+      description: "An app together with its plaintext secret key, returned once at create and rotate and never\
+        \ again."
+      type: "object"
+      properties:
+        app:
+          $ref: "#/components/schemas/App"
+        secretKey:
+          type: "string"
+    AppInput:
+      description: "The values to create an app with."
+      type: "object"
+      required:
+        - "name"
+        - "hostingTarget"
+      properties:
+        name:
+          type: "string"
+          maxLength: 256
+        description:
+          type: "string"
+        hostingTarget:
+          $ref: "#/components/schemas/AppHostingTarget"
+        visibility:
+          $ref: "#/components/schemas/AppVisibility"
+    AppUpdate:
+      description: "The values to change on an app. Every field is optional; an absent field keeps its stored\
+        \ value."
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          maxLength: 256
+        description:
+          description: "The new description. An empty string clears it."
+          type: "string"
+        status:
+          $ref: "#/components/schemas/AppStatus"
+        hostingTarget:
+          $ref: "#/components/schemas/AppHostingTarget"
+        url:
+          description: "The new url. An empty string clears it."
+          type: "string"
+          maxLength: 2048
+        lastDeployedDate:
+          type: "string"
+          format: "date-time"
+        visibility:
+          $ref: "#/components/schemas/AppVisibility"
+    AppBinding:
+      description: "A connection bound to an app under a binding key."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        appId:
+          type: "integer"
+          format: "int64"
+        bindingKey:
+          type: "string"
+        connectionId:
+          type: "integer"
+          format: "int64"
+        connectionName:
+          type: "string"
+        componentName:
+          type: "string"
+        connectionVersion:
+          type: "integer"
+          format: "int32"
+        actionNames:
+          type: "array"
+          items:
+            type: "string"
+        toolNames:
+          type: "array"
+          items:
+            type: "string"
+        proxyEnabled:
+          type: "boolean"
+        proxyAllowedMethods:
+          type: "array"
+          items:
+            type: "string"
+    AppBindingInput:
+      description: "The connection to bind and what the app may do with it."
+      type: "object"
+      required:
+        - "connectionId"
+      properties:
+        connectionId:
+          type: "integer"
+          format: "int64"
+        actionNames:
+          description: "The names of the actions the app may run. Defaults to none."
+          type: "array"
+          items:
+            type: "string"
+        toolNames:
+          description: "The names of the agent tools the app may run. Defaults to none."
+          type: "array"
+          items:
+            type: "string"
+        proxyEnabled:
+          description: "Whether the app may proxy HTTP requests through the connection. Defaults to false."
+          type: "boolean"
+        proxyAllowedMethods:
+          description: "The HTTP methods the proxy accepts. Defaults to none."
+          type: "array"
+          items:
+            type: "string"
+    AppApiCollectionBinding:
+      description: "An API collection bound to an app."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        appId:
+          type: "integer"
+          format: "int64"
+        apiCollectionId:
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The collection's name, or #apiCollectionId when the collection no longer exists."
+          type: "string"
+        contextPath:
+          type: "string"
+        collectionVersion:
+          type: "integer"
+          format: "int32"
+        projectId:
+          type: "integer"
+          format: "int64"
+        projectName:
+          type: "string"
+        available:
+          description: "Whether the collection's deployment exists, is enabled and is in the app's workspace and\
+            \ environment."
+          type: "boolean"
+    AppBindableApiCollection:
+      description: "An API collection that can be bound to an app."
+      type: "object"
+      properties:
+        apiCollectionId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        contextPath:
+          type: "string"
+        collectionVersion:
+          type: "integer"
+          format: "int32"
+        projectId:
+          type: "integer"
+          format: "int64"
+        projectName:
+          type: "string"
+        available:
+          description: "Whether the collection's deployment is enabled."
+          type: "boolean"
+    AppWorkflowBinding:
+      description: "A workflow bound to an app under a workflow key."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        appId:
+          type: "integer"
+          format: "int64"
+        workflowKey:
+          type: "string"
+        projectDeploymentId:
+          type: "integer"
+          format: "int64"
+        projectDeploymentName:
+          type: "string"
+        workflowUuid:
+          type: "string"
+        workflowName:
+          type: "string"
+        available:
+          type: "boolean"
+    AppWorkflowBindingInput:
+      description: "The deployed workflow to bind."
+      type: "object"
+      required:
+        - "projectDeploymentId"
+        - "workflowUuid"
+      properties:
+        projectDeploymentId:
+          type: "integer"
+          format: "int64"
+        workflowUuid:
+          type: "string"
+    AppBindableConnection:
+      description: "A connection that can be bound to an app."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        componentName:
+          type: "string"
+        connectionVersion:
+          type: "integer"
+          format: "int32"
+        componentVersion:
+          type: "integer"
+          format: "int32"
+        usable:
+          description: "Whether the connection's credentials are valid and the caller may use it."
+          type: "boolean"
+    AppBindableWorkflow:
+      description: "A deployed app-callable workflow that can be bound to an app."
+      type: "object"
+      properties:
+        projectDeploymentId:
+          type: "integer"
+          format: "int64"
+        projectDeploymentName:
+          type: "string"
+        projectName:
+          type: "string"
+        workflowUuid:
+          type: "string"
+        workflowName:
+          type: "string"
+        description:
+          type: "string"
+    AppComponentOperations:
+      description: "The names of the actions and agent tools of a component version."
+      type: "object"
+      properties:
+        actionNames:
+          type: "array"
+          items:
+            type: "string"
+        toolNames:
+          type: "array"
+          items:
+            type: "string"
+    AppWorkspaceConnection:
+      description: "A connection of a workspace. It never carries parameters or credentials."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        componentName:
+          type: "string"
+        connectionVersion:
+          type: "integer"
+          format: "int32"
+        authorizationType:
+          type: "string"
+        credentialStatus:
+          type: "string"
+        aiProvider:
+          description: "Whether this is a virtual AI-provider connection, which never fills a deployment connection slot."
+          type: "boolean"
+        usable:
+          description: "Whether the connection's credentials are valid and the caller may use it."
+          type: "boolean"
