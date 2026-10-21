@@ -9,6 +9,12 @@ springdoc:
     enabled: false
 ---
 
+docs:
+  changelog-url: https://github.com/bytechefhq/bytechef/releases
+  community-support-url: https://discord.gg/VKvNxHjpYx
+  documentation-url: https://docs.bytechef.io
+  report-bug-url: https://github.com/bytechefhq/bytechef/issues
+
 info:
   ai:
     enabled: ${bytechef.ai.enabled:false}
@@ -19,6 +25,11 @@ info:
       host: ${bytechef.analytics.postHog.host:}
   application:
     edition: ${bytechef.edition:}
+  docs:
+    changelogUrl: ${docs.changelog-url:}
+    communitySupportUrl: ${docs.community-support-url:}
+    documentationUrl: ${docs.documentation-url:}
+    reportBugUrl: ${docs.report-bug-url:}
   featureFlags: ${bytechef.featureFlags}
   helpHub:
     enabled: ${bytechef.helpHub.enabled:false}
