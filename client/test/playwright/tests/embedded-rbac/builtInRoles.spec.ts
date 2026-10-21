@@ -259,13 +259,24 @@ test.describe('tenant user who is not an embedded member', () => {
             ENVIRONMENT_IDS.DEVELOPMENT
         );
 
-        const failedResponses: string[] = [];
+        const deniedResponsePromises: Promise<string | null>[] = [];
 
         page.on('response', (response) => {
             const url = response.url();
 
-            if ((url.includes('/api/embedded/') || url.includes('/graphql')) && response.status() === 403) {
-                failedResponses.push(url);
+            if (url.includes('/api/embedded/') && response.status() === 403) {
+                deniedResponsePromises.push(Promise.resolve(`${response.status()} ${url}`));
+            } else if (url.includes('/graphql')) {
+                deniedResponsePromises.push(
+                    response
+                        .text()
+                        .then((body) =>
+                            /"classification":"FORBIDDEN"|"errorCode":"ACCESS_DENIED"/.test(body)
+                                ? `${response.status()} ${url} ${response.request().postData()?.slice(0, 120)}`
+                                : null
+                        )
+                        .catch(() => null)
+                );
             }
         });
 
@@ -289,7 +300,11 @@ test.describe('tenant user who is not an embedded member', () => {
 
             await page.waitForLoadState('networkidle');
 
-            expect(failedResponses).toEqual([]);
+            const deniedResponses = (await Promise.all(deniedResponsePromises)).filter(
+                (deniedResponse): deniedResponse is string => deniedResponse !== null
+            );
+
+            expect(deniedResponses).toEqual([]);
         } finally {
             await context.close();
         }
