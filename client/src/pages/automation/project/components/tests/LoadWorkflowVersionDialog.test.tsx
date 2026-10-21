@@ -79,6 +79,18 @@ describe('LoadWorkflowVersionDialog', () => {
         expect(hoisted.mutate).toHaveBeenCalledWith({id: 7, projectVersion: 1, workflowUuid: 'workflow-uuid'});
     });
 
+    it('selects a version from the keyboard', () => {
+        renderDialog();
+
+        fireEvent.keyDown(screen.getByRole('option', {name: 'Version 2'}), {key: 'Enter'});
+
+        expect(screen.getByRole('option', {name: 'Version 2'})).toHaveAttribute('aria-selected', 'true');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Load into draft'}));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith({id: 7, projectVersion: 2, workflowUuid: 'workflow-uuid'});
+    });
+
     it('clears the undo history and closes after a successful load', () => {
         renderDialog();
 
