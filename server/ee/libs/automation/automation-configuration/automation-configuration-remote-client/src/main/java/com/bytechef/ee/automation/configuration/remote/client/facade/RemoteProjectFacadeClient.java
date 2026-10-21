@@ -105,7 +105,17 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
+    public void deleteProjectVersion(long id, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public int publishProject(long id, String description, boolean syncWithGit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void restoreProjectVersion(long id, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 

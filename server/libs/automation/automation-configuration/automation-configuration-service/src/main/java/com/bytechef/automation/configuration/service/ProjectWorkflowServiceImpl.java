@@ -44,6 +44,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, UUID uuid) {
+        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId, uuid));
+    }
+
+    @Override
     public void delete(List<Long> ids) {
         projectWorkflowRepository.deleteAllById(ids);
     }

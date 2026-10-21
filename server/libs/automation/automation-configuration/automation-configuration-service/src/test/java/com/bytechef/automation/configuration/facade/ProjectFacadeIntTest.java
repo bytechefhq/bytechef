@@ -31,6 +31,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -45,6 +46,7 @@ import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
@@ -272,6 +274,59 @@ public class ProjectFacadeIntTest {
         // Verify all specific project workflow records are deleted from project_workflow table
         assertThat(projectWorkflowRepository.findById(projectWorkflowId1)).isEmpty();
         assertThat(projectWorkflowRepository.findById(projectWorkflowId2)).isEmpty();
+    }
+
+    @Test
+    public void testDeleteProjectVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+        projectFacade.publishProject(projectDTO.id(), "second", false);
+
+        List<String> firstVersionWorkflowIds = getProjectVersionWorkflowIds(projectDTO.id(), 1);
+
+        assertThat(firstVersionWorkflowIds).hasSize(1);
+
+        projectFacade.deleteProjectVersion(projectDTO.id(), 1);
+
+        Project project = projectRepository.findById(projectDTO.id())
+            .orElseThrow();
+
+        assertThat(project.getProjectVersions())
+            .extracting(ProjectVersion::getVersion)
+            .containsExactlyInAnyOrder(2, 3);
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 1)).isEmpty();
+        assertThat(workflowRepository.findById(firstVersionWorkflowIds.getFirst())).isEmpty();
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 2)).hasSize(1);
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 3)).hasSize(1);
+    }
+
+    @Test
+    public void testDeleteProjectVersionRejectsDeployedVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.createProjectDeployment(workspace.getId(), projectDTO);
+
+        assertThatThrownBy(() -> projectFacade.deleteProjectVersion(projectDTO.id(), 1))
+            .isInstanceOf(ConfigurationException.class);
+
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 1)).hasSize(1);
+
+        projectFacade.deleteProject(projectDTO.id());
+    }
+
+    @Test
+    public void testDeleteProjectVersionRejectsDraftVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        assertThatThrownBy(() -> projectFacade.deleteProjectVersion(projectDTO.id(), 1))
+            .isInstanceOf(ConfigurationException.class);
+
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 1)).hasSize(1);
     }
 
     @Test
@@ -657,6 +712,13 @@ public class ProjectFacadeIntTest {
 
     }
 
+    private List<String> getProjectVersionWorkflowIds(long projectId, int projectVersion) {
+        return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectId, projectVersion)
+            .stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+    }
+
     private void createTestProjectWorkflows(int workspaceCount, int projectCount, int workflowCount) {
         for (int i = 0; i < workspaceCount; i++) {
             Workspace testWorkspace = workspaceRepository.save(new Workspace("test_workspace_" + i));
@@ -965,6 +1027,104 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testRestoreProjectVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(
+            projectDTO, "{\"label\": \"Version 1\", \"description\": \"Test Description\", \"tasks\": []}");
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
+            .getFirst();
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2)
+            .getFirst();
+
+        String draftWorkflowId = draftProjectWorkflow.getWorkflowId();
+
+        Workflow draftWorkflow = workflowRepository.findById(draftWorkflowId)
+            .orElseThrow();
+
+        projectWorkflowFacade.updateWorkflow(
+            draftWorkflowId, "{\"label\": \"Version 2\", \"description\": \"Test Description\", \"tasks\": []}",
+            draftWorkflow.getVersion());
+
+        ProjectWorkflowDTO addedProjectWorkflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 2)).hasSize(2);
+
+        projectFacade.restoreProjectVersion(projectDTO.id(), 1);
+
+        List<ProjectWorkflow> restoredProjectWorkflows = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2);
+
+        assertThat(restoredProjectWorkflows).hasSize(1);
+
+        ProjectWorkflow restoredProjectWorkflow = restoredProjectWorkflows.getFirst();
+
+        assertThat(restoredProjectWorkflow.getId()).isEqualTo(draftProjectWorkflow.getId());
+        assertThat(restoredProjectWorkflow.getUuid()).isEqualTo(publishedProjectWorkflow.getUuid());
+        assertThat(restoredProjectWorkflow.getWorkflowId())
+            .isNotEqualTo(publishedProjectWorkflow.getWorkflowId())
+            .isNotEqualTo(draftWorkflowId);
+
+        Workflow restoredWorkflow = workflowRepository.findById(restoredProjectWorkflow.getWorkflowId())
+            .orElseThrow();
+
+        assertThat(restoredWorkflow.getLabel()).isEqualTo("Version 1");
+
+        assertThat(workflowRepository.findById(draftWorkflowId)).isEmpty();
+        assertThat(workflowRepository.findById(addedProjectWorkflowDTO.getId())).isEmpty();
+        assertThat(workflowRepository.findById(publishedProjectWorkflow.getWorkflowId())).isPresent();
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 1))
+            .containsExactly(publishedProjectWorkflow.getWorkflowId());
+    }
+
+    @Test
+    public void testRestoreProjectVersionAddsWorkflowsMissingFromDraft() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
+            .getFirst();
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2)
+            .getFirst();
+
+        projectWorkflowFacade.deleteWorkflow(draftProjectWorkflow.getWorkflowId());
+
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 1)).hasSize(1);
+        assertThat(getProjectVersionWorkflowIds(projectDTO.id(), 2)).isEmpty();
+
+        projectFacade.restoreProjectVersion(projectDTO.id(), 1);
+
+        List<ProjectWorkflow> restoredProjectWorkflows = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2);
+
+        assertThat(restoredProjectWorkflows).hasSize(1);
+        assertThat(restoredProjectWorkflows.getFirst()
+            .getUuid()).isEqualTo(publishedProjectWorkflow.getUuid());
+    }
+
+    @Test
+    public void testRestoreProjectVersionRejectsDraftVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        assertThatThrownBy(() -> projectFacade.restoreProjectVersion(projectDTO.id(), 1))
+            .isInstanceOf(ConfigurationException.class);
+        assertThatThrownBy(() -> projectFacade.restoreProjectVersion(projectDTO.id(), 5))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
     public void testUpdate() {
         ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
@@ -1039,6 +1199,9 @@ public class ProjectFacadeIntTest {
                 .build();
 
             assertRequiresScope(PROJECT_ID, "Project", "PROJECT_DELETE", () -> projectFacade.deleteProject(PROJECT_ID));
+            assertRequiresBothScopes(
+                PROJECT_ID, "Project", "WORKFLOW_EDIT", "DEPLOYMENT_PUSH",
+                () -> projectFacade.deleteProjectVersion(PROJECT_ID, 1));
             assertRequiresScope(
                 PROJECT_ID, "Project", "PROJECT_SETTINGS", () -> projectFacade.deleteSharedProject(PROJECT_ID));
             assertRequiresBothScopes(
@@ -1051,6 +1214,8 @@ public class ProjectFacadeIntTest {
             assertRequiresBothScopes(
                 PROJECT_ID, "Project", "WORKFLOW_EDIT", "DEPLOYMENT_PUSH",
                 () -> projectFacade.publishProject(PROJECT_ID, "description", false));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_EDIT", () -> projectFacade.restoreProjectVersion(PROJECT_ID, 1));
             assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_EDIT", () -> projectFacade.updateProject(projectDTO));
         }
 
