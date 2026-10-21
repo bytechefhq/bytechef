@@ -95,6 +95,8 @@ Removing a member from a workspace does two things to the connections in that wo
 1. Every grant naming that member on the workspace's connections is revoked at once.
 2. Every connection the member owns moves to **Pending reassignment** (status `PENDING_REASSIGNMENT`). A former member no longer counts as the owner.
 
+Deleting a user account does the same in every workspace the user belonged to.
+
 A pending connection stays in place, but workflows cannot run on it (see the next section). An organization admin resolves it from the connection's menu with **Reassign owner**, choosing a new owner from the workspace; the connection becomes active again, and the new owner can edit it and, as its owner, view and replace its credentials. The previous owner loses that access. Reassigning an active connection hands over its credentials the same way. A connection whose status is `REVOKED` cannot be reassigned.
 
 ## Runs are blocked while a connection is not active
