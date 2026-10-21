@@ -46,6 +46,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -83,6 +84,8 @@ import org.springframework.security.access.AccessDeniedException;
 public class ProjectWorkflowExecutionFacadeTest {
 
     private ContextService contextService;
+    private EmbeddedResourceResolver embeddedResourceResolver;
+    private StaticListableBeanFactory embeddedResourceResolverBeanFactory;
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private JobService jobService;
@@ -101,6 +104,8 @@ public class ProjectWorkflowExecutionFacadeTest {
         ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
 
         contextService = mock(ContextService.class);
+        embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        embeddedResourceResolverBeanFactory = new StaticListableBeanFactory();
         evaluator = mock(Evaluator.class);
         jobService = mock(JobService.class);
         permissionService = mock(PermissionService.class);
@@ -122,7 +127,8 @@ public class ProjectWorkflowExecutionFacadeTest {
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
-            contextService, evaluator, mock(EnvironmentService.class),
+            contextService, embeddedResourceResolverBeanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+            evaluator, mock(EnvironmentService.class),
             workflowExecutionRowService, jobService, permissionService, mock(PrincipalJobService.class),
             projectFacade, projectDeploymentService, mock(ProjectService.class), projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
@@ -343,6 +349,69 @@ public class ProjectWorkflowExecutionFacadeTest {
     }
 
     @Test
+    public void testGetWorkflowExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(permissionService.hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> facade.getWorkflowExecution(10L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(taskFileStorage, never()).readJobOutputs(any());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(permissionService.hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(10L, 1L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(taskFileStorage, never()).readTaskExecutionOutput(any());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionAllowsAConnectedUserProjectJobWithConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(taskFileStorage.readTaskExecutionOutput(any()))
+            .thenReturn("output-value");
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        assertThat(taskExecutionDTO.output())
+            .isEqualTo("output-value");
+
+        verify(permissionService).hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW");
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionSkipsConnectedUserViewForOtherJobs() {
+        Job job = new Job(10L);
+
+        job.setWorkflowId("workspace-workflow");
+
+        embeddedResourceResolverBeanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        when(jobService.getJob(10L))
+            .thenReturn(job);
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+
+        facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        verify(permissionService, never()).hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW");
+    }
+
+    @Test
     public void testGetWorkflowExecutionsDeniesWorkflowTheCallerCannotView() {
         when(permissionService.hasWorkflowScope("workflow-1", "EXECUTION_VIEW"))
             .thenReturn(false);
@@ -496,5 +565,18 @@ public class ProjectWorkflowExecutionFacadeTest {
                 eq(true), any(), any(), any(), any());
             verifyNoInteractions(workflowExecutionRowService);
         }
+    }
+
+    private void givenConnectedUserProjectJob(long jobId) {
+        Job job = new Job(jobId);
+
+        job.setWorkflowId("connected-user-workflow");
+
+        embeddedResourceResolverBeanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        when(jobService.getJob(jobId))
+            .thenReturn(job);
+        when(embeddedResourceResolver.isConnectedUserProjectWorkflow("connected-user-workflow"))
+            .thenReturn(true);
     }
 }

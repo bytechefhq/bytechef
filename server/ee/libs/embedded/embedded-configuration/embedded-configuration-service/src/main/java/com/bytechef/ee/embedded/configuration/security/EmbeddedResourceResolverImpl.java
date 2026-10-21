@@ -42,6 +42,11 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
     }
 
     @Override
+    public boolean isConnectedUserProjectWorkflow(String workflowId) {
+        return connectUserProjectRepository.existsByWorkflowId(workflowId);
+    }
+
+    @Override
     public boolean isEmbeddedProject(long projectId) {
         if (isHubProject(projectId)) {
             return true;
