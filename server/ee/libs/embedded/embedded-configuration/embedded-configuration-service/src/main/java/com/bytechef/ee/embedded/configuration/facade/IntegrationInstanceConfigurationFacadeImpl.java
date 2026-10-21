@@ -50,6 +50,7 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -410,7 +411,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
                 integrationWorkflows);
 
-        return permissionService.hasResourceScope(id, INSTANCE_CONFIGURATION_TYPE, INSTANCE_CONFIGURATION_EDIT)
+        boolean canEdit = permissionService.hasResourceScope(
+            id, INSTANCE_CONFIGURATION_TYPE, INSTANCE_CONFIGURATION_EDIT);
+
+        return canSeeCredentials(integrationInstanceConfigurationDTO, canEdit)
             ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials();
     }
 
@@ -429,11 +433,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     INSTANCE_CONFIGURATION_EDIT));
 
             redactedDTOs.add(
-                canEdit
+                canSeeCredentials(integrationInstanceConfigurationDTO, canEdit)
                     ? integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTO.withoutCredentials());
         }
 
         return redactedDTOs;
+    }
+
+    private static boolean canSeeCredentials(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, boolean canEdit) {
+
+        return canEdit && ConnectionSecrets.isCurrentUserCreator(integrationInstanceConfigurationDTO.createdBy());
     }
 
     @Override
