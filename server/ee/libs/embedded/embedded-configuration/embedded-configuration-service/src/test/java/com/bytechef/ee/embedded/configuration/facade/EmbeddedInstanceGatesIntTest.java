@@ -116,6 +116,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -418,6 +419,30 @@ class EmbeddedInstanceGatesIntTest {
         assertThat(integrationInstanceConfigurationRepository.findById(productionConfigurationId)).isEmpty();
         assertThat(integrationInstanceRepository.findById(integrationInstanceId)).isEmpty();
         assertThat(integrationInstanceConfigurationRepository.findById(developmentConfigurationId)).isPresent();
+    }
+
+    @Test
+    void testTheTagListShowsOnlyTagsFromEnvironmentsTheCallerCanView() {
+        String productionTagName = "production-tag-" + UUID.randomUUID();
+        String developmentTagName = "development-tag-" + UUID.randomUUID();
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
+            productionConfigurationId, List.of(new Tag(productionTagName)));
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
+            developmentConfigurationId, List.of(new Tag(developmentTagName)));
+
+        assertThat(integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationTags())
+            .extracting(Tag::getName)
+            .contains(productionTagName, developmentTagName);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        assertThat(integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationTags())
+            .extracting(Tag::getName)
+            .contains(productionTagName)
+            .doesNotContain(developmentTagName);
     }
 
     @Test

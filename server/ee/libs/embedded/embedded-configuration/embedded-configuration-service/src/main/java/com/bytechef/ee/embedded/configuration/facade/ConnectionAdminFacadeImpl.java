@@ -10,19 +10,24 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,21 +45,24 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
     private static final String CONNECTION_TYPE = "Connection";
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
 
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final PermissionService permissionService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService, @Lazy PermissionService permissionService) {
+        ConnectionService connectionService, @Lazy PermissionService permissionService, TagService tagService) {
 
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.permissionService = permissionService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -93,7 +101,19 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     @Override
     @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW')")
     public List<Tag> getConnectionTags() {
-        return connectionFacade.getConnectionTags(PlatformType.EMBEDDED);
+        Set<Integer> viewableEnvironmentIds = Arrays.stream(Environment.values())
+            .filter(environment -> permissionService.hasEmbeddedScope(CONNECTION_VIEW, environment))
+            .map(Environment::ordinal)
+            .collect(Collectors.toSet());
+
+        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
+
+        return tagService.getTags(
+            connections.stream()
+                .filter(connection -> viewableEnvironmentIds.contains(connection.getEnvironmentId()))
+                .map(Connection::getTagIds)
+                .flatMap(Collection::stream)
+                .toList());
     }
 
     @Override
