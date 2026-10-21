@@ -27,10 +27,12 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
@@ -47,7 +49,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -234,12 +236,27 @@ class PreAuthorizeProxyEnforcementIntTest {
     @Test
     void testEmbeddedOnlyMemberListsEmbeddedExecutionsWithoutTheWorkspaceGate() {
         when(permissionService.hasEmbeddedScope(eq("EXECUTION_VIEW"), any(Environment.class))).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
 
         projectWorkflowExecutionFacade.getWorkflowExecutions(
             true, 0L, null, null, null, null, null, null, null, 2L, 0);
 
         verify(permissionService).hasEmbeddedScope("EXECUTION_VIEW", Environment.values()[0]);
+        verify(permissionService).hasEmbeddedScope("CONNECTED_USER_VIEW", Environment.values()[0]);
         verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(projectFacade);
+    }
+
+    @Test
+    void testEmbeddedRunsAreDeniedWithoutConnectedUserView() {
+        when(permissionService.hasEmbeddedScope(eq("EXECUTION_VIEW"), any(Environment.class))).thenReturn(true);
+
+        assertThatThrownBy(
+            () -> projectWorkflowExecutionFacade.getWorkflowExecutions(
+                true, 0L, null, null, null, null, null, null, null, 2L, 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasEmbeddedScope("CONNECTED_USER_VIEW", Environment.values()[0]);
         verifyNoInteractions(projectFacade);
     }
 
@@ -410,10 +427,12 @@ class PreAuthorizeProxyEnforcementIntTest {
                 mock(ComponentDefinitionService.class),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
                 new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
-                mock(ContextService.class), mock(Evaluator.class), mock(EnvironmentService.class),
+                mock(ContextService.class),
+                new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class), mock(Evaluator.class),
+                mock(EnvironmentService.class),
                 mock(WorkflowExecutionRowService.class), mock(JobService.class), permissionService,
                 mock(PrincipalJobService.class), projectFacade, mock(ProjectDeploymentService.class),
-                mock(ProjectService.class), mock(ProjectWorkflowService.class),
+                mock(ProjectOwnershipService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
                 mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),
                 mock(TaskFileStorage.class), mock(TriggerExecutionService.class), mock(TriggerFileStorage.class),
                 mock(WorkflowService.class));
@@ -443,8 +462,8 @@ class PreAuthorizeProxyEnforcementIntTest {
         }
 
         @Bean
-        UserInvitationService userInvitationService() {
-            return mock(UserInvitationService.class);
+        UserInvitationFacade userInvitationFacade() {
+            return mock(UserInvitationFacade.class);
         }
 
         @Bean

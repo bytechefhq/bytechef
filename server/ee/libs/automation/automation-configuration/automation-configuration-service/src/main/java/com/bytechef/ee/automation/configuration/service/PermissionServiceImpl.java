@@ -16,6 +16,7 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -652,7 +653,8 @@ public class PermissionServiceImpl implements PermissionService {
         return canUseConnectionInWorkspace(connectionId, workspaceId, environment);
     }
 
-    private boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
+    @Override
+    public boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
         ConnectionService connectionService = connectionServiceProvider.getIfAvailable();
 
         if (connectionService == null) {
@@ -668,6 +670,12 @@ public class PermissionServiceImpl implements PermissionService {
         Connection connection = connectionOptional.get();
 
         if (connection.getType() != PlatformType.EMBEDDED) {
+            return false;
+        }
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver == null || embeddedResourceResolver.isConnectedUserConnection(connectionId)) {
             return false;
         }
 
@@ -794,7 +802,7 @@ public class PermissionServiceImpl implements PermissionService {
             return Collections.emptySet();
         }
 
-        return Set.copyOf(workspaceScopeCacheService.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment));
+        return Set.copyOf(workspaceScopeCache.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment));
     }
 
     @Override
@@ -948,7 +956,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         Set<String> scopeNames =
-            workspaceScopeCacheService.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment);
+            workspaceScopeCache.getWorkspaceScopes(userId.getAsLong(), workspaceId, environment);
 
         return scopeNames.contains(scope);
     }

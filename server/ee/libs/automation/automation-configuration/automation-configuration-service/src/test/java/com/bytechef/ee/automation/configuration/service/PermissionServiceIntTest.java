@@ -1243,6 +1243,16 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testAnIntegrationWorkflowRefusesAConnectionOwnedByAConnectedUser() {
+        assertThat(canUseEmbeddedConnectionInAnIntegrationWorkflow(true)).isFalse();
+    }
+
+    @Test
+    void testAnIntegrationWorkflowGrantsAnEmbeddedConnectionNoConnectedUserOwns() {
+        assertThat(canUseEmbeddedConnectionInAnIntegrationWorkflow(false)).isTrue();
+    }
+
+    @Test
     void testAnEmbeddedConnectionInAnotherEnvironmentIsRefused() {
         String workflowId = "integration-" + UUID.randomUUID();
         ConnectionService connectionService = mock(ConnectionService.class);
@@ -1644,7 +1654,7 @@ class PermissionServiceIntTest {
         };
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
             List.of(connectionEnvironmentResolver),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
@@ -1667,12 +1677,31 @@ class PermissionServiceIntTest {
         EmbeddedScopeCacheService embeddedScopeCacheService) {
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
             new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
             new StaticListableBeanFactory().getBeanProvider(ConnectionService.class));
+    }
+
+    private boolean canUseEmbeddedConnectionInAnIntegrationWorkflow(boolean connectedUserConnection) {
+        String workflowId = "integration-" + UUID.randomUUID();
+        ConnectionService connectionService = mock(ConnectionService.class);
+        EmbeddedResourceResolver embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        EmbeddedScopeCacheService embeddedScopeCacheService = mock(EmbeddedScopeCacheService.class);
+
+        when(embeddedScopeCacheService.getEmbeddedScopes(USER_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of(CONNECTION_VIEW));
+        when(connectionService.fetchConnection(1L))
+            .thenReturn(Optional.of(connection(PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+        when(embeddedResourceResolver.isIntegrationWorkflow(workflowId)).thenReturn(true);
+        when(embeddedResourceResolver.isConnectedUserConnection(1L)).thenReturn(connectedUserConnection);
+
+        PermissionService connectionAwarePermissionService = createConnectionAwarePermissionService(
+            List.of(), List.of(), embeddedResourceResolver, embeddedScopeCacheService, connectionService);
+
+        return connectionAwarePermissionService.canUseConnectionInWorkflow(1L, workflowId, Environment.DEVELOPMENT);
     }
 
     private PermissionService createConnectionAwarePermissionService(
@@ -1688,7 +1717,7 @@ class PermissionServiceIntTest {
             Map.of("embeddedResourceResolver", embeddedResourceResolver));
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, resourceOwnershipResolvers, resourceEnvironmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
@@ -1704,7 +1733,7 @@ class PermissionServiceIntTest {
             : new StaticListableBeanFactory(Map.of("embeddedResourceResolver", embeddedResourceResolver));
 
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, mock(EmbeddedUserRepository.class),
@@ -1714,7 +1743,7 @@ class PermissionServiceIntTest {
 
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
             workspaceUserRepository, List.of(resourceOwnershipResolver), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             mock(EmbeddedScopeCacheService.class), mock(EmbeddedUserRepository.class),

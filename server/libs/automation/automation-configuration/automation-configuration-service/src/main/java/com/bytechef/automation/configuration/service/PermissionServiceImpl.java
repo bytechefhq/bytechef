@@ -50,7 +50,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnCEVersion
 public class PermissionServiceImpl implements PermissionService {
 
-    private final UserService userService;
+    private final CurrentUserResolver currentUserResolver;
     private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
 
     @SuppressFBWarnings("EI")
@@ -190,6 +190,11 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
+        return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
+    }
+
+    @Override
+    public boolean canUseEmbeddedConnection(long connectionId, Environment environment) {
         return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
     }
 

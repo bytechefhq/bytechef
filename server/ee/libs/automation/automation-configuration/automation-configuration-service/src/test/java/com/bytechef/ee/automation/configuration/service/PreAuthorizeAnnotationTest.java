@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ class PreAuthorizeAnnotationTest {
         Class<?> categoryFacade = Class.forName(base + "IntegrationCategoryFacadeImpl");
         Class<?> tagFacade = Class.forName(base + "IntegrationTagFacadeImpl");
         Class<?> workflowFacade = Class.forName(base + "IntegrationWorkflowFacadeImpl");
-        Class<?> webhookFacade = Class.forName(base + "WebhookTriggerTestAdminFacadeImpl");
+        Class<?> webhookFacade = Class.forName(base + "WebhookTriggerTestFacadeImpl");
 
         String development = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
         String workflowView = "hasEmbeddedScope('WORKFLOW_VIEW')";
@@ -269,7 +270,6 @@ class PreAuthorizeAnnotationTest {
         String base = "com.bytechef.ee.embedded.configuration.facade.";
         Class<?> configurationFacade = Class.forName(base + "IntegrationInstanceConfigurationFacadeImpl");
         Class<?> instanceFacade = Class.forName(base + "IntegrationInstanceFacadeImpl");
-        Class<?> instanceAdminFacade = Class.forName(base + "IntegrationInstanceAdminFacadeImpl");
         Class<?> appEventFacade = Class.forName(base + "AppEventFacadeImpl");
 
         String configurationType = "'IntegrationInstanceConfiguration', ";
@@ -330,8 +330,6 @@ class PreAuthorizeAnnotationTest {
         assertEveryPublicOverloadIsGated(
             instanceFacade, "updateIntegrationInstanceWorkflow", instanceManage + " or isConnectedUser()");
 
-        assertEveryPublicOverloadIsGated(instanceAdminFacade, "enableIntegrationInstanceWorkflow", instanceManage);
-
         assertEveryPublicOverloadIsGated(appEventFacade, "create", "hasEmbeddedScope('APP_EVENT_CREATE')");
         assertEveryPublicOverloadIsGated(appEventFacade, "update", "hasEmbeddedScope('APP_EVENT_EDIT')");
         assertEveryPublicOverloadIsGated(appEventFacade, "delete", "hasEmbeddedScope('APP_EVENT_DELETE')");
@@ -344,10 +342,10 @@ class PreAuthorizeAnnotationTest {
         String base = "com.bytechef.ee.embedded.configuration.facade.";
         Class<?> connectedUserFacade =
             Class.forName("com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacadeImpl");
-        Class<?> projectAdminFacade = Class.forName(base + "ConnectedUserProjectAdminFacadeImpl");
-        Class<?> referenceAdminFacade = Class.forName(base + "ConnectedUserWorkflowReferenceAdminFacadeImpl");
+        Class<?> projectAdminFacade = Class.forName(base + "ConnectedUserProjectFacadeImpl");
+        Class<?> referenceAdminFacade = Class.forName(base + "ConnectedUserWorkflowReferenceFacadeImpl");
         Class<?> connectedUserConnectionFacade = Class.forName(base + "ConnectedUserConnectionFacadeImpl");
-        Class<?> connectionAdminFacade = Class.forName(base + "ConnectionAdminFacadeImpl");
+        Class<?> connectionAdminFacade = Class.forName(base + "ConnectionFacadeImpl");
 
         String userType = "'ConnectedUser', ";
         String userView = "hasPermission(#id, " + userType + "'CONNECTED_USER_VIEW')";
@@ -370,17 +368,20 @@ class PreAuthorizeAnnotationTest {
         assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUsers", userListView);
         assertEveryPublicOverloadIsGated(connectedUserFacade, "getConnectedUserDTOs", userListView);
 
-        assertEveryPublicOverloadIsGated(
-            projectAdminFacade, "deleteProjectWorkflow",
-            "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
+        assertOverloadPreAuthorize(
+            projectAdminFacade, "deleteProjectWorkflow", new Class<?>[] {
+                long.class
+            }, "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
                 + "'CONNECTED_USER_DELETE')");
-        assertEveryPublicOverloadIsGated(
-            projectAdminFacade, "enableProjectWorkflow",
-            "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
+        assertOverloadPreAuthorize(
+            projectAdminFacade, "enableProjectWorkflow", new Class<?>[] {
+                long.class, boolean.class
+            }, "hasPermission(#connectedUserProjectWorkflowId, 'ConnectedUserProjectWorkflow', "
                 + "'CONNECTED_USER_MANAGE')");
-        assertEveryPublicOverloadIsGated(
-            projectAdminFacade, "getConnectedUserProjects",
-            "#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : "
+        assertOverloadPreAuthorize(
+            projectAdminFacade, "getConnectedUserProjects", new Class<?>[] {
+                Long.class, Environment.class
+            }, "#connectedUserId == null ? hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment) : "
                 + "hasPermission(#connectedUserId, " + userType + "'CONNECTED_USER_VIEW')");
         assertEveryPublicOverloadIsGated(
             referenceAdminFacade, "getReferences", "hasEmbeddedScope('CONNECTED_USER_VIEW')");
@@ -666,7 +667,8 @@ class PreAuthorizeAnnotationTest {
             "#connectedUserId != null ? " +
                 "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and " +
                 "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : " +
-                "(#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : " +
+                "(#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and " +
+                "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : " +
                 "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId))");
     }
 
@@ -681,7 +683,8 @@ class PreAuthorizeAnnotationTest {
                 java.time.Instant.class, java.time.Instant.class, Long.class, Long.class, String.class,
                 Integer.class, long.class, int.class
             },
-            "#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : " +
+            "#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and " +
+                "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : " +
                 "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)");
     }
 
@@ -792,7 +795,7 @@ class PreAuthorizeAnnotationTest {
         // workspace memberships by passing their id. The annotation pins the self-or-admin check. Pair with
         // PermissionService.isCurrentUser(long) which backs the SpEL expression.
         Class<?> clazz = Class.forName(
-            "com.bytechef.ee.automation.configuration.facade.WorkspaceFacadeImpl");
+            "com.bytechef.ee.automation.configuration.facade.UserWorkspaceFacadeImpl");
 
         assertEveryPublicOverloadIsGated(
             clazz, "getUserWorkspaces",
