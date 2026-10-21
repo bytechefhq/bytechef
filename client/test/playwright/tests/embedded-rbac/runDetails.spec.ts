@@ -1,11 +1,18 @@
-import {type APIRequestContext, type Page, expect, request as playwrightRequest} from '@playwright/test';
+import {type APIRequestContext, type Page, expect} from '@playwright/test';
 import {readFileSync} from 'fs';
 
 import {embeddedRolesTest as test} from '../../fixtures/embeddedRoles';
 import {SAMPLE_WORKFLOW_PATH} from '../../utils/constants';
-import {embeddedInternalApi, openAsEmbeddedRoleUser, signConnectedUserJwt} from '../../utils/embeddedRbacUtils';
+import {
+    createConnectedUserApi,
+    createTeardownAttempt,
+    embeddedInternalApi,
+    openAsEmbeddedRoleUser,
+} from '../../utils/embeddedRbacUtils';
 import getRandomString from '../../utils/getRandomString';
 import {ENVIRONMENT_IDS, RBAC_BASE_URL, createRoleUserApiContext} from '../../utils/rbacUtils';
+
+const RUN_INPUT_MARKER = `rbac_run_input_${getRandomString().slice(0, 8)}`;
 
 const DETAILS_HIDDEN_TEXT = 'You do not have permission to see the inputs, outputs and logs of this run.';
 
@@ -81,35 +88,19 @@ async function createCompletedEmbeddedRun(adminApi: APIRequestContext): Promise<
 
     await embeddedInternalApi(adminApi, 'PATCH', `/integration-instance-configurations/${configurationId}/enable/true`);
 
-    const signingKeyName = `rbac_run_details_${suffix}`;
-
-    const {privateKey} = await embeddedInternalApi<{privateKey: string}>(adminApi, 'POST', '/signing-keys', {
-        environmentId: ENVIRONMENT_IDS.DEVELOPMENT,
-        name: signingKeyName,
-    });
-
-    const signingKeys = await embeddedInternalApi<{id: number; keyId: string; name: string}[]>(
+    const {api: connectedUserApi, signingKeyId} = await createConnectedUserApi(
         adminApi,
-        'GET',
-        `/signing-keys?environmentId=${ENVIRONMENT_IDS.DEVELOPMENT}`
+        RBAC_BASE_URL,
+        'DEVELOPMENT',
+        `rbac_run_details_${suffix}`
     );
-
-    const signingKey = signingKeys.find((candidate) => candidate.name === signingKeyName)!;
-
-    const connectedUserApi = await playwrightRequest.newContext({
-        baseURL: RBAC_BASE_URL,
-        extraHTTPHeaders: {
-            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, privateKey, `rbac_run_details_${suffix}`)}`,
-            'X-Environment': 'DEVELOPMENT',
-        },
-    });
 
     const embeddedRun: EmbeddedRunI = {
         configurationId,
         configurationName,
         connectedUserApi,
         integrationId,
-        signingKeyId: signingKey.id,
+        signingKeyId,
     };
 
     const connectionsResponse = await connectedUserApi.get('/api/embedded/v1/connections');
@@ -131,7 +122,7 @@ async function createCompletedEmbeddedRun(adminApi: APIRequestContext): Promise<
     expect(enableResponse.status(), await enableResponse.text()).toBeLessThan(300);
 
     const runResponse = await connectedUserApi.post(`/api/embedded/v1/workflows/${versionWorkflow.workflowUuid}`, {
-        data: {},
+        data: {rbacRunInput: RUN_INPUT_MARKER},
     });
 
     expect(runResponse.status(), await runResponse.text()).toBe(200);
@@ -167,13 +158,7 @@ async function createCompletedEmbeddedRun(adminApi: APIRequestContext): Promise<
 }
 
 async function deleteEmbeddedRun(adminApi: APIRequestContext, embeddedRun: EmbeddedRunI): Promise<void> {
-    const attempt = async (description: string, action: () => Promise<unknown>) => {
-        try {
-            await action();
-        } catch (error) {
-            console.warn(`runDetails teardown: ${description}: ${error}`);
-        }
-    };
+    const attempt = createTeardownAttempt('runDetails');
 
     if (embeddedRun.integrationInstanceId) {
         await attempt('delete integration instance', () =>
@@ -248,9 +233,19 @@ test.describe('Embedded run details', () => {
                 `/workflow-executions/${embeddedRun.jobId}`
             );
 
+            const editorExecution = await embeddedInternalApi<WorkflowExecutionI>(
+                editorApi,
+                'GET',
+                `/workflow-executions/${embeddedRun.jobId}`
+            );
+
+            expect(editorExecution.job.status).toBe('COMPLETED');
+            expect(JSON.stringify(editorExecution.job.inputs)).toContain(RUN_INPUT_MARKER);
+
             expect(viewerExecution.job.status).toBe('COMPLETED');
             expect(viewerExecution.job.inputs || {}).toEqual({});
             expect(viewerExecution.job.outputs ?? null).toBeNull();
+            expect(JSON.stringify(viewerExecution)).not.toContain(RUN_INPUT_MARKER);
 
             const taskExecutionId = viewerExecution.job.taskExecutions[0].id;
 
