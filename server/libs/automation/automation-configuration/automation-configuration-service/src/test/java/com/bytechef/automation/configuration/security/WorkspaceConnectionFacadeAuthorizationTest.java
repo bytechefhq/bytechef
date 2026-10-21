@@ -183,10 +183,10 @@ class WorkspaceConnectionFacadeAuthorizationTest {
     }
 
     @Test
-    void testUpdateConnectionCredentialsAllowsTheTenantAdmin() throws Exception {
+    void testUpdateConnectionCredentialsHasNoTenantAdminAlternative() throws Exception {
         assertScopeAndOwnerGuard(updateConnectionCredentialsMethod(), new Object[] {
             CONNECTION_ID, Map.of(), 1
-        }, "CONNECTION_EDIT", true, false, true, true);
+        }, "CONNECTION_EDIT", true, false, true, false);
     }
 
     @Test
