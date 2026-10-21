@@ -240,6 +240,17 @@ public interface PermissionService {
     boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment);
 
     /**
+     * Returns whether the current user may bind the embedded connection in the environment: it must be an embedded
+     * connection of that environment that no connected user or integration instance owns, and the user must hold the
+     * embedded {@code CONNECTION_VIEW} scope there.
+     *
+     * @param connectionId the connection being bound
+     * @param environment  the environment the binding applies to
+     * @return {@code true} if the binding is allowed
+     */
+    boolean canUseEmbeddedConnection(long connectionId, Environment environment);
+
+    /**
      * Returns the scope names the current user holds in the workspace (all registered scopes for a tenant admin).
      *
      * @param workspaceId the workspace whose scope grants are returned
