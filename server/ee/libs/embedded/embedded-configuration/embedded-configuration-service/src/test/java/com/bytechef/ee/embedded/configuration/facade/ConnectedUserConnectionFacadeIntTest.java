@@ -226,6 +226,15 @@ class ConnectedUserConnectionFacadeIntTest {
                 .filter(Objects::nonNull)
                 .toList();
         });
+
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(anyLong(), any());
     }
 
     @AfterEach
@@ -401,7 +410,7 @@ class ConnectedUserConnectionFacadeIntTest {
             () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
                 connectedUserId, 82452L, parameters));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
         verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
 
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).contains(82452L);
@@ -425,7 +434,7 @@ class ConnectedUserConnectionFacadeIntTest {
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 82512L));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -743,7 +752,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).containsExactly(83101L);
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -758,17 +767,21 @@ class ConnectedUserConnectionFacadeIntTest {
         doAnswer(invocation -> {
             connectionIdsSeenOnDelete.add(connectedUserConnectionService.getConnectionIds(connectedUserId));
 
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            connectionIdsSeenOnDelete.add(connectedUserConnectionService.getConnectionIds(connectedUserId));
+
             return null;
         }).when(connectionFacade)
-            .delete(83201L);
+            .delete(eq(83201L), any());
 
         connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 83201L);
 
-        verify(connectionFacade).delete(83201L);
+        verify(connectionFacade).delete(eq(83201L), any());
 
-        assertThat(connectionIdsSeenOnDelete)
-            .singleElement()
-            .satisfies(connectionIds -> assertThat(connectionIds).isEmpty());
+        assertThat(connectionIdsSeenOnDelete).containsExactly(List.of(83201L), List.of());
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).isEmpty();
         assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_DELETED, 83201L).getData())
             .containsEntry("result", "SUCCESS")
@@ -1116,7 +1129,7 @@ class ConnectedUserConnectionFacadeIntTest {
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 83550L));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -1614,7 +1627,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserBId, CONNECTED_USER_B_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
                 .containsExactly(CONNECTED_USER_B_CONNECTION_ID);
@@ -1629,7 +1642,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
                 .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
@@ -1644,7 +1657,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
                 .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
@@ -1657,7 +1670,7 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserConnectionFacade.deleteConnectedUserConnection(
                 connectedUserAId, CONNECTED_USER_A_CONNECTION_ID);
 
-            verify(connectionFacade).delete(CONNECTED_USER_A_CONNECTION_ID);
+            verify(connectionFacade).delete(eq(CONNECTED_USER_A_CONNECTION_ID), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId)).isEmpty();
         }
@@ -1669,7 +1682,7 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserConnectionFacade.deleteConnectedUserConnection(
                 connectedUserBId, CONNECTED_USER_B_CONNECTION_ID);
 
-            verify(connectionFacade).delete(CONNECTED_USER_B_CONNECTION_ID);
+            verify(connectionFacade).delete(eq(CONNECTED_USER_B_CONNECTION_ID), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId)).isEmpty();
         }

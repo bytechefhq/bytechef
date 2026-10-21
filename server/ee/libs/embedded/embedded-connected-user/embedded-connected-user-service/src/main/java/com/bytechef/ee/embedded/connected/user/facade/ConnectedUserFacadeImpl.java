@@ -210,9 +210,8 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             .runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
 
         for (long connectionId : connectedUserConnectionService.getConnectionIds(id)) {
-            connectedUserConnectionService.deleteByConnectionId(connectionId);
-
-            connectionFacade.delete(connectionId);
+            connectionFacade.delete(
+                connectionId, () -> connectedUserConnectionService.deleteByConnectionId(connectionId));
         }
 
         connectedUserService.deleteConnectedUser(id);
