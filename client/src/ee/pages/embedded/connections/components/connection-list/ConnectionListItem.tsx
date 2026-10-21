@@ -15,6 +15,7 @@ import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
 import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     IntegrationConnectionWorkflowParentType,
     useIntegrationConnectionWorkflowsQuery,
@@ -39,6 +40,9 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [workflowsOpen, setWorkflowsOpen] = useState(false);
+
+    const canEdit = useHasEmbeddedScope('CONNECTION_EDIT', connection.environmentId);
+    const canDelete = useHasEmbeddedScope('CONNECTION_DELETE', connection.environmentId);
 
     const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
@@ -150,15 +154,17 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             icon={componentDefinition.icon}
             id={connection.id}
             menuItems={
-                <DropdownMenuItem
-                    icon={<Trash2Icon />}
-                    label="Delete"
-                    onClick={() => setShowDeleteDialog(true)}
-                    variant="destructive"
-                />
+                canDelete && (
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                    />
+                )
             }
             name={connection.name}
-            onEditClick={() => setShowEditDialog(true)}
+            onEditClick={canEdit ? () => setShowEditDialog(true) : undefined}
             onOpenChange={setWorkflowsOpen}
             open={workflowsOpen}
             tagList={
@@ -171,6 +177,7 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
                             },
                         })}
                         id={connection.id!}
+                        readOnly={!canEdit}
                         remainingTags={remainingTags}
                         tags={connection.tags}
                         updateTagsMutation={updateConnectionTagsMutation}

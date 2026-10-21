@@ -18,6 +18,10 @@ const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogM
     })
 );
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: () => true,
 }));

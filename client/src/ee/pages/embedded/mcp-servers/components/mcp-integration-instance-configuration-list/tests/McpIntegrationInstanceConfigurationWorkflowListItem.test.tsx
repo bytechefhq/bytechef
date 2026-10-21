@@ -16,6 +16,10 @@ const hoisted = vi.hoisted(() => ({
     workflow: undefined as {id: string; label: string; workflowTaskComponentNames: string[]} | undefined,
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('../hooks/useMcpIntegrationInstanceConfigurationWorkflowListItem', () => ({
     default: () => ({
         handleCloseEditDialog: vi.fn(),
