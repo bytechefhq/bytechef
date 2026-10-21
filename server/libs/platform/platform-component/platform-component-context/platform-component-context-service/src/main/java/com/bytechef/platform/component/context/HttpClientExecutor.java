@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.exception.HttpResponseTooLargeException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -284,7 +285,8 @@ class HttpClientExecutor {
         return switch (responseType.getType()) {
             case ResponseType.Type.BINARY -> new ResponseImpl(
                 httpHeaders.map(),
-                storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody), statusCode);
+                storeBinaryResponseBody(configuration, httpHeaders.map(), (InputStream) httpResponseBody, context),
+                statusCode);
             case ResponseType.Type.JSON -> new ResponseImpl(
                 httpHeaders.map(), JsonUtils.read(httpResponseBody.toString()), statusCode);
             case ResponseType.Type.XML -> new ResponseImpl(
@@ -578,7 +580,8 @@ class HttpClientExecutor {
     }
 
     private FileEntry storeBinaryResponseBody(
-        Configuration configuration, Map<String, List<String>> headers, InputStream httpResponseBody) {
+        Configuration configuration, Map<String, List<String>> headers, InputStream httpResponseBody,
+        Context context) {
 
         String filename = configuration.getFilename();
 
@@ -596,7 +599,40 @@ class HttpClientExecutor {
             }
         }
 
-        return new FileEntryImpl(tempFileStorage.storeFileContent(filename, httpResponseBody));
+        Long maxResponseBytes = configuration.getMaxResponseBytes();
+
+        if (maxResponseBytes == null) {
+            return new FileEntryImpl(tempFileStorage.storeFileContent(filename, httpResponseBody));
+        }
+
+        MaxResponseBytesInputStream maxResponseBytesInputStream = new MaxResponseBytesInputStream(
+            httpResponseBody, maxResponseBytes);
+
+        com.bytechef.file.storage.domain.FileEntry storedFileEntry = tempFileStorage.storeFileContent(
+            filename, maxResponseBytesInputStream);
+
+        if (!maxResponseBytesInputStream.isExceeded()) {
+            return new FileEntryImpl(storedFileEntry);
+        }
+
+        HttpResponseTooLargeException httpResponseTooLargeException = new HttpResponseTooLargeException(
+            maxResponseBytes);
+
+        IOException closeException = maxResponseBytesInputStream.getCloseException();
+
+        if (closeException != null) {
+            httpResponseTooLargeException.addSuppressed(closeException);
+        }
+
+        try {
+            tempFileStorage.deleteFile(storedFileEntry);
+        } catch (RuntimeException deleteException) {
+            httpResponseTooLargeException.addSuppressed(deleteException);
+
+            context.log(log -> log.warn("Unable to delete the spool of an oversized HTTP response", deleteException));
+        }
+
+        throw httpResponseTooLargeException;
     }
 
     @Nullable

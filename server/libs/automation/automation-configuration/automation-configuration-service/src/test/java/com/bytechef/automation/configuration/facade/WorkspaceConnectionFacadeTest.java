@@ -501,10 +501,17 @@ class WorkspaceConnectionFacadeTest {
             ObjectProvider<com.bytechef.platform.connection.security.ConnectionOwnershipExemption> exemptionProvider =
                 mock(ObjectProvider.class);
 
+            @SuppressWarnings("unchecked")
+            ObjectProvider<com.bytechef.platform.connection.usage.ConnectionUsageChecker> emptyConnectionUsageCheckerProvider =
+                mock(ObjectProvider.class);
+
+            when(emptyConnectionUsageCheckerProvider.orderedStream()).thenReturn(java.util.stream.Stream.empty());
+
             com.bytechef.platform.connection.facade.ConnectionFacadeImpl realConnectionFacade =
                 new com.bytechef.platform.connection.facade.ConnectionFacadeImpl(
                     connectionDefinitionService, exemptionProvider, realDepConnectionService, "CE",
-                    jobPrincipalAccessorRegistry, oAuth2Service, tagService, testConfigService, emptyProvider);
+                    jobPrincipalAccessorRegistry, oAuth2Service, tagService, testConfigService, emptyProvider,
+                    emptyConnectionUsageCheckerProvider);
 
             // Capture the Connection passed to the persistence layer — that's the moment of truth.
             // The real ConnectionFacadeImpl.create call path writes connection.setVisibility(WORKSPACE)

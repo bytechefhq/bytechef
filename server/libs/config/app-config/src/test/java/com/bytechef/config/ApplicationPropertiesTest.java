@@ -18,8 +18,10 @@ package com.bytechef.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
+import com.bytechef.config.ApplicationProperties.App;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
 import java.time.Duration;
@@ -32,6 +34,7 @@ import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.bind.handler.NoUnboundElementsBindHandler;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.UnboundElementsSourceFilter;
@@ -330,6 +333,88 @@ class ApplicationPropertiesTest {
             .get())
                 .isInstanceOf(BindException.class)
                 .hasMessageContaining("bytechef.session.store");
+    }
+
+    @Test
+    void testAppWorkflowBinds() {
+        MapConfigurationPropertySource source = new MapConfigurationPropertySource(
+            Map.of(
+                "bytechef.app.workflow.default-wait", "30s",
+                "bytechef.app.workflow.max-wait", "60s",
+                "bytechef.app.workflow.run-retention-days", "30",
+                "bytechef.app.workflow.run-retention-cron", "0 15 3 * * *"));
+
+        App app = new Binder(source)
+            .bind("bytechef.app", App.class)
+            .get();
+
+        App.WorkflowRun workflow = app.getWorkflow();
+
+        assertThat(workflow.getDefaultWait()).isEqualTo(Duration.ofSeconds(30));
+        assertThat(workflow.getMaxWait()).isEqualTo(Duration.ofSeconds(60));
+        assertThat(workflow.getRunRetentionDays()).isEqualTo(30L);
+        assertThat(workflow.getRunRetentionCron()).isEqualTo("0 15 3 * * *");
+    }
+
+    @Test
+    void testAppWorkflowKeysBindWithoutUnboundElements() {
+        ConfigurationPropertySource source = new MapConfigurationPropertySource(
+            Map.of(
+                "bytechef.app.workflow.default-wait", "30s",
+                "bytechef.app.workflow.max-wait", "60s",
+                "bytechef.app.workflow.run-retention-days", "90",
+                "bytechef.app.workflow.run-retention-cron", "0 40 2 * * *"));
+
+        Binder binder = new Binder(source);
+
+        assertThatCode(
+            () -> binder.bind(
+                "bytechef", Bindable.of(ApplicationProperties.class),
+                new NoUnboundElementsBindHandler(BindHandler.DEFAULT)))
+                    .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testAppExecutionBindsWithoutUnboundElements() {
+        ConfigurationPropertySource source = new MapConfigurationPropertySource(
+            Map.of(
+                "bytechef.app.execution.concurrency-limit", "10",
+                "bytechef.app.execution.timeout", "60s"));
+
+        ApplicationProperties applicationProperties = new Binder(source)
+            .bind(
+                "bytechef", Bindable.of(ApplicationProperties.class),
+                new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        App.Execution execution = applicationProperties.getApp()
+            .getExecution();
+
+        assertThat(execution.getConcurrencyLimit()).isEqualTo(10);
+        assertThat(execution.getTimeout()).isEqualTo(Duration.ofSeconds(60));
+    }
+
+    @Test
+    void testAppProxyAndExecutionTimeoutBind() {
+        ConfigurationPropertySource source = new MapConfigurationPropertySource(
+            Map.of(
+                "bytechef.app.execution.timeout", "45s",
+                "bytechef.app.proxy.max-request-bytes", "1024",
+                "bytechef.app.proxy.max-response-bytes", "2048",
+                "bytechef.app.proxy.timeout", "15s"));
+
+        App app = new Binder(source)
+            .bind("bytechef.app", App.class)
+            .get();
+
+        assertThat(app.getExecution()
+            .getTimeout()).isEqualTo(Duration.ofSeconds(45));
+        assertThat(app.getProxy()
+            .getMaxRequestBytes()).isEqualTo(1024L);
+        assertThat(app.getProxy()
+            .getMaxResponseBytes()).isEqualTo(2048L);
+        assertThat(app.getProxy()
+            .getTimeout()).isEqualTo(Duration.ofSeconds(15));
     }
 
     private static ApplicationProperties bind(PropertySource<?> propertySource) {

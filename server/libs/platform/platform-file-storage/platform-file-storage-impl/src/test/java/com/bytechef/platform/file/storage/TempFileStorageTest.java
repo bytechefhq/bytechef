@@ -16,7 +16,11 @@
 
 package com.bytechef.platform.file.storage;
 
-import org.junit.jupiter.api.Disabled;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,8 +28,20 @@ import org.junit.jupiter.api.Test;
  */
 public class TempFileStorageTest {
 
-    @Disabled
+    private final FileEntry fileEntry = new FileEntry("body.bin", "base64:///temp/body.bin");
+    private final FileStorageService fileStorageService = mock(FileStorageService.class);
+
     @Test
-    public void test() {
+    public void testDeleteFileDeletesFromTempDirectory() {
+        new TempFileStorageImpl(fileStorageService).deleteFile(fileEntry);
+
+        verify(fileStorageService).deleteFile("temp", fileEntry);
+    }
+
+    @Test
+    public void testEditorDeleteFileDeletesFromEditorTempDirectory() {
+        new EditorTempFileStorageImpl(fileStorageService).deleteFile(fileEntry);
+
+        verify(fileStorageService).deleteFile("editor/temp", fileEntry);
     }
 }

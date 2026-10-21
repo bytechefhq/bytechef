@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.configurer;
 import static org.springframework.security.web.util.matcher.RegexRequestMatcher.regexMatcher;
 
 import com.bytechef.platform.security.web.filter.ApiKeyAuthenticationFilter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -26,6 +27,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.authentication.AuthenticationConverter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -85,10 +87,23 @@ public class AbstractApiKeyHttpConfigurer
             requestMatcher = (RequestMatcher) pathPattern;
         }
 
-        ApiKeyAuthenticationFilter filter = new ApiKeyAuthenticationFilter(
-            requestMatcher, authenticationConverter, authenticationManager, authenticationEventPublisher);
+        AuthenticationFailureHandler authenticationFailureHandler = getAuthenticationFailureHandler();
+
+        ApiKeyAuthenticationFilter filter = authenticationFailureHandler == null
+            ? new ApiKeyAuthenticationFilter(
+                requestMatcher, authenticationConverter, authenticationManager, authenticationEventPublisher)
+            : new ApiKeyAuthenticationFilter(
+                requestMatcher, authenticationConverter, authenticationManager, authenticationEventPublisher,
+                authenticationFailureHandler);
 
         http.addFilterBefore(filter, BasicAuthenticationFilter.class);
+    }
+
+    /**
+     * The handler answering a failed authentication on this configurer's paths; {@code null} answers a bare 401.
+     */
+    protected @Nullable AuthenticationFailureHandler getAuthenticationFailureHandler() {
+        return null;
     }
 
     protected void registerCsrfOverride(CsrfConfigurer<?> csrf) {

@@ -25,6 +25,8 @@ import java.io.OutputStream;
  */
 public interface TempFileStorage {
 
+    void deleteFile(FileEntry fileEntry);
+
     long getContentLength(FileEntry fileEntry);
 
     InputStream getInputStream(FileEntry fileEntry);

@@ -17,28 +17,40 @@
 package com.bytechef.platform.connection.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.connection.usage.ConnectionUsageChecker;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class ConnectionFacadeTest {
@@ -177,10 +189,77 @@ class ConnectionFacadeTest {
             .getVisibility()).isEqualTo(ResourceVisibility.WORKSPACE);
     }
 
-    private ConnectionFacadeImpl newFacade(String edition) {
+    @Test
+    void testDeleteIsRefusedWhenUsageCheckerReportsUsages() {
+        ConnectionFacadeImpl facade = newFacade("EE", connectionId -> List.of("app 'crm-dashboard' (binding 'crm')"));
+
+        stubConnection();
+
+        runAsAdmin(() -> assertThatThrownBy(() -> facade.delete(5L))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("app 'crm-dashboard' (binding 'crm')"));
+
+        verify(connectionService, never()).delete(5L);
+    }
+
+    @Test
+    void testDeleteProceedsWhenNoUsageCheckerReportsUsages() {
+        ConnectionFacadeImpl facade = newFacade("EE", connectionId -> List.of());
+
+        stubConnection();
+        stubUnusedByWorkflows();
+
+        runAsAdmin(() -> facade.delete(5L));
+
+        verify(connectionService).delete(5L);
+    }
+
+    private ConnectionFacadeImpl newFacade(String edition, ConnectionUsageChecker... usageCheckers) {
+        @SuppressWarnings("unchecked")
+        ObjectProvider<ConnectionUsageChecker> connectionUsageCheckerProvider =
+            (ObjectProvider<ConnectionUsageChecker>) org.mockito.Mockito.mock(ObjectProvider.class);
+
+        org.mockito.Mockito.lenient()
+            .when(connectionUsageCheckerProvider.orderedStream())
+            .thenAnswer(invocation -> Stream.of(usageCheckers));
+
         return new ConnectionFacadeImpl(
             connectionDefinitionService, connectionOwnershipExemptionProvider, connectionService, edition,
             jobPrincipalAccessorRegistry, oAuth2Service, tagService, workflowTestConfigurationService,
-            meterRegistryProvider);
+            meterRegistryProvider, connectionUsageCheckerProvider);
+    }
+
+    private static void runAsAdmin(Runnable runnable) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "admin@localhost.com", null, List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        try {
+            runnable.run();
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
+
+    private void stubUnusedByWorkflows() {
+        JobPrincipalAccessor jobPrincipalAccessor = org.mockito.Mockito.mock(JobPrincipalAccessor.class);
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.isConnectionUsed(5L)).thenReturn(false);
+        when(workflowTestConfigurationService.isConnectionUsed(5L)).thenReturn(false);
+    }
+
+    private void stubConnection() {
+        Connection connection = new Connection();
+
+        connection.setId(5L);
+        connection.setType(PlatformType.AUTOMATION);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
     }
 }
