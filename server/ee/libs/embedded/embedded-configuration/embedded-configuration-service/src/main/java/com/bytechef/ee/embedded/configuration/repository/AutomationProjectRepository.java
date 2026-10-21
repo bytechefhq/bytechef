@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -23,4 +25,12 @@ public interface AutomationProjectRepository extends ListCrudRepository<Automati
     void deleteByProjectId(long projectId);
 
     Optional<AutomationProject> findByProjectId(long projectId);
+
+    @Query("""
+        SELECT COUNT(*) > 0
+        FROM automation_project ap
+        JOIN project_workflow pw ON ap.project_id = pw.project_id
+        WHERE pw.workflow_id = :workflowId
+        """)
+    boolean existsByWorkflowId(@Param("workflowId") String workflowId);
 }
