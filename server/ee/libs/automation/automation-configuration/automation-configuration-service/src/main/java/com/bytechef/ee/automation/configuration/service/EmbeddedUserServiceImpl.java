@@ -18,6 +18,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -96,6 +97,8 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public void removeEnvironmentRole(long userId, Environment environment) {
         Assert.notNull(environment, "'environment' must not be null");
 
+        lockEmbeddedAdmins();
+
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
         Optional<EmbeddedUser> environmentEmbeddedUser = embeddedUserRepository
@@ -126,6 +129,12 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
             embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole));
         } else {
+            Set<Environment> remainingAdminEnvironments = resolveAdminEnvironments(memberRows);
+
+            remainingAdminEnvironments.remove(environment);
+
+            validateEnvironmentsKeepAnAdmin(memberRows, remainingAdminEnvironments);
+
             embeddedUserRepository.delete(removedEmbeddedUser);
         }
 
@@ -134,9 +143,15 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
     @Override
     public boolean removeEmbeddedUser(long userId) {
+        lockEmbeddedAdmins();
+
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
-        boolean existed = embeddedUserRepository.existsByUserId(userId);
+        List<EmbeddedUser> embeddedUsers = embeddedUserRepository.findAllByUserId(userId);
+
+        validateEnvironmentsKeepAnAdmin(embeddedUsers, Set.of());
+
+        boolean existed = !embeddedUsers.isEmpty();
 
         embeddedUserRepository.deleteByUserId(userId);
 
@@ -150,13 +165,27 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         Assert.notNull(environment, "'environment' must not be null");
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        lockEmbeddedAdmins();
+
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
         validateGrantWithinCallerScopes(List.of(environment), embeddedRole);
 
-        if (!embeddedUserRepository.existsByUserId(userId)) {
+        List<EmbeddedUser> memberRows = embeddedUserRepository.findAllByUserId(userId);
+
+        if (memberRows.isEmpty()) {
             throw missingMembership(userId);
         }
+
+        Set<Environment> remainingAdminEnvironments = resolveAdminEnvironments(memberRows);
+
+        if (embeddedRole == WorkspaceRole.ADMIN) {
+            remainingAdminEnvironments.add(environment);
+        } else {
+            remainingAdminEnvironments.remove(environment);
+        }
+
+        validateEnvironmentsKeepAnAdmin(memberRows, remainingAdminEnvironments);
 
         Optional<EmbeddedUser> implicitEmbeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId);
 
@@ -200,12 +229,18 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        lockEmbeddedAdmins();
+
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
         EmbeddedUser embeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId)
             .orElseThrow(() -> missingEmbeddedWideMembership(userId));
 
         validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
+
+        validateEnvironmentsKeepAnAdmin(
+            List.of(embeddedUser),
+            embeddedRole == WorkspaceRole.ADMIN ? EnumSet.allOf(Environment.class) : Set.of());
 
         embeddedUser.assignRole(embeddedRole);
 
@@ -214,6 +249,50 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         permissionService.evictEmbeddedScopeCache(userId);
 
         return savedEmbeddedUser;
+    }
+
+    private void lockEmbeddedAdmins() {
+        embeddedUserRepository.lockEmbeddedUsersWithRole(WorkspaceRole.ADMIN.ordinal());
+    }
+
+    private static Set<Environment> resolveAdminEnvironments(List<EmbeddedUser> embeddedUsers) {
+        Set<Environment> adminEnvironments = EnumSet.noneOf(Environment.class);
+
+        for (EmbeddedUser embeddedUser : embeddedUsers) {
+            if (embeddedUser.getEmbeddedRole() != WorkspaceRole.ADMIN) {
+                continue;
+            }
+
+            Environment environment = embeddedUser.getEnvironment();
+
+            if (environment == null) {
+                return EnumSet.allOf(Environment.class);
+            }
+
+            adminEnvironments.add(environment);
+        }
+
+        return adminEnvironments;
+    }
+
+    private void validateEnvironmentsKeepAnAdmin(
+        List<EmbeddedUser> embeddedUsers, Set<Environment> remainingAdminEnvironments) {
+
+        for (Environment environment : resolveAdminEnvironments(embeddedUsers)) {
+            if (remainingAdminEnvironments.contains(environment)) {
+                continue;
+            }
+
+            long adminCount = embeddedUserRepository.countUsersWithRoleForEnvironment(
+                WorkspaceRole.ADMIN.ordinal(), environment.ordinal());
+
+            if (adminCount <= 1) {
+                throw new ConfigurationException(
+                    "Cannot remove or demote the last embedded admin of environment " + environment.name()
+                        + ". At least one admin must remain there.",
+                    WorkspaceUserErrorType.LAST_ADMIN_PROTECTED);
+            }
+        }
     }
 
     private ConfigurationException missingEmbeddedWideMembership(long userId) {
