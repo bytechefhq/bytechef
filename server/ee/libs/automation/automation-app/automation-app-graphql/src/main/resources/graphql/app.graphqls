@@ -1,0 +1,154 @@
+extend type Query {
+    app(id: ID!): App!
+    appApiCollections(appId: ID!): [AppApiCollectionBinding!]!
+    appBindableApiCollections(appId: ID!): [AppBindableApiCollection!]!
+    appBindings(appId: ID!): [AppBinding!]!
+    apps(workspaceId: ID!, environmentId: ID!): [App!]!
+    appBindableConnections(appId: ID!): [AppBindableConnection!]!
+    appComponentOperations(componentName: String!, componentVersion: Int!): AppComponentOperations!
+    appWorkflows(appId: ID!): [AppWorkflowBinding!]!
+    appBindableWorkflows(appId: ID!): [AppBindableWorkflow!]!
+}
+
+extend type Mutation {
+    createApp(workspaceId: ID!, environmentId: ID!, input: AppInput!): AppSecretKey!
+    updateApp(id: ID!, input: AppInput!): App!
+    updateAppStatus(id: ID!, status: AppStatus!): App!
+    rotateAppSecretKey(id: ID!): AppSecretKey!
+    deleteApp(id: ID!): Boolean!
+    bindAppApiCollection(appId: ID!, apiCollectionId: ID!): AppApiCollectionBinding!
+    unbindAppApiCollection(appId: ID!, apiCollectionId: ID!): Boolean!
+    bindAppConnection(appId: ID!, input: AppBindingInput!): AppBinding!
+    unbindAppConnection(appId: ID!, bindingKey: String!): Boolean!
+    bindAppWorkflow(appId: ID!, input: AppWorkflowBindingInput!): AppWorkflowBinding!
+    unbindAppWorkflow(appId: ID!, workflowKey: String!): Boolean!
+}
+
+enum AppStatus {
+    ENABLED
+    DISABLED
+}
+
+enum AppHostingTarget {
+    VERCEL
+    SELF_HOSTED
+}
+
+type App {
+    id: ID!
+    uuid: String!
+    name: String!
+    description: String
+    workspaceId: ID!
+    environmentId: ID!
+    ownerUserId: ID!
+    status: AppStatus!
+    visibility: String!
+    hostingTarget: AppHostingTarget!
+    url: String
+    lastDeployedDate: String
+    secretKeyHint: String!
+    secretKeyLastUsedDate: String
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+}
+
+type AppSecretKey {
+    app: App!
+    secretKey: String!
+}
+
+type AppBinding {
+    id: ID!
+    appId: ID!
+    bindingKey: String!
+    connectionId: ID!
+    connectionName: String!
+    componentName: String!
+    connectionVersion: Int!
+    componentVersion: Int
+    actionNames: [String!]!
+    toolNames: [String!]!
+    proxyEnabled: Boolean!
+    proxyAllowedMethods: [String!]!
+}
+
+type AppBindableConnection {
+    id: ID!
+    name: String!
+    componentName: String!
+    connectionVersion: Int!
+    componentVersion: Int!
+}
+
+type AppComponentOperations {
+    actionNames: [String!]!
+    toolNames: [String!]!
+}
+
+type AppApiCollectionBinding {
+    id: ID!
+    appId: ID!
+    apiCollectionId: ID!
+    name: String!
+    contextPath: String
+    collectionVersion: Int!
+    projectId: ID
+    projectName: String
+    available: Boolean!
+}
+
+type AppBindableApiCollection {
+    apiCollectionId: ID!
+    name: String!
+    contextPath: String
+    collectionVersion: Int!
+    projectId: ID!
+    projectName: String
+    available: Boolean!
+}
+
+type AppWorkflowBinding {
+    id: ID!
+    appId: ID!
+    workflowKey: String!
+    projectDeploymentId: ID!
+    projectDeploymentName: String
+    workflowUuid: String!
+    workflowName: String
+    available: Boolean!
+}
+
+type AppBindableWorkflow {
+    projectDeploymentId: ID!
+    projectDeploymentName: String!
+    projectName: String!
+    workflowUuid: String!
+    workflowName: String!
+    description: String
+}
+
+input AppInput {
+    name: String!
+    description: String
+    hostingTarget: AppHostingTarget!
+    url: String
+    visibility: String
+}
+
+input AppBindingInput {
+    bindingKey: String!
+    connectionId: ID!
+    actionNames: [String!]!
+    toolNames: [String!]!
+    proxyEnabled: Boolean!
+    proxyAllowedMethods: [String!]!
+}
+
+input AppWorkflowBindingInput {
+    workflowKey: String!
+    projectDeploymentId: ID!
+    workflowUuid: String!
+}

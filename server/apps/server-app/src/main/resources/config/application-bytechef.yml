@@ -102,6 +102,26 @@ bytechef:
         dimensions: 1536
   analytics:
     enabled: false
+  app:
+    execution:
+      # Concurrent action, tool and proxy calls requested by apps. They run on their own lane (appExecutor), so a burst
+      # from apps cannot leave the editor's Test button or the API Platform sync path waiting for a permit.
+      concurrency-limit: 10
+      # Maximum time an action or tool execution requested by an app may run.
+      timeout: 60s
+    proxy:
+      max-request-bytes: 10485760
+      max-response-bytes: 10485760
+      timeout: 30s
+    workflow:
+      # How long a workflow run requested by an app is waited for when the request names no wait.
+      default-wait: 30s
+      # The longest wait an app may request for a workflow run.
+      max-wait: 60s
+      # How many days an app's workflow run records are kept; the retention job deletes older ones daily.
+      run-retention-days: 90
+      # Cron expression of the daily app workflow run retention sweep.
+      run-retention-cron: "0 40 2 * * *"
   approval:
     signed-token:
       # Tolerance applied to signed approval link expiry checks default: PT60S

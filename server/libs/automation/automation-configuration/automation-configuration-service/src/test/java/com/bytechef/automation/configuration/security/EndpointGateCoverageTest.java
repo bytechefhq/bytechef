@@ -46,6 +46,10 @@ class EndpointGateCoverageTest {
     private static final String EMBEDDED_INTERNAL_KEY_PREFIX = "embedded:";
     private static final String EMBEDDED_PATH_SCOPED =
         "connected-user scoped by the external user in the path, which the tenant's API key may act for";
+    private static final String API_PLATFORM_TEMPLATE_HOOK =
+        "template hook of AbstractApiPlatformEndpointController, not an endpoint";
+    private static final String APP_SECRET_KEY_SCOPED =
+        "app runtime, authenticated by the app secret key and confined to the calling app's own bindings";
     private static final String EMBEDDED_PRINCIPAL_SCOPED =
         "connected-user scoped by principal: the connected user is resolved from the caller's login";
     private static final String EMBEDDED_PUBLIC_KEY_PREFIX = "embedded-v1:";
@@ -283,6 +287,17 @@ class EndpointGateCoverageTest {
         Map.entry(
             "ApiPlatformHandlerController#getSearchableApiCollections",
             "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry("AppApiEndpointController#doHandle", APP_SECRET_KEY_SCOPED),
+        Map.entry("AppApiEndpointController#executeEndpoint", APP_SECRET_KEY_SCOPED),
+        Map.entry("AppApiEndpointController#getBasePath", API_PLATFORM_TEMPLATE_HOOK),
+        Map.entry("AppApiEndpointController#getEnvironment", API_PLATFORM_TEMPLATE_HOOK),
+        Map.entry("AppApiEndpointController#getSearchableApiCollections", API_PLATFORM_TEMPLATE_HOOK),
+        Map.entry("AppApiEndpointController#notFound", API_PLATFORM_TEMPLATE_HOOK),
+        Map.entry("AppApiEndpointController#unavailable", API_PLATFORM_TEMPLATE_HOOK),
+        Map.entry("AppConnectionApiController#executeAction", APP_SECRET_KEY_SCOPED),
+        Map.entry("AppProxyApiController#proxy", APP_SECRET_KEY_SCOPED),
+        Map.entry("AppToolApiController#executeTool", APP_SECRET_KEY_SCOPED),
+        Map.entry("AppWorkflowApiController#executeWorkflow", APP_SECRET_KEY_SCOPED),
         Map.entry("ApprovalController#approve", "permit-all inbound callback addressed by an approval id"),
         Map.entry("BillingWebhookApiController#handleWebhook", "Stripe webhook, verified by its signature"),
         Map.entry("CopilotApiController#chat", "checks the workflow scope in its body"),

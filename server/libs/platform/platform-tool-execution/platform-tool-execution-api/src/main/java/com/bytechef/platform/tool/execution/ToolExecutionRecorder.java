@@ -18,6 +18,7 @@ package com.bytechef.platform.tool.execution;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -33,4 +34,21 @@ public interface ToolExecutionRecorder {
         Function<? super V, ToolExecutionOutcome> outcomeResolver);
 
     void record(ToolExecutionEvent event);
+
+    default <V> V recordWithErrorMessage(
+        ToolExecutionEvent.Builder builder, Supplier<V> execution,
+        Function<? super V, @Nullable String> errorMessageResolver) {
+
+        return record(builder, execution, result -> {
+            String errorMessage = errorMessageResolver.apply(result);
+
+            if (errorMessage == null) {
+                return ToolExecutionOutcome.SUCCESS;
+            }
+
+            builder.errorMessage(errorMessage);
+
+            return ToolExecutionOutcome.ERROR;
+        });
+    }
 }

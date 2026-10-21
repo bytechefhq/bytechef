@@ -1,0 +1,1008 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The App Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/app/v1"
+tags:
+  - name: "app-connection"
+    description: "The App Connection Public API"
+  - name: "app-tool"
+    description: "The App Tool Public API"
+  - name: "app-proxy"
+    description: "The App Proxy Public API"
+  - name: "app-workflow"
+    description: "The App Workflow Public API"
+  - name: "app-api-collection"
+    description: "The App API Collection Public API"
+  - name: "app-api"
+    description: "The App API Platform endpoint calls"
+paths:
+  /connections:
+    get:
+      description: "Lists the connections bound to the calling app, with the actions and tools each one allows."
+      summary: "Lists the connections bound to the calling app"
+      tags:
+        - "app-connection"
+      operationId: "getConnections"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "The bindings."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppBinding"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /actions:
+    get:
+      description: "Lists the actions the calling app may execute, with the JSON Schema of each action's input."
+      summary: "Lists the actions the calling app may execute"
+      tags:
+        - "app-connection"
+      operationId: "getActions"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "The actions."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppAction"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /connections/{bindingKey}/actions/{actionName}:
+    post:
+      description: "Executes an allowed action through a bound connection."
+      summary: "Executes an allowed action through a bound connection"
+      tags:
+        - "app-connection"
+      operationId: "executeAction"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "bindingKey"
+          description: "The binding key of a connection bound to the calling app."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "actionName"
+          description: "The name of the action."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "input"
+              properties:
+                componentVersion:
+                  description: "The component version; the latest when omitted."
+                  type: "integer"
+                input:
+                  description: "The action input."
+                  type: "object"
+                  additionalProperties: true
+      responses:
+        "200":
+          description: "The action result under `result`."
+          content:
+            application/json:
+              schema:
+                type: "object"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "504":
+          $ref: "#/components/responses/gatewayTimeout"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /tools:
+    get:
+      description: "Lists the tools the calling app may execute, shaped for LLM function calling."
+      summary: "Lists the tools the calling app may execute"
+      tags:
+        - "app-tool"
+      operationId: "getTools"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "The tools."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppTool"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /connections/{bindingKey}/tools/{toolName}:
+    post:
+      description: "Executes an allowed tool through a bound connection."
+      summary: "Executes an allowed tool through a bound connection"
+      tags:
+        - "app-tool"
+      operationId: "executeTool"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "bindingKey"
+          description: "The binding key of a connection bound to the calling app."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "toolName"
+          description: "The name of the tool."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "input"
+              properties:
+                input:
+                  description: "The tool input."
+                  type: "object"
+                  additionalProperties: true
+      responses:
+        "200":
+          description: "The tool result under `result`."
+          content:
+            application/json:
+              schema:
+                type: "object"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "504":
+          $ref: "#/components/responses/gatewayTimeout"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /connections/{bindingKey}/proxy:
+    post:
+      description: "Sends a raw HTTP request through a bound connection."
+      summary: "Sends a raw HTTP request through a bound connection"
+      tags:
+        - "app-proxy"
+      operationId: "proxy"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "bindingKey"
+          description: "The binding key of a connection bound to the calling app."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProxyRequest"
+      responses:
+        "200":
+          description: "The upstream response; `status` is the upstream status."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyResponse"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "413":
+          $ref: "#/components/responses/contentTooLarge"
+        "502":
+          $ref: "#/components/responses/badGateway"
+        "504":
+          $ref: "#/components/responses/gatewayTimeout"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /workflows:
+    get:
+      description: "Lists the workflows bound to the calling app, with their input and output schemas."
+      summary: "Lists the workflows bound to the calling app"
+      tags:
+        - "app-workflow"
+      operationId: "getWorkflows"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "The workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppWorkflow"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /workflows/{workflowKey}:
+    post:
+      description: "Starts a run of a bound workflow and waits up to waitSeconds for it. A run that finished in time\
+        \ answers 200; a run still going or waiting on an approval answers 202 with the runId to poll."
+      summary: "Runs a bound workflow"
+      tags:
+        - "app-workflow"
+      operationId: "executeWorkflow"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "workflowKey"
+          description: "The key a workflow is bound to the calling app under."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecuteWorkflowRequest"
+      responses:
+        "200":
+          description: "The run finished: COMPLETED, FAILED or CANCELLED."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+        "202":
+          description: "The run is RUNNING or waiting on an approval (APPROVAL_REQUIRED)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /workflow-runs/{runId}:
+    get:
+      description: "Returns a workflow run the calling app started."
+      summary: "Returns a workflow run"
+      tags:
+        - "app-workflow"
+      operationId: "getWorkflowRun"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "runId"
+          description: "The id of a run the calling app started."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The run."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collections:
+    get:
+      description: "Lists the API collections bound to the calling app, with their endpoints and the request and\
+        \ response schemas each endpoint's workflow declares."
+      summary: "Lists the API collections bound to the calling app"
+      tags:
+        - "app-api-collection"
+      operationId: "getApiCollections"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "The API collections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppApiCollection"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api/{path}:
+    parameters:
+      - name: "path"
+        description: "v{collectionVersion}/{contextPath}/{endpointPath} of an endpoint of a bound API collection;\
+          \ may span several segments."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+    delete:
+      description: "Calls an endpoint of an API collection bound to the calling app with DELETE. The status,\
+        \ headers and body the endpoint's workflow chose pass through unchanged."
+      summary: "Calls an endpoint of a bound API collection with DELETE"
+      tags:
+        - "app-api"
+      operationId: "callApiEndpointDelete"
+      security:
+        - bearerAuth: []
+      responses:
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          description: "No endpoint of a bound collection matches (APP_API_ENDPOINT_NOT_FOUND)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "The path belongs to a bound collection that is unavailable, or the endpoint's workflow is\
+            \ disabled (APP_API_COLLECTION_UNAVAILABLE)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "The response the endpoint's workflow chose."
+          content:
+            application/json:
+              schema: {}
+    get:
+      description: "Calls an endpoint of an API collection bound to the calling app with GET. The status,\
+        \ headers and body the endpoint's workflow chose pass through unchanged."
+      summary: "Calls an endpoint of a bound API collection with GET"
+      tags:
+        - "app-api"
+      operationId: "callApiEndpointGet"
+      security:
+        - bearerAuth: []
+      responses:
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          description: "No endpoint of a bound collection matches (APP_API_ENDPOINT_NOT_FOUND)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "The path belongs to a bound collection that is unavailable, or the endpoint's workflow is\
+            \ disabled (APP_API_COLLECTION_UNAVAILABLE)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "The response the endpoint's workflow chose."
+          content:
+            application/json:
+              schema: {}
+    patch:
+      description: "Calls an endpoint of an API collection bound to the calling app with PATCH. The status,\
+        \ headers and body the endpoint's workflow chose pass through unchanged."
+      summary: "Calls an endpoint of a bound API collection with PATCH"
+      tags:
+        - "app-api"
+      operationId: "callApiEndpointPatch"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {}
+      responses:
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          description: "No endpoint of a bound collection matches (APP_API_ENDPOINT_NOT_FOUND)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "The path belongs to a bound collection that is unavailable, or the endpoint's workflow is\
+            \ disabled (APP_API_COLLECTION_UNAVAILABLE)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "The response the endpoint's workflow chose."
+          content:
+            application/json:
+              schema: {}
+    post:
+      description: "Calls an endpoint of an API collection bound to the calling app with POST. The status,\
+        \ headers and body the endpoint's workflow chose pass through unchanged."
+      summary: "Calls an endpoint of a bound API collection with POST"
+      tags:
+        - "app-api"
+      operationId: "callApiEndpointPost"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {}
+      responses:
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          description: "No endpoint of a bound collection matches (APP_API_ENDPOINT_NOT_FOUND)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "The path belongs to a bound collection that is unavailable, or the endpoint's workflow is\
+            \ disabled (APP_API_COLLECTION_UNAVAILABLE)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "The response the endpoint's workflow chose."
+          content:
+            application/json:
+              schema: {}
+    put:
+      description: "Calls an endpoint of an API collection bound to the calling app with PUT. The status,\
+        \ headers and body the endpoint's workflow chose pass through unchanged."
+      summary: "Calls an endpoint of a bound API collection with PUT"
+      tags:
+        - "app-api"
+      operationId: "callApiEndpointPut"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {}
+      responses:
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          description: "No endpoint of a bound collection matches (APP_API_ENDPOINT_NOT_FOUND)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "The path belongs to a bound collection that is unavailable, or the endpoint's workflow is\
+            \ disabled (APP_API_COLLECTION_UNAVAILABLE)."
+          headers:
+            X-ByteChef-App-Error:
+              $ref: "#/components/headers/AppError"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: "The response the endpoint's workflow chose."
+          content:
+            application/json:
+              schema: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  headers:
+    AppError:
+      description: "Present with the value true on an error ByteChef itself answers with; absent on a status, headers\
+        \ and body an endpoint's workflow chose, even when that body looks like an error."
+      schema:
+        type: "string"
+        enum:
+          - "true"
+  responses:
+    badRequest:
+      description: "Bad request"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    unauthorized:
+      description: "Unauthorized"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    forbidden:
+      description: "Forbidden"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    notFound:
+      description: "Not found"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    conflict:
+      description: "Conflict"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    unprocessableEntity:
+      description: "Unprocessable entity"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    contentTooLarge:
+      description: "Content too large"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    badGateway:
+      description: "Bad gateway"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    gatewayTimeout:
+      description: "Gateway timeout"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    internalServerError:
+      description: "Internal server error"
+      headers:
+        X-ByteChef-App-Error:
+          $ref: "#/components/headers/AppError"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      description: "An error. The code names the error; the message describes it."
+      type: "object"
+      properties:
+        code:
+          description: "The name of the error."
+          type: "string"
+        message:
+          description: "A description of the error."
+          type: "string"
+    AppBinding:
+      description: "A connection bound to the calling app and what the app may do through it."
+      type: "object"
+      required:
+        - "bindingKey"
+        - "componentName"
+        - "connectionVersion"
+        - "actionNames"
+        - "toolNames"
+        - "proxyEnabled"
+        - "proxyAllowedMethods"
+      properties:
+        bindingKey:
+          type: "string"
+        componentName:
+          type: "string"
+        connectionVersion:
+          type: "integer"
+        componentVersion:
+          description: "The latest version of the connection's component: the version actions and tools run\
+            \ on and whose operations the binding offers. Null when the component cannot be resolved (deleted,\
+            \ dropped in an upgrade, or missing from the component index); calls through such a binding fail."
+          type: "integer"
+          nullable: true
+        actionNames:
+          type: "array"
+          items:
+            type: "string"
+        toolNames:
+          type: "array"
+          items:
+            type: "string"
+        proxyEnabled:
+          type: "boolean"
+        proxyAllowedMethods:
+          type: "array"
+          items:
+            type: "string"
+    AppAction:
+      description: "An action the calling app may execute through a bound connection."
+      type: "object"
+      required:
+        - "bindingKey"
+        - "componentName"
+        - "actionName"
+        - "inputSchema"
+      properties:
+        bindingKey:
+          type: "string"
+        componentName:
+          type: "string"
+        actionName:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        inputSchema:
+          description: "JSON Schema of the action input, generated from the component's full property definition.\
+            \ Properties whose shape depends on the connection appear as open objects."
+          type: "object"
+          additionalProperties: true
+    AppTool:
+      description: "A tool the calling app may execute."
+      type: "object"
+      required:
+        - "name"
+        - "bindingKey"
+        - "componentName"
+        - "toolName"
+        - "parameters"
+      properties:
+        name:
+          description: "<BINDING_KEY>__<TOOL_NAME>, unique per app, for LLM function calling."
+          type: "string"
+        bindingKey:
+          type: "string"
+        componentName:
+          type: "string"
+        toolName:
+          type: "string"
+        description:
+          type: "string"
+        parameters:
+          description: "JSON Schema of the tool input."
+          type: "string"
+    ProxyRequest:
+      type: "object"
+      required:
+        - "method"
+        - "path"
+      properties:
+        method:
+          type: "string"
+          enum:
+            - "GET"
+            - "POST"
+            - "PUT"
+            - "PATCH"
+            - "DELETE"
+            - "HEAD"
+        path:
+          description: "Relative to the connection's base URI; must start with a single '/'."
+          type: "string"
+        query:
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              type: "string"
+        headers:
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              type: "string"
+        body:
+          description: "UTF-8 text, or base64 when bodyEncoding is BASE64."
+          type: "string"
+          nullable: true
+        bodyEncoding:
+          type: "string"
+          enum:
+            - "UTF8"
+            - "BASE64"
+          default: "UTF8"
+        contentType:
+          type: "string"
+    ProxyResponse:
+      type: "object"
+      required:
+        - "status"
+        - "headers"
+        - "bodyEncoding"
+      properties:
+        status:
+          type: "integer"
+        headers:
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              type: "string"
+        body:
+          type: "string"
+          nullable: true
+        bodyEncoding:
+          type: "string"
+          enum:
+            - "UTF8"
+            - "BASE64"
+    AppWorkflow:
+      description: "A workflow bound to the calling app."
+      type: "object"
+      required:
+        - "workflowKey"
+        - "name"
+        - "available"
+      properties:
+        workflowKey:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+          nullable: true
+        inputSchema:
+          description: "JSON Schema of the run input, as declared by the workflow's Call workflow trigger."
+          type: "object"
+          nullable: true
+          additionalProperties: true
+        outputSchema:
+          description: "JSON Schema of the result, as declared by the workflow's Respond to workflow call step."
+          type: "object"
+          nullable: true
+          additionalProperties: true
+        available:
+          description: "False when the deployment or workflow is gone or disabled; runs then fail with 409."
+          type: "boolean"
+    AppApiCollection:
+      description: "An API collection bound to the calling app."
+      type: "object"
+      required:
+        - "apiCollectionId"
+        - "name"
+        - "collectionVersion"
+        - "available"
+        - "endpoints"
+      properties:
+        apiCollectionId:
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The collection name; \"#\" followed by the id when the collection no longer exists."
+          type: "string"
+        contextPath:
+          type: "string"
+          nullable: true
+        collectionVersion:
+          type: "integer"
+        available:
+          description: "False when the collection, its deployment or its project is gone or disabled; calls then\
+            \ fail with 409 and endpoints is empty."
+          type: "boolean"
+        endpoints:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AppApiEndpoint"
+    AppApiEndpoint:
+      description: "An endpoint of an API collection bound to the calling app, called at\
+        \ /api/v{collectionVersion}/{contextPath}/{path}."
+      type: "object"
+      required:
+        - "name"
+        - "httpMethod"
+      properties:
+        name:
+          type: "string"
+        httpMethod:
+          type: "string"
+          enum:
+            - "DELETE"
+            - "GET"
+            - "PATCH"
+            - "POST"
+            - "PUT"
+        path:
+          description: "The endpoint path, relative to the collection's /v{collectionVersion}/{contextPath}."
+          type: "string"
+          nullable: true
+        requestSchema:
+          description: "The JSON Schemas of the request (headers, parameters, body) declared by the endpoint\
+            \ workflow's API request trigger; null when they cannot be read."
+          type: "object"
+          nullable: true
+          additionalProperties: true
+        responseSchema:
+          description: "The JSON Schemas of the responses (success, invalidInput, internalError, forbidden) declared\
+            \ by the endpoint workflow's API request trigger; null when they cannot be read."
+          type: "object"
+          nullable: true
+          additionalProperties: true
+    ExecuteWorkflowRequest:
+      type: "object"
+      required:
+        - "input"
+      properties:
+        input:
+          description: "The run input; validated against the workflow's inputSchema."
+          type: "object"
+          additionalProperties: true
+        waitSeconds:
+          description: "How long to wait for the run before answering 202, from 0 to the server's maximum; the\
+            \ server's default when omitted."
+          type: "integer"
+    WorkflowRunStatus:
+      type: "string"
+      enum:
+        - "RUNNING"
+        - "APPROVAL_REQUIRED"
+        - "COMPLETED"
+        - "FAILED"
+        - "CANCELLED"
+    WorkflowRunError:
+      type: "object"
+      required:
+        - "message"
+      properties:
+        message:
+          type: "string"
+    WorkflowRun:
+      type: "object"
+      required:
+        - "runId"
+        - "workflowKey"
+        - "status"
+      properties:
+        runId:
+          type: "string"
+        workflowKey:
+          type: "string"
+        status:
+          $ref: "#/components/schemas/WorkflowRunStatus"
+        result:
+          description: "The run's result on COMPLETED."
+        error:
+          allOf:
+            - $ref: "#/components/schemas/WorkflowRunError"
+          nullable: true
+        approvalFormUrl:
+          description: "The hosted approval form on APPROVAL_REQUIRED, when the server has a public URL."
+          type: "string"
+          nullable: true
