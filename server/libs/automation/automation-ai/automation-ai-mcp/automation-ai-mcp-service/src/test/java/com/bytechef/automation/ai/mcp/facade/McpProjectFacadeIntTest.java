@@ -48,6 +48,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -55,6 +57,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -88,6 +91,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -110,6 +114,9 @@ class McpProjectFacadeIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @Autowired
+    private JdbcClient jdbcClient;
 
     @Autowired
     private JobFacade jobFacade;
@@ -262,6 +269,20 @@ class McpProjectFacadeIntTest {
         assertThat(projectDeploymentService.getProjectDeployments(null, null, null, null, null))
             .extracting(ProjectDeployment::getId)
             .containsExactly(projectDeployment.getId());
+    }
+
+    @Test
+    void testStartupCheckFindsTheMcpServerRowsInTheOwnerTable() {
+        mcpProjectFacade.createMcpProject(mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+        ProjectOwnershipServiceImpl projectOwnershipService = new ProjectOwnershipServiceImpl(
+            jdbcClient, List.of(), List.of());
+
+        assertThatThrownBy(projectOwnershipService::afterSingletonsInstantiated)
+            .isInstanceOfSatisfying(
+                OwnerContributorMissingException.class,
+                exception -> assertThat(exception.getProjectDeploymentOwners())
+                    .contains(ProjectDeploymentOwner.MCP_SERVER));
     }
 
     @Test

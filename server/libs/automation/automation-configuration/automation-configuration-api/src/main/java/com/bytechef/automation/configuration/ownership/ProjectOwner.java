@@ -16,9 +16,23 @@
 
 package com.bytechef.automation.configuration.ownership;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
 public enum ProjectOwner {
-    EMBEDDED_CATALOG, EMBEDDED_CONNECTED_USER
+
+    EMBEDDED_CATALOG("automation_workflow_project"),
+    EMBEDDED_CONNECTED_USER("connected_user_project");
+
+    private final List<String> ownerTables;
+
+    ProjectOwner(String... ownerTables) {
+        this.ownerTables = List.of(ownerTables);
+    }
+
+    public List<String> getOwnerTables() {
+        return ownerTables;
+    }
 }

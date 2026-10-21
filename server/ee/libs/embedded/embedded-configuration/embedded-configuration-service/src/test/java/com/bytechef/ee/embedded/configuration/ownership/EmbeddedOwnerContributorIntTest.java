@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.ownership;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -28,8 +29,11 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -94,6 +98,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -171,6 +176,9 @@ class EmbeddedOwnerContributorIntTest {
 
     @Autowired
     private EnvironmentService environmentService;
+
+    @Autowired
+    private JdbcClient jdbcClient;
 
     @Autowired
     private PrincipalJobService principalJobService;
@@ -345,6 +353,41 @@ class EmbeddedOwnerContributorIntTest {
         assertThat(catalogProjectIds)
             .contains(catalogProjectId)
             .doesNotContain(connectedUserProjectId);
+    }
+
+    @Test
+    void testStartupCheckFindsTheEmbeddedRowsInTheOwnerTables() {
+        long catalogProjectId = automationWorkflowProjectFacade.createProject(
+            "Startup Check Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+
+        String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
+
+        automationWorkflowProjectFacade.publishProject(catalogProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
+
+        String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "published", null);
+
+        ProjectOwnershipServiceImpl projectOwnershipService = new ProjectOwnershipServiceImpl(
+            jdbcClient, List.of(), List.of());
+
+        assertThatThrownBy(projectOwnershipService::afterSingletonsInstantiated)
+            .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                assertThat(exception.getProjectOwners())
+                    .containsExactly(ProjectOwner.EMBEDDED_CATALOG, ProjectOwner.EMBEDDED_CONNECTED_USER);
+                assertThat(exception.getProjectDeploymentOwners()).contains(ProjectDeploymentOwner.EMBEDDED);
+            });
+        assertThat(ProjectDeploymentOwner.EMBEDDED.getOwnerTables())
+            .allSatisfy(ownerTable -> assertThat(
+                jdbcClient.sql("SELECT EXISTS (SELECT 1 FROM " + ownerTable + ")")
+                    .query(Boolean.class)
+                    .single())
+                        .isTrue());
     }
 
     private long createPlainDeployment() {
