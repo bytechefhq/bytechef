@@ -39,16 +39,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomRoleServiceImpl implements CustomRoleService {
 
     private final CustomRoleRepository customRoleRepository;
+    private final EmbeddedUserService embeddedUserService;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final PermissionService permissionService;
     private final WorkspaceUserService workspaceUserService;
 
     @SuppressFBWarnings("EI")
-    public CustomRoleServiceImpl(CustomRoleRepository customRoleRepository,
+    public CustomRoleServiceImpl(CustomRoleRepository customRoleRepository, EmbeddedUserService embeddedUserService,
         PermissionScopeRegistry permissionScopeRegistry, PermissionService permissionService,
         WorkspaceUserService workspaceUserService) {
 
         this.customRoleRepository = customRoleRepository;
+        this.embeddedUserService = embeddedUserService;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.permissionService = permissionService;
         this.workspaceUserService = workspaceUserService;
@@ -85,6 +87,14 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         if (memberCount > 0) {
             throw new ConfigurationException(
                 "Custom role is still assigned to " + memberCount + " workspace member(s)",
+                CustomRoleErrorType.CUSTOM_ROLE_IN_USE);
+        }
+
+        long embeddedMemberCount = embeddedUserService.countByCustomRoleId(roleId);
+
+        if (embeddedMemberCount > 0) {
+            throw new ConfigurationException(
+                "Custom role is still assigned to " + embeddedMemberCount + " embedded member(s)",
                 CustomRoleErrorType.CUSTOM_ROLE_IN_USE);
         }
 
