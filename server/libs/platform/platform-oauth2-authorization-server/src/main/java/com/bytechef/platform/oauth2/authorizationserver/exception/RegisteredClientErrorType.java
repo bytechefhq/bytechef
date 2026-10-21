@@ -25,6 +25,15 @@ public class RegisteredClientErrorType extends AbstractErrorType {
 
     public static final RegisteredClientErrorType DELETE_SHARED_REGISTERED_CLIENT = new RegisteredClientErrorType(100);
     public static final RegisteredClientErrorType GRANT_NOT_FOUND = new RegisteredClientErrorType(101);
+    public static final RegisteredClientErrorType CLIENT_ID_ALREADY_REGISTERED = new RegisteredClientErrorType(102);
+    public static final RegisteredClientErrorType INVALID_REDIRECT_URI = new RegisteredClientErrorType(103);
+    public static final RegisteredClientErrorType INVALID_SCOPE = new RegisteredClientErrorType(104);
+    public static final RegisteredClientErrorType REGISTERED_CLIENT_NOT_FOUND = new RegisteredClientErrorType(105);
+    public static final RegisteredClientErrorType REGISTERED_CLIENT_NOT_UPDATABLE = new RegisteredClientErrorType(106);
+    public static final RegisteredClientErrorType SCOPES_NOT_UPDATABLE = new RegisteredClientErrorType(107);
+    public static final RegisteredClientErrorType REGISTERED_CLIENT_NOT_DELETABLE = new RegisteredClientErrorType(108);
+    public static final RegisteredClientErrorType REGISTERED_CLIENT_MANAGED_BY_SERVER =
+        new RegisteredClientErrorType(109);
 
     private RegisteredClientErrorType(int errorKey) {
         super(RegisteredClientErrorType.class, errorKey);

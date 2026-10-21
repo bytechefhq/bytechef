@@ -18,6 +18,7 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -78,6 +79,8 @@ public interface UserService {
     User getUser(long id);
 
     User getUser(String login);
+
+    List<User> getUsers(Collection<Long> ids);
 
     List<User> getUsersByExternalId(String externalId);
 

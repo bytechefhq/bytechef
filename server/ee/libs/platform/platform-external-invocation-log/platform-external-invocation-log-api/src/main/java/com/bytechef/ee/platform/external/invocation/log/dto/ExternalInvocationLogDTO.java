@@ -17,5 +17,6 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ExternalInvocationLogDTO(ExternalInvocationLog externalInvocationLog, @Nullable String workflowName) {
+public record ExternalInvocationLogDTO(
+    ExternalInvocationLog externalInvocationLog, @Nullable String workflowName, @Nullable String userName) {
 }

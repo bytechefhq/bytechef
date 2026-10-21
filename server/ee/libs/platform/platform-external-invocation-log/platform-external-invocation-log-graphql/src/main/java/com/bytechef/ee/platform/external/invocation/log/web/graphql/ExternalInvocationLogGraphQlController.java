@@ -63,14 +63,14 @@ public class ExternalInvocationLogGraphQlController {
         @Argument @Nullable String source,
         @Argument @Nullable String status, @Argument @Nullable Long mcpServerId, @Argument @Nullable Long a2aServerId,
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
-        @Argument @Nullable Long appId,
+        @Argument @Nullable Long appId, @Argument @Nullable Long appInstanceId,
         @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
                 type, workspaceId, environmentId, toSource(source), toStatus(status), mcpServerId, a2aServerId,
-                connectedUserId,
-                integrationInstanceId, appId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                connectedUserId, integrationInstanceId, appId, appInstanceId, toInstant(fromDate), toInstant(toDate),
+                page == null ? 0 : page));
     }
 
     private static ExternalInvocationLogPage toPage(Page<ExternalInvocationLogDTO> externalInvocationLogPage) {
@@ -113,7 +113,8 @@ public class ExternalInvocationLogGraphQlController {
             externalInvocationLog.getConnectedUserId(), externalInvocationLog.getIntegrationInstanceId(),
             externalInvocationLog.getMcpServerId(), externalInvocationLog.getA2aServerId(),
             externalInvocationLog.getJobId(), externalInvocationLog.getAppId(),
-            externalInvocationLogDTO.workflowName(),
+            externalInvocationLog.getAppInstanceId(), externalInvocationLog.getUserId(),
+            externalInvocationLogDTO.userName(), externalInvocationLogDTO.workflowName(),
             externalInvocationLog.getStatus()
                 .name(),
             externalInvocationLog.getErrorType(), externalInvocationLog.getErrorMessage(),
@@ -125,7 +126,8 @@ public class ExternalInvocationLogGraphQlController {
         Long id, String source, String kind, String invocationName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
         Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long a2aServerId, Long jobId,
-        Long appId, String workflowName, String status, String errorType, String errorMessage, int durationMs,
+        Long appId, Long appInstanceId, Long userId, String userName, String workflowName, String status,
+        String errorType, String errorMessage, int durationMs,
         Long createdDate) {
     }
 

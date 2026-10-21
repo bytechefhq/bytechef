@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     api(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api"))
 

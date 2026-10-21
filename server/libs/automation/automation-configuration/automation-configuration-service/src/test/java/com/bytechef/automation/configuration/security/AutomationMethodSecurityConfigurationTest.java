@@ -152,7 +152,7 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("McpProjectWorkflowGraphQlController#deleteMcpProjectWorkflow",
             "McpProjectWorkflowFacadeImpl#deleteMcpProjectWorkflow"),
         Map.entry("McpProjectWorkflowGraphQlController#updateMcpProjectWorkflow",
-            "McpProjectWorkflowServiceImpl#update"),
+            "McpProjectWorkflowFacadeImpl#updateMcpProjectWorkflow"),
         Map.entry("McpServerGraphQlController#deleteMcpServer", "McpServerFacadeImpl#deleteMcpServer"),
         Map.entry("McpServerGraphQlController#updateMcpServer", "McpServerFacadeImpl#updateMcpServer"),
         Map.entry("McpServerGraphQlController#updateMcpServerTags", "McpServerFacadeImpl#updateMcpServerTags"),
@@ -273,6 +273,9 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry("AccountController#sendActivationEmail", "pre-login activation mail"),
         Map.entry("AccountController#setupMfa", "acts on the signed-in account only"),
         Map.entry("AccountController#unlinkProvider", "acts on the signed-in account only"),
+        Map.entry(
+            "WorkflowNodeScriptGraphQlController#stopScriptTest",
+            "WorkflowNodeScriptFacadeImpl stops only a script test the signed-in user started"),
         Map.entry("AiAgentTestApiController#stopAiAgentTest", "addressed by the random test id handed to the caller"),
         Map.entry("AiSkillGraphQlController#createAdditionalFilesInSkill",
             "AiSkillFacadeImpl checks the skill owner"),
@@ -295,6 +298,39 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry(
             "ApiPlatformHandlerController#getSearchableApiCollections",
             "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#doHandle",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppApiEndpointController#executeEndpoint",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppApiEndpointController#getBasePath",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#getEnvironment",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#getSearchableApiCollections",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#notFound",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppApiEndpointController#unavailable",
+            "template hook of AbstractApiPlatformEndpointController, not an endpoint"),
+        Map.entry(
+            "AppConnectionApiController#executeAction",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppProxyApiController#proxy",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppToolApiController#executeTool",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
+        Map.entry(
+            "AppWorkflowApiController#executeWorkflow",
+            "app runtime, authenticated by the app secret key and confined to the calling app's own bindings"),
         Map.entry("ApprovalController#approve", "permit-all inbound callback addressed by an approval id"),
         Map.entry(
             "ApprovalController#approveFromConfirmationPage",
@@ -388,6 +424,9 @@ class AutomationMethodSecurityConfigurationTest {
             "embedded-v1:ConnectedUserProjectWorkflowApiController#enableProjectWorkflow",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#getFrontendAutomationComponentInputOptions",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
             "embedded-v1:ConnectedUserProjectWorkflowApiController#provisionFrontendWorkflowReference",
             EMBEDDED_PRINCIPAL_SCOPED),
         Map.entry(
@@ -455,6 +494,14 @@ class AutomationMethodSecurityConfigurationTest {
         Map.entry(
             "embedded-v1:IntegrationInstanceWorkflowApiController#updateIntegrationInstanceWorkflow",
             EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#disableFrontendMcpAutomationWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:McpAutomationWorkflowApiController#disableMcpAutomationWorkflow", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpAutomationWorkflowApiController#enableFrontendMcpAutomationWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:McpAutomationWorkflowApiController#enableMcpAutomationWorkflow", EMBEDDED_PATH_SCOPED),
         Map.entry(
             "embedded-v1:McpIntegrationInstanceToolApiController#disableFrontendMcpIntegrationInstanceTool",
             EMBEDDED_PRINCIPAL_SCOPED),

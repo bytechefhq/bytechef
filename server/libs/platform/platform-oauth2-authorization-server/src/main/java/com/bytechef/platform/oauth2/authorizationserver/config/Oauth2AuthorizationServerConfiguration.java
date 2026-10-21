@@ -21,6 +21,9 @@ import static com.bytechef.platform.oauth2.authorizationserver.constant.OAuth2Au
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
+import com.bytechef.platform.oauth2.authorizationserver.authentication.AppRefreshTokenReuseAuthenticationProvider;
+import com.bytechef.platform.oauth2.authorizationserver.authentication.OAuth2ClientAccessChecker;
+import com.bytechef.platform.oauth2.authorizationserver.authentication.OAuth2ClientAccessValidator;
 import com.bytechef.platform.oauth2.authorizationserver.authentication.PublicClientRefreshTokenAuthenticationConverter;
 import com.bytechef.platform.oauth2.authorizationserver.authentication.PublicClientRefreshTokenAuthenticationProvider;
 import com.bytechef.platform.oauth2.authorizationserver.jackson.OAuth2AuthorizationJsonMapper;
@@ -34,17 +37,22 @@ import com.bytechef.platform.oauth2.authorizationserver.tenant.SharedRegisteredC
 import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantKeyedAuthorizationCodeGenerator;
 import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantKeyedRefreshTokenGenerator;
 import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantRoutingOAuth2AuthorizationService;
+import com.bytechef.platform.oauth2.authorizationserver.token.AppUserIdTokenCustomizer;
 import com.bytechef.platform.oauth2.authorizationserver.token.McpResourceAudienceTokenCustomizer;
 import com.bytechef.platform.oauth2.authorizationserver.web.LoginRedirectAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springaicommunity.mcp.security.authorizationserver.config.McpAuthorizationServerConfigurer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -68,8 +76,10 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationValidator;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationConsentAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientRegistrationAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -95,6 +105,8 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnOauth2AuthorizationServerEnabled
 public class Oauth2AuthorizationServerConfiguration {
 
+    private static final Logger log = LoggerFactory.getLogger(Oauth2AuthorizationServerConfiguration.class);
+
     private static final String AUTHORITIES_CLAIM = "authorities";
     private static final String CONSENT_PAGE_URI = "/oauth2/consent";
     private static final String FACTOR_AUTHORITY_PREFIX = "FACTOR_";
@@ -103,8 +115,13 @@ public class Oauth2AuthorizationServerConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain oauth2AuthorizationServerSecurityFilterChain(
         HttpSecurity http, AuthorizationServerSettings authorizationServerSettings, JwtDecoder jwtDecoder,
-        RegisteredClientRepository registeredClientRepository, ObjectProvider<McpEndpoint> mcpEndpointProvider)
+        RegisteredClientRepository registeredClientRepository, ObjectProvider<McpEndpoint> mcpEndpointProvider,
+        ObjectProvider<OAuth2ClientAccessChecker> clientAccessCheckerProvider,
+        TenantRoutingOAuth2AuthorizationService authorizationService, JdbcOperations jdbcOperations,
+        PlatformTransactionManager transactionManager)
         throws Exception {
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         List<String> mcpScopes = mcpEndpointProvider.orderedStream()
             .map(McpEndpoint::getScope)
@@ -120,6 +137,9 @@ public class Oauth2AuthorizationServerConfiguration {
                     mcpAuthorizationServer.dynamicClientRegistration(true);
                     mcpAuthorizationServer.dynamicClientRegistrationValidator(
                         new McpClientRegistrationValidator(mcpScopes));
+                    mcpAuthorizationServer.authorizationCodeRequestValidator(
+                        new OAuth2ClientAccessValidator(
+                            new OAuth2AuthorizationCodeRequestAuthenticationValidator(), clientAccessCheckerProvider));
 
                     mcpAuthorizationServer.authorizationServer(authorizationServer -> {
                         authorizationServer.addObjectPostProcessor(McpAuthorizationConsentRequired.postProcessor());
@@ -128,6 +148,12 @@ public class Oauth2AuthorizationServerConfiguration {
                             .authenticationConverter(new PublicClientRefreshTokenAuthenticationConverter())
                             .authenticationProviders(authenticationProviders -> authenticationProviders.addFirst(
                                 new PublicClientRefreshTokenAuthenticationProvider(registeredClientRepository))));
+
+                        authorizationServer.tokenEndpoint(tokenEndpoint -> tokenEndpoint.authenticationProviders(
+                            authenticationProviders -> authenticationProviders.replaceAll(
+                                authenticationProvider -> wrapRefreshTokenAuthenticationProvider(
+                                    authenticationProvider, authorizationService, jdbcOperations,
+                                    transactionTemplate))));
 
                         authorizationServer.clientRegistrationEndpoint(
                             clientRegistrationEndpoint -> clientRegistrationEndpoint.authenticationProviders(
@@ -221,6 +247,10 @@ public class Oauth2AuthorizationServerConfiguration {
 
         if (publicUrl != null && !publicUrl.isBlank()) {
             builder.issuer(removeTrailingSlash(publicUrl.strip()));
+        } else {
+            log.warn(
+                "bytechef.public-url is blank, so the authorization server takes its issuer from each request's " +
+                    "host; set it (BYTECHEF_PUBLIC_URL) so app user tokens verify");
         }
 
         return builder.build();
@@ -243,8 +273,12 @@ public class Oauth2AuthorizationServerConfiguration {
     }
 
     @Bean
-    OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
+    OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer(ObjectProvider<UserService> userServiceProvider) {
+        AppUserIdTokenCustomizer appUserIdTokenCustomizer = new AppUserIdTokenCustomizer(userServiceProvider);
+
         return context -> {
+            appUserIdTokenCustomizer.customize(context);
+
             if (!OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
                 return;
             }
@@ -279,6 +313,18 @@ public class Oauth2AuthorizationServerConfiguration {
         } else if (authenticationProvider instanceof OAuth2AuthorizationConsentAuthenticationProvider consentProvider) {
             consentProvider.setAuthorizationCodeGenerator(authorizationCodeGenerator);
         }
+    }
+
+    private static AuthenticationProvider wrapRefreshTokenAuthenticationProvider(
+        AuthenticationProvider authenticationProvider, TenantRoutingOAuth2AuthorizationService authorizationService,
+        JdbcOperations jdbcOperations, TransactionTemplate transactionTemplate) {
+
+        if (authenticationProvider instanceof OAuth2RefreshTokenAuthenticationProvider) {
+            return new AppRefreshTokenReuseAuthenticationProvider(
+                authenticationProvider, authorizationService, jdbcOperations, transactionTemplate, Clock.systemUTC());
+        }
+
+        return authenticationProvider;
     }
 
     private static void setRegisteredClientConverter(

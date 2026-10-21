@@ -217,6 +217,26 @@ class McpResourceAudienceTokenCustomizerTest {
         assertThat(getAudience(jwtEncodingContext)).isEqualTo(CLIENT_ID);
     }
 
+    @Test
+    void testAppClientAccessTokenIsNotCustomized() {
+        RegisteredClient appClient = RegisteredClient.withId("app-registered-client-id")
+            .clientId(CLIENT_ID)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .redirectUri("https://client.example.com/callback")
+            .scope("app:use")
+            .build();
+
+        JwtEncodingContext jwtEncodingContext = createContextBuilder(Set.of("app:use"))
+            .registeredClient(appClient)
+            .authorization(createAuthorization(Map.of("resource", RESOURCE)))
+            .authorizationGrant(createAuthorizationCodeGrant(Map.of("resource", RESOURCE)))
+            .build();
+
+        mcpResourceAudienceTokenCustomizer.customize(jwtEncodingContext);
+
+        assertThat(getAudience(jwtEncodingContext)).isEqualTo(CLIENT_ID);
+    }
+
     private static JwtEncodingContext.Builder createContextBuilder(Set<String> authorizedScopes) {
         JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder()
             .subject("user")

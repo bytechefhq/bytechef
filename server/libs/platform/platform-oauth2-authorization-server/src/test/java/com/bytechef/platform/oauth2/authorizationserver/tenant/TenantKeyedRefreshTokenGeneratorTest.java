@@ -24,10 +24,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 
@@ -67,6 +69,34 @@ class TenantKeyedRefreshTokenGeneratorTest {
     }
 
     @Test
+    void testRotatingAppClientRefreshTokenCarriesTheAuthorizationId() {
+        TenantContext.setCurrentTenantId("acme");
+
+        RegisteredClient registeredClient = createRotatingPublicClient("app:use");
+
+        OAuth2RefreshToken refreshToken = new TenantKeyedRefreshTokenGenerator().generate(
+            createRefreshTokenContext(registeredClient));
+
+        assertThat(refreshToken).isNotNull();
+        assertThat(TenantKeyedTokenValues.parseTenantId(refreshToken.getTokenValue())).contains("acme");
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId(refreshToken.getTokenValue()))
+            .contains("authorization-id");
+    }
+
+    @Test
+    void testRotatingNonAppClientRefreshTokenCarriesNoAuthorizationId() {
+        TenantContext.setCurrentTenantId("acme");
+
+        RegisteredClient registeredClient = createRotatingPublicClient("mcp:management");
+
+        OAuth2RefreshToken refreshToken = new TenantKeyedRefreshTokenGenerator().generate(
+            createRefreshTokenContext(registeredClient));
+
+        assertThat(refreshToken).isNotNull();
+        assertThat(TenantKeyedTokenValues.parseAuthorizationId(refreshToken.getTokenValue())).isEmpty();
+    }
+
+    @Test
     void testPublicClientGetsNoRefreshToken() {
         TenantContext.setCurrentTenantId("acme");
 
@@ -88,5 +118,34 @@ class TenantKeyedRefreshTokenGeneratorTest {
             .build();
 
         assertThat(new TenantKeyedRefreshTokenGenerator().generate(context)).isNull();
+    }
+
+    private static RegisteredClient createRotatingPublicClient(String scope) {
+        return RegisteredClient.withId("id")
+            .clientId("client")
+            .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .redirectUri("http://localhost/cb")
+            .scope(scope)
+            .tokenSettings(TokenSettings.builder()
+                .reuseRefreshTokens(false)
+                .build())
+            .build();
+    }
+
+    private static OAuth2TokenContext createRefreshTokenContext(RegisteredClient registeredClient) {
+        OAuth2Authorization authorization = OAuth2Authorization.withRegisteredClient(registeredClient)
+            .id("authorization-id")
+            .principalName("user")
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .build();
+
+        return DefaultOAuth2TokenContext.builder()
+            .registeredClient(registeredClient)
+            .authorization(authorization)
+            .tokenType(OAuth2TokenType.REFRESH_TOKEN)
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .build();
     }
 }

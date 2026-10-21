@@ -10,8 +10,11 @@ package com.bytechef.ee.platform.external.invocation.log.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -24,17 +27,24 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.dto.ExternalInvocationLogDTO;
+import com.bytechef.ee.platform.external.invocation.log.security.ExternalInvocationLogAppInstanceAccess;
+import com.bytechef.ee.platform.external.invocation.log.security.ViewableAppInstances;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -56,6 +66,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class ExternalInvocationLogFacadeIntTest {
 
     @Autowired
+    private ExternalInvocationLogAppInstanceAccess externalInvocationLogAppInstanceAccess;
+
+    @Autowired
     private JobService jobService;
 
     @Autowired
@@ -68,11 +81,16 @@ class ExternalInvocationLogFacadeIntTest {
     private ExternalInvocationLogService externalInvocationLogService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private WorkflowService workflowService;
 
     @BeforeEach
     void beforeEach() {
-        reset(jobService, permissionService, externalInvocationLogService, workflowService);
+        reset(
+            externalInvocationLogAppInstanceAccess, jobService, permissionService, externalInvocationLogService,
+            userService, workflowService);
 
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
@@ -201,19 +219,18 @@ class ExternalInvocationLogFacadeIntTest {
         Page<ExternalInvocationLog> page = new PageImpl<>(List.of());
 
         when(permissionService.hasResourceScope(7L, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
+        when(externalInvocationLogAppInstanceAccess.getViewableAppInstances(7L, 2))
+            .thenReturn(ViewableAppInstances.only(Set.of(50L)));
         when(
             externalInvocationLogService.getWorkspaceExternalInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
-                null,
-                null,
-                null,
-                1))
+                9L, 50L, ViewableAppInstances.only(Set.of(50L)), null, null, 1))
                     .thenReturn(page);
 
         assertThat(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
                 PlatformType.AUTOMATION, 7L, 2L, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
-                null,
+                9L, 50L,
                 null,
                 null,
                 1))
@@ -226,10 +243,10 @@ class ExternalInvocationLogFacadeIntTest {
 
         assertThatThrownBy(
             () -> externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, 0))
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, 50L, null, null, 0))
                     .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(externalInvocationLogService);
+        verifyNoInteractions(externalInvocationLogService, userService);
     }
 
     @Test
@@ -241,10 +258,146 @@ class ExternalInvocationLogFacadeIntTest {
         assertThatThrownBy(
             () -> callSkippingChecks(
                 () -> externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, 0)))
+                    PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, 50L, null, null, 0)))
                         .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(externalInvocationLogService);
+    }
+
+    @Test
+    void testWorkspaceQueryResolvesTheEndUserOfEachInvocationInOneLookup() {
+        ExternalInvocationLog firstUserExternalInvocationLog = appExternalInvocationLog(21L);
+        ExternalInvocationLog secondUserExternalInvocationLog = appExternalInvocationLog(22L);
+        ExternalInvocationLog repeatedUserExternalInvocationLog = appExternalInvocationLog(21L);
+        ExternalInvocationLog deletedUserExternalInvocationLog = appExternalInvocationLog(23L);
+        ExternalInvocationLog keyOnlyExternalInvocationLog = appExternalInvocationLog(null);
+
+        User firstUser = new User();
+
+        firstUser.setId(21L);
+        firstUser.setEmail("ada@example.com");
+        firstUser.setFirstName("Ada");
+        firstUser.setLastName("Lovelace");
+        firstUser.setLogin("ada");
+
+        User secondUser = new User();
+
+        secondUser.setId(22L);
+        secondUser.setEmail("grace@example.com");
+        secondUser.setLogin("grace");
+
+        when(permissionService.hasResourceScope(7L, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
+        when(externalInvocationLogAppInstanceAccess.getViewableAppInstances(7L, 2))
+            .thenReturn(ViewableAppInstances.only(Set.of()));
+        when(
+            externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, 9L, null,
+                ViewableAppInstances.only(Set.of()), null, null,
+                0))
+                    .thenReturn(
+                        new PageImpl<>(
+                            List.of(
+                                firstUserExternalInvocationLog, secondUserExternalInvocationLog,
+                                repeatedUserExternalInvocationLog, deletedUserExternalInvocationLog,
+                                keyOnlyExternalInvocationLog)));
+        when(userService.getUsers(List.of(21L, 22L, 23L))).thenReturn(List.of(firstUser, secondUser));
+
+        Page<ExternalInvocationLogDTO> externalInvocationLogDTOPage =
+            externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, 9L, null, null, null, 0);
+
+        assertThat(externalInvocationLogDTOPage.getContent())
+            .extracting(ExternalInvocationLogDTO::externalInvocationLog, ExternalInvocationLogDTO::userName)
+            .containsExactly(
+                tuple(firstUserExternalInvocationLog, "Ada Lovelace"),
+                tuple(secondUserExternalInvocationLog, "grace@example.com"),
+                tuple(repeatedUserExternalInvocationLog, "Ada Lovelace"),
+                tuple(deletedUserExternalInvocationLog, null),
+                tuple(keyOnlyExternalInvocationLog, null));
+
+        verify(userService, times(1)).getUsers(anyCollection());
+    }
+
+    @Test
+    void testWorkspaceQueryWithoutEndUsersSkipsTheUserLookup() {
+        when(permissionService.hasResourceScope(7L, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
+        when(externalInvocationLogAppInstanceAccess.getViewableAppInstances(7L, 2))
+            .thenReturn(ViewableAppInstances.only(Set.of()));
+        when(
+            externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, 9L, null,
+                ViewableAppInstances.only(Set.of()), null, null,
+                0))
+                    .thenReturn(new PageImpl<>(List.of(appExternalInvocationLog(null))));
+
+        Page<ExternalInvocationLogDTO> externalInvocationLogDTOPage =
+            externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, 9L, null, null, null, 0);
+
+        assertThat(externalInvocationLogDTOPage.getContent())
+            .extracting(ExternalInvocationLogDTO::userName)
+            .containsExactly((String) null);
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void testWorkspaceQueryPassesAnUnrestrictedAnswerToTheService() {
+        when(permissionService.hasResourceScope(7L, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
+        when(externalInvocationLogAppInstanceAccess.getViewableAppInstances(7L, 2))
+            .thenReturn(ViewableAppInstances.all());
+        when(
+            externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+                ViewableAppInstances.all(), null, null, 0))
+                    .thenReturn(new PageImpl<>(List.of()));
+
+        assertThat(
+            externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, null, 0))
+                    .isEmpty();
+
+        verify(externalInvocationLogService).getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.all(), null, null, 0);
+    }
+
+    @Test
+    void testWorkspaceQueryWithoutAnAppInstanceAccessHidesEveryAppInstanceRow() {
+        ExternalInvocationLogFacade externalInvocationLogFacadeWithoutApps = new ExternalInvocationLogFacadeImpl(
+            emptyProvider(ExternalInvocationLogAppInstanceAccess.class), jobService, externalInvocationLogService,
+            emptyProvider(UserService.class), workflowService);
+
+        when(
+            externalInvocationLogService.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+                ViewableAppInstances.only(Set.of()), null, null,
+                0))
+                    .thenReturn(new PageImpl<>(List.of()));
+
+        assertThat(
+            externalInvocationLogFacadeWithoutApps.getWorkspaceExternalInvocationLogs(
+                PlatformType.AUTOMATION, 7L, 2L, null, null, null, null, null, null, null, null, null, null, 0))
+                    .isEmpty();
+
+        verify(externalInvocationLogService).getWorkspaceExternalInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null,
+            ViewableAppInstances.only(Set.of()), null, null, 0);
+    }
+
+    private static <T> ObjectProvider<T> emptyProvider(Class<T> type) {
+        StaticListableBeanFactory staticListableBeanFactory = new StaticListableBeanFactory();
+
+        return staticListableBeanFactory.getBeanProvider(type);
+    }
+
+    private static ExternalInvocationLog appExternalInvocationLog(Long userId) {
+        ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
+
+        externalInvocationLog.setAppId(9L);
+        externalInvocationLog.setUserId(userId);
+
+        return externalInvocationLog;
     }
 
     private static void authenticate(Authentication authentication) {
@@ -276,11 +429,24 @@ class ExternalInvocationLogFacadeIntTest {
         }
 
         @Bean
-        ExternalInvocationLogFacade externalInvocationLogFacade(
-            JobService jobService, ExternalInvocationLogService externalInvocationLogService,
-            WorkflowService workflowService) {
+        ExternalInvocationLogAppInstanceAccess externalInvocationLogAppInstanceAccess() {
+            return mock(ExternalInvocationLogAppInstanceAccess.class);
+        }
 
-            return new ExternalInvocationLogFacadeImpl(jobService, externalInvocationLogService, workflowService);
+        @Bean
+        ExternalInvocationLogFacade externalInvocationLogFacade(
+            ObjectProvider<ExternalInvocationLogAppInstanceAccess> externalInvocationLogAppInstanceAccessProvider,
+            JobService jobService, ExternalInvocationLogService externalInvocationLogService,
+            ObjectProvider<UserService> userServiceProvider, WorkflowService workflowService) {
+
+            return new ExternalInvocationLogFacadeImpl(
+                externalInvocationLogAppInstanceAccessProvider, jobService, externalInvocationLogService,
+                userServiceProvider, workflowService);
+        }
+
+        @Bean
+        UserService userService() {
+            return mock(UserService.class);
         }
 
         @Bean

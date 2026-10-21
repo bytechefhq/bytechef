@@ -30,54 +30,97 @@ import org.jspecify.annotations.Nullable;
 public final class TenantKeyedTokenValues {
 
     private static final String SEPARATOR = ":";
-    private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private TenantKeyedTokenValues() {
     }
 
     public static String generate(String tenantId) {
+        return EncodingUtils.urlEncodeBase64ToString(createTenantKeyedValue(tenantId));
+    }
+
+    public static String generate(String tenantId, String authorizationId) {
+        if (!isValidIdentifier(authorizationId)) {
+            throw new IllegalArgumentException("The authorization id cannot be carried by a token value");
+        }
+
+        return EncodingUtils.urlEncodeBase64ToString(createTenantKeyedValue(tenantId) + SEPARATOR + authorizationId);
+    }
+
+    public static boolean isValidTenantId(@Nullable String tenantId) {
+        return isValidIdentifier(tenantId);
+    }
+
+    public static Optional<String> parseAuthorizationId(@Nullable String value) {
+        Optional<String> decodedValue = decode(value);
+
+        if (decodedValue.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String[] parts = decodedValue.get()
+            .split(SEPARATOR, -1);
+
+        if (parts.length != 3 || !isValidTenantId(parts[0]) || !isValidIdentifier(parts[2])) {
+            return Optional.empty();
+        }
+
+        return Optional.of(parts[2]);
+    }
+
+    public static Optional<String> parseTenantId(@Nullable String value) {
+        Optional<String> decodedValue = decode(value);
+
+        if (decodedValue.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String decoded = decodedValue.get();
+
+        int separatorIndex = decoded.indexOf(SEPARATOR);
+
+        if (separatorIndex <= 0) {
+            return Optional.empty();
+        }
+
+        String tenantId = decoded.substring(0, separatorIndex);
+
+        if (!isValidTenantId(tenantId)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(tenantId);
+    }
+
+    private static String createTenantKeyedValue(String tenantId) {
         if (!isValidTenantId(tenantId)) {
             throw new IllegalArgumentException("Tenant id " + tenantId + " cannot be carried by a token value");
         }
 
         String randomPart = EncodingUtils.urlEncodeBase64ToString(RandomUtils.nextBytes(32));
 
-        return EncodingUtils.urlEncodeBase64ToString(tenantId + SEPARATOR + randomPart);
+        return tenantId + SEPARATOR + randomPart;
     }
 
-    public static boolean isValidTenantId(@Nullable String tenantId) {
-        if (tenantId == null) {
-            return false;
-        }
-
-        Matcher matcher = TENANT_ID_PATTERN.matcher(tenantId);
-
-        return matcher.matches();
-    }
-
-    public static Optional<String> parseTenantId(@Nullable String value) {
+    private static Optional<String> decode(@Nullable String value) {
         if (value == null || value.isBlank() || value.indexOf('.') >= 0) {
             return Optional.empty();
         }
 
         try {
-            String decoded = new String(EncodingUtils.urlDecodeBase64FromString(value), StandardCharsets.UTF_8);
-
-            int separatorIndex = decoded.indexOf(SEPARATOR);
-
-            if (separatorIndex <= 0) {
-                return Optional.empty();
-            }
-
-            String tenantId = decoded.substring(0, separatorIndex);
-
-            if (!isValidTenantId(tenantId)) {
-                return Optional.empty();
-            }
-
-            return Optional.of(tenantId);
+            return Optional.of(new String(EncodingUtils.urlDecodeBase64FromString(value), StandardCharsets.UTF_8));
         } catch (IllegalArgumentException illegalArgumentException) {
             return Optional.empty();
         }
+    }
+
+    private static boolean isValidIdentifier(@Nullable String identifier) {
+        if (identifier == null) {
+            return false;
+        }
+
+        Matcher matcher = IDENTIFIER_PATTERN.matcher(identifier);
+
+        return matcher.matches();
     }
 }
