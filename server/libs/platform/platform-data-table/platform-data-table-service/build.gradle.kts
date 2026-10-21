@@ -1,5 +1,6 @@
 dependencies {
     implementation("de.siegmar:fastcsv:2.2.2")
+    implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

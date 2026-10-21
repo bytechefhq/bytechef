@@ -37,15 +37,15 @@ class DataTableRowConditionsTest {
     @Test
     void testRejectsEmptyGroup() {
         IllegalArgumentException illegalArgumentException = assertThrows(
-            IllegalArgumentException.class, () -> new DataTableRowConditions(List.of(List.of(FILTER), List.of())));
+            IllegalArgumentException.class, () -> DataTableRowConditions.anyOf(List.of(List.of(FILTER), List.of())));
 
         assertEquals("Condition group 2 is empty", illegalArgumentException.getMessage());
-        assertThrows(IllegalArgumentException.class, () -> new DataTableRowConditions(List.of(List.of())));
+        assertThrows(IllegalArgumentException.class, () -> DataTableRowConditions.anyOf(List.of(List.of())));
     }
 
     @Test
     void testKeepsNonEmptyGroups() {
-        DataTableRowConditions dataTableRowConditions = new DataTableRowConditions(
+        DataTableRowConditions dataTableRowConditions = DataTableRowConditions.anyOf(
             List.of(List.of(FILTER), List.of(FILTER, FILTER)));
 
         assertEquals(List.of(List.of(FILTER), List.of(FILTER, FILTER)), dataTableRowConditions.groups());
@@ -56,7 +56,16 @@ class DataTableRowConditionsTest {
     void testNoGroupsMatchAll() {
         assertTrue(DataTableRowConditions.matchAll()
             .isMatchAll());
-        assertTrue(new DataTableRowConditions(List.of()).isMatchAll());
+    }
+
+    @Test
+    void testAnyOfRejectsNoGroups() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class, () -> DataTableRowConditions.anyOf(List.of()));
+
+        assertEquals(
+            "At least one condition group is required; use matchAll() to match every row",
+            illegalArgumentException.getMessage());
     }
 
     @Test
@@ -68,6 +77,30 @@ class DataTableRowConditionsTest {
             "At least one filter is required; use matchAll() to match every row",
             illegalArgumentException.getMessage());
         assertThrows(NullPointerException.class, () -> DataTableRowConditions.of(null));
+    }
+
+    @Test
+    void testAnyOfNamesTheNullFilter() {
+        NullPointerException nullPointerException = assertThrows(
+            NullPointerException.class,
+            () -> DataTableRowConditions.anyOf(List.of(List.of(FILTER), Arrays.asList(FILTER, null))));
+
+        assertEquals("filter 2 of condition group 2 must not be null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void testRequireAtLeastOneCondition() {
+        DataTableRowConditions dataTableRowConditions = DataTableRowConditions.of(List.of(FILTER));
+
+        assertEquals(dataTableRowConditions, dataTableRowConditions.requireAtLeastOneCondition());
+
+        DataTableRowConditions matchAllConditions = DataTableRowConditions.matchAll();
+
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class, matchAllConditions::requireAtLeastOneCondition);
+
+        assertEquals(
+            "At least one condition is required to select the rows to change", illegalArgumentException.getMessage());
     }
 
     @Test
@@ -84,7 +117,7 @@ class DataTableRowConditionsTest {
     @Test
     void testRejectsNullGroupsAndFilters() {
         assertThrows(NullPointerException.class,
-            () -> new DataTableRowConditions(Arrays.asList(List.of(FILTER), null)));
+            () -> DataTableRowConditions.anyOf(Arrays.asList(List.of(FILTER), null)));
         assertThrows(NullPointerException.class, () -> DataTableRowConditions.of(Arrays.asList(FILTER, null)));
     }
 }

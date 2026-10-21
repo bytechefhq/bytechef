@@ -100,7 +100,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
             eq(1L));
 
         assertEquals(
-            new DataTableRowConditions(
+            DataTableRowConditions.anyOf(
                 List.of(
                     List.of(
                         new DataTableRowFilter("status", Operation.EQUALS, "BOT"),

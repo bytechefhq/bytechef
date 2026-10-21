@@ -17,6 +17,7 @@
 package com.bytechef.platform.data.table.execution.event;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,8 +29,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Application event published when a data table change should trigger webhooks. A bulk change publishes one event
- * holding a payload per changed row.
+ * Application event published when a data table change should trigger webhooks. One write publishes one event holding
+ * every row it changed.
  *
  * @author Ivica Cardic
  */
@@ -37,33 +38,31 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
 
     private final String baseName;
     private final long environmentId;
-    private final List<Map<String, Object>> payloads;
+    @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "Published in-process only, never serialized")
+    private final List<DataTableRow> rows;
     private final DataTableWebhookType type;
 
-    @SuppressFBWarnings("EI")
     public DataTableWebhookEvent(
-        String baseName, DataTableWebhookType type, Map<String, Object> payload, long environmentId) {
-
-        this(baseName, type, List.of(payload), environmentId);
-    }
-
-    @SuppressFBWarnings("EI")
-    public DataTableWebhookEvent(
-        String baseName, DataTableWebhookType type, List<Map<String, Object>> payloads, long environmentId) {
+        String baseName, DataTableWebhookType type, List<DataTableRow> rows, long environmentId) {
 
         super(Objects.requireNonNull(baseName, "baseName must not be null"));
 
-        Objects.requireNonNull(payloads, "payloads must not be null");
+        Objects.requireNonNull(rows, "rows must not be null");
 
-        if (payloads.isEmpty()) {
-            throw new IllegalArgumentException("payloads must not be empty");
+        if (rows.isEmpty()) {
+            throw new IllegalArgumentException("rows must not be empty");
         }
 
         this.baseName = baseName;
         this.environmentId = environmentId;
         this.type = Objects.requireNonNull(type, "type must not be null");
-        this.payloads = payloads.stream()
-            .map(payload -> copy(Objects.requireNonNull(payload, "payload must not be null")))
+        this.rows = rows.stream()
+            .map(row -> {
+                Objects.requireNonNull(row, "row must not be null");
+
+                return new DataTableRow(
+                    row.id(), copy(Objects.requireNonNull(row.values(), "row values must not be null")));
+            })
             .toList();
     }
 
@@ -80,8 +79,8 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
     }
 
     @SuppressFBWarnings("EI")
-    public List<Map<String, Object>> getPayloads() {
-        return payloads;
+    public List<DataTableRow> getRows() {
+        return rows;
     }
 
     @Override
@@ -89,7 +88,7 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
         return "DataTableWebhookEvent{" +
             "baseName='" + baseName + '\'' +
             ", environmentId=" + environmentId +
-            ", payloadCount=" + payloads.size() +
+            ", rowCount=" + rows.size() +
             ", type=" + type +
             "} " + super.toString();
     }
@@ -99,7 +98,7 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             copy.put(
-                String.valueOf(Objects.requireNonNull(entry.getKey(), "payload keys must not be null")),
+                String.valueOf(Objects.requireNonNull(entry.getKey(), "value keys must not be null")),
                 copyValue(entry.getValue()));
         }
 

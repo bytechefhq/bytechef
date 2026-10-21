@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,36 +33,53 @@ import org.junit.jupiter.api.Test;
 class DataTableWebhookEventTest {
 
     @Test
-    void testPayloadListsAreCopiedAndUnmodifiable() {
+    void testRowValuesAreCopiedAndUnmodifiable() {
         Map<String, Object> nestedMap = new HashMap<>(Map.of("name", "Apple"));
         List<Object> tags = new ArrayList<>(List.of("fruit", nestedMap));
 
-        Map<String, Object> payload = new HashMap<>(Map.of("id", 1L, "tags", tags));
+        Map<String, Object> values = new HashMap<>(Map.of("tags", tags));
 
         DataTableWebhookEvent dataTableWebhookEvent = new DataTableWebhookEvent(
-            "items", DataTableWebhookType.RECORD_CREATED, payload, 0);
+            "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(1L, values)), 0);
 
         tags.add("changed");
         nestedMap.put("name", "Banana");
+        values.put("extra", "value");
 
-        List<Map<String, Object>> payloads = dataTableWebhookEvent.getPayloads();
+        List<DataTableRow> rows = dataTableWebhookEvent.getRows();
 
-        Map<String, Object> copiedPayload = payloads.getFirst();
+        DataTableRow copiedRow = rows.getFirst();
 
-        List<?> copiedTags = (List<?>) copiedPayload.get("tags");
+        Map<String, Object> copiedValues = copiedRow.values();
 
+        List<?> copiedTags = (List<?>) copiedValues.get("tags");
+
+        assertEquals(1L, copiedRow.id());
         assertEquals(List.of("fruit", Map.of("name", "Apple")), copiedTags);
+        assertEquals(Map.of("tags", List.of("fruit", Map.of("name", "Apple"))), copiedValues);
         assertThrows(UnsupportedOperationException.class, () -> copiedTags.add(null));
+        assertThrows(UnsupportedOperationException.class, () -> copiedValues.put("other", "value"));
     }
 
     @Test
-    void testNullPayloadKeysAreRejected() {
-        Map<String, Object> payload = new HashMap<>();
+    void testNullValueKeysAreRejected() {
+        Map<String, Object> values = new HashMap<>();
 
-        payload.put(null, "value");
+        values.put(null, "value");
+
+        List<DataTableRow> rows = List.of(new DataTableRow(1L, values));
 
         assertThrows(
             NullPointerException.class,
-            () -> new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, payload, 0));
+            () -> new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, rows, 0));
+    }
+
+    @Test
+    void testEmptyRowsAreRejected() {
+        List<DataTableRow> rows = List.of();
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, rows, 0));
     }
 }
