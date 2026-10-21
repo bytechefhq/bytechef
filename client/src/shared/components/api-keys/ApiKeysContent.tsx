@@ -15,6 +15,7 @@ import {useShallow} from 'zustand/react/shallow';
 interface ApiKeysContentProps {
     canCreate?: boolean;
     canDelete?: boolean;
+    canEdit?: boolean;
     description: string;
     title: string;
 }
@@ -22,6 +23,7 @@ interface ApiKeysContentProps {
 const ApiKeysContent = ({
     canCreate: canCreateProp = true,
     canDelete = true,
+    canEdit = true,
     description,
     title,
 }: ApiKeysContentProps) => {
@@ -66,7 +68,7 @@ const ApiKeysContent = ({
                         title="No Access"
                     />
                 ) : apiKeys && apiKeys.length > 0 ? (
-                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} canManage={canManage} />
+                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} canEdit={canEdit} canManage={canManage} />
                 ) : (
                     <EmptyList
                         button={
