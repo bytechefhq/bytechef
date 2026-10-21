@@ -64,6 +64,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
@@ -105,6 +106,9 @@ class EmbeddedUserServiceIntTest {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -228,8 +232,8 @@ class EmbeddedUserServiceIntTest {
         embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
 
         WorkspaceMembershipAssignerImpl workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserService, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
-            mock(WorkspaceUserService.class));
+            mock(ApplicationEventPublisher.class), embeddedUserService, permissionService, userService,
+            mock(WorkspaceService.class), workspaceUserRepository, mock(WorkspaceUserService.class));
 
         workspaceMembershipAssigner.removeMemberships(userId(MEMBER));
 
