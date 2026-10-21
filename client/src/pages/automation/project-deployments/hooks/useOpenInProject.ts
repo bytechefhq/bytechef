@@ -26,7 +26,7 @@ export default function useOpenInProject({onBeforeNavigate}: {onBeforeNavigate?:
                 flushSync(() => setCurrentEnvironmentId(DEVELOPMENT_ENVIRONMENT));
             }
 
-            navigate(path);
+            void navigate(path);
         },
         [currentEnvironmentId, navigate, onBeforeNavigate, setCurrentEnvironmentId]
     );
