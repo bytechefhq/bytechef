@@ -206,6 +206,14 @@ public class IntegrationInstanceConfiguration {
         return enabled;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -234,6 +242,14 @@ public class IntegrationInstanceConfiguration {
 
     public void setPermissionExpression(String permissionExpression) {
         this.permissionExpression = permissionExpression;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setName(String name) {
