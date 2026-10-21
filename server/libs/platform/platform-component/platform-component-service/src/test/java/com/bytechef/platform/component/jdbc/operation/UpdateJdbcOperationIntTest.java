@@ -76,10 +76,15 @@ public class UpdateJdbcOperationIntTest {
             TABLE, "test",
             CONDITION, "name = 'name1'");
 
-        Map<String, Integer> result = new UpdateJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        assertEquals(1, result.get(ROWS));
+            Map<String, Integer> result = new UpdateJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            assertEquals(1, result.get(ROWS));
+        }
+
         assertEquals("name111", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id1'", String.class));
     }
 }

@@ -70,10 +70,14 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "id2"),
             JdbcConstants.QUERY, "SELECT count(*) FROM test where id=:id");
 
-        List<Map<String, Object>> result = new QueryJdbcOperation().execute(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        Assertions.assertEquals(1, result.size());
+            List<Map<String, Object>> result = new QueryJdbcOperation().execute(
+                inputParameters, singleConnectionDataSource);
+
+            Assertions.assertEquals(1, result.size());
+        }
     }
 
     @Test
@@ -82,19 +86,23 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "missing"),
             JdbcConstants.QUERY, "SELECT id, name FROM test where id=:id");
 
-        QueryResult result = new QueryJdbcOperation().executeWithColumns(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        Assertions.assertEquals(
-            List.of("id", "name"), result.columns()
-                .stream()
-                .map(QueryColumn::name)
-                .toList());
-        Assertions.assertEquals(Types.VARCHAR, result.columns()
-            .getFirst()
-            .type());
-        Assertions.assertTrue(result.rows()
-            .isEmpty());
+            QueryResult result = new QueryJdbcOperation().executeWithColumns(
+                inputParameters, singleConnectionDataSource);
+
+            Assertions.assertEquals(
+                List.of("id", "name"), result.columns()
+                    .stream()
+                    .map(QueryColumn::name)
+                    .toList());
+            Assertions.assertEquals(Types.VARCHAR, result.columns()
+                .getFirst()
+                .type());
+            Assertions.assertTrue(result.rows()
+                .isEmpty());
+        }
     }
 
     @Test
@@ -103,9 +111,13 @@ public class QueryJdbcOperationIntTest {
             JdbcConstants.PARAMETERS, Map.of("id", "id2"),
             JdbcConstants.QUERY, "SELECT id, name FROM test where id=:id");
 
-        QueryResult result = new QueryJdbcOperation().executeWithColumns(
-            inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
+        try (SingleConnectionDataSource singleConnectionDataSource =
+            new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-        Assertions.assertEquals(List.of(Map.of("id", "id2", "name", "name2")), result.rows());
+            QueryResult result = new QueryJdbcOperation().executeWithColumns(
+                inputParameters, singleConnectionDataSource);
+
+            Assertions.assertEquals(List.of(Map.of("id", "id2", "name", "name2")), result.rows());
+        }
     }
 }
