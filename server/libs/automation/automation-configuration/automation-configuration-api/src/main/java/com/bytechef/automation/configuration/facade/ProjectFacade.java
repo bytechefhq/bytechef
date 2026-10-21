@@ -44,8 +44,6 @@ public interface ProjectFacade {
 
     void exportSharedProject(long id, @Nullable String description);
 
-    Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner);
-
     Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners);
 
     ProjectTemplateDTO getProjectTemplate(String id, boolean sharedProject);

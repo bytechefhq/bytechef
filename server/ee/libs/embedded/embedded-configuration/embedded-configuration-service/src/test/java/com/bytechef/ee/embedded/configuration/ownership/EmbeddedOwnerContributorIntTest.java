@@ -314,14 +314,14 @@ class EmbeddedOwnerContributorIntTest {
             .getProjectId();
 
         Set<Long> ownedProjectIds = projectFacade.getOwnedProjectIds(
-            List.of(catalogProjectId, connectedUserProjectId), ProjectOwner.EMBEDDED_CONNECTED_USER);
+            List.of(catalogProjectId, connectedUserProjectId), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER));
 
         assertThat(ownedProjectIds)
             .contains(connectedUserProjectId)
             .doesNotContain(catalogProjectId);
 
         Set<Long> catalogProjectIds = projectFacade.getOwnedProjectIds(
-            List.of(catalogProjectId, connectedUserProjectId), ProjectOwner.EMBEDDED_CATALOG);
+            List.of(catalogProjectId, connectedUserProjectId), Set.of(ProjectOwner.EMBEDDED_CATALOG));
 
         assertThat(catalogProjectIds)
             .contains(catalogProjectId)
