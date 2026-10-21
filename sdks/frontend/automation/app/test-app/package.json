@@ -1,0 +1,33 @@
+{
+    "name": "@bytechef/app-test-app",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite dev --port 3000",
+        "generate-routes": "tsr generate",
+        "build": "vite build",
+        "preview": "vite preview",
+        "check:bundle": "node scripts/check-bundle.mjs"
+    },
+    "dependencies": {
+        "@bytechef/app": "0.1.0",
+        "@tanstack/react-router": "1.170.41",
+        "@tanstack/react-start": "1.168.60",
+        "ai": "^7.0.128",
+        "react": "^19.2.0",
+        "react-dom": "^19.2.0",
+        "zod": "^4.1.8"
+    },
+    "devDependencies": {
+        "@tanstack/router-cli": "^1.132.0",
+        "@types/node": "^22.10.2",
+        "@types/react": "^19.2.0",
+        "@types/react-dom": "^19.2.0",
+        "@vitejs/plugin-react": "^6.0.1",
+        "typescript": "5.7.3",
+        "vite": "^8.0.0"
+    },
+    "engines": {
+        "node": ">=22.12.0"
+    }
+}

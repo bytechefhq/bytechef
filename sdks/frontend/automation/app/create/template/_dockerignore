@@ -1,0 +1,9 @@
+node_modules
+dist
+.output
+.nitro
+.tanstack
+.vercel
+.git
+.env*
+!.env.example
