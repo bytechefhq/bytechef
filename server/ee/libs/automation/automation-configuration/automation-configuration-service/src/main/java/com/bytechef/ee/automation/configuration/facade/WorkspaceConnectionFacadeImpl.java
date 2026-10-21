@@ -178,7 +178,7 @@ public class WorkspaceConnectionFacadeImpl
     @Override
     @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
+        "isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         super.updateConnectionCredentials(connectionId, parameters, version);
     }
