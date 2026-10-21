@@ -173,6 +173,11 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId) {
+        return projectWorkflowRepository.findByWorkflowId(workflowId);
+    }
+
+    @Override
     public ProjectWorkflow getWorkflowProjectWorkflow(String workflowId) {
         return projectWorkflowRepository.findByWorkflowId(workflowId)
             .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
