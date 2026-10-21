@@ -205,19 +205,19 @@ export function signConnectedUserJwt(keyId: string, privateKey: string, external
     return `${header}.${payload}.${base64Url(signer.sign(privateKey))}`;
 }
 
-async function createEnvironmentData(
+export interface ConnectedUserApiI {
+    api: APIRequestContext;
+    signingKeyId: number;
+}
+
+export async function createConnectedUserApi(
     adminApi: APIRequestContext,
     baseURL: string,
-    environment: EmbeddedDataEnvironmentType,
-    integrationId: number,
-    suffix: string,
-    draft: Partial<EmbeddedEnvironmentDataI>
-): Promise<EmbeddedEnvironmentDataI> {
+    environment: EnvironmentType,
+    externalId: string,
+    signingKeyName: string = `rbac_signing_${externalId}`
+): Promise<ConnectedUserApiI> {
     const environmentId = ENVIRONMENT_IDS[environment];
-
-    const label = environment.toLowerCase();
-
-    const signingKeyName = `rbac_signing_${label}_${suffix}`;
 
     const {privateKey} = await embeddedInternalApi<{privateKey: string}>(adminApi, 'POST', '/signing-keys', {
         environmentId,
@@ -232,18 +232,61 @@ async function createEnvironmentData(
 
     const signingKey = signingKeys.find((candidate) => candidate.name === signingKeyName)!;
 
-    draft.signingKeyId = signingKey.id;
-    draft.signingKeyName = signingKeyName;
-
-    const connectedUserExternalId = `rbac_ext_${label}_${suffix}`;
-
-    const connectedUserApi = await playwrightRequest.newContext({
+    const api = await playwrightRequest.newContext({
         baseURL,
         extraHTTPHeaders: {
-            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, privateKey, connectedUserExternalId)}`,
+            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, privateKey, externalId)}`,
             'X-Environment': environment,
         },
     });
+
+    return {api, signingKeyId: signingKey.id};
+}
+
+export type TeardownAttemptType = (description: string, action: () => Promise<unknown>) => Promise<void>;
+
+export function createTeardownAttempt(label: string, failures?: string[]): TeardownAttemptType {
+    return async (description, action) => {
+        try {
+            await action();
+        } catch (error) {
+            const failure = `${description}: ${error instanceof Error ? error.message : String(error)}`;
+
+            if (failures) {
+                failures.push(failure);
+            } else {
+                console.warn(`${label} teardown: ${failure}`);
+            }
+        }
+    };
+}
+
+async function createEnvironmentData(
+    adminApi: APIRequestContext,
+    baseURL: string,
+    environment: EmbeddedDataEnvironmentType,
+    integrationId: number,
+    suffix: string,
+    draft: Partial<EmbeddedEnvironmentDataI>
+): Promise<EmbeddedEnvironmentDataI> {
+    const environmentId = ENVIRONMENT_IDS[environment];
+
+    const label = environment.toLowerCase();
+
+    const signingKeyName = `rbac_signing_${label}_${suffix}`;
+
+    const connectedUserExternalId = `rbac_ext_${label}_${suffix}`;
+
+    const {api: connectedUserApi, signingKeyId} = await createConnectedUserApi(
+        adminApi,
+        baseURL,
+        environment,
+        connectedUserExternalId,
+        signingKeyName
+    );
+
+    draft.signingKeyId = signingKeyId;
+    draft.signingKeyName = signingKeyName;
 
     try {
         const connectedUserResponse = await connectedUserApi.get('/api/embedded/v1/connections');
@@ -314,7 +357,7 @@ async function createEnvironmentData(
         connectionId,
         instanceConfigurationId,
         mcpServerId: mcpServer.createEmbeddedMcpServer.id,
-        signingKeyId: signingKey.id,
+        signingKeyId,
         signingKeyName,
     };
 }
@@ -383,13 +426,7 @@ export async function createEmbeddedData(adminApi: APIRequestContext, baseURL: s
 export async function deleteEmbeddedData(adminApi: APIRequestContext, embeddedData: EmbeddedDataDraftI): Promise<void> {
     const failures: string[] = [];
 
-    const attempt = async (description: string, action: () => Promise<unknown>) => {
-        try {
-            await action();
-        } catch (error) {
-            failures.push(`${description}: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    };
+    const attempt = createTeardownAttempt('embeddedData', failures);
 
     for (const environment of [...EMBEDDED_DATA_ENVIRONMENTS].reverse()) {
         const environmentData = embeddedData.byEnvironment[environment];
