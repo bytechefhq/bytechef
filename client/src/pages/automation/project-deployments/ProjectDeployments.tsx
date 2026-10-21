@@ -17,7 +17,8 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {TagIcon} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
+import {useState} from 'react';
+import {useLocation, useSearchParams} from 'react-router-dom';
 
 import ProjectDeploymentsEmptyState from './components/ProjectDeploymentsEmptyState';
 import ProjectDeploymentDialog from './components/project-deployment-dialog/ProjectDeploymentDialog';
@@ -51,9 +52,12 @@ const ProjectDeploymentsSkeleton = () => (
 );
 
 const ProjectDeployments = () => {
+    const [newlyCreatedDeploymentId, setNewlyCreatedDeploymentId] = useState<number | undefined>();
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const location = useLocation();
     const [searchParams] = useSearchParams();
 
     const projectId = searchParams.get('projectId');
@@ -117,6 +121,9 @@ const ProjectDeployments = () => {
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
+    const expandedProjectDeploymentId =
+        newlyCreatedDeploymentId ?? (location.state as {projectDeploymentId?: number} | null)?.projectDeploymentId;
+
     const isFirstRun = !isFiltered && projectDeployments?.length === 0;
 
     return (
@@ -129,6 +136,7 @@ const ProjectDeployments = () => {
                         projectDeployments &&
                         projectDeployments.length > 0 && (
                             <ProjectDeploymentDialog
+                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
                                 projectDeployment={
                                     {
                                         environmentId: currentEnvironmentId,
@@ -201,6 +209,7 @@ const ProjectDeployments = () => {
                                         <ProjectDeploymentList
                                             componentDefinitions={componentDefinitions}
                                             key={projectId}
+                                            newlyCreatedDeploymentId={expandedProjectDeploymentId}
                                             project={projects.find(
                                                 (currentProject) => currentProject.id === projectId
                                             )!}
@@ -223,7 +232,7 @@ const ProjectDeployments = () => {
                 ) : isFiltered ? (
                     <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
-                    <ProjectDeploymentsEmptyState />
+                    <ProjectDeploymentsEmptyState onDeploymentCreated={setNewlyCreatedDeploymentId} />
                 )}
             </PageLoader>
         </LayoutContainer>

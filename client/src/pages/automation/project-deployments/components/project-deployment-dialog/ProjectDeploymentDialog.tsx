@@ -315,7 +315,9 @@ const ProjectDeploymentDialog = ({
 
             const search = submittedProjectId != null ? `?projectId=${submittedProjectId}` : '';
 
-            navigate(`/automation/deployments${search}`);
+            navigate(`/automation/deployments${search}`, {
+                state: {projectDeploymentId: deploymentId || effectiveProjectDeployment?.id},
+            });
         }
     };
 
