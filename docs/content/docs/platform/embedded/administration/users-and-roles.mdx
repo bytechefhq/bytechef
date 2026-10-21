@@ -70,7 +70,7 @@ A member has **either** one role that applies in every [environment](/platform/a
 
 | Action | Result |
 |---|---|
-| Give a member with one role for every environment a role in a single environment | The member switches to per-environment roles. Their existing role is kept in the other environments; remove those explicitly if they should not have access there. |
+| Give a member with one role for every environment a role in a single environment | The member switches to per-environment roles. Their existing role is kept in each other environment; change or remove each of those as its own step if the member should not have that access there. |
 | Remove one environment role while others remain | The member is denied in that environment. Their other roles are unchanged. |
 | Remove the member's last environment role | The role becomes a role for every environment again, the same role in all environments. |
 
@@ -78,9 +78,9 @@ Who may make each change:
 
 - Adding or removing a member, and changing a role that applies in every environment, need `EMBEDDED_MEMBER_MANAGE` in every environment.
 - Once a member has per-environment roles, setting or removing the role for one environment needs `EMBEDDED_MEMBER_MANAGE` in that environment only.
-- A per-environment Admin cannot remove themselves, because removal needs `EMBEDDED_MEMBER_MANAGE` in every environment.
+- A per-environment Admin cannot remove their own membership, because removal needs `EMBEDDED_MEMBER_MANAGE` in every environment.
 
-<!-- TODO screenshot: Embedded → Settings → Users - one member with Editor in every environment and one with Viewer in Development and Admin in Production -->
+{/* TODO screenshot: Embedded → Settings → Users - one member with Editor in every environment and one with Viewer in Development and Admin in Production */}
 
 ---
 
@@ -155,6 +155,10 @@ Only a tenant admin can rotate an embedded MCP server's secret key. Editors with
 - **No last-Admin rule.** An Admin may step down to a lower role, even when no other Admin remains. Tenant admins always have full access, so the embedded side cannot be locked out.
 - **Hub and connected users' projects are not visible to automation workspace roles.** Automation Hub templates and the projects of connected users are not covered by automation workspace roles.
 - A request the member lacks permission for is refused: the REST API returns HTTP **403**, and GraphQL returns an error of type `FORBIDDEN`.
+
+## What gets logged
+
+Embedded membership changes are recorded in the [audit log](/platform/settings/audit-events) as `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED` and `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED`. Each event records the user, and where they apply the environment, the new role, the previous role, and whether removing the last environment role widened the member to a role for every environment.
 
 ## See also
 
