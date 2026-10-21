@@ -21,6 +21,10 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class IconController {
 
-    CacheControl cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
+    static final CacheControl CACHE_CONTROL = CacheControl.maxAge(1, TimeUnit.HOURS)
         .noTransform()
         .mustRevalidate();
 
@@ -65,7 +69,21 @@ public class IconController {
         }
 
         return ResponseEntity.ok()
-            .cacheControl(cacheControl)
+            .cacheControl(CACHE_CONTROL)
+            .eTag(computeETag(icon))
             .body(icon);
+    }
+
+    private static String computeETag(String icon) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+            byte[] digest = messageDigest.digest(icon.getBytes(StandardCharsets.UTF_8));
+
+            return HexFormat.of()
+                .formatHex(digest);
+        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            throw new IllegalStateException(noSuchAlgorithmException);
+        }
     }
 }
