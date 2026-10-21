@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -158,6 +159,14 @@ class ConnectionFacadeIntTest {
         grantEveryEmbeddedScope();
 
         when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(eq(7L), any());
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
 
         assertThat(connectionFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
@@ -172,7 +181,7 @@ class ConnectionFacadeIntTest {
         connectionAdminFacade.updateConnectionTags(7L, List.of());
 
         verify(connectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
-        verify(connectionFacade).delete(7L);
+        verify(connectionFacade).delete(eq(7L), any());
         verify(connectionFacade).getConnection(7L);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(connectionFacade).update(7L, "name", List.of(), 0);
@@ -297,7 +306,7 @@ class ConnectionFacadeIntTest {
             assertThatThrownBy(() -> connectionFacade.deleteConnection(AUTOMATION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(platformConnectionFacade, never()).delete(anyLong());
+            verify(connectionFacade, never()).delete(anyLong(), any());
             verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
 
             assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_DELETED).getData())
@@ -340,7 +349,7 @@ class ConnectionFacadeIntTest {
             assertThatThrownBy(() -> connectionFacade.getConnection(AUTOMATION_CONNECTION_ID))
                 .hasMessage("Connection id=%s not found".formatted(AUTOMATION_CONNECTION_ID));
 
-            verify(platformConnectionFacade, never()).delete(anyLong());
+            verify(connectionFacade, never()).delete(anyLong(), any());
         }
     }
 
