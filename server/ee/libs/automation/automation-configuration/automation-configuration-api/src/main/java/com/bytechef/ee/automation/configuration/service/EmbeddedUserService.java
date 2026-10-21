@@ -21,6 +21,8 @@ public interface EmbeddedUserService {
 
     EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole);
 
+    void deleteEmbeddedMemberships(long userId);
+
     List<EmbeddedUser> getEmbeddedUsers();
 
     List<EmbeddedUser> getUserEmbeddedUsers(long userId);

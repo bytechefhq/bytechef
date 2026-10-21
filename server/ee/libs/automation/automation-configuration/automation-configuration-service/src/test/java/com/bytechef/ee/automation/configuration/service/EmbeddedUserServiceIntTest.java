@@ -225,7 +225,7 @@ class EmbeddedUserServiceIntTest {
         embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
 
         WorkspaceMembershipAssignerImpl workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserRepository, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
+            embeddedUserService, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
             mock(WorkspaceUserService.class));
 
         workspaceMembershipAssigner.removeMemberships(userId(MEMBER));
