@@ -134,6 +134,29 @@ class EmbeddedUserAuditMapperTest {
     }
 
     @Test
+    void testRemovedSkipsASuccessfulRemovalOfANonMember() {
+        Map<String, Object> arguments = arguments("userId", USER_ID);
+
+        assertThat(
+            embeddedUserAuditMapper
+                .shouldRecord(invocation(EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED, arguments, "")))
+                    .isFalse();
+        assertThat(
+            embeddedUserAuditMapper.shouldRecord(
+                invocation(EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED, arguments, "EDITOR")))
+                    .isTrue();
+        assertThat(
+            embeddedUserAuditMapper.shouldRecord(
+                new AuditInvocation(
+                    EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED, arguments, null, "", AuditOutcome.DENIED, null)))
+                        .isTrue();
+        assertThat(
+            embeddedUserAuditMapper.shouldRecord(
+                invocation(EmbeddedUserAuditEvents.EMBEDDED_USER_ROLE_UPDATED, arguments, null)))
+                    .isTrue();
+    }
+
+    @Test
     void testEnvironmentRoleRemovedRecordsWideningOnlyWhenItHappened() {
         EmbeddedUser lastRow = EmbeddedUser.forRole(USER_ID, WorkspaceRole.EDITOR, Environment.PRODUCTION);
 
