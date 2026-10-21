@@ -445,6 +445,64 @@ class ConnectionFacadeIntTest {
             .isEmpty();
     }
 
+    @Test
+    void testUpdateAndDeleteOfAnEmbeddedConnectionByNonOwnerNonAdminSkipTheCreatorCheck() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+
+        ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version());
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
+                .isEqualTo("renamed"));
+
+        connectionFacade.update(connectionId, List.of());
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
+
+        connectionFacade.delete(connectionId);
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .isEmpty();
+    }
+
+    @Test
+    void testModifyingAnEmbeddedConnectionStillRequiresAuthentication() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+
+        SecurityContextHolder.clearContext();
+
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
     @ComponentScan(basePackages = {
         "com.bytechef.platform.configuration.accessor", "com.bytechef.platform.tag"
     })
