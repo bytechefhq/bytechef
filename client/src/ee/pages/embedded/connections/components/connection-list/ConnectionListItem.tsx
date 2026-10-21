@@ -13,6 +13,7 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/emb
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
@@ -31,6 +32,9 @@ interface ConnectionListItemProps {
 const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canEdit = useHasEmbeddedScope('CONNECTION_EDIT', connection.environmentId);
+    const canDelete = useHasEmbeddedScope('CONNECTION_DELETE', connection.environmentId);
 
     const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
@@ -105,6 +109,7 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                                 },
                                             })}
                                             id={connection.id!}
+                                            readOnly={!canEdit}
                                             remainingTags={remainingTags}
                                             tags={connection.tags}
                                             updateTagsMutation={updateConnectionTagsMutation}
@@ -156,14 +161,20 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                 )}
                             </div>
 
-                            <ConnectionListItemDropdownMenu onEditClick={() => setShowEditDialog(true)}>
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                />
-                            </ConnectionListItemDropdownMenu>
+                            {(canEdit || canDelete) && (
+                                <ConnectionListItemDropdownMenu
+                                    onEditClick={canEdit ? () => setShowEditDialog(true) : undefined}
+                                >
+                                    {canDelete && (
+                                        <DropdownMenuItem
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
+                                        />
+                                    )}
+                                </ConnectionListItemDropdownMenu>
+                            )}
                         </div>
                     </div>
                 </div>

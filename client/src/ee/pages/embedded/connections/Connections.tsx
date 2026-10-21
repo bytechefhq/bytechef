@@ -12,6 +12,7 @@ import {
 } from '@/ee/shared/queries/embedded/connections.queries';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -29,6 +30,8 @@ export const Connections = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const [searchParams] = useSearchParams();
+
+    const canCreateConnection = useHasEmbeddedScope('CONNECTION_CREATE');
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
@@ -79,20 +82,22 @@ export const Connections = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            <ConnectionDialog
-                                componentDefinitions={componentDefinitions}
-                                connection={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as Connection
-                                }
-                                connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                                connectionsQueryKey={ConnectionKeys.connections}
-                                showSharedOption
-                                triggerNode={<Button label="New Connection" />}
-                                useCreateConnectionMutation={useCreateConnectionMutation}
-                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                            />
+                            canCreateConnection && (
+                                <ConnectionDialog
+                                    componentDefinitions={componentDefinitions}
+                                    connection={
+                                        {
+                                            environmentId: currentEnvironmentId,
+                                        } as Connection
+                                    }
+                                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                    connectionsQueryKey={ConnectionKeys.connections}
+                                    showSharedOption
+                                    triggerNode={<Button label="New Connection" />}
+                                    useCreateConnectionMutation={useCreateConnectionMutation}
+                                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                />
+                            )
                         }
                         title={
                             <ConnectionsFilterTitle
@@ -134,6 +139,7 @@ export const Connections = () => {
                 ) : (
                     <EmptyList
                         button={
+                            canCreateConnection &&
                             componentDefinitions && (
                                 <ConnectionDialog
                                     componentDefinitions={componentDefinitions}
