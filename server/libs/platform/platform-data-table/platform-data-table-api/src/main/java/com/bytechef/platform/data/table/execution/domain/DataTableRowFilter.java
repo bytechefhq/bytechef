@@ -105,6 +105,19 @@ public record DataTableRowFilter(String column, Operation operation, @Nullable O
     }
 
     /**
+     * Returns the value to compare with for an {@link Operation.Arity#ONE} operation.
+     *
+     * @throws IllegalStateException if the operation does not take a single value
+     */
+    public Object singleValue() {
+        if (operation.arity() != Operation.Arity.ONE) {
+            throw new IllegalStateException("Operation %s does not take a single value".formatted(operation));
+        }
+
+        return Objects.requireNonNull(value);
+    }
+
+    /**
      * Returns the values to compare with: none for {@link Operation.Arity#NONE}, the single value for
      * {@link Operation.Arity#ONE}, and the list for {@link Operation.Arity#LIST} and {@link Operation.Arity#PAIR}.
      */

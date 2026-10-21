@@ -218,7 +218,8 @@ public final class DataTableUtils {
                 CONDITIONS, new TypeReference<List<Map<String, Object>>>() {}, List.of());
         } catch (RuntimeException runtimeException) {
             throw new IllegalArgumentException(
-                "OR Conditions must be a list of AND Condition lists, each holding condition objects",
+                "OR Conditions must be a list of AND Condition lists, each holding condition objects: " +
+                    runtimeException.getMessage(),
                 runtimeException);
         }
 
@@ -255,7 +256,7 @@ public final class DataTableUtils {
             conditions.add(filters);
         }
 
-        return new DataTableRowConditions(conditions);
+        return conditions.isEmpty() ? DataTableRowConditions.matchAll() : DataTableRowConditions.anyOf(conditions);
     }
 
     /**
@@ -452,6 +453,7 @@ public final class DataTableUtils {
      * Creates a PropertiesFunction for dynamic properties lookup based on table columns.
      *
      * @param dataTableService the data table service
+     * @param singleRecord     true to return one property per column, false to return a Records array of column objects
      * @return a PropertiesFunction that returns properties based on the selected table
      */
     public static ActionDefinition.PropertiesFunction createDynamicProperties(
@@ -528,6 +530,16 @@ public final class DataTableUtils {
             .collect(Collectors.joining(","));
     }
 
+    private static void requirePairValue(
+        Map<String, Object> condition, String key, String label, Operation operation) {
+
+        Object value = condition.get(key);
+
+        if (value == null || (value instanceof String string && string.isBlank())) {
+            throw new IllegalArgumentException("Operation %s requires %s".formatted(operation, label));
+        }
+    }
+
     private static DataTableRowFilter toDataTableRowFilter(Map<String, Object> condition) {
         List<String> unknownKeys = condition.keySet()
             .stream()
@@ -556,6 +568,16 @@ public final class DataTableUtils {
         }
 
         Operation operation = toEnum(Operation.class, operationValue, Operation.EQUALS, "Operation");
+
+        if (operation.arity() == Arity.LIST && condition.get(VALUES) == null && condition.get(VALUE) != null) {
+            throw new IllegalArgumentException(
+                "Operation %s takes its values from Values, not Value".formatted(operation));
+        }
+
+        if (operation.arity() == Arity.PAIR) {
+            requirePairValue(condition, VALUE, "Value", operation);
+            requirePairValue(condition, VALUE_TO, "To Value", operation);
+        }
 
         Object value = switch (operation.arity()) {
             case LIST -> condition.get(VALUES);

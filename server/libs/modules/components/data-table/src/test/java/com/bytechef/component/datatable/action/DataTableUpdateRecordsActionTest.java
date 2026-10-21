@@ -40,7 +40,7 @@ class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformUpdatesEveryRecordMatchingConditions() throws Exception {
-        DataTableRowConditions conditions = new DataTableRowConditions(
+        DataTableRowConditions conditions = DataTableRowConditions.anyOf(
             List.of(
                 List.of(new DataTableRowFilter("status", Operation.EQUALS, "BOT")),
                 List.of(new DataTableRowFilter("priority", Operation.GREATER, "3"))));
