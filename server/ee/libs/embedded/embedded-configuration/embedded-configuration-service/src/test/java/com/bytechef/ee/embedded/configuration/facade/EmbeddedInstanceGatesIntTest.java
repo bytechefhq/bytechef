@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -55,13 +56,13 @@ import com.bytechef.ee.automation.configuration.security.scope.embedded.Embedded
 import com.bytechef.ee.automation.configuration.security.scope.embedded.EmbeddedSharedPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationInstanceConfigurationPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.embedded.IntegrationPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverImpl;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -119,6 +120,7 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -172,7 +174,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class, JobFacade.class, JobService.class,
     McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
-    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceConfigurationWorkflowService.class, McpAutomationRowFacade.class,
+    McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
@@ -225,9 +228,6 @@ class EmbeddedInstanceGatesIntTest {
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
-
-    @Autowired
-    private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
 
     @Autowired
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
@@ -425,6 +425,30 @@ class EmbeddedInstanceGatesIntTest {
     }
 
     @Test
+    void testTheTagListShowsOnlyTagsFromEnvironmentsTheCallerCanView() {
+        String productionTagName = "production-tag-" + UUID.randomUUID();
+        String developmentTagName = "development-tag-" + UUID.randomUUID();
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
+            productionConfigurationId, List.of(new Tag(productionTagName)));
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
+            developmentConfigurationId, List.of(new Tag(developmentTagName)));
+
+        assertThat(integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationTags())
+            .extracting(Tag::getName)
+            .contains(productionTagName, developmentTagName);
+
+        authenticate(EDITOR_IN_PRODUCTION, false);
+
+        assertThat(integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationTags())
+            .extracting(Tag::getName)
+            .contains(productionTagName)
+            .doesNotContain(developmentTagName);
+    }
+
+    @Test
     void testAProductionEditorCreatesConfigurationsOnlyInProduction() {
         Integration integration = createPublishedIntegration();
 
@@ -532,10 +556,6 @@ class EmbeddedInstanceGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationInstanceFacade.getIntegrationInstance(integrationInstanceId))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(
-            () -> integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(
-                integrationInstanceId, workflowId, false))
-                    .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> appEventFacade.getAppEvents())
             .isInstanceOf(AccessDeniedException.class);
     }
@@ -553,7 +573,7 @@ class EmbeddedInstanceGatesIntTest {
 
         integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationTags(
             developmentConfigurationId, List.of());
-        integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(integrationInstanceId, workflowId, true);
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceId, workflowId, true);
 
         Integration integration = createPublishedIntegration();
 
@@ -615,10 +635,6 @@ class EmbeddedInstanceGatesIntTest {
                     .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceId))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(
-            () -> integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(
-                integrationInstanceId, workflowId, true))
-                    .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> appEventFacade.create(newAppEvent()))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> appEventFacade.getAppEvents())
@@ -719,7 +735,7 @@ class EmbeddedInstanceGatesIntTest {
         IntegrationInstanceConfigurationPermissionScopeProvider.class, IntegrationPermissionScopeProvider.class,
         KnowledgeBasePermissionScopeProvider.class, McpPermissionScopeProvider.class, PermissionScopeRegistry.class,
         PermissionServiceImpl.class, ProjectPermissionScopeProvider.class, WorkflowPermissionScopeProvider.class,
-        WorkspacePermissionScopeProvider.class, WorkspaceScopeCacheService.class
+        WorkspacePermissionScopeProvider.class, WorkspaceScopeCache.class
     })
     static class RealPermissionConfiguration {
 
