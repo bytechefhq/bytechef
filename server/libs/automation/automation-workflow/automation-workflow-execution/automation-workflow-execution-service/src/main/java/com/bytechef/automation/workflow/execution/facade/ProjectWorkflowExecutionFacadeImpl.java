@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -76,6 +77,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -97,11 +99,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
+    private static final String CONNECTED_USER_VIEW = "CONNECTED_USER_VIEW";
     private static final String EXECUTION_DETAILS_VIEW = "EXECUTION_DETAILS_VIEW";
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider;
     private final ContextService contextService;
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
     private final WorkflowExecutionRowService workflowExecutionRowService;
@@ -123,8 +127,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService,
         ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider,
-        ContextService contextService, Evaluator evaluator,
-        EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
+        ContextService contextService, ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        Evaluator evaluator, EnvironmentService environmentService,
+        WorkflowExecutionRowService workflowExecutionRowService,
         JobService jobService, PermissionService permissionService,
         PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
@@ -136,6 +141,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserProjectDeploymentResolverProvider = connectedUserProjectDeploymentResolverProvider;
         this.contextService = contextService;
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
         this.workflowExecutionRowService = workflowExecutionRowService;
@@ -159,6 +165,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
+
+        requireConnectedUserViewForConnectedUserProject(id, "Job", job::getWorkflowId);
 
         Map<String, ?> outputs = job.getOutputs() == null
             ? null
@@ -199,6 +207,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 "Trigger execution " + triggerExecutionId + " does not belong to a deployed workflow");
         }
 
+        Workflow workflow = workflowExecutionDTO.workflow();
+
+        requireConnectedUserViewForConnectedUserProject(triggerExecutionId, "TriggerExecution", workflow::getId);
+
         return permissionService.hasResourceScope(triggerExecutionId, "TriggerExecution", EXECUTION_DETAILS_VIEW)
             ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
@@ -210,6 +222,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        requireConnectedUserViewForConnectedUserProject(id, "Job", () -> jobService.getJob(id)
+            .getWorkflowId());
 
         if (!permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)) {
             return toTaskExecutionDTO(taskExecution, null, false).withoutDetails();
@@ -268,6 +283,18 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return workflowIds;
     }
 
+    private void requireConnectedUserViewForConnectedUserProject(
+        Serializable id, String resourceType, Supplier<String> workflowIdSupplier) {
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null
+            && embeddedResourceResolver.isConnectedUserProjectWorkflow(workflowIdSupplier.get())) {
+
+            requireResourceScope(id, resourceType, CONNECTED_USER_VIEW);
+        }
+    }
+
     /**
      * Denies unless the caller holds {@code scope} for the resource. Throwing rather than returning a narrowed result
      * on purpose: the caller named this resource, so an empty page would read as "no runs" and hide the refusal.
@@ -299,7 +326,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+    @PreAuthorize("#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : "
         + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
@@ -316,7 +344,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @PreAuthorize("#connectedUserId != null ? "
         + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
         + "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : "
-        + "(#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+        + "(#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : "
         + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId))")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,

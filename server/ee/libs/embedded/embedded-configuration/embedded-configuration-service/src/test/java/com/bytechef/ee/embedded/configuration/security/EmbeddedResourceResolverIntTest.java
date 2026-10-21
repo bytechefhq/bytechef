@@ -138,6 +138,29 @@ class EmbeddedResourceResolverIntTest {
         assertThat(embeddedResourceResolver.isEmbeddedProjectWorkflow("connected-user-workflow")).isTrue();
     }
 
+    @Test
+    void testOnlyAConnectedUserProjectWorkflowIsAConnectedUserProjectWorkflow() {
+        long workspaceId = insertWorkspace();
+        long automationHubProjectId = insertProject(workspaceId);
+        long connectedUserProjectId = insertProject(workspaceId);
+        long workspaceProjectId = insertProject(workspaceId);
+
+        jdbcTemplate.update("INSERT INTO automation_workflow_project (project_id) VALUES (?)", automationHubProjectId);
+        jdbcTemplate.update(
+            "INSERT INTO connected_user_project (connected_user_id, project_id) VALUES (1, ?)",
+            connectedUserProjectId);
+
+        insertProjectWorkflow(automationHubProjectId, "hub-template-workflow");
+        insertProjectWorkflow(connectedUserProjectId, "connected-user-project-workflow");
+        insertProjectWorkflow(workspaceProjectId, "plain-workspace-workflow");
+
+        assertThat(embeddedResourceResolver.isConnectedUserProjectWorkflow("connected-user-project-workflow"))
+            .isTrue();
+        assertThat(embeddedResourceResolver.isConnectedUserProjectWorkflow("hub-template-workflow")).isFalse();
+        assertThat(embeddedResourceResolver.isConnectedUserProjectWorkflow("plain-workspace-workflow")).isFalse();
+        assertThat(embeddedResourceResolver.isConnectedUserProjectWorkflow("unknown-workflow")).isFalse();
+    }
+
     private void insertProjectWorkflow(long projectId, String workflowId) {
         jdbcTemplate.update(
             """

@@ -25,6 +25,8 @@ package com.bytechef.automation.configuration.security;
  */
 public interface EmbeddedResourceResolver {
 
+    boolean isConnectedUserProjectWorkflow(String workflowId);
+
     boolean isEmbeddedProject(long projectId);
 
     boolean isEmbeddedProjectWorkflow(String workflowId);
