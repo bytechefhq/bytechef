@@ -171,8 +171,6 @@ public class ProjectFacadeIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        testOwnerContributors.clear();
-
         workspace = workspaceRepository.save(new Workspace("test"));
     }
 
