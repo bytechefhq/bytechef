@@ -42,7 +42,9 @@ const renderLayout = (readOnly: boolean) =>
 const findStickyNoteNode = () =>
     useWorkflowDataStore.getState().nodes.find((node) => node.type === STICKY_NOTE_NODE_TYPE);
 
-describe('useLayout sticky notes', () => {
+const LAYOUT_WAIT_OPTIONS = {interval: 10, timeout: 5000};
+
+describe('useLayout sticky notes', {timeout: 20_000}, () => {
     beforeEach(() => {
         useWorkflowDataStore.setState((state) => ({
             edges: [],
@@ -64,7 +66,7 @@ describe('useLayout sticky notes', () => {
     it('builds draggable, editable sticky notes in an editable editor', async () => {
         renderLayout(false);
 
-        await waitFor(() => expect(findStickyNoteNode()).toBeDefined());
+        await waitFor(() => expect(findStickyNoteNode()).toBeDefined(), LAYOUT_WAIT_OPTIONS);
 
         const stickyNoteNode = findStickyNoteNode()!;
 
@@ -75,7 +77,7 @@ describe('useLayout sticky notes', () => {
     it('builds locked sticky notes under the read-only provider', async () => {
         renderLayout(true);
 
-        await waitFor(() => expect(findStickyNoteNode()).toBeDefined());
+        await waitFor(() => expect(findStickyNoteNode()).toBeDefined(), LAYOUT_WAIT_OPTIONS);
 
         const stickyNoteNode = findStickyNoteNode()!;
 

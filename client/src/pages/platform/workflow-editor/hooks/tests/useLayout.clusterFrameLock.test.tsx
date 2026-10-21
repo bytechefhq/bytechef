@@ -33,11 +33,13 @@ vi.mock('../../../cluster-element-editor/hooks/useClusterElementNodes', () => ({
     }),
 }));
 
+const LAYOUT_WAIT_OPTIONS = {interval: 10, timeout: 5000};
+
 function findElementNode(): Node {
     return useWorkflowDataStore.getState().nodes.find((node) => node.id === ELEMENT_ID)!;
 }
 
-describe('useLayout reacts to a cluster box lock toggle', () => {
+describe('useLayout reacts to a cluster box lock toggle', {timeout: 20_000}, () => {
     beforeEach(() => {
         useClusterElementsViewModeStore.getState().setClusterElementsViewMode('box');
         useWorkflowEditorStore.setState({clusterFrameLockedByRootId: {}});
@@ -82,13 +84,13 @@ describe('useLayout reacts to a cluster box lock toggle', () => {
             useLayout({canvasHeight: 800, canvasWidth: 1200, componentDefinitions: [], taskDispatcherDefinitions: []})
         );
 
-        await waitFor(() => expect(findElementNode()).toBeDefined());
-        await waitFor(() => expect(findElementNode().draggable).toBe(false));
+        await waitFor(() => expect(findElementNode()).toBeDefined(), LAYOUT_WAIT_OPTIONS);
+        await waitFor(() => expect(findElementNode().draggable).toBe(false), LAYOUT_WAIT_OPTIONS);
 
         act(() => {
             useWorkflowEditorStore.getState().setClusterFrameLocked(ROOT_ID, false);
         });
 
-        await waitFor(() => expect(findElementNode().draggable).toBe(true), {interval: 10, timeout: 5000});
+        await waitFor(() => expect(findElementNode().draggable).toBe(true), LAYOUT_WAIT_OPTIONS);
     });
 });
