@@ -20,9 +20,15 @@ import com.bytechef.cli.client.automation.ApiClient;
 import com.bytechef.cli.client.automation.ApiException;
 import com.bytechef.cli.client.automation.api.ProjectCodeWorkflowApi;
 import com.bytechef.cli.client.automation.api.ProjectGitApi;
+import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionApi;
+import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionEndpointApi;
 import com.bytechef.cli.core.config.CliConfig;
 import com.bytechef.cli.core.error.CliException;
 import com.bytechef.cli.core.http.AuthInterceptor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Objects;
 
 /**
  * Builds automation public API clients configured with the resolved host and auth headers, and maps client
@@ -32,7 +38,11 @@ import com.bytechef.cli.core.http.AuthInterceptor;
  */
 final class AutomationClientFactory {
 
+    private static final String NEUTRAL_FORBIDDEN_HINT =
+        "Your role in DEVELOPMENT does not allow this; ask a workspace admin.";
+
     private static final String AUTOMATION_API_PATH = "/api/automation/v1";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private AutomationClientFactory() {
     }
@@ -54,8 +64,105 @@ final class AutomationClientFactory {
         return new ProjectGitApi(apiClient(config));
     }
 
+    /**
+     * The generated API Platform client's {@code ApiClient} is a distinct type per generated package.
+     */
+    static com.bytechef.cli.client.automationapiplatform.ApiClient apiPlatformApiClient(CliConfig config) {
+        com.bytechef.cli.client.automationapiplatform.ApiClient apiClient =
+            new com.bytechef.cli.client.automationapiplatform.ApiClient();
+
+        apiClient.updateBaseUri(AuthInterceptor.baseUri(config, AUTOMATION_API_PATH));
+        apiClient.setRequestInterceptor(new AuthInterceptor(config));
+
+        return apiClient;
+    }
+
+    static ApiCollectionApi apiCollectionApi(CliConfig config) {
+        return new ApiCollectionApi(apiPlatformApiClient(config));
+    }
+
+    static ApiCollectionEndpointApi apiCollectionEndpointApi(CliConfig config) {
+        return new ApiCollectionEndpointApi(apiPlatformApiClient(config));
+    }
+
     static CliException toCliException(ApiException exception) {
         return toCliException(exception.getCode());
+    }
+
+    /**
+     * Maps an API Platform client failure onto the CLI's exit codes, carrying the server's {@code {code, message}}
+     * error body. Status 0 is the generated client's code for an I/O failure, which includes a 2xx reply it could not
+     * read.
+     */
+    static CliException toCliException(com.bytechef.cli.client.automationapiplatform.ApiException exception) {
+        return toCliException(
+            exception.getCode(), exception.getMessage(), exception.getResponseBody(), NEUTRAL_FORBIDDEN_HINT);
+    }
+
+    private static CliException toCliException(
+        int status, String exceptionMessage, String responseBody, String forbiddenHint) {
+
+        if (status == 0) {
+            return new CliException(
+                1, "Cannot reach ByteChef, or the host is not a ByteChef server: "
+                    + Objects.requireNonNullElse(exceptionMessage, "no response") + ".");
+        }
+
+        String detail = appErrorDetail(responseBody);
+
+        if (status == 401) {
+            return new CliException(
+                2, "Authentication failed (HTTP 401)" + detail + ". Use an automation API key created in DEVELOPMENT "
+                    + "(bytechef configure --environment DEVELOPMENT --token <key>).");
+        }
+
+        if (status == 403) {
+            return new CliException(2, "Not allowed (HTTP 403)" + detail + ". " + forbiddenHint);
+        }
+
+        if (status == 404) {
+            return new CliException(3, "Not found (HTTP 404)" + detail + ".");
+        }
+
+        return new CliException(1, "Request failed (HTTP " + status + ")" + detail + ".");
+    }
+
+    private static String appErrorDetail(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return "";
+        }
+
+        JsonNode errorNode;
+
+        try {
+            errorNode = OBJECT_MAPPER.readTree(responseBody);
+        } catch (JsonProcessingException exception) {
+            return "";
+        }
+
+        JsonNode codeNode = errorNode.path("code");
+        JsonNode messageNode = errorNode.path("message");
+
+        String code = codeNode.asText("");
+        String message = messageNode.asText("");
+
+        while (message.endsWith(".")) {
+            message = message.substring(0, message.length() - 1);
+        }
+
+        if (code.isEmpty() && message.isEmpty()) {
+            return "";
+        }
+
+        if (code.isEmpty()) {
+            return ": " + message;
+        }
+
+        if (message.isEmpty()) {
+            return ": " + code;
+        }
+
+        return ": " + code + ": " + message;
     }
 
     static CliException toCliException(int status) {

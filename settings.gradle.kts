@@ -28,6 +28,7 @@ include("spring-ai:spring-ag-ui:integrations:spring-ai")
 
 include("cli:cli-app")
 include("cli:cli-core")
+include("cli:clients:automation-api-platform")
 include("cli:clients:automation-configuration")
 include("cli:clients:embedded-configuration")
 include("cli:clients:embedded-execution")
