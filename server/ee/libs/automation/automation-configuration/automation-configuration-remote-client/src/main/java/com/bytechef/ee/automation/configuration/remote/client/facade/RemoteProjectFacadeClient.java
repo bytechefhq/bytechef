@@ -60,11 +60,6 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         throw new UnsupportedOperationException();
     }
