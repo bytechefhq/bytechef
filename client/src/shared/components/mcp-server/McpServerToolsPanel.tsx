@@ -15,6 +15,7 @@ interface McpServerToolsPanelProps extends Omit<McpServerToolsContentProps, 'mcp
 
 const McpServerToolsPanel = ({
     activeToolsTab,
+    canAddWorkflows,
     canEdit = true,
     componentList,
     isComponentListEmpty,
@@ -43,7 +44,7 @@ const McpServerToolsPanel = ({
         <div className="flex justify-center py-8">
             <EmptyList
                 button={
-                    canEdit &&
+                    (canAddWorkflows ?? canEdit) &&
                     (workflowEmptyStateAction ? (
                         <div className="flex items-center gap-2">
                             <Button label="Add Workflows" onClick={onAddWorkflowsClick} />
