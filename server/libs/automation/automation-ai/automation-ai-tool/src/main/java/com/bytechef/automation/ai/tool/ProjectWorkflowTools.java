@@ -77,6 +77,7 @@ public class ProjectWorkflowTools {
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
 
+    private final AppCallableDraftGuard appCallableDraftGuard;
     private final ComponentDefinitionService componentDefinitionService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
@@ -85,10 +86,12 @@ public class ProjectWorkflowTools {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
-        ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
+        AppCallableDraftGuard appCallableDraftGuard, ComponentDefinitionService componentDefinitionService,
+        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
+        ScopedProjectGuard scopedProjectGuard,
         ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider) {
 
+        this.appCallableDraftGuard = appCallableDraftGuard;
         this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
@@ -278,9 +281,13 @@ public class ProjectWorkflowTools {
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
+            appCallableDraftGuard.checkDraft(toolContext, workflowId);
+
             String workflowName = projectWorkflowDTO.getLabel();
 
             projectWorkflowFacade.deleteWorkflow(projectWorkflowDTO.getId());
+
+            releaseCapturedWorkflow(toolContext, workflowId);
 
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -311,6 +318,8 @@ public class ProjectWorkflowTools {
 
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
+
+            appCallableDraftGuard.checkDraft(toolContext, workflowId);
 
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), definition, projectWorkflowDTO.getVersion());
@@ -522,6 +531,21 @@ public class ProjectWorkflowTools {
         entry.put("name", workflowName);
 
         captures.add(entry);
+    }
+
+    private static void releaseCapturedWorkflow(@Nullable ToolContext toolContext, String workflowId) {
+        if (toolContext == null) {
+            return;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        if (context == null || !(context.get(PERSISTED_WORKFLOW_CAPTURE_KEY) instanceof List<?> captures)) {
+            return;
+        }
+
+        captures.removeIf(
+            capture -> capture instanceof Map<?, ?> entry && workflowId.equals(entry.get("workflowId")));
     }
 
     private static String extractWorkflowName(String definition) {

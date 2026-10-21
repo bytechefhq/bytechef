@@ -18,12 +18,14 @@ package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -36,6 +38,7 @@ import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
@@ -49,6 +52,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,6 +70,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -191,6 +197,128 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow("wf-uuid-2", DEFINITION, null, toolContext))
                 .doesNotThrowAnyException();
+        }
+    }
+
+    @Nested
+    class AppCallableTest {
+
+        private static final String WORKFLOW_UUID = "11111111-1111-4111-8111-111111111111";
+
+        @Test
+        void testUpdateWorkflowRefusesAPublishedWorkflowInAppCallableMode() {
+            stubPublishedWorkflow();
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-published")).thenReturn(buildDto("wf-published", 55L, 1));
+            when(projectWorkflowService.getLastWorkflowId(WORKFLOW_UUID)).thenReturn("wf-draft");
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatThrownBy(() -> tools.updateWorkflow("wf-published", DEFINITION, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("edit the DRAFT workflow wf-draft");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testDeleteWorkflowRefusesAPublishedWorkflowInAppCallableMode() {
+            stubPublishedWorkflow();
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-published")).thenReturn(buildDto("wf-published", 55L, 1));
+            when(projectWorkflowService.getLastWorkflowId(WORKFLOW_UUID)).thenReturn("wf-draft");
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatThrownBy(() -> tools.deleteWorkflow("wf-published", null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("edit the DRAFT workflow wf-draft");
+
+            verify(projectWorkflowFacade, never()).deleteWorkflow(anyString());
+        }
+
+        @Test
+        void testUpdateWorkflowDeniedByTheFacadeNeverReachesTheDraftGuard() {
+            stubPublishedWorkflow();
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-published"))
+                .thenThrow(new AccessDeniedException("Access Denied"));
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatThrownBy(() -> tools.updateWorkflow("wf-published", DEFINITION, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Access Denied")
+                .hasMessageNotContaining("DRAFT");
+
+            verify(projectService, never()).getProject(anyLong());
+            verify(projectWorkflowService, never()).getLastWorkflowId(anyString());
+        }
+
+        @Test
+        void testDeleteWorkflowDeniedByTheFacadeNeverReachesTheDraftGuard() {
+            stubPublishedWorkflow();
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-published"))
+                .thenThrow(new AccessDeniedException("Access Denied"));
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatThrownBy(() -> tools.deleteWorkflow("wf-published", null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Access Denied")
+                .hasMessageNotContaining("DRAFT");
+
+            verify(projectService, never()).getProject(anyLong());
+            verify(projectWorkflowService, never()).getLastWorkflowId(anyString());
+        }
+
+        @Test
+        void testDeleteWorkflowDropsTheDeletedWorkflowFromTheCaptureHolder() {
+            List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+            captures.add(Map.of("workflowId", "wf-uuid-1"));
+            captures.add(Map.of("workflowId", "wf-uuid-2"));
+            captures.add(Map.of("workflowId", "wf-uuid-1"));
+
+            when(toolContext.getContext())
+                .thenReturn(Map.of("bytechef.workflowEditor.persistedWorkflows", captures));
+
+            resolveWorkspace(WORKSPACE_ID);
+            mockWorkflow("wf-uuid-1", 9L, WORKSPACE_ID);
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 1));
+
+            ProjectWorkflowTools tools = newTools();
+
+            tools.deleteWorkflow("wf-uuid-1", null, toolContext);
+
+            assertThat(captures)
+                .extracting(capture -> capture.get("workflowId"))
+                .containsExactly("wf-uuid-2");
+        }
+
+        private void stubPublishedWorkflow() {
+            when(toolContext.getContext()).thenReturn(Map.of(AppCallableDraftGuard.APP_CALLABLE_KEY, true));
+
+            resolveWorkspace(WORKSPACE_ID);
+
+            Project project = Project.builder()
+                .id(7L)
+                .name("project-7")
+                .workspaceId(WORKSPACE_ID)
+                .build();
+
+            project.setProjectVersions(
+                List.of(
+                    new ProjectVersion(1, ProjectVersion.Status.PUBLISHED.ordinal(), Instant.now(), "v1"),
+                    new ProjectVersion(2)));
+
+            when(projectService.fetchProject(7L)).thenReturn(Optional.of(project));
+            lenient().when(projectService.getProject(7L))
+                .thenReturn(project);
+            when(projectWorkflowService.getWorkflowProjectWorkflow("wf-published"))
+                .thenReturn(new ProjectWorkflow(7L, 1, "wf-published", UUID.fromString(WORKFLOW_UUID)));
         }
     }
 
@@ -1047,7 +1175,8 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return new ProjectWorkflowTools(
-            componentDefinitionService, projectWorkflowFacade, projectWorkflowService,
+            new AppCallableDraftGuard(projectService, projectWorkflowService), componentDefinitionService,
+            projectWorkflowFacade, projectWorkflowService,
             new ScopedProjectGuard(
                 projectOwnershipService, projectService, projectWorkflowService, scopedConnectionGuard,
                 workspaceScopeResolver),

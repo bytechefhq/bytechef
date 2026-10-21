@@ -148,7 +148,7 @@ class ScriptToolsTest {
 
     private ScriptTools newTools() {
         return new ScriptTools(
-            projectWorkflowFacade,
+            new AppCallableDraftGuard(projectService, projectWorkflowService), projectWorkflowFacade,
             new ScopedProjectGuard(
                 mock(ProjectOwnershipService.class), projectService, projectWorkflowService, scopedConnectionGuard,
                 workspaceScopeResolver));
