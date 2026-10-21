@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -6,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
@@ -41,34 +40,24 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
 
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                        className="dropdown-menu-item"
+                        icon={connectedUser.enabled ? <PowerOffIcon /> : <PowerIcon />}
+                        label={connectedUser.enabled ? 'Disable' : 'Enable'}
                         onClick={() =>
                             enableConnectedUserMutation.mutate({
                                 enable: !connectedUser.enabled,
                                 id: connectedUser.id!,
                             })
                         }
-                    >
-                        {connectedUser.enabled ? (
-                            <>
-                                <PowerOffIcon /> Disable
-                            </>
-                        ) : (
-                            <>
-                                <PowerIcon /> Enable
-                            </>
-                        )}
-                    </DropdownMenuItem>
+                    />
 
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
                         onClick={() => setShowDeleteDialog(true)}
                         variant="destructive"
-                    >
-                        <Trash2Icon /> Delete
-                    </DropdownMenuItem>
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
 

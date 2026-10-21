@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -6,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ConnectedUserDeleteDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/CredentialsStatus';
@@ -134,39 +133,28 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
 
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item"
                                     data-action="open-sheet"
                                     data-index={info.row.index.toString()}
-                                >
-                                    <EyeIcon /> Details
-                                </DropdownMenuItem>
+                                    icon={<EyeIcon />}
+                                    label="Details"
+                                />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item"
                                     data-action={connectedUsers[info.row.index].enabled ? 'disable' : 'enable'}
                                     data-index={info.row.index.toString()}
-                                >
-                                    {connectedUsers[info.row.index].enabled ? (
-                                        <>
-                                            <PowerOffIcon /> Disable
-                                        </>
-                                    ) : (
-                                        <>
-                                            <PowerIcon /> Enable
-                                        </>
-                                    )}
-                                </DropdownMenuItem>
+                                    icon={connectedUsers[info.row.index].enabled ? <PowerOffIcon /> : <PowerIcon />}
+                                    label={connectedUsers[info.row.index].enabled ? 'Disable' : 'Enable'}
+                                />
 
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-destructive"
                                     data-action="delete"
                                     data-index={info.row.index.toString()}
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
                                     variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ),
