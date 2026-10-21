@@ -1,0 +1,6 @@
+{
+  "name": "bytechef-dev",
+  "version": "0.3.0",
+  "description": "ByteChef development tools — platform component scaffolding, Management MCP server setup, building workflows live over the Management MCP server, and building apps from the create-bytechef-app template",
+  "author": "ByteChef Team"
+}
