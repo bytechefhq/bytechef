@@ -129,8 +129,11 @@ class DataTableUtilsTest {
                 IllegalArgumentException.class,
                 () -> DataTableUtils.getConditions(MockParametersFactory.create(Map.of("conditions", conditions))));
 
+            Throwable cause = illegalArgumentException.getCause();
+
             assertEquals(
-                "OR Conditions must be a list of AND Condition lists, each holding condition objects",
+                "OR Conditions must be a list of AND Condition lists, each holding condition objects: " +
+                    cause.getMessage(),
                 illegalArgumentException.getMessage());
         }
     }
@@ -200,8 +203,33 @@ class DataTableUtilsTest {
                         List.of(List.of(Map.of("column", "amount", "operation", "BETWEEN", "value", "1")))))));
 
         assertEquals(
-            "Condition 1 of OR Condition 1: Filter on column 'amount' with operation BETWEEN requires every value to be set",
-            missingBoundException.getMessage());
+            "Condition 1 of OR Condition 1: Operation BETWEEN requires To Value", missingBoundException.getMessage());
+
+        IllegalArgumentException missingLowerBoundException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "amount", "operation", "BETWEEN", "valueTo", " ")))))));
+
+        assertEquals(
+            "Condition 1 of OR Condition 1: Operation BETWEEN requires Value", missingLowerBoundException.getMessage());
+    }
+
+    @Test
+    void testGetConditionsRejectsValueInsteadOfValuesForIn() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> DataTableUtils.getConditions(
+                MockParametersFactory.create(
+                    Map.of(
+                        "conditions",
+                        List.of(List.of(Map.of("column", "status", "operation", "IN", "value", "BOT")))))));
+
+        assertEquals(
+            "Condition 1 of OR Condition 1: Operation IN takes its values from Values, not Value",
+            illegalArgumentException.getMessage());
     }
 
     @Test

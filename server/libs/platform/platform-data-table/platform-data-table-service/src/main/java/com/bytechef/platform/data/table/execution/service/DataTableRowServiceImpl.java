@@ -61,10 +61,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -76,6 +78,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -92,7 +95,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
 
-    private static final int MAX_ARRAY_PARAMETER_LENGTH = 50_000;
+    static final int MAX_ARRAY_PARAMETER_LENGTH = 50_000;
 
     private static final long MIN_EPOCH_MILLISECONDS = 100_000_000_000L;
 
@@ -154,29 +157,39 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return false;
         }
 
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", deletedDataTableRow.id());
-        payload.put("values", deletedDataTableRow.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environmentId));
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, List.of(deletedDataTableRow), environmentId);
 
         return true;
     }
 
+    @Override
+    @Transactional
+    public List<DataTableRow> deleteAllRows(String baseName, long environmentId) {
+        return deleteMatchingRows(baseName, DataTableRowConditions.matchAll(), environmentId);
+    }
+
+    @Override
+    @Transactional
+    public List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+        Objects.requireNonNull(conditions, "conditions");
+
+        conditions.requireAtLeastOneCondition();
+
+        return deleteMatchingRows(baseName, conditions, environmentId);
+    }
+
     /**
-     * Deletes every row of a data table matching the given OR groups of AND conditions in one transaction.
+     * Deletes every row of a data table matching the given OR groups of AND conditions.
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter columns must match an
      * existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
      * {@link #validateBaseName(String)}. Filter values use parameterized queries.
      */
-    @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    @Transactional
-    public List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+    private List<DataTableRow> deleteMatchingRows(
+        String baseName, DataTableRowConditions conditions, long environmentId) {
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -187,7 +200,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
-        WhereClause whereClause = buildRequiredWhereClause(columnSpecs, conditions);
+        WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
         String tableName = escapeIdentifier(physicalName);
 
@@ -396,12 +409,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
                 try {
                     insertedDataTableRows.add(
-                        insertRowWithoutEvent(baseName, physicalName, columnSpecs, values, environmentId));
+                        insertRowWithoutEvent(
+                            baseName, physicalName, columnSpecs, values, environmentId, new HashSet<>()));
                 } catch (IllegalArgumentException exception) {
                     throw new IllegalArgumentException(
                         "CSV line %d: %s; no row was imported".formatted(
                             csvRow.getOriginalLineNumber(), exception.getMessage()),
                         exception);
+                } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                    throw withRowPosition(
+                        "CSV line " + csvRow.getOriginalLineNumber(), "no row was imported",
+                        dataIntegrityViolationException);
                 }
             }
         } catch (IOException exception) {
@@ -428,24 +446,83 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(baseName, physicalName);
 
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
         DataTableRow dataTableRow = insertRowWithoutEvent(
-            baseName, physicalName, listColumns(physicalName), values, environmentId);
+            baseName, physicalName, listColumns(physicalName), values, environmentId, ignoredColumnNames);
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
 
         publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, List.of(dataTableRow), environmentId);
 
         return dataTableRow;
     }
 
+    @Override
+    @Transactional
+    public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<DataTableRow> insertedDataTableRows = new ArrayList<>();
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
+        for (int index = 0; index < rowValues.size(); index++) {
+            try {
+                insertedDataTableRows.add(
+                    insertRowWithoutEvent(
+                        baseName, physicalName, columnSpecs, rowValues.get(index), environmentId, ignoredColumnNames));
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()), exception);
+            } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                throw withRowPosition("Record " + (index + 1), "no record was inserted",
+                    dataIntegrityViolationException);
+            }
+        }
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
+
+        return insertedDataTableRows;
+    }
+
+    private static DataIntegrityViolationException withRowPosition(
+        String rowPosition, String outcome, DataIntegrityViolationException dataIntegrityViolationException) {
+
+        Throwable mostSpecificCause = dataIntegrityViolationException.getMostSpecificCause();
+
+        String message = mostSpecificCause.getMessage();
+
+        if (message == null || message.isBlank()) {
+            Class<? extends Throwable> mostSpecificCauseClass = mostSpecificCause.getClass();
+
+            message = mostSpecificCauseClass.getSimpleName();
+        }
+
+        String firstLine = message.lines()
+            .findFirst()
+            .orElse(message)
+            .strip();
+
+        return new DataIntegrityViolationException(
+            "%s: %s; %s".formatted(rowPosition, firstLine, outcome), dataIntegrityViolationException);
+    }
+
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow insertRowWithoutEvent(
         String baseName, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
-        long environmentId) {
+        long environmentId, Set<String> ignoredColumnNames) {
 
-        List<String> allColumnNames = columnSpecs.stream()
-            .map(ColumnSpec::name)
-            .toList();
+        List<String> allColumnNames = getColumnNames(columnSpecs);
 
-        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW);
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
 
         String columnsClause = columnValues.stream()
             .map(columnValue -> {
@@ -497,6 +574,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
         int offset, long environmentId) {
 
+        Objects.requireNonNull(conditions, "conditions");
+
         if (limit < 0 || offset < 0) {
             throw new IllegalArgumentException(
                 "limit and offset must not be negative, got limit=%d and offset=%d".formatted(limit, offset));
@@ -546,11 +625,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
-        List<String> allColumnNames = columnSpecs.stream()
-            .map(ColumnSpec::name)
-            .toList();
+        List<String> allColumnNames = getColumnNames(columnSpecs);
 
-        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW);
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
 
         if (columnValues.isEmpty()) {
             DataTableRow dataTableRow = getRow(baseName, id, environmentId);
@@ -584,13 +666,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             throw new IllegalArgumentException("Row not found: id=" + id);
         }
 
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", updatedDataTableRow.id());
-        payload.put("values", updatedDataTableRow.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, payload, environmentId));
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, List.of(updatedDataTableRow), environmentId);
 
         return updatedDataTableRow;
     }
@@ -609,6 +685,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     public List<DataTableRow> updateRows(
         String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
 
+        Objects.requireNonNull(conditions, "conditions");
+
+        conditions.requireAtLeastOneCondition();
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -619,9 +699,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
-        WhereClause whereClause = buildRequiredWhereClause(columnSpecs, conditions);
+        WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
-        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.BULK_UPDATE);
+        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.BULK_UPDATE, Set.of());
 
         if (columnValues.isEmpty()) {
             throw new IllegalArgumentException("Updating rows requires a value for at least one column");
@@ -706,14 +786,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .collect(Collectors.joining(", "));
     }
 
-    private WhereClause buildRequiredWhereClause(List<ColumnSpec> columnSpecs, DataTableRowConditions conditions) {
-        if (conditions.isMatchAll()) {
-            throw new IllegalArgumentException("At least one condition is required to select the rows to change");
-        }
-
-        return buildWhereClause(columnSpecs, conditions);
-    }
-
     private WhereClause buildWhereClause(List<ColumnSpec> columnSpecs, DataTableRowConditions conditions) {
         List<FilterParameter> filterParameters = new ArrayList<>();
         List<String> orConditions = new ArrayList<>();
@@ -735,7 +807,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private List<ColumnValue> getColumnValues(
-        List<ColumnSpec> columnSpecs, Map<String, Object> values, ValuePolicy valuePolicy) {
+        List<ColumnSpec> columnSpecs, Map<String, Object> values, ValuePolicy valuePolicy,
+        Set<String> ignoredColumnNames) {
 
         List<ColumnValue> columnValues = new ArrayList<>();
         List<String> unknownColumnNames = new ArrayList<>();
@@ -761,32 +834,37 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                         "Update Record to clear a column of a single record").formatted(columnName));
             }
 
-            columnSpecs.stream()
-                .filter(columnSpec -> {
-                    String name = columnSpec.name();
+            findColumnSpec(columnSpecs, columnName).ifPresentOrElse(
+                columnSpec -> {
+                    if (!givenColumnNames.add(columnSpec.name())) {
+                        throw new IllegalArgumentException(
+                            "Column '%s' is given more than once".formatted(columnSpec.name()));
+                    }
 
-                    return name.equalsIgnoreCase(columnName);
-                })
-                .findFirst()
-                .ifPresentOrElse(
-                    columnSpec -> {
-                        if (!givenColumnNames.add(columnSpec.name())) {
-                            throw new IllegalArgumentException(
-                                "Column '%s' is given more than once".formatted(columnSpec.name()));
-                        }
-
-                        columnValues.add(new ColumnValue(columnSpec, coerceValueStrictly(columnSpec, value, true)));
-                    },
-                    () -> unknownColumnNames.add(columnName));
+                    columnValues.add(new ColumnValue(columnSpec, coerceValueStrictly(columnSpec, value, true)));
+                },
+                () -> unknownColumnNames.add(columnName));
         }
 
         if (!unknownColumnNames.isEmpty()) {
-            throw new IllegalArgumentException(
-                "Unknown column(s): %s; available columns: %s".formatted(
-                    String.join(", ", unknownColumnNames), String.join(", ", getNonIdColumnNames(columnSpecs))));
+            if (valuePolicy == ValuePolicy.BULK_UPDATE || columnValues.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Unknown column(s): %s; available columns: %s".formatted(
+                        String.join(", ", unknownColumnNames), String.join(", ", getNonIdColumnNames(columnSpecs))));
+            }
+
+            ignoredColumnNames.addAll(unknownColumnNames);
         }
 
         return columnValues;
+    }
+
+    private static void logIgnoredColumnNames(String baseName, long environmentId, Set<String> ignoredColumnNames) {
+        if (!ignoredColumnNames.isEmpty()) {
+            log.warn(
+                "Ignored values for unknown column(s) {} of data table '{}' in environment {}",
+                String.join(", ", ignoredColumnNames), baseName, environmentId);
+        }
     }
 
     private static List<String> getColumnNames(List<ColumnSpec> columnSpecs) {
@@ -810,19 +888,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return;
         }
 
-        List<Map<String, Object>> payloads = dataTableRows.stream()
-            .map(dataTableRow -> {
-                Map<String, Object> payload = new HashMap<>();
-
-                payload.put("id", dataTableRow.id());
-                payload.put("values", dataTableRow.values());
-
-                return payload;
-            })
-            .toList();
-
         applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, dataTableWebhookType, payloads, environmentId));
+            new DataTableWebhookEvent(baseName, dataTableWebhookType, dataTableRows, environmentId));
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
@@ -974,7 +1041,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case EQUALS -> addComparison(column, "=", columnSpec, filter, filterParameters);
             case EQUALS_IGNORE_CASE -> {
                 filterParameters.add(
-                    new FilterParameter(ColumnType.STRING, coerceFilterValue(columnSpec, filter.value())));
+                    new FilterParameter(ColumnType.STRING, coerceFilterValue(columnSpec, filter.singleValue())));
 
                 yield "LOWER(" + column + ") = LOWER(?)";
             }
@@ -1003,9 +1070,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case BETWEEN -> {
                 List<Object> values = filter.values();
 
-                for (Object value : values) {
-                    filterParameters.add(new FilterParameter(columnType, coerceFilterValue(columnSpec, value)));
+                Object lowerValue = coerceFilterValue(columnSpec, values.getFirst());
+                Object upperValue = coerceFilterValue(columnSpec, values.getLast());
+
+                if (columnType != ColumnType.STRING && isGreater(lowerValue, upperValue)) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation BETWEEN has Value %s after To Value %s".formatted(
+                            columnSpec.name(), values.getFirst(), values.getLast()));
                 }
+
+                filterParameters.add(new FilterParameter(columnType, lowerValue));
+                filterParameters.add(new FilterParameter(columnType, upperValue));
 
                 yield column + " BETWEEN ? AND ?";
             }
@@ -1016,12 +1091,22 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         };
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private static boolean isGreater(Object value, Object otherValue) {
+        Class<?> valueClass = value.getClass();
+
+        return value instanceof Comparable comparable && valueClass.equals(otherValue.getClass())
+            && comparable.compareTo(otherValue) > 0;
+    }
+
     private String addComparison(
         String column, String comparisonOperator, ColumnSpec columnSpec, DataTableRowFilter filter,
         List<FilterParameter> filterParameters) {
 
         filterParameters.add(
-            new FilterParameter(columnSpec.type(), coerceFilterValue(columnSpec, filter.value())));
+            new FilterParameter(columnSpec.type(), coerceFilterValue(columnSpec, filter.singleValue())));
 
         return column + " " + comparisonOperator + " ?";
     }
@@ -1030,7 +1115,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String column, String prefix, String suffix, boolean negated, ColumnSpec columnSpec,
         DataTableRowFilter filter, List<FilterParameter> filterParameters) {
 
-        Object rawValue = filter.value();
+        Object rawValue = filter.singleValue();
 
         String value = rawValue instanceof String string ? string : (String) coerceFilterValue(columnSpec, rawValue);
 
@@ -1267,14 +1352,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .replace("_", "\\_");
     }
 
-    private static ColumnSpec getColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
+    private static Optional<ColumnSpec> findColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
         return columnSpecs.stream()
             .filter(columnSpec -> {
                 String name = columnSpec.name();
 
                 return name.equalsIgnoreCase(columnName);
             })
-            .findFirst()
+            .findFirst();
+    }
+
+    private static ColumnSpec getColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
+        return findColumnSpec(columnSpecs, columnName)
             .orElseThrow(() -> new IllegalArgumentException(
                 "Unknown column: %s; available columns: %s".formatted(
                     columnName, String.join(", ", getColumnNames(columnSpecs)))));

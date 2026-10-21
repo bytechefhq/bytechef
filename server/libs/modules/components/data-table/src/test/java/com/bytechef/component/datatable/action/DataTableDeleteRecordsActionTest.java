@@ -106,6 +106,27 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
     }
 
     @Test
+    void testPerformDeletesByConditionsWhenDeleteByIsConditionsAndRecordIdsAreAlsoGiven() throws Exception {
+        DataTableRowConditions conditions = DataTableRowConditions.of(
+            List.of(new DataTableRowFilter("status", Operation.EQUALS, "CLOSED")));
+
+        when(dataTableRowService.deleteRows("conversations", conditions, 1L))
+            .thenReturn(List.of(new DataTableRow(3, Map.of())));
+
+        assertEquals(
+            Map.of("deletedCount", 1, "deletedIds", List.of(3L)),
+            perform(
+                actionDefinition,
+                Map.of(
+                    "table", "conversations",
+                    "deleteBy", "CONDITIONS",
+                    "ids", List.of(7),
+                    "conditions", List.of(List.of(Map.of("column", "status", "value", "CLOSED"))))));
+
+        verify(dataTableRowService, never()).deleteRows("conversations", idsCondition(7L), 1L);
+    }
+
+    @Test
     void testPerformDeletesByRecordIdsWhenDeleteByIsIdsAndConditionsAreAlsoGiven() throws Exception {
         when(dataTableRowService.deleteRows("conversations", idsCondition(7L), 1L))
             .thenReturn(List.of(new DataTableRow(7, Map.of())));
@@ -159,6 +180,17 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
             () -> perform(actionDefinition, Map.of("table", "conversations", "ids", List.of(3.9))));
 
         assertEquals("Record ID '3.9' is not a whole number", illegalArgumentException.getMessage());
+
+        verifyNoInteractions(dataTableRowService);
+    }
+
+    @Test
+    void testPerformRejectsRecordIdsOutOfRange() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> perform(actionDefinition, Map.of("table", "conversations", "ids", List.of("1e30"))));
+
+        assertEquals("Record ID '1e30' is out of range", illegalArgumentException.getMessage());
 
         verifyNoInteractions(dataTableRowService);
     }

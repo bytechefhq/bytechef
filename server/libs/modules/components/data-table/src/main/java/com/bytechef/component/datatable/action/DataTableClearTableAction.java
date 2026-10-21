@@ -88,18 +88,11 @@ public class DataTableClearTableAction {
 
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
-        List<DataTableRow> dataTableRows = dataTableRowService.listRows(baseName, Integer.MAX_VALUE, 0, environmentId);
-        int count = 0;
-
-        for (DataTableRow dataTableRow : dataTableRows) {
-            if (dataTableRowService.deleteRow(baseName, dataTableRow.id(), environmentId)) {
-                count++;
-            }
-        }
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteAllRows(baseName, environmentId);
 
         Map<String, Object> result = new HashMap<>();
 
-        result.put("deletedCount", count);
+        result.put("deletedCount", deletedDataTableRows.size());
 
         return result;
     }

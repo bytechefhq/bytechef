@@ -69,6 +69,17 @@ class DataTableRowFilterTest {
     }
 
     @Test
+    void testSingleValueOnlyForSingleValueOperations() {
+        assertEquals(5, new DataTableRowFilter("amount", Operation.GREATER, 5).singleValue());
+
+        IllegalStateException illegalStateException = assertThrows(
+            IllegalStateException.class,
+            () -> new DataTableRowFilter("amount", Operation.IN, List.of(5)).singleValue());
+
+        assertEquals("Operation IN does not take a single value", illegalStateException.getMessage());
+    }
+
+    @Test
     void testRejectsMissingAndBlankValues() {
         assertMessageContains(
             "requires a value; use Empty or Not Empty", () -> new DataTableRowFilter("title", Operation.EQUALS, " "));
