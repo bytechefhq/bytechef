@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -45,6 +47,25 @@ public class DataTableIntTestConfiguration {
     @Bean
     TagService tagService() {
         return mock(TagService.class);
+    }
+
+    @Bean
+    AsyncTaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor("task-");
+    }
+
+    @Bean
+    AsyncTaskExecutor webhookDeliveryExecutor() {
+        return new SimpleAsyncTaskExecutor("webhook-delivery-");
+    }
+
+    @Bean
+    AsyncTaskExecutor workerExecutor() {
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("worker-");
+
+        simpleAsyncTaskExecutor.setConcurrencyLimit(1);
+
+        return simpleAsyncTaskExecutor;
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
