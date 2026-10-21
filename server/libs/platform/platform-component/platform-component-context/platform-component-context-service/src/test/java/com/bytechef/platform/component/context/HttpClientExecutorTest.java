@@ -38,6 +38,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.tenant.TenantContext;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
@@ -58,6 +59,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
@@ -65,7 +67,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Flow;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.net.ssl.SSLSession;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -298,6 +304,80 @@ public class HttpClientExecutorTest {
 
             assertEquals(MediaType.parse("image/jpeg"), mimeBodyPublisherAdapter.mediaType());
         }
+
+        @Test
+        @DisplayName("Should read binary body file under the tenant that created the publisher")
+        void testBinaryBodyPublisherReadsFileUnderCreatingTenant() throws Exception {
+            FileEntryImpl fileEntry = new FileEntryImpl("test.txt", "txt", "text/plain", "file://test");
+            AtomicReference<String> readTenantIdReference = new AtomicReference<>();
+
+            Mockito.when(tempFileStorage.getInputStream(Mockito.any()))
+                .thenAnswer(invocation -> {
+                    readTenantIdReference.set(TenantContext.getCurrentTenantId());
+
+                    return new ByteArrayInputStream("file content".getBytes(StandardCharsets.UTF_8));
+                });
+
+            BodyPublisher bodyPublisher = TenantContext.callWithTenantId(
+                "000001", () -> httpClientExecutor.createBodyPublisher(Http.Body.of(fileEntry)));
+
+            drainOnNewThread(bodyPublisher);
+
+            assertEquals("000001", readTenantIdReference.get());
+        }
+
+        @Test
+        @DisplayName("Should read form data file part under the tenant that created the publisher")
+        void testFormDataBodyPublisherReadsFileUnderCreatingTenant() throws Exception {
+            FileEntryImpl fileEntry = new FileEntryImpl("test.txt", "txt", "text/plain", "file://test");
+            AtomicReference<String> readTenantIdReference = new AtomicReference<>();
+
+            Mockito.when(tempFileStorage.getInputStream(Mockito.any()))
+                .thenAnswer(invocation -> {
+                    readTenantIdReference.set(TenantContext.getCurrentTenantId());
+
+                    return new ByteArrayInputStream("file content".getBytes(StandardCharsets.UTF_8));
+                });
+
+            BodyPublisher bodyPublisher = TenantContext.callWithTenantId(
+                "000001", () -> httpClientExecutor.createBodyPublisher(
+                    Http.Body.of(Map.of("file", fileEntry), Http.BodyContentType.FORM_DATA)));
+
+            drainOnNewThread(bodyPublisher);
+
+            assertEquals("000001", readTenantIdReference.get());
+        }
+    }
+
+    private static void drainOnNewThread(BodyPublisher bodyPublisher) throws Exception {
+        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+
+        Thread thread = new Thread(() -> bodyPublisher.subscribe(new Flow.Subscriber<>() {
+
+            @Override
+            public void onSubscribe(Flow.Subscription subscription) {
+                subscription.request(Long.MAX_VALUE);
+            }
+
+            @Override
+            public void onNext(ByteBuffer byteBuffer) {
+                byteBuffer.position(byteBuffer.limit());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                completableFuture.completeExceptionally(throwable);
+            }
+
+            @Override
+            public void onComplete() {
+                completableFuture.complete(null);
+            }
+        }));
+
+        thread.start();
+
+        completableFuture.get(5, TimeUnit.SECONDS);
     }
 
     @Nested
