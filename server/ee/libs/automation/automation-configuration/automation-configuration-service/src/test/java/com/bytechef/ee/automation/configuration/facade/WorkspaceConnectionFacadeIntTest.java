@@ -9,8 +9,12 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
@@ -121,6 +125,9 @@ class WorkspaceConnectionFacadeIntTest {
     private static final String[] GATED_METHODS = {
         "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
     };
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
 
     @Autowired
     private ConnectionService connectionService;
@@ -350,11 +357,70 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    void testUpdateConnectionCredentialsAllowsATenantAdmin() {
+    void testUpdateConnectionCredentialsGateAdmitsATenantAdmin() {
         authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
 
         assertBodyReached(
             () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRefusesATenantAdminOnAMembersWorkspaceConnection() {
+        givenConnection(OWNER_LOGIN, ResourceVisibility.WORKSPACE);
+
+        authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsATenantAdminOnAnOrganizationConnectionItDidNotCreate() {
+        givenConnection(OWNER_LOGIN, ResourceVisibility.ORGANIZATION);
+
+        authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
+
+        workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
+
+        verify(connectionFacade).replaceAuthorizationParameters(CONNECTION_ID, Map.of("token", "new"));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsTheReassignedOwner() {
+        Connection connection = givenConnection(OWNER_LOGIN, ResourceVisibility.WORKSPACE);
+
+        connection.reassignOwner(MEMBER_LOGIN);
+
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(MEMBER_USER_ID, WORKSPACE_ID)).thenReturn(true);
+        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
+
+        authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
+
+        workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
+
+        verify(connectionFacade).replaceAuthorizationParameters(CONNECTION_ID, Map.of("token", "new"));
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRefusesThePreviousOwnerAfterReassignment() {
+        Connection connection = givenConnection(OWNER_LOGIN, ResourceVisibility.WORKSPACE);
+
+        connection.reassignOwner(MEMBER_LOGIN);
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+            .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
+
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
     }
 
     @Nested
@@ -422,6 +488,20 @@ class WorkspaceConnectionFacadeIntTest {
                 UsernamePasswordAuthenticationToken.authenticated(
                     new org.springframework.security.core.userdetails.User(login, "", authorities), null,
                     authorities));
+    }
+
+    private Connection givenConnection(String createdBy, ResourceVisibility visibility) {
+        Connection connection = new Connection();
+
+        connection.setCreatedBy(createdBy);
+        connection.setId(CONNECTION_ID);
+        connection.setVisibility(visibility);
+
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
+        doReturn(connection).when(connectionService)
+            .getConnection(CONNECTION_ID);
+
+        return connection;
     }
 
     private static Set<String> builtInRoleScopes(WorkspaceRole workspaceRole) {
