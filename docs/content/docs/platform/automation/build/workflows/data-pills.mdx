@@ -101,7 +101,7 @@ by category.
 
 | Function | Purpose | Example |
 | --- | --- | --- |
-| `concat` | Concatenate strings (or lists) into one value | `=concat('Order #', ${trigger_1.body.id})` |
+| `concat` | Join any number of values into one string (numbers are converted to text, nulls are skipped), or any number of lists into one list | `=concat('Order #', ${trigger_1.body.id}, ' for ', ${trigger_1.body.customer})` |
 | `equalsIgnoreCase` | Compare two strings ignoring case | `=equalsIgnoreCase(${trigger_1.body.status}, 'active')` |
 | `format` | Format a date/time (or apply `String.format`) with a pattern | `=format(${trigger_1.body.createdDate}, 'yyyy-MM-dd')` |
 | `indexOf` | First position of a substring | `=indexOf(${trigger_1.body.email}, '@')` |
