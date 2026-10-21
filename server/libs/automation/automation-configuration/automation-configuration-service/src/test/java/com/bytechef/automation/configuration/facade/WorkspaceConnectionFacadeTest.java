@@ -19,6 +19,8 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -39,10 +41,12 @@ import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.service.TagService;
@@ -61,7 +65,9 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -108,6 +114,11 @@ class WorkspaceConnectionFacadeTest {
 
     private WorkspaceConnectionFacadeImpl workspaceConnectionFacade;
 
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
     @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
@@ -121,11 +132,6 @@ class WorkspaceConnectionFacadeTest {
             mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
             workflowTestConfigurationService,
             workspaceConnectionService, workspaceFacade);
-    }
-
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -149,7 +155,9 @@ class WorkspaceConnectionFacadeTest {
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L));
         givenCallerCanEditConnection(10L);
-        authenticateAs(CURRENT_USER);
+        authenticate(CURRENT_USER, "ROLE_USER");
+
+        authenticate(CURRENT_USER, "ROLE_USER");
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
@@ -181,8 +189,6 @@ class WorkspaceConnectionFacadeTest {
             .thenReturn(List.of(visibleConnection, hiddenConnection));
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L));
-        givenCallerCanEditConnection(10L);
-
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
         assertThat(result).extracting(ConnectionDTO::id)
@@ -219,15 +225,55 @@ class WorkspaceConnectionFacadeTest {
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L, 11L));
         when(permissionService.hasResourceScope(any(), eq("Connection"), eq("CONNECTION_EDIT"))).thenReturn(true);
-        when(permissionService.isResourceOwner("Connection", 10L)).thenReturn(true);
-        when(permissionService.isResourceOwner("Connection", 11L)).thenReturn(false);
-        when(permissionService.isTenantAdmin()).thenReturn(false);
-        authenticateAs(CURRENT_USER);
+
+        authenticate(CURRENT_USER, "ROLE_USER");
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
         assertThat(result).extracting(ConnectionDTO::authorizationParameters)
             .containsExactly(Map.of("access_token", "owned-secret"), Map.of());
+    }
+
+    @Test
+    void testGetConnectionHidesCredentialsOfAMembersConnectionFromATenantAdmin() {
+        givenAutomationConnection(12L);
+
+        when(connectionFacade.getConnection(12L)).thenReturn(
+            connectionDTO(12L, "someone@example.com", ResourceVisibility.WORKSPACE));
+        when(permissionService.hasResourceScope(12L, "Connection", "CONNECTION_EDIT")).thenReturn(true);
+
+        authenticate(CURRENT_USER, AuthorityConstants.ADMIN);
+
+        assertThat(workspaceConnectionFacade.getConnection(12L)
+            .authorizationParameters()).isEmpty();
+    }
+
+    @Test
+    void testGetConnectionShowsCredentialsOfAnOrganizationConnectionToATenantAdmin() {
+        givenAutomationConnection(12L);
+
+        when(connectionFacade.getConnection(12L)).thenReturn(
+            connectionDTO(12L, "other-admin@example.com", ResourceVisibility.ORGANIZATION));
+        when(permissionService.hasResourceScope(12L, "Connection", "CONNECTION_EDIT")).thenReturn(true);
+
+        authenticate(CURRENT_USER, AuthorityConstants.ADMIN);
+
+        assertThat(workspaceConnectionFacade.getConnection(12L)
+            .authorizationParameters()).isEqualTo(Map.of("access_token", "secret"));
+    }
+
+    @Test
+    void testGetConnectionHidesCredentialsOfAnOrganizationConnectionFromAMember() {
+        givenAutomationConnection(12L);
+
+        when(connectionFacade.getConnection(12L)).thenReturn(
+            connectionDTO(12L, "other-admin@example.com", ResourceVisibility.ORGANIZATION));
+        when(permissionService.hasResourceScope(12L, "Connection", "CONNECTION_EDIT")).thenReturn(true);
+
+        authenticate(CURRENT_USER, "ROLE_USER");
+
+        assertThat(workspaceConnectionFacade.getConnection(12L)
+            .authorizationParameters()).isEmpty();
     }
 
     @Test
@@ -528,14 +574,8 @@ class WorkspaceConnectionFacadeTest {
         when(connectionService.getConnection(connectionId)).thenReturn(connection);
     }
 
-    private static void authenticateAs(String login) {
-        SecurityContextHolder.getContext()
-            .setAuthentication(new TestingAuthenticationToken(login, null));
-    }
-
     private void givenCallerCanEditConnection(long connectionId) {
         when(permissionService.hasResourceScope(connectionId, "Connection", "CONNECTION_EDIT")).thenReturn(true);
-        when(permissionService.isResourceOwner("Connection", connectionId)).thenReturn(true);
     }
 
     private void stubCurrentUserIsWorkspaceMember(MockedStatic<SecurityUtils> securityUtils) {
@@ -557,13 +597,86 @@ class WorkspaceConnectionFacadeTest {
     void testUpdateConnectionCredentialsDelegatesToConnectionFacade() {
         Connection connection = new Connection();
 
+        connection.setCreatedBy(CURRENT_USER);
         connection.setId(5L);
         connection.setType(PlatformType.AUTOMATION);
 
         when(connectionService.getConnection(5L)).thenReturn(connection);
 
+        authenticate(CURRENT_USER, "ROLE_USER");
+
         workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
 
         verify(connectionFacade).updateCredentials(5L, Map.of("apiKey", "new"), 3);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRefusesATenantAdminOnAMembersConnection() {
+        Connection connection = activeConnection("someone@example.com", ResourceVisibility.WORKSPACE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        authenticate(CURRENT_USER, AuthorityConstants.ADMIN);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsATenantAdminOnAnOrganizationConnection() {
+        Connection connection = activeConnection("other-admin@example.com", ResourceVisibility.ORGANIZATION);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        authenticate(CURRENT_USER, AuthorityConstants.ADMIN);
+
+        workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
+
+        verify(connectionFacade).updateCredentials(5L, Map.of("apiKey", "new"), 3);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRefusesAMemberOnAnOrganizationConnection() {
+        Connection connection = activeConnection("other-admin@example.com", ResourceVisibility.ORGANIZATION);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        authenticate(CURRENT_USER, "ROLE_USER");
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    private static Connection activeConnection(String createdBy, ResourceVisibility visibility) {
+        Connection connection = new Connection();
+
+        connection.setCreatedBy(createdBy);
+        connection.setId(5L);
+        connection.setStatus(ConnectionStatus.ACTIVE);
+        connection.setType(PlatformType.AUTOMATION);
+        connection.setVersion(3);
+        connection.setVisibility(visibility);
+
+        return connection;
+    }
+
+    private static void authenticate(String login, String authority) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
+    }
+
+    private static ConnectionDTO connectionDTO(long connectionId, String createdBy, ResourceVisibility visibility) {
+        return ConnectionDTO.builder()
+            .authorizationParameters(Map.of("access_token", "secret"))
+            .createdBy(createdBy)
+            .environmentId(0)
+            .id(connectionId)
+            .visibility(visibility)
+            .build();
     }
 }
