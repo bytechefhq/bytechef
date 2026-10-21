@@ -18,6 +18,11 @@ import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
+export interface ProjectDeploymentsSheetStateI {
+    environmentId?: number;
+    expandedProjectDeploymentId?: number;
+}
+
 interface ProjectDeploymentsSheetProps {
     environmentId?: number;
     expandedProjectDeploymentId?: number;

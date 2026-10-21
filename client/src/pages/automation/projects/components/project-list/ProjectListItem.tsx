@@ -18,8 +18,12 @@ import {
 } from '@/ee/shared/mutations/automation/projectGit.mutations';
 import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import ProjectDeploymentsSheet, {
+    ProjectDeploymentsSheetStateI,
+} from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
+import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
@@ -73,6 +77,9 @@ interface ProjectItemProps {
 }
 
 const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: ProjectItemProps) => {
+    const [projectDeploymentsSheetState, setProjectDeploymentsSheetState] = useState<
+        ProjectDeploymentsSheetStateI | undefined
+    >();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
@@ -426,23 +433,41 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             <span>PUBLISHED</span>
                                         </Badge>
 
-                                        <ProjectDeploymentDialog
-                                            environmentEditable={true}
-                                            onOpenChange={setIsProjectDeploymentDialogOpen}
-                                            projectDeployment={{
-                                                name: project.name,
-                                                projectId: project.id,
-                                            }}
-                                            projectDeployments={projectDeploymentsQuery.data}
-                                            projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
-                                            showTabs
-                                            triggerNode={
-                                                <ProjectListItemDeployButton
-                                                    hasWorkflows={hasWorkflows}
-                                                    onClick={handleProjectDeploymentDialogOpen}
-                                                />
-                                            }
-                                        />
+                                        <ButtonGroup>
+                                            <ProjectDeploymentDialog
+                                                environmentEditable={true}
+                                                onOpenChange={setIsProjectDeploymentDialogOpen}
+                                                onSuccess={(projectDeploymentId, environmentId) =>
+                                                    setProjectDeploymentsSheetState({
+                                                        environmentId,
+                                                        expandedProjectDeploymentId: projectDeploymentId,
+                                                    })
+                                                }
+                                                projectDeployment={{
+                                                    name: project.name,
+                                                    projectId: project.id,
+                                                }}
+                                                projectDeployments={projectDeploymentsQuery.data}
+                                                projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                                                redirectOnSubmit={false}
+                                                showTabs
+                                                triggerNode={
+                                                    <ProjectListItemDeployButton
+                                                        hasWorkflows={hasWorkflows}
+                                                        onClick={handleProjectDeploymentDialogOpen}
+                                                    />
+                                                }
+                                            />
+
+                                            <ProjectDeploymentsButton
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+
+                                                    setProjectDeploymentsSheetState({});
+                                                }}
+                                                size="iconSm"
+                                            />
+                                        </ButtonGroup>
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
@@ -595,6 +620,16 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             />
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
+
+            {projectDeploymentsSheetState && (
+                <ProjectDeploymentsSheet
+                    environmentId={projectDeploymentsSheetState.environmentId}
+                    expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
+                    onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
+                    project={project}
+                    sheetOpen
+                />
+            )}
 
             {showProjectGitConfigurationDialog && (
                 <ProjectGitConfigurationDialog
