@@ -25,9 +25,7 @@ import org.springframework.shell.core.command.annotation.Option;
 @org.springframework.stereotype.Component
 public class ComponentCommand {
 
-    private static final String COMMAND_PREFIX = "component";
-
-    @Command(name = COMMAND_PREFIX + " init", description = "Generates project for a new component.")
+    @Command(name = "component init", description = "Generates project for a new component.")
     public void init(
         @Option(
             longName = "base-package-name", description = "package for generated classes",
