@@ -1,7 +1,7 @@
 import {type APIRequestContext, expect, request as playwrightRequest} from '@playwright/test';
-import {createSign} from 'crypto';
 
 import {workspaceRolesTest as test} from '../../fixtures/workspaceRoles';
+import {signConnectedUserJwt} from '../../utils/embeddedRbacUtils';
 import getRandomString from '../../utils/getRandomString';
 import {RBAC_BASE_URL, internalApi, sendInternalApi} from '../../utils/rbacUtils';
 
@@ -21,23 +21,6 @@ interface EmbeddedConnectionI {
     id: number;
     name: string;
     shared?: boolean;
-}
-
-function base64Url(value: Buffer | string): string {
-    return Buffer.from(value).toString('base64url');
-}
-
-function signConnectedUserJwt(signingKey: SigningKeyI, externalUserId: string): string {
-    const issuedAt = Math.floor(Date.now() / 1000);
-
-    const header = base64Url(JSON.stringify({alg: 'RS256', kid: signingKey.keyId, typ: 'JWT'}));
-    const payload = base64Url(JSON.stringify({exp: issuedAt + 3600, iat: issuedAt, sub: externalUserId}));
-
-    const signer = createSign('RSA-SHA256');
-
-    signer.update(`${header}.${payload}`);
-
-    return `${header}.${payload}.${base64Url(signer.sign(signingKey.privateKey))}`;
 }
 
 async function createSigningKey(adminApi: APIRequestContext): Promise<SigningKeyI> {
@@ -67,7 +50,7 @@ async function createConnectedUserContext(signingKey: SigningKeyI, externalUserI
     return playwrightRequest.newContext({
         baseURL: RBAC_BASE_URL,
         extraHTTPHeaders: {
-            Authorization: `Bearer ${signConnectedUserJwt(signingKey, externalUserId)}`,
+            Authorization: `Bearer ${signConnectedUserJwt(signingKey.keyId, signingKey.privateKey, externalUserId)}`,
             'X-Environment': environment,
         },
     });
