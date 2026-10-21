@@ -17,7 +17,6 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {TagIcon} from 'lucide-react';
-import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectDeploymentsEmptyState from './components/ProjectDeploymentsEmptyState';
@@ -52,8 +51,6 @@ const ProjectDeploymentsSkeleton = () => (
 );
 
 const ProjectDeployments = () => {
-    const [newlyCreatedDeploymentId, setNewlyCreatedDeploymentId] = useState<number | undefined>();
-
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -132,7 +129,6 @@ const ProjectDeployments = () => {
                         projectDeployments &&
                         projectDeployments.length > 0 && (
                             <ProjectDeploymentDialog
-                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
                                 projectDeployment={
                                     {
                                         environmentId: currentEnvironmentId,
@@ -205,7 +201,6 @@ const ProjectDeployments = () => {
                                         <ProjectDeploymentList
                                             componentDefinitions={componentDefinitions}
                                             key={projectId}
-                                            newlyCreatedDeploymentId={newlyCreatedDeploymentId}
                                             project={projects.find(
                                                 (currentProject) => currentProject.id === projectId
                                             )!}
@@ -228,7 +223,7 @@ const ProjectDeployments = () => {
                 ) : isFiltered ? (
                     <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
-                    <ProjectDeploymentsEmptyState onDeploymentCreated={setNewlyCreatedDeploymentId} />
+                    <ProjectDeploymentsEmptyState />
                 )}
             </PageLoader>
         </LayoutContainer>

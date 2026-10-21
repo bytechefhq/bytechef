@@ -54,7 +54,7 @@ const publishedProject: Project = {
 const renderEmptyState = () =>
     render(
         <MemoryRouter>
-            <ProjectDeploymentsEmptyState onDeploymentCreated={vi.fn()} />
+            <ProjectDeploymentsEmptyState />
         </MemoryRouter>
     );
 
