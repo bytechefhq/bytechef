@@ -260,37 +260,37 @@ class TaskCoordinatorTest {
         TaskExecution innerLoopTaskExecution = createTaskExecution(3L, TaskExecution.Status.STARTED);
         TaskExecution innerTaskExecution = createTaskExecution(4L, TaskExecution.Status.CREATED);
 
-        TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+        TaskExecutionService stopTaskExecutionService = mock(TaskExecutionService.class);
 
-        when(taskExecutionService.getJobTaskExecutions(4567L))
+        when(stopTaskExecutionService.getJobTaskExecutions(4567L))
             .thenReturn(
                 List.of(
                     outerLoopTaskExecution, completedTaskExecution, innerLoopTaskExecution, innerTaskExecution));
-        when(taskExecutionService.cancelIfUnfinished(any(Long.class)))
+        when(stopTaskExecutionService.cancelIfUnfinished(any(Long.class)))
             .thenReturn(true);
 
         TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
 
         ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-        TaskCoordinator taskCoordinator = new TaskCoordinator(
+        TaskCoordinator stoppingTaskCoordinator = new TaskCoordinator(
             List.of(), List.of(), eventPublisher, mock(JobExecutor.class), jobService, taskCompletionHandler,
-            taskDispatcher, taskExecutionService);
+            taskDispatcher, stopTaskExecutionService);
 
-        taskCoordinator.onStopJobEvent(new StopJobEvent(4567L));
+        stoppingTaskCoordinator.onStopJobEvent(new StopJobEvent(4567L));
 
-        InOrder inOrder = inOrder(taskExecutionService, eventPublisher);
+        InOrder inOrder = inOrder(stopTaskExecutionService, eventPublisher);
 
-        inOrder.verify(taskExecutionService)
+        inOrder.verify(stopTaskExecutionService)
             .cancelIfUnfinished(4L);
         inOrder.verify(eventPublisher)
             .publishEvent(isA(JobStatusApplicationEvent.class));
 
-        verify(taskExecutionService).cancelIfUnfinished(1L);
-        verify(taskExecutionService, never()).cancelIfUnfinished(2L);
-        verify(taskExecutionService).cancelIfUnfinished(3L);
-        verify(taskExecutionService).cancelIfUnfinished(4L);
-        verify(taskExecutionService, never()).update(any());
+        verify(stopTaskExecutionService).cancelIfUnfinished(1L);
+        verify(stopTaskExecutionService, never()).cancelIfUnfinished(2L);
+        verify(stopTaskExecutionService).cancelIfUnfinished(3L);
+        verify(stopTaskExecutionService).cancelIfUnfinished(4L);
+        verify(stopTaskExecutionService, never()).update(any());
 
         ArgumentCaptor<Task> taskArgumentCaptor = ArgumentCaptor.forClass(Task.class);
 
