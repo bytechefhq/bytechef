@@ -2,7 +2,7 @@ import './PropertyMentionsInputEditorSuggestionList.css';
 
 import {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
 import {SuggestionProps} from '@tiptap/suggestion';
-import {forwardRef} from 'react';
+import {forwardRef, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {formatFunctionSignature} from './functionSuggestionUtils';
@@ -15,6 +15,8 @@ type FunctionSuggestionListPropsType = SuggestionProps<EvaluatorFunctionDefiniti
 
 const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, FunctionSuggestionListPropsType>(
     ({command, items}, ref) => {
+        const listRef = useRef<HTMLUListElement>(null);
+
         const selectItem = (index: number) => {
             const item = items[index];
 
@@ -23,10 +25,10 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
             }
         };
 
-        const selectedIndex = useSuggestionListNavigation(items, ref, selectItem);
+        const selectedIndex = useSuggestionListNavigation(items, ref, selectItem, listRef);
 
         return (
-            <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
+            <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto" ref={listRef}>
                 {items.length ? (
                     items.map((item, index) => (
                         <li key={item.name}>

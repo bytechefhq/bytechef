@@ -102,4 +102,25 @@ describe('FunctionSuggestionList', () => {
 
         expect(command).toHaveBeenCalledWith(items[1]);
     });
+
+    it('scrolls the last item into view when ArrowUp wraps around from the first row', () => {
+        const ref = createRef<FunctionSuggestionListRefType>();
+
+        renderFunctionSuggestionList(
+            [definition('concat'), definition('contains'), definition('format')],
+            vi.fn(),
+            ref
+        );
+
+        const scrollIntoViewMock = vi.mocked(Element.prototype.scrollIntoView);
+
+        scrollIntoViewMock.mockClear();
+
+        act(() => {
+            ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'ArrowUp'})} as never);
+        });
+
+        expect(scrollIntoViewMock).toHaveBeenLastCalledWith({block: 'nearest'});
+        expect(scrollIntoViewMock.mock.contexts.at(-1)).toBe(screen.getAllByRole('listitem')[2]);
+    });
 });
