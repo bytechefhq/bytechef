@@ -309,14 +309,14 @@ function App() {
                     </div>
                 </SidebarInset>
 
-                <Toaster />
-
                 {ff_2396 && searchOpen && (
                     <Suspense fallback={null}>
                         <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
                     </Suspense>
                 )}
             </SidebarProvider>
+
+            <Toaster />
         </div>
     ) : (
         <Outlet />

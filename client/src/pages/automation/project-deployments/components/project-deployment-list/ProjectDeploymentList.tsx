@@ -9,18 +9,22 @@ import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
+    hideOpenInProject?: boolean;
     newlyCreatedDeploymentId?: number;
     project: Project;
     projectDeployments: ProjectDeployment[];
+    showEnvironment?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }
 
 const ProjectDeploymentList = ({
     componentDefinitions,
+    hideOpenInProject,
     newlyCreatedDeploymentId,
     project,
     projectDeployments,
+    showEnvironment,
     tags,
     taskDispatcherDefinitions,
 }: ProjectDeploymentListProps) => {
@@ -64,9 +68,11 @@ const ProjectDeploymentList = ({
                         open={openCollapsibles.has(projectDeployment.id!)}
                     >
                         <ProjectDeploymentListItem
+                            hideOpenInProject={hideOpenInProject}
                             key={projectDeployment.id}
                             projectDeployment={projectDeployment}
                             remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
+                            showEnvironment={showEnvironment}
                         />
 
                         {!!projectDeployment.projectDeploymentWorkflows?.length && (
@@ -74,6 +80,7 @@ const ProjectDeploymentList = ({
                                 <ProjectDeploymentWorkflowList
                                     componentDefinitions={componentDefinitions}
                                     environmentId={projectDeployment.environmentId!}
+                                    hideOpenInProject={hideOpenInProject}
                                     projectDeploymentEnabled={
                                         projectDeploymentMap.has(projectDeployment.id!)
                                             ? projectDeploymentMap.get(projectDeployment.id!)!

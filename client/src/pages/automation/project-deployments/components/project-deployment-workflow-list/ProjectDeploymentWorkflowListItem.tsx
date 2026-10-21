@@ -26,6 +26,7 @@ const projectDeploymentApi = new ProjectDeploymentApi();
 interface ProjectDeploymentWorkflowListItemProps {
     environmentId: number;
     filteredComponentNames?: string[];
+    hideOpenInProject?: boolean;
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
     projectDeploymentWorkflow: ProjectDeploymentWorkflow;
@@ -44,6 +45,7 @@ interface ProjectDeploymentWorkflowListItemProps {
 const ProjectDeploymentWorkflowListItem = ({
     environmentId,
     filteredComponentNames,
+    hideOpenInProject,
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflow,
@@ -100,7 +102,7 @@ const ProjectDeploymentWorkflowListItem = ({
         }
     };
 
-    const showOpenInProject = projectId != null;
+    const showOpenInProject = !hideOpenInProject && projectId != null;
 
     const handleOpenInProjectClick = () => {
         if (projectId != null) {

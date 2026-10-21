@@ -7,7 +7,12 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {RocketIcon} from 'lucide-react';
 import {MouseEvent} from 'react';
 
-const DeployButton = ({project}: {project: Project}) => {
+interface DeployButtonProps {
+    onDeploymentSaved?: (projectDeploymentId: number, environmentId?: number) => void;
+    project: Project;
+}
+
+const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
@@ -36,7 +41,7 @@ const DeployButton = ({project}: {project: Project}) => {
                 <TooltipTrigger asChild>
                     <span className="inline-flex">
                         <Button
-                            className="rounded-l-none border-l-0"
+                            className="rounded-none border-l-0"
                             disabled
                             icon={<RocketIcon />}
                             label="Deploy"
@@ -53,12 +58,14 @@ const DeployButton = ({project}: {project: Project}) => {
     return (
         <ProjectDeploymentDialog
             environmentEditable={true}
+            onSuccess={onDeploymentSaved}
             projectDeployment={{
                 name: project.name,
                 projectId: project.id,
             }}
             projectDeployments={projectDeploymentsQuery.data}
             projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+            redirectOnSubmit={false}
             showTabs
             triggerNode={<Button icon={<RocketIcon />} label="Deploy" onClick={handleDeployClick} variant="outline" />}
         />

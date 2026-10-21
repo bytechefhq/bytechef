@@ -8,6 +8,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
+import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
@@ -25,11 +26,18 @@ import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
 
 interface ProjectDeploymentListItemProps {
+    hideOpenInProject?: boolean;
     projectDeployment: ProjectDeployment;
     remainingTags?: Tag[];
+    showEnvironment?: boolean;
 }
 
-const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDeploymentListItemProps) => {
+const ProjectDeploymentListItem = ({
+    hideOpenInProject,
+    projectDeployment,
+    remainingTags,
+    showEnvironment,
+}: ProjectDeploymentListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
@@ -112,7 +120,13 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     const isDeploymentSwitchDisabled =
         enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
-    const showOpenProject = projectDeployment.projectId != null;
+    const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
+
+    const environmentConfig =
+        showEnvironment && projectDeployment.environmentId != null
+            ? ENVIRONMENT_CONFIGS[projectDeployment.environmentId]
+            : undefined;
+    const EnvironmentIcon = environmentConfig?.icon;
 
     const handleOpenProjectClick = () => {
         if (projectDeployment.projectId != null) {
@@ -130,6 +144,15 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
+                                {environmentConfig && EnvironmentIcon && (
+                                    <Badge
+                                        icon={<EnvironmentIcon className="size-3" />}
+                                        label={environmentConfig.shortLabel}
+                                        styleType={environmentConfig.styleType}
+                                        weight="semibold"
+                                    />
+                                )}
+
                                 {projectDeployment.description ? (
                                     <Tooltip>
                                         <TooltipTrigger>

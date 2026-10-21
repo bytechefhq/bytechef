@@ -9,6 +9,7 @@ import {ChevronDownIcon} from 'lucide-react';
 const ProjectDeploymentWorkflowList = ({
     componentDefinitions,
     environmentId,
+    hideOpenInProject,
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflows,
@@ -19,6 +20,7 @@ const ProjectDeploymentWorkflowList = ({
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
     environmentId: number;
+    hideOpenInProject?: boolean;
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
     projectDeploymentWorkflows: Array<ProjectDeploymentWorkflow>;
@@ -138,6 +140,7 @@ const ProjectDeploymentWorkflowList = ({
                             <ProjectDeploymentWorkflowListItem
                                 environmentId={environmentId}
                                 filteredComponentNames={filteredComponentNames}
+                                hideOpenInProject={hideOpenInProject}
                                 key={workflow.id}
                                 projectDeploymentEnabled={projectDeploymentEnabled}
                                 projectDeploymentId={projectDeploymentId}
@@ -178,6 +181,7 @@ const ProjectDeploymentWorkflowList = ({
                                     <ProjectDeploymentWorkflowListItem
                                         environmentId={environmentId}
                                         filteredComponentNames={filteredComponentNames}
+                                        hideOpenInProject={hideOpenInProject}
                                         key={workflow.id}
                                         projectDeploymentEnabled={projectDeploymentEnabled}
                                         projectDeploymentId={projectDeploymentId}
