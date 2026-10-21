@@ -29,7 +29,6 @@ import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisi
 import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
-import {useIsResourceOwnerOrTenantAdmin} from '@/shared/hooks/useIsResourceOwnerOrTenantAdmin';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {
@@ -153,15 +152,12 @@ const ConnectionDialog = ({
     const currentType = platformType ?? storedPlatformType;
 
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
-    const isTenantAdmin = useIsTenantAdmin();
     const hasWorkspaceConnectionEditScope = useHasWorkspaceScope(
         currentWorkspaceId,
         'CONNECTION_EDIT',
         connection?.environmentId
     );
-    const isConnectionOwnerOrTenantAdmin = useIsResourceOwnerOrTenantAdmin(connection?.createdBy);
-
-    const canEditWorkspaceConnection = hasWorkspaceConnectionEditScope && isConnectionOwnerOrTenantAdmin;
+    const isTenantAdmin = useIsTenantAdmin();
 
     // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
     // edition check in one hook means a future migration away from EditionType.EE updates the
@@ -230,14 +226,20 @@ const ConnectionDialog = ({
 
     const selectedComponentName = selectedComponentDefinition?.name || connection?.componentName;
 
-    const canEditConnection =
-        currentType === PlatformType.EMBEDDED ? canEditEmbeddedConnection : canEditWorkspaceConnection;
+    const isConnectionOwner = !!account?.login && account.login === connection?.createdBy;
 
-    const isConnectionCreator = !!account?.login && account.login === connection?.createdBy;
+    const canSeeCredentials =
+        currentType === PlatformType.EMBEDDED
+            ? canEditEmbeddedConnection && isConnectionOwner
+            : hasWorkspaceConnectionEditScope &&
+              (isConnectionOwner || (connection?.visibility === 'ORGANIZATION' && isTenantAdmin));
 
-    const credentialsHidden = isEdit && (!canEditConnection || !isConnectionCreator);
+    const credentialsHidden = isEdit && !canSeeCredentials;
 
-    const canReplaceCredentials = canEditConnection && (isConnectionCreator || isTenantAdmin);
+    const canReplaceCredentials =
+        currentType === PlatformType.EMBEDDED
+            ? canEditEmbeddedConnection && (isConnectionOwner || isTenantAdmin)
+            : hasWorkspaceConnectionEditScope && (isConnectionOwner || isTenantAdmin);
 
     const canUpdateCredentials =
         isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && canReplaceCredentials;

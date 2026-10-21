@@ -13,7 +13,6 @@ import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest
 
 const hoisted = vi.hoisted(() => ({
     embeddedGrants: {} as Record<number, string[]>,
-    ownerOrTenantAdmin: true,
     workspaceGrants: {} as Record<number, string[]>,
 }));
 
@@ -41,10 +40,6 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', async () => {
             ).includes(scope),
     };
 });
-
-vi.mock('@/shared/hooks/useIsResourceOwnerOrTenantAdmin', () => ({
-    useIsResourceOwnerOrTenantAdmin: () => hoisted.ownerOrTenantAdmin,
-}));
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(),
@@ -86,7 +81,7 @@ vi.mock('@tanstack/react-query', async () => {
 const DEVELOPMENT = 0;
 const PRODUCTION = 2;
 const CREATOR_LOGIN = 'creator@localhost.com';
-const HIDDEN_HINT = 'Only the member who created this connection can see or replace its credentials.';
+const HIDDEN_HINT = "Only this connection's owner can see or replace its credentials.";
 const WORKSPACE_ID = 1049;
 
 const CONNECTION_DEFINITION = {
@@ -119,7 +114,7 @@ const CONNECTION = {
 
 const CREDENTIAL_KEYS = ['authorizationParameters', 'connectionParameters', 'parameters'];
 
-const renderEditDialog = (platformType?: PlatformType) => {
+const renderEditDialog = (platformType?: PlatformType, connectionOverrides: Record<string, unknown> = {}) => {
     const credentialsMutateAsync = vi.fn().mockResolvedValue(undefined);
     const updateConnectionMutate = vi.fn();
 
@@ -127,7 +122,7 @@ const renderEditDialog = (platformType?: PlatformType) => {
         <MemoryRouter>
             <ConnectionDialog
                 componentDefinitions={[{name: 'slack', title: 'Slack'}] as never}
-                connection={CONNECTION as never}
+                connection={{...CONNECTION, ...connectionOverrides} as never}
                 connectionTagsQueryKey={['connectionTags']}
                 connectionsQueryKey={['connections']}
                 platformType={platformType}
@@ -176,7 +171,6 @@ describe('ConnectionDialog withheld credentials', () => {
 
     beforeEach(() => {
         hoisted.embeddedGrants = {};
-        hoisted.ownerOrTenantAdmin = true;
         hoisted.workspaceGrants = {};
 
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
@@ -313,7 +307,8 @@ describe('ConnectionDialog withheld credentials', () => {
             useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
         });
 
-        hoisted.ownerOrTenantAdmin = false;
+        authenticateAs('editor@localhost.com', ['ROLE_USER']);
+
         hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
 
         renderEditDialog();
@@ -321,6 +316,69 @@ describe('ConnectionDialog withheld credentials', () => {
         expect(screen.getAllByText('Hidden')).toHaveLength(3);
         expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+    });
+
+    it('testATenantAdminSeesAndReplacesCredentialsOfAnOrganizationConnectionItDidNotCreate', () => {
+        act(() => {
+            authenticateAs('second-admin@localhost.com', ['ROLE_ADMIN']);
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderEditDialog(PlatformType.AUTOMATION, {visibility: 'ORGANIZATION'});
+
+        expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+        expect(screen.getByText('secret-api-key-value')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+    });
+
+    it('testAMemberSeesHiddenCredentialsOfAnOrganizationConnection', () => {
+        act(() => {
+            authenticateAs('editor@localhost.com', ['ROLE_USER']);
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderEditDialog(PlatformType.AUTOMATION, {visibility: 'ORGANIZATION'});
+
+        expect(screen.getAllByText('Hidden')).toHaveLength(3);
+        expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+    });
+
+    it('testATenantAdminSeesHiddenCredentialsOfAMembersWorkspaceConnection', () => {
+        act(() => {
+            authenticateAs('admin@localhost.com', ['ROLE_ADMIN']);
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderEditDialog(PlatformType.AUTOMATION, {visibility: 'WORKSPACE'});
+
+        expect(screen.getAllByText('Hidden')).toHaveLength(3);
+        expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+    });
+
+    it('testTheMemberAConnectionWasReassignedToSeesItsCredentials', () => {
+        act(() => {
+            authenticateAs('new-owner@localhost.com', ['ROLE_USER']);
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+            useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        });
+
+        hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderEditDialog(PlatformType.AUTOMATION, {createdBy: 'new-owner@localhost.com'});
+
+        expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+        expect(screen.getByText('secret-api-key-value')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
     });
 
     it('testAnExplicitPlatformTypeWinsOverAStaleStoredType', () => {
