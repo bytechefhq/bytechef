@@ -1,4 +1,3 @@
-import '@/shared/styles/dropdownMenu.css';
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
@@ -7,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDialog';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
@@ -70,20 +69,17 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                         <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
-                        <DropdownMenuItem className="dropdown-menu-item" onClick={() => setShowEditDialog(true)}>
-                            <EditIcon /> Edit
-                        </DropdownMenuItem>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={() => setShowEditDialog(true)} />
 
-                        <DropdownMenuSeparator className="m-0" />
+                        <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
+                            icon={<Trash2Icon />}
+                            label="Delete"
                             onClick={() => setShowDeleteDialog(true)}
                             variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
+                        />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
