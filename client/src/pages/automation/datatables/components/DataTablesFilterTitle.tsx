@@ -16,6 +16,7 @@ const DataTablesFilterTitle = ({allTags, tagsByTableData}: DataTablesFilterTitle
 
             {tagId ? (
                 <Badge
+                    className="border-transparent"
                     label={`Tags: ${typeof pageTitle === 'string' ? pageTitle : 'Unknown Tag'}`}
                     styleType="primary-outline"
                     weight="semibold"

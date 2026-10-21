@@ -29,6 +29,7 @@ const ApiCollectionsFilterTitle = ({
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             <Badge
+                className="border-transparent"
                 label={`${searchParams.get('tagId') ? 'Tags' : 'Projects'}: ${typeof pageTitle === 'string' ? pageTitle : 'All Projects'}`}
                 styleType="primary-outline"
                 weight="semibold"

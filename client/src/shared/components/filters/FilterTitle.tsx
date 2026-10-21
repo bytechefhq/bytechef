@@ -18,6 +18,7 @@ const FilterTitle = ({filters}: FilterTitleProps) => {
 
             {activeFilters.map((filter) => (
                 <Badge
+                    className="border-transparent"
                     key={filter.label}
                     label={`${filter.label}: ${filter.value}`}
                     styleType="primary-outline"
