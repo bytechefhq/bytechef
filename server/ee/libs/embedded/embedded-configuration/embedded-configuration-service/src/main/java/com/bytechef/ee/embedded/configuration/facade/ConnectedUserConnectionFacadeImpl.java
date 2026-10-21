@@ -103,9 +103,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
 
-        connectedUserConnectionService.deleteByConnectionId(connectionId);
-
-        connectionFacade.delete(connectionId);
+        connectionFacade.delete(
+            connectionId, () -> connectedUserConnectionService.deleteByConnectionId(connectionId));
     }
 
     @Override

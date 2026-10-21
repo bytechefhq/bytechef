@@ -34,15 +34,19 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.Assertions;
@@ -86,10 +90,14 @@ class ConnectionFacadeIntTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private TestConnectionOwnershipExemption testConnectionOwnershipExemption;
+
     @AfterEach
     void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
+        testConnectionOwnershipExemption.connectedUserOwnedConnectionIds.clear();
     }
 
     @BeforeEach
@@ -407,23 +415,44 @@ class ConnectionFacadeIntTest {
     }
 
     @Test
-    void testUpdateAndDeleteOfAnEmbeddedConnectionByNonOwnerNonAdminSkipTheCreatorCheck() {
-        ConnectionDTO connectionDTO = ConnectionDTO.builder()
-            .authorizationType(AuthorizationType.BASIC_AUTH)
-            .componentName("componentName")
-            .connectionVersion(1)
-            .environmentId(Environment.STAGING.ordinal())
-            .name("name")
-            .build();
-
-        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+    void testAMemberCreatedEmbeddedConnectionKeepsTheCreatorRule() {
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.EMBEDDED);
 
         ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         securityContext.setAuthentication(
-            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+            new TestingAuthenticationToken("editor@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version()))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(() -> connectionFacade.update(connectionId, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value")))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
+            .isInstanceOf(AccessDeniedException.class);
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
+                .isEqualTo("name"));
+    }
+
+    @Test
+    void testAConnectedUserOwnedEmbeddedConnectionSkipsTheCreatorRule() {
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.EMBEDDED);
+
+        testConnectionOwnershipExemption.connectedUserOwnedConnectionIds.add(connectionId);
+
+        ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("editor@localhost.com", null, AuthorityConstants.USER));
 
         connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version());
 
@@ -440,9 +469,50 @@ class ConnectionFacadeIntTest {
                 .get("key"))
                 .isEqualTo("value"));
 
-        connectionFacade.delete(connectionId);
+        List<Boolean> ownedWhenReferencesReleased = new ArrayList<>();
 
+        connectionFacade.delete(
+            connectionId,
+            () -> ownedWhenReferencesReleased.add(
+                testConnectionOwnershipExemption.connectedUserOwnedConnectionIds.remove(connectionId)));
+
+        Assertions.assertThat(ownedWhenReferencesReleased)
+            .containsExactly(true);
         Assertions.assertThat(connectionRepository.findById(connectionId))
+            .isEmpty();
+    }
+
+    @Test
+    void testTheOwnershipExemptionDoesNotApplyToAnAutomationConnection() {
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.AUTOMATION);
+
+        testConnectionOwnershipExemption.connectedUserOwnedConnectionIds.add(connectionId);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("editor@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testARefusedDeleteDoesNotReleaseReferences() {
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.EMBEDDED);
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("editor@localhost.com", null, AuthorityConstants.USER));
+
+        List<Long> releasedConnectionIds = new ArrayList<>();
+
+        Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId, () -> releasedConnectionIds.add(
+            connectionId)))
+            .isInstanceOf(AccessDeniedException.class);
+
+        Assertions.assertThat(releasedConnectionIds)
             .isEmpty();
     }
 
@@ -478,6 +548,31 @@ class ConnectionFacadeIntTest {
         @Bean
         JobPrincipalAccessor embeddedJobPrincipalAccessor() {
             return new TestJobPrincipalAccessor(PlatformType.EMBEDDED);
+        }
+
+        @Bean
+        TestConnectionOwnershipExemption testConnectionOwnershipExemption() {
+            return new TestConnectionOwnershipExemption();
+        }
+    }
+
+    private static ConnectionDTO connectionDTO() {
+        return ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+    }
+
+    static class TestConnectionOwnershipExemption implements ConnectionOwnershipExemption {
+
+        private final Set<Long> connectedUserOwnedConnectionIds = ConcurrentHashMap.newKeySet();
+
+        @Override
+        public boolean isConnectedUserOwned(long connectionId) {
+            return connectedUserOwnedConnectionIds.contains(connectionId);
         }
     }
 
