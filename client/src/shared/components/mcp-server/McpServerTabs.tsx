@@ -19,6 +19,7 @@ export interface McpServerWorkflowDialogProps {
 
 export interface McpServerToolsContentProps {
     activeToolsTab: McpServerToolsTabType;
+    canAddWorkflows?: boolean;
     canEdit?: boolean;
     mcpServer: McpServer;
     onAddComponentClick: () => void;
@@ -26,6 +27,7 @@ export interface McpServerToolsContentProps {
 }
 
 export interface McpServerTabsProps {
+    canAddWorkflows?: boolean;
     canEdit?: boolean;
     connectContent: ReactNode;
     mcpComponentDialog: ComponentType<McpServerComponentDialogProps>;
@@ -35,6 +37,7 @@ export interface McpServerTabsProps {
 }
 
 const McpServerTabs = ({
+    canAddWorkflows,
     canEdit = true,
     connectContent,
     mcpComponentDialog: McpComponentDialog,
@@ -47,6 +50,10 @@ const McpServerTabs = ({
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const isComponentsTab = activeTab === 'components';
+
+    const workflowsAddable = canAddWorkflows ?? canEdit;
+
+    const addButtonShown = isComponentsTab ? canEdit : workflowsAddable;
 
     const handleAddClick = () => {
         if (isComponentsTab) {
@@ -68,7 +75,7 @@ const McpServerTabs = ({
                         <TabsTrigger value="connect">Connect</TabsTrigger>
                     </TabsList>
 
-                    {canEdit && activeTab !== 'connect' && (
+                    {addButtonShown && activeTab !== 'connect' && (
                         <Button
                             icon={<PlusIcon />}
                             label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
@@ -83,6 +90,7 @@ const McpServerTabs = ({
                     <TabsContent className="pt-2" key={toolsTab} value={toolsTab}>
                         <ToolsContent
                             activeToolsTab={toolsTab}
+                            canAddWorkflows={workflowsAddable}
                             canEdit={canEdit}
                             mcpServer={mcpServer}
                             onAddComponentClick={() => setShowMcpComponentDialog(true)}

@@ -1,7 +1,9 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {act, render, resetAll, screen, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {ComponentProps, ReactNode} from 'react';
 import {MemoryRouter, Route, Routes, useLocation} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -13,9 +15,27 @@ const hoisted = vi.hoisted(() => ({
     connectedUserConnections: [] as Connection[],
     connectedUserConnectionsError: null as Error | null,
     connectedUserIsLoading: false,
+    grants: {} as Record<number, string[]>,
     useGetAllConnectedUserConnectionsQuery: vi.fn(),
     useGetConnectionsQuery: vi.fn(),
+    useRealConnectionList: false,
+    useRealScopeHook: false,
 }));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>();
+    const {environmentStore: mockedEnvironmentStore} = await import('@/shared/stores/useEnvironmentStore');
+
+    return {
+        ...actual,
+        useHasEmbeddedScope: (scope: string, environmentId?: number) =>
+            hoisted.useRealScopeHook
+                ? actual.useHasEmbeddedScope(scope as never, environmentId)
+                : (
+                      hoisted.grants[environmentId ?? mockedEnvironmentStore.getState().currentEnvironmentId] ?? []
+                  ).includes(scope),
+    };
+});
 
 vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
     ConnectionKeys: {connectionTags: ['connectionTags'], connections: ['connections']},
@@ -57,12 +77,27 @@ vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
     }),
 }));
 
+vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
+    ComponentDefinitionKeys: {componentDefinitions: ['componentDefinitions']},
+    useGetConnectionComponentDefinitionQuery: () => ({data: {icon: '', name: 'slack', title: 'Slack'}}),
+}));
+
 vi.mock('@/ee/shared/mutations/embedded/connections.mutations', () => ({
     useCreateConnectionMutation: vi.fn(),
+    useDeleteConnectionMutation: () => ({mutate: vi.fn()}),
+    useUpdateConnectionMutation: vi.fn(),
+}));
+
+vi.mock('@/ee/shared/mutations/embedded/connectionTags.mutations', () => ({
+    useUpdateConnectionTagsMutation: () => ({mutate: vi.fn()}),
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
-    default: () => <div data-testid="connection-dialog" />,
+    default: ({triggerNode}: {triggerNode?: ReactNode}) => <div data-testid="connection-dialog">{triggerNode}</div>,
+}));
+
+vi.mock('@/components/LazyLoadSVG/LazyLoadSVG', () => ({
+    default: () => null,
 }));
 
 vi.mock('@/ee/pages/embedded/connections/components/ConnectedUserFilterNav', () => ({
@@ -70,15 +105,23 @@ vi.mock('@/ee/pages/embedded/connections/components/ConnectedUserFilterNav', () 
     getConnectedUserLabel: ({externalId, name}: {externalId: string; name?: string}) => name || externalId,
 }));
 
-vi.mock('../components/connection-list/ConnectionList', () => ({
-    default: ({connectedUserId, connections}: {connectedUserId?: number; connections: Connection[]}) => (
-        <ul data-connected-user-id={connectedUserId ?? ''} data-testid="connection-list">
-            {connections.map((connection) => (
-                <li key={connection.id}>{connection.name}</li>
-            ))}
-        </ul>
-    ),
-}));
+vi.mock('../components/connection-list/ConnectionList', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../components/connection-list/ConnectionList')>();
+    const ActualConnectionList = actual.default;
+
+    return {
+        default: (props: ComponentProps<typeof ActualConnectionList>) =>
+            hoisted.useRealConnectionList ? (
+                <ActualConnectionList {...props} />
+            ) : (
+                <ul data-connected-user-id={props.connectedUserId ?? ''} data-testid="connection-list">
+                    {props.connections.map((connection) => (
+                        <li key={connection.id}>{connection.name}</li>
+                    ))}
+                </ul>
+            ),
+    };
+});
 
 const createConnection = (id: number, componentName: string, tagIds: number[] = []): Connection => ({
     componentName,
@@ -122,6 +165,9 @@ describe('Connections', () => {
 
         environmentStore.setState({currentEnvironmentId: 1});
 
+        hoisted.grants = {1: ['CONNECTION_CREATE', 'CONNECTION_DELETE', 'CONNECTION_EDIT', 'CONNECTION_VIEW']};
+        hoisted.useRealConnectionList = false;
+        hoisted.useRealScopeHook = false;
         hoisted.adminConnections = [createConnection(1, 'slack')];
         hoisted.connectedUser = {environmentId: 1, externalId: 'acme-1', id: 42, name: 'Acme Corp'};
         hoisted.connectedUserIsLoading = false;
@@ -247,5 +293,91 @@ describe('Connections', () => {
             },
             {interval: 5, timeout: 5000}
         );
+    });
+});
+
+const DEVELOPMENT = 0;
+const PRODUCTION = 2;
+
+describe('embedded Connections', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+
+        hoisted.adminConnections = [
+            {
+                active: false,
+                componentName: 'slack',
+                connectionVersion: 1,
+                credentialStatus: 'VALID',
+                environmentId: PRODUCTION,
+                id: 5,
+                name: 'Slack connection',
+                parameters: {},
+                tags: [],
+            } as Connection,
+        ];
+        hoisted.connectedUser = undefined;
+        hoisted.grants = {};
+        hoisted.useRealConnectionList = true;
+        hoisted.useRealScopeHook = false;
+
+        act(() => {
+            environmentStore.setState({currentEnvironmentId: PRODUCTION});
+        });
+    });
+
+    afterEach(() => {
+        act(() => {
+            authenticationStore.setState({account: undefined, authenticated: false});
+            environmentStore.setState({currentEnvironmentId: DEVELOPMENT});
+        });
+
+        resetAll();
+    });
+
+    it('testAViewerSeesConnectionsWithoutCreateEditOrDelete', () => {
+        hoisted.grants = {
+            [DEVELOPMENT]: ['CONNECTION_CREATE', 'CONNECTION_DELETE', 'CONNECTION_EDIT', 'CONNECTION_VIEW'],
+            [PRODUCTION]: ['CONNECTION_VIEW'],
+        };
+
+        renderPage('/');
+
+        expect(screen.getByText('Slack connection')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Connection'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
+    });
+
+    it('testConnectionControlsFollowTheirOwnScopes', async () => {
+        hoisted.grants = {[PRODUCTION]: ['CONNECTION_CREATE', 'CONNECTION_EDIT', 'CONNECTION_VIEW']};
+
+        renderPage('/');
+
+        expect(screen.getByRole('button', {name: 'New Connection'})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(await screen.findByText('Edit')).toBeInTheDocument();
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    });
+
+    it('testATenantAdminSeesEveryControl', async () => {
+        hoisted.useRealScopeHook = true;
+
+        act(() => {
+            authenticationStore.setState({
+                account: {authorities: ['ROLE_ADMIN'], login: 'admin'} as never,
+                authenticated: true,
+            });
+        });
+
+        renderPage('/');
+
+        expect(screen.getByRole('button', {name: 'New Connection'})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(await screen.findByText('Edit')).toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
     });
 });

@@ -5,6 +5,7 @@ import {EMBEDDED_SIGNING_KEYS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embed
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import SigningKeyTable from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyTable';
 import {useGeSigningKeysQuery} from '@/ee/shared/queries/embedded/signingKeys.queries';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ClipboardSignatureIcon} from 'lucide-react';
@@ -13,7 +14,26 @@ import {useState} from 'react';
 const SigningKeys = () => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
-    const {data: signingKeys, error: signingKeysError, isLoading: signingKeysLoading} = useGeSigningKeysQuery();
+    const canManageSigningKeys = useHasEmbeddedScope('EMBEDDED_SETTINGS_MANAGE');
+
+    const {
+        data: signingKeys,
+        error: signingKeysError,
+        isLoading: signingKeysLoading,
+    } = useGeSigningKeysQuery(canManageSigningKeys);
+
+    if (!canManageSigningKeys) {
+        return (
+            <LayoutContainer
+                header={<Header centerTitle position="main" title="Signing Keys" />}
+                leftSidebarOpen={false}
+            >
+                <div className="p-4 text-sm text-muted-foreground">
+                    You do not have permission to manage the signing keys of this environment.
+                </div>
+            </LayoutContainer>
+        );
+    }
 
     return (
         <PageLoader errors={[signingKeysError]} loading={signingKeysLoading}>

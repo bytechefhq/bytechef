@@ -34,10 +34,12 @@ const McpServerToolsContent = ({mcpServer, ...toolsContentProps}: McpServerTools
                 }
                 isWorkflowListEmpty={isWorkflowListEmpty}
                 workflowEmptyStateAction={
-                    <McpAutomationProjectConfigurationDialog
-                        mcpServer={mcpServer}
-                        triggerNode={<Button label="Add Automations" variant="secondary" />}
-                    />
+                    toolsContentProps.canEdit !== false && (
+                        <McpAutomationProjectConfigurationDialog
+                            mcpServer={mcpServer}
+                            triggerNode={<Button label="Add Automations" variant="secondary" />}
+                        />
+                    )
                 }
                 workflowList={
                     <>
