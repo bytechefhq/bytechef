@@ -1,0 +1,745 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Automation API Platform Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/automation/v1"
+tags:
+  - name: "api-collection"
+    description: "The Automation API Collection Public API"
+  - name: "api-collection-endpoint"
+    description: "The Automation API Collection Endpoint Public API"
+paths:
+  /workspaces/{workspaceId}/api-collections:
+    get:
+      description: "Get the API collections of a workspace in an environment."
+      summary: "Get API collections"
+      tags:
+        - "api-collection"
+      operationId: "getApiCollections"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/workspaceId"
+        - name: "projectId"
+          description: "Only the API collections of this project."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "200":
+          description: "The API collections."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiCollection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    post:
+      description: "Create an API collection in an environment from a published project version. The API collection\
+        \ is created in the workspace the project belongs to."
+      summary: "Create an API collection"
+      tags:
+        - "api-collection"
+      operationId: "createApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/workspaceId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionInput"
+      responses:
+        "201":
+          description: "The created API collection."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collections/{id}:
+    get:
+      description: "Get an API collection."
+      summary: "Get an API collection"
+      tags:
+        - "api-collection"
+      operationId: "getApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "200":
+          description: "The API collection."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    put:
+      description: "Update an API collection. A field left out keeps its stored value."
+      summary: "Update an API collection"
+      tags:
+        - "api-collection"
+      operationId: "updateApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionUpdate"
+      responses:
+        "200":
+          description: "The updated API collection."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollection"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Delete an API collection and its endpoints."
+      summary: "Delete an API collection"
+      tags:
+        - "api-collection"
+      operationId: "deleteApiCollection"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "204":
+          description: "The API collection was deleted."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collections/{id}/project-version:
+    put:
+      description: "Move an API collection to a newer published project version in place. The response names the\
+        \ endpoints that were removed, the connections and inputs the new version still needs, and the endpoints that\
+        \ were disabled because of them."
+      summary: "Update the project version of an API collection"
+      tags:
+        - "api-collection"
+      operationId: "updateApiCollectionProjectVersion"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionProjectVersionInput"
+      responses:
+        "200":
+          description: "The outcome of the move."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionVersionUpdate"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collections/{id}/endpoints:
+    get:
+      description: "Get the endpoints of an API collection."
+      summary: "Get API collection endpoints"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "getApiCollectionEndpoints"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "200":
+          description: "The endpoints."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiCollectionEndpoint"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    post:
+      description: "Create an endpoint in an API collection. The connections and inputs of its workflow can be set in\
+        \ the same call. Endpoints that serve the same workflow share its connections and inputs, so setting them for\
+        \ one endpoint sets them for the others too."
+      summary: "Create an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "createApiCollectionEndpoint"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionEndpointInput"
+      responses:
+        "201":
+          description: "The created endpoint."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collection-endpoints/{id}:
+    get:
+      description: "Get an API collection endpoint."
+      summary: "Get an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "getApiCollectionEndpoint"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionEndpointId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "200":
+          description: "The endpoint."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    put:
+      description: "Update an API collection endpoint. A field left out keeps its stored value; connections and inputs,\
+        \ when present, replace the stored ones as a whole, so a single connection cannot be removed on its own: send\
+        \ the full list of replacement connections instead. Endpoints that serve the same workflow share its connections\
+        \ and inputs, so changing them for one endpoint changes them for the others too."
+      summary: "Update an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "updateApiCollectionEndpoint"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionEndpointId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionEndpointUpdate"
+      responses:
+        "200":
+          description: "The updated endpoint."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+    delete:
+      description: "Delete an API collection endpoint."
+      summary: "Delete an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "deleteApiCollectionEndpoint"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionEndpointId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      responses:
+        "204":
+          description: "The endpoint was deleted."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+  /api-collection-endpoints/{id}/enabled:
+    put:
+      description: "Enable or disable an API collection endpoint."
+      summary: "Enable or disable an API collection endpoint"
+      tags:
+        - "api-collection-endpoint"
+      operationId: "enableApiCollectionEndpoint"
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/apiCollectionEndpointId"
+        - $ref: "#/components/parameters/apiCollectionEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiCollectionEndpointEnabledInput"
+      responses:
+        "200":
+          description: "The endpoint."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiCollectionEndpoint"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    apiCollectionEnvironment:
+      name: "X-Environment"
+      description: "The environment the API collection must belong to; an API collection of another environment is\
+        \ not found. Defaults to PRODUCTION."
+      in: "header"
+      required: false
+      schema:
+        $ref: "#/components/schemas/Environment"
+    apiCollectionId:
+      name: "id"
+      description: "The id of an API collection."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    apiCollectionEndpointId:
+      name: "id"
+      description: "The id of an API collection endpoint."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    workspaceId:
+      name: "workspaceId"
+      description: "The id of a workspace."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+  responses:
+    badRequest:
+      description: "Bad request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    notFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    conflict:
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    internalServerError:
+      description: "Internal server error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Environment:
+      description: "The environment."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
+    Error:
+      description: "An error. The code names the error; the message describes it."
+      type: "object"
+      properties:
+        code:
+          description: "The name of the error."
+          type: "string"
+        message:
+          description: "A description of the error."
+          type: "string"
+    ApiCollection:
+      description: "An API collection."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        contextPath:
+          description: "The path every endpoint of the collection is served under."
+          type: "string"
+        collectionVersion:
+          type: "integer"
+        projectId:
+          type: "integer"
+          format: "int64"
+        projectVersion:
+          type: "integer"
+        environment:
+          $ref: "#/components/schemas/Environment"
+        enabled:
+          type: "boolean"
+        createdDate:
+          type: "string"
+          format: "date-time"
+        lastModifiedDate:
+          type: "string"
+          format: "date-time"
+    ApiCollectionInput:
+      description: "The values to create an API collection from."
+      type: "object"
+      required:
+        - "projectId"
+        - "projectVersion"
+        - "name"
+        - "contextPath"
+      properties:
+        projectId:
+          type: "integer"
+          format: "int64"
+        projectVersion:
+          type: "integer"
+        name:
+          type: "string"
+        contextPath:
+          description: "The path every endpoint of the collection is served under. It must not start with a slash."
+          type: "string"
+        collectionVersion:
+          type: "integer"
+          default: 1
+        description:
+          type: "string"
+    ApiCollectionUpdate:
+      description: "The values to change on an API collection. A field left out keeps its stored value."
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+    ApiCollectionProjectVersionInput:
+      description: "The project version to move an API collection to."
+      type: "object"
+      required:
+        - "projectVersion"
+      properties:
+        projectVersion:
+          type: "integer"
+        removeMissingEndpoints:
+          description: "Delete the endpoints whose workflow the new version lacks instead of refusing the move."
+          type: "boolean"
+          default: false
+    ApiCollectionMissingConnection:
+      description: "A required connection of a workflow that no carried connection binds."
+      type: "object"
+      properties:
+        endpointName:
+          type: "string"
+        workflowNodeName:
+          type: "string"
+        key:
+          type: "string"
+        componentName:
+          type: "string"
+    ApiCollectionMissingInput:
+      description: "A required input of a workflow that carries no value."
+      type: "object"
+      properties:
+        endpointName:
+          type: "string"
+        inputName:
+          type: "string"
+    ApiCollectionVersionUpdate:
+      description: "The outcome of moving an API collection to a newer project version."
+      type: "object"
+      properties:
+        apiCollection:
+          $ref: "#/components/schemas/ApiCollection"
+        removedEndpointNames:
+          type: "array"
+          items:
+            type: "string"
+        disabledEndpointNames:
+          type: "array"
+          items:
+            type: "string"
+        missingConnections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ApiCollectionMissingConnection"
+        missingInputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ApiCollectionMissingInput"
+    HttpMethod:
+      description: "The endpoint HTTP method."
+      type: "string"
+      enum:
+        - "DELETE"
+        - "GET"
+        - "PATCH"
+        - "POST"
+        - "PUT"
+    EndpointConnection:
+      description: "A connection bound to a connection slot of the endpoint's workflow."
+      type: "object"
+      required:
+        - "workflowNodeName"
+        - "key"
+        - "connectionId"
+      properties:
+        workflowNodeName:
+          description: "The workflow node the slot belongs to."
+          type: "string"
+        key:
+          description: "The key of the slot in the node."
+          type: "string"
+        connectionId:
+          description: "The id of the connection bound to the slot."
+          type: "integer"
+          format: "int64"
+    ApiCollectionEndpoint:
+      description: "An endpoint of an API collection."
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        apiCollectionId:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        httpMethod:
+          $ref: "#/components/schemas/HttpMethod"
+        path:
+          type: "string"
+        workflowUuid:
+          description: "The uuid of the project workflow the endpoint serves."
+          type: "string"
+        enabled:
+          type: "boolean"
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/EndpointConnection"
+        inputs:
+          description: "The values of the workflow's inputs."
+          type: "object"
+          additionalProperties: true
+    ApiCollectionEndpointInput:
+      description: "The values to create an API collection endpoint from."
+      type: "object"
+      required:
+        - "name"
+        - "httpMethod"
+        - "path"
+        - "workflowUuid"
+      properties:
+        name:
+          type: "string"
+        httpMethod:
+          $ref: "#/components/schemas/HttpMethod"
+        path:
+          type: "string"
+        workflowUuid:
+          description: "The uuid of the project workflow the endpoint serves."
+          type: "string"
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/EndpointConnection"
+        inputs:
+          description: "The values of the workflow's inputs."
+          type: "object"
+          additionalProperties: true
+    ApiCollectionEndpointUpdate:
+      description: "The values to change on an API collection endpoint. A field left out keeps its stored value."
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        httpMethod:
+          $ref: "#/components/schemas/HttpMethod"
+        path:
+          type: "string"
+        workflowUuid:
+          type: "string"
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/EndpointConnection"
+        inputs:
+          type: "object"
+          additionalProperties: true
+    ApiCollectionEndpointEnabledInput:
+      description: "Whether an API collection endpoint is enabled."
+      type: "object"
+      required:
+        - "enabled"
+      properties:
+        enabled:
+          type: "boolean"

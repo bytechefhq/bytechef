@@ -33,6 +33,44 @@ bytechef automation project pull --id 5
 Requests are sent to `<host>/api/automation/v1` with `Authorization: Bearer <token>` and
 `X-Environment: <environment>` headers.
 
+## API collection commands
+
+API collections and their endpoints are managed in any environment (`--environment`), with the same profile and
+`X-Environment` handling as the other automation commands. Output is JSON by default; `--output table` is also accepted.
+
+```bash
+bytechef automation api-collection list --workspace-id 1 --project-id 3
+bytechef automation api-collection create --project-id 3 --project-version 2 --name orders --context-path orders \
+  --collection-version 1 --description "Order API"
+bytechef automation api-collection get --id 5
+bytechef automation api-collection update --id 5 --name renamed --description "New description"
+bytechef automation api-collection delete --id 5
+bytechef automation api-collection update-version --id 5 --project-version 3 --remove-missing-endpoints
+bytechef automation api-collection endpoint list --collection-id 5
+bytechef automation api-collection endpoint create --collection-id 5 --name create-order --method POST \
+  --path /orders --workflow-uuid <uuid> --connection http_1:connection=7 --inputs-json '{"orderId":"abc"}'
+bytechef automation api-collection endpoint update --id 9 --path /orders/new
+bytechef automation api-collection endpoint delete --id 9
+bytechef automation api-collection endpoint enable --id 9
+bytechef automation api-collection endpoint disable --id 9
+```
+
+- `--connection node:key=connectionId` binds a connection to a connection slot of the endpoint's workflow and is
+  repeatable; a malformed value fails locally before any request is sent. `--inputs-json` takes a JSON object.
+- `create` puts the API collection in the workspace the project belongs to.
+- `endpoint update` keeps the stored connections and inputs unless `--connection` or `--inputs-json` is given, in
+  which case they replace the stored ones as a whole. It cannot clear the connections or remove a single one: pass
+  every connection the workflow should keep as a `--connection` instead.
+- Endpoints that serve the same workflow share its connections and inputs, so setting them for one endpoint sets them
+  for the others too.
+- `update-version` prints the endpoints it removed, the connections and inputs the new version still needs, and the
+  endpoints it disabled because of them.
+- `cli/clients/automation-api-platform/openapi.yaml` is a copy of
+  `server/ee/libs/automation/automation-api-platform/automation-api-platform-configuration/automation-api-platform-configuration-rest/openapi-public.yaml`
+  with the `Environment` schema inlined. When the server spec changes, copy it again, inline `Environment`, and run
+  `./gradlew :cli:clients:automation-api-platform:generateClient`.
+
+
 ## Embedded commands
 
 Embedded commands act on behalf of a connected user, identified by `--external-user-id`, and hit
