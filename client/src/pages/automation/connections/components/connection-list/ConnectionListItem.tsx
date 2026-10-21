@@ -2,6 +2,7 @@ import AlertDialog from '@/components/AlertDialog';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
@@ -307,6 +308,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditDialog(false)}
+                    platformType={PlatformType.AUTOMATION}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     useUpdateConnectionCredentialsMutation={
                         canReplaceCredentials ? useUpdateConnectionCredentialsMutation : undefined
