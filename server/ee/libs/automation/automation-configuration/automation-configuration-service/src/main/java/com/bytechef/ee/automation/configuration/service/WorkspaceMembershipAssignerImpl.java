@@ -14,7 +14,6 @@ import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
-import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
@@ -39,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceMembershipAssignerImpl implements WorkspaceMembershipAssigner {
 
-    private final EmbeddedUserRepository embeddedUserRepository;
+    private final EmbeddedUserService embeddedUserService;
     private final PermissionService permissionService;
     private final WorkspaceService workspaceService;
     private final WorkspaceUserRepository workspaceUserRepository;
@@ -47,11 +46,11 @@ public class WorkspaceMembershipAssignerImpl implements WorkspaceMembershipAssig
 
     @SuppressFBWarnings("EI")
     public WorkspaceMembershipAssignerImpl(
-        EmbeddedUserRepository embeddedUserRepository, PermissionService permissionService,
+        EmbeddedUserService embeddedUserService, PermissionService permissionService,
         WorkspaceService workspaceService, WorkspaceUserRepository workspaceUserRepository,
         WorkspaceUserService workspaceUserService) {
 
-        this.embeddedUserRepository = embeddedUserRepository;
+        this.embeddedUserService = embeddedUserService;
         this.permissionService = permissionService;
         this.workspaceService = workspaceService;
         this.workspaceUserRepository = workspaceUserRepository;
@@ -101,9 +100,7 @@ public class WorkspaceMembershipAssignerImpl implements WorkspaceMembershipAssig
 
         permissionService.evictWorkspaceScopeCaches(cacheEvictionTargets);
 
-        embeddedUserRepository.deleteByUserId(userId);
-
-        permissionService.evictEmbeddedScopeCache(userId);
+        embeddedUserService.deleteEmbeddedMemberships(userId);
     }
 
     private static WorkspaceRole parseRole(String roleName) {

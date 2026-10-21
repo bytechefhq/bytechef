@@ -8,6 +8,8 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -15,6 +17,7 @@ import com.bytechef.ee.automation.configuration.security.constant.PermissionScop
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -73,6 +76,14 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         permissionService.evictEmbeddedScopeCache(userId);
 
         return savedEmbeddedUser;
+    }
+
+    @Override
+    @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED, mapper = EmbeddedUserAuditMapper.class)
+    public void deleteEmbeddedMemberships(long userId) {
+        embeddedUserRepository.deleteByUserId(userId);
+
+        permissionService.evictEmbeddedScopeCache(userId);
     }
 
     @Override
