@@ -414,6 +414,18 @@ const TENANT_ADMIN_CASES: Omit<GateCaseI, 'allowed' | 'denied' | 'module'>[] = [
     },
 ];
 
+const NON_EMBEDDED_MEMBER_CASES: Omit<GateCaseI, 'allowed' | 'denied' | 'module'>[] = [
+    {name: 'list embedded connections', rest: {method: 'GET', path: () => '/api/embedded/internal/connections'}},
+    {
+        graphQl: {
+            query: 'query EmbeddedMcpServers { embeddedMcpServers { id } }',
+            variables: () => ({}),
+        },
+        name: 'list embedded MCP servers',
+    },
+    {name: 'list connected users', rest: {method: 'GET', path: () => '/api/embedded/internal/connected-users'}},
+];
+
 async function expectGraphQlDenied(
     apiContext: APIRequestContext,
     probe: GraphQlProbeI,
@@ -684,6 +696,22 @@ test.describe('Server-side permission gates', () => {
                 );
             } else {
                 await expectRestStatus(callers.ADMIN!, tenantAdminCase.rest!, rbacWorkspace, resources, true);
+            }
+        });
+    }
+
+    for (const nonEmbeddedMemberCase of NON_EMBEDDED_MEMBER_CASES) {
+        test(`embedded members only: ${nonEmbeddedMemberCase.name} is refused for a workspace ADMIN who is not an embedded member`, async ({
+            rbacWorkspace,
+        }) => {
+            if (nonEmbeddedMemberCase.graphQl) {
+                await expectGraphQlDenied(
+                    callers.ADMIN!,
+                    nonEmbeddedMemberCase.graphQl,
+                    nonEmbeddedMemberCase.graphQl.variables(rbacWorkspace, resources)
+                );
+            } else {
+                await expectRestStatus(callers.ADMIN!, nonEmbeddedMemberCase.rest!, rbacWorkspace, resources, true);
             }
         });
     }
