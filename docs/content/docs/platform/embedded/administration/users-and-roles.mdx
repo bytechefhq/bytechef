@@ -6,7 +6,7 @@ description: Give people access to the embedded side of ByteChef with built-in r
 <EEBadge />
 
 <Callout title="Availability">
-    Embedded roles are an Enterprise Edition feature. The page that manages them is **Embedded → Settings → Users**.
+    Embedded roles are an Enterprise Edition feature. The page that manages them is **Embedded → Settings → Members**.
 </Callout>
 
 Embedded access is separate from [workspace access](/platform/settings/users#roles-and-permissions). A person can be an Admin in an automation workspace and have no access to the embedded side, or the other way round.
@@ -31,7 +31,7 @@ Membership is opt-in. Being a user in the organization does not give anyone acce
 | **Editor** | Everything Viewer has, plus creating and publishing integrations, creating and editing workflows, instance configurations, connected users, app events, connections and MCP servers, managing API keys, reading run details, and deleting workflows and connections. |
 | **Viewer** | Read-only. Sees integrations, workflows, configurations, connected users and runs with their status, but not run details, API keys or credentials. |
 
-Roles are ranked, so Viewer is contained in Editor and Editor is contained in Admin. A custom role can be assigned wherever a built-in role can.
+Roles are ranked, so Viewer is contained in Editor and Editor is contained in Admin.
 
 ---
 
@@ -80,7 +80,7 @@ Who may make each change:
 - Once a member has per-environment roles, setting or removing the role for one environment needs `EMBEDDED_MEMBER_MANAGE` in that environment only.
 - A per-environment Admin cannot remove their own membership, because removal needs `EMBEDDED_MEMBER_MANAGE` in every environment.
 
-{/* TODO screenshot: Embedded → Settings → Users - one member with Editor in every environment and one with Viewer in Development and Admin in Production */}
+{/* TODO screenshot: Embedded → Settings → Members - one member with Editor in every environment and one with Viewer in Development and Admin in Production */}
 
 ---
 
