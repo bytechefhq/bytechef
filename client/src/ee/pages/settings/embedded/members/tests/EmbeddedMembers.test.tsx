@@ -136,6 +136,14 @@ describe('EmbeddedMembers', () => {
         render(<EmbeddedMembers />);
 
         await userEvent.click(screen.getByRole('button', {name: /per-environment roles/i}));
+
+        expect(
+            screen.getByText(
+                'They keep this role in every other environment. Change or remove each environment separately.'
+            )
+        ).toBeInTheDocument();
+        expect(screen.queryByText(/lose access to every other environment/)).not.toBeInTheDocument();
+
         await userEvent.click(screen.getByRole('combobox', {name: 'Environment to grant first'}));
         await userEvent.click(screen.getByRole('option', {name: 'Production'}));
 
