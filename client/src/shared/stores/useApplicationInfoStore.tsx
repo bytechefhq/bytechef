@@ -34,6 +34,12 @@ export interface ApplicationInfoI {
     embedded: {
         allowedParentOrigins: string[];
     } | null;
+    docs: {
+        changelogUrl: string | undefined;
+        communitySupportUrl: string | undefined;
+        documentationUrl: string | undefined;
+        reportBugUrl: string | undefined;
+    };
     featureFlags: Record<string, boolean>;
     helpHub: {
         commandBar: {
@@ -94,6 +100,12 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     customerPortalUrl: undefined,
                     enabled: false,
                 },
+                docs: {
+                    changelogUrl: undefined,
+                    communitySupportUrl: undefined,
+                    documentationUrl: undefined,
+                    reportBugUrl: undefined,
+                },
                 embedded: null,
                 featureFlags: {},
 
@@ -130,6 +142,12 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             billing: {
                                 customerPortalUrl: json.billing?.customerPortalUrl || undefined,
                                 enabled: json.billing?.enabled === 'true',
+                            },
+                            docs: {
+                                changelogUrl: json.docs?.changelogUrl || undefined,
+                                communitySupportUrl: json.docs?.communitySupportUrl || undefined,
+                                documentationUrl: json.docs?.documentationUrl || undefined,
+                                reportBugUrl: json.docs?.reportBugUrl || undefined,
                             },
                             embedded: {
                                 allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
