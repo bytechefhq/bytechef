@@ -37,6 +37,11 @@ public class TempFileStorageImpl implements TempFileStorage {
     }
 
     @Override
+    public void deleteFile(FileEntry fileEntry) {
+        fileStorageService.deleteFile(TEMP_DIR, fileEntry);
+    }
+
+    @Override
     public long getContentLength(FileEntry fileEntry) {
         return fileStorageService.getContentLength(TEMP_DIR, fileEntry);
     }

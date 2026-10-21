@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.exception.HttpResponseTooLargeException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -43,12 +44,16 @@ import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import com.github.mizosoft.methanol.internal.extensions.MimeBodyPublisherAdapter;
+import com.sun.net.httpserver.HttpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
@@ -61,6 +66,9 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,6 +77,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -4055,6 +4065,256 @@ public class HttpClientExecutorTest {
                     socket.close();
                 }
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("binary response read")
+    class BinaryResponseReadTests {
+
+        @Test
+        @DisplayName("Should stop reading a body that an upstream drips forever when the calling thread is interrupted")
+        @Timeout(30)
+        void testInterruptStopsReadingADrippingBinaryBody() throws Exception {
+            HttpServer httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+            httpServer.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+
+            CountDownLatch dripStarted = new CountDownLatch(1);
+            CountDownLatch dripEnded = new CountDownLatch(1);
+
+            httpServer.createContext("/drip", exchange -> {
+                exchange.sendResponseHeaders(200, 0);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    while (true) {
+                        outputStream.write('x');
+                        outputStream.flush();
+
+                        dripStarted.countDown();
+
+                        Thread.sleep(50);
+                    }
+                } catch (IOException | InterruptedException exception) {
+                    dripEnded.countDown();
+                }
+            });
+
+            httpServer.start();
+
+            Mockito.when(tempFileStorage.storeFileContent(Mockito.anyString(), Mockito.any(InputStream.class)))
+                .thenAnswer(invocation -> {
+                    Path spoolPath = Files.createTempFile("drip-spool", ".tmp");
+
+                    try {
+                        Files.copy(
+                            invocation.<InputStream>getArgument(1), spoolPath, StandardCopyOption.REPLACE_EXISTING);
+                    } finally {
+                        Files.deleteIfExists(spoolPath);
+                    }
+
+                    return null;
+                });
+
+            AtomicReference<Throwable> failure = new AtomicReference<>();
+            AtomicReference<Object> completed = new AtomicReference<>();
+
+            String url = "http://127.0.0.1:" + httpServer.getAddress()
+                .getPort() + "/drip";
+
+            Thread readerThread = new Thread(() -> {
+                try {
+                    completed.set(
+                        httpClientExecutor.execute(
+                            url, new HashMap<>(), new HashMap<>(), null,
+                            Http.Configuration.newConfiguration()
+                                .responseType(Http.ResponseType.BINARY)
+                                .build(),
+                            Http.RequestMethod.GET, "componentName", 1, "componentOperationName", null,
+                            Mockito.mock(ActionContext.class)));
+                } catch (Exception exception) {
+                    failure.set(exception);
+                }
+            });
+
+            try {
+                readerThread.start();
+
+                assertTrue(dripStarted.await(5, TimeUnit.SECONDS), "the upstream started dripping");
+
+                readerThread.join(1_000);
+
+                assertTrue(readerThread.isAlive(), "a dripping body keeps the read going: no timeout covers it");
+
+                readerThread.interrupt();
+                readerThread.join(5_000);
+
+                assertFalse(readerThread.isAlive(), "the read stopped on interrupt");
+                assertNull(completed.get());
+                assertNotNull(failure.get());
+
+                Throwable cause = failure.get();
+
+                while (cause.getCause() != null && !(cause instanceof InterruptedException)) {
+                    cause = cause.getCause();
+                }
+
+                assertInstanceOf(InterruptedException.class, cause);
+                assertTrue(dripEnded.await(5, TimeUnit.SECONDS), "the upstream connection was closed");
+            } finally {
+                readerThread.interrupt();
+
+                httpServer.stop(0);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("maxResponseBytes tests")
+    class MaxResponseBytesTests {
+
+        private static final com.bytechef.file.storage.domain.FileEntry STORED_FILE_ENTRY =
+            new com.bytechef.file.storage.domain.FileEntry("download.bin", "file://stored");
+
+        @Test
+        @DisplayName("Should store a binary body exactly at the limit")
+        void testBinaryBodyAtTheLimitIsStored() {
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.BINARY)
+                .filename("download.bin")
+                .maxResponseBytes(4)
+                .build();
+
+            ByteArrayOutputStream storedBytes = stubStoreCopyingTheStream();
+
+            TestHttpResponse testHttpResponse = new TestHttpResponse(
+                new ByteArrayInputStream(new byte[] {
+                    1, 2, 3, 4
+                }),
+                HttpHeaders.of(Map.of("content-type", List.of("application/octet-stream")), (name, value) -> true),
+                200);
+
+            Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
+
+            FileEntryImpl resultFileEntry = response.getBody(FileEntryImpl.class);
+
+            assertEquals("file://stored", resultFileEntry.getUrl());
+            assertEquals(4, storedBytes.size());
+
+            Mockito.verify(tempFileStorage, Mockito.never())
+                .deleteFile(Mockito.any());
+        }
+
+        @Test
+        @DisplayName("Should stop reading past the limit, close the upstream, delete the spool and throw")
+        void testBinaryBodyOverTheLimitIsAbortedAndTheUpstreamClosed() {
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.BINARY)
+                .filename("download.bin")
+                .maxResponseBytes(4)
+                .build();
+
+            ByteArrayOutputStream storedBytes = stubStoreCopyingTheStream();
+
+            CloseTrackingInputStream upstream = new CloseTrackingInputStream(new byte[] {
+                1, 2, 3, 4, 5, 6, 7, 8
+            });
+
+            TestHttpResponse testHttpResponse = new TestHttpResponse(
+                upstream,
+                HttpHeaders.of(Map.of("content-type", List.of("application/octet-stream")), (name, value) -> true),
+                200);
+
+            HttpResponseTooLargeException exception = assertThrows(
+                HttpResponseTooLargeException.class,
+                () -> httpClientExecutor.handleResponse(testHttpResponse, configuration, context));
+
+            assertEquals(4, exception.getMaxResponseBytes());
+            assertTrue(upstream.isClosed());
+            assertTrue(storedBytes.size() <= 4);
+
+            Mockito.verify(tempFileStorage)
+                .deleteFile(STORED_FILE_ENTRY);
+        }
+
+        @Test
+        @DisplayName("Should still throw the size error when deleting the oversized spool fails")
+        void testDeleteFailureOfAnOversizedSpoolStillThrowsTooLarge() {
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.BINARY)
+                .filename("download.bin")
+                .maxResponseBytes(4)
+                .build();
+
+            stubStoreCopyingTheStream();
+
+            IllegalStateException deleteFailure = new IllegalStateException("storage down");
+
+            Mockito.doThrow(deleteFailure)
+                .when(tempFileStorage)
+                .deleteFile(STORED_FILE_ENTRY);
+
+            TestHttpResponse testHttpResponse = new TestHttpResponse(
+                new ByteArrayInputStream(new byte[16]),
+                HttpHeaders.of(Map.of("content-type", List.of("application/octet-stream")), (name, value) -> true),
+                200);
+
+            HttpResponseTooLargeException exception = assertThrows(
+                HttpResponseTooLargeException.class,
+                () -> httpClientExecutor.handleResponse(testHttpResponse, configuration, context));
+
+            assertEquals(List.of(deleteFailure), List.of(exception.getSuppressed()));
+        }
+
+        @Test
+        @DisplayName("Should not limit a binary body when no maximum is set")
+        void testBinaryBodyWithoutALimitIsStoredWhole() {
+            Http.Configuration configuration = Http.responseType(Http.ResponseType.BINARY)
+                .filename("download.bin")
+                .build();
+
+            ByteArrayOutputStream storedBytes = stubStoreCopyingTheStream();
+
+            TestHttpResponse testHttpResponse = new TestHttpResponse(
+                new ByteArrayInputStream(new byte[65536]),
+                HttpHeaders.of(Map.of("content-type", List.of("application/octet-stream")), (name, value) -> true),
+                200);
+
+            httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
+
+            assertEquals(65536, storedBytes.size());
+        }
+
+        private ByteArrayOutputStream stubStoreCopyingTheStream() {
+            ByteArrayOutputStream storedBytes = new ByteArrayOutputStream();
+
+            Mockito.when(tempFileStorage.storeFileContent(Mockito.anyString(), Mockito.any(InputStream.class)))
+                .thenAnswer(invocation -> {
+                    InputStream inputStream = invocation.getArgument(1);
+
+                    inputStream.transferTo(storedBytes);
+
+                    return STORED_FILE_ENTRY;
+                });
+
+            return storedBytes;
+        }
+    }
+
+    private static final class CloseTrackingInputStream extends ByteArrayInputStream {
+
+        private boolean closed;
+
+        private CloseTrackingInputStream(byte[] bytes) {
+            super(bytes);
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+
+            super.close();
+        }
+
+        private boolean isClosed() {
+            return closed;
         }
     }
 

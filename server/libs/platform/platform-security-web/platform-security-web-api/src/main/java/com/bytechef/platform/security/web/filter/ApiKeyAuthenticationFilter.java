@@ -68,8 +68,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         .getContextHolderStrategy();
     private final SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
     private final AuthenticationSuccessHandler successHandler = new PassthroughSuccessHandler();
-    private final AuthenticationFailureHandler failureHandler = new AuthenticationEntryPointFailureHandler(
-        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+    private final AuthenticationFailureHandler failureHandler;
     private final AuthenticationFailureHandler serviceUnavailableFailureHandler =
         createServiceUnavailableFailureHandler();
 
@@ -82,7 +81,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
         AuthenticationManager authenticationManager) {
 
-        this(requestMatcher, authenticationConverter, authenticationManager, null);
+        this(requestMatcher, authenticationConverter, authenticationManager, (AuthenticationEventPublisher) null);
     }
 
     public ApiKeyAuthenticationFilter(
@@ -90,9 +89,31 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         AuthenticationManager authenticationManager,
         @Nullable AuthenticationEventPublisher authenticationEventPublisher) {
 
+        this(
+            requestMatcher, authenticationConverter, authenticationManager, authenticationEventPublisher,
+            new AuthenticationEntryPointFailureHandler(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+    }
+
+    /**
+     * Answers a failed authentication with {@code failureHandler} instead of a bare 401.
+     */
+    public ApiKeyAuthenticationFilter(
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
+        AuthenticationManager authenticationManager, AuthenticationFailureHandler failureHandler) {
+
+        this(requestMatcher, authenticationConverter, authenticationManager, null, failureHandler);
+    }
+
+    public ApiKeyAuthenticationFilter(
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
+        AuthenticationManager authenticationManager,
+        @Nullable AuthenticationEventPublisher authenticationEventPublisher,
+        AuthenticationFailureHandler failureHandler) {
+
         this.authenticationConverter = authenticationConverter;
         this.authenticationEventPublisher = authenticationEventPublisher;
         this.authenticationManager = authenticationManager;
+        this.failureHandler = failureHandler;
         this.requestMatcher = new NegatedRequestMatcher(requestMatcher);
     }
 

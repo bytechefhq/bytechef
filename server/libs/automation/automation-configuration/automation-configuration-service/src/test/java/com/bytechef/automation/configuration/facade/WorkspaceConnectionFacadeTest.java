@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -57,10 +58,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -107,6 +110,9 @@ class WorkspaceConnectionFacadeTest {
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Mock
+    private WorkspaceConnectionContributor workspaceConnectionContributor;
+
+    @Mock
     private WorkspaceConnectionService workspaceConnectionService;
 
     @Mock
@@ -126,11 +132,17 @@ class WorkspaceConnectionFacadeTest {
 
         when(emptyProvider.getIfAvailable()).thenReturn(null);
 
+        ObjectProvider<WorkspaceConnectionContributor> workspaceConnectionContributorProvider =
+            mock(ObjectProvider.class);
+
+        when(workspaceConnectionContributorProvider.orderedStream())
+            .thenReturn(Stream.of(workspaceConnectionContributor));
+
         workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
             connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, emptyProvider,
             permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, projectService,
             mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
-            workflowTestConfigurationService,
+            workflowTestConfigurationService, workspaceConnectionContributorProvider,
             workspaceConnectionService, workspaceFacade);
     }
 
@@ -162,6 +174,41 @@ class WorkspaceConnectionFacadeTest {
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
         assertThat(result).isEqualTo(allConnections);
+    }
+
+    @Test
+    void testGetConnectionsListsTheConnectionsAContributorShares() {
+        WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
+
+        when(workspaceConnection.getConnectionId()).thenReturn(10L);
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(workspaceConnection));
+        when(workspaceConnectionContributor.getSharedConnectionIds()).thenReturn(List.of(20L));
+
+        workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        verify(connectionFacade).getConnections(null, null, List.of(10L, 20L), null, null, PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testDeleteRunsTheContributorsBeforeTheConnectionIsRemoved() {
+        Connection connection = new Connection();
+
+        connection.setId(10L);
+        connection.setType(PlatformType.AUTOMATION);
+
+        when(connectionService.getConnection(10L)).thenReturn(connection);
+
+        workspaceConnectionFacade.delete(10L);
+
+        InOrder inOrder = inOrder(workspaceConnectionContributor, workspaceConnectionService, connectionFacade);
+
+        inOrder.verify(workspaceConnectionContributor)
+            .beforeDelete(10L);
+        inOrder.verify(workspaceConnectionService)
+            .deleteWorkspaceConnection(10L);
+        inOrder.verify(connectionFacade)
+            .delete(10L);
     }
 
     @Test
@@ -301,9 +348,10 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, projectService,
+                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+                projectService,
                 mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
-                workflowTestConfigurationService,
+                workflowTestConfigurationService, mock(ObjectProvider.class),
                 workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
@@ -348,9 +396,10 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, projectService,
+                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+                projectService,
                 mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
-                workflowTestConfigurationService,
+                workflowTestConfigurationService, mock(ObjectProvider.class),
                 workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
@@ -392,9 +441,10 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, projectService,
+                permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService,
+                projectService,
                 mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
-                workflowTestConfigurationService,
+                workflowTestConfigurationService, mock(ObjectProvider.class),
                 workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
@@ -511,10 +561,17 @@ class WorkspaceConnectionFacadeTest {
             ObjectProvider<com.bytechef.platform.connection.security.ConnectionOwnershipExemption> exemptionProvider =
                 mock(ObjectProvider.class);
 
+            @SuppressWarnings("unchecked")
+            ObjectProvider<com.bytechef.platform.connection.usage.ConnectionUsageChecker> emptyConnectionUsageCheckerProvider =
+                mock(ObjectProvider.class);
+
+            when(emptyConnectionUsageCheckerProvider.orderedStream()).thenReturn(java.util.stream.Stream.empty());
+
             com.bytechef.platform.connection.facade.ConnectionFacadeImpl realConnectionFacade =
                 new com.bytechef.platform.connection.facade.ConnectionFacadeImpl(
                     connectionDefinitionService, exemptionProvider, realDepConnectionService, "CE",
-                    jobPrincipalAccessorRegistry, oAuth2Service, tagService, testConfigService, emptyProvider);
+                    jobPrincipalAccessorRegistry, oAuth2Service, tagService, testConfigService, emptyProvider,
+                    emptyConnectionUsageCheckerProvider);
 
             // Capture the Connection passed to the persistence layer — that's the moment of truth.
             // The real ConnectionFacadeImpl.create call path writes connection.setVisibility(WORKSPACE)
@@ -534,9 +591,11 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl workspaceFacadeWithRealChain = new WorkspaceConnectionFacadeImpl(
                 realConnectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver,
-                emptyProvider, permissionService, mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, projectService,
+                emptyProvider, permissionService, mock(ProjectDeploymentService.class),
+                projectDeploymentWorkflowService, projectService,
                 mock(ProjectWorkflowService.class), mock(TagService.class), userService, mock(WorkflowService.class),
-                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                workflowTestConfigurationService, mock(ObjectProvider.class), workspaceConnectionService,
+                workspaceFacade);
 
             ConnectionDTO requestDto = ConnectionDTO.builder()
                 .componentName("dummy")
