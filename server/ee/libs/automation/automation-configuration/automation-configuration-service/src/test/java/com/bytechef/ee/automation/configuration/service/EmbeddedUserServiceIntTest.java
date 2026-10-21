@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.security.ProjectDeploymentEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ProjectDeploymentOwnershipResolver;
 import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
@@ -225,7 +226,7 @@ class EmbeddedUserServiceIntTest {
         embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
 
         WorkspaceMembershipAssignerImpl workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserRepository, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
+            embeddedUserService, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
             mock(WorkspaceUserService.class));
 
         workspaceMembershipAssigner.removeMemberships(userId(MEMBER));
@@ -394,7 +395,7 @@ class EmbeddedUserServiceIntTest {
         ProjectDeploymentEnvironmentResolver.class, ProjectDeploymentOwnershipResolver.class,
         ProjectDeploymentServiceImpl.class, ProjectOwnershipResolver.class, ProjectPermissionScopeProvider.class,
         WorkflowPermissionScopeProvider.class, WorkspacePermissionScopeProvider.class,
-        WorkspaceScopeCacheService.class
+        WorkspaceScopeCache.class
     })
     static class RealEmbeddedUserServiceConfiguration {
 
