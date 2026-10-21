@@ -15,6 +15,10 @@ const hoisted = vi.hoisted(() => ({
     deletePending: false,
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: () => true,
 }));

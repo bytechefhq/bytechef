@@ -8,6 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     McpComponent,
@@ -29,9 +30,12 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+    const canEditWorkspaceMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+    const canEditEmbeddedMcpServer = useHasEmbeddedScope('MCP_EDIT');
 
     const queryClient = useQueryClient();
+
+    const canEditMcpServer = embedded ? canEditEmbeddedMcpServer : canEditWorkspaceMcpServer;
 
     const handleDeleteSuccess = () => {
         void queryClient.invalidateQueries({
@@ -67,8 +71,7 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
         }
     };
 
-    // Embedded servers are a tenant admin's, outside any workspace, so workspace scopes do not apply to them.
-    if (!embedded && !canEditMcpServer) {
+    if (!canEditMcpServer) {
         return null;
     }
 

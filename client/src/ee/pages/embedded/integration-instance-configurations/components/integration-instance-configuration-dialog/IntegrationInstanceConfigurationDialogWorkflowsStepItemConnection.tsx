@@ -11,6 +11,7 @@ import {
 } from '@/ee/shared/queries/embedded/connections.queries';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -36,6 +37,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const canCreateConnection = useHasEmbeddedScope('CONNECTION_CREATE');
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: componentConnection.componentName,
@@ -82,15 +85,17 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                                         <SelectValue placeholder="Choose Connection..." />
                                     </SelectTrigger>
 
-                                    <Button
-                                        className="mt-auto p-2"
-                                        onClick={() => setShowNewConnectionDialog(true)}
-                                        title="Create a new connection"
-                                        type="button"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon className="size-5" />
-                                    </Button>
+                                    {canCreateConnection && (
+                                        <Button
+                                            className="mt-auto p-2"
+                                            onClick={() => setShowNewConnectionDialog(true)}
+                                            title="Create a new connection"
+                                            type="button"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon className="size-5" />
+                                        </Button>
+                                    )}
                                 </div>
                             </FormControl>
 

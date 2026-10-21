@@ -14,11 +14,18 @@ import {useShallow} from 'zustand/react/shallow';
 interface ApiKeysContentProps {
     canCreate?: boolean;
     canDelete?: boolean;
+    canEdit?: boolean;
     description: string;
     title: string;
 }
 
-const ApiKeysContent = ({canCreate = true, canDelete = true, description, title}: ApiKeysContentProps) => {
+const ApiKeysContent = ({
+    canCreate = true,
+    canDelete = true,
+    canEdit = true,
+    description,
+    title,
+}: ApiKeysContentProps) => {
     const {setShowEditDialog, showDeleteDialog, showEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setShowEditDialog: state.setShowEditDialog,
@@ -48,7 +55,7 @@ const ApiKeysContent = ({canCreate = true, canDelete = true, description, title}
                 leftSidebarOpen={false}
             >
                 {apiKeys && apiKeys.length > 0 ? (
-                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} />
+                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} canEdit={canEdit} />
                 ) : (
                     <EmptyList
                         button={

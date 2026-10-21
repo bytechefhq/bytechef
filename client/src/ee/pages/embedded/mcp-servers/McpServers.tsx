@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -19,6 +20,8 @@ export enum Type {
 }
 
 const McpServers = () => {
+    const canCreateMcpServer = useHasEmbeddedScope('MCP_CREATE');
+
     const {
         allComponentNames,
         componentDefinitions,
@@ -41,6 +44,7 @@ const McpServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateMcpServer &&
                         validMcpServers.length > 0 && (
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
                         )
@@ -75,7 +79,12 @@ const McpServers = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
+                            canCreateMcpServer ? (
+                                <McpServerDialog
+                                    mcpServer={undefined}
+                                    triggerNode={<Button label="Create MCP Server" />}
+                                />
+                            ) : undefined
                         }
                         icon={<ServerIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new MCP server."

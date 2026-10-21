@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import McpComponentToolListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolListItem';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {McpComponent, McpTool} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
@@ -26,6 +27,8 @@ const McpComponentToolList = ({
     mcpTools,
 }: McpComponentToolListProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
+
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({componentName, componentVersion});
 
@@ -63,7 +66,7 @@ const McpComponentToolList = ({
     ) : (
         <div className="flex justify-center py-4">
             <EmptyList
-                button={<Button label="Edit Tools" onClick={() => setShowEditDialog(true)} />}
+                button={canEditMcpServer && <Button label="Edit Tools" onClick={() => setShowEditDialog(true)} />}
                 icon={<ComponentIcon className="size-12 text-gray-300" />}
                 message="This component has no selected tools."
                 title="No Tools"
