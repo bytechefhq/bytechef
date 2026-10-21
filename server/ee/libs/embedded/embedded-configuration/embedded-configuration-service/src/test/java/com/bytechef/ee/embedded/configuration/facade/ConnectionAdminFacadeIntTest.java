@@ -133,6 +133,7 @@ class ConnectionAdminFacadeIntTest {
         }).when(connectionFacade)
             .delete(eq(7L), any());
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
+        when(connectionFacade.getConnection(7L)).thenReturn(connectionDTO);
 
         assertThat(connectionAdminFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 

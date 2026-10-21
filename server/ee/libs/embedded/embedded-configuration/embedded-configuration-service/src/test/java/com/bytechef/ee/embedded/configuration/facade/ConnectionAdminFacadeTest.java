@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -45,8 +46,8 @@ class ConnectionAdminFacadeTest {
         tagService = mock(TagService.class);
 
         connectionAdminFacade = new ConnectionAdminFacadeImpl(
-            mock(ConnectedUserConnectionService.class), mock(ConnectionFacade.class), connectionService,
-            permissionService, tagService);
+            mock(ConnectedUserConnectionService.class), mock(ConnectionFacade.class),
+            mock(ConnectionOwnershipExemption.class), connectionService, permissionService, tagService);
 
         when(connectionService.getConnections(PlatformType.EMBEDDED)).thenReturn(
             List.of(

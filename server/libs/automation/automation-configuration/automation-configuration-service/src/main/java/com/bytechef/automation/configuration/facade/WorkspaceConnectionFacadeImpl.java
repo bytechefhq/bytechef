@@ -25,6 +25,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -113,8 +114,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         ConnectionDTO connectionDTO = connectionFacade.getConnection(connectionId);
 
-        return permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)
-            ? connectionDTO : connectionDTO.withoutCredentials();
+        return canSeeCredentials(
+            connectionDTO, permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT))
+                ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
@@ -141,7 +143,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
                 connectionEnvironmentId -> permissionService.hasResourceScope(
                     connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
 
-            redactedConnectionDTOs.add(canEdit ? connectionDTO : connectionDTO.withoutCredentials());
+            redactedConnectionDTOs.add(
+                canSeeCredentials(connectionDTO, canEdit) ? connectionDTO : connectionDTO.withoutCredentials());
         }
 
         return redactedConnectionDTOs;
@@ -180,6 +183,15 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         requireAutomation(connectionId);
 
         connectionFacade.update(connectionId, tags);
+    }
+
+    private static boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
+        if (!canEdit) {
+            return false;
+        }
+
+        return ConnectedUserAuthentications.isConnectedUser() ||
+            ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy());
     }
 
     private void rejectNonAutomation(long connectionId) {
