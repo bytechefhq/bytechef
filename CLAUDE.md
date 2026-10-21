@@ -405,10 +405,11 @@ project. There is no `Workflow` token: `hasWorkflowScope` resolves the workflow'
 
 **What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
 controllers obfuscate `authorizationParameters` and null `parameters`. A member can run a workflow against
-a colleague's account; they cannot extract or repoint the credential. Renaming and replacing the credentials of a
-connection (`updateConnectionCredentials`) need `CONNECTION_EDIT`, deleting needs `CONNECTION_DELETE`, and
-both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>) && (isResourceOwner(#connectionId,
-'Connection') || isTenantAdmin())`. Attaching a connection to a project
+a colleague's account; they cannot extract or repoint the credential. Renaming a connection needs `CONNECTION_EDIT`,
+deleting needs `CONNECTION_DELETE`, and both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>)
+&& (isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())`. Replacing the credentials
+(`updateConnectionCredentials`) needs `CONNECTION_EDIT` and the owner, in CE and EE alike; a tenant admin is not
+enough. Attaching a connection to a project
 workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
 connection cannot be bound by id.
 

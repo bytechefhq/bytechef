@@ -120,6 +120,14 @@ public class WorkspaceConnectionFacadeImpl
         // Only narrowing can strand a deployment, so widening does not pay for the query.
         if (visibility == ResourceVisibility.PRIVATE) {
             validateConnectionNotUsedByDeployments(connectionId);
+
+            ResourceVisibility currentVisibility = connectionService.fetchConnection(connectionId)
+                .map(Connection::getVisibility)
+                .orElse(null);
+
+            if (currentVisibility != ResourceVisibility.PRIVATE) {
+                resourceGrantService.deleteGrants(CONNECTION, connectionId);
+            }
         }
 
         connectionService.updateVisibility(connectionId, visibility);
@@ -178,7 +186,7 @@ public class WorkspaceConnectionFacadeImpl
     @Override
     @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, mapper = ConnectionAuditMapper.class)
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
+        "isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         super.updateConnectionCredentials(connectionId, parameters, version);
     }

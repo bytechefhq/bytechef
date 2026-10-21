@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -139,6 +140,35 @@ class WorkspaceConnectionFacadeTest {
     }
 
     @Test
+    void testSetVisibilityToPrivateRevokesGrantsRetainedFromWorkspaceVisibility() {
+        Connection connection = new Connection();
+
+        connection.setId(CONNECTION_ID);
+        connection.setVisibility(ResourceVisibility.WORKSPACE);
+
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+        workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE);
+
+        verify(resourceGrantService).deleteGrants("Connection", CONNECTION_ID);
+        verify(connectionService).updateVisibility(CONNECTION_ID, ResourceVisibility.PRIVATE);
+    }
+
+    @Test
+    void testSetVisibilityToPrivateOnAPrivateConnectionKeepsItsGrants() {
+        Connection connection = new Connection();
+
+        connection.setId(CONNECTION_ID);
+        connection.setVisibility(ResourceVisibility.PRIVATE);
+
+        when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+        workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE);
+
+        verify(resourceGrantService, never()).deleteGrants(anyString(), anyLong());
+    }
+
+    @Test
     void testWideningVisibilityDoesNotCheckDeploymentUsage() {
         workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.WORKSPACE);
 
@@ -178,7 +208,7 @@ class WorkspaceConnectionFacadeTest {
                         // comparing responses.
                         .isEqualTo(ConnectionErrorType.INVALID_CONNECTION.getErrorKey()));
 
-        verify(resourceGrantService, never()).grant(org.mockito.ArgumentMatchers.anyString(), anyLong(), anyLong());
+        verify(resourceGrantService, never()).grant(anyString(), anyLong(), anyLong());
     }
 
     @Test
