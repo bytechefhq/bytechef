@@ -3,6 +3,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuPortal,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
@@ -12,6 +13,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -22,9 +24,15 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     BlendIcon,
+    BookOpenIcon,
+    BugIcon,
     ChevronsUpDownIcon,
     ClipboardCheckIcon,
+    EyeIcon,
+    EyeOffIcon,
     HelpCircleIcon,
+    HistoryIcon,
+    MessagesSquareIcon,
     SettingsIcon,
     User2Icon,
     UserRoundCogIcon,
@@ -33,8 +41,15 @@ import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
+const openExternalLink = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
+
 export function AppSidebarFooter() {
-    const application = useApplicationInfoStore((state) => state.application);
+    const {application, docs} = useApplicationInfoStore(
+        useShallow((state) => ({
+            application: state.application,
+            docs: state.docs,
+        }))
+    );
     const {account, logout} = useAuthenticationStore(
         useShallow((state) => ({
             account: state.account,
@@ -55,6 +70,7 @@ export function AppSidebarFooter() {
     );
 
     const analytics = useAnalytics();
+    const userGuidingLauncher = useUserGuidingLauncher();
 
     const {pathname} = useLocation();
 
@@ -175,7 +191,7 @@ export function AppSidebarFooter() {
                     </>
                 )}
 
-                <div className="min-h-40 space-y-1">
+                <div className="space-y-1">
                     {currentType === PlatformType.AUTOMATION && (
                         <DropdownMenuItem
                             className="cursor-pointer font-semibold"
@@ -217,16 +233,94 @@ export function AppSidebarFooter() {
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem
-                        className="cursor-pointer font-semibold"
-                        onClick={() => window.open('https://docs.bytechef.io', '_blank')}
-                    >
-                        <div className="flex items-center space-x-1">
-                            <HelpCircleIcon className="size-5" />
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                            <div className="flex items-center space-x-1">
+                                <HelpCircleIcon className="size-5" />
 
-                            <span>Documentation</span>
-                        </div>
-                    </DropdownMenuItem>
+                                <span>Help & Feedback</span>
+                            </div>
+                        </DropdownMenuSubTrigger>
+
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent className="w-56">
+                                {docs.documentationUrl && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => openExternalLink(docs.documentationUrl!)}
+                                    >
+                                        <BookOpenIcon className="size-4" />
+
+                                        <span>Documentation</span>
+                                    </DropdownMenuItem>
+                                )}
+
+                                {docs.changelogUrl && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => openExternalLink(docs.changelogUrl!)}
+                                    >
+                                        <HistoryIcon className="size-4" />
+
+                                        <span>Changelog</span>
+                                    </DropdownMenuItem>
+                                )}
+
+                                {(docs.communitySupportUrl || docs.reportBugUrl) && (
+                                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                                        Need Help?
+                                    </DropdownMenuLabel>
+                                )}
+
+                                {docs.communitySupportUrl && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => openExternalLink(docs.communitySupportUrl!)}
+                                    >
+                                        <MessagesSquareIcon className="size-4" />
+
+                                        <span>Community Support</span>
+                                    </DropdownMenuItem>
+                                )}
+
+                                {docs.reportBugUrl && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => openExternalLink(docs.reportBugUrl!)}
+                                    >
+                                        <BugIcon className="size-4" />
+
+                                        <span>Report a Bug</span>
+                                    </DropdownMenuItem>
+                                )}
+
+                                {userGuidingLauncher.available && (
+                                    <>
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={
+                                                userGuidingLauncher.launcherHidden
+                                                    ? userGuidingLauncher.showLauncher
+                                                    : userGuidingLauncher.hideLauncher
+                                            }
+                                        >
+                                            {userGuidingLauncher.launcherHidden ? (
+                                                <EyeIcon className="size-4" />
+                                            ) : (
+                                                <EyeOffIcon className="size-4" />
+                                            )}
+
+                                            <span>
+                                                {userGuidingLauncher.launcherHidden ? 'Show Guide' : 'Hide Guide'}
+                                            </span>
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
                 </div>
 
                 <DropdownMenuSeparator />
