@@ -11,7 +11,7 @@ import {
     PINNED_HEAD_CLASS_NAME,
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
-import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
+import {GlobeIcon, type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
 import {KeyboardEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -44,12 +44,14 @@ interface InvocationTypeI {
 
 const KIND_TYPES: Record<string, InvocationTypeI> = {
     COMPONENT: {icon: PuzzleIcon, label: 'Component tool'},
+    HTTP_PROXY: {icon: GlobeIcon, label: 'HTTP proxy'},
     WORKFLOW: {icon: WorkflowIcon, label: 'Workflow tool'},
 };
 
 const SOURCE_TYPES: Record<string, InvocationTypeI> = {
     A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
     API_ACTION: {icon: ZapIcon, label: 'Action'},
+    APP_ACTION: {icon: ZapIcon, label: 'Action'},
 };
 
 const serverLabel = (

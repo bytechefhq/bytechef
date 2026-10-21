@@ -1,0 +1,22 @@
+query app($id: ID!) {
+    app(id: $id) {
+        id
+        uuid
+        name
+        description
+        workspaceId
+        environmentId
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        lastDeployedDate
+        secretKeyHint
+        secretKeyLastUsedDate
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

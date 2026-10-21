@@ -1,0 +1,3 @@
+mutation unbindAppConnection($appId: ID!, $bindingKey: String!) {
+    unbindAppConnection(appId: $appId, bindingKey: $bindingKey)
+}

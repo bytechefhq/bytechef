@@ -34,6 +34,7 @@ const externalInvocationsState = () => ({
     externalInvocationLogsIsFetching: false,
     externalInvocationLogsIsLoading: false,
     filterPageNumber: 0,
+    handleAppChange: vi.fn(),
     handleEndDateChange: vi.fn(),
     handleMcpServerChange: vi.fn(),
     handlePaginationClick: vi.fn(),
@@ -96,20 +97,46 @@ describe('ExternalInvocations', () => {
         hoisted.useExternalInvocationsMock.mockReturnValue(externalInvocationsState());
     });
 
-    it('offers the automation MCP and A2A sources on the automation page', () => {
+    it('offers the automation MCP, A2A and app sources on the automation page', () => {
         hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
         renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).toEqual(expect.arrayContaining(['A2A_SERVER', 'MCP_SERVER']));
+        expect(itemValues).toEqual(
+            expect.arrayContaining([
+                'A2A_SERVER',
+                'APP_ACTION',
+                'APP_API',
+                'APP_PROXY',
+                'APP_TOOL',
+                'APP_WORKFLOW',
+                'MCP_SERVER',
+            ])
+        );
         expect(itemValues).not.toContain('API_ACTION');
+        expect(itemValues).not.toContain('API_TOOL');
         expect(renderedItemLabels()).toEqual(
             expect.arrayContaining(['A2A_SERVER=A2A Servers', 'MCP_SERVER=MCP Servers'])
         );
         expect(screen.getByText('Source', {selector: 'label'})).toBeInTheDocument();
         expect(screen.getByRole('cell', {name: 'MCP'})).toBeInTheDocument();
+    });
+
+    it('offers the app filter only when the workspace has apps', () => {
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
+
+        const {unmount} = renderExternalInvocations({appOptions: []});
+
+        expect(screen.queryByText('App', {selector: 'label'})).not.toBeInTheDocument();
+
+        unmount();
+
+        renderExternalInvocations({appOptions: [{label: 'Support', value: '5'}]});
+
+        expect(screen.getByText('App', {selector: 'label'})).toBeInTheDocument();
+        expect(renderedItemValues()).toContain('5');
     });
 
     it('shows the name of the A2A server an A2A skill call came through', () => {
@@ -189,6 +216,15 @@ describe('ExternalInvocations', () => {
 
         expect(screen.getByText('No Matching External Invocations')).toBeInTheDocument();
         expect(screen.getByText('Status')).toBeInTheDocument();
+        expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
+    });
+
+    it('shows a no-match state instead of the first-run guide when only the app filter is set', () => {
+        hoisted.useExternalInvocationsMock.mockReturnValue({...externalInvocationsState(), filterAppId: '5'});
+
+        renderExternalInvocations({appOptions: [{label: 'Support', value: '5'}]});
+
+        expect(screen.getByText('No Matching External Invocations')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
     });
 

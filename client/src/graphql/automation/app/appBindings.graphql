@@ -1,0 +1,16 @@
+query appBindings($appId: ID!) {
+    appBindings(appId: $appId) {
+        id
+        appId
+        bindingKey
+        connectionId
+        connectionName
+        componentName
+        connectionVersion
+        componentVersion
+        actionNames
+        toolNames
+        proxyEnabled
+        proxyAllowedMethods
+    }
+}

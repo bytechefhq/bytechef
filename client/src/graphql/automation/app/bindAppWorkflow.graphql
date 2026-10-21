@@ -1,0 +1,12 @@
+mutation bindAppWorkflow($appId: ID!, $input: AppWorkflowBindingInput!) {
+    bindAppWorkflow(appId: $appId, input: $input) {
+        id
+        appId
+        workflowKey
+        projectDeploymentId
+        projectDeploymentName
+        workflowUuid
+        workflowName
+        available
+    }
+}

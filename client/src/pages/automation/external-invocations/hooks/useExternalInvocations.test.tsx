@@ -1,4 +1,6 @@
 import {act, renderHook} from '@testing-library/react';
+import {ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
@@ -26,14 +28,23 @@ const emptyQueryResult = () => ({
     refetch: vi.fn(),
 });
 
-const renderUseExternalInvocations = (workspaceScope?: ExternalInvocationsWorkspaceScopeI) =>
-    renderHook(() =>
-        useExternalInvocations({type: 'AUTOMATION' as UseExternalInvocationsOptionsI['type'], workspaceScope})
+const routerWrapper =
+    (initialEntry: string) =>
+    ({children}: {children: ReactNode}) => <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>;
+
+const renderUseExternalInvocations = (
+    workspaceScope?: ExternalInvocationsWorkspaceScopeI,
+    initialEntry = '/automation/external-invocations'
+) =>
+    renderHook(
+        () => useExternalInvocations({type: 'AUTOMATION' as UseExternalInvocationsOptionsI['type'], workspaceScope}),
+        {wrapper: routerWrapper(initialEntry)}
     );
 
 const renderUseEmbeddedExternalInvocations = (environmentId?: number) =>
-    renderHook(() =>
-        useExternalInvocations({environmentId, type: 'EMBEDDED' as UseExternalInvocationsOptionsI['type']})
+    renderHook(
+        () => useExternalInvocations({environmentId, type: 'EMBEDDED' as UseExternalInvocationsOptionsI['type']}),
+        {wrapper: routerWrapper('/embedded/external-invocations')}
     );
 
 describe('useExternalInvocations', () => {
@@ -42,6 +53,52 @@ describe('useExternalInvocations', () => {
         hoisted.useExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
         hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReset();
         hoisted.useWorkspaceExternalInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+    });
+
+    it('reads the appId search parameter into the initial filter', () => {
+        const {result} = renderUseExternalInvocations(undefined, '/automation/external-invocations?appId=7');
+
+        expect(result.current.filterAppId).toBe('7');
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: 7, page: 0}),
+            {enabled: true}
+        );
+    });
+
+    it('ignores a malformed appId search parameter', () => {
+        const {result} = renderUseExternalInvocations(undefined, '/automation/external-invocations?appId=abc');
+
+        expect(result.current.filterAppId).toBeUndefined();
+        expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: undefined}),
+            {enabled: true}
+        );
+    });
+
+    it('changes the app filter and resets the page', () => {
+        const {result} = renderUseExternalInvocations();
+
+        act(() => result.current.handlePaginationClick(3));
+
+        expect(result.current.filterPageNumber).toBe(3);
+
+        act(() => result.current.handleAppChange({label: 'CRM', value: '9'}));
+
+        expect(result.current.filterAppId).toBe('9');
+        expect(result.current.filterPageNumber).toBe(0);
+
+        act(() => result.current.handleAppChange({label: 'Any', value: ''}));
+
+        expect(result.current.filterAppId).toBeUndefined();
+    });
+
+    it('passes the app filter to the workspace query', () => {
+        renderUseExternalInvocations({environmentId: 2, workspaceId: 1049}, '/automation/external-invocations?appId=7');
+
+        expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: 7, environmentId: '2', type: 'AUTOMATION', workspaceId: '1049'}),
+            {enabled: true}
+        );
     });
 
     it('queries the tenant-wide log and leaves the workspace query off without a workspace scope', () => {

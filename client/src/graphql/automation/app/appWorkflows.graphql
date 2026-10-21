@@ -1,0 +1,12 @@
+query appWorkflows($appId: ID!) {
+    appWorkflows(appId: $appId) {
+        id
+        appId
+        workflowKey
+        projectDeploymentId
+        projectDeploymentName
+        workflowUuid
+        workflowName
+        available
+    }
+}

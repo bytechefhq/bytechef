@@ -14,6 +14,7 @@ const renderWithProviders = (element: ReactElement) =>
 
 const baseLog = {
     a2aServerId: null,
+    appId: null,
     componentName: 'slack',
     componentVersion: 1,
     connectedUserId: null,
@@ -46,6 +47,28 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getByText('SUCCESS')).toBeInTheDocument();
         expect(screen.getByText('42ms')).toBeInTheDocument();
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
+    });
+
+    it('renders the app source labels', () => {
+        render(
+            <ExternalInvocationsTable
+                externalInvocationLogs={[
+                    {...baseLog, appId: 5, id: '3', source: 'APP_ACTION'},
+                    {...baseLog, appId: 5, id: '4', source: 'APP_TOOL'},
+                    {...baseLog, appId: 5, id: '5', kind: 'HTTP_PROXY', source: 'APP_PROXY'},
+                    {...baseLog, appId: 5, id: '6', kind: 'WORKFLOW', source: 'APP_WORKFLOW'},
+                    {...baseLog, appId: 5, id: '7', kind: 'WORKFLOW', source: 'APP_API'},
+                ]}
+            />
+        );
+
+        expect(screen.getByText('App (Action)')).toBeInTheDocument();
+        expect(screen.getByText('App (Tool)')).toBeInTheDocument();
+        expect(screen.getByText('App (Proxy)')).toBeInTheDocument();
+        expect(screen.getByText('App (Workflow)')).toBeInTheDocument();
+        expect(screen.getByText('App (API)')).toBeInTheDocument();
+        expect(screen.getByRole('img', {name: 'Action'})).toBeInTheDocument();
+        expect(screen.getByRole('img', {name: 'HTTP proxy'})).toBeInTheDocument();
     });
 
     it('renders the status as the first column', () => {
