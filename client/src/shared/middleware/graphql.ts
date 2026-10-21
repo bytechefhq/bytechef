@@ -384,6 +384,158 @@ export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuditEventTypesQuery = { auditEventTypes: Array<string> };
 
+export type AppQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AppQuery = { app: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null } };
+
+export type AppApiCollectionsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppApiCollectionsQuery = { appApiCollections: Array<{ id: string, appId: string, apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string | null, projectName: string | null, available: boolean }> };
+
+export type AppBindableApiCollectionsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppBindableApiCollectionsQuery = { appBindableApiCollections: Array<{ apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string, projectName: string | null, available: boolean }> };
+
+export type AppBindableConnectionsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppBindableConnectionsQuery = { appBindableConnections: Array<{ id: string, name: string, componentName: string, connectionVersion: number, componentVersion: number }> };
+
+export type AppBindableWorkflowsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppBindableWorkflowsQuery = { appBindableWorkflows: Array<{ projectDeploymentId: string, projectDeploymentName: string, projectName: string, workflowUuid: string, workflowName: string, description: string | null }> };
+
+export type AppBindingsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppBindingsQuery = { appBindings: Array<{ id: string, appId: string, bindingKey: string, connectionId: string, connectionName: string, componentName: string, connectionVersion: number, componentVersion: number | null, actionNames: Array<string>, toolNames: Array<string>, proxyEnabled: boolean, proxyAllowedMethods: Array<string> }> };
+
+export type AppComponentOperationsQueryVariables = Exact<{
+  componentName: string;
+  componentVersion: number;
+}>;
+
+
+export type AppComponentOperationsQuery = { appComponentOperations: { actionNames: Array<string>, toolNames: Array<string> } };
+
+export type AppWorkflowsQueryVariables = Exact<{
+  appId: string | number;
+}>;
+
+
+export type AppWorkflowsQuery = { appWorkflows: Array<{ id: string, appId: string, workflowKey: string, projectDeploymentId: string, projectDeploymentName: string | null, workflowUuid: string, workflowName: string | null, available: boolean }> };
+
+export type AppsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type AppsQuery = { apps: Array<{ id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null }> };
+
+export type BindAppApiCollectionMutationVariables = Exact<{
+  appId: string | number;
+  apiCollectionId: string | number;
+}>;
+
+
+export type BindAppApiCollectionMutation = { bindAppApiCollection: { id: string, appId: string, apiCollectionId: string, name: string, contextPath: string | null, collectionVersion: number, projectId: string | null, projectName: string | null, available: boolean } };
+
+export type BindAppConnectionMutationVariables = Exact<{
+  appId: string | number;
+  input: Types.AppBindingInput;
+}>;
+
+
+export type BindAppConnectionMutation = { bindAppConnection: { id: string, appId: string, bindingKey: string, connectionId: string, connectionName: string, componentName: string, connectionVersion: number, componentVersion: number | null, actionNames: Array<string>, toolNames: Array<string>, proxyEnabled: boolean, proxyAllowedMethods: Array<string> } };
+
+export type BindAppWorkflowMutationVariables = Exact<{
+  appId: string | number;
+  input: Types.AppWorkflowBindingInput;
+}>;
+
+
+export type BindAppWorkflowMutation = { bindAppWorkflow: { id: string, appId: string, workflowKey: string, projectDeploymentId: string, projectDeploymentName: string | null, workflowUuid: string, workflowName: string | null, available: boolean } };
+
+export type CreateAppMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  input: Types.AppInput;
+}>;
+
+
+export type CreateAppMutation = { createApp: { secretKey: string, app: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null } } };
+
+export type DeleteAppMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAppMutation = { deleteApp: boolean };
+
+export type RotateAppSecretKeyMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RotateAppSecretKeyMutation = { rotateAppSecretKey: { secretKey: string, app: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null } } };
+
+export type UnbindAppApiCollectionMutationVariables = Exact<{
+  appId: string | number;
+  apiCollectionId: string | number;
+}>;
+
+
+export type UnbindAppApiCollectionMutation = { unbindAppApiCollection: boolean };
+
+export type UnbindAppConnectionMutationVariables = Exact<{
+  appId: string | number;
+  bindingKey: string;
+}>;
+
+
+export type UnbindAppConnectionMutation = { unbindAppConnection: boolean };
+
+export type UnbindAppWorkflowMutationVariables = Exact<{
+  appId: string | number;
+  workflowKey: string;
+}>;
+
+
+export type UnbindAppWorkflowMutation = { unbindAppWorkflow: boolean };
+
+export type UpdateAppMutationVariables = Exact<{
+  id: string | number;
+  input: Types.AppInput;
+}>;
+
+
+export type UpdateAppMutation = { updateApp: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null } };
+
+export type UpdateAppStatusMutationVariables = Exact<{
+  id: string | number;
+  status: Types.AppStatus;
+}>;
+
+
+export type UpdateAppStatusMutation = { updateAppStatus: { id: string, uuid: string, name: string, description: string | null, workspaceId: string, environmentId: string, ownerUserId: string, status: Types.AppStatus, visibility: string, hostingTarget: Types.AppHostingTarget, url: string | null, lastDeployedDate: string | null, secretKeyHint: string, secretKeyLastUsedDate: string | null, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null } };
+
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -2774,13 +2926,14 @@ export type ToolInvocationLogsQueryVariables = Exact<{
   mcpServerId?: any;
   connectedUserId?: any;
   integrationInstanceId?: any;
+  appId?: any;
   fromDate?: any;
   toDate?: any;
   page?: number | null | undefined;
 }>;
 
 
-export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, appId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
   type: Types.PlatformType;
@@ -2791,13 +2944,14 @@ export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
   mcpServerId?: any;
   connectedUserId?: any;
   integrationInstanceId?: any;
+  appId?: any;
   fromDate?: any;
   toDate?: any;
   page?: number | null | undefined;
 }>;
 
 
-export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, appId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 
 export class TypedDocumentString<TResult, TVariables>
@@ -4177,6 +4331,628 @@ export const useAuditEventTypesQuery = <
       {
     queryKey: variables === undefined ? ['AuditEventTypes'] : ['AuditEventTypes', variables],
     queryFn: fetcher<AuditEventTypesQuery, AuditEventTypesQueryVariables>(AuditEventTypesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppDocument = new TypedDocumentString(`
+    query app($id: ID!) {
+  app(id: $id) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    environmentId
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    lastDeployedDate
+    secretKeyHint
+    secretKeyLastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useAppQuery = <
+      TData = AppQuery,
+      TError = unknown
+    >(
+      variables: AppQueryVariables,
+      options?: Omit<UseQueryOptions<AppQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppQuery, TError, TData>(
+      {
+    queryKey: ['app', variables],
+    queryFn: fetcher<AppQuery, AppQueryVariables>(AppDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppApiCollectionsDocument = new TypedDocumentString(`
+    query appApiCollections($appId: ID!) {
+  appApiCollections(appId: $appId) {
+    id
+    appId
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useAppApiCollectionsQuery = <
+      TData = AppApiCollectionsQuery,
+      TError = unknown
+    >(
+      variables: AppApiCollectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppApiCollectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppApiCollectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppApiCollectionsQuery, TError, TData>(
+      {
+    queryKey: ['appApiCollections', variables],
+    queryFn: fetcher<AppApiCollectionsQuery, AppApiCollectionsQueryVariables>(AppApiCollectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableApiCollectionsDocument = new TypedDocumentString(`
+    query appBindableApiCollections($appId: ID!) {
+  appBindableApiCollections(appId: $appId) {
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useAppBindableApiCollectionsQuery = <
+      TData = AppBindableApiCollectionsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableApiCollectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableApiCollectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableApiCollectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableApiCollectionsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableApiCollections', variables],
+    queryFn: fetcher<AppBindableApiCollectionsQuery, AppBindableApiCollectionsQueryVariables>(AppBindableApiCollectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableConnectionsDocument = new TypedDocumentString(`
+    query appBindableConnections($appId: ID!) {
+  appBindableConnections(appId: $appId) {
+    id
+    name
+    componentName
+    connectionVersion
+    componentVersion
+  }
+}
+    `);
+
+export const useAppBindableConnectionsQuery = <
+      TData = AppBindableConnectionsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableConnections', variables],
+    queryFn: fetcher<AppBindableConnectionsQuery, AppBindableConnectionsQueryVariables>(AppBindableConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindableWorkflowsDocument = new TypedDocumentString(`
+    query appBindableWorkflows($appId: ID!) {
+  appBindableWorkflows(appId: $appId) {
+    projectDeploymentId
+    projectDeploymentName
+    projectName
+    workflowUuid
+    workflowName
+    description
+  }
+}
+    `);
+
+export const useAppBindableWorkflowsQuery = <
+      TData = AppBindableWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: AppBindableWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindableWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindableWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindableWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['appBindableWorkflows', variables],
+    queryFn: fetcher<AppBindableWorkflowsQuery, AppBindableWorkflowsQueryVariables>(AppBindableWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppBindingsDocument = new TypedDocumentString(`
+    query appBindings($appId: ID!) {
+  appBindings(appId: $appId) {
+    id
+    appId
+    bindingKey
+    connectionId
+    connectionName
+    componentName
+    connectionVersion
+    componentVersion
+    actionNames
+    toolNames
+    proxyEnabled
+    proxyAllowedMethods
+  }
+}
+    `);
+
+export const useAppBindingsQuery = <
+      TData = AppBindingsQuery,
+      TError = unknown
+    >(
+      variables: AppBindingsQueryVariables,
+      options?: Omit<UseQueryOptions<AppBindingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppBindingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppBindingsQuery, TError, TData>(
+      {
+    queryKey: ['appBindings', variables],
+    queryFn: fetcher<AppBindingsQuery, AppBindingsQueryVariables>(AppBindingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppComponentOperationsDocument = new TypedDocumentString(`
+    query appComponentOperations($componentName: String!, $componentVersion: Int!) {
+  appComponentOperations(
+    componentName: $componentName
+    componentVersion: $componentVersion
+  ) {
+    actionNames
+    toolNames
+  }
+}
+    `);
+
+export const useAppComponentOperationsQuery = <
+      TData = AppComponentOperationsQuery,
+      TError = unknown
+    >(
+      variables: AppComponentOperationsQueryVariables,
+      options?: Omit<UseQueryOptions<AppComponentOperationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppComponentOperationsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppComponentOperationsQuery, TError, TData>(
+      {
+    queryKey: ['appComponentOperations', variables],
+    queryFn: fetcher<AppComponentOperationsQuery, AppComponentOperationsQueryVariables>(AppComponentOperationsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppWorkflowsDocument = new TypedDocumentString(`
+    query appWorkflows($appId: ID!) {
+  appWorkflows(appId: $appId) {
+    id
+    appId
+    workflowKey
+    projectDeploymentId
+    projectDeploymentName
+    workflowUuid
+    workflowName
+    available
+  }
+}
+    `);
+
+export const useAppWorkflowsQuery = <
+      TData = AppWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: AppWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<AppWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['appWorkflows', variables],
+    queryFn: fetcher<AppWorkflowsQuery, AppWorkflowsQueryVariables>(AppWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AppsDocument = new TypedDocumentString(`
+    query apps($workspaceId: ID!, $environmentId: ID!) {
+  apps(workspaceId: $workspaceId, environmentId: $environmentId) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    environmentId
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    lastDeployedDate
+    secretKeyHint
+    secretKeyLastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useAppsQuery = <
+      TData = AppsQuery,
+      TError = unknown
+    >(
+      variables: AppsQueryVariables,
+      options?: Omit<UseQueryOptions<AppsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AppsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AppsQuery, TError, TData>(
+      {
+    queryKey: ['apps', variables],
+    queryFn: fetcher<AppsQuery, AppsQueryVariables>(AppsDocument, variables),
+    ...options
+  }
+    )};
+
+export const BindAppApiCollectionDocument = new TypedDocumentString(`
+    mutation bindAppApiCollection($appId: ID!, $apiCollectionId: ID!) {
+  bindAppApiCollection(appId: $appId, apiCollectionId: $apiCollectionId) {
+    id
+    appId
+    apiCollectionId
+    name
+    contextPath
+    collectionVersion
+    projectId
+    projectName
+    available
+  }
+}
+    `);
+
+export const useBindAppApiCollectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppApiCollectionMutation, TError, BindAppApiCollectionMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppApiCollectionMutation, TError, BindAppApiCollectionMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppApiCollection'],
+    mutationFn: (variables?: BindAppApiCollectionMutationVariables) => fetcher<BindAppApiCollectionMutation, BindAppApiCollectionMutationVariables>(BindAppApiCollectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const BindAppConnectionDocument = new TypedDocumentString(`
+    mutation bindAppConnection($appId: ID!, $input: AppBindingInput!) {
+  bindAppConnection(appId: $appId, input: $input) {
+    id
+    appId
+    bindingKey
+    connectionId
+    connectionName
+    componentName
+    connectionVersion
+    componentVersion
+    actionNames
+    toolNames
+    proxyEnabled
+    proxyAllowedMethods
+  }
+}
+    `);
+
+export const useBindAppConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppConnectionMutation, TError, BindAppConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppConnectionMutation, TError, BindAppConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppConnection'],
+    mutationFn: (variables?: BindAppConnectionMutationVariables) => fetcher<BindAppConnectionMutation, BindAppConnectionMutationVariables>(BindAppConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const BindAppWorkflowDocument = new TypedDocumentString(`
+    mutation bindAppWorkflow($appId: ID!, $input: AppWorkflowBindingInput!) {
+  bindAppWorkflow(appId: $appId, input: $input) {
+    id
+    appId
+    workflowKey
+    projectDeploymentId
+    projectDeploymentName
+    workflowUuid
+    workflowName
+    available
+  }
+}
+    `);
+
+export const useBindAppWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<BindAppWorkflowMutation, TError, BindAppWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<BindAppWorkflowMutation, TError, BindAppWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['bindAppWorkflow'],
+    mutationFn: (variables?: BindAppWorkflowMutationVariables) => fetcher<BindAppWorkflowMutation, BindAppWorkflowMutationVariables>(BindAppWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAppDocument = new TypedDocumentString(`
+    mutation createApp($workspaceId: ID!, $environmentId: ID!, $input: AppInput!) {
+  createApp(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    input: $input
+  ) {
+    secretKey
+    app {
+      id
+      uuid
+      name
+      description
+      workspaceId
+      environmentId
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      lastDeployedDate
+      secretKeyHint
+      secretKeyLastUsedDate
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+    }
+  }
+}
+    `);
+
+export const useCreateAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAppMutation, TError, CreateAppMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAppMutation, TError, CreateAppMutationVariables, TContext>(
+      {
+    mutationKey: ['createApp'],
+    mutationFn: (variables?: CreateAppMutationVariables) => fetcher<CreateAppMutation, CreateAppMutationVariables>(CreateAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAppDocument = new TypedDocumentString(`
+    mutation deleteApp($id: ID!) {
+  deleteApp(id: $id)
+}
+    `);
+
+export const useDeleteAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAppMutation, TError, DeleteAppMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAppMutation, TError, DeleteAppMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteApp'],
+    mutationFn: (variables?: DeleteAppMutationVariables) => fetcher<DeleteAppMutation, DeleteAppMutationVariables>(DeleteAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RotateAppSecretKeyDocument = new TypedDocumentString(`
+    mutation rotateAppSecretKey($id: ID!) {
+  rotateAppSecretKey(id: $id) {
+    secretKey
+    app {
+      id
+      uuid
+      name
+      description
+      workspaceId
+      environmentId
+      ownerUserId
+      status
+      visibility
+      hostingTarget
+      url
+      lastDeployedDate
+      secretKeyHint
+      secretKeyLastUsedDate
+      createdBy
+      createdDate
+      lastModifiedBy
+      lastModifiedDate
+    }
+  }
+}
+    `);
+
+export const useRotateAppSecretKeyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RotateAppSecretKeyMutation, TError, RotateAppSecretKeyMutationVariables, TContext>) => {
+    
+    return useMutation<RotateAppSecretKeyMutation, TError, RotateAppSecretKeyMutationVariables, TContext>(
+      {
+    mutationKey: ['rotateAppSecretKey'],
+    mutationFn: (variables?: RotateAppSecretKeyMutationVariables) => fetcher<RotateAppSecretKeyMutation, RotateAppSecretKeyMutationVariables>(RotateAppSecretKeyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppApiCollectionDocument = new TypedDocumentString(`
+    mutation unbindAppApiCollection($appId: ID!, $apiCollectionId: ID!) {
+  unbindAppApiCollection(appId: $appId, apiCollectionId: $apiCollectionId)
+}
+    `);
+
+export const useUnbindAppApiCollectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppApiCollectionMutation, TError, UnbindAppApiCollectionMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppApiCollectionMutation, TError, UnbindAppApiCollectionMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppApiCollection'],
+    mutationFn: (variables?: UnbindAppApiCollectionMutationVariables) => fetcher<UnbindAppApiCollectionMutation, UnbindAppApiCollectionMutationVariables>(UnbindAppApiCollectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppConnectionDocument = new TypedDocumentString(`
+    mutation unbindAppConnection($appId: ID!, $bindingKey: String!) {
+  unbindAppConnection(appId: $appId, bindingKey: $bindingKey)
+}
+    `);
+
+export const useUnbindAppConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppConnectionMutation, TError, UnbindAppConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppConnectionMutation, TError, UnbindAppConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppConnection'],
+    mutationFn: (variables?: UnbindAppConnectionMutationVariables) => fetcher<UnbindAppConnectionMutation, UnbindAppConnectionMutationVariables>(UnbindAppConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnbindAppWorkflowDocument = new TypedDocumentString(`
+    mutation unbindAppWorkflow($appId: ID!, $workflowKey: String!) {
+  unbindAppWorkflow(appId: $appId, workflowKey: $workflowKey)
+}
+    `);
+
+export const useUnbindAppWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnbindAppWorkflowMutation, TError, UnbindAppWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UnbindAppWorkflowMutation, TError, UnbindAppWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['unbindAppWorkflow'],
+    mutationFn: (variables?: UnbindAppWorkflowMutationVariables) => fetcher<UnbindAppWorkflowMutation, UnbindAppWorkflowMutationVariables>(UnbindAppWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppDocument = new TypedDocumentString(`
+    mutation updateApp($id: ID!, $input: AppInput!) {
+  updateApp(id: $id, input: $input) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    environmentId
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    lastDeployedDate
+    secretKeyHint
+    secretKeyLastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useUpdateAppMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppMutation, TError, UpdateAppMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppMutation, TError, UpdateAppMutationVariables, TContext>(
+      {
+    mutationKey: ['updateApp'],
+    mutationFn: (variables?: UpdateAppMutationVariables) => fetcher<UpdateAppMutation, UpdateAppMutationVariables>(UpdateAppDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAppStatusDocument = new TypedDocumentString(`
+    mutation updateAppStatus($id: ID!, $status: AppStatus!) {
+  updateAppStatus(id: $id, status: $status) {
+    id
+    uuid
+    name
+    description
+    workspaceId
+    environmentId
+    ownerUserId
+    status
+    visibility
+    hostingTarget
+    url
+    lastDeployedDate
+    secretKeyHint
+    secretKeyLastUsedDate
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useUpdateAppStatusMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAppStatusMutation, TError, UpdateAppStatusMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAppStatusMutation, TError, UpdateAppStatusMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAppStatus'],
+    mutationFn: (variables?: UpdateAppStatusMutationVariables) => fetcher<UpdateAppStatusMutation, UpdateAppStatusMutationVariables>(UpdateAppStatusDocument, variables)(),
     ...options
   }
     )};
@@ -12921,7 +13697,7 @@ export const useUsersQuery = <
     )};
 
 export const ToolInvocationLogsDocument = new TypedDocumentString(`
-    query ToolInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+    query ToolInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $appId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
   toolInvocationLogs(
     type: $type
     environmentId: $environmentId
@@ -12930,6 +13706,7 @@ export const ToolInvocationLogsDocument = new TypedDocumentString(`
     mcpServerId: $mcpServerId
     connectedUserId: $connectedUserId
     integrationInstanceId: $integrationInstanceId
+    appId: $appId
     fromDate: $fromDate
     toDate: $toDate
     page: $page
@@ -12949,6 +13726,7 @@ export const ToolInvocationLogsDocument = new TypedDocumentString(`
       integrationInstanceId
       mcpServerId
       jobId
+      appId
       workflowName
       outcome
       errorType
@@ -12981,7 +13759,7 @@ export const useToolInvocationLogsQuery = <
     )};
 
 export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
-    query WorkspaceToolInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+    query WorkspaceToolInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $appId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
   workspaceToolInvocationLogs(
     type: $type
     workspaceId: $workspaceId
@@ -12991,6 +13769,7 @@ export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
     mcpServerId: $mcpServerId
     connectedUserId: $connectedUserId
     integrationInstanceId: $integrationInstanceId
+    appId: $appId
     fromDate: $fromDate
     toDate: $toDate
     page: $page
@@ -13010,6 +13789,7 @@ export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
       integrationInstanceId
       mcpServerId
       jobId
+      appId
       workflowName
       outcome
       errorType
