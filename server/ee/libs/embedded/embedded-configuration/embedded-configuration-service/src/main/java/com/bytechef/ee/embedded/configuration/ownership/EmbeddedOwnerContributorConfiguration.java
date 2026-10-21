@@ -11,7 +11,6 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEEVersion
 public class EmbeddedOwnerContributorConfiguration {
 
     private static final String CATALOG_CLAIM_CONDITION =

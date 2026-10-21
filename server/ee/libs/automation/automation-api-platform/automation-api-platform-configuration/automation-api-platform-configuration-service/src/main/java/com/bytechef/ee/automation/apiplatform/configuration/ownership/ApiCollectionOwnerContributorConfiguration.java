@@ -9,7 +9,6 @@ package com.bytechef.ee.automation.apiplatform.configuration.ownership;
 
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEEVersion
 public class ApiCollectionOwnerContributorConfiguration {
 
     private static final String API_COLLECTION_DEPLOYMENT_CLAIM_CONDITION =
