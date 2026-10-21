@@ -113,7 +113,7 @@ describe('useSettingsMenu', () => {
     });
 
     it('stays on the current workflow when the restored version still contains it', async () => {
-        vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
 
         const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
@@ -130,7 +130,7 @@ describe('useSettingsMenu', () => {
     });
 
     it('opens the first restored workflow when the restored version no longer contains the current one', async () => {
-        vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue({...project, projectWorkflowIds: [13, 14]});
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [13, 14]});
 
         const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
@@ -145,7 +145,7 @@ describe('useSettingsMenu', () => {
     });
 
     it('returns to the project list when the restored version has no workflows', async () => {
-        vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue({...project, projectWorkflowIds: []});
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: []});
 
         renderSettingsMenu();
 
