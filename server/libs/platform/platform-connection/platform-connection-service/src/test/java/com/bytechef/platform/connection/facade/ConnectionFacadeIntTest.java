@@ -474,6 +474,13 @@ class ConnectionFacadeIntTest {
 
         connectionFacade.update(connectionId, List.of());
 
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
+
         connectionFacade.delete(connectionId);
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
