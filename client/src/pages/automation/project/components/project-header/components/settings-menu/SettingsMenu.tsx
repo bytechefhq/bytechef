@@ -72,14 +72,18 @@ const SettingsMenu = ({
     const queryClient = useQueryClient();
 
     const {
+        deleteProjectVersionPending,
         handleDeleteProjectAlertDialogClick,
+        handleDeleteProjectVersion,
         handleDeleteWorkflowAlertDialogClick,
         handleDuplicateProjectClick,
         handleDuplicateWorkflowClick,
         handlePullProjectFromGitClick,
+        handleRestoreProjectVersion,
         handleUpdateProjectGitConfigurationSubmit,
         projectGitConfiguration,
         projectVersions,
+        restoreProjectVersionPending,
     } = useSettingsMenu({project, workflow});
 
     return (
@@ -247,8 +251,12 @@ const SettingsMenu = ({
 
             {showProjectVersionHistorySheet && projectVersions && (
                 <ProjectVersionHistorySheet
+                    deleteProjectVersionPending={deleteProjectVersionPending}
+                    onDeleteProjectVersion={handleDeleteProjectVersion}
+                    onRestoreProjectVersion={handleRestoreProjectVersion}
                     onSheetOpenChange={setShowProjectVersionHistorySheet}
                     projectVersions={projectVersions}
+                    restoreProjectVersionPending={restoreProjectVersionPending}
                     sheetOpen={showProjectVersionHistorySheet}
                 />
             )}
