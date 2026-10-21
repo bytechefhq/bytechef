@@ -8,6 +8,7 @@ import {
     hideLauncherOnceSdkIsReady,
     hideUserGuidingLauncher,
     initUserGuiding,
+    showLauncherOnceSdkIsReady,
     showUserGuidingLauncher,
     useUserGuiding,
     useUserGuidingLauncher,
@@ -129,6 +130,73 @@ describe('useUserGuiding', () => {
         vi.advanceTimersByTime(5000);
 
         expect(hideChecklist).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the launcher once the SDK loads its resource centers', () => {
+        useUserGuidingStore.setState({launcherHidden: false});
+
+        const launchResourceCenter = vi.fn();
+        let resourceCenters: {id: number}[] = [];
+
+        window.userGuiding = {
+            getAppState: () => ({api: {resourceCenters}}),
+            launchResourceCenter,
+        } as unknown as Window['userGuiding'];
+
+        showLauncherOnceSdkIsReady();
+
+        vi.advanceTimersByTime(1000);
+
+        expect(launchResourceCenter).not.toHaveBeenCalled();
+
+        resourceCenters = [{id: 42}];
+
+        vi.advanceTimersByTime(500);
+
+        expect(launchResourceCenter).toHaveBeenCalledWith(42);
+
+        vi.advanceTimersByTime(5000);
+
+        expect(launchResourceCenter).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops showing once the user chooses to hide the launcher', () => {
+        useUserGuidingStore.setState({launcherHidden: false});
+
+        const launchResourceCenter = vi.fn();
+
+        window.userGuiding = {
+            getAppState: () => ({api: {resourceCenters: []}}),
+            launchResourceCenter,
+        } as unknown as Window['userGuiding'];
+
+        showLauncherOnceSdkIsReady();
+
+        useUserGuidingStore.setState({launcherHidden: true});
+
+        window.userGuiding = {
+            getAppState: () => ({api: {resourceCenters: [{id: 42}]}}),
+            launchResourceCenter,
+        } as unknown as Window['userGuiding'];
+
+        vi.advanceTimersByTime(20000);
+
+        expect(launchResourceCenter).not.toHaveBeenCalled();
+    });
+
+    it('shows the launcher after loading by default', () => {
+        useUserGuidingStore.setState({launcherHidden: false});
+
+        initUserGuiding('container-id');
+
+        const launchResourceCenter = vi.fn();
+
+        window.userGuiding!.getAppState = () => ({api: {resourceCenters: [{id: 42}]}});
+        window.userGuiding!.launchResourceCenter = launchResourceCenter;
+
+        vi.advanceTimersByTime(500);
+
+        expect(launchResourceCenter).toHaveBeenCalledWith(42);
     });
 
     it('loads the container script and queues SDK calls until it is ready', () => {
