@@ -1,8 +1,14 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ListIcon} from 'lucide-react';
+import {MouseEvent} from 'react';
 
-const ProjectDeploymentsButton = ({onClick}: {onClick: () => void}) => (
+interface ProjectDeploymentsButtonProps {
+    onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+    size?: 'icon' | 'iconSm';
+}
+
+const ProjectDeploymentsButton = ({onClick, size = 'icon'}: ProjectDeploymentsButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
             <Button
@@ -10,7 +16,7 @@ const ProjectDeploymentsButton = ({onClick}: {onClick: () => void}) => (
                 className="rounded-l-none border-l-0 px-2"
                 icon={<ListIcon />}
                 onClick={onClick}
-                size="icon"
+                size={size}
                 variant="outline"
             />
         </TooltipTrigger>

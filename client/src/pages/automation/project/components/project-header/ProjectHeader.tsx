@@ -1,5 +1,7 @@
 import {ButtonGroup} from '@/components/ui/button-group';
-import ProjectDeploymentsSheet from '@/pages/automation/project/components/ProjectDeploymentsSheet';
+import ProjectDeploymentsSheet, {
+    ProjectDeploymentsSheetStateI,
+} from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
@@ -27,11 +29,6 @@ import {useShallow} from 'zustand/react/shallow';
 const getOnlineStatus = () => onlineManager.isOnline();
 
 const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
-
-interface ProjectDeploymentsSheetStateI {
-    environmentId?: number;
-    expandedProjectDeploymentId?: number;
-}
 
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
