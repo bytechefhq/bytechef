@@ -36,6 +36,11 @@ public class EditorTempFileStorageImpl implements EditorTempFileStorage {
         this.fileStorageService = fileStorageService;
     }
 
+    @Override
+    public void deleteFile(FileEntry fileEntry) {
+        fileStorageService.deleteFile(EDITOR_TEMP_DIR, fileEntry);
+    }
+
     public long getContentLength(FileEntry fileEntry) {
         return fileStorageService.getContentLength(EDITOR_TEMP_DIR, fileEntry);
     }

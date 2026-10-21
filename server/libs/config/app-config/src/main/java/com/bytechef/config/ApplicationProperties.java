@@ -67,6 +67,11 @@ public class ApplicationProperties {
     private Approval approval = new Approval();
 
     /**
+     * Apps (EE) configuration
+     */
+    private App app = new App();
+
+    /**
      * Default @Async executor configuration
      */
     private Async async = new Async();
@@ -269,6 +274,10 @@ public class ApplicationProperties {
         return analytics;
     }
 
+    public App getApp() {
+        return app;
+    }
+
     public Approval getApproval() {
         return approval;
     }
@@ -443,6 +452,10 @@ public class ApplicationProperties {
 
     public void setAnalytics(Analytics analytics) {
         this.analytics = analytics;
+    }
+
+    public void setApp(App app) {
+        this.app = app;
     }
 
     public void setApproval(Approval approval) {
@@ -823,6 +836,233 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+    }
+
+    /**
+     * Apps (EE) configuration: the app-facing execution, HTTP proxy and workflow run surfaces. Defaults live in
+     * application-bytechef.yml.
+     */
+    public static class App {
+
+        /**
+         * Following deployments that a hosting provider builds
+         */
+        private Deployment deployment = new Deployment();
+
+        /**
+         * Action and tool execution limits
+         */
+        private Execution execution = new Execution();
+
+        /**
+         * HTTP proxy limits
+         */
+        private Proxy proxy = new Proxy();
+
+        /**
+         * Limits of an app running a bound workflow
+         */
+        private WorkflowRun workflow = new WorkflowRun();
+
+        public Deployment getDeployment() {
+            return deployment;
+        }
+
+        public Execution getExecution() {
+            return execution;
+        }
+
+        public Proxy getProxy() {
+            return proxy;
+        }
+
+        public WorkflowRun getWorkflow() {
+            return workflow;
+        }
+
+        public void setDeployment(Deployment deployment) {
+            this.deployment = deployment;
+        }
+
+        public void setExecution(Execution execution) {
+            this.execution = execution;
+        }
+
+        public void setProxy(Proxy proxy) {
+            this.proxy = proxy;
+        }
+
+        public void setWorkflow(WorkflowRun workflow) {
+            this.workflow = workflow;
+        }
+
+        /**
+         * Following deployments that a hosting provider builds.
+         */
+        public static class Deployment {
+
+            /**
+             * Cron expression of the sweep that asks the providers for the status of unfinished deployments
+             */
+            private String pollCron;
+
+            /**
+             * How long a provider deployment may stay unfinished before the sweep marks it failed
+             */
+            private Duration timeout;
+
+            public String getPollCron() {
+                return pollCron;
+            }
+
+            public Duration getTimeout() {
+                return timeout;
+            }
+
+            public void setPollCron(String pollCron) {
+                this.pollCron = pollCron;
+            }
+
+            public void setTimeout(Duration timeout) {
+                this.timeout = timeout;
+            }
+        }
+
+        /**
+         * Limits of an app calling an action or a tool.
+         */
+        public static class Execution {
+
+            /**
+             * Concurrent action, tool and proxy calls requested by apps. They run on their own executor so a burst from
+             * apps cannot take permits from the editor's Test button or the API Platform sync path
+             */
+            private int concurrencyLimit;
+
+            /**
+             * Maximum time an action or tool execution requested by an app may run
+             */
+            private Duration timeout;
+
+            public int getConcurrencyLimit() {
+                return concurrencyLimit;
+            }
+
+            public Duration getTimeout() {
+                return timeout;
+            }
+
+            public void setConcurrencyLimit(int concurrencyLimit) {
+                this.concurrencyLimit = concurrencyLimit;
+            }
+
+            public void setTimeout(Duration timeout) {
+                this.timeout = timeout;
+            }
+        }
+
+        /**
+         * Limits of an app calling a bound connection's API through the proxy.
+         */
+        public static class Proxy {
+
+            /**
+             * Maximum size, in bytes, of a proxied request body
+             */
+            private long maxRequestBytes;
+
+            /**
+             * Maximum size, in bytes, of a proxied response body
+             */
+            private long maxResponseBytes;
+
+            /**
+             * Maximum time a proxied request may run
+             */
+            private Duration timeout;
+
+            public long getMaxRequestBytes() {
+                return maxRequestBytes;
+            }
+
+            public long getMaxResponseBytes() {
+                return maxResponseBytes;
+            }
+
+            public Duration getTimeout() {
+                return timeout;
+            }
+
+            public void setMaxRequestBytes(long maxRequestBytes) {
+                this.maxRequestBytes = maxRequestBytes;
+            }
+
+            public void setMaxResponseBytes(long maxResponseBytes) {
+                this.maxResponseBytes = maxResponseBytes;
+            }
+
+            public void setTimeout(Duration timeout) {
+                this.timeout = timeout;
+            }
+        }
+
+        /**
+         * Limits of an app running a bound workflow.
+         */
+        public static class WorkflowRun {
+
+            /**
+             * How long a workflow run requested by an app is waited for when the request names no wait
+             */
+            private Duration defaultWait;
+
+            /**
+             * The longest wait an app may request for a workflow run
+             */
+            private Duration maxWait;
+
+            /**
+             * How many days an app's workflow run records are kept before the retention job deletes them
+             */
+            private long runRetentionDays;
+
+            /**
+             * Cron expression of the daily app workflow run retention sweep
+             */
+            private String runRetentionCron;
+
+            public Duration getDefaultWait() {
+                return defaultWait;
+            }
+
+            public Duration getMaxWait() {
+                return maxWait;
+            }
+
+            public long getRunRetentionDays() {
+                return runRetentionDays;
+            }
+
+            public String getRunRetentionCron() {
+                return runRetentionCron;
+            }
+
+            public void setDefaultWait(Duration defaultWait) {
+                this.defaultWait = defaultWait;
+            }
+
+            public void setMaxWait(Duration maxWait) {
+                this.maxWait = maxWait;
+            }
+
+            public void setRunRetentionDays(long runRetentionDays) {
+                this.runRetentionDays = runRetentionDays;
+            }
+
+            public void setRunRetentionCron(String runRetentionCron) {
+                this.runRetentionCron = runRetentionCron;
             }
         }
     }
