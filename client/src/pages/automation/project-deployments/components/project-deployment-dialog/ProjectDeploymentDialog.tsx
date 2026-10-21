@@ -530,7 +530,7 @@ const ProjectDeploymentDialog = ({
 
         const filterKey = filterWorkflowUuids ? filterWorkflowUuids.join(',') : '';
 
-        const projectKey = `${getValues().projectId}-${getValues().projectVersion}-${filterKey}`;
+        const projectKey = `${effectiveProjectDeployment?.id}-${getValues().projectId}-${getValues().projectVersion}-${filterKey}`;
 
         if (initializedProjectKeyRef.current === projectKey) {
             return;
@@ -576,7 +576,7 @@ const ProjectDeploymentDialog = ({
         setValue('projectDeploymentWorkflows', projectDeploymentWorkflows);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getValues().projectId, getValues().projectVersion, workflows]);
+    }, [effectiveProjectDeployment?.id, getValues().projectId, getValues().projectVersion, workflows]);
 
     useLayoutEffect(() => {
         if (!isOpen) {
