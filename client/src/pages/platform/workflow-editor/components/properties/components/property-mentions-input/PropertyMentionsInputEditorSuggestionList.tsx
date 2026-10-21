@@ -3,7 +3,7 @@ import './PropertyMentionsInputEditorSuggestionList.css';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {DataPillType} from '@/shared/types';
 import {SuggestionProps} from '@tiptap/suggestion';
-import {forwardRef} from 'react';
+import {forwardRef, useRef} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -39,6 +39,8 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
     PropertyMentionsInputListRefType,
     PropertyMentionsInputListPropsType
 >(({command, items, query}, ref) => {
+    const listRef = useRef<HTMLUListElement>(null);
+
     const selectItem = (index: number) => {
         const item: DataPillType = items[index];
 
@@ -49,10 +51,10 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
         }
     };
 
-    const selectedIndex = useSuggestionListNavigation(items, ref, selectItem);
+    const selectedIndex = useSuggestionListNavigation(items, ref, selectItem, listRef);
 
     return (
-        <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
+        <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto" ref={listRef}>
             {items.length ? (
                 items.map((item: DataPillType, index: number) => (
                     <li key={item.value}>

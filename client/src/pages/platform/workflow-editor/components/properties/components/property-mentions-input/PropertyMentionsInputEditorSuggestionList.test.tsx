@@ -1,20 +1,23 @@
 import {DataPillType} from '@/shared/types';
-import {render, screen} from '@testing-library/react';
-import {SuggestionProps} from '@tiptap/suggestion';
+import {act, render, screen} from '@testing-library/react';
+import {SuggestionKeyDownProps, SuggestionProps} from '@tiptap/suggestion';
+import {createRef} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import PropertyMentionsInputEditorSuggestionList from './PropertyMentionsInputEditorSuggestionList';
+import PropertyMentionsInputEditorSuggestionList, {
+    PropertyMentionsInputListRefType,
+} from './PropertyMentionsInputEditorSuggestionList';
 
 vi.mock('react-inlinesvg', () => ({
     default: () => <span />,
 }));
 
-function renderList(values: string[], query: string) {
+function renderList(values: string[], query: string, listRef = createRef<PropertyMentionsInputListRefType>()) {
     const items: DataPillType[] = values.map((value) => ({id: value, value}));
 
     const props = {command: vi.fn(), items, query} as unknown as SuggestionProps<DataPillType>;
 
-    return render(<PropertyMentionsInputEditorSuggestionList {...props} />);
+    return render(<PropertyMentionsInputEditorSuggestionList ref={listRef} {...props} />);
 }
 
 describe('PropertyMentionsInputEditorSuggestionList', () => {
@@ -35,5 +38,81 @@ describe('PropertyMentionsInputEditorSuggestionList', () => {
 
         expect(screen.queryByTestId('data-pill-suggestion-match')).toBeNull();
         expect(screen.getByRole('button').textContent).toBe('firecrawl_5.data');
+    });
+
+    it('scrolls the highlighted suggestion into view when navigating with the arrow keys', () => {
+        const listRef = createRef<PropertyMentionsInputListRefType>();
+
+        renderList(['config', 'config.batches', 'config.batchSize'], '', listRef);
+
+        const scrollIntoViewMock = vi.mocked(Element.prototype.scrollIntoView);
+
+        scrollIntoViewMock.mockClear();
+
+        act(() => {
+            listRef.current?.onKeyDown({
+                event: new KeyboardEvent('keydown', {key: 'ArrowDown'}),
+            } as SuggestionKeyDownProps);
+        });
+
+        expect(scrollIntoViewMock).toHaveBeenLastCalledWith({block: 'nearest'});
+        expect(scrollIntoViewMock.mock.contexts.at(-1)).toBe(screen.getAllByRole('listitem')[1]);
+    });
+
+    it('scrolls back to the first suggestion when ArrowDown wraps around from the last row', () => {
+        const listRef = createRef<PropertyMentionsInputListRefType>();
+
+        renderList(['config', 'config.batches'], '', listRef);
+
+        const scrollIntoViewMock = vi.mocked(Element.prototype.scrollIntoView);
+
+        act(() => {
+            listRef.current?.onKeyDown({
+                event: new KeyboardEvent('keydown', {key: 'ArrowDown'}),
+            } as SuggestionKeyDownProps);
+        });
+
+        scrollIntoViewMock.mockClear();
+
+        act(() => {
+            listRef.current?.onKeyDown({
+                event: new KeyboardEvent('keydown', {key: 'ArrowDown'}),
+            } as SuggestionKeyDownProps);
+        });
+
+        expect(scrollIntoViewMock).toHaveBeenLastCalledWith({block: 'nearest'});
+        expect(scrollIntoViewMock.mock.contexts.at(-1)).toBe(screen.getAllByRole('listitem')[0]);
+    });
+
+    it('scrolls the first suggestion into view when the filtered items change', () => {
+        const listRef = createRef<PropertyMentionsInputListRefType>();
+        const command = vi.fn();
+
+        const {rerender} = renderList(['config', 'config.batches', 'config.batchSize'], '', listRef);
+
+        act(() => {
+            listRef.current?.onKeyDown({
+                event: new KeyboardEvent('keydown', {key: 'ArrowDown'}),
+            } as SuggestionKeyDownProps);
+        });
+
+        const scrollIntoViewMock = vi.mocked(Element.prototype.scrollIntoView);
+
+        scrollIntoViewMock.mockClear();
+
+        const filteredItems: DataPillType[] = ['config.batches', 'config.batchSize'].map((value) => ({
+            id: value,
+            value,
+        }));
+
+        rerender(
+            <PropertyMentionsInputEditorSuggestionList
+                ref={listRef}
+                {...({command, items: filteredItems, query: 'batch'} as unknown as SuggestionProps<DataPillType>)}
+            />
+        );
+
+        expect(scrollIntoViewMock).toHaveBeenLastCalledWith({block: 'nearest'});
+        expect(scrollIntoViewMock.mock.contexts.at(-1)).toBe(screen.getAllByRole('listitem')[0]);
     });
 });
