@@ -1,7 +1,7 @@
 import {ConnectionDefinition} from '@/shared/middleware/platform/configuration';
 import {Fragment} from 'react';
 
-const HIDDEN_CREDENTIALS_HINT = 'Only the member who created this connection can see or replace its credentials.';
+const HIDDEN_CREDENTIALS_HINT = "Only this connection's owner can see or replace its credentials.";
 
 interface ConnectionParametersProps {
     authorizationType?: string;
