@@ -79,6 +79,12 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long countByCustomRoleId(long customRoleId) {
+        return embeddedUserRepository.countByCustomRoleId(customRoleId);
+    }
+
+    @Override
     @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_REMOVED, mapper = EmbeddedUserAuditMapper.class)
     public void deleteEmbeddedMemberships(long userId) {
         embeddedUserRepository.deleteByUserId(userId);
