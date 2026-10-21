@@ -32,6 +32,11 @@ const failedSubflowChildJobExecution = {
     job: {id: '12', parentTaskExecutionId: 30, status: 'FAILED'},
 } as unknown as WorkflowExecution;
 
+const stoppedJobExecution = {
+    id: 11,
+    job: {id: '11', status: 'STOPPED'},
+} as unknown as WorkflowExecution;
+
 const jobExecution = {
     id: 5,
     job: {id: '5', status: 'STARTED'},
@@ -97,9 +102,30 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         renderMenu(failedJobExecution);
 
         await user.click(screen.getByRole('button'));
-        await user.click(await screen.findByText('Restart'));
+
+        const restartMenuItem = await screen.findByRole('menuitem', {name: /Restart/});
+
+        expect(restartMenuItem).not.toHaveAttribute('data-disabled');
+
+        await user.click(restartMenuItem);
 
         expect(restartJobMutateMock).toHaveBeenCalledWith(9);
+    });
+
+    it('restarts a stopped job', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(stoppedJobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        const restartMenuItem = await screen.findByRole('menuitem', {name: /Restart/});
+
+        expect(restartMenuItem).not.toHaveAttribute('data-disabled');
+
+        await user.click(restartMenuItem);
+
+        expect(restartJobMutateMock).toHaveBeenCalledWith(11);
     });
 
     it('renders with the design-system DropdownMenu', async () => {
@@ -135,7 +161,7 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         expect(await screen.findByRole('menuitem', {name: 'Stop'})).toHaveAttribute('data-disabled');
     });
 
-    it('disables Restart for a job that has not failed', async () => {
+    it('disables Restart for a job that is still running', async () => {
         const user = userEvent.setup();
 
         renderMenu(jobExecution);
