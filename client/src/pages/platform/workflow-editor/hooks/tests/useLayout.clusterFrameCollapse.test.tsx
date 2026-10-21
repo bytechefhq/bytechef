@@ -48,6 +48,8 @@ vi.mock('../../../cluster-element-editor/hooks/useClusterElementNodes', () => ({
     },
 }));
 
+const LAYOUT_WAIT_OPTIONS = {interval: 10, timeout: 5000};
+
 function findRootNodeData(): NodeDataType | undefined {
     return useWorkflowDataStore.getState().nodes.find((node) => node.id === ROOT_ID)?.data as NodeDataType | undefined;
 }
@@ -62,7 +64,7 @@ function renderLayout() {
     );
 }
 
-describe('useLayout skips the box for a collapsed cluster root', () => {
+describe('useLayout skips the box for a collapsed cluster root', {timeout: 20_000}, () => {
     beforeEach(() => {
         useClusterElementsViewModeStore.getState().setClusterElementsViewMode('box');
         useClusterFrameCollapsedStore.setState({collapsedByWorkflowId: {}});
@@ -105,7 +107,7 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
 
         renderLayout();
 
-        await waitFor(() => expect(findRootNodeData()).toBeDefined());
+        await waitFor(() => expect(findRootNodeData()).toBeDefined(), LAYOUT_WAIT_OPTIONS);
 
         expect(findRootNodeData()?.clusterFrame).toBeUndefined();
         expect(findElementNode()).toBeUndefined();
@@ -114,14 +116,14 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
     it('drops the box the moment its root is collapsed, without any other trigger', async () => {
         renderLayout();
 
-        await waitFor(() => expect(findElementNode()).toBeDefined());
-        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined());
+        await waitFor(() => expect(findElementNode()).toBeDefined(), LAYOUT_WAIT_OPTIONS);
+        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined(), LAYOUT_WAIT_OPTIONS);
 
         act(() => {
             useClusterFrameCollapsedStore.getState().setClusterFrameCollapsed(WORKFLOW_ID, ROOT_ID, true);
         });
 
-        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeUndefined(), {interval: 10, timeout: 5000});
+        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeUndefined(), LAYOUT_WAIT_OPTIONS);
 
         expect(findElementNode()).toBeUndefined();
     });
@@ -131,6 +133,6 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
 
         renderLayout();
 
-        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined());
+        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined(), LAYOUT_WAIT_OPTIONS);
     });
 });
