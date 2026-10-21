@@ -1,5 +1,10 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useRestartJobMutation, useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -73,26 +78,22 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem className="dropdown-menu-item" onClick={handleViewClick}>
-                    <ViewIcon /> View
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<ViewIcon />} label="View" onClick={handleViewClick} />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item"
                     disabled={restartDisabled}
+                    icon={<RotateCcwIcon />}
+                    label="Restart"
                     onClick={handleRestartWorkflowExecutionClick}
-                >
-                    <RotateCcwIcon /> Restart
-                </DropdownMenuItem>
+                />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
                     disabled={stopDisabled}
+                    icon={<CircleStopIcon />}
+                    label="Stop"
                     onClick={handleStopWorkflowExecutionClick}
                     variant="destructive"
-                >
-                    <CircleStopIcon /> Stop
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );

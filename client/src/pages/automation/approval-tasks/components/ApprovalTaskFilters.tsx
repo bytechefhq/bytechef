@@ -8,7 +8,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {CheckCircle2Icon, CheckIcon, CircleIcon, ClockIcon, SlidersHorizontalIcon, UserIcon, XIcon} from 'lucide-react';
 
 import {useApprovalTaskFilters} from './hooks/useApprovalTaskFilters';
@@ -45,7 +45,7 @@ export default function ApprovalTaskFilters() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Status</DropdownMenuLabel>
+                    <DropdownMenuLabel>Status</DropdownMenuLabel>
 
                     <DropdownMenuItem
                         className="flex items-center justify-between"
@@ -55,7 +55,9 @@ export default function ApprovalTaskFilters() {
 
                         {filters.status === 'all' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({approvalTaskCounts.all})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">
+                            ({approvalTaskCounts.all})
+                        </span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -70,7 +72,9 @@ export default function ApprovalTaskFilters() {
 
                         {filters.status === 'open' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({approvalTaskCounts.open})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">
+                            ({approvalTaskCounts.open})
+                        </span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -85,7 +89,7 @@ export default function ApprovalTaskFilters() {
 
                         {filters.status === 'in-progress' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">
+                        <span className="ml-auto text-xs text-content-neutral-secondary">
                             ({approvalTaskCounts['in-progress']})
                         </span>
                     </DropdownMenuItem>
@@ -102,16 +106,16 @@ export default function ApprovalTaskFilters() {
 
                         {filters.status === 'completed' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({approvalTaskCounts.completed})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">
+                            ({approvalTaskCounts.completed})
+                        </span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                        Priority
-                    </DropdownMenuLabel>
+                    <DropdownMenuLabel>Priority</DropdownMenuLabel>
 
                     <DropdownMenuItem
                         className="flex items-center justify-between"
@@ -121,7 +125,7 @@ export default function ApprovalTaskFilters() {
 
                         {filters.priority === 'all' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.all})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">({priorityCounts.all})</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -141,7 +145,7 @@ export default function ApprovalTaskFilters() {
 
                         {filters.priority === 'high' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.high})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">({priorityCounts.high})</span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -161,7 +165,9 @@ export default function ApprovalTaskFilters() {
 
                         {filters.priority === 'medium' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.medium})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">
+                            ({priorityCounts.medium})
+                        </span>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -181,16 +187,14 @@ export default function ApprovalTaskFilters() {
 
                         {filters.priority === 'low' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({priorityCounts.low})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">({priorityCounts.low})</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
 
                 <DropdownMenuGroup>
-                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                        Assignee
-                    </DropdownMenuLabel>
+                    <DropdownMenuLabel>Assignee</DropdownMenuLabel>
 
                     <DropdownMenuItem
                         className="flex items-center justify-between"
@@ -200,7 +204,7 @@ export default function ApprovalTaskFilters() {
 
                         {filters.assignee === 'all' && <CheckIcon className="size-4" />}
 
-                        <span className="ml-auto text-xs text-muted-foreground">({assigneeCounts.all})</span>
+                        <span className="ml-auto text-xs text-content-neutral-secondary">({assigneeCounts.all})</span>
                     </DropdownMenuItem>
 
                     {assignees.map((assignee) => (
@@ -210,14 +214,16 @@ export default function ApprovalTaskFilters() {
                             onClick={() => handleAssigneeChange(assignee)}
                         >
                             <div className="flex items-center">
-                                <UserIcon className="mr-2 size-3 text-muted-foreground" />
+                                <UserIcon className="mr-2 size-3 text-content-neutral-secondary" />
 
                                 <span className="truncate">{assignee}</span>
                             </div>
 
                             {filters.assignee === assignee && <CheckIcon className="size-4" />}
 
-                            <span className="ml-auto text-xs text-muted-foreground">({assigneeCounts[assignee]})</span>
+                            <span className="ml-auto text-xs text-content-neutral-secondary">
+                                ({assigneeCounts[assignee]})
+                            </span>
                         </DropdownMenuItem>
                     ))}
                 </DropdownMenuGroup>
@@ -225,13 +231,11 @@ export default function ApprovalTaskFilters() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                    className="text-primary focus:text-primary"
                     disabled={!hasActiveFilters}
+                    icon={<XIcon />}
+                    label="Clear all filters"
                     onClick={handleResetFilters}
-                >
-                    <XIcon className="mr-2 size-4" />
-                    Clear all filters
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );
