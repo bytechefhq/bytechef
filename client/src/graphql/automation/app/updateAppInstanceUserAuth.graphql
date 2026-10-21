@@ -1,0 +1,29 @@
+mutation updateAppInstanceUserAuth($id: ID!, $userAuthMode: AppUserAuthMode!) {
+    updateAppInstanceUserAuth(id: $id, userAuthMode: $userAuthMode) {
+        id
+        uuid
+        app {
+            id
+            name
+            description
+            status
+        }
+        workspaceId
+        environmentId
+        name
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        secretKeyHint
+        secretKeyLastUsedDate
+        userAuthMode
+        currentAppDeploymentId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}

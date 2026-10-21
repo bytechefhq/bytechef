@@ -11,7 +11,7 @@ import {
     PINNED_HEAD_CLASS_NAME,
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
-import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
+import {GlobeIcon, type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
 import {KeyboardEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -24,6 +24,8 @@ import {
 } from '../utils/externalInvocationLabels';
 import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
 
+type ExternalInvocationLogRowType = ExternalInvocationLogItemType & {userName?: string | null};
+
 interface ExternalInvocationsTableProps {
     a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
@@ -31,7 +33,8 @@ interface ExternalInvocationsTableProps {
     onViewJob?: (jobId: number) => void;
     showConnectedUser?: boolean;
     showSource?: boolean;
-    externalInvocationLogs: Array<ExternalInvocationLogItemType>;
+    showUser?: boolean;
+    externalInvocationLogs: Array<ExternalInvocationLogRowType>;
 }
 
 const PINNED_IDLE_CELL_CLASS_NAME =
@@ -44,12 +47,14 @@ interface InvocationTypeI {
 
 const KIND_TYPES: Record<string, InvocationTypeI> = {
     COMPONENT: {icon: PuzzleIcon, label: 'Component tool'},
+    HTTP_PROXY: {icon: GlobeIcon, label: 'HTTP proxy'},
     WORKFLOW: {icon: WorkflowIcon, label: 'Workflow tool'},
 };
 
 const SOURCE_TYPES: Record<string, InvocationTypeI> = {
     A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
     API_ACTION: {icon: ZapIcon, label: 'Action'},
+    APP_ACTION: {icon: ZapIcon, label: 'Action'},
 };
 
 const serverLabel = (
@@ -108,6 +113,7 @@ const ExternalInvocationsTable = ({
     onViewJob,
     showConnectedUser = false,
     showSource = true,
+    showUser = false,
 }: ExternalInvocationsTableProps) => (
     <Table>
         <TableHeader className={EXECUTIONS_TABLE_HEADER_CLASS_NAME}>
@@ -125,6 +131,8 @@ const ExternalInvocationsTable = ({
                 {showConnectedUser && (
                     <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Connected User</TableHead>
                 )}
+
+                {showUser && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>User</TableHead>}
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Target</TableHead>
 
@@ -192,6 +200,12 @@ const ExternalInvocationsTable = ({
                         {showConnectedUser && (
                             <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                                 {externalInvocationLog.externalUserId || externalInvocationLog.connectedUserId || '—'}
+                            </TableCell>
+                        )}
+
+                        {showUser && (
+                            <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                                {externalInvocationLog.userName || '-'}
                             </TableCell>
                         )}
 

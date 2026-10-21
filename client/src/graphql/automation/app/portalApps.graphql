@@ -1,0 +1,21 @@
+query portalApps($environmentId: ID!) {
+    portalApps(environmentId: $environmentId) {
+        id
+        name
+        description
+        categoryId
+        categoryName
+        hasIcon
+        favorite
+        lastUsedDate
+        instances {
+            id
+            name
+            workspaceId
+            workspaceName
+            url
+            lastUsedDate
+            useCount
+        }
+    }
+}

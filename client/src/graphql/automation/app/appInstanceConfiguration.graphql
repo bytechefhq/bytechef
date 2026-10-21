@@ -1,0 +1,6 @@
+query appInstanceConfiguration($id: ID!) {
+    appInstance(id: $id) {
+        id
+        configuration
+    }
+}

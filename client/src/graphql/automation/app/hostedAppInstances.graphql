@@ -1,0 +1,29 @@
+query hostedAppInstances($workspaceId: ID!, $environmentId: ID!) {
+    hostedAppInstances(workspaceId: $workspaceId, environmentId: $environmentId) {
+        id
+        uuid
+        app {
+            id
+            name
+            description
+            status
+        }
+        workspaceId
+        environmentId
+        name
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        secretKeyHint
+        secretKeyLastUsedDate
+        userAuthMode
+        currentAppDeploymentId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+        version
+    }
+}
