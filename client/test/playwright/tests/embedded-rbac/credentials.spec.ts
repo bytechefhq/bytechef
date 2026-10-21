@@ -3,7 +3,7 @@ import {readFileSync} from 'fs';
 
 import {embeddedRolesTest as test} from '../../fixtures/embeddedRoles';
 import {SAMPLE_WORKFLOW_PATH} from '../../utils/constants';
-import {embeddedInternalApi, openAsEmbeddedRoleUser} from '../../utils/embeddedRbacUtils';
+import {createTeardownAttempt, embeddedInternalApi, openAsEmbeddedRoleUser} from '../../utils/embeddedRbacUtils';
 import getRandomString from '../../utils/getRandomString';
 import {ENVIRONMENT_IDS, RBAC_BASE_URL, createRoleUserApiContext, graphql} from '../../utils/rbacUtils';
 
@@ -134,13 +134,7 @@ async function createCredentialResources(adminApi: APIRequestContext): Promise<C
 }
 
 async function deleteCredentialResources(adminApi: APIRequestContext, resources: CredentialResourcesI) {
-    const attempt = async (description: string, action: () => Promise<unknown>) => {
-        try {
-            await action();
-        } catch (error) {
-            console.warn(`credentials teardown: ${description}: ${error}`);
-        }
-    };
+    const attempt = createTeardownAttempt('credentials');
 
     await attempt('delete MCP server', () =>
         graphql(adminApi, 'mutation DeleteEmbeddedMcpServer($id: ID!) { deleteEmbeddedMcpServer(mcpServerId: $id) }', {
@@ -171,24 +165,20 @@ async function fetchMcpServer(apiContext: APIRequestContext, mcpServerId: string
     return embeddedMcpServers.find((mcpServer) => mcpServer.id === mcpServerId)!;
 }
 
-function recordResponseBodies(page: Page): string[] {
-    const responseBodies: string[] = [];
+function recordResponseBodies(page: Page): Promise<string>[] {
+    const responseBodyPromises: Promise<string>[] = [];
 
-    page.on('response', async (response: Response) => {
+    page.on('response', (response: Response) => {
         const url = response.url();
 
         if (!url.includes('/api/') && !url.includes('/graphql')) {
             return;
         }
 
-        try {
-            responseBodies.push(await response.text());
-        } catch {
-            return;
-        }
+        responseBodyPromises.push(response.text().catch(() => ''));
     });
 
-    return responseBodies;
+    return responseBodyPromises;
 }
 
 async function openMcpServerConnectTab(page: Page, mcpServerName: string): Promise<void> {
@@ -337,7 +327,7 @@ test.describe('Embedded credentials', () => {
             ENVIRONMENT_IDS.DEVELOPMENT
         );
 
-        const responseBodies = recordResponseBodies(page);
+        const responseBodyPromises = recordResponseBodies(page);
 
         try {
             await test.step('connections page', async () => {
@@ -364,6 +354,8 @@ test.describe('Embedded credentials', () => {
             await page.waitForLoadState('networkidle');
 
             await test.step('no response carried a credential value or the MCP secret key', async () => {
+                const responseBodies = await Promise.all(responseBodyPromises);
+
                 expect(responseBodies.length).toBeGreaterThan(0);
 
                 for (const secretMarker of [...SECRET_MARKERS, resources.mcpServerSecretKey]) {
