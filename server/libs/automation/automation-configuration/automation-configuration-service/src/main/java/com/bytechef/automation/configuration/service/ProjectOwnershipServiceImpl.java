@@ -158,12 +158,6 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
 
     @Override
     @Transactional(readOnly = true)
-    public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, ProjectOwner projectOwner) {
-        return getOwnedProjectIds(projectIds, Set.of(projectOwner));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         if (projectIds.isEmpty() || projectOwners.isEmpty()) {
             return Set.of();

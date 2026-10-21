@@ -342,7 +342,7 @@ public class ProjectOwnershipServiceIntTest {
 
         assertThat(
             projectOwnershipService.getOwnedProjectIds(
-                List.of(firstProjectId, secondProjectId), ProjectOwner.EMBEDDED_CATALOG))
+                List.of(firstProjectId, secondProjectId), Set.of(ProjectOwner.EMBEDDED_CATALOG)))
                     .isEqualTo(Set.of(firstProjectId));
     }
 
@@ -378,13 +378,14 @@ public class ProjectOwnershipServiceIntTest {
 
         projectIds.add(1500, ownedProjectId);
 
-        assertThat(projectOwnershipService.getOwnedProjectIds(projectIds, ProjectOwner.EMBEDDED_CATALOG))
+        assertThat(projectOwnershipService.getOwnedProjectIds(projectIds, Set.of(ProjectOwner.EMBEDDED_CATALOG)))
             .isEqualTo(Set.of(ownedProjectId));
     }
 
     @Test
     public void testGetOwnedProjectIdsWithEmptyIdsReturnsEmpty() {
-        assertThat(projectOwnershipService.getOwnedProjectIds(List.of(), ProjectOwner.EMBEDDED_CATALOG)).isEmpty();
+        assertThat(projectOwnershipService.getOwnedProjectIds(List.of(), Set.of(ProjectOwner.EMBEDDED_CATALOG)))
+            .isEmpty();
     }
 
     @Test
