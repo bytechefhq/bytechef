@@ -110,7 +110,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const restoreProjectVersionMutation = useRestoreProjectVersionMutation({
         onSuccess: async (_, {id, projectVersion}) => {
-            const restoredProject = await queryClient.fetchQuery({
+            const restoredProject = await queryClient.query({
                 queryFn: () => new ProjectApi().getProject({id}),
                 queryKey: ProjectKeys.project(id),
                 staleTime: 0,
