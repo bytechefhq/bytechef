@@ -81,6 +81,7 @@ interface ConnectionDialogProps {
     description?: string;
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
+    platformType?: PlatformType;
     showSharedOption?: boolean;
     startInCredentialsMode?: boolean;
     title?: string;
@@ -114,6 +115,7 @@ const ConnectionDialog = ({
     description,
     onClose,
     onConnectionCreate,
+    platformType,
     showSharedOption,
     startInCredentialsMode,
     title,
@@ -135,11 +137,15 @@ const ConnectionDialog = ({
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentType = usePlatformTypeStore((state) => state.currentType);
+    const storedPlatformType = usePlatformTypeStore((state) => state.currentType);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
-    const canEditWorkspaceConnection = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
+    const canEditWorkspaceConnection = useHasWorkspaceScope(
+        currentWorkspaceId,
+        'CONNECTION_EDIT',
+        connection?.environmentId
+    );
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -196,6 +202,8 @@ const ConnectionDialog = ({
     } = useGetOAuth2PropertiesQuery();
 
     const queryClient = useQueryClient();
+
+    const currentType = platformType ?? storedPlatformType;
 
     const isEdit = !!connection?.id;
 
