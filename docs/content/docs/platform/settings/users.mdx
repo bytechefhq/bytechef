@@ -234,7 +234,7 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Delete a data table | `DATA_TABLE_DELETE` | Admin |
 | Delete a knowledge base | `KNOWLEDGE_BASE_DELETE` | Admin |
 | Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE`, **and** being the connection's owner or an organization admin | Editor |
-| View or replace a connection's credentials | Being the connection's creator, plus `CONNECTION_EDIT` | Editor |
+| View or replace a connection's credentials | `CONNECTION_EDIT`, **and** being the connection's owner; for an organization connection, being an organization admin | Editor |
 | Enable, disable or update a deployment; stop or restart a job | `DEPLOYMENT_EDIT` | Editor |
 | Create or import a workflow | `WORKFLOW_CREATE` in Development | Editor |
 | Duplicate a workflow | `WORKFLOW_CREATE` and `WORKFLOW_VIEW` in Development | Editor |
@@ -253,12 +253,12 @@ See [Git Configuration](/platform/automation/settings/git-configuration#required
 
 <EEBadge />
 
-A connection's secret values are shown and can be replaced only by the member who created it. Organization admins can use, rename, tag and delete connections they do not own, but cannot see or replace their secrets.
+A connection's secret values are shown and can be replaced only by its owner: the member who created it, or the member an organization admin reassigned it to. Reassigning a connection gives the new owner that access and takes it from the previous owner. Organization admins can use, rename, tag, delete and reassign connections they do not own, but cannot see or replace their secrets. Organization connections are the exception: every organization admin can view and replace their secrets.
 
 | Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
 |---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
+| A connection you own (you created it, or it was reassigned to you) | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins, who can also reassign it to another member |
 | An organization connection | Every organization admin | Every member | Organization admins |
 | An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
