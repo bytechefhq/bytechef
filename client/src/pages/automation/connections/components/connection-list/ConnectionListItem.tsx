@@ -4,6 +4,7 @@ import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
@@ -263,6 +264,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         connectionTagsQueryKey={ConnectionKeys.connectionTags}
                         connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowEditDialog(false)}
+                        platformType={PlatformType.AUTOMATION}
                         useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                         useUpdateConnectionMutation={useUpdateConnectionMutation}
                     />
