@@ -36,12 +36,17 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -256,6 +261,96 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
+    void testFindRowsInMatchesEveryColumnType() {
+        assertEquals(
+            List.of(itemIds.get(0), itemIds.get(2)),
+            findItemIds(List.of(filter("title", Operation.IN, List.of("Apple", "Banana", "Cherry"))), null));
+        assertEquals(List.of(typedIds.get(1)), findTypedIds(List.of(filter("active", Operation.IN, List.of("no")))));
+        assertEquals(
+            List.of(typedIds.get(0), typedIds.get(1)),
+            findTypedIds(List.of(filter("price", Operation.IN, List.of("1.5", 2.5)))));
+        assertEquals(
+            List.of(typedIds.get(1)),
+            findTypedIds(List.of(filter("due", Operation.IN, List.of("2026-02-10", "2026-03-10")))));
+        assertEquals(
+            List.of(typedIds.get(0)),
+            findTypedIds(List.of(filter("created", Operation.IN, List.of("2026-01-10T08:00:00")))));
+    }
+
+    @Test
+    void testFindRowsAndDeleteRowsAcceptMoreInValuesThanTheBindParameterLimit() {
+        List<Object> ids = new ArrayList<>(LongStream.rangeClosed(1_000_000, 1_070_000)
+            .boxed()
+            .toList());
+
+        ids.add(itemIds.get(0));
+        ids.add(itemIds.get(2));
+
+        List<DataTableRowFilter> filters = List.of(filter("id", Operation.IN, ids));
+
+        assertEquals(List.of(itemIds.get(0), itemIds.get(2)), findItemIds(filters, null));
+
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteRows(
+            "items", DataTableRowConditions.of(filters), DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(itemIds.get(0), itemIds.get(2)), deletedDataTableRows.stream()
+                .map(DataTableRow::id)
+                .toList());
+        assertEquals(List.of(itemIds.get(1), itemIds.get(3), itemIds.get(4)), findItemIds(List.of(), null));
+    }
+
+    @Test
+    void testInValuesOverSeveralBindParametersStillNeedTheOtherConditionsOfTheGroup() {
+        List<Object> ids = new ArrayList<>(List.of(itemIds.get(0), itemIds.get(2)));
+
+        ids.addAll(
+            LongStream.rangeClosed(1_000_000, 1_070_000)
+                .boxed()
+                .toList());
+
+        DataTableRowConditions conditions = DataTableRowConditions.of(
+            List.of(filter("id", Operation.IN, ids), filter("title", Operation.EQUALS, "Apple")));
+
+        List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
+            "items", conditions, Map.of("amount", 1), DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(itemIds.get(0)), updatedDataTableRows.stream()
+                .map(DataTableRow::id)
+                .toList());
+
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteRows(
+            "items", conditions, DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(itemIds.get(0)), deletedDataTableRows.stream()
+                .map(DataTableRow::id)
+                .toList());
+        assertEquals(
+            List.of(itemIds.get(1), itemIds.get(2), itemIds.get(3), itemIds.get(4)), findItemIds(List.of(), null));
+        assertEquals(List.of(itemIds.get(2)), findItemIds(List.of(filter("amount", Operation.EQUALS, 20)), null));
+    }
+
+    @Test
+    void testDateTimesWithAnOffsetAreConvertedToUtc() {
+        assertEquals(
+            List.of(typedIds.get(1)),
+            findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-02-10T10:00:00+02:00"))));
+        assertEquals(
+            List.of(typedIds.get(1)),
+            findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-02-10T08:00:00Z"))));
+
+        dataTableRowService.updateRows(
+            "typed", DataTableRowConditions.of(List.of(filter("active", Operation.EQUALS, true))),
+            Map.of("created", "2026-03-01T11:30:00+02:00"), DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(typedIds.get(0)),
+            findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-03-01T09:30:00"))));
+    }
+
+    @Test
     void testFindRowsIsEmptyAndIsNotEmpty() {
         assertEquals(List.of(itemIds.get(4)), findItemIds(List.of(filter("title", Operation.EMPTY, null)), null));
         assertEquals(
@@ -289,13 +384,6 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
-    void testFindRowsRejectsAnEmptyAndCondition() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> findItemIdsMatchingAny(List.of(List.of(), List.of(filter("title", Operation.EQUALS, "Banana")))));
-    }
-
-    @Test
     void testFindRowsFiltersById() {
         assertEquals(
             List.of(itemIds.get(1)), findItemIds(List.of(filter("id", Operation.EQUALS, itemIds.get(1))), null));
@@ -316,6 +404,27 @@ class DataTableRowServiceIntTest {
             dataTableRows.stream()
                 .map(DataTableRow::id)
                 .toList());
+    }
+
+    @Test
+    void testHostileColumnNamesAreRejected() {
+        for (String columnName : List.of("title\" OR \"1\"=\"1", "title; DROP TABLE items")) {
+            assertMessageContains(
+                "Unknown column", () -> findItemIds(List.of(filter(columnName, Operation.EQUALS, "x")), null));
+            assertMessageContains(
+                "Unknown column",
+                () -> findItemIds(List.of(), new DataTableRowSort(columnName, Direction.ASC)));
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> dataTableRowService.updateRows(
+                    "items", toConditions(List.of(filter("title", Operation.EQUALS, "Apple"))),
+                    Map.of(columnName, "x"), DEV_ENVIRONMENT_ID));
+        }
+
+        assertEquals(5, findItemIds(List.of(), null).size());
+        assertEquals(
+            List.of(itemIds.getFirst()), findItemIds(List.of(filter("title", Operation.EQUALS, "Apple")), null));
+        assertTrue(getWebhookEvents(DataTableWebhookType.RECORD_UPDATED).isEmpty());
     }
 
     @Test
@@ -380,21 +489,105 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
-    void testDeleteRowsAndUpdateRowsRejectNumbersForDateColumnsWithoutChangingRows() {
+    void testDeleteRowsRejectsNumbersForDateColumnsWithoutChangingRows() {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(filter("due", Operation.GREATER, 1760000000L)));
 
         assertMessageContains(
             "is not a valid date for column 'due'",
             () -> dataTableRowService.deleteRows("typed", conditions, DEV_ENVIRONMENT_ID));
-        assertMessageContains(
-            "is not a valid date for column 'due'",
-            () -> dataTableRowService.updateRows(
-                "typed", DataTableRowConditions.of(List.of(filter("price", Operation.NOT_EMPTY, null))),
-                Map.of("due", 1760000000L), DEV_ENVIRONMENT_ID));
 
         assertEquals(typedIds, findTypedIds(List.of()));
         assertEquals(List.of(typedIds.get(1)), findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-02-10"))));
+    }
+
+    @Test
+    void testInsertRowAndUpdateRowsReadWholeNumbersForDateColumnsAsUtcEpochMilliseconds() {
+        DataTableRow dataTableRow = dataTableRowService.insertRow(
+            "typed", Map.of("due", 1769817600000L, "created", "1769846400000"), DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(dataTableRow.id()), findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-31"))));
+        assertEquals(
+            List.of(dataTableRow.id()),
+            findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T08:00:00Z"))));
+
+        dataTableRowService.updateRows(
+            "typed", DataTableRowConditions.of(List.of(filter("id", Operation.EQUALS, dataTableRow.id()))),
+            Map.of("created", 1769850000000L), DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(dataTableRow.id()),
+            findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T09:00:00"))));
+    }
+
+    @Test
+    void testDateObjectsAreStoredInUtcWhateverTheDefaultZone() {
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Zagreb"));
+
+            DataTableRow fromDate = dataTableRowService.insertRow(
+                "typed",
+                Map.of(
+                    "due", Date.from(Instant.parse("2026-01-31T23:30:00Z")),
+                    "created", Date.from(Instant.parse("2026-01-31T08:00:00Z"))),
+                DEV_ENVIRONMENT_ID);
+            DataTableRow fromTimestamp = dataTableRowService.insertRow(
+                "typed", Map.of("created", Timestamp.from(Instant.parse("2026-01-31T09:00:00Z"))),
+                DEV_ENVIRONMENT_ID);
+            DataTableRow fromText = dataTableRowService.insertRow(
+                "typed", Map.of("created", "2026-01-31T10:00:00Z"), DEV_ENVIRONMENT_ID);
+
+            assertEquals(
+                List.of(fromDate.id()), findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-31"))));
+            assertEquals(
+                List.of(fromDate.id()),
+                findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T08:00:00"))));
+            assertEquals(
+                List.of(fromTimestamp.id()),
+                findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T09:00:00"))));
+            assertEquals(
+                List.of(fromText.id()),
+                findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T10:00:00"))));
+        } finally {
+            TimeZone.setDefault(defaultTimeZone);
+        }
+    }
+
+    @Test
+    void testDateTimeReadBackAndWrittenAgainKeepsItsValueWhateverTheDefaultZone() {
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Zagreb"));
+
+            DataTableRow insertedRow = dataTableRowService.insertRow(
+                "typed", Map.of("created", "2026-01-31T08:00:00"), DEV_ENVIRONMENT_ID);
+
+            DataTableRow readRow = Objects.requireNonNull(
+                dataTableRowService.getRow("typed", insertedRow.id(), DEV_ENVIRONMENT_ID));
+
+            Map<String, Object> readValues = readRow.values();
+
+            Timestamp created = (Timestamp) readValues.get("created");
+
+            assertEquals(Instant.parse("2026-01-31T08:00:00Z"), created.toInstant());
+
+            dataTableRowService.updateRow(
+                "typed", insertedRow.id(), Map.of("created", created), DEV_ENVIRONMENT_ID);
+            dataTableRowService.updateRow(
+                "typed", insertedRow.id(), Map.of("created", created.getTime()), DEV_ENVIRONMENT_ID);
+
+            assertEquals(
+                List.of(insertedRow.id()),
+                findTypedIds(List.of(filter("created", Operation.EQUALS, "2026-01-31T08:00:00"))));
+            assertEquals(
+                List.of(insertedRow.id()), findTypedIds(List.of(filter("created", Operation.EQUALS, created))));
+        } finally {
+            TimeZone.setDefault(defaultTimeZone);
+        }
     }
 
     @Test
@@ -431,13 +624,15 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
-    void testFindRowsComparesDateColumnsWithTheDateWrittenInADateTime() {
+    void testFindRowsComparesDateColumnsWithTheUtcDateOfADateTime() {
         assertEquals(
             List.of(typedIds.get(0)),
-            findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-10T23:30:00-05:00"))));
+            findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-09T23:30:00-05:00"))));
+        assertEquals(
+            List.of(), findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-10T23:30:00-05:00"))));
         assertEquals(
             List.of(typedIds.get(1)),
-            findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-02-10T00:30:00+05:00"))));
+            findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-02-11T03:00:00+05:00"))));
         assertEquals(
             List.of(typedIds.get(0)), findTypedIds(List.of(filter("due", Operation.EQUALS, "2026-01-10 23:30"))));
     }
@@ -531,13 +726,29 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
+    void testMissingTableIsReportedByItsName() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> dataTableRowService.findRows(
+                "missing", DataTableRowConditions.matchAll(), null, 100, 0, DEV_ENVIRONMENT_ID));
+
+        assertEquals("Table 'missing' not found", illegalArgumentException.getMessage());
+    }
+
+    @Test
     void testFindRowsSortsRowsWithoutValueLastAndBreaksTiesById() {
         insertItem("Cherry", 10);
 
+        List<List<DataTableRowFilter>> collationSafeTitles = List.of(
+            List.of(filter("title", Operation.IN, List.of("Apple", "Banana", "Cherry"))),
+            List.of(filter("title", Operation.EMPTY, null)));
+
         assertEquals(
-            itemIds.get(4), findItemIds(List.of(), new DataTableRowSort("title", Direction.ASC)).getLast());
+            List.of(itemIds.get(0), itemIds.get(2), itemIds.get(5), itemIds.get(4)),
+            findItemIdsMatchingAny(collationSafeTitles, new DataTableRowSort("title", Direction.ASC)));
         assertEquals(
-            itemIds.get(4), findItemIds(List.of(), new DataTableRowSort("title", Direction.DESC)).getLast());
+            List.of(itemIds.get(5), itemIds.get(2), itemIds.get(0), itemIds.get(4)),
+            findItemIdsMatchingAny(collationSafeTitles, new DataTableRowSort("title", Direction.DESC)));
         assertEquals(
             List.of(itemIds.get(0), itemIds.get(1), itemIds.get(5), itemIds.get(4), itemIds.get(2), itemIds.get(3)),
             findItemIds(List.of(), new DataTableRowSort("amount", Direction.ASC)));
@@ -1027,8 +1238,14 @@ class DataTableRowServiceIntTest {
     }
 
     private List<Long> findItemIdsMatchingAny(List<List<DataTableRowFilter>> conditions) {
+        return findItemIdsMatchingAny(conditions, null);
+    }
+
+    private List<Long> findItemIdsMatchingAny(
+        List<List<DataTableRowFilter>> conditions, DataTableRowSort sort) {
+
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            "items", new DataTableRowConditions(conditions), null, 100, 0, DEV_ENVIRONMENT_ID);
+            "items", new DataTableRowConditions(conditions), sort, 100, 0, DEV_ENVIRONMENT_ID);
 
         return dataTableRows.stream()
             .map(DataTableRow::id)
