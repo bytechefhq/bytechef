@@ -10,6 +10,7 @@ import {getWorkflowNodeComponentName} from '@/pages/platform/workflow-editor/uti
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ActionBarPrimitive,
+    AuiIf,
     BranchPickerPrimitive,
     ComposerPrimitive,
     ErrorPrimitive,
@@ -451,11 +452,13 @@ const AssistantActionBar: FC = () => {
                 </TooltipIconButton>
             </ActionBarPrimitive.Copy>
 
-            <ActionBarPrimitive.Reload asChild>
-                <TooltipIconButton tooltip="Refresh">
-                    <RefreshCwIcon />
-                </TooltipIconButton>
-            </ActionBarPrimitive.Reload>
+            <AuiIf condition={(state) => state.thread.capabilities.reload}>
+                <ActionBarPrimitive.Reload asChild>
+                    <TooltipIconButton tooltip="Refresh">
+                        <RefreshCwIcon />
+                    </TooltipIconButton>
+                </ActionBarPrimitive.Reload>
+            </AuiIf>
         </ActionBarPrimitive.Root>
     );
 };

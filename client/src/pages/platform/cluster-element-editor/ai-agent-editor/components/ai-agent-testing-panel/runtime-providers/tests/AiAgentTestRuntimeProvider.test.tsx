@@ -2,6 +2,7 @@ import {useSSE} from '@/shared/hooks/useSSE';
 import {AppendMessage, useExternalStoreRuntime} from '@assistant-ui/react';
 import {act, render} from '@testing-library/react';
 import {ReactNode} from 'react';
+import {toast} from 'sonner';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useAiAgentTestingChatStore} from '../../../../stores';
@@ -23,6 +24,10 @@ vi.mock('@/shared/hooks/useSSE', () => ({
     useSSE: vi.fn(() => ({close: vi.fn(), connectionState: 'CLOSED', data: null, error: null, errorStatus: null})),
 }));
 
+vi.mock('sonner', () => ({
+    toast: {error: vi.fn()},
+}));
+
 vi.mock('@assistant-ui/react', () => ({
     AssistantRuntimeProvider: ({children}: {children: ReactNode}) => <div>{children}</div>,
     CompositeAttachmentAdapter: vi.fn(),
@@ -37,6 +42,7 @@ function getRuntimeOptions() {
     return vi.mocked(useExternalStoreRuntime).mock.lastCall![0] as unknown as {
         isRunning: boolean;
         onNew: (message: AppendMessage) => Promise<void>;
+        onReload: (parentId: string | null) => Promise<void>;
     };
 }
 
@@ -249,6 +255,52 @@ describe('AiAgentTestRuntimeProvider', () => {
             role: 'assistant',
             status: {error: 'Connection to the AI agent test failed: HTTP 500'},
         });
+        expect(getRuntimeOptions().isRunning).toBe(false);
+    });
+
+    it('resends the parent user message and drops the old answer when the user refreshes a response', async () => {
+        render(<AiAgentTestRuntimeProvider>child</AiAgentTestRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('Hi'));
+        });
+
+        act(() => {
+            getSSEOptions().eventHandlers!.result('Old answer');
+        });
+
+        await act(async () => {
+            await getRuntimeOptions().onReload('__external_store_fallback_0');
+        });
+
+        const {messages} = useAiAgentTestingChatStore.getState();
+        const streamRequest = vi.mocked(useSSE).mock.lastCall![0]!;
+
+        expect(messages).toHaveLength(2);
+        expect(messages[0]).toMatchObject({content: 'Hi', role: 'user'});
+        expect(JSON.stringify(messages[1].content)).not.toContain('Old answer');
+        expect(streamRequest.url).toBe(AI_AGENT_TESTS_URL);
+        expect(JSON.parse(streamRequest.init!.body as string)).toMatchObject({message: 'Hi'});
+        expect(getRuntimeOptions().isRunning).toBe(true);
+    });
+
+    it('shows a toast and keeps the messages when the message to refresh is not found', async () => {
+        render(<AiAgentTestRuntimeProvider>child</AiAgentTestRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('Hi'));
+        });
+
+        act(() => {
+            getSSEOptions().eventHandlers!.result('Answer');
+        });
+
+        await act(async () => {
+            await expect(getRuntimeOptions().onReload(null)).resolves.toBeUndefined();
+        });
+
+        expect(toast.error).toHaveBeenCalledWith('Could not resolve the message to refresh');
+        expect(useAiAgentTestingChatStore.getState().messages).toHaveLength(2);
         expect(getRuntimeOptions().isRunning).toBe(false);
     });
 });
