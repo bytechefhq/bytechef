@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,6 +72,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -109,6 +111,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.service.McpComponentService;
@@ -231,6 +234,9 @@ class EmbeddedConnectedUserGatesIntTest {
     private ConnectionFacade connectionFacade;
 
     @Autowired
+    private ConnectionOwnershipExemption connectionOwnershipExemption;
+
+    @Autowired
     private ConnectionService connectionService;
 
     @Autowired
@@ -275,6 +281,15 @@ class EmbeddedConnectedUserGatesIntTest {
     void beforeEach() {
         when(environmentService.getEnvironment(anyLong()))
             .thenAnswer(invocation -> Environment.values()[((Long) invocation.getArgument(0)).intValue()]);
+
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(anyLong(), any());
 
         when(connectionService.fetchConnection(AUTOMATION_CONNECTION_ID))
             .thenReturn(
@@ -443,7 +458,7 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThat(integrationInstanceRepository.findById(instanceId)).isEmpty();
         assertThat(connectedUserService.fetchConnectedUser(developmentConnectedUser.getId())).isPresent();
 
-        verify(connectionFacade).delete(INSTANCE_CONNECTION_ID);
+        verify(connectionFacade).delete(eq(INSTANCE_CONNECTION_ID), any());
     }
 
     @Test
@@ -469,7 +484,7 @@ class EmbeddedConnectedUserGatesIntTest {
             productionConnectedUserId, OWN_CONNECTION_ID, Map.of("apiKey", "new"));
         connectedUserConnectionFacade.deleteConnectedUserConnection(productionConnectedUserId, OWN_CONNECTION_ID);
 
-        verify(connectionFacade).delete(OWN_CONNECTION_ID);
+        verify(connectionFacade).delete(eq(OWN_CONNECTION_ID), any());
 
         assertThat(connectedUserConnectionRepository.findAllByConnectedUserId(productionConnectedUserId)).isEmpty();
 
@@ -508,7 +523,7 @@ class EmbeddedConnectedUserGatesIntTest {
         verify(connectionFacade).getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID);
         verify(connectionFacade).update(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of());
         verify(connectionFacade).update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0);
-        verify(connectionFacade).delete(EMBEDDED_PRODUCTION_CONNECTION_ID);
+        verify(connectionFacade).delete(eq(EMBEDDED_PRODUCTION_CONNECTION_ID), any());
 
         assertThatThrownBy(() -> connectionAdminFacade.createConnection(connectionDTO(Environment.DEVELOPMENT), false))
             .isInstanceOf(AccessDeniedException.class);
@@ -532,7 +547,7 @@ class EmbeddedConnectedUserGatesIntTest {
             .isInstanceOf(NoSuchElementException.class);
 
         verify(connectionFacade, never()).update(AUTOMATION_CONNECTION_ID, List.of());
-        verify(connectionFacade, never()).delete(AUTOMATION_CONNECTION_ID);
+        verify(connectionFacade, never()).delete(eq(AUTOMATION_CONNECTION_ID), any());
     }
 
     @Test
@@ -558,7 +573,7 @@ class EmbeddedConnectedUserGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
-        verify(connectionFacade, never()).delete(CONNECTED_USER_CREATED_CONNECTION_ID);
+        verify(connectionFacade, never()).delete(eq(CONNECTED_USER_CREATED_CONNECTION_ID), any());
 
         authenticate(EDITOR_IN_PRODUCTION, false);
 
@@ -568,7 +583,19 @@ class EmbeddedConnectedUserGatesIntTest {
 
         verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, List.of());
         verify(connectionFacade).update(CONNECTED_USER_CREATED_CONNECTION_ID, "name", List.of(), 0);
-        verify(connectionFacade).delete(CONNECTED_USER_CREATED_CONNECTION_ID);
+        verify(connectionFacade).delete(eq(CONNECTED_USER_CREATED_CONNECTION_ID), any());
+    }
+
+    @Test
+    void testOnlyConnectionsAConnectedUserOwnsAreExemptFromTheCreatorRule() {
+        createInstance(productionConnectedUser.getId());
+
+        connectedUserConnectionRepository.save(
+            new ConnectedUserConnection(null, productionConnectedUser.getId(), OWN_CONNECTION_ID));
+
+        assertThat(connectionOwnershipExemption.isConnectedUserOwned(INSTANCE_CONNECTION_ID)).isTrue();
+        assertThat(connectionOwnershipExemption.isConnectedUserOwned(OWN_CONNECTION_ID)).isTrue();
+        assertThat(connectionOwnershipExemption.isConnectedUserOwned(EMBEDDED_PRODUCTION_CONNECTION_ID)).isFalse();
     }
 
     @Test
@@ -672,6 +699,7 @@ class EmbeddedConnectedUserGatesIntTest {
 
         verify(connectionFacade, never()).create(any(ConnectionDTO.class), any());
         verify(connectionFacade, never()).delete(anyLong());
+        verify(connectionFacade, never()).delete(anyLong(), any());
         verify(connectionFacade, never()).update(anyLong(), anyList());
         verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
 

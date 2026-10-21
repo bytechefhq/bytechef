@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -180,23 +180,34 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     @Override
     @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_DELETE')")
     public void deleteConnectedUser(long id) {
-        Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
+        Map<Long, List<Long>> integrationInstanceIdsByConnectionId = new LinkedHashMap<>();
+
+        for (long connectionId : connectedUserConnectionService.getConnectionIds(id)) {
+            integrationInstanceIdsByConnectionId.put(connectionId, new ArrayList<>());
+        }
 
         for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
             id)) {
 
-            connectionIds.add(integrationInstance.getConnectionId());
+            List<Long> integrationInstanceIds = integrationInstanceIdsByConnectionId.computeIfAbsent(
+                integrationInstance.getConnectionId(), connectionId -> new ArrayList<>());
 
-            integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
+            integrationInstanceIds.add(integrationInstance.getId());
         }
 
         AutomationAuthorizationContext
             .runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
 
-        for (long connectionId : connectionIds) {
-            connectedUserConnectionService.deleteByConnectionId(connectionId);
+        for (Map.Entry<Long, List<Long>> entry : integrationInstanceIdsByConnectionId.entrySet()) {
+            long connectionId = entry.getKey();
 
-            connectionFacade.delete(connectionId);
+            connectionFacade.delete(connectionId, () -> {
+                for (long integrationInstanceId : entry.getValue()) {
+                    integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceId);
+                }
+
+                connectedUserConnectionService.deleteByConnectionId(connectionId);
+            });
         }
 
         connectedUserService.deleteConnectedUser(id);

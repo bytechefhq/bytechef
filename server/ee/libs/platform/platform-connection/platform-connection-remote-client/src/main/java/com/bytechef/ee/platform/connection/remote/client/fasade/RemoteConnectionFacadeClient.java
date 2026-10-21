@@ -35,6 +35,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
+    public void delete(Long id, Runnable releaseReferences) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Integer executeConnectionRefresh(Long connectionId) {
         throw new UnsupportedOperationException();
     }
