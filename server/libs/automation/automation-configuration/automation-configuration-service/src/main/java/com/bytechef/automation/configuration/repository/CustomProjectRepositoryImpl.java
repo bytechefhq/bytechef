@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -157,9 +158,9 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
     }
 
     @Override
-    public List<Long> findProjectIdsByWorkspaceIdExcludingOwned(long workspaceId) {
+    public List<Long> findProjectIdsByWorkspaceIdExcludingOwned(long workspaceId, Set<ProjectOwner> projectOwners) {
         String query = "SELECT project.id FROM project WHERE project.workspace_id = ? AND " +
-            projectOwnershipService.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id");
+            projectOwnershipService.getExcludeProjectsCondition(projectOwners, "project.id");
 
         return jdbcClient.sql(query)
             .param(workspaceId)

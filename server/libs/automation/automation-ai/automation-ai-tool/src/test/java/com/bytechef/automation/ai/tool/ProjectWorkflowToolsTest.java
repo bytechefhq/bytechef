@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -49,6 +50,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -199,7 +201,8 @@ class ProjectWorkflowToolsTest {
         void testSearchWorkflowsScopesToTheResolvedWorkspace() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(10L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                .thenReturn(List.of(10L));
             when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
 
             ProjectWorkflowTools tools = newTools();
@@ -215,7 +218,8 @@ class ProjectWorkflowToolsTest {
         void testSearchWorkflowsRejectsAProjectOutsideTheWorkspace() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID)).thenReturn(List.of(10L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                .thenReturn(List.of(10L));
 
             ProjectWorkflowTools tools = newTools();
 
@@ -238,7 +242,7 @@ class ProjectWorkflowToolsTest {
                 .isInstanceOf(ExecutionException.class)
                 .hasMessageContaining("workspace_required");
 
-            verify(projectService, never()).getWorkspaceProjectIds(anyLong());
+            verify(projectService, never()).getWorkspaceProjectIds(anyLong(), anySet());
             verify(projectWorkflowFacade, never()).getProjectWorkflows(anyLong());
         }
     }
@@ -725,12 +729,24 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testGetWorkflowRejectsAWorkflowOfAnOwnedProject() {
+        void testGetWorkflowReadsAWorkflowOfAnEmbeddedCatalogProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            when(projectOwnershipService.getOwnedProjectIds(List.of(7L), EnumSet.allOf(ProjectOwner.class)))
-                .thenReturn(Set.of(7L));
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 1));
+
+            WorkflowInfo workflowInfo = newTools().getWorkflow("wf-uuid-1", null, toolContext);
+
+            assertThat(workflowInfo.id()).isEqualTo("wf-uuid-1");
+        }
+
+        @Test
+        void testGetWorkflowRejectsAWorkflowOfAConnectedUserProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
+
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -799,6 +815,61 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testListWorkflowsListsAnEmbeddedCatalogProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockProject(7L, WORKSPACE_ID);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+
+            when(projectWorkflowFacade.getProjectWorkflows(7L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
+
+            List<WorkflowInfo> workflowInfos = newTools().listWorkflows(7L, null, toolContext);
+
+            assertThat(workflowInfos).hasSize(1);
+        }
+
+        @Test
+        void testListWorkflowsRejectsAConnectedUserProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockProject(7L, WORKSPACE_ID);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER);
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(() -> tools.listWorkflows(7L, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Project 7 not found in workspace " + WORKSPACE_ID);
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflows(anyLong());
+        }
+
+        @Test
+        void testCreateProjectWorkflowCreatesAWorkflowInAnEmbeddedCatalogProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockProject(7L, WORKSPACE_ID);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+
+            when(projectWorkflowFacade.addWorkflow(7L, DEFINITION))
+                .thenReturn(buildProjectWorkflow(55L, 7L, "wf-uuid-1"));
+
+            newTools().createProjectWorkflow(7L, DEFINITION, null, toolContext);
+
+            verify(projectWorkflowFacade).addWorkflow(7L, DEFINITION);
+        }
+
+        @Test
+        void testUpdateWorkflowUpdatesAWorkflowOfAnEmbeddedCatalogProject() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 3));
+
+            newTools().updateWorkflow("wf-uuid-1", DEFINITION, null, toolContext);
+
+            verify(projectWorkflowFacade).updateWorkflow("wf-uuid-1", DEFINITION, 3);
+        }
+
+        @Test
         void testCreateProjectWorkflowRejectsAProjectOfAnotherWorkspace() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, FOREIGN_WORKSPACE_ID);
@@ -846,6 +917,17 @@ class ProjectWorkflowToolsTest {
             .build();
 
         when(projectService.fetchProject(projectId)).thenReturn(Optional.of(project));
+    }
+
+    private void givenOwnedProject(long projectId, ProjectOwner projectOwner) {
+        when(projectOwnershipService.getOwnedProjectIds(any(), any()))
+            .thenAnswer(invocation -> {
+                Collection<Long> projectIds = invocation.getArgument(0);
+                Set<ProjectOwner> projectOwners = invocation.getArgument(1);
+
+                return projectIds.contains(projectId) && projectOwners.contains(projectOwner)
+                    ? Set.of(projectId) : Set.of();
+            });
     }
 
     private void mockWorkflow(String workflowId, long projectId, long workspaceId) {
