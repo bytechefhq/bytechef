@@ -28,11 +28,12 @@ public class EmbeddedOwnerContributorConfiguration {
         "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project_id = %1$s)";
     private static final String CONNECTED_USER_CLAIM_CONDITION =
         "EXISTS (SELECT 1 FROM connected_user_project WHERE connected_user_project.project_id = %1$s)";
-    private static final String EMBEDDED_DEPLOYMENT_CLAIM_CONDITION =
-        "(EXISTS (SELECT 1 FROM project_deployment owned_deployment JOIN connected_user_project ON " +
-            "connected_user_project.project_id = owned_deployment.project_id WHERE owned_deployment.id = %1$s) OR " +
-            "EXISTS (SELECT 1 FROM connected_user_reference_deployment WHERE " +
-            "connected_user_reference_deployment.project_deployment_id = %1$s))";
+    private static final String CONNECTED_USER_DEPLOYMENT_CLAIM_CONDITION =
+        "EXISTS (SELECT 1 FROM project_deployment owned_deployment JOIN connected_user_project ON " +
+            "connected_user_project.project_id = owned_deployment.project_id WHERE owned_deployment.id = %1$s)";
+    private static final String REFERENCE_DEPLOYMENT_CLAIM_CONDITION =
+        "EXISTS (SELECT 1 FROM connected_user_reference_deployment WHERE " +
+            "connected_user_reference_deployment.project_deployment_id = %1$s)";
 
     @Bean
     ProjectOwnerContributor embeddedCatalogProjectOwnerContributor() {
@@ -45,8 +46,14 @@ public class EmbeddedOwnerContributorConfiguration {
     }
 
     @Bean
-    ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor() {
+    ProjectDeploymentOwnerContributor embeddedConnectedUserProjectDeploymentOwnerContributor() {
         return ProjectDeploymentOwnerContributor.of(
-            ProjectDeploymentOwner.EMBEDDED, EMBEDDED_DEPLOYMENT_CLAIM_CONDITION);
+            ProjectDeploymentOwner.EMBEDDED, CONNECTED_USER_DEPLOYMENT_CLAIM_CONDITION);
+    }
+
+    @Bean
+    ProjectDeploymentOwnerContributor embeddedReferenceProjectDeploymentOwnerContributor() {
+        return ProjectDeploymentOwnerContributor.of(
+            ProjectDeploymentOwner.EMBEDDED, REFERENCE_DEPLOYMENT_CLAIM_CONDITION);
     }
 }
