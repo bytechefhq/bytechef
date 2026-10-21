@@ -10,14 +10,18 @@ import {
 } from '../../utils/rbacUtils';
 import {
     connectionName,
+    createAccount,
     createConnection,
+    createOrganizationConnectionId,
     createUserApiContext,
     createWorkspaceMember,
+    deleteOrganizationConnection,
     deployHttpClientProject,
     expectAccessDenied,
     expectNoGraphQlErrors,
     getConnectionResponse,
     listDeploymentJobs,
+    reassignConnection,
     runDeployedWorkflowResponse,
     setWorkspaceRole,
     updateConnectionCredentials,
@@ -100,12 +104,63 @@ test.describe('Connection credential replacement', () => {
         });
     }
 
-    test("a tenant admin replaces the credentials of a colleague's connection", async ({adminApi, rbacWorkspace}) => {
+    test("a tenant admin cannot replace the credentials of a colleague's connection", async ({
+        adminApi,
+        rbacWorkspace,
+    }) => {
         const connectionId = await createConnection(apis.EDITOR!, rbacWorkspace.id);
 
         const version = await connectionVersion(adminApi, connectionId);
 
-        expectNoGraphQlErrors(await updateConnectionCredentials(adminApi, connectionId, {}, version));
+        expectAccessDenied(await updateConnectionCredentials(adminApi, connectionId, {}, version));
+        expect(await connectionVersion(adminApi, connectionId)).toBe(version);
+    });
+
+    test("a second tenant admin replaces the credentials of another admin's organization connection", async ({
+        adminApi,
+    }) => {
+        const secondAdmin = await createAccount(adminApi, 'ROLE_ADMIN');
+        const secondAdminApi = await createUserApiContext(secondAdmin.email, secondAdmin.password);
+        const connectionId = await createOrganizationConnectionId(adminApi);
+
+        try {
+            const version = await connectionVersion(adminApi, connectionId);
+
+            expectAccessDenied(await updateConnectionCredentials(apis.ADMIN!, connectionId, {}, version));
+            expectNoGraphQlErrors(await updateConnectionCredentials(secondAdminApi, connectionId, {}, version));
+        } finally {
+            await secondAdminApi.dispose();
+
+            await deleteOrganizationConnection(adminApi, connectionId);
+
+            await deleteRoleUser(adminApi, secondAdmin);
+        }
+    });
+
+    test('the member a connection is reassigned to replaces its credentials and the previous owner cannot', async ({
+        adminApi,
+        rbacWorkspace,
+        workerRoleUsers,
+    }) => {
+        const previousOwner = await createWorkspaceMember(adminApi, rbacWorkspace.id, 'EDITOR');
+        const previousOwnerApi = await createUserApiContext(previousOwner.email, previousOwner.password);
+
+        try {
+            const connectionId = await createConnection(previousOwnerApi, rbacWorkspace.id);
+
+            expectNoGraphQlErrors(
+                await reassignConnection(adminApi, rbacWorkspace.id, connectionId, workerRoleUsers.EDITOR.login)
+            );
+
+            const version = await connectionVersion(adminApi, connectionId);
+
+            expectAccessDenied(await updateConnectionCredentials(previousOwnerApi, connectionId, {}, version));
+            expectNoGraphQlErrors(await updateConnectionCredentials(apis.EDITOR!, connectionId, {}, version));
+        } finally {
+            await previousOwnerApi.dispose();
+
+            await deleteRoleUser(adminApi, previousOwner);
+        }
     });
 
     test('a member who is neither the owner nor a tenant admin cannot replace the credentials', async ({
@@ -128,7 +183,7 @@ test.describe('Connection credential replacement', () => {
 
         const version = await connectionVersion(adminApi, connectionId);
 
-        const response = await updateConnectionCredentials(adminApi, connectionId, {}, version + 5);
+        const response = await updateConnectionCredentials(apis.EDITOR!, connectionId, {}, version + 5);
 
         expect(JSON.stringify(response.errors)).toMatch(/modified by someone else/);
     });
@@ -143,7 +198,7 @@ test.describe('Connection credential replacement', () => {
 
         const version = await connectionVersion(adminApi, connectionId);
 
-        expectNoGraphQlErrors(await updateConnectionCredentials(adminApi, connectionId, {}, version));
+        expectNoGraphQlErrors(await updateConnectionCredentials(apis.EDITOR!, connectionId, {}, version));
 
         const runResponse = await runDeployedWorkflowResponse(apis.EDITOR!, deployment);
 
@@ -156,7 +211,7 @@ test.describe('Connection credential replacement', () => {
         }).toPass({timeout: 60000});
     });
 
-    test('an EDITOR owner and a tenant admin are offered Update credentials; a VIEWER owner and non-owners get no Edit', async ({
+    test('an EDITOR owner is offered Update credentials; a tenant admin sees them hidden; a VIEWER owner and non-owners get no Edit', async ({
         adminApi,
         browser,
         rbacWorkspace,
@@ -199,7 +254,8 @@ test.describe('Connection credential replacement', () => {
             try {
                 const dialog = await openEditDialog(tenantAdmin.page, name);
 
-                await expect(dialog.getByRole('button', {name: 'Update credentials'})).toBeVisible();
+                await expect(dialog.getByText('Hidden').first()).toBeVisible();
+                await expect(dialog.getByRole('button', {name: 'Update credentials'})).toHaveCount(0);
             } finally {
                 await tenantAdmin.context.close();
             }
