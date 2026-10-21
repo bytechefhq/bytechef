@@ -1099,7 +1099,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testSizeOfArray() {
+    void testSizeOfArray() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("size", "=size(${textHelper_1})", "last", "=${textHelper_1}[size(${textHelper_1}) - 1]"),
             Map.of("textHelper_1", "prvi,drugi,treci,cetvrti".split(",")));
@@ -1109,7 +1109,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testSizeOfMap() {
+    void testSizeOfMap() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("size", "=size(${map})"), Map.of("map", Map.of("a", 1, "b", 2)));
 
