@@ -80,6 +80,29 @@ jobs:
         with:
           projectBaseDir: client/
 
+  sdk-app:
+    runs-on: ubuntu-latest
+    env:
+      BYTECHEF_APP_KEY: sk-ci-canary-4b9e
+      BYTECHEF_URL: https://example.invalid
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: sdks/frontend/automation/app/package-lock.json
+      - name: Check, build and verify the app SDK
+        working-directory: sdks/frontend/automation/app
+        run: |
+          npm ci
+          npm run format
+          npm run check:all
+          npm run build:all
+          npm run check:test-app
+          npm run check:template
+
   server:
     runs-on: ubuntu-latest
 

@@ -1,0 +1,1 @@
+{"$schema": "https://openapi.vercel.sh/vercel.json", "buildCommand": "npm run check", "framework": "tanstack-start"}
