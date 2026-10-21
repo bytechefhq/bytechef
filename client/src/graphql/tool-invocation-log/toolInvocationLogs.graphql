@@ -6,6 +6,7 @@ query ToolInvocationLogs(
     $mcpServerId: Long
     $connectedUserId: Long
     $integrationInstanceId: Long
+    $appId: Long
     $fromDate: Long
     $toDate: Long
     $page: Int
@@ -18,6 +19,7 @@ query ToolInvocationLogs(
         mcpServerId: $mcpServerId
         connectedUserId: $connectedUserId
         integrationInstanceId: $integrationInstanceId
+        appId: $appId
         fromDate: $fromDate
         toDate: $toDate
         page: $page
@@ -37,6 +39,7 @@ query ToolInvocationLogs(
             integrationInstanceId
             mcpServerId
             jobId
+            appId
             workflowName
             outcome
             errorType

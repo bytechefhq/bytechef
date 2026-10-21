@@ -1,0 +1,11 @@
+query appBindableApiCollections($appId: ID!) {
+    appBindableApiCollections(appId: $appId) {
+        apiCollectionId
+        name
+        contextPath
+        collectionVersion
+        projectId
+        projectName
+        available
+    }
+}

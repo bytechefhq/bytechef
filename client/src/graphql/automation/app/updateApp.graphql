@@ -1,0 +1,22 @@
+mutation updateApp($id: ID!, $input: AppInput!) {
+    updateApp(id: $id, input: $input) {
+        id
+        uuid
+        name
+        description
+        workspaceId
+        environmentId
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        lastDeployedDate
+        secretKeyHint
+        secretKeyLastUsedDate
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

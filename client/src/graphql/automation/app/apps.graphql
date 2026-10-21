@@ -1,0 +1,22 @@
+query apps($workspaceId: ID!, $environmentId: ID!) {
+    apps(workspaceId: $workspaceId, environmentId: $environmentId) {
+        id
+        uuid
+        name
+        description
+        workspaceId
+        environmentId
+        ownerUserId
+        status
+        visibility
+        hostingTarget
+        url
+        lastDeployedDate
+        secretKeyHint
+        secretKeyLastUsedDate
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

@@ -1,4 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import {parseAppId} from '@/pages/automation/tool-invocations/utils/parseAppId';
 import {
     PlatformType,
     ToolInvocationLogsQuery,
@@ -8,6 +9,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {endOfDay} from 'date-fns';
 import {useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
 
 type ToolInvocationLogItemType = ToolInvocationLogsQuery['toolInvocationLogs']['content'][number];
 
@@ -23,6 +25,7 @@ export interface UseToolInvocationsOptionsI {
 }
 
 interface ToolInvocationsFiltersI {
+    appId: string | undefined;
     endDate: Date | undefined;
     mcpServerId: string | undefined;
     outcome: string | undefined;
@@ -32,12 +35,14 @@ interface ToolInvocationsFiltersI {
 }
 
 interface UseToolInvocationsI {
+    filterAppId: string | undefined;
     filterEndDate: Date | undefined;
     filterMcpServerId: string | undefined;
     filterOutcome: string | undefined;
     filterPageNumber: number;
     filterStartDate: Date | undefined;
     filterSurface: string | undefined;
+    handleAppChange: (item?: ComboBoxItemType) => void;
     handleEndDateChange: (date: Date | undefined) => void;
     handleMcpServerChange: (item?: ComboBoxItemType) => void;
     handleOutcomeChange: (item?: ComboBoxItemType) => void;
@@ -57,6 +62,7 @@ const toFilterVariables = (
     type: PlatformType,
     environmentId?: number
 ): ToolInvocationLogsQueryVariables => ({
+    appId: parseAppId(filters.appId),
     environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
@@ -72,6 +78,13 @@ export const useToolInvocations = ({
     type,
     workspaceScope,
 }: UseToolInvocationsOptionsI): UseToolInvocationsI => {
+    const [searchParams] = useSearchParams();
+
+    const [filterAppId, setFilterAppId] = useState<string | undefined>(() => {
+        const appId = parseAppId(searchParams.get('appId'));
+
+        return appId === undefined ? undefined : String(appId);
+    });
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
     const [filterOutcome, setFilterOutcome] = useState<string | undefined>(undefined);
@@ -81,6 +94,7 @@ export const useToolInvocations = ({
 
     const filterVariables = toFilterVariables(
         {
+            appId: filterAppId,
             endDate: filterEndDate,
             mcpServerId: filterMcpServerId,
             outcome: filterOutcome,
@@ -108,6 +122,13 @@ export const useToolInvocations = ({
     const toolInvocationLogPage = workspaceScoped
         ? workspaceQuery.data?.workspaceToolInvocationLogs
         : tenantQuery.data?.toolInvocationLogs;
+
+    const handleAppChange = (item?: ComboBoxItemType) => {
+        const appId = parseAppId(item?.value ? String(item.value) : undefined);
+
+        setFilterAppId(appId === undefined ? undefined : String(appId));
+        setFilterPageNumber(0);
+    };
 
     const handleEndDateChange = (date: Date | undefined) => {
         setFilterEndDate(date);
@@ -137,12 +158,14 @@ export const useToolInvocations = ({
     };
 
     return {
+        filterAppId,
         filterEndDate,
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
         filterStartDate,
         filterSurface,
+        handleAppChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,

@@ -1,0 +1,3 @@
+mutation unbindAppWorkflow($appId: ID!, $workflowKey: String!) {
+    unbindAppWorkflow(appId: $appId, workflowKey: $workflowKey)
+}

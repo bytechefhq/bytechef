@@ -34,7 +34,14 @@ const outcomeOptions = [
 ];
 
 const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
-    [PlatformType.Automation]: [{label: 'Automation MCP', value: 'MCP_AUTOMATION'}],
+    [PlatformType.Automation]: [
+        {label: 'Automation MCP', value: 'MCP_AUTOMATION'},
+        {label: 'App action', value: 'AUTOMATION_APP_ACTION'},
+        {label: 'App API', value: 'AUTOMATION_APP_API'},
+        {label: 'App tool', value: 'AUTOMATION_APP_TOOL'},
+        {label: 'App proxy', value: 'AUTOMATION_APP_PROXY'},
+        {label: 'App workflow', value: 'AUTOMATION_APP_WORKFLOW'},
+    ],
     [PlatformType.Embedded]: [
         {label: 'Embedded MCP', value: 'MCP_EMBEDDED'},
         {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
@@ -43,6 +50,7 @@ const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
 };
 
 interface ToolInvocationsProps {
+    appOptions?: Array<ComboBoxItemType>;
     environmentId?: number;
     /* Shown instead of the filters and the table when nothing has been recorded yet and no filter is set. */
     firstRunEmptyState: ReactNode;
@@ -52,6 +60,7 @@ interface ToolInvocationsProps {
 }
 
 export const ToolInvocations = ({
+    appOptions,
     environmentId,
     firstRunEmptyState,
     mcpServerOptions,
@@ -59,12 +68,14 @@ export const ToolInvocations = ({
     workspaceScope,
 }: ToolInvocationsProps) => {
     const {
+        filterAppId,
         filterEndDate,
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
         filterStartDate,
         filterSurface,
+        handleAppChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,
@@ -92,7 +103,12 @@ export const ToolInvocations = ({
     const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
 
     const hasActiveFilters =
-        !!filterEndDate || !!filterMcpServerId || !!filterOutcome || !!filterStartDate || !!filterSurface;
+        !!filterAppId ||
+        !!filterEndDate ||
+        !!filterMcpServerId ||
+        !!filterOutcome ||
+        !!filterStartDate ||
+        !!filterSurface;
 
     const isFirstRun =
         !toolInvocationLogsIsLoading &&
@@ -174,6 +190,18 @@ export const ToolInvocations = ({
                                 items={[ANY_FILTER_OPTION, ...mcpServerOptions]}
                                 onChange={handleMcpServerChange}
                                 value={filterMcpServerId}
+                            />
+                        </div>
+                    )}
+
+                    {appOptions && appOptions.length > 0 && (
+                        <div className="flex flex-col space-y-2">
+                            <Label>App</Label>
+
+                            <ComboBox
+                                items={[ANY_FILTER_OPTION, ...appOptions]}
+                                onChange={handleAppChange}
+                                value={filterAppId}
                             />
                         </div>
                     )}

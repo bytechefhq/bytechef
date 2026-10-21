@@ -1,0 +1,13 @@
+query appApiCollections($appId: ID!) {
+    appApiCollections(appId: $appId) {
+        id
+        appId
+        apiCollectionId
+        name
+        contextPath
+        collectionVersion
+        projectId
+        projectName
+        available
+    }
+}

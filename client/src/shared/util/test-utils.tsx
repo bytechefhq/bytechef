@@ -2,7 +2,7 @@ import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {cleanup, render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
-import {afterEach, vi} from 'vitest';
+import {type Mock, afterEach, vi} from 'vitest';
 
 afterEach(() => {
     cleanup();
@@ -100,6 +100,71 @@ export const renderConnectionComponent = (ui: ReactElement, options = {}) => {
         wrapper: ({children}) => <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>,
         ...options,
     });
+};
+
+interface MutationMockOptionsI<TData, TVariables> {
+    onError?: (error: unknown, variables: TVariables) => void;
+    onSuccess?: (data: TData, variables: TVariables) => void;
+}
+
+/**
+ * Wires a stable stand-in implementation onto an already-mocked generated `useXMutation` GraphQL
+ * hook.
+ *
+ * The naive `vi.mock('@/shared/middleware/graphql', () => ({useXMutation: () => ({isPending:
+ * false, mutate: vi.fn()})}))` creates a BRAND NEW `mutate` function every time the hook is called
+ * (i.e. on every render), which both breaks any `useEffect` keyed on the mutation and makes
+ * `expect(mutate).toHaveBeenCalled()` silently meaningless — the assertion only ever sees whichever
+ * `mutate` instance happened to run last. This helper keeps `mutate` at one stable identity across
+ * renders and captures the latest `onSuccess`/`onError` the component passed in, so a test can
+ * trigger them manually to exercise the onSuccess -> invalidateQueries -> onClose chain.
+ *
+ * `vi.mock` factories hoist above module-scope `const` declarations (see CLAUDE.md's "Vitest mock
+ * factory hoisting"), so this can't be called from inside the factory itself. Instead, mock the
+ * hook as a bare `vi.fn()` in the factory, grab it back via `await import(...)`, and call this
+ * helper on the result — the same shape already used by `useTruncateTaskMessages.test.tsx`.
+ *
+ * Usage:
+ * ```ts
+ * vi.mock('@/shared/middleware/graphql', () => ({
+ *     useCreateWorkflowAlertRuleMutation: vi.fn(),
+ * }));
+ *
+ * const {useCreateWorkflowAlertRuleMutation} = await import('@/shared/middleware/graphql');
+ *
+ * const createRuleMutation = stubMutation(vi.mocked(useCreateWorkflowAlertRuleMutation));
+ *
+ * // in a test:
+ * expect(createRuleMutation.mutate).toHaveBeenCalledWith({input, workspaceId: '1'});
+ * createRuleMutation.triggerOnSuccess(undefined, {input, workspaceId: '1'});
+ * expect(onClose).toHaveBeenCalledTimes(1);
+ * ```
+ */
+export const stubMutation = <TData = unknown, TVariables = unknown>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationHookMock: Mock<(...args: any[]) => any>
+) => {
+    let latestOnError: MutationMockOptionsI<TData, TVariables>['onError'];
+    let latestOnSuccess: MutationMockOptionsI<TData, TVariables>['onSuccess'];
+
+    const mutate = vi.fn();
+
+    mutationHookMock.mockImplementation((options?: MutationMockOptionsI<TData, TVariables>) => {
+        latestOnError = options?.onError;
+        latestOnSuccess = options?.onSuccess;
+
+        return {isPending: false, mutate};
+    });
+
+    const triggerOnError = (error: unknown, variables: TVariables) => {
+        latestOnError?.(error, variables);
+    };
+
+    const triggerOnSuccess = (data: TData, variables: TVariables) => {
+        latestOnSuccess?.(data, variables);
+    };
+
+    return {mutate, triggerOnError, triggerOnSuccess};
 };
 
 export * from '@testing-library/react';

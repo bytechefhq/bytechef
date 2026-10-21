@@ -7,6 +7,7 @@ query WorkspaceToolInvocationLogs(
     $mcpServerId: Long
     $connectedUserId: Long
     $integrationInstanceId: Long
+    $appId: Long
     $fromDate: Long
     $toDate: Long
     $page: Int
@@ -20,6 +21,7 @@ query WorkspaceToolInvocationLogs(
         mcpServerId: $mcpServerId
         connectedUserId: $connectedUserId
         integrationInstanceId: $integrationInstanceId
+        appId: $appId
         fromDate: $fromDate
         toDate: $toDate
         page: $page
@@ -39,6 +41,7 @@ query WorkspaceToolInvocationLogs(
             integrationInstanceId
             mcpServerId
             jobId
+            appId
             workflowName
             outcome
             errorType

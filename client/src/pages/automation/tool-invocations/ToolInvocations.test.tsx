@@ -29,6 +29,7 @@ vi.mock('@/components/ComboBox/ComboBox', () => ({
 
 const toolInvocationsState = () => ({
     filterPageNumber: 0,
+    handleAppChange: vi.fn(),
     handleEndDateChange: vi.fn(),
     handleMcpServerChange: vi.fn(),
     handleOutcomeChange: vi.fn(),
@@ -89,16 +90,42 @@ describe('ToolInvocations', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(toolInvocationsState());
     });
 
-    it('shows no surface filter or column on the automation page, which has a single surface', () => {
+    it('offers the automation MCP and the app surfaces, but no embedded surface, on the automation page', () => {
         hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
 
         renderToolInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
         const itemValues = renderedItemValues();
 
-        expect(itemValues).not.toContain('MCP_AUTOMATION');
-        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
-        expect(screen.queryByText('Automation MCP')).not.toBeInTheDocument();
+        expect(itemValues).toEqual(
+            expect.arrayContaining([
+                'AUTOMATION_APP_ACTION',
+                'AUTOMATION_APP_API',
+                'AUTOMATION_APP_PROXY',
+                'AUTOMATION_APP_TOOL',
+                'AUTOMATION_APP_WORKFLOW',
+                'MCP_AUTOMATION',
+            ])
+        );
+        expect(itemValues).not.toContain('EMBEDDED_API_ACTION');
+        expect(itemValues).not.toContain('EMBEDDED_API_TOOL');
+        expect(itemValues).not.toContain('MCP_EMBEDDED');
+        expect(screen.getByText('Surface', {selector: 'label'})).toBeInTheDocument();
+    });
+
+    it('offers the app filter only when the workspace has apps', () => {
+        hoisted.useToolInvocationsMock.mockReturnValue(recordedToolInvocationsState());
+
+        const {unmount} = renderToolInvocations({appOptions: []});
+
+        expect(screen.queryByText('App', {selector: 'label'})).not.toBeInTheDocument();
+
+        unmount();
+
+        renderToolInvocations({appOptions: [{label: 'Support', value: '5'}]});
+
+        expect(screen.getByText('App', {selector: 'label'})).toBeInTheDocument();
+        expect(renderedItemValues()).toContain('5');
     });
 
     it('shows the name of the MCP server each invocation came through', () => {

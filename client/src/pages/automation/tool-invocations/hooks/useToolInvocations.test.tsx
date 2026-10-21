@@ -1,4 +1,6 @@
 import {act, renderHook} from '@testing-library/react';
+import {ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {ToolInvocationsWorkspaceScopeI, UseToolInvocationsOptionsI, useToolInvocations} from './useToolInvocations';
@@ -22,11 +24,22 @@ const emptyQueryResult = () => ({
     refetch: vi.fn(),
 });
 
-const renderUseToolInvocations = (workspaceScope?: ToolInvocationsWorkspaceScopeI) =>
-    renderHook(() => useToolInvocations({type: 'AUTOMATION' as UseToolInvocationsOptionsI['type'], workspaceScope}));
+const routerWrapper =
+    (initialEntry: string) =>
+    ({children}: {children: ReactNode}) => <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>;
+
+const renderUseToolInvocations = (
+    workspaceScope?: ToolInvocationsWorkspaceScopeI,
+    initialEntry = '/automation/executions/tool-invocations'
+) =>
+    renderHook(() => useToolInvocations({type: 'AUTOMATION' as UseToolInvocationsOptionsI['type'], workspaceScope}), {
+        wrapper: routerWrapper(initialEntry),
+    });
 
 const renderUseEmbeddedToolInvocations = (environmentId?: number) =>
-    renderHook(() => useToolInvocations({environmentId, type: 'EMBEDDED' as UseToolInvocationsOptionsI['type']}));
+    renderHook(() => useToolInvocations({environmentId, type: 'EMBEDDED' as UseToolInvocationsOptionsI['type']}), {
+        wrapper: routerWrapper('/embedded/executions/tool-invocations'),
+    });
 
 describe('useToolInvocations', () => {
     beforeEach(() => {
@@ -34,6 +47,55 @@ describe('useToolInvocations', () => {
         hoisted.useToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
         hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReset();
         hoisted.useWorkspaceToolInvocationLogsQueryMock.mockReturnValue(emptyQueryResult());
+    });
+
+    it('reads the appId search parameter into the initial filter', () => {
+        const {result} = renderUseToolInvocations(undefined, '/automation/executions/tool-invocations?appId=7');
+
+        expect(result.current.filterAppId).toBe('7');
+        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: 7, page: 0}),
+            {enabled: true}
+        );
+    });
+
+    it('ignores a malformed appId search parameter', () => {
+        const {result} = renderUseToolInvocations(undefined, '/automation/executions/tool-invocations?appId=abc');
+
+        expect(result.current.filterAppId).toBeUndefined();
+        expect(hoisted.useToolInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: undefined}),
+            {enabled: true}
+        );
+    });
+
+    it('changes the app filter and resets the page', () => {
+        const {result} = renderUseToolInvocations();
+
+        act(() => result.current.handlePaginationClick(3));
+
+        expect(result.current.filterPageNumber).toBe(3);
+
+        act(() => result.current.handleAppChange({label: 'CRM', value: '9'}));
+
+        expect(result.current.filterAppId).toBe('9');
+        expect(result.current.filterPageNumber).toBe(0);
+
+        act(() => result.current.handleAppChange({label: 'Any', value: ''}));
+
+        expect(result.current.filterAppId).toBeUndefined();
+    });
+
+    it('passes the app filter to the workspace query', () => {
+        renderUseToolInvocations(
+            {environmentId: 2, workspaceId: 1049},
+            '/automation/executions/tool-invocations?appId=7'
+        );
+
+        expect(hoisted.useWorkspaceToolInvocationLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({appId: 7, environmentId: '2', type: 'AUTOMATION', workspaceId: '1049'}),
+            {enabled: true}
+        );
     });
 
     it('queries the tenant-wide log and leaves the workspace query off without a workspace scope', () => {
