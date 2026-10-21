@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -23,6 +24,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
     private static final String CONNECTION_TYPE = "Connection";
+    private static final String CONNECTION_VIEW = "CONNECTION_VIEW";
 
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserConnectionService connectedUserConnectionService;
@@ -149,7 +152,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW')")
     public List<Tag> getConnectionTags() {
-        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
+        Set<Integer> viewableEnvironmentIds = Arrays.stream(Environment.values())
+            .filter(environment -> permissionService.hasEmbeddedScope(CONNECTION_VIEW, environment))
+            .map(Environment::ordinal)
+            .collect(Collectors.toSet());
+
+        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED)
+            .stream()
+            .filter(connection -> viewableEnvironmentIds.contains(connection.getEnvironmentId()))
+            .toList();
 
         Set<Long> connectionIds = connections.stream()
             .map(Connection::getId)
