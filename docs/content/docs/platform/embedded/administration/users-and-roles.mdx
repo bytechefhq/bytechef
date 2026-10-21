@@ -140,7 +140,7 @@ Run responses never include connection parameters, whatever the role.
     Removing a member does not delete the API keys they created. Delete those keys yourself if the member should no longer be able to use them.
 </Callout>
 
-Embedded connections can be edited and deleted by anyone who holds `CONNECTION_EDIT` or `CONNECTION_DELETE`, whoever created them.
+Connections that belong to connected users are managed by scope: a member who holds `CONNECTION_EDIT` or `CONNECTION_DELETE` can edit or delete them. Connections a member created can be changed only by that member or a tenant admin.
 
 ---
 
