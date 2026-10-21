@@ -64,9 +64,11 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -105,6 +107,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
     private static final String INSTANCE_CONFIGURATION_EDIT = "INTEGRATION_INSTANCE_CONFIGURATION_EDIT";
     private static final String INSTANCE_CONFIGURATION_TYPE = "IntegrationInstanceConfiguration";
+    private static final String INSTANCE_CONFIGURATION_VIEW = "INTEGRATION_INSTANCE_CONFIGURATION_VIEW";
 
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
@@ -542,9 +545,15 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
 
+        Set<Environment> viewableEnvironments = Arrays.stream(Environment.values())
+            .filter(environment -> permissionService.hasEmbeddedScope(INSTANCE_CONFIGURATION_VIEW, environment))
+            .collect(Collectors.toCollection(() -> EnumSet.noneOf(Environment.class)));
+
         return tagService.getTags(
             integrationInstanceConfigurations
                 .stream()
+                .filter(integrationInstanceConfiguration -> viewableEnvironments.contains(
+                    integrationInstanceConfiguration.getEnvironment()))
                 .map(IntegrationInstanceConfiguration::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());

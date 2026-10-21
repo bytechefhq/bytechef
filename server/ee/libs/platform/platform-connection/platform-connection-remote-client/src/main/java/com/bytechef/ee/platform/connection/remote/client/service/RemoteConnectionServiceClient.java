@@ -71,8 +71,8 @@ public class RemoteConnectionServiceClient implements ConnectionService {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
-                .path("/remote/connection-service/get-connections")
-                .build(),
+                .path("/remote/connection-service/get-connections/{type}")
+                .build(type),
             new ParameterizedTypeReference<>() {});
     }
 
