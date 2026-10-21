@@ -19,6 +19,8 @@ package com.bytechef.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -30,6 +32,7 @@ import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
@@ -41,10 +44,13 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import javax.sql.DataSource;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -196,6 +203,40 @@ public class ProjectOwnershipServiceIntTest {
     }
 
     @Test
+    public void testExcludeKeepsRowsWhoseOwnerConditionIsNull() {
+        long ownedProjectId = saveProject("p1");
+        long plainProjectId = saveProject("p2");
+
+        long ownedDeploymentId = saveDeployment(plainProjectId, "d1");
+        long plainDeploymentId = saveDeployment(plainProjectId, "d2");
+
+        ProjectOwnershipService service = new ProjectOwnershipServiceImpl(
+            jdbcClient,
+            List.of(
+                ProjectDeploymentOwnerContributor.of(
+                    ProjectDeploymentOwner.MCP_SERVER, "%1$s IN (" + ownedDeploymentId + ", NULL)")),
+            List.of(
+                ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CATALOG, "%1$s IN (" + ownedProjectId + ", NULL)")));
+
+        List<Long> unownedProjectIds = jdbcClient
+            .sql(
+                "SELECT id FROM project WHERE " +
+                    service.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id"))
+            .query(Long.class)
+            .list();
+        List<Long> unownedDeploymentIds = jdbcClient
+            .sql(
+                "SELECT id FROM project_deployment WHERE " +
+                    service.getExcludeProjectDeploymentsCondition(
+                        EnumSet.allOf(ProjectDeploymentOwner.class), "project_deployment.id"))
+            .query(Long.class)
+            .list();
+
+        assertThat(unownedProjectIds).containsExactly(plainProjectId);
+        assertThat(unownedDeploymentIds).containsExactly(plainDeploymentId);
+    }
+
+    @Test
     public void testContributorsSharingAnOwnerAreCombinedWithOr() {
         long projectId = saveProject("p1");
 
@@ -230,25 +271,6 @@ public class ProjectOwnershipServiceIntTest {
         assertThat(embeddedDeploymentIds)
             .containsExactlyInAnyOrder(connectedUserDeploymentId, referenceDeploymentId);
         assertThat(unownedDeploymentIds).containsExactly(plainDeploymentId);
-    }
-
-    @Test
-    public void testSelectWithoutContributorMatchesNothing() {
-        ProjectOwnershipService emptyService = new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of());
-
-        assertThat(
-            emptyService.getSelectProjectDeploymentsCondition(ProjectDeploymentOwner.EMBEDDED, "project_deployment.id"))
-                .isEqualTo("1 = 0");
-    }
-
-    @Test
-    public void testExcludeWithoutContributorKeepsEverything() {
-        ProjectOwnershipService emptyService = new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of());
-
-        assertThat(
-            emptyService.getExcludeProjectDeploymentsCondition(
-                Set.of(ProjectDeploymentOwner.EMBEDDED), "project_deployment.id"))
-                    .isEqualTo("1 = 1");
     }
 
     @Test
@@ -291,6 +313,24 @@ public class ProjectOwnershipServiceIntTest {
         assertThat(projectIds).containsExactlyInAnyOrder(firstProjectId, secondProjectId);
         assertThat(excludedProjectDeploymentIds).containsExactly(projectDeployment.getId());
         assertThat(selectedProjectDeploymentIds).isEmpty();
+    }
+
+    @Test
+    public void testConditionsRejectAnIdColumnThatIsNotValidatedAtStartup() {
+        assertThatThrownBy(
+            () -> projectOwnershipService.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "p.id"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("validated against at startup");
+        assertThatThrownBy(
+            () -> projectOwnershipService.getExcludeProjectDeploymentsCondition(
+                EnumSet.allOf(ProjectDeploymentOwner.class), "project_deployment.project_id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("validated against at startup");
+        assertThatThrownBy(
+            () -> projectOwnershipService.getSelectProjectDeploymentsCondition(
+                ProjectDeploymentOwner.EMBEDDED, "pd.id"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("validated against at startup");
     }
 
     @Test
@@ -354,9 +394,30 @@ public class ProjectOwnershipServiceIntTest {
             List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)), true);
 
         assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("[EMBEDDED_CATALOG]")
-            .hasMessageContaining("[EMBEDDED]");
+            .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                assertThat(exception.getProjectOwners()).containsExactly(ProjectOwner.EMBEDDED_CATALOG);
+                assertThat(exception.getProjectDeploymentOwners()).containsExactly(ProjectDeploymentOwner.EMBEDDED);
+            });
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedReportsMissingEmbeddedContributorsTogetherWithOwnersThatHaveRows() {
+        createOwnerTableWithRow("mcp_project", "project_deployment_id");
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(), List.of(), true);
+
+            assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                    assertThat(exception.getProjectOwners())
+                        .containsExactly(ProjectOwner.EMBEDDED_CATALOG, ProjectOwner.EMBEDDED_CONNECTED_USER);
+                    assertThat(exception.getProjectDeploymentOwners())
+                        .containsExactly(ProjectDeploymentOwner.EMBEDDED, ProjectDeploymentOwner.MCP_SERVER);
+                });
+        } finally {
+            dropOwnerTables("mcp_project");
+        }
     }
 
     @Test
@@ -380,26 +441,23 @@ public class ProjectOwnershipServiceIntTest {
     }
 
     @Test
-    public void testAfterSingletonsInstantiatedDoesNotWarnInTheCommunityEditionWithoutEmbeddedChangesets() {
+    public void testAfterSingletonsInstantiatedOnlyLogsInfoInTheCommunityEditionWithoutOwnerTables() {
         ListAppender<ILoggingEvent> appender = attachAppender();
 
         try {
             new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of(), false).afterSingletonsInstantiated();
 
-            assertThat(appender.list).noneMatch(event -> event.getLevel() == Level.WARN);
+            assertThat(appender.list).extracting(ILoggingEvent::getLevel)
+                .containsOnly(Level.INFO);
         } finally {
             detachAppender(appender);
         }
     }
 
     @Test
-    public void testAfterSingletonsInstantiatedWarnsInTheCommunityEditionWhenEmbeddedChangesetsWereApplied() {
+    public void testAfterSingletonsInstantiatedDoesNotThrowInTheCommunityEditionWithEmptyOwnerTables() {
         jdbcClient
-            .sql(
-                "INSERT INTO databasechangelog (id, author, filename, dateexecuted, orderexecuted, exectype) " +
-                    "VALUES ('owner-test-embedded', 'test', " +
-                    "'config/liquibase/changelog/embedded/test/embedded_test.xml', CURRENT_TIMESTAMP, 999999, " +
-                    "'EXECUTED')")
+            .sql("CREATE TABLE connected_user_project (project_id BIGINT)")
             .update();
 
         ListAppender<ILoggingEvent> appender = attachAppender();
@@ -407,17 +465,241 @@ public class ProjectOwnershipServiceIntTest {
         try {
             new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of(), false).afterSingletonsInstantiated();
 
-            assertThat(appender.list)
-                .filteredOn(event -> event.getLevel() == Level.WARN)
-                .singleElement()
-                .satisfies(event -> assertThat(event.getFormattedMessage())
-                    .contains("EMBEDDED_CATALOG", "EMBEDDED_CONNECTED_USER", "EMBEDDED"));
+            assertThat(appender.list).extracting(ILoggingEvent::getLevel)
+                .containsOnly(Level.INFO);
         } finally {
             detachAppender(appender);
 
             jdbcClient
-                .sql("DELETE FROM databasechangelog WHERE id = 'owner-test-embedded'")
+                .sql("DROP TABLE connected_user_project")
                 .update();
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedThrowsInTheCommunityEditionWhenOwnerRowsExistWithoutAContributor() {
+        jdbcClient
+            .sql("CREATE TABLE connected_user_project (project_id BIGINT)")
+            .update();
+        jdbcClient
+            .sql("INSERT INTO connected_user_project (project_id) VALUES (1)")
+            .update();
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(), List.of(), false);
+
+            assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                    assertThat(exception.getProjectOwners()).containsExactly(ProjectOwner.EMBEDDED_CONNECTED_USER);
+                    assertThat(exception.getProjectDeploymentOwners()).containsExactly(ProjectDeploymentOwner.EMBEDDED);
+                });
+        } finally {
+            jdbcClient
+                .sql("DROP TABLE connected_user_project")
+                .update();
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedThrowsWhenOnlyReferenceDeploymentRowsExistWithoutAContributor() {
+        jdbcClient
+            .sql("CREATE TABLE connected_user_reference_deployment (project_deployment_id BIGINT)")
+            .update();
+        jdbcClient
+            .sql("INSERT INTO connected_user_reference_deployment (project_deployment_id) VALUES (1)")
+            .update();
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(), List.of(), false);
+
+            assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                    assertThat(exception.getProjectOwners()).isEmpty();
+                    assertThat(exception.getProjectDeploymentOwners()).containsExactly(ProjectDeploymentOwner.EMBEDDED);
+                });
+        } finally {
+            jdbcClient
+                .sql("DROP TABLE connected_user_reference_deployment")
+                .update();
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedThrowsWhenOwnerRowsExistInAnotherSchema() {
+        jdbcClient
+            .sql("CREATE SCHEMA tenant_owner_check")
+            .update();
+        jdbcClient
+            .sql("CREATE TABLE tenant_owner_check.mcp_project (project_deployment_id BIGINT)")
+            .update();
+        jdbcClient
+            .sql("INSERT INTO tenant_owner_check.mcp_project (project_deployment_id) VALUES (1)")
+            .update();
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient, List.of(), List.of(), false);
+
+            assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                    assertThat(exception.getProjectOwners()).isEmpty();
+                    assertThat(exception.getProjectDeploymentOwners())
+                        .containsExactly(ProjectDeploymentOwner.MCP_SERVER);
+                });
+        } finally {
+            jdbcClient
+                .sql("DROP SCHEMA tenant_owner_check CASCADE")
+                .update();
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedReportsAFailingOwnerTableCheck() throws SQLException {
+        DataSource dataSource = mock(DataSource.class);
+
+        when(dataSource.getConnection()).thenThrow(new SQLException("unavailable"));
+
+        ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+            JdbcClient.create(dataSource), List.of(), List.of(), false);
+
+        assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Checking the owner table")
+            .hasCauseInstanceOf(DataAccessException.class);
+    }
+
+    @Test
+    public void testConstructorRejectsAContributorWhoseConditionShadowsAnIdColumnTable() {
+        List<ProjectOwnerContributor> projectOwnerContributors = List.of(
+            ProjectOwnerContributor.of(
+                ProjectOwner.EMBEDDED_CATALOG,
+                "EXISTS (SELECT 1 FROM project_deployment WHERE project_deployment.project_id = %1$s)"));
+
+        assertThatThrownBy(() -> new ProjectOwnershipServiceImpl(jdbcClient, List.of(), projectOwnerContributors))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("project_deployment.project_id");
+    }
+
+    @Test
+    public void testConstructorRejectsADeploymentContributorWhoseConditionShadowsTheIdColumnTable() {
+        List<ProjectDeploymentOwnerContributor> projectDeploymentOwnerContributors = List.of(
+            ProjectDeploymentOwnerContributor.of(
+                ProjectDeploymentOwner.MCP_SERVER,
+                "EXISTS (SELECT 1 FROM mcp_project project_deployment WHERE project_deployment.id = %1$s)"));
+
+        assertThatThrownBy(
+            () -> new ProjectOwnershipServiceImpl(jdbcClient, projectDeploymentOwnerContributors, List.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("project_deployment.id");
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedThrowsInTheEnterpriseEditionWhenA2aRowsExistWithoutAContributor() {
+        createOwnerTableWithRow("a2a_project", "project_deployment_id");
+        createOwnerTableWithRow("connected_user_project", "project_id");
+        createOwnerTableWithRow("mcp_project", "project_deployment_id");
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient,
+                List.of(
+                    deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
+                    deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
+                List.of(
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                true);
+
+            assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
+                .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
+                    assertThat(exception.getProjectOwners()).isEmpty();
+                    assertThat(exception.getProjectDeploymentOwners())
+                        .containsExactly(ProjectDeploymentOwner.A2A_SERVER);
+                });
+        } finally {
+            dropOwnerTables("a2a_project", "connected_user_project", "mcp_project");
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedDoesNotThrowWhenOwnerRowsExistForOwnersWithAContributor() {
+        createOwnerTableWithRow("connected_user_project", "project_id");
+        createOwnerTableWithRow("mcp_project", "project_deployment_id");
+
+        try {
+            ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
+                jdbcClient,
+                List.of(
+                    deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
+                    deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
+                List.of(
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                true);
+
+            assertThatCode(projectOwnershipServiceImpl::afterSingletonsInstantiated).doesNotThrowAnyException();
+        } finally {
+            dropOwnerTables("connected_user_project", "mcp_project");
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedListsEveryOwnerWithoutContributor() {
+        ListAppender<ILoggingEvent> appender = attachAppender();
+
+        try {
+            new ProjectOwnershipServiceImpl(
+                jdbcClient,
+                List.of(
+                    deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
+                    deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
+                List.of(
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                true)
+                    .afterSingletonsInstantiated();
+
+            assertThat(appender.list)
+                .filteredOn(event -> event.getLevel() == Level.INFO)
+                .anySatisfy(event -> {
+                    Object[] arguments = event.getArgumentArray();
+
+                    assertThat(arguments).hasSize(2);
+                    assertThat(arguments[0]).asInstanceOf(InstanceOfAssertFactories.LIST)
+                        .isEmpty();
+                    assertThat(arguments[1]).asInstanceOf(InstanceOfAssertFactories.list(ProjectDeploymentOwner.class))
+                        .containsExactlyInAnyOrder(
+                            ProjectDeploymentOwner.API_COLLECTION, ProjectDeploymentOwner.A2A_SERVER);
+                });
+        } finally {
+            detachAppender(appender);
+        }
+    }
+
+    @Test
+    public void testAfterSingletonsInstantiatedLogsNothingWhenEveryOwnerHasAContributor() {
+        ListAppender<ILoggingEvent> appender = attachAppender();
+
+        try {
+            new ProjectOwnershipServiceImpl(
+                jdbcClient,
+                EnumSet.allOf(ProjectDeploymentOwner.class)
+                    .stream()
+                    .map(ProjectOwnershipServiceIntTest::deploymentOwnerContributor)
+                    .toList(),
+                EnumSet.allOf(ProjectOwner.class)
+                    .stream()
+                    .map(ProjectOwnershipServiceIntTest::projectOwnerContributor)
+                    .toList(),
+                true)
+                    .afterSingletonsInstantiated();
+
+            assertThat(appender.list).noneMatch(event -> event.getLevel()
+                .isGreaterOrEqual(Level.INFO));
+        } finally {
+            detachAppender(appender);
         }
     }
 
@@ -437,6 +719,23 @@ public class ProjectOwnershipServiceIntTest {
         Logger logger = (Logger) LoggerFactory.getLogger(ProjectOwnershipServiceImpl.class);
 
         logger.detachAppender(appender);
+    }
+
+    private void createOwnerTableWithRow(String ownerTable, String idColumn) {
+        jdbcClient
+            .sql("CREATE TABLE %s (%s BIGINT)".formatted(ownerTable, idColumn))
+            .update();
+        jdbcClient
+            .sql("INSERT INTO %s (%s) VALUES (1)".formatted(ownerTable, idColumn))
+            .update();
+    }
+
+    private void dropOwnerTables(String... ownerTables) {
+        for (String ownerTable : ownerTables) {
+            jdbcClient
+                .sql("DROP TABLE " + ownerTable)
+                .update();
+        }
     }
 
     private static ProjectDeploymentOwnerContributor deploymentOwnerContributor(
