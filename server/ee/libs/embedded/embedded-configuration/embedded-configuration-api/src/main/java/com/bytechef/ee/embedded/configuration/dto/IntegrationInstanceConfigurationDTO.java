@@ -113,8 +113,11 @@ public record IntegrationInstanceConfigurationDTO(
         integrationInstance.setIntegrationVersion(integrationVersion);
         integrationInstance.setName(name);
         integrationInstance.setTags(tags);
-        integrationInstance.setAuthorizationType(authorizationType);
         integrationInstance.setVersion(version);
+
+        if (authorizationType != null) {
+            integrationInstance.setAuthorizationType(authorizationType);
+        }
 
         return integrationInstance;
     }
