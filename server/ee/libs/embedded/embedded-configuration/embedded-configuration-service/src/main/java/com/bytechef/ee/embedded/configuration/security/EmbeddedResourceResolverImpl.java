@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.configuration.security;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,17 +30,34 @@ public class EmbeddedResourceResolverImpl implements EmbeddedResourceResolver {
 
     private final AutomationWorkflowProjectRepository automationWorkflowProjectRepository;
     private final ConnectUserProjectRepository connectUserProjectRepository;
+    private final ConnectedUserConnectionRepository connectedUserConnectionRepository;
+    private final IntegrationInstanceRepository integrationInstanceRepository;
     private final IntegrationWorkflowRepository integrationWorkflowRepository;
 
     @SuppressFBWarnings("EI")
     public EmbeddedResourceResolverImpl(
         AutomationWorkflowProjectRepository automationWorkflowProjectRepository,
         ConnectUserProjectRepository connectUserProjectRepository,
+        ConnectedUserConnectionRepository connectedUserConnectionRepository,
+        IntegrationInstanceRepository integrationInstanceRepository,
         IntegrationWorkflowRepository integrationWorkflowRepository) {
 
         this.automationWorkflowProjectRepository = automationWorkflowProjectRepository;
         this.connectUserProjectRepository = connectUserProjectRepository;
+        this.connectedUserConnectionRepository = connectedUserConnectionRepository;
+        this.integrationInstanceRepository = integrationInstanceRepository;
         this.integrationWorkflowRepository = integrationWorkflowRepository;
+    }
+
+    @Override
+    public boolean isConnectedUserConnection(long connectionId) {
+        return connectedUserConnectionRepository.existsByConnectionId(connectionId) ||
+            integrationInstanceRepository.existsByConnectionId(connectionId);
+    }
+
+    @Override
+    public boolean isConnectedUserProjectWorkflow(String workflowId) {
+        return connectUserProjectRepository.existsByWorkflowId(workflowId);
     }
 
     @Override

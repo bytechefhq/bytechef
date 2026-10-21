@@ -65,6 +65,7 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
@@ -192,6 +193,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
     @Autowired
     private EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds;
+
+    @MockitoBean
+    private EmbeddedResourceResolver embeddedResourceResolver;
 
     @Autowired
     private ProjectWorkflowExecutionFacade facade;
@@ -681,6 +685,62 @@ class ProjectWorkflowExecutionFacadeIntTest {
             .isInstanceOf(NoSuchElementException.class);
         assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(getId(job), Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Nested
+    class ConnectedUserProjectRunsIntTest {
+
+        @Test
+        void testGetWorkflowExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+
+            when(permissionService.hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(() -> facade.getWorkflowExecution(getId(job)))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            when(permissionService.hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(getId(job), getId(taskExecution)))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionAllowsAConnectedUserProjectJobWithConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(
+                getId(job), getId(taskExecution));
+
+            assertThat(taskExecutionDTO.output()).isEqualTo("output-value");
+
+            verify(permissionService).hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW");
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionSkipsConnectedUserViewForOtherJobs() {
+            Job job = saveJob(createWorkflowId(createProject(workspace)), null);
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            facade.getWorkflowExecutionTaskExecution(getId(job), getId(taskExecution));
+
+            verify(permissionService, never()).hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW");
+        }
+
+        private Job saveConnectedUserProjectJob() {
+            String workflowId = createWorkflowId(createProject(workspace));
+
+            when(embeddedResourceResolver.isConnectedUserProjectWorkflow(workflowId)).thenReturn(true);
+
+            return saveJob(workflowId, null);
+        }
     }
 
     @Nested
