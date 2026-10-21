@@ -276,6 +276,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:ee:libs:automation:automation-app:automation-app-graphql"))
     implementation(project(":server:ee:libs:automation:automation-app:automation-app-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-app:automation-app-service"))
@@ -381,6 +382,9 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
+    testImplementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))

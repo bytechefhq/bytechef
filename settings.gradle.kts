@@ -33,6 +33,7 @@ include("cli:commands:component:init:openapi")
 include("server:apps:server-app")
 
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql")
+include("server:ee:libs:automation:automation-ai:automation-ai-tool")
 include("server:libs:ai:ai-api")
 include("server:libs:ai:ai-copilot:ai-copilot-api")
 include("server:libs:ai:ai-copilot:ai-copilot-service")
