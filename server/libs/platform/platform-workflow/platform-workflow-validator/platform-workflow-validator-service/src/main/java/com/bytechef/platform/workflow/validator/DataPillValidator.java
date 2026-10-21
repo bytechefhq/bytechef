@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import tools.jackson.databind.JsonNode;
 /**
  * @author Marko Kriskovic
  */
+@SuppressFBWarnings("REDOS")
 class DataPillValidator {
 
     private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
