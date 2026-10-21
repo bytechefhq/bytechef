@@ -41,6 +41,7 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -130,6 +131,7 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const account = useAuthenticationStore((state) => state.account);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const storedPlatformType = usePlatformTypeStore((state) => state.currentType);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -206,7 +208,9 @@ const ConnectionDialog = ({
     const canEditConnection =
         currentType === PlatformType.EMBEDDED ? canEditEmbeddedConnection : canEditWorkspaceConnection;
 
-    const credentialsHidden = isEdit && !canEditConnection;
+    const isConnectionCreator = !!account?.login && account.login === connection?.createdBy;
+
+    const credentialsHidden = isEdit && (!canEditConnection || !isConnectionCreator);
 
     const canUpdateCredentials =
         isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && !credentialsHidden;
