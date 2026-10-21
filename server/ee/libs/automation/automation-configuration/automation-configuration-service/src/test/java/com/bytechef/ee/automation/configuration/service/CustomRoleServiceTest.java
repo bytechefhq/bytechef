@@ -38,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 class CustomRoleServiceTest {
 
     private CustomRoleRepository customRoleRepository;
+    private EmbeddedUserService embeddedUserService;
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionService permissionService;
     private WorkspaceUserService workspaceUserService;
@@ -46,6 +47,7 @@ class CustomRoleServiceTest {
     @BeforeEach
     void setUp() {
         customRoleRepository = mock(CustomRoleRepository.class);
+        embeddedUserService = mock(EmbeddedUserService.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         permissionService = mock(PermissionService.class);
         workspaceUserService = mock(WorkspaceUserService.class);
@@ -53,7 +55,8 @@ class CustomRoleServiceTest {
         when(permissionScopeRegistry.getAllScopeNames())
             .thenReturn(Set.of("WORKFLOW_VIEW", "WORKFLOW_CREATE", "WORKFLOW_EDIT"));
 
-        customRoleService = new CustomRoleServiceImpl(customRoleRepository, permissionScopeRegistry, permissionService,
+        customRoleService = new CustomRoleServiceImpl(customRoleRepository, embeddedUserService,
+            permissionScopeRegistry, permissionService,
             workspaceUserService);
     }
 
@@ -102,6 +105,20 @@ class CustomRoleServiceTest {
 
         assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
             .isInstanceOf(ConfigurationException.class);
+
+        verify(customRoleRepository, never()).deleteById(1L);
+    }
+
+    @Test
+    void testDeleteCustomRoleHeldByAnEmbeddedMemberThrowsException() {
+        when(customRoleRepository.existsById(1L)).thenReturn(true);
+        when(workspaceUserService.countByCustomRoleId(1L)).thenReturn(0L);
+        when(embeddedUserService.countByCustomRoleId(1L)).thenReturn(2L);
+
+        assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
+            .isInstanceOf(ConfigurationException.class)
+            .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+            .isEqualTo(CustomRoleErrorType.CUSTOM_ROLE_IN_USE.getErrorKey());
 
         verify(customRoleRepository, never()).deleteById(1L);
     }
