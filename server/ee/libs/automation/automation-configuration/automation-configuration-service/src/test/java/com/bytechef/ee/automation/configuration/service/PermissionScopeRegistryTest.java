@@ -20,6 +20,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiPlatformPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.AppPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DataTablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
@@ -314,7 +315,7 @@ class PermissionScopeRegistryTest {
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
                 new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
-                new ApiPlatformPermissionScopeProvider(),
+                new ApiPlatformPermissionScopeProvider(), new AppPermissionScopeProvider(),
                 new ConnectionPermissionScopeProvider(), new DataTablePermissionScopeProvider(),
                 new DeploymentPermissionScopeProvider(), new ExecutionPermissionScopeProvider(),
                 new KnowledgeBasePermissionScopeProvider(), new McpPermissionScopeProvider(),

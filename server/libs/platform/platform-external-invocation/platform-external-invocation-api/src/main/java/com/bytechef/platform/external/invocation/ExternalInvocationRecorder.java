@@ -18,6 +18,7 @@ package com.bytechef.platform.external.invocation;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -33,4 +34,21 @@ public interface ExternalInvocationRecorder {
         Function<? super V, ExternalInvocationStatus> statusResolver);
 
     void record(ExternalInvocationEvent event);
+
+    default <V> V recordWithErrorMessage(
+        ExternalInvocationEvent.Builder builder, Supplier<V> execution,
+        Function<? super V, @Nullable String> errorMessageResolver) {
+
+        return record(builder, execution, result -> {
+            String errorMessage = errorMessageResolver.apply(result);
+
+            if (errorMessage == null) {
+                return ExternalInvocationStatus.SUCCESS;
+            }
+
+            builder.errorMessage(errorMessage);
+
+            return ExternalInvocationStatus.ERROR;
+        });
+    }
 }
