@@ -24,6 +24,8 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
@@ -62,6 +64,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private final ConnectedUserService connectedUserService;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionFacade connectionFacade;
+    private final ConnectionOwnershipExemption connectionOwnershipExemption;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final PermissionService permissionService;
@@ -72,6 +75,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         ConnectedUserConnectionReader connectedUserConnectionReader,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
+        ConnectionOwnershipExemption connectionOwnershipExemption,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, @Lazy PermissionService permissionService) {
 
@@ -81,6 +85,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         this.connectedUserService = connectedUserService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionFacade = connectionFacade;
+        this.connectionOwnershipExemption = connectionOwnershipExemption;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.permissionService = permissionService;
@@ -180,13 +185,23 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
             .map(connectedUserAuthentication -> connectedUserAuthentication.connectedUserId() == connectedUserId)
             .orElse(false);
 
-        if (currentConnectedUser ||
-            permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE")) {
-
+        if (currentConnectedUser) {
             return connectionDTOs;
         }
 
-        return CollectionUtils.map(connectionDTOs, ConnectionDTO::withoutCredentials);
+        if (!permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE")) {
+            return CollectionUtils.map(connectionDTOs, ConnectionDTO::withoutCredentials);
+        }
+
+        return CollectionUtils.map(
+            connectionDTOs,
+            connectionDTO -> isMemberCreated(connectionDTO) ? connectionDTO : connectionDTO.withoutCredentials());
+    }
+
+    private boolean isMemberCreated(ConnectionDTO connectionDTO) {
+        return ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy()) &&
+            !connectionOwnershipExemption.isConnectedUserOwned(
+                Objects.requireNonNull(connectionDTO.id(), "connection id"));
     }
 
     private ConnectionDTO requireOwned(long connectedUserId, long connectionId) {

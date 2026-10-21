@@ -132,6 +132,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -214,6 +215,9 @@ class EmbeddedCredentialsGatesIntTest {
     private IntegrationWorkflowService integrationWorkflowService;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private PermissionService permissionService;
 
     @Autowired
@@ -259,8 +263,9 @@ class EmbeddedCredentialsGatesIntTest {
 
         integrationWorkflowService.addWorkflow(integration.getId(), 1, workflow.getId());
 
-        productionConfigurationId = createConfiguration(integration.getId(), Environment.PRODUCTION);
-        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT);
+        productionConfigurationId = createConfiguration(
+            integration.getId(), Environment.PRODUCTION, PRODUCTION_EDITOR);
+        developmentConfigurationId = createConfiguration(integration.getId(), Environment.DEVELOPMENT, TENANT_ADMIN);
     }
 
     @AfterEach
@@ -303,7 +308,7 @@ class EmbeddedCredentialsGatesIntTest {
     }
 
     @Test
-    void testAProductionEditorGetsCredentialsOnlyForProductionConfigurations() {
+    void testAProductionEditorGetsCredentialsOnlyForTheProductionConfigurationItCreated() {
         authenticate(PRODUCTION_EDITOR, false);
 
         assertCredentialsVisible(
@@ -327,22 +332,45 @@ class EmbeddedCredentialsGatesIntTest {
     }
 
     @Test
-    void testATenantAdminGetsCredentialsInEveryEnvironment() {
+    void testATenantAdminGetsCredentialsOnlyForTheConfigurationItCreated() {
         authenticate(TENANT_ADMIN, true);
 
-        assertCredentialsVisible(
+        assertCredentialsHidden(
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(productionConfigurationId));
         assertCredentialsVisible(
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(developmentConfigurationId));
 
-        integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurations(null, null, null, true)
-            .forEach(EmbeddedCredentialsGatesIntTest::assertCredentialsVisible);
+        for (boolean includeAllFields : List.of(true, false)) {
+            List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs =
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurations(
+                    null, null, null, includeAllFields);
+
+            assertThat(integrationInstanceConfigurationDTOs).hasSize(2);
+
+            for (IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO : integrationInstanceConfigurationDTOs) {
+
+                if (integrationInstanceConfigurationDTO.id() == developmentConfigurationId) {
+                    assertCredentialsVisible(integrationInstanceConfigurationDTO, includeAllFields);
+                } else {
+                    assertCredentialsHidden(integrationInstanceConfigurationDTO);
+                }
+            }
+        }
     }
 
     private static void assertCredentialsHidden(IntegrationInstanceConfigurationDTO dto) {
         assertThat(dto.connectionAuthorizationParameters()).isEmpty();
         assertThat(dto.connectionConnectionParameters()).isEmpty();
         assertThat(dto.connectionParameters()).isEmpty();
+    }
+
+    private static void assertCredentialsVisible(IntegrationInstanceConfigurationDTO dto, boolean includeAllFields) {
+        if (includeAllFields) {
+            assertCredentialsVisible(dto);
+        } else {
+            assertThat(dto.connectionParameters()
+                .get("api_key")).isEqualTo("secret-api-key-12345678");
+        }
     }
 
     private static void assertCredentialsVisible(IntegrationInstanceConfigurationDTO dto) {
@@ -362,7 +390,7 @@ class EmbeddedCredentialsGatesIntTest {
                 new UsernamePasswordAuthenticationToken(login, "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
-    private long createConfiguration(long integrationId, Environment environment) {
+    private long createConfiguration(long integrationId, Environment environment, String createdBy) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setAuthorizationType(AuthorizationType.API_KEY);
@@ -375,6 +403,10 @@ class EmbeddedCredentialsGatesIntTest {
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
+
+        jdbcTemplate.update(
+            "UPDATE integration_instance_configuration SET created_by = ? WHERE id = ?", createdBy,
+            integrationInstanceConfiguration.getId());
 
         return integrationInstanceConfiguration.getId();
     }
