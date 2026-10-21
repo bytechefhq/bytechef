@@ -214,6 +214,7 @@ class CustomRoleServiceTest {
         customRoleService.updateCustomRole(1L, "Role", "Desc", Set.of("WORKFLOW_VIEW"));
 
         verify(permissionService).evictAllWorkspaceScopeCache();
+        verify(permissionService).evictAllEmbeddedScopeCache();
     }
 
     @Test
@@ -231,6 +232,7 @@ class CustomRoleServiceTest {
         customRoleService.updateCustomRole(1L, "New Name", "New description", scopeNames);
 
         verify(permissionService, never()).evictAllWorkspaceScopeCache();
+        verify(permissionService, never()).evictAllEmbeddedScopeCache();
     }
 
     @Test
