@@ -141,7 +141,7 @@ export async function graphql<T>(
 
 export async function internalApi<T>(
     apiContext: APIRequestContext,
-    method: 'DELETE' | 'GET' | 'POST' | 'PUT',
+    method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT',
     path: string,
     data?: unknown
 ): Promise<T> {
