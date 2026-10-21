@@ -124,10 +124,10 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         validateNameIsAvailable(name, customRole.getName());
 
         // Capture the scope set BEFORE mutation so we only evict the cache when permissions actually change. A
-        // name-only or description-only edit does not affect any user's resolved permissions, and the eviction below is
-        // evictAllWorkspaceScopeCache(), which bottoms out in cache.clear() on the single workspaceScopes cache. Keys
-        // are tenant-prefixed by TenantKeyGenerator but clear() ignores keys, so this drops every (userId, workspaceId)
-        // entry of every tenant, not just the members holding this role. Doing that on every rename is a significant
+        // name-only or description-only edit does not affect any user's resolved permissions, and the evictions below
+        // bottom out in cache.clear() on the workspaceScopes and embeddedScopes caches. Keys are tenant-prefixed by
+        // TenantKeyGenerator but clear() ignores keys, so this drops every entry of every tenant, not just the members
+        // holding this role. Doing that on every rename is a significant
         // performance regression well beyond the tenant being edited.
         //
         // Both sides are normalized to immutable Set copies so equality is order- and source-independent: a HashSet
@@ -144,6 +144,7 @@ public class CustomRoleServiceImpl implements CustomRoleService {
 
         if (!previousScopeNames.equals(requestedScopeNames)) {
             permissionService.evictAllWorkspaceScopeCache();
+            permissionService.evictAllEmbeddedScopeCache();
         }
 
         return saved;
