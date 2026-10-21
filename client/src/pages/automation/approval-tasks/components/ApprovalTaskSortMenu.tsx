@@ -6,7 +6,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/DropdownMenu/DropdownMenu';
 import {ArrowUpDown} from 'lucide-react';
 
 import {useApprovalTaskSortMenu} from './hooks/useApprovalTaskSortMenu';

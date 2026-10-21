@@ -45,6 +45,16 @@ describe('EmbeddedWorkflowExecutionsDropdownMenu', () => {
         expect(onView).toHaveBeenCalledTimes(1);
     });
 
+    it('renders with the design-system DropdownMenu', async () => {
+        render(<EmbeddedWorkflowExecutionsDropdownMenu jobId="7" jobStatus="STARTED" onView={vi.fn()} />);
+
+        await userEvent.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menu')).toHaveClass('bg-surface-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'View'})).toHaveClass('text-content-neutral-primary');
+        expect(screen.getByRole('menuitem', {name: 'Stop'})).toHaveClass('text-content-destructive-primary');
+    });
+
     it('stops a started job through the stop mutation', async () => {
         render(<EmbeddedWorkflowExecutionsDropdownMenu jobId="7" jobStatus="STARTED" onView={vi.fn()} />);
 

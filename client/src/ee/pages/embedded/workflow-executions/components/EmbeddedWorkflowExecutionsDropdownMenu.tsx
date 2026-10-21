@@ -1,5 +1,10 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -54,18 +59,15 @@ const EmbeddedWorkflowExecutionsDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                <DropdownMenuItem className="dropdown-menu-item" onClick={onView}>
-                    <ViewIcon /> View
-                </DropdownMenuItem>
+                <DropdownMenuItem icon={<ViewIcon />} label="View" onClick={onView} />
 
                 <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
                     disabled={stopDisabled}
+                    icon={<CircleStopIcon />}
+                    label="Stop"
                     onClick={handleStopWorkflowExecutionClick}
                     variant="destructive"
-                >
-                    <CircleStopIcon /> Stop
-                </DropdownMenuItem>
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );
