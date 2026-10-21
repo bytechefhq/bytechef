@@ -37,6 +37,16 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
     boolean existsByProjectId(@Param("projectId") long projectId);
 
     @Query("""
+        SELECT COUNT(*) > 0
+        FROM project_workflow pw
+        WHERE pw.workflow_id = :workflowId
+          AND (
+            EXISTS (SELECT 1 FROM automation_workflow_project awp WHERE awp.project_id = pw.project_id)
+            OR EXISTS (SELECT 1 FROM connected_user_project cup WHERE cup.project_id = pw.project_id))
+        """)
+    boolean existsEmbeddedProjectByWorkflowId(@Param("workflowId") String workflowId);
+
+    @Query("""
         SELECT cup.*
         FROM connected_user_project cup
         JOIN connected_user cu ON cup.connected_user_id = cu.id
