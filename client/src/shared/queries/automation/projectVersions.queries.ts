@@ -17,12 +17,12 @@ export const useGetProjectVersionsQuery = (projectId: number, enabled?: boolean)
     useQuery<ProjectVersion[], Error>({
         queryKey: ProjectVersionKeys.projectProjectVersions(projectId),
         queryFn: () => new ProjectApi().getProjectVersions({id: projectId}),
-        enabled: enabled === undefined ? true : enabled,
+        enabled: enabled ?? true,
     });
 
 export const useGetProjectWorkflowVersionsQuery = (projectId: number, workflowUuid: string, enabled?: boolean) =>
     useQuery<ProjectVersion[], Error>({
         queryKey: ProjectVersionKeys.projectWorkflowVersions(projectId, workflowUuid),
         queryFn: () => new WorkflowApi().getProjectWorkflowVersions({id: projectId, workflowUuid}),
-        enabled: enabled === undefined ? true : enabled,
+        enabled: enabled ?? true,
     });

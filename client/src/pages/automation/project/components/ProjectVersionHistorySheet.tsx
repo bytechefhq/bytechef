@@ -77,7 +77,11 @@ const ProjectVersionHistorySheet = ({
                     <SheetCloseButton />
                 </header>
 
-                <ol aria-label="Project versions" className="flex min-h-0 flex-1 flex-col gap-y-3 overflow-y-auto p-3">
+                <ol
+                    aria-label="Project versions"
+                    className="flex min-h-0 flex-1 flex-col gap-y-3 overflow-y-auto p-3"
+                    role="listbox"
+                >
                     {projectVersions.map((projectVersion, index) => {
                         const version = projectVersion.version!;
                         const published = projectVersion.status === ProjectStatus.Published;
@@ -85,7 +89,23 @@ const ProjectVersionHistorySheet = ({
                         const lastItem = index === projectVersions.length - 1;
 
                         return (
-                            <li className="flex gap-x-3" key={version}>
+                            <li
+                                aria-disabled={!published}
+                                aria-label={`Version ${version}`}
+                                aria-selected={selected}
+                                className={twMerge('group flex gap-x-3', published && 'cursor-pointer')}
+                                key={version}
+                                onClick={() => published && setSelectedVersion(version)}
+                                onKeyDown={(event) => {
+                                    if (published && (event.key === 'Enter' || event.key === ' ')) {
+                                        event.preventDefault();
+
+                                        setSelectedVersion(version);
+                                    }
+                                }}
+                                role="option"
+                                tabIndex={published ? 0 : -1}
+                            >
                                 <div className="flex w-10 shrink-0 flex-col items-center">
                                     <span
                                         className={twMerge(
@@ -100,24 +120,11 @@ const ProjectVersionHistorySheet = ({
                                 </div>
 
                                 <div
-                                    aria-disabled={!published}
-                                    aria-label={`Version ${version}`}
-                                    aria-selected={selected}
                                     className={twMerge(
-                                        'group flex flex-1 flex-col gap-y-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
-                                        published && 'cursor-pointer hover:border-stroke-brand-secondary-hover',
+                                        'flex flex-1 flex-col gap-y-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
+                                        published && 'hover:border-stroke-brand-secondary-hover',
                                         selected && 'border-stroke-brand-primary hover:border-stroke-brand-primary'
                                     )}
-                                    onClick={() => published && setSelectedVersion(version)}
-                                    onKeyDown={(event) => {
-                                        if (published && (event.key === 'Enter' || event.key === ' ')) {
-                                            event.preventDefault();
-
-                                            setSelectedVersion(version);
-                                        }
-                                    }}
-                                    role="option"
-                                    tabIndex={published ? 0 : -1}
                                 >
                                     <div className="flex items-center justify-between gap-x-2">
                                         <div className="flex items-center gap-x-2">
