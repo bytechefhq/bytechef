@@ -299,6 +299,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             throw new AccessDeniedException("Authentication required to modify connection " + connection.getId());
         }
 
+        if (connection.getType() == PlatformType.EMBEDDED) {
+            return;
+        }
+
         String currentUserLogin = SecurityUtils.getCurrentUserLogin();
 
         if (!currentUserLogin.equals(connection.getCreatedBy()) &&
