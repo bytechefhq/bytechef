@@ -20,8 +20,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,9 +39,30 @@ public final class WorkflowPersistCaptureUtils {
     public static Map<String, Object> withCaptureHolder(Map<String, Object> forwardedContext) {
         Map<String, Object> context = new HashMap<>(forwardedContext);
 
-        context.put(PERSISTED_WORKFLOW_CAPTURE_KEY, Collections.synchronizedList(new ArrayList<Map<String, Object>>()));
+        context.putIfAbsent(
+            PERSISTED_WORKFLOW_CAPTURE_KEY, Collections.synchronizedList(new ArrayList<Map<String, Object>>()));
 
         return context;
+    }
+
+    public static List<String> getCapturedWorkflowIds(Map<String, Object> context) {
+        Object holder = context.get(PERSISTED_WORKFLOW_CAPTURE_KEY);
+
+        if (!(holder instanceof List<?> captures)) {
+            return List.of();
+        }
+
+        Set<String> workflowIds = new LinkedHashSet<>();
+
+        synchronized (captures) {
+            for (Object capture : captures) {
+                if (capture instanceof Map<?, ?> entry && entry.get("workflowId") instanceof String workflowId) {
+                    workflowIds.add(workflowId);
+                }
+            }
+        }
+
+        return List.copyOf(workflowIds);
     }
 
     @SuppressFBWarnings(
