@@ -25,7 +25,7 @@ const ALL_ENVIRONMENTS: EnvironmentType[] = ['DEVELOPMENT', 'STAGING', 'PRODUCTI
 
 const INHERITED_ADMIN_TEXT = 'Admin - inherited from tenant admin';
 
-const SPLIT_HINT_TEXT = 'They will lose access to every other environment until you grant it.';
+const SPLIT_HINT_TEXT = 'They keep this role in every other environment. Change or remove each environment separately.';
 
 interface EmbeddedUserI {
     embeddedRole: string | null;
@@ -338,7 +338,7 @@ test.describe('Embedded membership', () => {
         }
     });
 
-    test('splitting an embedded-wide role into per-environment roles keeps only the chosen environment', async ({
+    test('splitting an embedded-wide role keeps it in every environment until each is removed', async ({
         adminApi,
         browser,
         embeddedRoleUsers,
@@ -369,14 +369,42 @@ test.describe('Embedded membership', () => {
 
             await page.getByRole('option', {exact: true, name: 'Production'}).click();
 
-            await expect(memberRow.getByRole('combobox', {name: 'Production role'})).toContainText('Viewer');
-            await expect(memberRow.getByText('All environments')).toHaveCount(0);
+            await test.step('the role stays in Development and Staging', async () => {
+                for (const environmentLabel of ['Development', 'Staging', 'Production']) {
+                    await expect(memberRow.getByRole('combobox', {name: `${environmentLabel} role`})).toContainText(
+                        'Viewer'
+                    );
+                }
 
-            expect(await fetchMyEmbeddedScopes(memberApi, 'PRODUCTION')).toContain('EMBEDDED_VIEW');
+                await expect(memberRow.getByText('All environments')).toHaveCount(0);
 
-            await expect.poll(() => fetchMyEmbeddedScopes(memberApi, 'DEVELOPMENT')).toEqual([]);
+                for (const environment of ALL_ENVIRONMENTS) {
+                    expect(await fetchMyEmbeddedScopes(memberApi, environment), environment).toContain('EMBEDDED_VIEW');
+                }
+            });
 
-            await expect(memberRow.getByRole('combobox', {name: 'Development role'})).toHaveCount(0);
+            await test.step('removing Development and Staging leaves Production only', async () => {
+                const alertDialog = page.getByRole('alertdialog');
+
+                for (const [environmentLabel, environment] of [
+                    ['Development', 'DEVELOPMENT'],
+                    ['Staging', 'STAGING'],
+                ] as const) {
+                    await memberRow.getByRole('button', {name: `Remove ${environmentLabel} role`}).click();
+
+                    await expect(alertDialog).toContainText(`Remove the ${environmentLabel} role?`);
+
+                    await alertDialog.getByRole('button', {name: 'Remove'}).click();
+
+                    await expect(memberRow.getByRole('combobox', {name: `${environmentLabel} role`})).toHaveCount(0);
+
+                    await expect.poll(() => fetchMyEmbeddedScopes(memberApi, environment)).toEqual([]);
+                }
+
+                await expect(memberRow.getByRole('combobox', {name: 'Production role'})).toContainText('Viewer');
+
+                expect(await fetchMyEmbeddedScopes(memberApi, 'PRODUCTION')).toContain('EMBEDDED_VIEW');
+            });
         } finally {
             await memberApi.dispose();
 
