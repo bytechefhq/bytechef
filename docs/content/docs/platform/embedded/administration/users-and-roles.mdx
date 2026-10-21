@@ -116,6 +116,8 @@ Publishing an integration needs `WORKFLOW_EDIT` as well as `INTEGRATION_PUBLISH`
 
 A member with `EXECUTION_VIEW` but not `EXECUTION_DETAILS_VIEW` (a Viewer) sees the list of runs with their status and timing. The inputs, outputs, errors, trigger data and logs of a run need `EXECUTION_DETAILS_VIEW` in the run's environment, which is Editor and above.
 
+Runs of connected users' automation workflows also need `CONNECTED_USER_VIEW` in the run's environment, for the list and for each run. Both scopes come with Viewer, so the built-in roles are unaffected; a custom role needs both to see these runs.
+
 ---
 
 ## Credentials
