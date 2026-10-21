@@ -32,7 +32,7 @@ const WorkspaceApiKeys = () => {
     return (
         <ApiKeysProvider
             value={{
-                permissions: {canCreate, canManage, canView, loading: scopesLoading},
+                permissions: {canCreate, canEdit: canView, canManage, canView, loading: scopesLoading},
                 useApiKeysQuery: () => {
                     const {
                         data: {workspaceApiKeys} = {},

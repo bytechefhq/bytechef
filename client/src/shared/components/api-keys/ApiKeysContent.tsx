@@ -44,7 +44,7 @@ const ApiKeysContent = ({
     const canView = permissions?.canView ?? true;
 
     const canDelete = canManage && canDeleteProp;
-    const canEdit = canManage && canEditProp;
+    const canEdit = (permissions?.canEdit ?? canManage) && canEditProp;
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading || !!permissions?.loading}>

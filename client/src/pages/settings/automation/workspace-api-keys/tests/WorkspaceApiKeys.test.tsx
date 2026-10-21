@@ -112,7 +112,13 @@ describe('WorkspaceApiKeys', () => {
 
         expect(useWorkspaceApiKeysQuery).toHaveBeenCalledWith({environmentId: '1', workspaceId: '7'}, {enabled: true});
         expect(probe.query?.data).toEqual([apiKey]);
-        expect(probe.provider?.permissions).toEqual({canCreate: true, canManage: true, canView: true, loading: false});
+        expect(probe.provider?.permissions).toEqual({
+            canCreate: true,
+            canEdit: true,
+            canManage: true,
+            canView: true,
+            loading: false,
+        });
     });
 
     it('does not query the keys for a member without the view scope', () => {
@@ -121,6 +127,7 @@ describe('WorkspaceApiKeys', () => {
         expect(useWorkspaceApiKeysQuery).toHaveBeenCalledWith({environmentId: '1', workspaceId: '7'}, {enabled: false});
         expect(probe.provider?.permissions).toEqual({
             canCreate: false,
+            canEdit: false,
             canManage: false,
             canView: false,
             loading: false,

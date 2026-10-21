@@ -14,6 +14,7 @@ export interface SimpleMutationProps {
 
 export interface ApiKeysPermissionsI {
     canCreate: boolean;
+    canEdit?: boolean;
     canManage: boolean;
     canView: boolean;
     loading: boolean;
