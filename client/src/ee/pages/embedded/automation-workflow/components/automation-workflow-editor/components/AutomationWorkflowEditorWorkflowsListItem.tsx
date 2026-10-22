@@ -65,9 +65,10 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
             onClick={handleCardClick}
         >
             <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
+                <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-hidden">
                     <WorkflowComponentsList
                         filteredComponentNames={filteredComponentNames}
+                        fitToWidth
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={{}}
                     />
