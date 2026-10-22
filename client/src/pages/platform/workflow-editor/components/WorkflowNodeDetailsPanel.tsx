@@ -130,6 +130,11 @@ const WorkflowNodeDetailsPanel = ({
         [errors]
     );
 
+    const missingRequiredProperties = useMemo(
+        () => errors.filter((error) => error.kind === 'PROPERTY').map((error) => error.name),
+        [errors]
+    );
+
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
         return <></>;
     }
@@ -453,6 +458,7 @@ const WorkflowNodeDetailsPanel = ({
                                             currentNode={currentNode}
                                             currentOperationProperties={currentOperationProperties}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_output`}
+                                            missingRequiredProperties={missingRequiredProperties}
                                             outputDefined={outputDefined}
                                             outputFunctionDefined={outputFunctionDefined}
                                             parentWorkflowNodeName={resolveMainClusterRootName(

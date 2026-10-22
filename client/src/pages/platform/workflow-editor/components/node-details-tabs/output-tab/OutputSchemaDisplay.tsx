@@ -15,6 +15,7 @@ import {MoreHorizontalIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 import ClusterElementTestButton from './ClusterElementTestButton';
+import OutputTabTestButton from './OutputTabTestButton';
 
 interface OutputSchemaDisplayProps {
     connectionMissing: boolean;
@@ -28,6 +29,7 @@ interface OutputSchemaDisplayProps {
     handleTestOperationClick: () => void;
     clusterElementType?: string;
     isClusterElement?: boolean;
+    missingRequiredProperties?: string[];
     outputDefined?: boolean;
     outputSchema?: PropertyAllType;
     resumePerformFunctionDefined?: boolean;
@@ -55,6 +57,7 @@ const OutputSchemaDisplay = ({
     handlePredefinedOutputSchemaClick,
     handleTestOperationClick,
     isClusterElement,
+    missingRequiredProperties = [],
     outputDefined,
     outputSchema,
     resumePerformFunctionDefined,
@@ -99,10 +102,13 @@ const OutputSchemaDisplay = ({
                                         saving={!!saveClusterElementTestOutputMutationPending}
                                     />
                                 ) : (
-                                    <Button
-                                        disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                                    <OutputTabTestButton
+                                        className="rounded-r-none"
+                                        connectionMissing={connectionMissing}
                                         label={`Test ${operationLabel}`}
+                                        missingRequiredProperties={missingRequiredProperties}
                                         onClick={handleTestOperationClick}
+                                        pending={saveWorkflowNodeTestOutputMutation.isPending}
                                         variant="outline"
                                     />
                                 ))}

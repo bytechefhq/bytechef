@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -37,20 +38,22 @@ const variableOutputSchema = {
 
 const renderOutputSchemaDisplay = (props: Partial<Parameters<typeof OutputSchemaDisplay>[0]> = {}) =>
     render(
-        <OutputSchemaDisplay
-            connectionMissing={false}
-            copiedValue={null}
-            copyToClipboard={vi.fn()}
-            currentNode={currentNode}
-            handlePredefinedOutputSchemaClick={vi.fn()}
-            handleTestOperationClick={vi.fn()}
-            outputDefined={true}
-            outputSchema={outputSchema}
-            sampleOutput={{message: 'sample message'}}
-            saveWorkflowNodeTestOutputMutation={{isPending: false}}
-            setShowUploadDialog={vi.fn()}
-            {...props}
-        />
+        <TooltipProvider>
+            <OutputSchemaDisplay
+                connectionMissing={false}
+                copiedValue={null}
+                copyToClipboard={vi.fn()}
+                currentNode={currentNode}
+                handlePredefinedOutputSchemaClick={vi.fn()}
+                handleTestOperationClick={vi.fn()}
+                outputDefined={true}
+                outputSchema={outputSchema}
+                sampleOutput={{message: 'sample message'}}
+                saveWorkflowNodeTestOutputMutation={{isPending: false}}
+                setShowUploadDialog={vi.fn()}
+                {...props}
+            />
+        </TooltipProvider>
     );
 
 const openMoreOptionsMenu = async () => {
@@ -132,6 +135,12 @@ describe('OutputSchemaDisplay', () => {
 
         expect(screen.getByRole('button', {name: 'Test Action'})).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Upload Sample Output'})).not.toBeInTheDocument();
+    });
+
+    it('should disable Test Action when a required property is missing', () => {
+        renderOutputSchemaDisplay({missingRequiredProperties: ['key']});
+
+        expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
     });
 
     it('should offer Upload Sample Output instead of Test Action for a task dispatcher', () => {
