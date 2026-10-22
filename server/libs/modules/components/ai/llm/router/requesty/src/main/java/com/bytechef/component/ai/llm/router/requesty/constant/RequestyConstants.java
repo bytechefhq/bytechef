@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Thibault Jaigu
+ * @author Igor Beslic
  */
 public class RequestyConstants {
 
@@ -81,6 +82,7 @@ public class RequestyConstants {
         .label("Model")
         .description("ID of the model to use.")
         .options(
+            option("google/gemma-4-31b-it", "google/gemma-4-31b-it"),
             option("openai/tts-1", "openai/tts-1"),
             option("openai/tts-1-hd", "openai/tts-1-hd"),
             option("openai/gpt-4o-mini-tts", "openai/gpt-4o-mini-tts"))
