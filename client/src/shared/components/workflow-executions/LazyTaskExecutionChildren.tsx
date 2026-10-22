@@ -88,7 +88,7 @@ const LazyTaskExecutionChildren = ({
 
     const handleLoadMore = useCallback(() => {
         if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
-            fetchNextPage();
+            void fetchNextPage();
         }
     }, [fetchNextPage, hasNextPage, isFetchNextPageError, isFetchingNextPage]);
 
@@ -129,7 +129,7 @@ const LazyTaskExecutionChildren = ({
                 <div className="flex items-center justify-center gap-x-2 p-2 text-sm text-content-neutral-secondary">
                     <span>Failed to load more task executions.</span>
 
-                    <Button label="Retry" onClick={() => fetchNextPage()} size="xs" variant="outline" />
+                    <Button label="Retry" onClick={() => void fetchNextPage()} size="xs" variant="outline" />
                 </div>
             )}
 
