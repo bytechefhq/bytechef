@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261022130000-1" author="Ivica Cardic" dbms="postgresql" runInTransaction="false">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM pg_index
+                JOIN pg_class ON pg_class.oid = pg_index.indexrelid
+                WHERE pg_class.relname = 'idx_job_parent_task_execution_id'
+                AND pg_class.relnamespace = current_schema()::regnamespace AND pg_index.indisvalid
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            DROP INDEX CONCURRENTLY IF EXISTS idx_job_parent_task_execution_id;
+            CREATE INDEX CONCURRENTLY idx_job_parent_task_execution_id ON job (parent_task_execution_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261022130000-2" author="Ivica Cardic" dbms="!postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_job_parent_task_execution_id"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_job_parent_task_execution_id" tableName="job">
+            <column name="parent_task_execution_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
