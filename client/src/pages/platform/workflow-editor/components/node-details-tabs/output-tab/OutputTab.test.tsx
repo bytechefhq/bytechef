@@ -1,4 +1,5 @@
 import {CLUSTER_ELEMENT_TYPE_TOOLS} from '@/shared/constants';
+import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
@@ -187,6 +188,61 @@ describe('OutputTab', () => {
             renderOutputTab({clusterElementType: CLUSTER_ELEMENT_TYPE_TOOLS});
 
             expect(screen.getByRole('alert')).toHaveTextContent('The tool ran successfully but returned no data.');
+        });
+    });
+
+    describe('a running test', () => {
+        beforeEach(() => {
+            hoisted.outputTabState.copyToClipboard = vi.fn();
+            hoisted.outputTabState.handleTestCancelClick = vi.fn();
+            hoisted.outputTabState.testing = true;
+            hoisted.outputTabState.webhookTestCancelEnabled = true;
+            hoisted.outputTabState.webhookTestUrl = 'https://example.com/webhooks/test';
+        });
+
+        it('shows the action being tested without a cancel button', () => {
+            renderOutputTab();
+
+            expect(screen.getByText('Testing Action')).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
+            expect(screen.queryByTestId('output-schema-creation-controls')).not.toBeInTheDocument();
+        });
+
+        it('shows the tool being tested', () => {
+            renderOutputTab({clusterElementType: CLUSTER_ELEMENT_TYPE_TOOLS});
+
+            expect(screen.getByText('Testing Tool')).toBeInTheDocument();
+        });
+
+        it('shows a polling trigger being tested without asking for an action', () => {
+            renderOutputTab({currentNode: {...currentNode, trigger: true, triggerType: TriggerType.Polling}});
+
+            expect(screen.getByText('Testing Trigger')).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
+            expect(screen.queryByText('Action Required')).not.toBeInTheDocument();
+        });
+
+        it('asks to call the test URL of a static webhook trigger and lets the test be cancelled', async () => {
+            renderOutputTab({currentNode: {...currentNode, trigger: true, triggerType: TriggerType.StaticWebhook}});
+
+            expect(screen.getByText('Testing Trigger')).toBeInTheDocument();
+            expect(screen.getByText('Action Required')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('https://example.com/webhooks/test')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+            expect(hoisted.outputTabState.handleTestCancelClick).toHaveBeenCalledTimes(1);
+        });
+
+        it('asks to act in the service of a dynamic webhook trigger', () => {
+            renderOutputTab({
+                currentNode: {...currentNode, trigger: true, triggerType: TriggerType.DynamicWebhook},
+            });
+
+            expect(
+                screen.getByText('Please go to your service and make an action that will activate this trigger')
+            ).toBeInTheDocument();
+            expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
         });
     });
 });
