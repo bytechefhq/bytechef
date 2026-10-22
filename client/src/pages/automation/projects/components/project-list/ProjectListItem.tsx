@@ -18,6 +18,7 @@ import {
 } from '@/ee/shared/mutations/automation/projectGit.mutations';
 import {ProjectGitConfigurationKeys} from '@/ee/shared/mutations/automation/projectGit.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import ProjectDeploymentsSheet, {
     ProjectDeploymentsSheetStateI,
 } from '@/pages/automation/project/components/ProjectDeploymentsSheet';
@@ -95,6 +96,12 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
 
     const navigate = useNavigate();
+
+    const openSavedProjectDeployment = useOpenSavedProjectDeployment({
+        onDevelopmentDeploymentSaved: (projectDeploymentId) =>
+            setProjectDeploymentsSheetState({expandedProjectDeploymentId: projectDeploymentId}),
+        projectId: project.id,
+    });
     const [searchParams] = useSearchParams();
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
@@ -437,12 +444,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             <ProjectDeploymentDialog
                                                 environmentEditable={true}
                                                 onOpenChange={setIsProjectDeploymentDialogOpen}
-                                                onSuccess={(projectDeploymentId, environmentId) =>
-                                                    setProjectDeploymentsSheetState({
-                                                        environmentId,
-                                                        expandedProjectDeploymentId: projectDeploymentId,
-                                                    })
-                                                }
+                                                onSuccess={openSavedProjectDeployment}
                                                 projectDeployment={{
                                                     name: project.name,
                                                     projectId: project.id,
@@ -623,7 +625,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
             {projectDeploymentsSheetState && (
                 <ProjectDeploymentsSheet
-                    environmentId={projectDeploymentsSheetState.environmentId}
                     expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
                     onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
                     project={project}
