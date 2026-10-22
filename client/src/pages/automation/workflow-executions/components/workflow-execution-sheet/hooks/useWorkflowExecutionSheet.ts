@@ -31,6 +31,7 @@ const useWorkflowExecutionSheet = () => {
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
         {
             id: workflowExecutionId,
+            lazy: true,
         },
         workflowExecutionSheetOpen,
         undefined,

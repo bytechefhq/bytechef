@@ -44,7 +44,7 @@ describe('useWorkflowExecutionSheet', () => {
 
         renderHook(() => useWorkflowExecutionSheet());
 
-        expect(executionQueryMock).toHaveBeenCalledWith({id: 77}, true, undefined, 'TRIGGER_EXECUTION');
+        expect(executionQueryMock).toHaveBeenCalledWith({id: 77, lazy: true}, true, undefined, 'TRIGGER_EXECUTION');
     });
 
     it('fetches a job-backed row from the job endpoint', () => {
@@ -52,7 +52,7 @@ describe('useWorkflowExecutionSheet', () => {
 
         const {result} = renderHook(() => useWorkflowExecutionSheet());
 
-        expect(executionQueryMock).toHaveBeenCalledWith({id: 5}, true, undefined, 'JOB');
+        expect(executionQueryMock).toHaveBeenCalledWith({id: 5, lazy: true}, true, undefined, 'JOB');
         expect(result.current.workflowExecutionId).toBe(5);
         expect(result.current.workflowExecutionLoading).toBe(true);
     });
