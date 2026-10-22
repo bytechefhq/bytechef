@@ -32,20 +32,20 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
 
 /**
  * @author Thibault Jaigu
+ * @author Igor Beslic
  */
 public class RequestyCreateSpeechAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
@@ -96,22 +96,17 @@ public class RequestyCreateSpeechAction {
         Double speed = inputParameters.getDouble(SPEED);
 
         if (speed != null) {
-            body.put(SPEED, speed);
+            body.put(SPEED, speed.intValue());
         }
 
-        RestClient restClient = ModelUtils.getRestClientBuilder()
-            .baseUrl(BASE_URL)
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
-            .build();
+        Context.Http.Response response1 = context.http(http -> http.post(BASE_URL + "/audio/speech")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
+            .body(Context.Http.Body.of(body, Context.Http.BodyContentType.JSON)))
+            .execute();
 
-        byte[] audioBytes = restClient.post()
-            .uri("/audio/speech")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(body)
-            .retrieve()
-            .body(byte[].class);
+        byte[] bodyBytes = response1.getBody(new TypeReference<byte[]>() {});
 
         return context.file(
-            file -> file.storeContent("speech." + responseFormat, new ByteArrayInputStream(audioBytes)));
+            file -> file.storeContent("speech." + responseFormat, new ByteArrayInputStream(bodyBytes)));
     }
 }

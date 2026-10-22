@@ -31,22 +31,21 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
 
 /**
  * @author Thibault Jaigu
+ * @author Igor Beslic
  */
 public class RequestyCreateTranscriptionAction {
 
@@ -105,22 +104,13 @@ public class RequestyCreateTranscriptionAction {
             formData.add(TEMPERATURE, String.valueOf(temperature));
         }
 
-        RestClient restClient = ModelUtils.getRestClientBuilder()
-            .baseUrl(BASE_URL)
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
-            .build();
+        Context.Http.Response response1 = context.http(http -> http.post(BASE_URL + "/audio/transcriptions")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
+            .body(Context.Http.Body.of(formData, Context.Http.BodyContentType.FORM_DATA)))
+            .execute();
 
-        Map<String, Object> response = restClient.post()
-            .uri("/audio/transcriptions")
-            .contentType(MediaType.MULTIPART_FORM_DATA)
-            .body(formData)
-            .retrieve()
-            .body(new ParameterizedTypeReference<>() {});
+        Map<String, String> body = response1.getBody(new TypeReference<Map<String, String>>() {});
 
-        if (response == null) {
-            throw new IllegalStateException("Transcription response body is missing");
-        }
-
-        return (String) response.get("text");
+        return body.get("text");
     }
 }
