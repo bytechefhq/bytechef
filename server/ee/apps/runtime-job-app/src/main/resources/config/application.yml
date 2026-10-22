@@ -44,12 +44,6 @@ management:
         enabled: ${bytechef.observability.metrics.enabled}
         step: 10s
         url: ${bytechef.observability.metrics.endpoint}
-  # Prometheus is the default metrics backend
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-        step: 60
 
 spring:
   config:
