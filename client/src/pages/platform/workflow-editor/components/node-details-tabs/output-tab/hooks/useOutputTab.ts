@@ -1,5 +1,6 @@
 import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
 import {ResponseError, TriggerType} from '@/shared/middleware/platform/configuration';
@@ -64,6 +65,7 @@ export default function useOutputTab({
     const isClusterElement = !!clusterElementType && !!parentWorkflowNodeName;
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const operationChangeInProgress = useWorkflowNodeDetailsPanelStore((state) => state.operationChangeInProgress);
 
     const startWebhookTestRef = useRef(false);
     const testOutputErrorGenerationRef = useRef(0);
@@ -85,7 +87,7 @@ export default function useOutputTab({
             id: workflowId!,
             workflowNodeName: parentWorkflowNodeName ?? '',
         },
-        isClusterElement
+        isClusterElement && !operationChangeInProgress
     );
 
     const {
@@ -98,13 +100,12 @@ export default function useOutputTab({
             id: workflowId!,
             workflowNodeName: currentNode?.name as string,
         },
-        !isClusterElement
+        !isClusterElement && !operationChangeInProgress
     );
 
     const workflowNodeOutput = isClusterElement ? clusterElementOutput : regularNodeOutput;
-    const workflowNodeOutputIsFetching = isClusterElement
-        ? clusterElementOutputIsFetching
-        : regularNodeOutputIsFetching;
+    const workflowNodeOutputLoading =
+        operationChangeInProgress || (isClusterElement ? clusterElementOutputIsFetching : regularNodeOutputIsFetching);
     const workflowNodeOutputRefetch = isClusterElement ? clusterElementOutputRefetch : regularNodeOutputRefetch;
 
     const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput?.outputResponse || {};
@@ -404,6 +405,6 @@ export default function useOutputTab({
         variableSampleOutput,
         webhookTestCancelEnabled,
         webhookTestUrl,
-        workflowNodeOutputIsFetching,
+        workflowNodeOutputLoading,
     };
 }

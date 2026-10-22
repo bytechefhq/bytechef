@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import {OutputTabSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
 import OutputTabNoOutputNotice from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabNoOutputNotice';
@@ -75,7 +76,7 @@ const OutputTab = ({
         variableSampleOutput,
         webhookTestCancelEnabled,
         webhookTestUrl,
-        workflowNodeOutputIsFetching,
+        workflowNodeOutputLoading,
     } = useOutputTab({
         clusterElementType,
         currentNode,
@@ -86,8 +87,8 @@ const OutputTab = ({
 
     const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
 
-    if (!testing && workflowNodeOutputIsFetching) {
-        return <></>;
+    if (!testing && workflowNodeOutputLoading) {
+        return <OutputTabSkeleton />;
     }
 
     if (!testing && outputFunctionDefined && !outputSchema && !variableOutputSchema) {

@@ -42,6 +42,20 @@ describe('saveClusterElementFieldChange', () => {
         });
     });
 
+    it('clears the in-progress flag of an operation switch when the save fails', () => {
+        useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: true});
+
+        saveClusterElementFieldChange({
+            currentComponentDefinition: {name: 'agileCrm', version: 1} as ComponentDefinition,
+            fieldUpdate: {field: 'operation', value: 'createContact'},
+            updateWorkflowMutation: {mutate: vi.fn()} as never,
+        });
+
+        saveWorkflowDefinitionMock.mock.calls[0][0].onError();
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().operationChangeInProgress).toBe(false);
+    });
+
     it('saves a label change against the root resolved from the node when no root is in the store', () => {
         saveClusterElementFieldChange({
             currentComponentDefinition: {name: 'agileCrm', version: 1} as ComponentDefinition,
