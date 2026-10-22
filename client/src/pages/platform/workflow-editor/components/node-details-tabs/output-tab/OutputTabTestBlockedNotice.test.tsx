@@ -33,10 +33,11 @@ describe('OutputTabTestBlockedNotice', () => {
         });
 
         expect(screen.getByRole('alert')).toHaveTextContent(
-            'Required properties missingSet Scope, Key to test the action.'
+            'Required properties missingSet these properties to test the action:'
         );
+        expect(screen.getAllByRole('listitem').map((listItem) => listItem.textContent)).toEqual(['Scope', 'Key']);
 
-        await userEvent.click(screen.getByRole('button', {name: 'Scope, Key'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Key'}));
 
         expect(onMissingRequiredPropertiesClick).toHaveBeenCalledOnce();
     });
@@ -44,7 +45,8 @@ describe('OutputTabTestBlockedNotice', () => {
     it('lists the missing required properties as text without a click handler', () => {
         renderOutputTabTestBlockedNotice({missingRequiredProperties: ['Key'], operationLabel: 'Trigger'});
 
-        expect(screen.getByRole('alert')).toHaveTextContent('Set Key to test the trigger.');
+        expect(screen.getByRole('alert')).toHaveTextContent('Set these properties to test the trigger:');
+        expect(screen.getByRole('listitem')).toHaveTextContent('Key');
         expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 

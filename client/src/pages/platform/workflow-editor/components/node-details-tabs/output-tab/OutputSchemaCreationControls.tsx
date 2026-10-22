@@ -78,7 +78,7 @@ const OutputSchemaCreationControls = ({
                     </div>
                 )}
 
-                <div className="flex flex-col gap-4">
+                <div className="flex w-full flex-col gap-4">
                     {testable && (
                         <div className="flex w-full flex-col gap-3">
                             {showClusterElementTestButton &&
@@ -96,7 +96,7 @@ const OutputSchemaCreationControls = ({
                             ) : (
                                 <>
                                     <OutputTabTestBlockedNotice
-                                        className="max-w-sm"
+                                        className="mb-5"
                                         connectionMissing={!!connectionMissing}
                                         missingRequiredProperties={missingRequiredProperties}
                                         onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
