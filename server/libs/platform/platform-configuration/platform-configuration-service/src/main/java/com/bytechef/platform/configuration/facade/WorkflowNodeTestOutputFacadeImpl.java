@@ -26,6 +26,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
@@ -50,13 +51,16 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,6 +83,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
     private final ConnectionService connectionService;
+    private final EditorTempFileStorage editorTempFileStorage;
     private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -93,7 +98,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         ActionDefinitionFacade actionDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders, ConnectionService connectionService,
-        Evaluator evaluator, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        EditorTempFileStorage editorTempFileStorage, Evaluator evaluator,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -102,6 +108,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.codeEditorScriptInputProviders = codeEditorScriptInputProviders;
         this.connectionService = connectionService;
+        this.editorTempFileStorage = editorTempFileStorage;
         this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -177,6 +184,26 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 curEnvironmentId) -> executeClusterElement(
                     workflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
                     curInputParameters, curConnectionIds, curExtensions, curEnvironmentId));
+    }
+
+    @Override
+    @WorkflowCacheEvict(cacheNames = {
+        PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
+    })
+    public WorkflowNodeTestOutput saveWorkflowNodeSampleFile(
+        @WorkflowIdParam String workflowId, String workflowNodeName, String filename, InputStream inputStream,
+        @EnvironmentIdParam long environmentId) {
+
+        FileEntry fileEntry = editorTempFileStorage.storeFileContent(filename, inputStream);
+
+        Map<String, Object> sampleOutput = new HashMap<>();
+
+        sampleOutput.put("extension", fileEntry.getExtension());
+        sampleOutput.put("mimeType", fileEntry.getMimeType());
+        sampleOutput.put("name", fileEntry.getName());
+        sampleOutput.put("url", fileEntry.getUrl());
+
+        return saveWorkflowNodeSampleOutput(workflowId, workflowNodeName, sampleOutput, environmentId);
     }
 
     @Override

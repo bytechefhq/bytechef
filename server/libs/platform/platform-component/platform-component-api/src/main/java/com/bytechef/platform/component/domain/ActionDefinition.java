@@ -43,6 +43,7 @@ public final class ActionDefinition {
     private Help help;
     private String name;
     private boolean outputDefined;
+    private boolean outputFileEntry;
     private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private boolean outputSchemaDefined;
@@ -78,6 +79,7 @@ public final class ActionDefinition {
         this.outputResponse = actionDefinition.getOutputDefinition()
             .map(ActionDefinition::toOutputResponse)
             .orElse(null);
+        this.outputFileEntry = outputResponse != null && outputResponse.outputSchema() instanceof FileEntryProperty;
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             actionDefinition.getProperties()
@@ -163,6 +165,10 @@ public final class ActionDefinition {
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFileEntry() {
+        return outputFileEntry;
     }
 
     public boolean isOutputFunctionDefined() {

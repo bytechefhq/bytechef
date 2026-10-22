@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -33,6 +34,9 @@ public interface WorkflowNodeTestOutputFacade {
     WorkflowNodeTestOutput saveClusterElementTestOutput(
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, Map<String, Object> inputParameters, long environmentId);
+
+    WorkflowNodeTestOutput saveWorkflowNodeSampleFile(
+        String workflowId, String workflowNodeName, String filename, InputStream inputStream, long environmentId);
 
     WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Object sampleOutput, long environmentId);

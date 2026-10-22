@@ -23,11 +23,15 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Ivica Cardic
@@ -86,6 +90,21 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
         }
 
         return ResponseEntity.ok(conversionService.convert(workflowNodeTestOutput, WorkflowNodeTestOutputModel.class));
+    }
+
+    @Override
+    public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleFile(
+        String workflowId, String workflowNodeName, Long environmentId, MultipartFile file) {
+
+        try (InputStream inputStream = file.getInputStream()) {
+            return ResponseEntity.ok(
+                conversionService.convert(
+                    workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
+                        workflowId, workflowNodeName, file.getOriginalFilename(), inputStream, environmentId),
+                    WorkflowNodeTestOutputModel.class));
+        } catch (IOException ioException) {
+            throw new UncheckedIOException(ioException);
+        }
     }
 
     @Override
