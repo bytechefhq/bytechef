@@ -157,6 +157,10 @@ export interface TaskExecution {
      * 
      */
     childJob?: Job;
+    /**
+     * The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page.
+     */
+    readonly childCount?: number;
 }
 
 
@@ -223,6 +227,7 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'children': json['children'] == null ? undefined : ((json['children'] as Array<any>).map(TaskExecutionFromJSON)),
         'iterations': json['iterations'] == null ? undefined : json['iterations'],
         'childJob': json['childJob'] == null ? undefined : JobFromJSON(json['childJob']),
+        'childCount': json['childCount'] == null ? undefined : json['childCount'],
     };
 }
 
@@ -230,7 +235,7 @@ export function TaskExecutionToJSON(json: any): TaskExecution {
     return TaskExecutionToJSONTyped(json, false);
 }
 
-export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
+export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'|'childCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
