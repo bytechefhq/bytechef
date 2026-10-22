@@ -8,10 +8,16 @@ import {ReactNode} from 'react';
 interface WorkflowExecutionsHeaderProps {
     actions?: ReactNode;
     job?: Job;
+    taskExecutionCount?: number;
     triggerExecution?: TriggerExecution;
 }
 
-const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExecutionsHeaderProps) => {
+const WorkflowExecutionsHeader = ({
+    actions,
+    job,
+    taskExecutionCount,
+    triggerExecution,
+}: WorkflowExecutionsHeaderProps) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
@@ -23,7 +29,8 @@ const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExec
         duration = Math.round(endTime - startTime);
     }
 
-    const taskExecutionsCount = countTaskExecutions(job?.taskExecutions || []);
+    const taskExecutionsCount =
+        taskExecutionCount !== undefined ? taskExecutionCount : countTaskExecutions(job?.taskExecutions || []);
 
     return (
         <header className="flex w-full items-center gap-x-3 px-3 py-3">

@@ -1,8 +1,15 @@
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsHeader from '../WorkflowExecutionsHeader';
+import {countTaskExecutions} from '../util/countTaskExecutions';
+
+vi.mock('@/shared/components/workflow-executions/util/countTaskExecutions', async (importOriginal) => {
+    const original = await importOriginal<typeof import('../util/countTaskExecutions')>();
+
+    return {countTaskExecutions: vi.fn(original.countTaskExecutions)};
+});
 
 function createJob(overrides: Partial<Job> = {}): Job {
     return {
@@ -271,5 +278,14 @@ describe('WorkflowExecutionsHeader', () => {
 
             expect(screen.getByText('3 tasks executed')).toBeInTheDocument();
         });
+    });
+
+    it('showsTaskExecutionCountWhenProvided', () => {
+        vi.mocked(countTaskExecutions).mockClear();
+
+        render(<WorkflowExecutionsHeader job={createJob({taskExecutions: []})} taskExecutionCount={112464} />);
+
+        expect(screen.getByText(/112464/)).toBeInTheDocument();
+        expect(countTaskExecutions).not.toHaveBeenCalled();
     });
 });

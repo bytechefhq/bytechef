@@ -3,6 +3,15 @@ import {TaskExecution} from '@/shared/middleware/automation/workflow/execution';
 import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const hoisted = vi.hoisted(() => ({
+    useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery: vi.fn(),
+}));
+
+vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+    useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery:
+        hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
+}));
+
 import WorkflowExecutionsAccordionItem from '../WorkflowExecutionsAccordionItem';
 import WorkflowTaskExecutionItem from '../WorkflowTaskExecutionItem';
 
@@ -196,6 +205,68 @@ describe('WorkflowExecutionsAccordionItem', () => {
 
             expect(screen.getByText('Attempt 1')).toBeInTheDocument();
             expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+        });
+    });
+    describe('lazy mode', () => {
+        beforeEach(() => {
+            hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReset();
+            hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
+                data: {pages: [{children: [], number: 0, totalElements: 0, totalPages: 1}]},
+                fetchNextPage: vi.fn(),
+                hasNextPage: false,
+                isFetchingNextPage: false,
+                isLoading: false,
+            });
+        });
+
+        const renderLazyItem = (execution: TaskExecution, accordionDefaultValue?: string[]) =>
+            render(
+                <Accordion defaultValue={accordionDefaultValue} type="multiple">
+                    <WorkflowExecutionsAccordionItem
+                        execution={execution}
+                        lazy={{workflowExecutionId: 9}}
+                        onExecutionClick={vi.fn()}
+                        selectedExecutionId=""
+                    >
+                        <span>Lazy parent</span>
+                    </WorkflowExecutionsAccordionItem>
+                </Accordion>
+            );
+
+        it('isExpandableFromChildCountInLazyMode', () => {
+            renderLazyItem({...createTaskExecution('13', 'COMPLETED'), childCount: 3} as TaskExecution);
+
+            expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'false');
+        });
+
+        it('doesNotFetchChildrenUntilOpened', async () => {
+            renderLazyItem({...createTaskExecution('13', 'COMPLETED'), childCount: 3} as TaskExecution);
+
+            expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).not.toHaveBeenCalledWith(
+                expect.anything(),
+                true,
+                undefined
+            );
+
+            await userEvent.click(screen.getByText('Lazy parent'));
+
+            expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).toHaveBeenCalledWith(
+                {id: 9, taskExecutionId: 13},
+                true,
+                undefined
+            );
+        });
+
+        it('loadsChildrenWhenOpenedByTheParentAccordionWithoutAFocusPath', () => {
+            renderLazyItem({...createTaskExecution('13', 'COMPLETED'), childCount: 3} as TaskExecution, ['13']);
+
+            expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'true');
+            expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).toHaveBeenCalledWith(
+                {id: 9, taskExecutionId: 13},
+                true,
+                undefined,
+                0
+            );
         });
     });
 });
