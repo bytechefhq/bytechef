@@ -151,7 +151,7 @@ paths:
           type: "integer"
           format: "int64"
       - name: "lazy"
-        description: "If only the top-level task executions should be returned, with their child counts, the focus path and the total task execution count."
+        description: "Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions."
         in: "query"
         required: false
         schema:
@@ -217,7 +217,7 @@ paths:
                 $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
   /workflow-executions/{id}/task-executions/{taskExecutionId}/children:
     get:
-      description: "Get a page of the direct children of a task execution."
+      description: "Get a page of the children of a task execution of the execution or of one of its subflow jobs. A loop returns whole iterations, an on-error task returns its two branches on a single page."
       summary: "Get a page of task execution children"
       tags:
       - "workflow-execution"
@@ -238,21 +238,24 @@ paths:
           type: "integer"
           format: "int64"
       - name: "pageNumber"
-        description: "The number of the page to return."
+        description: "The zero-based number of the page to return."
         in: "query"
         required: false
         schema:
           type: "integer"
           format: "int32"
           default: 0
+          minimum: 0
       - name: "pageSize"
-        description: "The number of children or loop iterations per page."
+        description: "The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size."
         in: "query"
         required: false
         schema:
           type: "integer"
           format: "int32"
           default: 50
+          minimum: 1
+          maximum: 200
       responses:
         "200":
           description: "The page of task execution children."
@@ -274,7 +277,7 @@ components:
         - "workflow"
       properties:
         focusPath:
-          description: "The path from the root task executions to the task execution to focus, set when the execution is loaded lazily."
+          description: "The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint."
           type: "array"
           items:
             $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/FocusPathElement"
@@ -294,7 +297,7 @@ components:
           type: "integer"
           readOnly: true
         taskExecutionCount:
-          description: "The total number of task executions of the job and its subflow jobs, set when the execution is loaded lazily."
+          description: "The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily."
           type: "integer"
           format: "int64"
           readOnly: true

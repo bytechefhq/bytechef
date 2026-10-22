@@ -161,8 +161,8 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.taskExecutionCount").value(120))
             .andExpect(jsonPath("$.focusPath.length()").value(2))
-            .andExpect(jsonPath("$.focusPath[0].taskExecutionId").value(1))
-            .andExpect(jsonPath("$.focusPath[1].taskExecutionId").value(7))
+            .andExpect(jsonPath("$.focusPath[0].taskExecutionId").value("1"))
+            .andExpect(jsonPath("$.focusPath[1].taskExecutionId").value("7"))
             .andExpect(jsonPath("$.focusPath[1].iterationIndex").value(3))
             .andExpect(jsonPath("$.job.taskExecutions[0].id").value(1))
             .andExpect(jsonPath("$.job.taskExecutions[0].childCount").value(2));

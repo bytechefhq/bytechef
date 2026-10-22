@@ -426,17 +426,16 @@ components:
         - "taskExecutionId"
       properties:
         childIndex:
-          description: "The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; set only when the previous element is neither a loop nor an on-error task."
+          description: "The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; absent for the first element and set only when the previous element is neither a loop nor an on-error task."
           type: "integer"
           format: "int32"
         iterationIndex:
-          description: "The index of the loop iteration, or of the on-error branch (0 for the try branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks."
+          description: "The index of the loop iteration, or of the on-error branch (0 for the main branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks."
           type: "integer"
           format: "int32"
         taskExecutionId:
           description: "The id of a task execution."
-          type: "integer"
-          format: "int64"
+          type: "string"
     JobConnection:
       description: "The connection used in a particular task."
       type: "object"
@@ -602,7 +601,7 @@ components:
           description: "The job associated with the task execution."
           $ref: "#/components/schemas/Job"
         childCount:
-          description: "The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page."
+          description: "The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task, and 0 when it has no children. Set only on the task executions of a lazily loaded workflow execution and of a children page."
           type: "integer"
           format: "int32"
           readOnly: true
@@ -639,7 +638,7 @@ components:
           type: "integer"
           format: "int32"
         size:
-          description: "The size of the page."
+          description: "The requested page size."
           type: "integer"
           format: "int32"
         totalElements:
