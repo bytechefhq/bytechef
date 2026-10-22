@@ -5,7 +5,6 @@ import {
     ON_ERROR_MAIN_BRANCH,
     ON_ERROR_WIRE_KEY_ERROR_BRANCH,
     ON_ERROR_WIRE_KEY_MAIN_BRANCH,
-    TASK_DISPATCHER_DATA_KEY_MAP,
 } from '@/shared/constants';
 import {
     useClusterElementMissingRequiredPropertiesQuery,
@@ -56,7 +55,6 @@ import {
     BranchCaseType,
     ComponentPropertiesType,
     DataPillType,
-    NodeDataType,
     PropertyAllType,
     TabNameType,
     UpdateWorkflowMutationType,
@@ -78,18 +76,14 @@ import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import changeComponentVersion from '../../utils/changeComponentVersion';
+import changeOperation from '../../utils/changeOperation';
 import findWorkflowIssueParameterPaths, {getParameterPathRoot} from '../../utils/findWorkflowIssueParameterPaths';
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
-import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
 import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
-import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
 import {resolveClusterRootId, resolveMainClusterRootName} from '../../utils/resolveClusterRootId';
-import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
-import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
-import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 import getMissingRequiredConnectionErrors, {
     WorkflowNodeDetailsErrorI,
@@ -163,7 +157,6 @@ export default function useWorkflowNodeDetailsPanel({
         pendingSaveNodeNames,
         setActiveTab,
         setCurrentNode,
-        setOperationChangeInProgress,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -173,7 +166,6 @@ export default function useWorkflowNodeDetailsPanel({
             pendingSaveNodeNames: state.pendingSaveNodeNames,
             setActiveTab: state.setActiveTab,
             setCurrentNode: state.setCurrentNode,
-            setOperationChangeInProgress: state.setOperationChangeInProgress,
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
@@ -1030,144 +1022,36 @@ export default function useWorkflowNodeDetailsPanel({
     }, [workflowNodeOutputs]);
 
     const handleOperationSelectChange = useCallback(
-        async (newOperationName: string) => {
-            if (
-                currentOperationName === newOperationName ||
-                !currentComponentDefinition ||
-                !currentNode ||
-                useWorkflowNodeDetailsPanelStore.getState().operationChangeInProgress
-            ) {
-                return;
-            }
-
-            setCurrentOperationName(newOperationName);
-
-            setOperationChangeInProgress(true);
-
-            try {
-                let newOperationDefinition: ActionDefinition | TriggerDefinition | ClusterElementDefinition | undefined;
-
-                if (currentNode.trigger && !isClusterElement) {
-                    newOperationDefinition = await fetchTriggerDefinition(newOperationName);
-                } else if (isClusterElement) {
-                    newOperationDefinition = await fetchClusterElementDefinition(newOperationName);
-                } else {
-                    newOperationDefinition = await fetchActionDefinition(newOperationName);
-                }
-
-                if (!newOperationDefinition) {
-                    console.error(`newOperationDefinition not found for: ${newOperationName}`);
-
-                    setOperationChangeInProgress(false);
-
-                    return;
-                }
-
-                await deleteWorkflowNodeTestOutputMutation.mutateAsync({
-                    environmentId: currentEnvironmentId,
-                    id: workflow.id!,
-                    workflowNodeName: currentNode.name,
-                });
-
-                invalidateOperationQueries(queryClient);
-
-                const {componentName, description, label, workflowNodeName} = currentNode;
-
-                const newOperationProperties = newOperationDefinition.properties as Array<PropertyAllType>;
-
-                const nodeData: NodeDataType = {
-                    componentName,
-                    description,
-                    label,
-                    name: workflowNodeName || currentNode.workflowNodeName || '',
-                    operationName: newOperationName,
-                    parameters: getParametersWithDefaultValues({
-                        properties: newOperationProperties,
-                    }),
-                    trigger: currentNode.trigger,
-                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                    workflowNodeName,
-                };
-
-                const isTaskDispatcherSubtask = Object.values(TASK_DISPATCHER_DATA_KEY_MAP).some(
-                    (dataKey) => dataKey && currentNode[dataKey as keyof typeof currentNode]
-                );
-
-                if (isTaskDispatcherSubtask) {
-                    saveTaskDispatcherSubtaskFieldChange({
-                        currentComponentDefinition,
-                        currentNodeIndex: currentNodeIndex ?? 0,
-                        currentOperationProperties: newOperationProperties,
-                        fieldUpdate: {
-                            field: 'operation',
-                            value: newOperationName,
-                        },
-                        onError: () => setOperationChangeInProgress(false),
-                        updateWorkflowMutation,
-                    });
-
-                    return;
-                }
-
-                if (currentNode.clusterElementType) {
-                    saveClusterElementFieldChange({
-                        currentComponentDefinition,
-                        currentOperationProperties: newOperationProperties,
-                        fieldUpdate: {
-                            field: 'operation',
-                            value: newOperationName,
-                        },
-                        onError: () => setOperationChangeInProgress(false),
-                        updateWorkflowMutation,
-                    });
-
-                    return;
-                }
-
-                saveWorkflowDefinition({
-                    nodeData,
-                    onError: () => setOperationChangeInProgress(false),
-                    onSuccess: () => {
-                        setCurrentNode({
-                            ...currentNode,
-                            componentName,
-                            displayConditions: {},
-                            metadata: {},
-                            name: workflowNodeName || currentNode.workflowNodeName || '',
-                            operationName: newOperationName,
-                            parameters: getParametersWithDefaultValues({
-                                properties: newOperationProperties,
-                            }),
-                            type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                            workflowNodeName,
-                        });
-
-                        setOperationChangeInProgress(false);
-                    },
-                    updateWorkflowMutation,
-                });
-            } catch (error) {
-                console.error(`Failed to change ${currentNode.name} to ${newOperationName}`, error);
-
-                setOperationChangeInProgress(false);
-            }
-        },
+        (newOperationName: string) =>
+            changeOperation({
+                currentComponentDefinition,
+                currentNodeIndex,
+                currentOperationName,
+                deleteWorkflowNodeTestOutputMutation,
+                environmentId: currentEnvironmentId,
+                fetchActionDefinition,
+                fetchClusterElementDefinition,
+                fetchTriggerDefinition,
+                isClusterElement,
+                newOperationName,
+                queryClient,
+                setCurrentOperationName,
+                updateWorkflowMutation,
+                workflowId: workflow.id!,
+            }),
         [
-            currentEnvironmentId,
-            currentOperationName,
             currentComponentDefinition,
-            currentNode,
-            isClusterElement,
+            currentEnvironmentId,
+            currentNodeIndex,
+            currentOperationName,
             deleteWorkflowNodeTestOutputMutation,
-            workflow.id,
+            fetchActionDefinition,
+            fetchClusterElementDefinition,
+            fetchTriggerDefinition,
+            isClusterElement,
             queryClient,
             updateWorkflowMutation,
-            fetchTriggerDefinition,
-            fetchClusterElementDefinition,
-            fetchActionDefinition,
-            currentNodeIndex,
-            setCurrentNode,
-            setOperationChangeInProgress,
+            workflow.id,
         ]
     );
 
