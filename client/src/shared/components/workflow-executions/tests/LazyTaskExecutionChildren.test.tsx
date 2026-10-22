@@ -1,5 +1,5 @@
 import {TaskExecution} from '@/shared/middleware/automation/workflow/execution';
-import {act, render, screen} from '@/shared/util/test-utils';
+import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import LazyTaskExecutionChildren from '../LazyTaskExecutionChildren';
@@ -29,11 +29,13 @@ const createIteration = (index: number) => [
 const mockQueryResult = ({
     fetchNextPage = vi.fn(),
     hasNextPage = false,
+    isFetchNextPageError = false,
     iterationCount,
     totalElements,
 }: {
     fetchNextPage?: () => void;
     hasNextPage?: boolean;
+    isFetchNextPageError?: boolean;
     iterationCount: number;
     totalElements: number;
 }) => {
@@ -52,6 +54,7 @@ const mockQueryResult = ({
         },
         fetchNextPage,
         hasNextPage,
+        isFetchNextPageError,
         isFetchingNextPage: false,
         isLoading: false,
     });
@@ -170,5 +173,42 @@ describe('LazyTaskExecutionChildren', () => {
             true,
             2000
         );
+    });
+
+    it('stopsLoadingPagesAfterAFailedPageFetchUntilRetried', async () => {
+        const fetchNextPage = mockQueryResult({
+            hasNextPage: true,
+            isFetchNextPageError: true,
+            iterationCount: 50,
+            totalElements: 100,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['4', '4-iteration-60']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={loopTaskExecution}
+                selectedExecutionId=""
+            />
+        );
+
+        const sentinel = screen.getByText('Loading 50 more iterations...');
+        const observed = intersectionCallbacks.find((entry) => entry.element === sentinel);
+
+        expect(observed).toBeDefined();
+
+        act(() => {
+            observed!.callback(
+                [{isIntersecting: true, target: sentinel} as unknown as IntersectionObserverEntry],
+                {} as IntersectionObserver
+            );
+        });
+
+        expect(fetchNextPage).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Retry'}));
+
+        expect(fetchNextPage).toHaveBeenCalledTimes(1);
     });
 });

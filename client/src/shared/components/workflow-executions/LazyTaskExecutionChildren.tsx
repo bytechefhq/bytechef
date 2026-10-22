@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -26,7 +27,7 @@ const LazyTaskExecutionChildren = ({
     parentTaskExecution,
     selectedExecutionId,
 }: LazyTaskExecutionChildrenProps) => {
-    const {data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading} =
+    const {data, fetchNextPage, hasNextPage, isFetchNextPageError, isFetchingNextPage, isLoading} =
         useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery(
             {id: lazy.workflowExecutionId, taskExecutionId: +parentTaskExecution.id!},
             true,
@@ -64,10 +65,10 @@ const LazyTaskExecutionChildren = ({
     }, [defaultValue, parentTaskExecution.id]);
 
     const handleLoadMore = useCallback(() => {
-        if (hasNextPage && !isFetchingNextPage) {
+        if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
             fetchNextPage();
         }
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+    }, [fetchNextPage, hasNextPage, isFetchNextPageError, isFetchingNextPage]);
 
     useEffect(() => {
         if (focusedIterationIndex === undefined || isLoading || focusedIterationIndex < loadedCount) {
@@ -93,6 +94,14 @@ const LazyTaskExecutionChildren = ({
             >
                 {children}
             </TaskExecutionChildrenList>
+
+            {isFetchNextPageError && hasNextPage && !isFetchingNextPage && (
+                <div className="flex items-center justify-center gap-x-2 p-2 text-sm text-content-neutral-secondary">
+                    <span>Failed to load more task executions.</span>
+
+                    <Button label="Retry" onClick={() => fetchNextPage()} size="xs" variant="outline" />
+                </div>
+            )}
 
             {(isLoading || isFetchingNextPage) && (
                 <div className="flex items-center justify-center p-2 text-content-neutral-secondary">
