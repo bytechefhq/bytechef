@@ -15,7 +15,7 @@ import ResumeForm from '@/pages/automation/resume-form/ResumeForm';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
-import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {AUTHORITIES} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
@@ -27,6 +27,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import redirectOutsideDevelopmentEnvironment from '@/shared/util/redirectOutsideDevelopmentEnvironment';
 import {QueryClient} from '@tanstack/react-query';
 import {Suspense, lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
@@ -591,15 +592,8 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </LazyLoadWrapper>
                                         </PrivateRoute>
                                     ),
-                                    loader: async () => {
-                                        const currentEnvironmentId = environmentStore.getState().currentEnvironmentId;
-
-                                        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
-                                            return redirect('/automation/deployments');
-                                        }
-
-                                        return null;
-                                    },
+                                    loader: async () =>
+                                        redirectOutsideDevelopmentEnvironment('/automation/deployments'),
                                     path: 'projects',
                                 },
                                 {
@@ -611,6 +605,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
+                                        redirectOutsideDevelopmentEnvironment('/automation/deployments') ??
                                         queryClient.query({
                                             queryFn: () =>
                                                 new ProjectApi().getProject({
@@ -910,6 +905,8 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
+                                    loader: async () =>
+                                        redirectOutsideDevelopmentEnvironment('/embedded/configurations'),
                                     path: 'integrations',
                                 },
                                 {
@@ -923,6 +920,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
+                                        redirectOutsideDevelopmentEnvironment('/embedded/configurations') ??
                                         queryClient.query({
                                             queryFn: () =>
                                                 new IntegrationApi().getIntegration({
