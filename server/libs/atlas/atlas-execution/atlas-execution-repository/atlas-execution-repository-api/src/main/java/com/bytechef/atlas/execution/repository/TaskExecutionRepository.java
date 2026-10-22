@@ -19,7 +19,9 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -27,6 +29,17 @@ import java.util.Optional;
  * @author Igor Beslic
  */
 public interface TaskExecutionRepository {
+
+    Map<Long, Long> countAllByParentIdIn(List<Long> parentIds);
+
+    Map<Long, Long> countAllByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber);
+
+    long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds);
+
+    long countByParentIdAndCreatedDateBeforeOrEqual(long parentId, Instant createdDate, long id);
+
+    long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+        long parentId, int taskNumber, Instant createdDate, long id);
 
     void deleteById(long id);
 
@@ -68,6 +81,28 @@ public interface TaskExecutionRepository {
      */
     List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId);
 
+    List<TaskExecution> findAllByIdIn(List<Long> ids);
+
+    List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(long jobId);
+
+    List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+        long jobId, List<Long> supersededIds, int limit, long offset);
+
+    List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset);
+
+    List<TaskExecution> findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+        long parentId, Instant fromCreatedDate, long fromId, Instant toCreatedDate, long toId);
+
+    List<TaskExecution> findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+        long parentId, Instant fromCreatedDate, long fromId);
+
+    List<TaskExecution> findAllByParentIdAndTaskNumberOrderByCreatedDate(
+        long parentId, int taskNumber, int limit, long offset);
+
+    List<Long> findAllIdsByIdInAndFirstChildTaskNumberNot(List<Long> ids, int taskNumber);
+
+    List<Long> findAllIdsByParentIdOrderByCreatedDate(long parentId);
+
     /**
      * Find a single {@link TaskExecution} instance by its id.
      *
@@ -79,6 +114,8 @@ public interface TaskExecutionRepository {
     Optional<TaskExecution> findByIdForUpdate(long id);
 
     Optional<TaskExecution> findLastByJobId(long jobId);
+
+    Optional<TaskExecution> findLastStartedByJobId(long jobId);
 
     /**
      * Creates a new persistent represenation of the given {@link TaskExecution}.
