@@ -160,10 +160,47 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
-    public void testCountByJobId() {
-        ChildrenFixture fixture = saveChildrenFixture();
+    public void testCountLatestAttemptsByJobId() {
+        long jobId = saveJob();
 
-        Assertions.assertEquals(6, taskExecutionRepository.countByJobId(fixture.jobId()));
+        TaskExecution retriedLoopTaskExecution = saveRetriedTaskExecution(jobId, null, 0);
+
+        saveTaskExecution(jobId, retriedLoopTaskExecution.getId(), 0, null);
+        saveTaskExecution(jobId, retriedLoopTaskExecution.getId(), 1, null);
+
+        TaskExecution loopRetryTaskExecution = saveTaskExecution(jobId, null, 0, null, 1);
+
+        saveTaskExecution(jobId, loopRetryTaskExecution.getId(), 0, null);
+        saveRetriedTaskExecution(jobId, loopRetryTaskExecution.getId(), 0);
+        saveTaskExecution(jobId, loopRetryTaskExecution.getId(), 1, null, 1);
+        saveTaskExecution(jobId, null, 1, new ExecutionError("failed", List.of()), 0);
+
+        saveChildrenFixture();
+
+        Assertions.assertEquals(4, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+    }
+
+    @Test
+    public void testCountLatestAttemptsByJobIdExcludesSupersededAttempts() {
+        long jobId = saveJob();
+
+        ExecutionError executionError = new ExecutionError("failed", List.of());
+
+        TaskExecution resumedLoopTaskExecution = saveTaskExecution(jobId, null, 0, executionError);
+
+        TaskExecution resumedIterationTaskExecution = saveTaskExecution(
+            jobId, resumedLoopTaskExecution.getId(), 0, null);
+
+        saveTaskExecution(jobId, resumedIterationTaskExecution.getId(), 0, null);
+        saveRetriedTaskExecution(jobId, resumedLoopTaskExecution.getId(), 1);
+
+        TaskExecution loopTaskExecution = saveTaskExecution(jobId, null, 0, null);
+
+        saveTaskExecution(jobId, loopTaskExecution.getId(), 0, null);
+
+        Assertions.assertEquals(
+            2, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of(resumedLoopTaskExecution.getId())));
+        Assertions.assertEquals(5, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
     }
 
     @Test
@@ -217,10 +254,31 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     private TaskExecution saveTaskExecution(Long jobId, Long parentId, int taskNumber, ExecutionError error) {
+        return saveTaskExecution(jobId, parentId, taskNumber, error, 0);
+    }
+
+    private TaskExecution saveTaskExecution(
+        Long jobId, Long parentId, int taskNumber, ExecutionError error, int retryAttempts) {
+
         TaskExecution taskExecution = TaskExecution.builder()
             .error(error)
+            .retryAttempts(retryAttempts)
             .jobId(jobId)
             .parentId(parentId)
+            .taskNumber(taskNumber)
+            .workflowTask(new WorkflowTask(Map.of("name", "task" + taskNumber, "type", "test/v1")))
+            .build();
+
+        return taskExecutionRepository.save(taskExecution);
+    }
+
+    private TaskExecution saveRetriedTaskExecution(long jobId, Long parentId, int taskNumber) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .error(new ExecutionError("failed", List.of()))
+            .jobId(jobId)
+            .maxRetries(1)
+            .parentId(parentId)
+            .status(TaskExecution.Status.FAILED)
             .taskNumber(taskNumber)
             .workflowTask(new WorkflowTask(Map.of("name", "task" + taskNumber, "type", "test/v1")))
             .build();

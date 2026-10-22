@@ -26,7 +26,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,7 +69,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     @Override
-    public long countByJobId(long jobId) {
+    public long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds) {
         Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 
         ReentrantLock lock = obtainLock(getJobLockKey(jobId));
@@ -75,11 +77,45 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         try {
             lock.lock();
 
-            return store.getJobTaskExecutions(jobId)
-                .size();
+            List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(jobId);
+
+            Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
+
+            for (TaskExecution taskExecution : jobTaskExecutions) {
+                taskExecutionMap.put(taskExecution.getId(), taskExecution);
+            }
+
+            return jobTaskExecutions.stream()
+                .filter(taskExecution -> !isInRetriedAttempt(taskExecution, taskExecutionMap, supersededIds))
+                .count();
         } finally {
             lock.unlock();
         }
+    }
+
+    private static boolean isInRetriedAttempt(
+        TaskExecution taskExecution, Map<Long, TaskExecution> taskExecutionMap, List<Long> supersededIds) {
+
+        TaskExecution currentTaskExecution = taskExecution;
+
+        while (currentTaskExecution != null) {
+            if (supersededIds.contains(currentTaskExecution.getId())) {
+                return true;
+            }
+
+            if (currentTaskExecution.getStatus() == TaskExecution.Status.FAILED &&
+                currentTaskExecution.getError() != null &&
+                currentTaskExecution.getRetryAttempts() < currentTaskExecution.getMaxRetries()) {
+
+                return true;
+            }
+
+            Long parentId = currentTaskExecution.getParentId();
+
+            currentTaskExecution = parentId == null ? null : taskExecutionMap.get(parentId);
+        }
+
+        return false;
     }
 
     @Override

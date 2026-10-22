@@ -67,6 +67,17 @@ class LazyTaskExecutionTreeBuilder {
         this.taskExecutionDTOConverterFactory = taskExecutionDTOConverterFactory;
     }
 
+    long countTaskExecutions(long jobId, List<TaskExecution> topLevelTaskExecutions) {
+        Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
+
+        List<Long> supersededTaskExecutionIds = topLevelTaskExecutions.stream()
+            .map(TaskExecution::getId)
+            .filter(id -> !latestAttemptIds.contains(id))
+            .toList();
+
+        return taskExecutionService.countJobTaskExecutions(jobId, supersededTaskExecutionIds);
+    }
+
     List<TaskExecutionDTO> getTopLevelTaskExecutions(long jobId) {
         return decorate(getTopLevelTaskExecutionRows(jobId));
     }

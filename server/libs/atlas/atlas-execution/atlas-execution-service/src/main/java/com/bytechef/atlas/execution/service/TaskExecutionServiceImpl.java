@@ -87,8 +87,8 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
-    public long countJobTaskExecutions(long jobId) {
-        return taskExecutionRepository.countByJobId(jobId);
+    public long countJobTaskExecutions(long jobId, List<Long> supersededTaskExecutionIds) {
+        return taskExecutionRepository.countLatestAttemptsByJobId(jobId, supersededTaskExecutionIds);
     }
 
     @Override

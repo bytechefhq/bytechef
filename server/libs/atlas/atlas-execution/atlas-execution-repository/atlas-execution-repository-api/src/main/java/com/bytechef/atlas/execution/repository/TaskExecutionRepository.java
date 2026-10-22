@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 public interface TaskExecutionRepository {
 
-    long countByJobId(long jobId);
+    long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds);
 
     long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
         long parentId, int taskNumber, Instant createdDate, long id);

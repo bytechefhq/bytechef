@@ -111,6 +111,13 @@ class TaskExecutionServiceTest {
     }
 
     @Test
+    void countJobTaskExecutionsCountsOnlyLatestAttempts() {
+        when(taskExecutionRepository.countLatestAttemptsByJobId(7L, List.of(3L))).thenReturn(4L);
+
+        assertThat(taskExecutionService.countJobTaskExecutions(7L, List.of(3L))).isEqualTo(4L);
+    }
+
+    @Test
     void getChildCountsCountsRowsPerParent() {
         when(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of(7L, 8L)))
             .thenReturn(List.of(7L, 7L, 8L));

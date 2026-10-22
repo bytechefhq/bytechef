@@ -171,7 +171,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
             jobDTO = new JobDTO(job, outputs, lazyTaskExecutionTreeBuilder.decorate(topLevelTaskExecutions));
             focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(id, topLevelTaskExecutions);
-            taskExecutionCount = taskExecutionService.countJobTaskExecutions(id);
+            taskExecutionCount = lazyTaskExecutionTreeBuilder.countTaskExecutions(id, topLevelTaskExecutions);
         } else {
             jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
         }

@@ -343,7 +343,7 @@ public class ProjectWorkflowExecutionFacadeTest {
             .thenReturn(List.of(topLevelTaskExecution));
         when(taskExecutionService.fetchLastJobTaskExecution(30L))
             .thenReturn(Optional.of(topLevelTaskExecution));
-        when(taskExecutionService.countJobTaskExecutions(30L))
+        when(taskExecutionService.countJobTaskExecutions(30L, List.of()))
             .thenReturn(5L);
 
         WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
@@ -431,7 +431,7 @@ public class ProjectWorkflowExecutionFacadeTest {
             .extracting(TaskExecutionDTO::id, TaskExecutionDTO::childCount)
             .containsExactly(tuple(2L, null));
 
-        verify(taskExecutionService, never()).countJobTaskExecutions(anyLong());
+        verify(taskExecutionService, never()).countJobTaskExecutions(anyLong(), anyList());
         verify(taskExecutionService, never()).getFailedJobTaskExecutions(anyLong());
     }
 

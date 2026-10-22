@@ -36,8 +36,42 @@ public interface JdbcTaskExecutionRepository
     TaskExecutionRepository {
 
     @Override
-    @Query("SELECT COUNT(*) FROM task_execution WHERE job_id = :jobId")
-    long countByJobId(@Param("jobId") long jobId);
+    default long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds) {
+        if (supersededIds.isEmpty()) {
+            return selectLatestAttemptCountByJobId(jobId);
+        }
+
+        return selectLatestAttemptCountByJobIdAndSupersededIds(jobId, supersededIds);
+    }
+
+    @Query("""
+        WITH RECURSIVE retried_task_execution AS (
+            SELECT id FROM task_execution
+            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
+            UNION
+            SELECT task_execution.id FROM task_execution
+            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
+        )
+        SELECT (SELECT COUNT(*) FROM task_execution WHERE job_id = :jobId)
+            - (SELECT COUNT(*) FROM retried_task_execution)
+        """)
+    long selectLatestAttemptCountByJobId(@Param("jobId") long jobId);
+
+    @Query("""
+        WITH RECURSIVE retried_task_execution AS (
+            SELECT id FROM task_execution
+            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
+            UNION
+            SELECT id FROM task_execution WHERE job_id = :jobId AND id IN (:supersededIds)
+            UNION
+            SELECT task_execution.id FROM task_execution
+            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
+        )
+        SELECT (SELECT COUNT(*) FROM task_execution WHERE job_id = :jobId)
+            - (SELECT COUNT(*) FROM retried_task_execution)
+        """)
+    long selectLatestAttemptCountByJobIdAndSupersededIds(
+        @Param("jobId") long jobId, @Param("supersededIds") List<Long> supersededIds);
 
     @Override
     @Query("""

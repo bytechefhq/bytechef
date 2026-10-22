@@ -30,7 +30,7 @@ public interface TaskExecutionService {
 
     boolean completeIfNotCancelled(long id);
 
-    long countJobTaskExecutions(long jobId);
+    long countJobTaskExecutions(long jobId, List<Long> supersededTaskExecutionIds);
 
     TaskExecution create(TaskExecution taskExecution);
 

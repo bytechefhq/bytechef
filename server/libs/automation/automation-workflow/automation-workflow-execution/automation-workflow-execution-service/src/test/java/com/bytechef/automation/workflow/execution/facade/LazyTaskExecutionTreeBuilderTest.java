@@ -274,6 +274,21 @@ class LazyTaskExecutionTreeBuilderTest {
     }
 
     @Test
+    void countTaskExecutionsExcludesSupersededTopLevelAttempts() {
+        TaskExecution firstTaskExecution = createTaskExecution(1L, null, "a", "myComponent/v1/a", 0);
+        TaskExecution resumedLoopTaskExecution = createTaskExecution(3L, null, "loop", "loop/v1", 1);
+        TaskExecution loopTaskExecution = createTaskExecution(4L, null, "loop", "loop/v1", 1);
+
+        when(taskExecutionService.countJobTaskExecutions(JOB_ID, List.of(3L)))
+            .thenReturn(7L);
+
+        assertThat(
+            lazyTaskExecutionTreeBuilder.countTaskExecutions(
+                JOB_ID, List.of(firstTaskExecution, resumedLoopTaskExecution, loopTaskExecution)))
+                    .isEqualTo(7L);
+    }
+
+    @Test
     void getFocusPathPicksFirstFailureUnderLatestAttempt() {
         TaskExecution firstTaskExecution = createTaskExecution(1L, null, "a", "myComponent/v1/a", 0);
         TaskExecution loopTaskExecution = createTaskExecution(3L, null, "loop", "loop/v1", 1);

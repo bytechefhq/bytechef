@@ -125,7 +125,7 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
-    public long countJobTaskExecutions(long jobId) {
+    public long countJobTaskExecutions(long jobId, List<Long> supersededTaskExecutionIds) {
         throw new UnsupportedOperationException();
     }
 
