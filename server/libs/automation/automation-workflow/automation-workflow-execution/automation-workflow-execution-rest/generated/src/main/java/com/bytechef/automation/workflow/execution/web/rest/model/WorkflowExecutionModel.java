@@ -5,6 +5,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,8 +25,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.962843+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T09:01:00.827116+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowExecutionModel {
+
+  private List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath = new ArrayList<>();
 
   private Long id;
 
@@ -34,6 +39,8 @@ public class WorkflowExecutionModel {
   private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private @Nullable Integer projectVersion;
+
+  private @Nullable Long taskExecutionCount;
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
@@ -51,6 +58,35 @@ public class WorkflowExecutionModel {
     this.project = project;
     this.projectDeployment = projectDeployment;
     this.workflow = workflow;
+  }
+
+  public WorkflowExecutionModel focusPath(List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath) {
+    this.focusPath = focusPath;
+    return this;
+  }
+
+  public WorkflowExecutionModel addFocusPathItem(com.bytechef.platform.workflow.execution.web.rest.model.FocusPathElementModel focusPathItem) {
+    if (this.focusPath == null) {
+      this.focusPath = new ArrayList<>();
+    }
+    this.focusPath.add(focusPathItem);
+    return this;
+  }
+
+  /**
+   * The path from the root task executions to the task execution to focus, set when the execution is loaded lazily.
+   * @return focusPath
+   */
+  
+  @Schema(name = "focusPath", description = "The path from the root task executions to the task execution to focus, set when the execution is loaded lazily.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("focusPath")
+  public List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> getFocusPath() {
+    return focusPath;
+  }
+
+  @JsonProperty("focusPath")
+  public void setFocusPath(List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath) {
+    this.focusPath = focusPath;
   }
 
   public WorkflowExecutionModel id(Long id) {
@@ -158,6 +194,27 @@ public class WorkflowExecutionModel {
     this.projectVersion = projectVersion;
   }
 
+  public WorkflowExecutionModel taskExecutionCount(@Nullable Long taskExecutionCount) {
+    this.taskExecutionCount = taskExecutionCount;
+    return this;
+  }
+
+  /**
+   * The total number of task executions of the job and its subflow jobs, set when the execution is loaded lazily.
+   * @return taskExecutionCount
+   */
+  
+  @Schema(name = "taskExecutionCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The total number of task executions of the job and its subflow jobs, set when the execution is loaded lazily.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("taskExecutionCount")
+  public @Nullable Long getTaskExecutionCount() {
+    return taskExecutionCount;
+  }
+
+  @JsonProperty("taskExecutionCount")
+  public void setTaskExecutionCount(@Nullable Long taskExecutionCount) {
+    this.taskExecutionCount = taskExecutionCount;
+  }
+
   public WorkflowExecutionModel triggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
     return this;
@@ -209,29 +266,33 @@ public class WorkflowExecutionModel {
       return false;
     }
     WorkflowExecutionModel workflowExecution = (WorkflowExecutionModel) o;
-    return Objects.equals(this.id, workflowExecution.id) &&
+    return Objects.equals(this.focusPath, workflowExecution.focusPath) &&
+        Objects.equals(this.id, workflowExecution.id) &&
         Objects.equals(this.job, workflowExecution.job) &&
         Objects.equals(this.project, workflowExecution.project) &&
         Objects.equals(this.projectDeployment, workflowExecution.projectDeployment) &&
         Objects.equals(this.projectVersion, workflowExecution.projectVersion) &&
+        Objects.equals(this.taskExecutionCount, workflowExecution.taskExecutionCount) &&
         Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, job, project, projectDeployment, projectVersion, triggerExecution, workflow);
+    return Objects.hash(focusPath, id, job, project, projectDeployment, projectVersion, taskExecutionCount, triggerExecution, workflow);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowExecutionModel {\n");
+    sb.append("    focusPath: ").append(toIndentedString(focusPath)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    taskExecutionCount: ").append(toIndentedString(taskExecutionCount)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");

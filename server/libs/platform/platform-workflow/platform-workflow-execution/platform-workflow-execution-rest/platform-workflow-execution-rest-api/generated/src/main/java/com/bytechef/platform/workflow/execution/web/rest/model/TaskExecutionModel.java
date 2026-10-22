@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T09:01:00.753919+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -137,6 +137,8 @@ public class TaskExecutionModel {
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
   private @Nullable JobModel childJob;
+
+  private @Nullable Integer childCount;
 
   public TaskExecutionModel() {
     super();
@@ -785,6 +787,27 @@ public class TaskExecutionModel {
     this.childJob = childJob;
   }
 
+  public TaskExecutionModel childCount(@Nullable Integer childCount) {
+    this.childCount = childCount;
+    return this;
+  }
+
+  /**
+   * The number of direct children of the task execution, set when the children are loaded on demand.
+   * @return childCount
+   */
+  
+  @Schema(name = "childCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of direct children of the task execution, set when the children are loaded on demand.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("childCount")
+  public @Nullable Integer getChildCount() {
+    return childCount;
+  }
+
+  @JsonProperty("childCount")
+  public void setChildCount(@Nullable Integer childCount) {
+    this.childCount = childCount;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -822,12 +845,13 @@ public class TaskExecutionModel {
         Objects.equals(this.type, taskExecution.type) &&
         Objects.equals(this.children, taskExecution.children) &&
         Objects.equals(this.iterations, taskExecution.iterations) &&
-        Objects.equals(this.childJob, taskExecution.childJob);
+        Objects.equals(this.childJob, taskExecution.childJob) &&
+        Objects.equals(this.childCount, taskExecution.childCount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob, childCount);
   }
 
   @Override
@@ -863,6 +887,7 @@ public class TaskExecutionModel {
     sb.append("    children: ").append(toIndentedString(children)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    childJob: ").append(toIndentedString(childJob)).append("\n");
+    sb.append("    childCount: ").append(toIndentedString(childCount)).append("\n");
     sb.append("}");
     return sb.toString();
   }
