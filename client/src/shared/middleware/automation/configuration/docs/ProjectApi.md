@@ -6,6 +6,7 @@ All URIs are relative to */api/automation/internal*
 |------------- | ------------- | -------------|
 | [**createProject**](ProjectApi.md#createproject) | **POST** /projects | Create a new project. |
 | [**deleteProject**](ProjectApi.md#deleteproject) | **DELETE** /projects/{id} | Delete a project. |
+| [**deleteProjectVersion**](ProjectApi.md#deleteprojectversion) | **DELETE** /projects/{id}/versions/{projectVersion} | Deletes a published project version. |
 | [**duplicateProject**](ProjectApi.md#duplicateproject) | **POST** /projects/{id}/duplicate | Duplicates existing project. |
 | [**exportProject**](ProjectApi.md#exportproject) | **GET** /projects/{id}/export | Export project. |
 | [**getProject**](ProjectApi.md#getproject) | **GET** /projects/{id} | Get a project by id. |
@@ -13,6 +14,7 @@ All URIs are relative to */api/automation/internal*
 | [**getWorkspaceProjects**](ProjectApi.md#getworkspaceprojects) | **GET** /workspaces/{id}/projects | Get projects by workspace id |
 | [**importProject**](ProjectApi.md#importproject) | **POST** /workspaces/{workspaceId}/projects/import | Import project. |
 | [**publishProject**](ProjectApi.md#publishprojectoperation) | **POST** /projects/{id}/publish | Publishes existing project. |
+| [**restoreProjectVersion**](ProjectApi.md#restoreprojectversion) | **POST** /projects/{id}/versions/{projectVersion}/restore | Restores a published project version into the draft. |
 | [**updateProject**](ProjectApi.md#updateproject) | **PUT** /projects/{id} | Update an existing project. |
 
 
@@ -151,6 +153,76 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## deleteProjectVersion
+
+> deleteProjectVersion(id, projectVersion)
+
+Deletes a published project version.
+
+Deletes a published project version.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ProjectApi,
+} from '';
+import type { DeleteProjectVersionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ProjectApi();
+
+  const body = {
+    // number | The id of a project.
+    id: 789,
+    // number | The version of a project.
+    projectVersion: 56,
+  } satisfies DeleteProjectVersionRequest;
+
+  try {
+    const data = await api.deleteProjectVersion(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a project. | [Defaults to `undefined`] |
+| **projectVersion** | `number` | The version of a project. | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## duplicateProject
 
 > Project duplicateProject(id)
@@ -220,7 +292,7 @@ No authorization required
 
 ## exportProject
 
-> Blob exportProject(id)
+> Blob exportProject(id, projectVersion)
 
 Export project.
 
@@ -242,6 +314,8 @@ async function example() {
   const body = {
     // number | The id of a project.
     id: 789,
+    // number | The version of a project to export. Defaults to the latest version. (optional)
+    projectVersion: 56,
   } satisfies ExportProjectRequest;
 
   try {
@@ -262,6 +336,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of a project. | [Defaults to `undefined`] |
+| **projectVersion** | `number` | The version of a project to export. Defaults to the latest version. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -633,6 +708,76 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## restoreProjectVersion
+
+> restoreProjectVersion(id, projectVersion)
+
+Restores a published project version into the draft.
+
+Replaces the draft workflows of a project with the workflows of a published project version.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ProjectApi,
+} from '';
+import type { RestoreProjectVersionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ProjectApi();
+
+  const body = {
+    // number | The id of a project.
+    id: 789,
+    // number | The version of a project.
+    projectVersion: 56,
+  } satisfies RestoreProjectVersionRequest;
+
+  try {
+    const data = await api.restoreProjectVersion(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a project. | [Defaults to `undefined`] |
+| **projectVersion** | `number` | The version of a project. | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: Not defined
 
 
