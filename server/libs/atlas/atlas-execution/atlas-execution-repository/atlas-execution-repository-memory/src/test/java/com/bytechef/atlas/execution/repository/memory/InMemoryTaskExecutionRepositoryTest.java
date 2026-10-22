@@ -151,6 +151,46 @@ class InMemoryTaskExecutionRepositoryTest {
                 .toList());
     }
 
+    @Test
+    void testChildrenWithoutCreatedDateKeepInsertionOrder() {
+        List<Long> childIds = new ArrayList<>();
+        List<Long> failedIds = new ArrayList<>();
+
+        for (int index = 0; index < 20; index++) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(408L);
+            taskExecution.setParentId(460L);
+            taskExecution.setTaskNumber(index % 2);
+
+            if (index % 3 == 0) {
+                taskExecution.setError(new ExecutionError("failed", List.of()));
+            }
+
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            childIds.add(savedTaskExecution.getId());
+
+            if (index % 3 == 0) {
+                failedIds.add(savedTaskExecution.getId());
+            }
+        }
+
+        assertEquals(childIds, inMemoryTaskExecutionRepository.findAllIdsByParentIdOrderByCreatedDate(460L));
+        assertEquals(
+            childIds.subList(5, 9),
+            inMemoryTaskExecutionRepository.findAllByParentIdOrderByCreatedDate(460L, 4, 5)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+        assertEquals(
+            failedIds,
+            inMemoryTaskExecutionRepository.findAllByJobIdAndErrorNotNullOrderByCreatedDate(408L)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
     private List<Long> saveChildren(long jobId, long parentId) {
         return saveChildren(jobId, parentId, Instant.parse("2026-01-01T00:00:00Z"));
     }

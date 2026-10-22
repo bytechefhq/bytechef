@@ -41,9 +41,27 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
-    private static final Comparator<TaskExecution> CREATED_DATE_COMPARATOR = Comparator.comparing(
-        TaskExecution::getCreatedDate, Comparator.nullsFirst(Comparator.<Instant>naturalOrder()))
-        .thenComparing(TaskExecution::getId, Comparator.nullsFirst(Comparator.<Long>naturalOrder()));
+    private static final Comparator<TaskExecution> CREATED_DATE_COMPARATOR = (first, second) -> {
+        Instant firstCreatedDate = first.getCreatedDate();
+        Instant secondCreatedDate = second.getCreatedDate();
+
+        if (firstCreatedDate == null || secondCreatedDate == null) {
+            if (firstCreatedDate == secondCreatedDate) {
+                return 0;
+            }
+
+            return firstCreatedDate == null ? -1 : 1;
+        }
+
+        int comparison = firstCreatedDate.compareTo(secondCreatedDate);
+
+        if (comparison != 0) {
+            return comparison;
+        }
+
+        return Comparator.nullsFirst(Comparator.<Long>naturalOrder())
+            .compare(first.getId(), second.getId());
+    };
 
     private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
