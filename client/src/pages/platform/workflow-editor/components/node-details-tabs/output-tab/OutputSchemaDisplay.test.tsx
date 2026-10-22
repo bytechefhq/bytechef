@@ -140,7 +140,7 @@ describe('OutputSchemaDisplay', () => {
         const [notice, placeholderWarning] = screen.getAllByRole('alert');
 
         expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
-        expect(notice).toHaveTextContent('Set Key to test the action.');
+        expect(notice).toHaveTextContent('Set these properties to test the action:Key');
         expect(placeholderWarning).toHaveTextContent('Placeholder sample data');
     });
 

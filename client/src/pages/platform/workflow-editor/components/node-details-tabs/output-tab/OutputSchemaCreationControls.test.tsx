@@ -40,7 +40,7 @@ describe('OutputSchemaCreationControls', () => {
         const notice = screen.getByRole('alert');
 
         expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
-        expect(notice).toHaveTextContent('Set Key to test the action.');
+        expect(notice).toHaveTextContent('Set these properties to test the action:Key');
         expect(notice.compareDocumentPosition(screen.getByRole('button', {name: 'Test Action'}))).toBe(
             Node.DOCUMENT_POSITION_FOLLOWING
         );

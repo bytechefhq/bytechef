@@ -1,5 +1,5 @@
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {CircleAlertIcon} from 'lucide-react';
+import {TriangleAlertIcon} from 'lucide-react';
 
 interface OutputTabTestBlockedNoticeProps {
     className?: string;
@@ -19,32 +19,32 @@ const OutputTabTestBlockedNotice = ({
     const operationText = operationLabel.toLowerCase();
 
     if (missingRequiredProperties.length) {
-        const missingRequiredPropertiesText = missingRequiredProperties.join(', ');
-
         return (
-            <Alert className={className}>
-                <CircleAlertIcon />
+            <Alert className={className} variant="warning">
+                <TriangleAlertIcon />
 
                 <AlertTitle>Required properties missing</AlertTitle>
 
                 <AlertDescription>
-                    <p>
-                        <span>Set </span>
+                    <p>{`Set these properties to test the ${operationText}:`}</p>
 
-                        {onMissingRequiredPropertiesClick ? (
-                            <button
-                                className="font-medium text-content-brand-primary underline-offset-2 hover:underline"
-                                onClick={onMissingRequiredPropertiesClick}
-                                type="button"
-                            >
-                                {missingRequiredPropertiesText}
-                            </button>
-                        ) : (
-                            <span className="font-medium">{missingRequiredPropertiesText}</span>
-                        )}
-
-                        <span>{` to test the ${operationText}.`}</span>
-                    </p>
+                    <ul className="list-disc pl-4">
+                        {missingRequiredProperties.map((missingRequiredProperty) => (
+                            <li key={missingRequiredProperty}>
+                                {onMissingRequiredPropertiesClick ? (
+                                    <button
+                                        className="font-medium underline-offset-2 hover:underline"
+                                        onClick={onMissingRequiredPropertiesClick}
+                                        type="button"
+                                    >
+                                        {missingRequiredProperty}
+                                    </button>
+                                ) : (
+                                    <span className="font-medium">{missingRequiredProperty}</span>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
                 </AlertDescription>
             </Alert>
         );
@@ -52,8 +52,8 @@ const OutputTabTestBlockedNotice = ({
 
     if (connectionMissing) {
         return (
-            <Alert className={className}>
-                <CircleAlertIcon />
+            <Alert className={className} variant="warning">
+                <TriangleAlertIcon />
 
                 <AlertTitle>Connection missing</AlertTitle>
 
