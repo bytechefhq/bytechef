@@ -1769,6 +1769,52 @@ paths:
                 properties:
                   exists:
                     type: "boolean"
+  /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-file:
+    post:
+      description: "Upload a sample file to create a new or update existing workflow node test output with a file entry."
+      summary: "Upload a sample file to create a new or update existing workflow node test output with a file entry"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "uploadWorkflowNodeSampleFile"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow node for which to create test output objects."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "environmentId"
+          description: "The id of an environment."
+          required: true
+          in: "query"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+              required:
+                - "file"
+        required: true
+      responses:
+        "200":
+          description: "The workflow node test output object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowNodeTestOutput"
   /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-output:
     put:
       description: "Upload a sample output to create a new or update existing workflow node test output."
@@ -1848,6 +1894,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does action defines output."
+          type: "boolean"
+        outputFileEntry:
+          description: "Does action define a file entry as its output schema."
           type: "boolean"
         outputFunctionDefined:
           description: "Does action defines output function."
@@ -2954,6 +3003,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does trigger defines output."
+          type: "boolean"
+        outputFileEntry:
+          description: "Does trigger define a file entry as its output schema."
           type: "boolean"
         outputFunctionDefined:
           description: "Does trigger defines output function."

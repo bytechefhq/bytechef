@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -30,6 +31,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -42,10 +45,14 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,6 +83,9 @@ class WorkflowNodeTestOutputFacadeTest {
     private ConnectionService connectionService;
 
     @Mock
+    private EditorTempFileStorage editorTempFileStorage;
+
+    @Mock
     private Evaluator evaluator;
 
     @Mock
@@ -104,8 +114,9 @@ class WorkflowNodeTestOutputFacadeTest {
     @BeforeEach
     void setUp() {
         workflowNodeTestOutputFacade = new WorkflowNodeTestOutputFacadeImpl(
-            actionDefinitionFacade, clusterElementDefinitionService, List.of(), connectionService, evaluator,
-            jobPrincipalAccessorRegistry, triggerDefinitionFacade, workflowNodeTestOutputService,
+            actionDefinitionFacade, clusterElementDefinitionService, List.of(), connectionService,
+            editorTempFileStorage, evaluator, jobPrincipalAccessorRegistry, triggerDefinitionFacade,
+            workflowNodeTestOutputService,
             workflowNodeOutputFacade, webhookTriggerTestFacade, workflowService, workflowTestConfigurationService);
     }
 
@@ -150,6 +161,42 @@ class WorkflowNodeTestOutputFacadeTest {
 
         assertEquals(outputSchema, savedOutputResponse.outputSchema());
         assertEquals(List.of(), savedOutputResponse.sampleOutput());
+    }
+
+    @Test
+    void testSaveWorkflowNodeSampleFileStoresFileAsFileEntrySampleOutput() {
+        Workflow workflow = new Workflow(WORKFLOW_ID, """
+            {
+                "triggers": [
+                    {"name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                ],
+                "tasks": [
+                    {"name": "awsS3_1", "type": "awsS3/v1/getObject", "parameters": {}}
+                ]
+            }
+            """, Format.JSON);
+        InputStream inputStream = new ByteArrayInputStream("a,b\n1,2".getBytes(StandardCharsets.UTF_8));
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(editorTempFileStorage.storeFileContent("sample.csv", inputStream))
+            .thenReturn(new FileEntry("sample.csv", "csv", "text/csv", "file:/editor/temp/sample.csv"));
+
+        workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
+            WORKFLOW_ID, "awsS3_1", "sample.csv", inputStream, ENVIRONMENT_ID);
+
+        ArgumentCaptor<OutputResponse> outputResponseCaptor = ArgumentCaptor.forClass(OutputResponse.class);
+
+        verify(workflowNodeTestOutputService).save(
+            eq(WORKFLOW_ID), eq("awsS3_1"), any(WorkflowNodeType.class), outputResponseCaptor.capture(),
+            eq(ENVIRONMENT_ID));
+
+        OutputResponse savedOutputResponse = outputResponseCaptor.getValue();
+
+        assertThat(savedOutputResponse.outputSchema()).isInstanceOf(FileEntryProperty.class);
+        assertThat(savedOutputResponse.sampleOutput()).isEqualTo(
+            Map.of(
+                "extension", "csv", "mimeType", "text/csv", "name", "sample.csv", "url",
+                "file:/editor/temp/sample.csv"));
     }
 
     @Test

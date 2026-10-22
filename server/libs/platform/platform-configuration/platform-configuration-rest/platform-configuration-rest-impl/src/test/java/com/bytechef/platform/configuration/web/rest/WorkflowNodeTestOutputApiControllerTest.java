@@ -27,11 +27,14 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * @author Ivica Cardic
@@ -83,5 +86,26 @@ class WorkflowNodeTestOutputApiControllerTest {
         assertThat(responseEntity.getBody()).isNull();
 
         verifyNoInteractions(conversionService);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleFilePassesTheFileToTheFacade() {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "sample.csv", "text/csv", "a,b\n1,2".getBytes(StandardCharsets.UTF_8));
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+        WorkflowNodeTestOutputModel workflowNodeTestOutputModel = new WorkflowNodeTestOutputModel();
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
+            eq("workflow-1"), eq("awsS3_1"), eq("sample.csv"), any(InputStream.class), eq(ENVIRONMENT_ID)))
+                .thenReturn(workflowNodeTestOutput);
+        when(conversionService.convert(workflowNodeTestOutput, WorkflowNodeTestOutputModel.class))
+            .thenReturn(workflowNodeTestOutputModel);
+
+        ResponseEntity<WorkflowNodeTestOutputModel> responseEntity =
+            workflowNodeTestOutputApiController.uploadWorkflowNodeSampleFile(
+                "workflow-1", "awsS3_1", ENVIRONMENT_ID, file);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isSameAs(workflowNodeTestOutputModel);
     }
 }
