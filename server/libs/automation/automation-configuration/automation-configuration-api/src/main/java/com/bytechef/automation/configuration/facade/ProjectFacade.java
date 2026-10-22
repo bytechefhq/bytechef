@@ -39,7 +39,7 @@ public interface ProjectFacade {
 
     ProjectDTO duplicateProject(long id);
 
-    byte[] exportProject(long id);
+    byte[] exportProject(long id, @Nullable Integer projectVersion);
 
     void exportSharedProject(long id, @Nullable String description);
 

@@ -91,12 +91,16 @@ public class ProjectApiController implements ProjectApi {
 
     @Override
     @ResponseBody
-    public ResponseEntity<Resource> exportProject(@PathVariable("id") Long id) {
-        byte[] projectData = projectFacade.exportProject(id);
+    public ResponseEntity<Resource> exportProject(@PathVariable("id") Long id, Integer projectVersion) {
+        byte[] projectData = projectFacade.exportProject(id, projectVersion);
         Project project = projectService.getProject(id);
 
+        int exportedProjectVersion = projectVersion == null ? project.getLastProjectVersion() : projectVersion;
+
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + project.getName() + ".zip" + "\"")
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + project.getName() + "_v" + exportedProjectVersion + ".zip" + "\"")
             .body(new org.springframework.core.io.ByteArrayResource(projectData));
     }
 

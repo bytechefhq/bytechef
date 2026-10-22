@@ -633,6 +633,12 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "projectVersion"
+          description: "The version of a project to export. Defaults to the latest version."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
       responses:
         "200":
           description: "The project export file."
