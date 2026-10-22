@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import ClusterElementTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestButton';
+import OutputTabTestBlockedNotice from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestBlockedNotice';
 import OutputTabTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestButton';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 
@@ -13,6 +14,7 @@ interface OutputSchemaCreationControlsProps {
     handleClusterElementTestSubmit?: (inputParameters: Record<string, any>, onSuccess?: () => void) => void;
     handleTestOperationClick: () => void;
     missingRequiredProperties?: string[];
+    onMissingRequiredPropertiesClick?: () => void;
     outputDefined?: boolean;
     saveClusterElementTestOutputMutationPending?: boolean;
     saveWorkflowNodeTestOutputMutationPending: boolean;
@@ -32,6 +34,7 @@ const OutputSchemaCreationControls = ({
     handleClusterElementTestSubmit,
     handleTestOperationClick,
     missingRequiredProperties = [],
+    onMissingRequiredPropertiesClick,
     outputDefined,
     saveClusterElementTestOutputMutationPending,
     saveWorkflowNodeTestOutputMutationPending,
@@ -91,13 +94,23 @@ const OutputSchemaCreationControls = ({
                                     saving={!!saveClusterElementTestOutputMutationPending}
                                 />
                             ) : (
-                                <OutputTabTestButton
-                                    connectionMissing={!!connectionMissing}
-                                    label={`Test ${operationLabel}`}
-                                    missingRequiredProperties={missingRequiredProperties}
-                                    onClick={handleTestOperationClick}
-                                    pending={saveWorkflowNodeTestOutputMutationPending}
-                                />
+                                <>
+                                    <OutputTabTestBlockedNotice
+                                        className="max-w-sm"
+                                        connectionMissing={!!connectionMissing}
+                                        missingRequiredProperties={missingRequiredProperties}
+                                        onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
+                                        operationLabel={operationLabel}
+                                    />
+
+                                    <OutputTabTestButton
+                                        connectionMissing={!!connectionMissing}
+                                        label={`Test ${operationLabel}`}
+                                        missingRequiredProperties={missingRequiredProperties}
+                                        onClick={handleTestOperationClick}
+                                        pending={saveWorkflowNodeTestOutputMutationPending}
+                                    />
+                                </>
                             )}
 
                             {clusterElementType !== 'tools' && showUploadSampleOutputButton && (

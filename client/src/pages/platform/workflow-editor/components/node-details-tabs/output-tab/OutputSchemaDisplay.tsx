@@ -15,6 +15,7 @@ import {MoreHorizontalIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 import ClusterElementTestButton from './ClusterElementTestButton';
+import OutputTabTestBlockedNotice from './OutputTabTestBlockedNotice';
 import OutputTabTestButton from './OutputTabTestButton';
 
 interface OutputSchemaDisplayProps {
@@ -30,6 +31,7 @@ interface OutputSchemaDisplayProps {
     clusterElementType?: string;
     isClusterElement?: boolean;
     missingRequiredProperties?: string[];
+    onMissingRequiredPropertiesClick?: () => void;
     outputDefined?: boolean;
     outputSchema?: PropertyAllType;
     resumePerformFunctionDefined?: boolean;
@@ -58,6 +60,7 @@ const OutputSchemaDisplay = ({
     handleTestOperationClick,
     isClusterElement,
     missingRequiredProperties = [],
+    onMissingRequiredPropertiesClick,
     outputDefined,
     outputSchema,
     resumePerformFunctionDefined,
@@ -78,6 +81,8 @@ const OutputSchemaDisplay = ({
 
     const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
     const testable = !currentNode.taskDispatcher && !resumePerformFunctionDefined && !variablePropertiesDefined;
+    const clusterElementTestButtonShown =
+        !!showClusterElementTestButton && !!currentOperationProperties && !!handleClusterElementTestSubmit;
     const showPlaceholderSampleOutputWarning =
         !testOutputResponse && !currentNode.taskDispatcher && sampleOutput !== undefined && sampleOutput !== null;
 
@@ -90,9 +95,7 @@ const OutputSchemaDisplay = ({
 
                         <ButtonGroup>
                             {testable &&
-                                (showClusterElementTestButton &&
-                                currentOperationProperties &&
-                                handleClusterElementTestSubmit ? (
+                                (clusterElementTestButtonShown ? (
                                     <ClusterElementTestButton
                                         clusterElementType={clusterElementType}
                                         connectionMissing={connectionMissing}
@@ -152,6 +155,16 @@ const OutputSchemaDisplay = ({
                     {testErrorAlert}
 
                     {testNotice}
+
+                    {testable && !clusterElementTestButtonShown && (
+                        <OutputTabTestBlockedNotice
+                            className="mb-3"
+                            connectionMissing={connectionMissing}
+                            missingRequiredProperties={missingRequiredProperties}
+                            onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
+                            operationLabel={operationLabel}
+                        />
+                    )}
 
                     {showPlaceholderSampleOutputWarning && (
                         <Alert className="mb-3" variant="warning">

@@ -1,4 +1,3 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
@@ -10,17 +9,15 @@ vi.mock('./ClusterElementTestButton', () => ({
 
 const renderOutputSchemaCreationControls = (props: Partial<Parameters<typeof OutputSchemaCreationControls>[0]> = {}) =>
     render(
-        <TooltipProvider>
-            <OutputSchemaCreationControls
-                handleTestOperationClick={vi.fn()}
-                outputDefined
-                saveWorkflowNodeTestOutputMutationPending={false}
-                setShowUploadDialog={vi.fn()}
-                showUploadSampleOutputButton
-                uploadSampleOutputRequestMutationPending={false}
-                {...props}
-            />
-        </TooltipProvider>
+        <OutputSchemaCreationControls
+            handleTestOperationClick={vi.fn()}
+            outputDefined
+            saveWorkflowNodeTestOutputMutationPending={false}
+            setShowUploadDialog={vi.fn()}
+            showUploadSampleOutputButton
+            uploadSampleOutputRequestMutationPending={false}
+            {...props}
+        />
     );
 
 afterEach(() => {
@@ -37,10 +34,16 @@ describe('OutputSchemaCreationControls', () => {
         expect(screen.getByText('Define the expected output schema with one of the methods')).toBeInTheDocument();
     });
 
-    it('disables Test Action when a required property is missing', () => {
-        renderOutputSchemaCreationControls({missingRequiredProperties: ['key']});
+    it('disables Test Action and lists the missing required properties when one is missing', () => {
+        renderOutputSchemaCreationControls({missingRequiredProperties: ['Key']});
+
+        const notice = screen.getByRole('alert');
 
         expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
+        expect(notice).toHaveTextContent('Set Key to test the action.');
+        expect(notice.compareDocumentPosition(screen.getByRole('button', {name: 'Test Action'}))).toBe(
+            Node.DOCUMENT_POSITION_FOLLOWING
+        );
     });
 
     it('disables Test Action when the connection is missing', () => {
