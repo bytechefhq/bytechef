@@ -325,6 +325,80 @@ public class ProjectWorkflowExecutionFacadeTest {
     }
 
     @Test
+    public void testGetSubflowJobTaskExecutionsLoadsParentTaskExecutionsInOneCall() {
+        Job firstChildJob = new Job(41L);
+
+        firstChildJob.setParentTaskExecutionId(11L);
+        firstChildJob.setWorkflowId("first-subflow");
+
+        Job secondChildJob = new Job(42L);
+
+        secondChildJob.setParentTaskExecutionId(12L);
+        secondChildJob.setWorkflowId("second-subflow");
+
+        TaskExecution firstParentTaskExecution = TaskExecution.builder()
+            .id(11L)
+            .jobId(33911L)
+            .workflowTask(workflowTask)
+            .build();
+        TaskExecution secondParentTaskExecution = TaskExecution.builder()
+            .id(12L)
+            .jobId(33911L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(jobService.getChildJobIds(33911L))
+            .thenReturn(List.of(41L, 42L));
+        when(jobService.getJobs(List.of(41L, 42L)))
+            .thenReturn(List.of(firstChildJob, secondChildJob));
+        when(taskExecutionService.getTaskExecutions(List.of(11L, 12L)))
+            .thenReturn(List.of(firstParentTaskExecution, secondParentTaskExecution));
+
+        List<TaskExecutionDTO> taskExecutionDTOs = facade.getSubflowJobTaskExecutions(33911L);
+
+        assertThat(taskExecutionDTOs)
+            .extracting(TaskExecutionDTO::id)
+            .containsExactly(11L, 12L);
+        assertThat(taskExecutionDTOs)
+            .extracting(taskExecutionDTO -> Objects.requireNonNull(taskExecutionDTO.childJob())
+                .id())
+            .containsExactly(41L, 42L);
+
+        verify(taskExecutionService, times(1)).getTaskExecutions(List.of(11L, 12L));
+        verify(taskExecutionService, never()).getTaskExecution(anyLong());
+    }
+
+    @Test
+    public void testGetSubflowJobTaskExecutionsSkipsChildJobWithMissingParentTaskExecution() {
+        Job firstChildJob = new Job(41L);
+
+        firstChildJob.setParentTaskExecutionId(11L);
+        firstChildJob.setWorkflowId("first-subflow");
+
+        Job secondChildJob = new Job(42L);
+
+        secondChildJob.setParentTaskExecutionId(12L);
+        secondChildJob.setWorkflowId("second-subflow");
+
+        TaskExecution secondParentTaskExecution = TaskExecution.builder()
+            .id(12L)
+            .jobId(33911L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(jobService.getChildJobIds(33911L))
+            .thenReturn(List.of(41L, 42L));
+        when(jobService.getJobs(List.of(41L, 42L)))
+            .thenReturn(List.of(firstChildJob, secondChildJob));
+        when(taskExecutionService.getTaskExecutions(List.of(11L, 12L)))
+            .thenReturn(List.of(secondParentTaskExecution));
+
+        assertThat(facade.getSubflowJobTaskExecutions(33911L))
+            .extracting(TaskExecutionDTO::id)
+            .containsExactly(12L);
+    }
+
+    @Test
     public void getWorkflowExecutionLazyForChildJob() {
         Job childJob = new Job(30L);
 

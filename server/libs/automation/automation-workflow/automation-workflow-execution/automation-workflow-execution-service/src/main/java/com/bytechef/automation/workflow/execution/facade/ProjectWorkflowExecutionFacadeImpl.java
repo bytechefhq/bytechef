@@ -746,13 +746,36 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             return List.of();
         }
 
-        return jobService.getJobs(childJobIds)
+        List<Job> childJobs = jobService.getJobs(childJobIds)
             .stream()
             .filter(childJob -> childJob.getParentTaskExecutionId() != null)
-            .map(childJob -> toTaskExecutionDTO(
-                taskExecutionService.getTaskExecution(childJob.getParentTaskExecutionId()), toSubflowJobDTO(childJob),
-                false))
             .toList();
+
+        Map<Long, TaskExecution> parentTaskExecutionMap = taskExecutionService
+            .getTaskExecutions(
+                CollectionUtils.map(childJobs, childJob -> Objects.requireNonNull(childJob.getParentTaskExecutionId())))
+            .stream()
+            .collect(Collectors.toMap(TaskExecution::getId, Function.identity(), (first, second) -> first));
+
+        return childJobs.stream()
+            .filter(childJob -> hasParentTaskExecution(childJob, parentTaskExecutionMap))
+            .map(childJob -> toTaskExecutionDTO(
+                parentTaskExecutionMap.get(childJob.getParentTaskExecutionId()), toSubflowJobDTO(childJob), false))
+            .toList();
+    }
+
+    private static boolean hasParentTaskExecution(Job childJob, Map<Long, TaskExecution> parentTaskExecutionMap) {
+        if (parentTaskExecutionMap.containsKey(childJob.getParentTaskExecutionId())) {
+            return true;
+        }
+
+        if (log.isWarnEnabled()) {
+            log.warn(
+                "Skipping child job id={}: parent task execution id={} not found", childJob.getId(),
+                childJob.getParentTaskExecutionId());
+        }
+
+        return false;
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
