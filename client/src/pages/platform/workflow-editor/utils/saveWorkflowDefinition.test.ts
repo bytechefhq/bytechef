@@ -299,6 +299,46 @@ describe('saveWorkflowDefinition', () => {
         });
     });
 
+    describe('failure reporting', () => {
+        const nodeData = {
+            componentName: 'httpClient',
+            name: 'httpClient_1',
+            operationName: 'get',
+            version: 1,
+        } as unknown as NodeDataType;
+
+        it('reports a definition that cannot be parsed as failed without saving', async () => {
+            const onError = vi.fn();
+            const mutation = makeMutation();
+
+            mockWorkflowState.workflow.definition = '{not json';
+
+            await saveWorkflowDefinition({nodeData, onError, updateWorkflowMutation: mutation});
+
+            expect(mutation.mutate).not.toHaveBeenCalled();
+            expect(onError).toHaveBeenCalledOnce();
+        });
+
+        it('reports a failed mutation as failed', async () => {
+            const onError = vi.fn();
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({nodeData, onError, updateWorkflowMutation: mutation});
+
+            (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1].onError(new Error('Conflict'));
+
+            expect(onError).toHaveBeenCalledOnce();
+        });
+
+        it('does not report a submitted save as failed', async () => {
+            const onError = vi.fn();
+
+            await saveWorkflowDefinition({nodeData, onError, updateWorkflowMutation: makeMutation()});
+
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
     describe('mutation guard', () => {
         it('queues the save while another mutation is in flight and fires it from fresh state once released', async () => {
             mockWorkflowState = makeWorkflowState();
@@ -393,6 +433,22 @@ describe('saveWorkflowDefinition', () => {
 
             expect(mutation.mutate).not.toHaveBeenCalled();
             expect(hasPendingSaves('workflow-1')).toBe(false);
+        });
+
+        it('reports a dropped precomputed-tasks save as failed', async () => {
+            const onError = vi.fn();
+
+            const {setWorkflowMutating} = await import('./workflowMutationGuard');
+
+            setWorkflowMutating('workflow-1', true);
+
+            await saveWorkflowDefinition({
+                onError,
+                updateWorkflowMutation: makeMutation(),
+                updatedWorkflowTasks: [{name: 'stale_1', type: 'logger/v1/debug'}],
+            });
+
+            expect(onError).toHaveBeenCalledOnce();
         });
 
         it('should set and clear mutation flag around mutate', async () => {

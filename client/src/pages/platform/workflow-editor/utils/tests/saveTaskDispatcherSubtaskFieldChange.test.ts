@@ -32,11 +32,12 @@ vi.mock('../../stores/useWorkflowDataStore', () => ({
 
 vi.mock('../saveWorkflowDefinition', () => ({default: saveWorkflowDefinitionMock}));
 
-function callSave() {
+function callSave(onError?: () => void) {
     saveTaskDispatcherSubtaskFieldChange({
         currentComponentDefinition: {name: 'logger', version: 1} as ComponentDefinition,
         currentNodeIndex: 0,
         fieldUpdate: {field: 'label', value: 'Renamed'},
+        onError,
         updateWorkflowMutation: {mutate: vi.fn()} as unknown as UpdateWorkflowMutationType,
     });
 }
@@ -95,11 +96,45 @@ describe('saveTaskDispatcherSubtaskFieldChange', () => {
         expect(hasPendingSaves('workflow-1')).toBe(false);
     });
 
-    it('clears the in-progress flag of an operation switch when the save fails', () => {
-        callSave();
+    it('reports a failed save to the caller', () => {
+        const onError = vi.fn();
+
+        callSave(onError);
 
         saveWorkflowDefinitionMock.mock.calls[0][0].onError();
 
-        expect(panelState.setOperationChangeInProgress).toHaveBeenCalledWith(false);
+        expect(onError).toHaveBeenCalledOnce();
+    });
+
+    it('reports a save it cannot start to the caller', () => {
+        const onError = vi.fn();
+
+        workflowDataState.workflow = {definition: undefined, id: 'workflow-1'};
+
+        callSave(onError);
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledOnce();
+    });
+
+    it('reports a save for a node outside any task dispatcher to the caller', () => {
+        const onError = vi.fn();
+
+        panelState.currentNode = {componentName: 'logger', name: 'logger_1', workflowNodeName: 'logger_1'};
+
+        callSave(onError);
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledOnce();
+    });
+
+    it('does not report a save queued behind another save as failed', () => {
+        const onError = vi.fn();
+
+        setWorkflowMutating('workflow-1', true);
+
+        callSave(onError);
+
+        expect(onError).not.toHaveBeenCalled();
     });
 });

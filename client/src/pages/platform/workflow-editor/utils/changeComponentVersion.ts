@@ -65,9 +65,10 @@ export default async function changeComponentVersion({
     updateWorkflowMutation,
     workflowId,
 }: ChangeComponentVersionProps): Promise<void> {
-    const {currentNode, setCurrentNode, setOperationChangeInProgress} = useWorkflowNodeDetailsPanelStore.getState();
+    const {currentNode, operationChangeInProgress, setCurrentNode, setOperationChangeInProgress} =
+        useWorkflowNodeDetailsPanelStore.getState();
 
-    if (!currentNode || !Number.isInteger(newComponentVersion)) {
+    if (!currentNode || !Number.isInteger(newComponentVersion) || operationChangeInProgress) {
         return;
     }
 
@@ -156,6 +157,7 @@ export default async function changeComponentVersion({
                     field: 'operation',
                     value: newOperationName,
                 },
+                onError: () => setOperationChangeInProgress(false),
                 parameters: newParameters,
                 updateWorkflowMutation,
             });
@@ -171,6 +173,7 @@ export default async function changeComponentVersion({
                     field: 'operation',
                     value: newOperationName,
                 },
+                onError: () => setOperationChangeInProgress(false),
                 parameters: newParameters,
                 updateWorkflowMutation,
             });

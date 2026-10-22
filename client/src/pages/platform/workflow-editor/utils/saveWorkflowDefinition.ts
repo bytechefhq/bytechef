@@ -48,6 +48,8 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
         if (updatedWorkflowTasks) {
             console.warn('Dropped a workflow save with precomputed tasks while another save was in flight');
 
+            onError?.();
+
             return;
         }
 
@@ -64,6 +66,8 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
         workflowDefinition = JSON.parse(workflow.definition!);
     } catch (error) {
         console.error('Failed to parse workflow definition:', error);
+
+        onError?.();
 
         return;
     }
@@ -232,6 +236,8 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
                 if (!nestedTask) {
                     console.error(`Task ${existingWorkflowTask.name} not found in workflow definition`);
 
+                    onError?.();
+
                     return;
                 }
 
@@ -323,6 +329,8 @@ function executeWorkflowMutation({
 }: ExecuteWorkflowMutationProps) {
     if (isWorkflowMutating(workflow.id!)) {
         console.warn('Dropped a workflow save that raced another save for the guard');
+
+        onError?.();
 
         return;
     }
