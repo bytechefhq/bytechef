@@ -22,8 +22,10 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -168,14 +170,18 @@ public class JdbcTaskExecutionRepositoryIntTest {
     public void testCountByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual() {
         ChildrenFixture fixture = saveChildrenFixture();
 
-        TaskExecution secondTaskExecution = taskExecutionRepository.findById(fixture.childIds()
-            .get(2))
+        List<Long> childIds = fixture.childIds();
+
+        TaskExecution secondTaskExecution = taskExecutionRepository.findById(childIds.get(2))
             .orElseThrow();
+
+        Instant secondCreatedDate = Objects.requireNonNull(secondTaskExecution.getCreatedDate());
+        long secondTaskExecutionId = Objects.requireNonNull(secondTaskExecution.getId());
 
         Assertions.assertEquals(
             2,
             taskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
-                fixture.parentId(), 0, secondTaskExecution.getCreatedDate(), secondTaskExecution.getId()));
+                fixture.parentId(), 0, secondCreatedDate, secondTaskExecutionId));
     }
 
     private ChildrenFixture saveChildrenFixture() {
@@ -183,14 +189,12 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
         TaskExecution parentTaskExecution = saveTaskExecution(jobId, null, 0, null);
 
-        long parentId = parentTaskExecution.getId();
+        long parentId = Objects.requireNonNull(parentTaskExecution.getId());
 
         List<Long> childIds = List.of(
-            saveTaskExecution(jobId, parentId, 0, null).getId(),
-            saveTaskExecution(jobId, parentId, 1, null).getId(),
-            saveTaskExecution(jobId, parentId, 0, null).getId(),
-            saveTaskExecution(jobId, parentId, 1, null).getId(),
-            saveTaskExecution(jobId, parentId, 0, null).getId());
+            saveTaskExecutionId(jobId, parentId, 0), saveTaskExecutionId(jobId, parentId, 1),
+            saveTaskExecutionId(jobId, parentId, 0), saveTaskExecutionId(jobId, parentId, 1),
+            saveTaskExecutionId(jobId, parentId, 0));
 
         return new ChildrenFixture(jobId, parentId, childIds);
     }
@@ -201,8 +205,15 @@ public class JdbcTaskExecutionRepositoryIntTest {
         job.setStatus(Job.Status.STARTED);
         job.setWorkflowId("demo:1234");
 
-        return jobRepository.save(job)
-            .getId();
+        Job savedJob = jobRepository.save(job);
+
+        return Objects.requireNonNull(savedJob.getId());
+    }
+
+    private long saveTaskExecutionId(long jobId, long parentId, int taskNumber) {
+        TaskExecution taskExecution = saveTaskExecution(jobId, parentId, taskNumber, null);
+
+        return Objects.requireNonNull(taskExecution.getId());
     }
 
     private TaskExecution saveTaskExecution(Long jobId, Long parentId, int taskNumber, ExecutionError error) {

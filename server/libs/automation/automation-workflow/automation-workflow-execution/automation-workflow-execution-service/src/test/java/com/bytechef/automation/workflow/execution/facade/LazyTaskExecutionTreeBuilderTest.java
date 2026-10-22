@@ -94,11 +94,13 @@ class LazyTaskExecutionTreeBuilderTest {
         assertThat(taskExecutionDTOs)
             .extracting(TaskExecutionDTO::childCount)
             .containsExactly(97, 387, 0);
-        assertThat(taskExecutionDTOs.get(0)
-            .childJob()).isNull();
+        TaskExecutionDTO firstTaskExecutionDTO = taskExecutionDTOs.get(0);
 
-        JobDTO childJobDTO = taskExecutionDTOs.get(2)
-            .childJob();
+        assertThat(firstTaskExecutionDTO.childJob()).isNull();
+
+        TaskExecutionDTO thirdTaskExecutionDTO = taskExecutionDTOs.get(2);
+
+        JobDTO childJobDTO = thirdTaskExecutionDTO.childJob();
 
         assertThat(childJobDTO).isNotNull();
         assertThat(childJobDTO.id()).isEqualTo(50L);

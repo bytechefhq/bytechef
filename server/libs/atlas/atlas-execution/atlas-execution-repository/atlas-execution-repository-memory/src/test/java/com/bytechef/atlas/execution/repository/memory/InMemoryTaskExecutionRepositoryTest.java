@@ -160,8 +160,9 @@ class InMemoryTaskExecutionRepositoryTest {
 
             taskExecution.setJobId(409L);
 
-            topLevelIds.add(inMemoryTaskExecutionRepository.save(taskExecution)
-                .getId());
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            topLevelIds.add(savedTaskExecution.getId());
         }
 
         saveChildren(409L, topLevelIds.getFirst());
@@ -240,8 +241,9 @@ class InMemoryTaskExecutionRepositoryTest {
                 throw new IllegalStateException(reflectiveOperationException);
             }
 
-            childIds.add(inMemoryTaskExecutionRepository.save(taskExecution)
-                .getId());
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            childIds.add(savedTaskExecution.getId());
         }
 
         return childIds;
