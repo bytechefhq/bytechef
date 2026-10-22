@@ -22,18 +22,11 @@ interface EnvironmentOptionI {
 }
 
 interface EnvironmentSelectPropsI {
-    align?: 'center' | 'end' | 'start';
-    environmentId?: number;
     onChange?: (environmentId: number) => void;
     variant?: 'compact' | 'default' | 'icon';
 }
 
-const EnvironmentSelect = ({
-    align = 'start',
-    environmentId,
-    onChange,
-    variant = 'default',
-}: EnvironmentSelectPropsI = {}) => {
+const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPropsI = {}) => {
     const application = useApplicationInfoStore((state) => state.application);
 
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -69,9 +62,7 @@ const EnvironmentSelect = ({
         return null;
     }
 
-    const selectedEnvironmentId = environmentId ?? currentEnvironmentId;
-
-    const currentConfig = ENVIRONMENT_CONFIGS[selectedEnvironmentId];
+    const currentConfig = ENVIRONMENT_CONFIGS[currentEnvironmentId];
 
     if (!currentConfig) {
         return null;
@@ -117,22 +108,20 @@ const EnvironmentSelect = ({
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align={align} className="w-72">
+            <DropdownMenuContent align="start" className="w-72">
                 <DropdownMenuRadioGroup
                     onValueChange={(value) => {
                         const nextEnvironmentId = +value;
 
-                        if (environmentId === undefined) {
-                            setCurrentEnvironmentId(nextEnvironmentId);
-                        }
+                        setCurrentEnvironmentId(nextEnvironmentId);
 
                         onChange?.(nextEnvironmentId);
                     }}
-                    value={selectedEnvironmentId.toString()}
+                    value={currentEnvironmentId.toString()}
                 >
                     {environmentOptions.map(({config, id}) => {
                         const Icon = config.icon;
-                        const isSelected = +id === selectedEnvironmentId;
+                        const isSelected = +id === currentEnvironmentId;
 
                         return (
                             <DropdownMenuRadioItem

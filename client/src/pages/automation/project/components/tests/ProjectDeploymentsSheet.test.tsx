@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectDeploymentsSheet from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project, ProjectDeployment} from '@/shared/middleware/automation/configuration';
@@ -8,6 +9,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[],
+    refetch: vi.fn(),
+    savedEnvironmentId: 0,
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -16,7 +19,12 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: hoisted.projectDeployments, isLoading: false}),
+    useGetWorkspaceProjectDeploymentsQuery: () => ({
+        data: hoisted.projectDeployments,
+        isFetching: false,
+        isLoading: false,
+        refetch: hoisted.refetch,
+    }),
 }));
 
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
@@ -77,10 +85,16 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
                 onClick={() => {
                     hoisted.projectDeployments = [
                         ...hoisted.projectDeployments,
-                        {enabled: true, environmentId: 1, id: 3, name: 'Orders Staging', projectVersion: 2},
+                        {
+                            enabled: true,
+                            environmentId: hoisted.savedEnvironmentId,
+                            id: 3,
+                            name: 'Orders New',
+                            projectVersion: 2,
+                        },
                     ];
 
-                    onSuccess(3, 1);
+                    onSuccess(3, hoisted.savedEnvironmentId);
                 }}
             >
                 Save deployment
@@ -89,32 +103,26 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     ),
 }));
 
-vi.mock('@/shared/components/EnvironmentSelect', () => ({
-    default: ({environmentId, onChange}: {environmentId: number; onChange: (environmentId: number) => void}) => (
-        <div>
-            <span>{`Selected environment ${environmentId}`}</span>
-
-            <button onClick={() => onChange(1)}>Staging</button>
-
-            <button onClick={() => onChange(2)}>Production</button>
-        </div>
-    ),
-}));
-
 const onSheetOpenChange = vi.fn();
 
 const project = {id: 7, lastProjectVersion: 3, lastPublishedDate: new Date(), name: 'Orders'} as Project;
 
 const renderProjectDeploymentsSheet = () =>
-    render(<ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />);
+    render(
+        <TooltipProvider>
+            <ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />
+        </TooltipProvider>
+    );
 
 describe('ProjectDeploymentsSheet', () => {
     beforeEach(() => {
         hoisted.navigate.mockReset();
+        hoisted.refetch.mockReset();
         hoisted.projectDeployments = [
             {enabled: true, environmentId: 0, id: 1, name: 'Orders Dev', projectVersion: 3},
             {enabled: false, environmentId: 2, id: 2, name: 'Orders Prod', projectVersion: 2},
         ];
+        hoisted.savedEnvironmentId = 0;
 
         onSheetOpenChange.mockReset();
 
@@ -122,83 +130,106 @@ describe('ProjectDeploymentsSheet', () => {
         environmentStore.setState({currentEnvironmentId: 0});
     });
 
-    it('shows the deployments of the current environment by default', () => {
+    it('shows only the deployments of the current environment', () => {
         renderProjectDeploymentsSheet();
 
         expect(screen.getByText('Project Deployments')).toBeInTheDocument();
-        expect(screen.getByText('Selected environment 0')).toBeInTheDocument();
         expect(screen.getByText('Orders Dev')).toBeInTheDocument();
         expect(screen.queryByText('Orders Prod')).not.toBeInTheDocument();
+        expect(screen.queryByText('DEVELOPMENT')).not.toBeInTheDocument();
         expect(screen.getByText('Workflow Executions Sheet')).toBeInTheDocument();
     });
 
-    it('switches the listed deployments without changing the current environment', () => {
-        renderProjectDeploymentsSheet();
+    it('expands the given deployment', () => {
+        render(
+            <TooltipProvider>
+                <ProjectDeploymentsSheet
+                    expandedProjectDeploymentId={1}
+                    onSheetOpenChange={onSheetOpenChange}
+                    project={project}
+                    sheetOpen
+                />
+            </TooltipProvider>
+        );
 
-        fireEvent.click(screen.getByText('Production'));
-
-        expect(screen.queryByText('Orders Dev')).not.toBeInTheDocument();
-        expect(screen.getByText('Orders Prod')).toBeInTheDocument();
-        expect(environmentStore.getState().currentEnvironmentId).toBe(0);
-
-        fireEvent.click(screen.getByText('Staging'));
-
-        expect(screen.getByText('No deployments in STAGING')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
-        expect(screen.getByText('Deploy dialog for environment 1')).toBeInTheDocument();
+        expect(screen.getByText('Orders Dev expanded')).toBeInTheDocument();
     });
 
-    it('opens the deployments page in the selected environment', () => {
+    it('opens the deployments page without changing the current environment', () => {
         renderProjectDeploymentsSheet();
 
-        fireEvent.click(screen.getByText('Production'));
         fireEvent.click(screen.getByText('Open in Deployments'));
 
-        expect(environmentStore.getState().currentEnvironmentId).toBe(2);
+        expect(environmentStore.getState().currentEnvironmentId).toBe(0);
         expect(onSheetOpenChange).toHaveBeenCalledWith(false);
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/deployments?projectId=7');
     });
 
-    it('opens on the given environment instead of the current one', () => {
-        render(
-            <ProjectDeploymentsSheet
-                environmentId={2}
-                expandedProjectDeploymentId={2}
-                onSheetOpenChange={onSheetOpenChange}
-                project={project}
-                sheetOpen
-            />
-        );
+    it('offers to deploy into the current environment when it has no deployments', () => {
+        hoisted.projectDeployments = [
+            {enabled: false, environmentId: 2, id: 2, name: 'Orders Prod', projectVersion: 2},
+        ];
 
-        expect(screen.getByText('Selected environment 2')).toBeInTheDocument();
-        expect(screen.getByText('Orders Prod expanded')).toBeInTheDocument();
-        expect(screen.queryByText('Orders Dev')).not.toBeInTheDocument();
+        renderProjectDeploymentsSheet();
+
+        expect(screen.getByText('No deployments in DEVELOPMENT')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
+        expect(screen.getByText('Deploy dialog for environment 0')).toBeInTheDocument();
     });
 
-    it('expands the deployment created from the empty state', () => {
+    it('expands a development deployment created from the empty state', () => {
+        hoisted.projectDeployments = [];
+
         const {rerender} = renderProjectDeploymentsSheet();
 
-        fireEvent.click(screen.getByText('Staging'));
         fireEvent.click(screen.getByText('Save deployment'));
 
-        rerender(<ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />);
+        rerender(
+            <TooltipProvider>
+                <ProjectDeploymentsSheet onSheetOpenChange={onSheetOpenChange} project={project} sheetOpen />
+            </TooltipProvider>
+        );
 
-        expect(screen.getByText('Selected environment 1')).toBeInTheDocument();
-        expect(screen.getByText('Orders Staging expanded')).toBeInTheDocument();
+        expect(screen.getByText('Orders New expanded')).toBeInTheDocument();
+        expect(hoisted.navigate).not.toHaveBeenCalled();
+    });
+
+    it('opens the deployments page in the environment of a staging deployment created from the empty state', () => {
+        hoisted.projectDeployments = [];
+        hoisted.savedEnvironmentId = 1;
+
+        renderProjectDeploymentsSheet();
+
+        fireEvent.click(screen.getByText('Save deployment'));
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(1);
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/deployments?projectId=7', {
+            state: {projectDeploymentId: 3},
+        });
     });
 
     it('asks to publish an unpublished project instead of offering to deploy it', () => {
-        render(
-            <ProjectDeploymentsSheet
-                onSheetOpenChange={onSheetOpenChange}
-                project={{id: 7, name: 'Orders'} as Project}
-                sheetOpen
-            />
-        );
+        hoisted.projectDeployments = [];
 
-        fireEvent.click(screen.getByText('Staging'));
+        render(
+            <TooltipProvider>
+                <ProjectDeploymentsSheet
+                    onSheetOpenChange={onSheetOpenChange}
+                    project={{id: 7, name: 'Orders'} as Project}
+                    sheetOpen
+                />
+            </TooltipProvider>
+        );
 
         expect(screen.getByText('Publish the project to deploy it')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+    });
+
+    it('refreshes the deployments from the header', () => {
+        renderProjectDeploymentsSheet();
+
+        fireEvent.click(screen.getByLabelText('Refresh project deployments'));
+
+        expect(hoisted.refetch).toHaveBeenCalledTimes(1);
     });
 });

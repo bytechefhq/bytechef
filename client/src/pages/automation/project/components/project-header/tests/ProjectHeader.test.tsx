@@ -1,6 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {act, fireEvent, render, screen} from '@/shared/util/test-utils';
 import {onlineManager} from '@tanstack/react-query';
@@ -8,6 +9,12 @@ import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     isMutating: vi.fn(() => 0),
+    navigate: vi.fn(),
+}));
+
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => hoisted.navigate,
 }));
 
 vi.mock('@tanstack/react-query', async (importOriginal) => ({
@@ -50,7 +57,9 @@ vi.mock('@/pages/automation/project/components/project-header/components/DeployB
         <>
             <button>Deploy</button>
 
-            <button onClick={() => onDeploymentSaved(42, 2)}>Save deployment</button>
+            <button onClick={() => onDeploymentSaved(42, 0)}>Save deployment</button>
+
+            <button onClick={() => onDeploymentSaved(43, 2)}>Save production deployment</button>
         </>
     ),
 }));
@@ -61,16 +70,14 @@ vi.mock('@/pages/automation/project/components/project-header/components/Project
 
 vi.mock('@/pages/automation/project/components/ProjectDeploymentsSheet', () => ({
     default: ({
-        environmentId,
         expandedProjectDeploymentId,
         onSheetOpenChange,
     }: {
-        environmentId?: number;
         expandedProjectDeploymentId?: number;
         onSheetOpenChange: (open: boolean) => void;
     }) => (
         <div>
-            <span>{`Deployments sheet ${environmentId ?? 'current'} ${expandedProjectDeploymentId ?? 'none'}`}</span>
+            <span>{`Deployments sheet ${expandedProjectDeploymentId ?? 'none'}`}</span>
 
             <button onClick={() => onSheetOpenChange(false)}>Close sheet</button>
         </div>
@@ -170,7 +177,7 @@ it('opens the project deployments sheet from the deployments button and closes i
 
     fireEvent.click(screen.getByText('Project Deployments'));
 
-    expect(screen.getByText('Deployments sheet current none')).toBeInTheDocument();
+    expect(screen.getByText('Deployments sheet none')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Close sheet'));
 
@@ -182,5 +189,20 @@ it('opens the project deployments sheet on the saved deployment after deploying'
 
     fireEvent.click(screen.getByText('Save deployment'));
 
-    expect(screen.getByText('Deployments sheet 2 42')).toBeInTheDocument();
+    expect(screen.getByText('Deployments sheet 42')).toBeInTheDocument();
+});
+
+it('opens the deployments page in production after deploying to production', () => {
+    environmentStore.setState({currentEnvironmentId: 0});
+    hoisted.navigate.mockReset();
+
+    renderProjectHeader();
+
+    fireEvent.click(screen.getByText('Save production deployment'));
+
+    expect(environmentStore.getState().currentEnvironmentId).toBe(2);
+    expect(hoisted.navigate).toHaveBeenCalledWith(expect.stringContaining('/automation/deployments?projectId='), {
+        state: {projectDeploymentId: 43},
+    });
+    expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
 });

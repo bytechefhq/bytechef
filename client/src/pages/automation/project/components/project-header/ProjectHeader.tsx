@@ -1,4 +1,5 @@
 import {ButtonGroup} from '@/components/ui/button-group';
+import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import ProjectDeploymentsSheet, {
     ProjectDeploymentsSheetStateI,
 } from '@/pages/automation/project/components/ProjectDeploymentsSheet';
@@ -73,6 +74,12 @@ const ProjectHeader = ({
         }))
     );
 
+    const openSavedProjectDeployment = useOpenSavedProjectDeployment({
+        onDevelopmentDeploymentSaved: (projectDeploymentId) =>
+            setProjectDeploymentsSheetState({expandedProjectDeploymentId: projectDeploymentId}),
+        projectId,
+    });
+
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
     const {
@@ -143,15 +150,7 @@ const ProjectHeader = ({
                         onPublishProjectSubmit={handlePublishProjectSubmit}
                     />
 
-                    <DeployButton
-                        onDeploymentSaved={(projectDeploymentId, environmentId) =>
-                            setProjectDeploymentsSheetState({
-                                environmentId,
-                                expandedProjectDeploymentId: projectDeploymentId,
-                            })
-                        }
-                        project={project}
-                    />
+                    <DeployButton onDeploymentSaved={openSavedProjectDeployment} project={project} />
 
                     <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
                 </ButtonGroup>
@@ -168,7 +167,6 @@ const ProjectHeader = ({
 
             {projectDeploymentsSheetState && (
                 <ProjectDeploymentsSheet
-                    environmentId={projectDeploymentsSheetState.environmentId}
                     expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
                     onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
                     project={project}
