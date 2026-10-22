@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T11:26:22.355798+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -186,6 +186,7 @@ public interface ProjectApi {
      * Export project as a zip file.
      *
      * @param id The id of a project. (required)
+     * @param projectVersion The version of a project to export. Defaults to the latest version. (optional)
      * @return The project export file. (status code 200)
      */
     @Operation(
@@ -205,7 +206,8 @@ public interface ProjectApi {
         produces = { "application/octet-stream" }
     )
     default ResponseEntity<org.springframework.core.io.Resource> exportProject(
-        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+        @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "projectVersion", description = "The version of a project to export. Defaults to the latest version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectVersion", required = false) @Nullable Integer projectVersion
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
