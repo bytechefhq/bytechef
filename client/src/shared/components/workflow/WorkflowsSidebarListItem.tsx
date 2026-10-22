@@ -1,5 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {MouseEvent, ReactNode} from 'react';
+import {KeyboardEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface WorkflowsSidebarListItemProps {
@@ -19,47 +19,51 @@ const WorkflowsSidebarListItem = ({
     menu,
     onClick,
 }: WorkflowsSidebarListItemProps) => {
-    const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
-        if (!event.currentTarget.contains(event.target as Node)) {
-            return;
-        }
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
 
-        onClick();
+            onClick();
+        }
     };
 
     return (
         <li
             className={twMerge(
-                'w-full cursor-pointer rounded-md border border-transparent py-3 pr-1 pl-3 hover:bg-background',
+                'flex w-full items-center justify-between gap-2 rounded-md border border-transparent pr-1 hover:bg-background',
                 active && 'border-stroke-brand-primary bg-background'
             )}
-            onClick={handleCardClick}
         >
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-hidden">
-                    {components}
+            <div
+                aria-current={active || undefined}
+                className="flex min-w-0 flex-1 cursor-pointer flex-col gap-3 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                onClick={onClick}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+            >
+                {components}
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex flex-col gap-1 text-start">
-                                <span className="truncate overflow-hidden text-sm font-medium">{label}</span>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className="flex flex-col gap-1 text-start">
+                            <span className="truncate overflow-hidden text-sm font-medium">{label}</span>
 
-                                {editedTimeAgo && (
-                                    <div className="flex gap-1 text-xs text-content-neutral-secondary">
-                                        <span>Edited</span>
+                            {editedTimeAgo && (
+                                <div className="flex gap-1 text-xs text-content-neutral-secondary">
+                                    <span>Edited</span>
 
-                                        <span>{editedTimeAgo}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </TooltipTrigger>
+                                    <span>{editedTimeAgo}</span>
+                                </div>
+                            )}
+                        </div>
+                    </TooltipTrigger>
 
-                        {label && label.length > 40 && <TooltipContent className="max-w-96">{label}</TooltipContent>}
-                    </Tooltip>
-                </div>
-
-                {menu}
+                    {label && label.length > 40 && <TooltipContent className="max-w-96">{label}</TooltipContent>}
+                </Tooltip>
             </div>
+
+            {menu}
         </li>
     );
 };
