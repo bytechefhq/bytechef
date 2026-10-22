@@ -514,6 +514,9 @@ export default function useWorkflowNodeDetailsPanel({
         currentClusterElementDefinition?.outputDefined ||
         (currentOperationDefinition as TaskDispatcherDefinition)?.outputDefined ||
         (currentOperationDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined;
+    const outputFileEntry =
+        (currentActionDefinition as ActionDefinition | undefined)?.outputFileEntry ||
+        currentTriggerDefinition?.outputFileEntry;
     const outputFunctionDefined =
         currentActionDefinition?.outputFunctionDefined ||
         currentTriggerDefinition?.outputFunctionDefined ||
@@ -1466,6 +1469,7 @@ export default function useWorkflowNodeDetailsPanel({
         nodeTabs,
         operationDataMissing,
         outputDefined,
+        outputFileEntry,
         outputFunctionDefined,
         propertiesLoading,
         rootClusterElementNodeData,

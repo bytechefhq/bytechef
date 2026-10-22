@@ -27,6 +27,7 @@ interface OutputTabProps {
     missingRequiredProperties?: string[];
     onMissingRequiredPropertiesClick?: () => void;
     outputDefined?: boolean;
+    outputFileEntry?: boolean;
     outputFunctionDefined?: boolean;
     parentWorkflowNodeName?: string;
     resumePerformFunctionDefined?: boolean;
@@ -42,6 +43,7 @@ const OutputTab = ({
     missingRequiredProperties,
     onMissingRequiredPropertiesClick,
     outputDefined,
+    outputFileEntry = false,
     outputFunctionDefined,
     parentWorkflowNodeName,
     resumePerformFunctionDefined = false,
@@ -55,6 +57,7 @@ const OutputTab = ({
         handleClusterElementTestSubmit,
         handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
+        handleSampleDataDialogFileUpload,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
         handleTestOperationClick,
@@ -270,7 +273,9 @@ const OutputTab = ({
             {showUploadDialog && (
                 <Suspense fallback={<DialogLoader />}>
                     <OutputTabSampleDataDialog
+                        fileUploadEnabled={outputFileEntry}
                         onClose={() => setShowUploadDialog(false)}
+                        onFileUpload={handleSampleDataDialogFileUpload}
                         onUpload={handleSampleDataDialogUpload}
                         open={showUploadDialog}
                         placeholder={placeholder || sampleOutput}

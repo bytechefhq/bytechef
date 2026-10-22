@@ -7,6 +7,7 @@ import {ResponseError, TriggerType} from '@/shared/middleware/platform/configura
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
+    useUploadSampleFileRequestMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {
@@ -159,6 +160,14 @@ export default function useOutputTab({
         onSuccess: invalidateNodeOutputs,
     });
 
+    const uploadSampleFileRequestMutation = useUploadSampleFileRequestMutation({
+        onSuccess: () => {
+            invalidateNodeOutputs();
+
+            setShowUploadDialog(false);
+        },
+    });
+
     const uploadSampleOutputRequestMutation = useUploadSampleOutputRequestMutation({
         onSuccess: () => {
             invalidateNodeOutputs();
@@ -188,6 +197,18 @@ export default function useOutputTab({
         showTestOutputError,
         workflowId,
     ]);
+
+    const handleSampleDataDialogFileUpload = useCallback(
+        (file: File) => {
+            uploadSampleFileRequestMutation.mutate({
+                environmentId: currentEnvironmentId,
+                file,
+                id: workflowId,
+                workflowNodeName: currentNode.name,
+            });
+        },
+        [currentEnvironmentId, currentNode.name, uploadSampleFileRequestMutation, workflowId]
+    );
 
     const handleSampleDataDialogUpload = useCallback(
         (value: string) => {
@@ -384,6 +405,7 @@ export default function useOutputTab({
         handleClusterElementTestSubmit,
         handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
+        handleSampleDataDialogFileUpload,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
         handleTestOperationClick,
@@ -400,7 +422,8 @@ export default function useOutputTab({
         testOutputResponse,
         testReturnedNoOutput,
         testing,
-        uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
+        uploadSampleOutputRequestMutationPending:
+            uploadSampleOutputRequestMutation.isPending || uploadSampleFileRequestMutation.isPending,
         variableOutputSchema,
         variableSampleOutput,
         webhookTestCancelEnabled,

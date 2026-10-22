@@ -101,6 +101,7 @@ const WorkflowNodeDetailsPanel = ({
         nodeTabs,
         operationDataMissing,
         outputDefined,
+        outputFileEntry,
         outputFunctionDefined,
         propertiesLoading,
         rootClusterElementNodeData,
@@ -462,6 +463,7 @@ const WorkflowNodeDetailsPanel = ({
                                             missingRequiredProperties={missingRequiredProperties}
                                             onMissingRequiredPropertiesClick={() => setActiveTab('properties')}
                                             outputDefined={outputDefined}
+                                            outputFileEntry={outputFileEntry}
                                             outputFunctionDefined={outputFunctionDefined}
                                             parentWorkflowNodeName={resolveMainClusterRootName(
                                                 currentNode,
