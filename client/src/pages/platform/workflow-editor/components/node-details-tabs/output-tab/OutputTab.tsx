@@ -24,6 +24,7 @@ interface OutputTabProps {
     currentNode: NodeDataType;
     currentOperationProperties?: PropertyAllType[];
     missingRequiredProperties?: string[];
+    onMissingRequiredPropertiesClick?: () => void;
     outputDefined?: boolean;
     outputFunctionDefined?: boolean;
     parentWorkflowNodeName?: string;
@@ -38,6 +39,7 @@ const OutputTab = ({
     currentNode,
     currentOperationProperties,
     missingRequiredProperties,
+    onMissingRequiredPropertiesClick,
     outputDefined,
     outputFunctionDefined,
     parentWorkflowNodeName,
@@ -108,6 +110,7 @@ const OutputTab = ({
                         handleTestOperationClick={handleTestOperationClick}
                         isClusterElement={!!clusterElementType}
                         missingRequiredProperties={missingRequiredProperties}
+                        onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
                         outputDefined={outputDefined}
                         outputSchema={outputSchema}
                         resumePerformFunctionDefined={resumePerformFunctionDefined}
@@ -169,6 +172,7 @@ const OutputTab = ({
                             handleClusterElementTestSubmit={handleClusterElementTestSubmit}
                             handleTestOperationClick={handleTestOperationClick}
                             missingRequiredProperties={missingRequiredProperties}
+                            onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
                             outputDefined={outputDefined}
                             saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
                             saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}

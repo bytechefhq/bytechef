@@ -33,6 +33,7 @@ import {
     WorkflowNodeDetailsErrorI,
     getWorkflowNodeDetailsErrorsSummary,
 } from './hooks/getMissingRequiredConnectionErrors';
+import getMissingRequiredPropertyLabels from './hooks/getMissingRequiredPropertyLabels';
 import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
 
 const ERROR_KIND_LABELS: Record<Exclude<WorkflowNodeDetailsErrorI['kind'], 'ISSUE'>, string> = {
@@ -131,8 +132,8 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const missingRequiredProperties = useMemo(
-        () => errors.filter((error) => error.kind === 'PROPERTY').map((error) => error.name),
-        [errors]
+        () => getMissingRequiredPropertyLabels(errors, currentOperationProperties),
+        [currentOperationProperties, errors]
     );
 
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
@@ -459,6 +460,7 @@ const WorkflowNodeDetailsPanel = ({
                                             currentOperationProperties={currentOperationProperties}
                                             key={`${currentNode?.componentName}-${currentNode?.type}_output`}
                                             missingRequiredProperties={missingRequiredProperties}
+                                            onMissingRequiredPropertiesClick={() => setActiveTab('properties')}
                                             outputDefined={outputDefined}
                                             outputFunctionDefined={outputFunctionDefined}
                                             parentWorkflowNodeName={resolveMainClusterRootName(

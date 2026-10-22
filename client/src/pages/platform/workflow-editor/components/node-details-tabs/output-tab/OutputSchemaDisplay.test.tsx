@@ -1,4 +1,3 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -38,22 +37,20 @@ const variableOutputSchema = {
 
 const renderOutputSchemaDisplay = (props: Partial<Parameters<typeof OutputSchemaDisplay>[0]> = {}) =>
     render(
-        <TooltipProvider>
-            <OutputSchemaDisplay
-                connectionMissing={false}
-                copiedValue={null}
-                copyToClipboard={vi.fn()}
-                currentNode={currentNode}
-                handlePredefinedOutputSchemaClick={vi.fn()}
-                handleTestOperationClick={vi.fn()}
-                outputDefined={true}
-                outputSchema={outputSchema}
-                sampleOutput={{message: 'sample message'}}
-                saveWorkflowNodeTestOutputMutation={{isPending: false}}
-                setShowUploadDialog={vi.fn()}
-                {...props}
-            />
-        </TooltipProvider>
+        <OutputSchemaDisplay
+            connectionMissing={false}
+            copiedValue={null}
+            copyToClipboard={vi.fn()}
+            currentNode={currentNode}
+            handlePredefinedOutputSchemaClick={vi.fn()}
+            handleTestOperationClick={vi.fn()}
+            outputDefined={true}
+            outputSchema={outputSchema}
+            sampleOutput={{message: 'sample message'}}
+            saveWorkflowNodeTestOutputMutation={{isPending: false}}
+            setShowUploadDialog={vi.fn()}
+            {...props}
+        />
     );
 
 const openMoreOptionsMenu = async () => {
@@ -137,10 +134,23 @@ describe('OutputSchemaDisplay', () => {
         expect(screen.queryByRole('button', {name: 'Upload Sample Output'})).not.toBeInTheDocument();
     });
 
-    it('should disable Test Action when a required property is missing', () => {
-        renderOutputSchemaDisplay({missingRequiredProperties: ['key']});
+    it('should disable Test Action and note the missing required properties above the placeholder warning', () => {
+        renderOutputSchemaDisplay({missingRequiredProperties: ['Key']});
+
+        const [notice, placeholderWarning] = screen.getAllByRole('alert');
 
         expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
+        expect(notice).toHaveTextContent('Set Key to test the action.');
+        expect(placeholderWarning).toHaveTextContent('Placeholder sample data');
+    });
+
+    it('should not note missing required properties for a task dispatcher', () => {
+        renderOutputSchemaDisplay({
+            currentNode: {...currentNode, taskDispatcher: true},
+            missingRequiredProperties: ['Key'],
+        });
+
+        expect(screen.queryByText(/Required properties missing/)).not.toBeInTheDocument();
     });
 
     it('should offer Upload Sample Output instead of Test Action for a task dispatcher', () => {
