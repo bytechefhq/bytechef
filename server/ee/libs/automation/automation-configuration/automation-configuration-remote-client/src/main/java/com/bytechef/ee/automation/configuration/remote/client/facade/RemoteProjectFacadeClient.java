@@ -47,7 +47,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public byte[] exportProject(long id) {
+    public byte[] exportProject(long id, Integer projectVersion) {
         throw new UnsupportedOperationException();
     }
 
