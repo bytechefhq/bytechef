@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,6 +30,8 @@ public interface TaskExecutionService {
 
     boolean completeIfNotCancelled(long id);
 
+    long countJobTaskExecutions(long jobId);
+
     TaskExecution create(TaskExecution taskExecution);
 
     void delete(long id);
@@ -37,7 +40,23 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
+    Map<Long, Long> getChildCounts(List<Long> parentIds);
+
+    List<TaskExecution> getFailedJobTaskExecutions(long jobId);
+
+    int getIterationIndex(TaskExecution taskExecution);
+
+    Map<Long, Long> getIterationCounts(List<Long> parentIds);
+
+    List<Long> getParentIterationStartIds(long parentId);
+
+    List<Long> getParentTaskExecutionIds(long parentId);
+
+    List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize);
+
     TaskExecution getTaskExecution(long id);
+
+    List<TaskExecution> getTaskExecutions(List<Long> ids);
 
     TaskExecution getTaskExecutionForUpdate(long id);
 

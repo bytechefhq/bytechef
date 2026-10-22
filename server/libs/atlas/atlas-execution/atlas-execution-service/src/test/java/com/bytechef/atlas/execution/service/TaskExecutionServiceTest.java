@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -106,6 +108,57 @@ class TaskExecutionServiceTest {
         assertThat(completedTaskExecution.getStartDate()).isEqualTo(startDate);
 
         verify(taskExecutionRepository).save(completedTaskExecution);
+    }
+
+    @Test
+    void getChildCountsCountsRowsPerParent() {
+        when(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of(7L, 8L)))
+            .thenReturn(List.of(7L, 7L, 8L));
+
+        assertThat(taskExecutionService.getChildCounts(List.of(7L, 8L))).isEqualTo(Map.of(7L, 2L, 8L, 1L));
+    }
+
+    @Test
+    void getIterationCountsCountsIterationStartRowsPerParent() {
+        when(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(7L, 8L), 0))
+            .thenReturn(List.of(7L, 8L, 8L));
+
+        assertThat(taskExecutionService.getIterationCounts(List.of(7L, 8L))).isEqualTo(Map.of(7L, 1L, 8L, 2L));
+    }
+
+    @Test
+    void getTaskExecutionsKeepsRequestedOrder() {
+        TaskExecution first = new TaskExecution();
+        TaskExecution second = new TaskExecution();
+
+        first.setId(1L);
+        second.setId(2L);
+
+        when(taskExecutionRepository.findAllByIdIn(List.of(1L, 2L))).thenReturn(List.of(second, first));
+
+        assertThat(taskExecutionService.getTaskExecutions(List.of(1L, 2L))).containsExactly(first, second);
+    }
+
+    @Test
+    void getIterationIndexIsZeroBasedCount() {
+        Instant createdDate = Instant.parse("2026-09-25T10:00:00Z");
+
+        TaskExecution taskExecution = mock(TaskExecution.class);
+
+        when(taskExecution.getId()).thenReturn(TASK_EXECUTION_ID);
+        when(taskExecution.getParentId()).thenReturn(5L);
+        when(taskExecution.getCreatedDate()).thenReturn(createdDate);
+        when(taskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+            5L, 0, createdDate, TASK_EXECUTION_ID)).thenReturn(3L);
+
+        assertThat(taskExecutionService.getIterationIndex(taskExecution)).isEqualTo(2);
+    }
+
+    @Test
+    void getParentTaskExecutionsUsesPageOffset() {
+        taskExecutionService.getParentTaskExecutions(9L, 2, 50);
+
+        verify(taskExecutionRepository).findAllByParentIdOrderByCreatedDate(9L, 50, 100L);
     }
 
     private TaskExecution stubTaskExecution(TaskExecution.Status status) {

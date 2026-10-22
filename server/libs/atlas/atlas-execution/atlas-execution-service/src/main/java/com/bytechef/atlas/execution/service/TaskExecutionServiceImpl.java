@@ -20,7 +20,10 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +86,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long countJobTaskExecutions(long jobId) {
+        return taskExecutionRepository.countByJobId(jobId);
+    }
+
+    @Override
     public TaskExecution create(TaskExecution taskExecution) {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
         Validate.isTrue(taskExecution.getId() == null, "'taskExecution.id' must be null");
@@ -112,9 +121,72 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Map<Long, Long> getChildCounts(List<Long> parentIds) {
+        return countByParentId(taskExecutionRepository.findAllParentIdsByParentIdIn(parentIds));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskExecution> getFailedJobTaskExecutions(long jobId) {
+        return taskExecutionRepository.findAllByJobIdAndErrorNotNullOrderByCreatedDate(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getIterationIndex(TaskExecution taskExecution) {
+        long precedingCount = taskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+            Validate.notNull(taskExecution.getParentId(), "parentId"), 0,
+            Validate.notNull(taskExecution.getCreatedDate(), "createdDate"),
+            Validate.notNull(taskExecution.getId(), "id"));
+
+        return (int) precedingCount - 1;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Long> getIterationCounts(List<Long> parentIds) {
+        return countByParentId(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(parentIds, 0));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getParentIterationStartIds(long parentId) {
+        return taskExecutionRepository.findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(parentId, 0);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getParentTaskExecutionIds(long parentId) {
+        return taskExecutionRepository.findAllIdsByParentIdOrderByCreatedDate(parentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize) {
+        return taskExecutionRepository.findAllByParentIdOrderByCreatedDate(
+            parentId, pageSize, (long) pageNumber * pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskExecution> getTaskExecutions(List<Long> ids) {
+        Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
+
+        for (TaskExecution taskExecution : taskExecutionRepository.findAllByIdIn(ids)) {
+            taskExecutionMap.put(taskExecution.getId(), taskExecution);
+        }
+
+        return ids.stream()
+            .map(taskExecutionMap::get)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override
@@ -164,5 +236,15 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         } finally {
             taskExecutionRepository.unlockForUpdate(id);
         }
+    }
+
+    private static Map<Long, Long> countByParentId(List<Long> parentIds) {
+        Map<Long, Long> counts = new HashMap<>();
+
+        for (Long parentId : parentIds) {
+            counts.merge(parentId, 1L, Long::sum);
+        }
+
+        return counts;
     }
 }

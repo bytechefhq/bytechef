@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -121,6 +122,51 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
                 .path(TASK_EXECUTION_SERVICE + "/get-task-execution-for-update/{id}")
                 .build(id),
             TaskExecution.class);
+    }
+
+    @Override
+    public long countJobTaskExecutions(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<Long, Long> getChildCounts(List<Long> parentIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getFailedJobTaskExecutions(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getIterationIndex(TaskExecution taskExecution) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<Long, Long> getIterationCounts(List<Long> parentIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getParentIterationStartIds(long parentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Long> getParentTaskExecutionIds(long parentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getTaskExecutions(List<Long> ids) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
