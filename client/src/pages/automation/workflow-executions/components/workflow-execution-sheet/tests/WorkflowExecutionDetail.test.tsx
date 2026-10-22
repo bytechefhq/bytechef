@@ -13,6 +13,10 @@ vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
     useGetWorkflowExecutionTaskExecutionQuery: taskExecutionQueryMock,
 }));
 
+vi.mock('@tanstack/react-query', () => ({
+    useQueryClient: () => ({invalidateQueries: vi.fn()}),
+}));
+
 vi.mock('../WorkflowExecutionSheetContent', () => ({
     default: (props: {headerActions?: React.ReactNode}) => {
         sheetContentPropsMock(props);
@@ -49,6 +53,20 @@ describe('WorkflowExecutionDetail', () => {
         render(<WorkflowExecutionDetail workflowExecutionId={501} />, {wrapper: TooltipProvider});
 
         expect(screen.getByTestId('workflow-execution-detail-loading')).toBeInTheDocument();
+    });
+
+    it('shows a retry control when the execution fails to load', () => {
+        const refetch = vi.fn();
+
+        executionQueryMock.mockReturnValue({data: undefined, isError: true, isLoading: false, refetch});
+
+        render(<WorkflowExecutionDetail workflowExecutionId={501} />, {wrapper: TooltipProvider});
+
+        expect(screen.getByTestId('workflow-execution-detail-error')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
+
+        expect(refetch).toHaveBeenCalledTimes(1);
     });
 
     it('shows the execution panel for a trigger-only row, which has no job', () => {
@@ -117,7 +135,7 @@ describe('WorkflowExecutionDetail', () => {
 
         executionQueryMock.mockReturnValue({
             data: {
-                focusPath: [{taskExecutionId: 1}, {taskExecutionId: 9}],
+                focusPath: [{taskExecutionId: '1'}, {taskExecutionId: '9'}],
                 id: 5,
                 job: {id: '5', status: 'FAILED', taskExecutions: [{childCount: 1, id: '1', jobId: '5'}]},
                 taskExecutionCount: 112464,
@@ -132,10 +150,58 @@ describe('WorkflowExecutionDetail', () => {
         expect(sheetContentPropsMock).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 focusedExecution: {execution: focusedTaskExecution, path: ['1', '9']},
-                lazy: {refetchInterval: false, workflowExecutionId: 5},
+                lazy: {focusPath: expect.any(Array), refetchInterval: false, workflowExecutionId: 5},
                 selectedItem: focusedTaskExecution,
                 taskExecutionCount: 112464,
             })
         );
+    });
+
+    it('reports a failed focused task load to the panel and retries it', () => {
+        const refetch = vi.fn().mockResolvedValue({data: undefined});
+
+        executionQueryMock.mockReturnValue({
+            data: {
+                focusPath: [{taskExecutionId: '1'}, {taskExecutionId: '9'}],
+                id: 5,
+                job: {id: '5', status: 'FAILED', taskExecutions: [{childCount: 1, id: '1', jobId: '5'}]},
+            },
+            isLoading: false,
+        });
+        taskExecutionQueryMock.mockReturnValue({data: undefined, isError: true, refetch});
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        const props = sheetContentPropsMock.mock.lastCall![0];
+
+        expect(props.focusedTaskExecutionError).toBe(true);
+
+        props.handleFocusedTaskExecutionRetry();
+
+        expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps showing a loaded execution when a refetch fails and passes a live updates retry to the panel', () => {
+        const refetch = vi.fn();
+
+        executionQueryMock.mockReturnValue({
+            data: {focusPath: [], id: 5, job: {id: '5', status: 'STARTED', taskExecutions: []}},
+            isError: true,
+            isLoading: false,
+            refetch,
+        });
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        expect(screen.queryByTestId('workflow-execution-detail-error')).not.toBeInTheDocument();
+        expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
+
+        const props = sheetContentPropsMock.mock.lastCall![0];
+
+        expect(props.liveUpdatesError).toBe(true);
+
+        props.handleLiveUpdatesRetry();
+
+        expect(refetch).toHaveBeenCalledTimes(1);
     });
 });

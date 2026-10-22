@@ -99,13 +99,15 @@ export const useGetProjectWorkflowExecutionQuery = (
 export const useGetWorkflowExecutionTaskExecutionQuery = (
     request: GetWorkflowExecutionTaskExecutionRequest,
     enabled: boolean,
-    refetchInterval?: number | false
+    refetchInterval?: number | false,
+    retry?: boolean
 ) =>
     useQuery<TaskExecution, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecutionTaskExecution(request.id, request.taskExecutionId),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionTaskExecution(request),
         enabled,
         refetchInterval,
+        retry,
     });
 
 export const useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery = (

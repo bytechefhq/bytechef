@@ -8,7 +8,7 @@ export function buildFocusPath(focusPath: FocusPathElement[]): string[] {
             accordionValues.push(`${focusPath[index - 1].taskExecutionId}-iteration-${element.iterationIndex}`);
         }
 
-        accordionValues.push(`${element.taskExecutionId}`);
+        accordionValues.push(element.taskExecutionId);
     });
 
     return accordionValues;

@@ -245,7 +245,8 @@ describe('WorkflowExecutionsAccordionItem', () => {
             expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).not.toHaveBeenCalledWith(
                 expect.anything(),
                 true,
-                undefined
+                false,
+                0
             );
 
             await userEvent.click(screen.getByText('Lazy parent'));
@@ -253,7 +254,8 @@ describe('WorkflowExecutionsAccordionItem', () => {
             expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).toHaveBeenCalledWith(
                 {id: 9, taskExecutionId: 13},
                 true,
-                undefined
+                false,
+                0
             );
         });
 
@@ -264,7 +266,7 @@ describe('WorkflowExecutionsAccordionItem', () => {
             expect(hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery).toHaveBeenCalledWith(
                 {id: 9, taskExecutionId: 13},
                 true,
-                undefined,
+                false,
                 0
             );
         });

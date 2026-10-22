@@ -29,8 +29,7 @@ const WorkflowExecutionsHeader = ({
         duration = Math.round(endTime - startTime);
     }
 
-    const taskExecutionsCount =
-        taskExecutionCount !== undefined ? taskExecutionCount : countTaskExecutions(job?.taskExecutions || []);
+    const taskExecutionsCount = taskExecutionCount ?? countTaskExecutions(job?.taskExecutions || []);
 
     return (
         <header className="flex w-full items-center gap-x-3 px-3 py-3">

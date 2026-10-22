@@ -4,14 +4,26 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
 import useWorkflowExecutionDetail from '../hooks/useWorkflowExecutionDetail';
 
-const {executionQueryMock, taskExecutionQueryMock} = vi.hoisted(() => ({
+const {executionQueryMock, invalidateQueriesMock, taskExecutionQueryMock} = vi.hoisted(() => ({
     executionQueryMock: vi.fn(),
+    invalidateQueriesMock: vi.fn(),
     taskExecutionQueryMock: vi.fn(),
 }));
 
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+    WorkflowExecutionKeys: {
+        workflowExecutionTaskExecutionChildrenOfJob: (id: number) => [
+            'workflowExecutions',
+            id,
+            'taskExecutionChildren',
+        ],
+    },
     useGetProjectWorkflowExecutionQuery: executionQueryMock,
     useGetWorkflowExecutionTaskExecutionQuery: taskExecutionQueryMock,
+}));
+
+vi.mock('@tanstack/react-query', () => ({
+    useQueryClient: () => ({invalidateQueries: invalidateQueriesMock}),
 }));
 
 const failedTriggerExecution = {
@@ -25,6 +37,7 @@ const failedTriggerExecution = {
 describe('useWorkflowExecutionDetail', () => {
     beforeEach(() => {
         executionQueryMock.mockReset();
+        invalidateQueriesMock.mockReset();
         taskExecutionQueryMock.mockReset();
         taskExecutionQueryMock.mockReturnValue({data: undefined, isError: false});
         useWorkflowExecutionSheetStore.setState({workflowExecutionId: 0, workflowExecutionKind: 'JOB'});
@@ -94,7 +107,7 @@ describe('useWorkflowExecutionDetail', () => {
         taskExecutionQueryMock.mockReturnValue({data: restartedConditionTaskExecution, isError: false});
         executionQueryMock.mockReturnValue({
             data: {
-                focusPath: [{taskExecutionId: 12}],
+                focusPath: [{taskExecutionId: '12'}],
                 id: 7,
                 job: {
                     id: '7',
@@ -154,7 +167,7 @@ describe('useWorkflowExecutionDetail', () => {
         useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
         executionQueryMock.mockReturnValue({
             data: {
-                focusPath: [{taskExecutionId: 1}, {iterationIndex: 2, taskExecutionId: 7}, {taskExecutionId: 9}],
+                focusPath: [{taskExecutionId: '1'}, {iterationIndex: 2, taskExecutionId: '7'}, {taskExecutionId: '9'}],
                 id: 3,
                 job: {
                     id: '3',
@@ -171,7 +184,8 @@ describe('useWorkflowExecutionDetail', () => {
 
         const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
 
-        expect(taskExecutionQueryMock).toHaveBeenCalledWith({id: 3, taskExecutionId: 9}, true);
+        expect(taskExecutionQueryMock).toHaveBeenCalledWith({id: 3, taskExecutionId: 9}, true, undefined, false);
+        expect(result.current.focusedTaskExecutionError).toBe(false);
         expect(result.current.selectedItem?.id).toBe('9');
         expect(result.current.focusedExecution?.path).toEqual(['1', '1-iteration-2', '7', '9']);
         expect(result.current.activeTab).toBe('error');
@@ -207,7 +221,67 @@ describe('useWorkflowExecutionDetail', () => {
         expect(result.current.job?.id).toBe('77');
         expect(result.current.rootJob?.id).toBe('5');
         expect(result.current.subflowStack).toEqual([{jobId: 77, label: 'Process order'}]);
-        expect(result.current.lazy).toEqual({refetchInterval: false, workflowExecutionId: 77});
+        expect(result.current.lazy).toEqual({focusPath: [], refetchInterval: false, workflowExecutionId: 77});
+    });
+
+    it('polls the active job and the lazy tree only while the execution runs', () => {
+        const execution = (status: string) => ({
+            data: {focusPath: [], id: 3, job: {id: '3', status, taskExecutions: []}},
+            isLoading: false,
+        });
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue(execution('STARTED'));
+
+        const {rerender, result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(executionQueryMock).toHaveBeenCalledWith({id: 3, lazy: true}, true, 2000, 'JOB');
+        expect(result.current.lazy.refetchInterval).toBe(2000);
+
+        executionQueryMock.mockClear();
+        executionQueryMock.mockReturnValue(execution('COMPLETED'));
+
+        rerender();
+
+        expect(executionQueryMock).toHaveBeenCalledWith({id: 3, lazy: true}, false, 2000, 'JOB');
+        expect(result.current.lazy.refetchInterval).toBe(false);
+    });
+
+    it('closes an open subflow when another execution is shown', () => {
+        executionQueryMock.mockImplementation((request: {id: number}) => ({
+            data: {
+                focusPath: [],
+                id: request.id,
+                job: {id: `${request.id}`, status: 'COMPLETED', taskExecutions: []},
+            },
+            isLoading: false,
+        }));
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 5, workflowExecutionKind: 'JOB'});
+
+        const {rerender, result} = renderHook(({id}) => useWorkflowExecutionDetail(id, true), {
+            initialProps: {id: 5},
+        });
+
+        act(() => {
+            result.current.handleSeeExecutions({
+                id: '77',
+                label: 'Process order',
+                priority: 0,
+                startDate: new Date('2026-10-22T10:00:00Z'),
+                status: 'COMPLETED',
+            });
+        });
+
+        expect(result.current.job?.id).toBe('77');
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 6, workflowExecutionKind: 'JOB'});
+
+        rerender({id: 6});
+
+        expect(result.current.subflowStack).toEqual([]);
+        expect(result.current.job?.id).toBe('6');
+        expect(result.current.lazy.workflowExecutionId).toBe(6);
     });
 
     it('exposesTaskExecutionCount', () => {
@@ -231,7 +305,7 @@ describe('useWorkflowExecutionDetail', () => {
         useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
         executionQueryMock.mockReturnValue({
             data: {
-                focusPath: [{taskExecutionId: 1}, {taskExecutionId: 9}],
+                focusPath: [{taskExecutionId: '1'}, {taskExecutionId: '9'}],
                 id: 3,
                 job: {id: '3', status: 'FAILED', taskExecutions: [{childCount: 1, id: '1', jobId: '3'}]},
             },
@@ -255,9 +329,9 @@ describe('useWorkflowExecutionDetail', () => {
     });
 
     it('keeps the applied focus while a running execution moves its focus to a newly started task', () => {
-        const runningExecution = (lastTaskExecutionId: number) => ({
+        const runningExecution = (lastTaskExecutionId: string) => ({
             data: {
-                focusPath: [{taskExecutionId: 1}, {taskExecutionId: lastTaskExecutionId}],
+                focusPath: [{taskExecutionId: '1'}, {taskExecutionId: lastTaskExecutionId}],
                 id: 3,
                 job: {id: '3', status: 'STARTED', taskExecutions: [{childCount: 2, id: '1', jobId: '3'}]},
             },
@@ -266,7 +340,7 @@ describe('useWorkflowExecutionDetail', () => {
         const startedTaskExecution = {id: '9', jobId: '3', status: 'STARTED'};
 
         useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
-        executionQueryMock.mockReturnValue(runningExecution(9));
+        executionQueryMock.mockReturnValue(runningExecution('9'));
         taskExecutionQueryMock.mockImplementation((request: {id: number; taskExecutionId: number}) => ({
             data: request.taskExecutionId === 9 ? startedTaskExecution : undefined,
             isError: false,
@@ -278,7 +352,7 @@ describe('useWorkflowExecutionDetail', () => {
 
         const appliedFocusedExecution = result.current.focusedExecution;
 
-        executionQueryMock.mockReturnValue(runningExecution(10));
+        executionQueryMock.mockReturnValue(runningExecution('10'));
 
         rerender();
 
@@ -289,5 +363,205 @@ describe('useWorkflowExecutionDetail', () => {
         expect(result.current.focusedExecution).toBe(appliedFocusedExecution);
         expect(result.current.focusedExecution?.path).toEqual(['1', '9']);
         expect(result.current.selectedItem?.id).toBe('9');
+    });
+
+    it('reloads the open task execution pages once when a running execution finishes', () => {
+        const execution = (status: string) => ({
+            data: {focusPath: [], id: 3, job: {id: '3', status, taskExecutions: []}},
+            isLoading: false,
+        });
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue(execution('STARTED'));
+
+        const {rerender} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(invalidateQueriesMock).not.toHaveBeenCalled();
+
+        executionQueryMock.mockReturnValue(execution('COMPLETED'));
+
+        rerender();
+        rerender();
+
+        expect(invalidateQueriesMock).toHaveBeenCalledTimes(1);
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            queryKey: ['workflowExecutions', 3, 'taskExecutionChildren'],
+        });
+    });
+
+    it('reports a failed root load while a subflow is open and retries both loads', () => {
+        const rootRefetch = vi.fn();
+        const subflowRefetch = vi.fn();
+
+        let rootLoadFails = false;
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 5, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockImplementation((request: {id: number}) => {
+            if (request.id === 77) {
+                return {
+                    data: {focusPath: [], id: 77, job: {id: '77', status: 'COMPLETED', taskExecutions: []}},
+                    isLoading: false,
+                    refetch: subflowRefetch,
+                };
+            }
+
+            if (rootLoadFails) {
+                return {data: undefined, isError: true, isLoading: false, refetch: rootRefetch};
+            }
+
+            return {
+                data: {focusPath: [], id: 5, job: {id: '5', status: 'COMPLETED', taskExecutions: []}},
+                isLoading: false,
+                refetch: rootRefetch,
+            };
+        });
+
+        const {rerender, result} = renderHook(() => useWorkflowExecutionDetail(5, true));
+
+        act(() => {
+            result.current.handleSeeExecutions({
+                id: '77',
+                label: 'Process order',
+                priority: 0,
+                startDate: new Date('2026-10-22T10:00:00Z'),
+                status: 'COMPLETED',
+            });
+        });
+
+        expect(result.current.workflowExecutionError).toBeFalsy();
+
+        rootLoadFails = true;
+
+        rerender();
+
+        expect(result.current.workflowExecutionError).toBe(true);
+
+        act(() => {
+            result.current.handleWorkflowExecutionRetry();
+        });
+
+        expect(subflowRefetch).toHaveBeenCalledTimes(1);
+        expect(rootRefetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the loaded execution and reports a failed refetch as a live updates error', () => {
+        const refetch = vi.fn();
+        const workflowExecution = {
+            focusPath: [],
+            job: {id: '3', status: 'STARTED', taskExecutions: []},
+        };
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({data: workflowExecution, isError: true, isLoading: false, refetch});
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.workflowExecutionError).toBe(false);
+        expect(result.current.workflowExecutionRefetchError).toBe(true);
+        expect(result.current.job).toBe(workflowExecution.job);
+
+        act(() => {
+            result.current.handleWorkflowExecutionRetry();
+        });
+
+        expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not report a live updates error when the initial load failed', () => {
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({data: undefined, isError: true, isLoading: false, refetch: vi.fn()});
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.workflowExecutionRefetchError).toBe(false);
+    });
+
+    it('reports a failed execution load and retries it', () => {
+        const refetch = vi.fn();
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({data: undefined, isError: true, isLoading: false, refetch});
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.workflowExecutionError).toBe(true);
+        expect(result.current.workflowExecutionLoading).toBe(false);
+
+        act(() => {
+            result.current.handleWorkflowExecutionRetry();
+        });
+
+        expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('opens the tree on the focus path at its top-level task when the focused task fails to load', () => {
+        const topLevelTaskExecution = {childCount: 3, id: '1', jobId: '3', status: 'FAILED'};
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {
+                focusPath: [{taskExecutionId: '1'}, {iterationIndex: 2, taskExecutionId: '7'}, {taskExecutionId: '9'}],
+                id: 3,
+                job: {id: '3', status: 'FAILED', taskExecutions: [topLevelTaskExecution]},
+            },
+            isLoading: false,
+        });
+        taskExecutionQueryMock.mockReturnValue({data: undefined, isError: true});
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.workflowExecutionLoading).toBe(false);
+        expect(result.current.selectedItem).toEqual(topLevelTaskExecution);
+        expect(result.current.focusedExecution?.path).toEqual(['1', '1-iteration-2', '7', '9']);
+    });
+
+    it('reports a failed focused task load and selects the focused task once a retry loads it', async () => {
+        const focusedTaskExecution = {
+            error: {message: 'Order rejected', stackTrace: []},
+            id: '9',
+            jobId: '3',
+            status: 'FAILED',
+            workflowTask: {name: 'httpClient_1', type: 'httpClient/v1/get'},
+        };
+        const refetch = vi.fn().mockResolvedValue({data: focusedTaskExecution});
+        const topLevelTaskExecution = {childCount: 3, id: '1', jobId: '3', status: 'FAILED'};
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {
+                focusPath: [{taskExecutionId: '1'}, {iterationIndex: 2, taskExecutionId: '7'}, {taskExecutionId: '9'}],
+                id: 3,
+                job: {id: '3', status: 'FAILED', taskExecutions: [topLevelTaskExecution]},
+            },
+            isLoading: false,
+        });
+        taskExecutionQueryMock.mockReturnValue({data: undefined, isError: true, refetch});
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.focusedTaskExecutionError).toBe(true);
+        expect(result.current.selectedItem).toEqual(topLevelTaskExecution);
+
+        await act(async () => {
+            await result.current.handleFocusedTaskExecutionRetry();
+        });
+
+        expect(refetch).toHaveBeenCalledTimes(1);
+        expect(result.current.selectedItem?.id).toBe('9');
+        expect(result.current.activeTab).toBe('error');
+    });
+
+    it('passes the applied focus path to the lazy tree', () => {
+        const focusPath = [{taskExecutionId: '1'}, {childIndex: 120, taskExecutionId: '9'}];
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {focusPath, id: 3, job: {id: '3', status: 'COMPLETED', taskExecutions: []}},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.lazy.focusPath).toEqual(focusPath);
     });
 });

@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
@@ -25,7 +26,10 @@ interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
     dialogOpen: boolean;
     focusedExecution?: FocusedExecutionI;
+    focusedTaskExecutionError?: boolean;
     handleBreadcrumbNavigate: (index: number) => void;
+    handleFocusedTaskExecutionRetry?: () => void;
+    handleLiveUpdatesRetry?: () => void;
     handleSeeExecutions: (childJob: Job) => void;
     handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
     headerActions?: ReactNode;
@@ -34,6 +38,7 @@ interface WorkflowExecutionSheetContentProps {
     jobFailedWithNoExecutions: boolean;
     jobFailureError: ExecutionError;
     lazy: LazyTaskExecutionChildrenOptionsI;
+    liveUpdatesError?: boolean;
     rootJob?: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
     setActiveTab: (tab: TabValueType) => void;
@@ -48,7 +53,10 @@ const WorkflowExecutionSheetContent = ({
     activeTab,
     dialogOpen,
     focusedExecution,
+    focusedTaskExecutionError,
     handleBreadcrumbNavigate,
+    handleFocusedTaskExecutionRetry,
+    handleLiveUpdatesRetry,
     handleSeeExecutions,
     handleTaskClick,
     headerActions,
@@ -57,6 +65,7 @@ const WorkflowExecutionSheetContent = ({
     jobFailedWithNoExecutions,
     jobFailureError,
     lazy,
+    liveUpdatesError,
     rootJob,
     selectedItem,
     setActiveTab,
@@ -131,6 +140,42 @@ const WorkflowExecutionSheetContent = ({
                                 items={breadcrumbItems}
                                 onBackClick={handleBreadcrumbBackClick}
                             />
+                        )}
+
+                        {liveUpdatesError && (
+                            <div
+                                className="flex items-center gap-x-2 px-3 py-2 text-xs text-content-neutral-secondary"
+                                data-testid="live-updates-error"
+                            >
+                                <span>Live updates failed.</span>
+
+                                {handleLiveUpdatesRetry && (
+                                    <Button
+                                        label="Retry"
+                                        onClick={handleLiveUpdatesRetry}
+                                        size="xs"
+                                        variant="outline"
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {focusedTaskExecutionError && (
+                            <div
+                                className="flex items-center gap-x-2 px-3 py-2 text-xs text-content-neutral-secondary"
+                                data-testid="focused-task-execution-error"
+                            >
+                                <span>Failed to load the focused task execution.</span>
+
+                                {handleFocusedTaskExecutionRetry && (
+                                    <Button
+                                        label="Retry"
+                                        onClick={handleFocusedTaskExecutionRetry}
+                                        size="xs"
+                                        variant="outline"
+                                    />
+                                )}
+                            </div>
                         )}
 
                         <ScrollArea className="min-h-0 flex-1 pr-4 pl-1">
