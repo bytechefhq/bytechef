@@ -21,27 +21,44 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A page of the direct children of a task execution.
+ * A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page.
  */
 
-@Schema(name = "TaskExecutionChildrenPage", description = "A page of the direct children of a task execution.")
+@Schema(name = "TaskExecutionChildrenPage", description = "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page.")
 @JsonTypeName("TaskExecutionChildrenPage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T09:01:00.753919+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T16:26:57.995256+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionChildrenPageModel {
 
   private List<@Valid TaskExecutionModel> children = new ArrayList<>();
 
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
-  private @Nullable Integer number;
+  private Integer number;
 
-  private @Nullable Integer numberOfElements;
+  private Integer numberOfElements;
 
-  private @Nullable Integer size;
+  private Integer size;
 
-  private @Nullable Long totalElements;
+  private Long totalElements;
 
-  private @Nullable Integer totalPages;
+  private Integer totalPages;
+
+  public TaskExecutionChildrenPageModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public TaskExecutionChildrenPageModel(List<@Valid TaskExecutionModel> children, List<List<@Valid TaskExecutionModel>> iterations, Integer number, Integer numberOfElements, Integer size, Long totalElements, Integer totalPages) {
+    this.children = children;
+    this.iterations = iterations;
+    this.number = number;
+    this.numberOfElements = numberOfElements;
+    this.size = size;
+    this.totalElements = totalElements;
+    this.totalPages = totalPages;
+  }
 
   public TaskExecutionChildrenPageModel children(List<@Valid TaskExecutionModel> children) {
     this.children = children;
@@ -57,11 +74,11 @@ public class TaskExecutionChildrenPageModel {
   }
 
   /**
-   * The child task executions on this page.
+   * The child task executions on this page, filled for a task that is neither a loop nor an on-error task.
    * @return children
    */
-  
-  @Schema(name = "children", description = "The child task executions on this page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "children", description = "The child task executions on this page, filled for a task that is neither a loop nor an on-error task.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("children")
   public List<@Valid TaskExecutionModel> getChildren() {
     return children;
@@ -86,11 +103,11 @@ public class TaskExecutionChildrenPageModel {
   }
 
   /**
-   * The loop iterations on this page, each a list of task executions.
+   * The loop iterations or on-error branches on this page, each a list of task executions.
    * @return iterations
    */
-  
-  @Schema(name = "iterations", description = "The loop iterations on this page, each a list of task executions.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "iterations", description = "The loop iterations or on-error branches on this page, each a list of task executions.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("iterations")
   public List<List<@Valid TaskExecutionModel>> getIterations() {
     return iterations;
@@ -101,7 +118,7 @@ public class TaskExecutionChildrenPageModel {
     this.iterations = iterations;
   }
 
-  public TaskExecutionChildrenPageModel number(@Nullable Integer number) {
+  public TaskExecutionChildrenPageModel number(Integer number) {
     this.number = number;
     return this;
   }
@@ -110,40 +127,40 @@ public class TaskExecutionChildrenPageModel {
    * The number of the page.
    * @return number
    */
-  
-  @Schema(name = "number", description = "The number of the page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "number", description = "The number of the page.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("number")
-  public @Nullable Integer getNumber() {
+  public Integer getNumber() {
     return number;
   }
 
   @JsonProperty("number")
-  public void setNumber(@Nullable Integer number) {
+  public void setNumber(Integer number) {
     this.number = number;
   }
 
-  public TaskExecutionChildrenPageModel numberOfElements(@Nullable Integer numberOfElements) {
+  public TaskExecutionChildrenPageModel numberOfElements(Integer numberOfElements) {
     this.numberOfElements = numberOfElements;
     return this;
   }
 
   /**
-   * The number of elements on this page.
+   * The number of children, iterations or branches on this page.
    * @return numberOfElements
    */
-  
-  @Schema(name = "numberOfElements", description = "The number of elements on this page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "numberOfElements", description = "The number of children, iterations or branches on this page.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("numberOfElements")
-  public @Nullable Integer getNumberOfElements() {
+  public Integer getNumberOfElements() {
     return numberOfElements;
   }
 
   @JsonProperty("numberOfElements")
-  public void setNumberOfElements(@Nullable Integer numberOfElements) {
+  public void setNumberOfElements(Integer numberOfElements) {
     this.numberOfElements = numberOfElements;
   }
 
-  public TaskExecutionChildrenPageModel size(@Nullable Integer size) {
+  public TaskExecutionChildrenPageModel size(Integer size) {
     this.size = size;
     return this;
   }
@@ -152,40 +169,40 @@ public class TaskExecutionChildrenPageModel {
    * The size of the page.
    * @return size
    */
-  
-  @Schema(name = "size", description = "The size of the page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "size", description = "The size of the page.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("size")
-  public @Nullable Integer getSize() {
+  public Integer getSize() {
     return size;
   }
 
   @JsonProperty("size")
-  public void setSize(@Nullable Integer size) {
+  public void setSize(Integer size) {
     this.size = size;
   }
 
-  public TaskExecutionChildrenPageModel totalElements(@Nullable Long totalElements) {
+  public TaskExecutionChildrenPageModel totalElements(Long totalElements) {
     this.totalElements = totalElements;
     return this;
   }
 
   /**
-   * The total number of elements.
+   * The total number of children, iterations or branches.
    * @return totalElements
    */
-  
-  @Schema(name = "totalElements", description = "The total number of elements.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "totalElements", description = "The total number of children, iterations or branches.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("totalElements")
-  public @Nullable Long getTotalElements() {
+  public Long getTotalElements() {
     return totalElements;
   }
 
   @JsonProperty("totalElements")
-  public void setTotalElements(@Nullable Long totalElements) {
+  public void setTotalElements(Long totalElements) {
     this.totalElements = totalElements;
   }
 
-  public TaskExecutionChildrenPageModel totalPages(@Nullable Integer totalPages) {
+  public TaskExecutionChildrenPageModel totalPages(Integer totalPages) {
     this.totalPages = totalPages;
     return this;
   }
@@ -194,15 +211,15 @@ public class TaskExecutionChildrenPageModel {
    * The total number of pages.
    * @return totalPages
    */
-  
-  @Schema(name = "totalPages", description = "The total number of pages.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "totalPages", description = "The total number of pages.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("totalPages")
-  public @Nullable Integer getTotalPages() {
+  public Integer getTotalPages() {
     return totalPages;
   }
 
   @JsonProperty("totalPages")
-  public void setTotalPages(@Nullable Integer totalPages) {
+  public void setTotalPages(Integer totalPages) {
     this.totalPages = totalPages;
   }
 

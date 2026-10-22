@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T09:01:00.753919+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T16:26:57.995256+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -793,11 +793,11 @@ public class TaskExecutionModel {
   }
 
   /**
-   * The number of direct children of the task execution, set when the children are loaded on demand.
+   * The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page.
    * @return childCount
    */
   
-  @Schema(name = "childCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of direct children of the task execution, set when the children are loaded on demand.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "childCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("childCount")
   public @Nullable Integer getChildCount() {
     return childCount;
