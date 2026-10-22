@@ -32,4 +32,37 @@ describe('getFormattedName', () => {
 
         expect(getFormattedName('fork-join')).toBe('forkJoin_2');
     });
+
+    it('ignores a renamed node whose name does not end in a number', () => {
+        setWorkflowState({tasks: [], triggers: []}, ['dataStorageResetCounter']);
+
+        expect(getFormattedName('dataStorage')).toBe('dataStorage_1');
+    });
+
+    it('numbers past the numbered nodes when a renamed node of the component exists', () => {
+        setWorkflowState({tasks: [], triggers: []}, ['dataStorage_2', 'dataStorageResetCounter']);
+
+        expect(getFormattedName('dataStorage')).toBe('dataStorage_3');
+    });
+
+    it('ignores a numbered name that only contains the prefix', () => {
+        setWorkflowState({tasks: [], triggers: []}, ['olddataStorage_7']);
+
+        expect(getFormattedName('dataStorage')).toBe('dataStorage_1');
+    });
+
+    it('ignores a renamed cluster element and a reserved name without a number', () => {
+        setWorkflowState({
+            tasks: [
+                {
+                    clusterElements: {tools: [{name: 'httpClientLookup', type: 'httpClient/v1/get'}]},
+                    name: 'aiAgent_1',
+                    type: 'aiAgent/v1/chat',
+                },
+            ],
+            triggers: [],
+        });
+
+        expect(getFormattedName('httpClient', new Set(['httpClientDraft', 'httpClient_4']))).toBe('httpClient_5');
+    });
 });
