@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import PageLoader from '@/components/PageLoader';
 import {Skeleton} from '@/components/ui/skeleton';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -16,9 +17,10 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {TagIcon} from 'lucide-react';
+import {RefreshCwIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import ProjectDeploymentsEmptyState from './components/ProjectDeploymentsEmptyState';
 import ProjectDeploymentDialog from './components/project-deployment-dialog/ProjectDeploymentDialog';
@@ -84,7 +86,9 @@ const ProjectDeployments = () => {
     const {
         data: projectDeployments,
         error: projectDeploymentsError,
+        isFetching: projectDeploymentsIsFetching,
         isLoading: projectDeploymentsIsLoading,
+        refetch: refetchProjectDeployments,
     } = useGetWorkspaceProjectDeploymentsQuery({
         environmentId: currentEnvironmentId,
         id: currentWorkspaceId!,
@@ -135,16 +139,37 @@ const ProjectDeployments = () => {
                     right={
                         projectDeployments &&
                         projectDeployments.length > 0 && (
-                            <ProjectDeploymentDialog
-                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
-                                projectDeployment={
-                                    {
-                                        environmentId: currentEnvironmentId,
-                                    } as ProjectDeployment
-                                }
-                                redirectOnSubmit={false}
-                                triggerNode={<Button label="New Deployment" />}
-                            />
+                            <div className="flex items-center gap-x-2">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label="Refresh deployments"
+                                            disabled={projectDeploymentsIsFetching}
+                                            icon={
+                                                <RefreshCwIcon
+                                                    className={twMerge(projectDeploymentsIsFetching && 'animate-spin')}
+                                                />
+                                            }
+                                            onClick={() => refetchProjectDeployments()}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Refresh</TooltipContent>
+                                </Tooltip>
+
+                                <ProjectDeploymentDialog
+                                    onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
+                                    projectDeployment={
+                                        {
+                                            environmentId: currentEnvironmentId,
+                                        } as ProjectDeployment
+                                    }
+                                    redirectOnSubmit={false}
+                                    triggerNode={<Button label="New Deployment" />}
+                                />
+                            </div>
                         )
                     }
                     title={
