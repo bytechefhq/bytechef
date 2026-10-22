@@ -1,11 +1,10 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsListItemDropdownMenu';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
+import WorkflowsSidebarListItem from '@/shared/components/workflow/WorkflowsSidebarListItem';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {MouseEvent, useMemo} from 'react';
-import {twMerge} from 'tailwind-merge';
+import {useMemo} from 'react';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 type AutomationWorkflowProjectWorkflowTemplateType = AutomationWorkflowProjectType['workflowTemplates'][number];
@@ -26,14 +25,6 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
     const {calculateTimeDifference} = useProjectsLeftSidebar();
 
     const editedTimeAgo = workflow.lastModifiedDate ? calculateTimeDifference(workflow.lastModifiedDate) : undefined;
-
-    const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
-        if (!event.currentTarget.contains(event.target as Node)) {
-            return;
-        }
-
-        onWorkflowClick(workflow.workflowUuid);
-    };
 
     const {filteredComponentNames, workflowComponentDefinitions} = useMemo(() => {
         const componentNames: string[] = [];
@@ -57,50 +48,27 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
     }, [workflow.components, workflow.triggers]);
 
     return (
-        <li
-            className={twMerge(
-                'w-full cursor-pointer rounded-md border border-transparent py-3 pr-1 pl-3 hover:bg-background',
-                workflow.workflowUuid === currentWorkflowId && 'border-stroke-brand-primary bg-background'
-            )}
-            onClick={handleCardClick}
-        >
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-hidden">
-                    <WorkflowComponentsList
-                        filteredComponentNames={filteredComponentNames}
-                        fitToWidth
-                        workflowComponentDefinitions={workflowComponentDefinitions}
-                        workflowTaskDispatcherDefinitions={{}}
-                    />
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex flex-col gap-1 text-start">
-                                <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
-
-                                {editedTimeAgo && (
-                                    <div className="flex gap-1 text-xs text-content-neutral-secondary">
-                                        <span>Edited</span>
-
-                                        <span>{editedTimeAgo}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </TooltipTrigger>
-
-                        {workflow.label && workflow.label.length > 40 && (
-                            <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
-                        )}
-                    </Tooltip>
-                </div>
-
+        <WorkflowsSidebarListItem
+            active={workflow.workflowUuid === currentWorkflowId}
+            components={
+                <WorkflowComponentsList
+                    filteredComponentNames={filteredComponentNames}
+                    fitToWidth
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={{}}
+                />
+            }
+            editedTimeAgo={editedTimeAgo}
+            label={workflow.label}
+            menu={
                 <AutomationWorkflowEditorWorkflowsListItemDropdownMenu
                     currentWorkflowId={currentWorkflowId}
                     project={project}
                     workflow={workflow}
                 />
-            </div>
-        </li>
+            }
+            onClick={() => onWorkflowClick(workflow.workflowUuid)}
+        />
     );
 };
 
