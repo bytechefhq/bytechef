@@ -18,6 +18,7 @@ package com.bytechef.automation.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,7 @@ import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -238,7 +240,7 @@ class LazyTaskExecutionTreeBuilderTest {
 
         when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
             .thenReturn(List.of(loopTaskExecution, firstFailedTaskExecution, secondFailedTaskExecution));
-        when(taskExecutionService.getChildCounts(List.of(3L, 5L, 6L)))
+        when(taskExecutionService.getChildCounts(List.of(3L)))
             .thenReturn(Map.of(3L, 2L));
         when(taskExecutionService.getTaskExecution(3L))
             .thenReturn(loopTaskExecution);
@@ -249,6 +251,33 @@ class LazyTaskExecutionTreeBuilderTest {
             JOB_ID, List.of(firstTaskExecution, loopTaskExecution));
 
         assertThat(focusPath).containsExactly(new FocusPathElementDTO(3L, null), new FocusPathElementDTO(5L, 1));
+    }
+
+    @Test
+    void getFocusPathStopsAtFirstAcceptedFailureWithoutListingEveryFailure() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+
+        List<TaskExecution> failedTaskExecutions = new ArrayList<>();
+
+        for (long id = 100L; id < 200L; id++) {
+            failedTaskExecutions.add(createTaskExecution(id, 1L, "x", "myComponent/v1/a", 0));
+        }
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(failedTaskExecutions);
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(loopTaskExecution);
+        when(taskExecutionService.getIterationIndex(failedTaskExecutions.getFirst()))
+            .thenReturn(0);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null), new FocusPathElementDTO(100L, 0));
+
+        verify(taskExecutionService).getChildCounts(List.of(100L));
+        verify(taskExecutionService, never()).getChildCounts(argThat(ids -> ids.size() > 1));
+        verify(taskExecutionService, never()).getIterationIndex(failedTaskExecutions.get(1));
     }
 
     @Test

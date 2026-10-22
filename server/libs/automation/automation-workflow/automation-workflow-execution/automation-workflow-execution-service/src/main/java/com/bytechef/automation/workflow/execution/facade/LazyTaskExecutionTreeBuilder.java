@@ -121,26 +121,13 @@ class LazyTaskExecutionTreeBuilder {
         Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
         Map<Long, TaskExecution> ancestorCache = new HashMap<>();
 
-        List<TaskExecution> failedTaskExecutions = taskExecutionService.getFailedJobTaskExecutions(jobId);
+        for (TaskExecution failedTaskExecution : taskExecutionService.getFailedJobTaskExecutions(jobId)) {
+            List<TaskExecution> ancestry = getAncestry(failedTaskExecution, ancestorCache);
 
-        if (!failedTaskExecutions.isEmpty()) {
-            Map<Long, Long> childCounts = taskExecutionService.getChildCounts(
-                failedTaskExecutions.stream()
-                    .map(TaskExecution::getId)
-                    .toList());
+            TaskExecution topLevelTaskExecution = ancestry.getFirst();
 
-            for (TaskExecution failedTaskExecution : failedTaskExecutions) {
-                if (childCounts.getOrDefault(failedTaskExecution.getId(), 0L) > 0) {
-                    continue;
-                }
-
-                List<TaskExecution> ancestry = getAncestry(failedTaskExecution, ancestorCache);
-
-                TaskExecution topLevelTaskExecution = ancestry.getFirst();
-
-                if (latestAttemptIds.contains(topLevelTaskExecution.getId())) {
-                    return toFocusPath(ancestry);
-                }
+            if (latestAttemptIds.contains(topLevelTaskExecution.getId()) && isLeaf(failedTaskExecution)) {
+                return toFocusPath(ancestry);
             }
         }
 
@@ -168,6 +155,14 @@ class LazyTaskExecutionTreeBuilder {
         Collections.reverse(ancestry);
 
         return ancestry;
+    }
+
+    private boolean isLeaf(TaskExecution taskExecution) {
+        long id = Objects.requireNonNull(taskExecution.getId());
+
+        Map<Long, Long> childCounts = taskExecutionService.getChildCounts(List.of(id));
+
+        return childCounts.getOrDefault(id, 0L) == 0;
     }
 
     private int getChildCount(
