@@ -9,6 +9,7 @@ import ProjectDeployments from './ProjectDeployments';
 
 const hoisted = vi.hoisted(() => ({
     projectDeployments: [] as ProjectDeployment[],
+    projectDeploymentsIsFetching: false,
     refetchProjectDeployments: vi.fn(),
 }));
 
@@ -45,7 +46,7 @@ vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importO
     useGetWorkspaceProjectDeploymentsQuery: () => ({
         data: hoisted.projectDeployments,
         error: null,
-        isFetching: false,
+        isFetching: hoisted.projectDeploymentsIsFetching,
         isLoading: false,
         refetch: hoisted.refetchProjectDeployments,
     }),
@@ -131,6 +132,7 @@ describe('ProjectDeployments expanded deployment', () => {
             },
         ];
 
+        hoisted.projectDeploymentsIsFetching = false;
         hoisted.refetchProjectDeployments.mockClear();
     });
 
@@ -161,5 +163,16 @@ describe('ProjectDeployments expanded deployment', () => {
 
         expect(hoisted.refetchProjectDeployments).toHaveBeenCalledTimes(1);
         expect(screen.getByText('Expanded deployment: 2')).toBeInTheDocument();
+    });
+
+    it('should disable the refresh button and spin its icon while deployments are fetching', () => {
+        hoisted.projectDeploymentsIsFetching = true;
+
+        renderProjectDeployments();
+
+        const refreshButton = screen.getByRole('button', {name: 'Refresh deployments'});
+
+        expect(refreshButton).toBeDisabled();
+        expect(refreshButton.querySelector('svg')).toHaveClass('animate-spin');
     });
 });
