@@ -42,6 +42,41 @@ describe('getMissingRequiredPropertyLabels', () => {
         ]);
     });
 
+    it('labels nested object paths and orders them by their root property', () => {
+        expect(
+            getMissingRequiredPropertyLabels([propertyError('response.responseSchema'), propertyError('scope')], [
+                {
+                    label: 'Response',
+                    name: 'response',
+                    properties: [{label: 'Response Schema', name: 'responseSchema'}],
+                },
+                ...properties,
+            ] as PropertyAllType[])
+        ).toEqual(['Response > Response Schema', 'Scope']);
+    });
+
+    it('labels array item paths once, whichever items miss the property', () => {
+        expect(
+            getMissingRequiredPropertyLabels(
+                [propertyError('headers[1].name'), propertyError('key'), propertyError('headers[0].name')],
+                [
+                    ...properties,
+                    {
+                        items: [{properties: [{label: 'Name', name: 'name'}], type: 'OBJECT'}],
+                        label: 'Headers',
+                        name: 'headers',
+                    },
+                ] as PropertyAllType[]
+            )
+        ).toEqual(['Key', 'Headers > Name']);
+    });
+
+    it('falls back to the path segment name when a nested property is unknown', () => {
+        expect(getMissingRequiredPropertyLabels([propertyError('scope.unknown')], properties)).toEqual([
+            'Scope > unknown',
+        ]);
+    });
+
     it('falls back to the name when the property has no label', () => {
         expect(getMissingRequiredPropertyLabels([propertyError('key')], [{name: 'key'}] as PropertyAllType[])).toEqual([
             'key',
