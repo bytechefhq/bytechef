@@ -25,10 +25,6 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useEnvironmentsQuery: () => ({data: {environments: []}}),
 }));
 
-vi.mock('@/shared/hooks/useAnalytics', () => ({
-    useAnalytics: () => ({reset: vi.fn()}),
-}));
-
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
     useFeatureFlagsStore: () => () => false,
 }));

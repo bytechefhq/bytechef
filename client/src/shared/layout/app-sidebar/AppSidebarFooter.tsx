@@ -16,7 +16,6 @@ import {
 import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
-import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -69,7 +68,6 @@ export function AppSidebarFooter() {
         }))
     );
 
-    const analytics = useAnalytics();
     const userGuidingLauncher = useUserGuidingLauncher();
 
     const {pathname} = useLocation();
@@ -82,8 +80,6 @@ export function AppSidebarFooter() {
     const {data: environmentsQuery} = useEnvironmentsQuery();
 
     const handleLogOutClick = async () => {
-        analytics.reset();
-
         await queryClient.cancelQueries();
 
         await logout();
