@@ -18,8 +18,11 @@ package com.bytechef.encryption.filesystem;
 
 import com.bytechef.encryption.AbstractEncryptionKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author Ivica Cardic
@@ -40,9 +43,7 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
             if (Files.exists(keyPath)) {
                 key = Files.readString(keyPath);
             } else {
-                key = generateKey();
-
-                Files.writeString(Files.createFile(keyPath), key);
+                key = createKey(bytechefPath, keyPath);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -52,5 +53,23 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
     @Override
     protected String doGetKey() {
         return key;
+    }
+
+    private String createKey(Path bytechefPath, Path keyPath) throws IOException, NoSuchAlgorithmException {
+        Path tempKeyPath = Files.createTempFile(bytechefPath, "key", ".tmp");
+
+        try {
+            String generatedKey = generateKey();
+
+            Files.writeString(tempKeyPath, generatedKey);
+
+            Files.createLink(keyPath, tempKeyPath);
+
+            return generatedKey;
+        } catch (FileAlreadyExistsException fileAlreadyExistsException) {
+            return Files.readString(keyPath);
+        } finally {
+            Files.deleteIfExists(tempKeyPath);
+        }
     }
 }
