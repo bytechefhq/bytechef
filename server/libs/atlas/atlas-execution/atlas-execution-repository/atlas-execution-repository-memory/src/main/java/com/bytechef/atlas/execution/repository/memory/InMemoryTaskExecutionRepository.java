@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.execution.repository.memory;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
@@ -37,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.comparator.Comparators;
 
 /**
@@ -103,15 +105,34 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             }
 
             return jobTaskExecutions.stream()
-                .filter(taskExecution -> !isInRetriedAttempt(taskExecution, taskExecutionMap, supersededIds))
+                .filter(taskExecution -> !isInRetriedAttempt(
+                    taskExecution, taskExecutionMap, jobTaskExecutions, supersededIds))
                 .count();
         } finally {
             lock.unlock();
         }
     }
 
+    private static boolean hasLaterRetry(TaskExecution taskExecution, List<TaskExecution> jobTaskExecutions) {
+        int index = jobTaskExecutions.indexOf(taskExecution);
+
+        return jobTaskExecutions.subList(index + 1, jobTaskExecutions.size())
+            .stream()
+            .anyMatch(laterTaskExecution -> Objects.equals(
+                laterTaskExecution.getParentId(), taskExecution.getParentId()) &&
+                laterTaskExecution.getRetryAttempts() == taskExecution.getRetryAttempts() + 1 &&
+                Objects.equals(getTaskName(laterTaskExecution), getTaskName(taskExecution)));
+    }
+
+    private static @Nullable String getTaskName(TaskExecution taskExecution) {
+        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+        return workflowTask == null ? null : workflowTask.getName();
+    }
+
     private static boolean isInRetriedAttempt(
-        TaskExecution taskExecution, Map<Long, TaskExecution> taskExecutionMap, List<Long> supersededIds) {
+        TaskExecution taskExecution, Map<Long, TaskExecution> taskExecutionMap,
+        List<TaskExecution> jobTaskExecutions, List<Long> supersededIds) {
 
         TaskExecution currentTaskExecution = taskExecution;
 
@@ -122,7 +143,8 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
             if (currentTaskExecution.getStatus() == TaskExecution.Status.FAILED &&
                 currentTaskExecution.getError() != null &&
-                currentTaskExecution.getRetryAttempts() < currentTaskExecution.getMaxRetries()) {
+                currentTaskExecution.getRetryAttempts() < currentTaskExecution.getMaxRetries() &&
+                hasLaterRetry(currentTaskExecution, jobTaskExecutions)) {
 
                 return true;
             }
@@ -355,7 +377,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
-        long jobId, int limit, long offset) {
+        long jobId, List<Long> supersededIds, int limit, long offset) {
 
         List<TaskExecution> jobTaskExecutions = findAllByJobIdOrderByCreatedDate(jobId);
 
@@ -373,7 +395,8 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         return jobTaskExecutions.stream()
             .filter(taskExecution -> taskExecution.getError() != null)
             .filter(taskExecution -> !parentIds.contains(taskExecution.getId()))
-            .filter(taskExecution -> !isInRetriedAttempt(taskExecution, taskExecutionMap, List.of()))
+            .filter(taskExecution -> !isInRetriedAttempt(
+                taskExecution, taskExecutionMap, jobTaskExecutions, supersededIds))
             .sorted(CREATED_DATE_COMPARATOR)
             .skip(offset)
             .limit(limit)

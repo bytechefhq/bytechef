@@ -186,9 +186,11 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize) {
+    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(
+        long jobId, List<Long> supersededTaskExecutionIds, int pageNumber, int pageSize) {
+
         return taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
-            jobId, pageSize, (long) pageNumber * pageSize);
+            jobId, supersededTaskExecutionIds, pageSize, (long) pageNumber * pageSize);
     }
 
     @Override

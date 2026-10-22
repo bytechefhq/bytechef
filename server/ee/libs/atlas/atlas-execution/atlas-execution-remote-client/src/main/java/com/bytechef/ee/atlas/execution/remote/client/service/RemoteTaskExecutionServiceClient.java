@@ -165,7 +165,9 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
-    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize) {
+    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(
+        long jobId, List<Long> supersededTaskExecutionIds, int pageNumber, int pageSize) {
+
         throw new UnsupportedOperationException();
     }
 

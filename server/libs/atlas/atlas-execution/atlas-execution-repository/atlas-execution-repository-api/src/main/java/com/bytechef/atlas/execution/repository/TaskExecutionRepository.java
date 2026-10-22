@@ -85,7 +85,8 @@ public interface TaskExecutionRepository {
 
     List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(long jobId);
 
-    List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(long jobId, int limit, long offset);
+    List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+        long jobId, List<Long> supersededIds, int limit, long offset);
 
     List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset);
 

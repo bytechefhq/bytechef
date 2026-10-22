@@ -218,7 +218,7 @@ public class JdbcTaskExecutionRepositoryIntTest {
         saveRetriedTaskExecution(jobId, loopTaskExecution.getId(), 0);
 
         TaskExecution firstFailedLeafTaskExecution = saveTaskExecution(
-            jobId, loopTaskExecution.getId(), 0, executionError);
+            jobId, loopTaskExecution.getId(), 0, executionError, 1);
         TaskExecution failedParentTaskExecution = saveTaskExecution(
             jobId, loopTaskExecution.getId(), 1, executionError);
 
@@ -230,10 +230,12 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
         Assertions.assertEquals(
             List.of(firstFailedLeafTaskExecution.getId(), secondFailedLeafTaskExecution.getId()),
-            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, 10, 0)));
+            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, List.of(),
+                10, 0)));
         Assertions.assertEquals(
             List.of(secondFailedLeafTaskExecution.getId()),
-            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, 1, 1)));
+            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, List.of(), 1,
+                1)));
     }
 
     @Test
@@ -261,7 +263,7 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
         saveTaskExecution(jobId, loopRetryTaskExecution.getId(), 0, null);
         saveRetriedTaskExecution(jobId, loopRetryTaskExecution.getId(), 0);
-        saveTaskExecution(jobId, loopRetryTaskExecution.getId(), 1, null, 1);
+        saveTaskExecution(jobId, loopRetryTaskExecution.getId(), 0, null, 1);
         saveTaskExecution(jobId, null, 1, new ExecutionError("failed", List.of()), 0);
 
         saveChildrenFixture();
@@ -282,6 +284,7 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
         saveTaskExecution(jobId, resumedIterationTaskExecution.getId(), 0, null);
         saveRetriedTaskExecution(jobId, resumedLoopTaskExecution.getId(), 1);
+        saveTaskExecution(jobId, resumedLoopTaskExecution.getId(), 1, null, 1);
 
         TaskExecution loopTaskExecution = saveTaskExecution(jobId, null, 0, null);
 
@@ -289,7 +292,94 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
         Assertions.assertEquals(
             2, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of(resumedLoopTaskExecution.getId())));
-        Assertions.assertEquals(5, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+        Assertions.assertEquals(6, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+    }
+
+    @Test
+    public void testFailedOnErrorTaskWithRetriesLeftIsNotRetriedAttempt() {
+        long jobId = saveJob();
+
+        TaskExecution onErrorTaskExecution = saveRetriedTaskExecution(jobId, null, 0);
+
+        saveTaskExecution(jobId, onErrorTaskExecution.getId(), 0, null);
+
+        TaskExecution failedErrorBranchTaskExecution = saveTaskExecution(
+            jobId, onErrorTaskExecution.getId(), 0, new ExecutionError("failed", List.of()));
+
+        Assertions.assertEquals(3, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+        Assertions.assertEquals(
+            List.of(failedErrorBranchTaskExecution.getId()),
+            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, List.of(),
+                10, 0)));
+    }
+
+    @Test
+    public void testFailedAttemptIsNotRetriedByARetryOfADifferentSiblingTask() {
+        long jobId = saveJob();
+
+        TaskExecution parentTaskExecution = saveTaskExecution(jobId, null, 0, null);
+        TaskExecution failedTaskExecution = saveRetriedTaskExecution(jobId, parentTaskExecution.getId(), 1);
+
+        saveTaskExecution(jobId, parentTaskExecution.getId(), 2, null, 1);
+
+        Assertions.assertEquals(3, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+        Assertions.assertEquals(
+            List.of(failedTaskExecution.getId()),
+            toIds(
+                taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                    jobId, List.of(), 10, 0)));
+    }
+
+    @Test
+    public void testLatestAttemptQueriesExcludeDescendantsOfARetriedAttemptAtAnyDepth() {
+        long jobId = saveJob();
+
+        ExecutionError executionError = new ExecutionError("failed", List.of());
+
+        TaskExecution loopTaskExecution = saveTaskExecution(jobId, null, 0, null);
+        TaskExecution retriedTaskExecution = saveRetriedTaskExecution(jobId, loopTaskExecution.getId(), 0);
+        TaskExecution childTaskExecution = saveTaskExecution(jobId, retriedTaskExecution.getId(), 0, null);
+
+        saveTaskExecution(jobId, childTaskExecution.getId(), 0, executionError);
+
+        TaskExecution retryTaskExecution = saveTaskExecution(jobId, loopTaskExecution.getId(), 0, null, 1);
+
+        TaskExecution failedLeafTaskExecution = saveTaskExecution(
+            jobId, retryTaskExecution.getId(), 0, executionError);
+
+        Assertions.assertEquals(3, taskExecutionRepository.countLatestAttemptsByJobId(jobId, List.of()));
+        Assertions.assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(
+                taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                    jobId, List.of(), 10, 0)));
+    }
+
+    @Test
+    public void testFindAllLatestAttemptFailedLeavesByJobIdExcludesSupersededAttempts() {
+        long jobId = saveJob();
+
+        ExecutionError executionError = new ExecutionError("failed", List.of());
+
+        TaskExecution resumedTaskExecution = saveTaskExecution(jobId, null, 0, null);
+        TaskExecution resumedIterationTaskExecution = saveTaskExecution(
+            jobId, resumedTaskExecution.getId(), 0, null);
+        TaskExecution supersededFailedLeafTaskExecution = saveTaskExecution(
+            jobId, resumedIterationTaskExecution.getId(), 0, executionError);
+        TaskExecution latestTaskExecution = saveTaskExecution(jobId, null, 0, null);
+        TaskExecution failedLeafTaskExecution = saveTaskExecution(
+            jobId, latestTaskExecution.getId(), 0, executionError);
+
+        Assertions.assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(
+                taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                    jobId, List.of(resumedTaskExecution.getId()), 10, 0)));
+        Assertions.assertEquals(
+            List.of(supersededFailedLeafTaskExecution.getId(), failedLeafTaskExecution.getId()),
+            toIds(
+                taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                    jobId, List.of(), 10, 0)));
     }
 
     @Test

@@ -71,14 +71,8 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     long countTaskExecutions(long jobId, List<TaskExecution> topLevelTaskExecutions) {
-        Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
-
-        List<Long> supersededTaskExecutionIds = topLevelTaskExecutions.stream()
-            .map(TaskExecution::getId)
-            .filter(id -> !latestAttemptIds.contains(id))
-            .toList();
-
-        return taskExecutionService.countJobTaskExecutions(jobId, supersededTaskExecutionIds);
+        return taskExecutionService.countJobTaskExecutions(
+            jobId, getSupersededTaskExecutionIds(topLevelTaskExecutions));
     }
 
     List<TaskExecutionDTO> getTopLevelTaskExecutions(long jobId) {
@@ -147,14 +141,13 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     List<FocusPathElementDTO> getFocusPath(long jobId, List<TaskExecution> topLevelTaskExecutions) {
-        Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
         Map<Long, Optional<TaskExecution>> ancestorCache = new HashMap<>();
 
-        Optional<List<TaskExecution>> failedAncestryOptional = fetchFailedLeafAncestry(
-            jobId, latestAttemptIds, ancestorCache);
+        Optional<List<FocusPathElementDTO>> failedFocusPathOptional = fetchFailedLeafFocusPath(
+            jobId, getSupersededTaskExecutionIds(topLevelTaskExecutions), ancestorCache);
 
-        if (failedAncestryOptional.isPresent()) {
-            return toFocusPath(failedAncestryOptional.get());
+        if (failedFocusPathOptional.isPresent()) {
+            return failedFocusPathOptional.get();
         }
 
         Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService
@@ -163,33 +156,27 @@ class LazyTaskExecutionTreeBuilder {
 
         return lastTaskExecutionOptional
             .flatMap(lastTaskExecution -> fetchAncestry(lastTaskExecution, ancestorCache))
-            .map(this::toFocusPath)
+            .flatMap(this::fetchFocusPath)
             .orElse(List.of());
     }
 
-    private Optional<List<TaskExecution>> fetchFailedLeafAncestry(
-        long jobId, Set<Long> latestAttemptIds, Map<Long, Optional<TaskExecution>> ancestorCache) {
+    private Optional<List<FocusPathElementDTO>> fetchFailedLeafFocusPath(
+        long jobId, List<Long> supersededTaskExecutionIds, Map<Long, Optional<TaskExecution>> ancestorCache) {
 
         int pageNumber = 0;
         List<TaskExecution> failedTaskExecutions;
 
         do {
             failedTaskExecutions = taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(
-                jobId, pageNumber, FOCUS_CANDIDATE_PAGE_SIZE);
+                jobId, supersededTaskExecutionIds, pageNumber, FOCUS_CANDIDATE_PAGE_SIZE);
 
             for (TaskExecution failedTaskExecution : failedTaskExecutions) {
-                Optional<List<TaskExecution>> ancestryOptional = fetchAncestry(failedTaskExecution, ancestorCache);
+                Optional<List<FocusPathElementDTO>> focusPathOptional = fetchAncestry(
+                    failedTaskExecution, ancestorCache)
+                        .flatMap(this::fetchFocusPath);
 
-                if (ancestryOptional.isEmpty()) {
-                    continue;
-                }
-
-                List<TaskExecution> ancestry = ancestryOptional.get();
-
-                TaskExecution topLevelTaskExecution = ancestry.getFirst();
-
-                if (latestAttemptIds.contains(topLevelTaskExecution.getId())) {
-                    return Optional.of(ancestry);
+                if (focusPathOptional.isPresent()) {
+                    return focusPathOptional;
                 }
             }
 
@@ -301,6 +288,15 @@ class LazyTaskExecutionTreeBuilder {
 
     private static Set<String> getErrorBranchTaskNames(TaskExecution onErrorTaskExecution) {
         return TaskExecutionDTO.getBranchTaskNames(onErrorTaskExecution.getWorkflowTask(), ON_ERROR_BRANCH);
+    }
+
+    private static List<Long> getSupersededTaskExecutionIds(List<TaskExecution> topLevelTaskExecutions) {
+        Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
+
+        return topLevelTaskExecutions.stream()
+            .map(TaskExecution::getId)
+            .filter(id -> !latestAttemptIds.contains(id))
+            .toList();
     }
 
     private static Set<Long> getLatestAttemptIds(List<TaskExecution> topLevelTaskExecutions) {
@@ -476,20 +472,47 @@ class LazyTaskExecutionTreeBuilder {
         return iterations;
     }
 
-    private List<FocusPathElementDTO> toFocusPath(List<TaskExecution> ancestry) {
+    private Optional<List<FocusPathElementDTO>> fetchFocusPath(List<TaskExecution> ancestry) {
+        TaskExecution focusedTaskExecution = ancestry.getLast();
+
+        try {
+            return toFocusPath(ancestry, focusedTaskExecution);
+        } catch (ArithmeticException exception) {
+            log.warn("Focus path of task execution id={} not resolved", focusedTaskExecution.getId(), exception);
+
+            return Optional.empty();
+        }
+    }
+
+    private Optional<List<FocusPathElementDTO>> toFocusPath(
+        List<TaskExecution> ancestry, TaskExecution focusedTaskExecution) {
+
         List<FocusPathElementDTO> focusPath = new ArrayList<>();
 
         TaskExecution parent = null;
 
         for (TaskExecution taskExecution : ancestry) {
+            Integer iterationIndex = getIterationIndex(taskExecution, parent);
+            Integer childIndex = getChildIndex(taskExecution, parent);
+
+            if (isNegative(iterationIndex) || isNegative(childIndex)) {
+                log.warn(
+                    "Focus path of task execution id={} not resolved: negative index of task execution id={}",
+                    focusedTaskExecution.getId(), taskExecution.getId());
+
+                return Optional.empty();
+            }
+
             focusPath.add(
-                new FocusPathElementDTO(
-                    Objects.requireNonNull(taskExecution.getId()), getIterationIndex(taskExecution, parent),
-                    getChildIndex(taskExecution, parent)));
+                new FocusPathElementDTO(Objects.requireNonNull(taskExecution.getId()), iterationIndex, childIndex));
 
             parent = taskExecution;
         }
 
-        return focusPath;
+        return Optional.of(focusPath);
+    }
+
+    private static boolean isNegative(@Nullable Integer index) {
+        return index != null && index < 0;
     }
 }

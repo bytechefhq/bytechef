@@ -52,7 +52,8 @@ public interface TaskExecutionService {
 
     Map<Long, Long> getIterationCounts(List<Long> parentIds);
 
-    List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize);
+    List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(
+        long jobId, List<Long> supersededTaskExecutionIds, int pageNumber, int pageSize);
 
     List<TaskExecution> getParentIterationStartTaskExecutions(long parentId, long offset, int limit);
 

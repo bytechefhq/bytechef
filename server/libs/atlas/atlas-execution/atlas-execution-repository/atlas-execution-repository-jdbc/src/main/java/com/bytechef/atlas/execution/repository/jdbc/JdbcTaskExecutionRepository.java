@@ -36,6 +36,33 @@ public interface JdbcTaskExecutionRepository
     extends ListPagingAndSortingRepository<TaskExecution, Long>, ListCrudRepository<TaskExecution, Long>,
     TaskExecutionRepository {
 
+    String RETRIED_FAILED_ATTEMPT_IDS = """
+        SELECT id FROM task_execution failed
+        WHERE failed.job_id = :jobId AND failed.status = 3 AND failed.error IS NOT NULL
+        AND failed.retry_attempts < failed.max_retries
+        AND EXISTS (
+            SELECT 1 FROM task_execution retry
+            WHERE retry.job_id = failed.job_id AND retry.retry_attempts = failed.retry_attempts + 1
+            AND (retry.parent_id = failed.parent_id OR (retry.parent_id IS NULL AND failed.parent_id IS NULL))
+            AND (retry.workflow_task::jsonb ->> 'name') = (failed.workflow_task::jsonb ->> 'name')
+            AND (retry.created_date > failed.created_date
+                OR (retry.created_date = failed.created_date AND retry.id > failed.id))
+        )
+        """;
+
+    String RETRIED_DESCENDANT_IDS = """
+        SELECT task_execution.id FROM task_execution
+        JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
+        """;
+
+    String RETRIED_TASK_EXECUTION_CTE = "WITH RECURSIVE retried_task_execution AS ("
+        + RETRIED_FAILED_ATTEMPT_IDS + "UNION " + RETRIED_DESCENDANT_IDS + ") ";
+
+    String RETRIED_OR_SUPERSEDED_TASK_EXECUTION_CTE = "WITH RECURSIVE retried_task_execution AS ("
+        + RETRIED_FAILED_ATTEMPT_IDS
+        + "UNION SELECT id FROM task_execution WHERE job_id = :jobId AND id IN (:supersededIds) "
+        + "UNION " + RETRIED_DESCENDANT_IDS + ") ";
+
     @Override
     default Map<Long, Long> countAllByParentIdIn(List<Long> parentIds) {
         if (parentIds.isEmpty()) {
@@ -63,29 +90,13 @@ public interface JdbcTaskExecutionRepository
         return selectLatestAttemptCountByJobIdAndSupersededIds(jobId, supersededIds);
     }
 
-    @Query("""
-        WITH RECURSIVE retried_task_execution AS (
-            SELECT id FROM task_execution
-            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
-            UNION
-            SELECT task_execution.id FROM task_execution
-            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
-        )
+    @Query(RETRIED_TASK_EXECUTION_CTE + """
         SELECT (SELECT COUNT(*) FROM task_execution WHERE job_id = :jobId)
             - (SELECT COUNT(*) FROM retried_task_execution)
         """)
     long selectLatestAttemptCountByJobId(@Param("jobId") long jobId);
 
-    @Query("""
-        WITH RECURSIVE retried_task_execution AS (
-            SELECT id FROM task_execution
-            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
-            UNION
-            SELECT id FROM task_execution WHERE job_id = :jobId AND id IN (:supersededIds)
-            UNION
-            SELECT task_execution.id FROM task_execution
-            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
-        )
+    @Query(RETRIED_OR_SUPERSEDED_TASK_EXECUTION_CTE + """
         SELECT (SELECT COUNT(*) FROM task_execution WHERE job_id = :jobId)
             - (SELECT COUNT(*) FROM retried_task_execution)
         """)
@@ -131,22 +142,36 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(@Param("jobId") long jobId);
 
     @Override
-    @Query("""
-        WITH RECURSIVE retried_task_execution AS (
-            SELECT id FROM task_execution
-            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
-            UNION
-            SELECT task_execution.id FROM task_execution
-            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
-        )
+    default List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+        long jobId, List<Long> supersededIds, int limit, long offset) {
+
+        if (supersededIds.isEmpty()) {
+            return selectAllLatestAttemptFailedLeavesByJobId(jobId, limit, offset);
+        }
+
+        return selectAllLatestAttemptFailedLeavesByJobIdAndSupersededIds(jobId, supersededIds, limit, offset);
+    }
+
+    @Query(RETRIED_TASK_EXECUTION_CTE + """
         SELECT * FROM task_execution
         WHERE job_id = :jobId AND error IS NOT NULL
         AND id NOT IN (SELECT id FROM retried_task_execution)
         AND NOT EXISTS (SELECT 1 FROM task_execution child WHERE child.parent_id = task_execution.id)
         ORDER BY created_date ASC, id ASC LIMIT :limit OFFSET :offset
         """)
-    List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+    List<TaskExecution> selectAllLatestAttemptFailedLeavesByJobId(
         @Param("jobId") long jobId, @Param("limit") int limit, @Param("offset") long offset);
+
+    @Query(RETRIED_OR_SUPERSEDED_TASK_EXECUTION_CTE + """
+        SELECT * FROM task_execution
+        WHERE job_id = :jobId AND error IS NOT NULL
+        AND id NOT IN (SELECT id FROM retried_task_execution)
+        AND NOT EXISTS (SELECT 1 FROM task_execution child WHERE child.parent_id = task_execution.id)
+        ORDER BY created_date ASC, id ASC LIMIT :limit OFFSET :offset
+        """)
+    List<TaskExecution> selectAllLatestAttemptFailedLeavesByJobIdAndSupersededIds(
+        @Param("jobId") long jobId, @Param("supersededIds") List<Long> supersededIds, @Param("limit") int limit,
+        @Param("offset") long offset);
 
     @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);

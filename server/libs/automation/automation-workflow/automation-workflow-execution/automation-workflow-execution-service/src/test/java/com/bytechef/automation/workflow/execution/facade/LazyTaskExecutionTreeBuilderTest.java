@@ -33,6 +33,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
@@ -397,8 +398,9 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution firstFailedTaskExecution = createTaskExecution(5L, 3L, "x", "myComponent/v1/a", 0);
         TaskExecution secondFailedTaskExecution = createTaskExecution(6L, 3L, "x", "myComponent/v1/a", 0);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(List.of(firstFailedTaskExecution, secondFailedTaskExecution));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(firstFailedTaskExecution, secondFailedTaskExecution));
         when(taskExecutionService.fetchTaskExecution(3L))
             .thenReturn(Optional.of(loopTaskExecution));
         when(taskExecutionService.getIterationIndex(firstFailedTaskExecution))
@@ -419,8 +421,9 @@ class LazyTaskExecutionTreeBuilderTest {
 
         List<TaskExecution> failedTaskExecutions = createFailedTaskExecutions(100L, 1L);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(failedTaskExecutions);
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(failedTaskExecutions);
         when(taskExecutionService.fetchTaskExecution(1L))
             .thenReturn(Optional.of(loopTaskExecution));
         when(taskExecutionService.getIterationIndex(failedTaskExecutions.getFirst()))
@@ -433,50 +436,49 @@ class LazyTaskExecutionTreeBuilderTest {
             new FocusPathElementDTO(100L, 0, null));
 
         verify(taskExecutionService, never())
-            .getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 1, FOCUS_CANDIDATE_PAGE_SIZE);
+            .getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 1, FOCUS_CANDIDATE_PAGE_SIZE);
         verify(taskExecutionService, never()).getIterationIndex(failedTaskExecutions.get(1));
     }
 
     @Test
-    void getFocusPathReadsNextPageWhenNoFailureOnAFullPageIsUnderTheLatestAttempt() {
-        TaskExecution firstAttemptTaskExecution = createTaskExecution(1L, null, "a", "parallel/v1", 0);
-        TaskExecution secondAttemptTaskExecution = createTaskExecution(2L, null, "a", "parallel/v1", 0);
+    void getFocusPathReadsNextPageWhenNoFailureOnAFullPageResolves() {
+        TaskExecution topLevelTaskExecution = createTaskExecution(2L, null, "a", "parallel/v1", 0);
         TaskExecution acceptedTaskExecution = createTaskExecution(900L, 2L, "y", "myComponent/v1/a", 0);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(createFailedTaskExecutions(100L, 1L));
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 1, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(List.of(acceptedTaskExecution));
-        when(taskExecutionService.fetchTaskExecution(1L))
-            .thenReturn(Optional.of(firstAttemptTaskExecution));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(
+            JOB_ID, List.of(), 0, FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(createFailedTaskExecutions(100L, 77L));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(
+            JOB_ID, List.of(), 1, FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(acceptedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(77L))
+            .thenReturn(Optional.empty());
         when(taskExecutionService.fetchTaskExecution(2L))
-            .thenReturn(Optional.of(secondAttemptTaskExecution));
+            .thenReturn(Optional.of(topLevelTaskExecution));
         when(taskExecutionService.getChildIndex(acceptedTaskExecution))
             .thenReturn(3);
 
         List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
-            JOB_ID, List.of(firstAttemptTaskExecution, secondAttemptTaskExecution));
+            JOB_ID, List.of(topLevelTaskExecution));
 
         assertThat(focusPath).containsExactly(
             new FocusPathElementDTO(2L, null, null), new FocusPathElementDTO(900L, null, 3));
 
-        verify(taskExecutionService).fetchTaskExecution(1L);
+        verify(taskExecutionService).fetchTaskExecution(77L);
         verify(taskExecutionService, never())
-            .getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 2, FOCUS_CANDIDATE_PAGE_SIZE);
+            .getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 2, FOCUS_CANDIDATE_PAGE_SIZE);
     }
 
     @Test
-    void focusPathSkipsRetriedTopLevelAttempt() {
+    void getFocusPathExcludesRetriedTopLevelAttemptsFromFailureCandidates() {
         TaskExecution firstAttemptTaskExecution = createTaskExecution(1L, null, "a", "parallel/v1", 0);
         TaskExecution secondAttemptTaskExecution = createTaskExecution(2L, null, "a", "parallel/v1", 0);
         TaskExecution otherTaskExecution = createTaskExecution(3L, null, "b", "parallel/v1", 1);
-        TaskExecution xTaskExecution = createTaskExecution(4L, 1L, "x", "myComponent/v1/a", 0);
         TaskExecution yTaskExecution = createTaskExecution(5L, 3L, "y", "myComponent/v1/a", 0);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(List.of(xTaskExecution, yTaskExecution));
-        when(taskExecutionService.fetchTaskExecution(1L))
-            .thenReturn(Optional.of(firstAttemptTaskExecution));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(
+            JOB_ID, List.of(1L), 0, FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(yTaskExecution));
         when(taskExecutionService.fetchTaskExecution(3L))
             .thenReturn(Optional.of(otherTaskExecution));
         when(taskExecutionService.getChildIndex(yTaskExecution))
@@ -487,6 +489,24 @@ class LazyTaskExecutionTreeBuilderTest {
 
         assertThat(focusPath).containsExactly(
             new FocusPathElementDTO(3L, null, null), new FocusPathElementDTO(5L, null, 74));
+    }
+
+    @Test
+    void getFocusPathPropagatesAnUnexpectedIllegalArgumentException() {
+        TaskExecution parentTaskExecution = createTaskExecution(3L, null, "b", "parallel/v1", 0);
+        TaskExecution failedTaskExecution = createTaskExecution(5L, 3L, "y", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(failedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(3L))
+            .thenReturn(Optional.of(parentTaskExecution));
+        when(taskExecutionService.getChildIndex(failedTaskExecution))
+            .thenThrow(new IllegalArgumentException("unexpected"));
+
+        assertThatThrownBy(() -> lazyTaskExecutionTreeBuilder.getFocusPath(JOB_ID, List.of(parentTaskExecution)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("unexpected");
     }
 
     @Test
@@ -529,8 +549,9 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution onErrorTaskExecution = createOnErrorTaskExecution(1L, null);
         TaskExecution errorTaskExecution = createTaskExecution(3L, 1L, "errorTask", "myComponent/v1/a", 0);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(List.of(errorTaskExecution));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(errorTaskExecution));
         when(taskExecutionService.fetchTaskExecution(1L))
             .thenReturn(Optional.of(onErrorTaskExecution));
 
@@ -546,8 +567,9 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution orphanTaskExecution = createTaskExecution(7L, 6L, "x", "myComponent/v1/a", 0);
         TaskExecution startedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 0);
 
-        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, 0, FOCUS_CANDIDATE_PAGE_SIZE))
-            .thenReturn(List.of(orphanTaskExecution));
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(orphanTaskExecution));
         when(taskExecutionService.fetchTaskExecution(6L))
             .thenReturn(Optional.empty());
         when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
@@ -557,6 +579,43 @@ class LazyTaskExecutionTreeBuilderTest {
             JOB_ID, List.of(startedTaskExecution));
 
         assertThat(focusPath).containsExactly(new FocusPathElementDTO(4L, null, null));
+    }
+
+    @Test
+    void getFocusPathFallsBackToLastStartedTaskWhenTheFailureIndexIsInvalid() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution failedTaskExecution = createTaskExecution(5L, 1L, "x", "myComponent/v1/a", 0);
+        TaskExecution startedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 1);
+
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(failedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(loopTaskExecution));
+        when(taskExecutionService.getIterationIndex(failedTaskExecution))
+            .thenReturn(-1);
+        when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(startedTaskExecution));
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution, startedTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(4L, null, null));
+    }
+
+    @Test
+    void getFocusPathIsEmptyWhenTheIndexOfTheLastStartedTaskCannotBeComputed() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution startedTaskExecution = createTaskExecution(9L, 1L, "x", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(startedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(loopTaskExecution));
+        when(taskExecutionService.getIterationIndex(startedTaskExecution))
+            .thenThrow(new ArithmeticException("integer overflow"));
+
+        assertThat(lazyTaskExecutionTreeBuilder.getFocusPath(JOB_ID, List.of(loopTaskExecution))).isEmpty();
     }
 
     @Test

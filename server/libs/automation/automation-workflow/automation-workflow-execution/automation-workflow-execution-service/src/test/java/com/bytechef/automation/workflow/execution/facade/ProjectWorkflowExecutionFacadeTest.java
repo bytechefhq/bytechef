@@ -507,8 +507,8 @@ public class ProjectWorkflowExecutionFacadeTest {
             .containsExactly(tuple(2L, null));
 
         verify(taskExecutionService, never()).countJobTaskExecutions(anyLong(), anyList());
-        verify(taskExecutionService, never()).getLatestAttemptFailedLeafJobTaskExecutions(anyLong(), anyInt(),
-            anyInt());
+        verify(taskExecutionService, never()).getLatestAttemptFailedLeafJobTaskExecutions(
+            anyLong(), anyList(), anyInt(), anyInt());
     }
 
     @Test

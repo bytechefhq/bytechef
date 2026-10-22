@@ -23,9 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,10 +45,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class InMemoryTaskExecutionRepositoryTest {
 
     private InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
@@ -180,11 +184,11 @@ class InMemoryTaskExecutionRepositoryTest {
         saveTaskExecution(404L, retriedLoopTaskExecution.getId(), false);
         saveTaskExecution(404L, retriedLoopTaskExecution.getId(), false);
 
-        TaskExecution loopRetryTaskExecution = saveTaskExecution(404L, null, false);
+        TaskExecution loopRetryTaskExecution = saveRetryTaskExecution(404L, null);
 
         saveTaskExecution(404L, loopRetryTaskExecution.getId(), false);
         saveTaskExecution(404L, loopRetryTaskExecution.getId(), true);
-        saveTaskExecution(404L, loopRetryTaskExecution.getId(), false);
+        saveRetryTaskExecution(404L, loopRetryTaskExecution.getId());
 
         assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(404L, List.of()));
         assertEquals(0, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(405L, List.of()));
@@ -199,6 +203,7 @@ class InMemoryTaskExecutionRepositoryTest {
 
         saveTaskExecution(408L, resumedIterationTaskExecution.getId(), false);
         saveTaskExecution(408L, resumedLoopTaskExecution.getId(), true);
+        saveRetryTaskExecution(408L, resumedLoopTaskExecution.getId());
 
         TaskExecution loopTaskExecution = saveTaskExecution(408L, null, false);
 
@@ -207,7 +212,91 @@ class InMemoryTaskExecutionRepositoryTest {
         assertEquals(
             2, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(
                 408L, List.of(resumedLoopTaskExecution.getId())));
-        assertEquals(5, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(408L, List.of()));
+        assertEquals(6, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(408L, List.of()));
+    }
+
+    @Test
+    void testFailedOnErrorTaskWithRetriesLeftIsNotRetriedAttempt() {
+        TaskExecution onErrorTaskExecution = saveTaskExecution(409L, null, true);
+
+        saveTaskExecution(409L, onErrorTaskExecution.getId(), false);
+
+        TaskExecution failedErrorBranchTaskExecution = saveFailedTaskExecution(409L, onErrorTaskExecution.getId());
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(409L, List.of()));
+        assertEquals(
+            List.of(failedErrorBranchTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                409L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testFailedAttemptIsNotRetriedByARetryOfADifferentSiblingTask() {
+        TaskExecution parentTaskExecution = saveTaskExecution(511L, null, false);
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setError(new ExecutionError("failed", List.of()));
+        failedTaskExecution.setJobId(511L);
+        failedTaskExecution.setMaxRetries(1);
+        failedTaskExecution.setParentId(parentTaskExecution.getId());
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        failedTaskExecution = inMemoryTaskExecutionRepository.save(failedTaskExecution);
+
+        TaskExecution siblingRetryTaskExecution = new TaskExecution();
+
+        siblingRetryTaskExecution.setJobId(511L);
+        siblingRetryTaskExecution.setParentId(parentTaskExecution.getId());
+        siblingRetryTaskExecution.setRetryAttempts(1);
+        siblingRetryTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "b", "type", "test/v1")));
+
+        inMemoryTaskExecutionRepository.save(siblingRetryTaskExecution);
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(511L, List.of()));
+        assertEquals(
+            List.of(failedTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                511L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testLatestAttemptQueriesExcludeDescendantsOfARetriedAttemptAtAnyDepth() {
+        TaskExecution loopTaskExecution = saveTaskExecution(480L, null, false);
+        TaskExecution retriedTaskExecution = saveTaskExecution(480L, loopTaskExecution.getId(), true);
+        TaskExecution childTaskExecution = saveTaskExecution(480L, retriedTaskExecution.getId(), false);
+
+        saveFailedTaskExecution(480L, childTaskExecution.getId());
+
+        TaskExecution retryTaskExecution = saveRetryTaskExecution(480L, loopTaskExecution.getId());
+
+        TaskExecution failedLeafTaskExecution = saveFailedTaskExecution(480L, retryTaskExecution.getId());
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(480L, List.of()));
+        assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                480L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testFindAllLatestAttemptFailedLeavesByJobIdExcludesSupersededAttempts() {
+        TaskExecution resumedTaskExecution = saveTaskExecution(481L, null, false);
+        TaskExecution resumedIterationTaskExecution = saveTaskExecution(481L, resumedTaskExecution.getId(), false);
+        TaskExecution supersededFailedLeafTaskExecution = saveFailedTaskExecution(
+            481L, resumedIterationTaskExecution.getId());
+        TaskExecution latestTaskExecution = saveTaskExecution(481L, null, false);
+        TaskExecution failedLeafTaskExecution = saveFailedTaskExecution(481L, latestTaskExecution.getId());
+
+        assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                481L, List.of(resumedTaskExecution.getId()), 10, 0)));
+        assertEquals(
+            List.of(supersededFailedLeafTaskExecution.getId(), failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                481L, List.of(), 10, 0)));
     }
 
     @Test
@@ -269,11 +358,11 @@ class InMemoryTaskExecutionRepositoryTest {
 
         saveFailedTaskExecution(406L, retriedLoopTaskExecution.getId());
 
-        TaskExecution loopTaskExecution = saveTaskExecution(406L, null, false);
+        TaskExecution loopTaskExecution = saveRetryTaskExecution(406L, null);
 
         saveTaskExecution(406L, loopTaskExecution.getId(), true);
 
-        TaskExecution firstFailedLeafTaskExecution = saveFailedTaskExecution(406L, loopTaskExecution.getId());
+        TaskExecution firstFailedLeafTaskExecution = saveFailedTaskExecution(406L, loopTaskExecution.getId(), 1);
         TaskExecution failedParentTaskExecution = saveFailedTaskExecution(406L, loopTaskExecution.getId());
 
         saveTaskExecution(406L, failedParentTaskExecution.getId(), false);
@@ -285,11 +374,11 @@ class InMemoryTaskExecutionRepositoryTest {
         assertEquals(
             List.of(firstFailedLeafTaskExecution.getId(), secondFailedLeafTaskExecution.getId()),
             toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
-                406L, 10, 0)));
+                406L, List.of(), 10, 0)));
         assertEquals(
             List.of(secondFailedLeafTaskExecution.getId()),
             toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
-                406L, 1, 1)));
+                406L, List.of(), 1, 1)));
     }
 
     @Test
@@ -359,7 +448,7 @@ class InMemoryTaskExecutionRepositoryTest {
         assertEquals(
             failedIds,
             toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
-                408L, 100, 0)));
+                408L, List.of(), 100, 0)));
     }
 
     @Test
@@ -1025,12 +1114,27 @@ class InMemoryTaskExecutionRepositoryTest {
         return inMemoryTaskExecutionRepository.save(taskExecution);
     }
 
+    private TaskExecution saveRetryTaskExecution(long jobId, Long parentId) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setParentId(parentId);
+        taskExecution.setRetryAttempts(1);
+
+        return inMemoryTaskExecutionRepository.save(taskExecution);
+    }
+
     private TaskExecution saveFailedTaskExecution(long jobId, Long parentId) {
+        return saveFailedTaskExecution(jobId, parentId, 0);
+    }
+
+    private TaskExecution saveFailedTaskExecution(long jobId, Long parentId, int retryAttempts) {
         TaskExecution taskExecution = new TaskExecution();
 
         taskExecution.setError(new ExecutionError("failed", List.of()));
         taskExecution.setJobId(jobId);
         taskExecution.setParentId(parentId);
+        taskExecution.setRetryAttempts(retryAttempts);
         taskExecution.setStatus(TaskExecution.Status.FAILED);
 
         return inMemoryTaskExecutionRepository.save(taskExecution);
