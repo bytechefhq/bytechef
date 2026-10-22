@@ -106,7 +106,7 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
     it('calls onWorkflowClick with the workflow uuid when the card is clicked', () => {
         const onWorkflowClick = vi.fn();
 
-        const {container} = render(
+        render(
             <MemoryRouter>
                 <TooltipProvider>
                     <ul>
@@ -121,7 +121,7 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
             </MemoryRouter>
         );
 
-        fireEvent.click(container.querySelector('li')!);
+        fireEvent.click(screen.getByText('Mailer'));
 
         expect(onWorkflowClick).toHaveBeenCalledWith('wf-1');
     });
