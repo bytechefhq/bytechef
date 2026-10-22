@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -493,7 +494,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             } else {
                 outputResponse = checkOutputSchemaIsFileEntryProperty(actionDefinition.getOutputResponse());
 
-                if (outputResponse == null) {
+                if (outputResponse == null &&
+                    !hasMissingRequiredProperties(actionDefinition.getProperties(), workflowTask.getParameters())) {
+
                     try {
                         outputResponse = getWorkflowTaskDynamicOutputResponse(
                             workflowId, workflowTask, environmentId, sampleOutputsCache);
@@ -540,7 +543,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
             .or(() -> fetchWorkflowTriggerDynamicOutputResponse(
-                workflowId, workflowTrigger, environmentId, previousNode))
+                workflowId, workflowTrigger, triggerDefinition, environmentId, previousNode))
             .orElse(null);
 
         if (outputResponse == null) {
@@ -656,7 +659,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private Optional<OutputResponse> fetchWorkflowTriggerDynamicOutputResponse(
-        String workflowId, WorkflowTrigger workflowTrigger, long environmentId, boolean previousNode) {
+        String workflowId, WorkflowTrigger workflowTrigger, TriggerDefinition triggerDefinition, long environmentId,
+        boolean previousNode) {
+
+        if (hasMissingRequiredProperties(triggerDefinition.getProperties(), workflowTrigger.getParameters())) {
+            return Optional.empty();
+        }
 
         if (!previousNode) {
             return getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId);
@@ -689,6 +697,19 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             triggerDefinitionFacade.executeOutput(
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
                 connectionId));
+    }
+
+    private boolean hasMissingRequiredProperties(
+        @Nullable List<?> properties, @Nullable Map<String, ?> parameterMap) {
+
+        if (properties == null) {
+            return false;
+        }
+
+        Set<String> missingRequiredProperties = RequiredPropertyUtils.getMissingRequiredProperties(
+            properties, parameterMap == null ? Map.of() : parameterMap, evaluator);
+
+        return !missingRequiredProperties.isEmpty();
     }
 
     private record WorkflowTaskDispatcherDynamicOutputResponse(
