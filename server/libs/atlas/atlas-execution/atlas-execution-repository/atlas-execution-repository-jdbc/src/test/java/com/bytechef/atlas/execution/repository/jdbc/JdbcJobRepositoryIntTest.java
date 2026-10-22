@@ -20,11 +20,14 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -49,9 +52,48 @@ public class JdbcJobRepositoryIntTest {
     @Autowired
     private JdbcJobRepository jobRepository;
 
+    @Autowired
+    private JdbcTaskExecutionRepository taskExecutionRepository;
+
     @AfterEach
     public void afterEach() {
+        for (Job job : jobRepository.findAll()) {
+            if (job.getParentTaskExecutionId() != null) {
+                jobRepository.delete(job);
+            }
+        }
+
+        taskExecutionRepository.deleteAll();
         jobRepository.deleteAll();
+    }
+
+    @Test
+    public void testFindAllByParentTaskExecutionIdIn() {
+        Job parentJob = jobRepository.save(getJob(Job.Status.STARTED));
+
+        long parentJobId = Validate.notNull(parentJob.getId(), "id");
+
+        long firstTaskExecutionId = saveTaskExecutionId(parentJobId);
+        long secondTaskExecutionId = saveTaskExecutionId(parentJobId);
+        long thirdTaskExecutionId = saveTaskExecutionId(parentJobId);
+
+        long firstChildJobId = saveChildJobId(firstTaskExecutionId);
+
+        saveChildJobId(secondTaskExecutionId);
+
+        List<Long> childJobIds = jobRepository
+            .findAllByParentTaskExecutionIdIn(List.of(firstTaskExecutionId, thirdTaskExecutionId))
+            .stream()
+            .map(Job::getId)
+            .toList();
+
+        Assertions.assertEquals(List.of(firstChildJobId), childJobIds);
+    }
+
+    @Test
+    public void testFindAllByParentTaskExecutionIdInReturnsEmptyListForEmptyInput() {
+        Assertions.assertTrue(jobRepository.findAllByParentTaskExecutionIdIn(List.of())
+            .isEmpty());
     }
 
     @Test
@@ -192,6 +234,27 @@ public class JdbcJobRepositoryIntTest {
 
         // assert
         Assertions.assertEquals(countCompletedJobsYesterday + 5, yesterdayJobs);
+    }
+
+    private long saveChildJobId(long parentTaskExecutionId) {
+        Job childJob = getJob(Job.Status.COMPLETED);
+
+        childJob.setParentTaskExecutionId(parentTaskExecutionId);
+
+        Job savedChildJob = jobRepository.save(childJob);
+
+        return Validate.notNull(savedChildJob.getId(), "id");
+    }
+
+    private long saveTaskExecutionId(long jobId) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(jobId)
+            .workflowTask(new WorkflowTask(Map.of("name", "subflow", "type", "subflow/v1")))
+            .build();
+
+        TaskExecution savedTaskExecution = taskExecutionRepository.save(taskExecution);
+
+        return Validate.notNull(savedTaskExecution.getId(), "id");
     }
 
     private static Job getJob(Job.Status status) {

@@ -32,6 +32,11 @@ public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFun
     }
 
     @Override
+    public List<Job> getChildJobs(List<Long> parentTaskExecutionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job getJob(long id) {
         throw new UnsupportedOperationException();
     }

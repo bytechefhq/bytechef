@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +41,18 @@ class JobServiceTest {
 
     private final JobRepository jobRepository = mock(JobRepository.class);
     private final JobService jobService = new JobServiceImpl(jobRepository);
+
+    @Test
+    void testGetChildJobsLooksUpJobsByParentTaskExecutionIds() {
+        Job childJob = new Job();
+
+        childJob.setParentTaskExecutionId(11L);
+
+        when(jobRepository.findAllByParentTaskExecutionIdIn(List.of(11L, 12L)))
+            .thenReturn(List.of(childJob));
+
+        assertThat(jobService.getChildJobs(List.of(11L, 12L))).containsExactly(childJob);
+    }
 
     @Test
     void testResumeToStatusStartedRestartsFailedJobFromCurrentTask() {
