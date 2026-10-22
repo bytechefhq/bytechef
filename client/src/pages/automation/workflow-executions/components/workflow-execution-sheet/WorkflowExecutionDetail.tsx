@@ -65,6 +65,15 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                 <span>Failed to load the workflow execution.</span>
 
                 <Button label="Retry" onClick={handleWorkflowExecutionRetry} size="xs" variant="outline" />
+
+                {subflowStack.length > 0 && (
+                    <Button
+                        label="Back to parent"
+                        onClick={() => handleBreadcrumbNavigate(subflowStack.length - 1)}
+                        size="xs"
+                        variant="ghost"
+                    />
+                )}
             </div>
         );
     }

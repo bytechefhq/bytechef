@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {executionQueryMock, sheetContentPropsMock, taskExecutionQueryMock} = vi.hoisted(() => ({
@@ -67,6 +67,36 @@ describe('WorkflowExecutionDetail', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
 
         expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('offers a way back to the parent when a subflow fails to load', () => {
+        const refetch = vi.fn();
+
+        executionQueryMock.mockImplementation(({id}: {id: number}) =>
+            id === 501
+                ? {data: {id: 501, job: {id: '501', label: 'Parent', status: 'COMPLETED'}}, isLoading: false}
+                : {data: undefined, isError: true, isLoading: false, refetch}
+        );
+
+        render(<WorkflowExecutionDetail workflowExecutionId={501} />, {wrapper: TooltipProvider});
+
+        const {handleSeeExecutions} = sheetContentPropsMock.mock.calls.at(-1)![0];
+
+        act(() => handleSeeExecutions({id: '900', label: 'Child'}));
+
+        expect(screen.getByTestId('workflow-execution-detail-error')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Back to parent'}));
+
+        expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
+    });
+
+    it('shows no way back when the root execution fails to load', () => {
+        executionQueryMock.mockReturnValue({data: undefined, isError: true, isLoading: false, refetch: vi.fn()});
+
+        render(<WorkflowExecutionDetail workflowExecutionId={501} />, {wrapper: TooltipProvider});
+
+        expect(screen.queryByRole('button', {name: 'Back to parent'})).not.toBeInTheDocument();
     });
 
     it('shows the execution panel for a trigger-only row, which has no job', () => {
