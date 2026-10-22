@@ -1,10 +1,17 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
-import {CheckIcon, FileIcon, HistoryIcon, SendIcon, Trash2Icon} from 'lucide-react';
+import {CheckIcon, DownloadIcon, EllipsisVerticalIcon, FileIcon, HistoryIcon, SendIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -13,6 +20,7 @@ interface ProjectVersionHistorySheetProps {
     onDeleteProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
     onRestoreProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
     onSheetOpenChange: (open: boolean) => void;
+    projectId: number;
     projectVersions: ProjectVersion[];
     restoreProjectVersionPending?: boolean;
     sheetOpen: boolean;
@@ -26,6 +34,7 @@ const ProjectVersionHistorySheet = ({
     onDeleteProjectVersion,
     onRestoreProjectVersion,
     onSheetOpenChange,
+    projectId,
     projectVersions,
     restoreProjectVersionPending,
     sheetOpen,
@@ -93,7 +102,7 @@ const ProjectVersionHistorySheet = ({
                                 aria-disabled={!published}
                                 aria-label={`Version ${version}`}
                                 aria-selected={selected}
-                                className={twMerge('group flex gap-x-3', published && 'cursor-pointer')}
+                                className={twMerge('flex gap-x-3', published && 'cursor-pointer')}
                                 key={version}
                                 onClick={() => published && setSelectedVersion(version)}
                                 onKeyDown={(event) => {
@@ -151,23 +160,45 @@ const ProjectVersionHistorySheet = ({
                                             )}
                                         </div>
 
-                                        {published && (
-                                            <Button
-                                                aria-label={`Delete version ${version}`}
-                                                className={twMerge(
-                                                    'size-6 text-destructive opacity-0 group-hover:opacity-100 focus-visible:opacity-100',
-                                                    selected && 'opacity-100'
-                                                )}
-                                                icon={<Trash2Icon />}
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label={`Version ${version} actions`}
+                                                    className="size-6"
+                                                    icon={<EllipsisVerticalIcon />}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    onKeyDown={(event) => event.stopPropagation()}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </DropdownMenuTrigger>
 
-                                                    setDeleteCandidateVersion(version);
-                                                }}
-                                                size="icon"
-                                                variant="ghost"
-                                            />
-                                        )}
+                                            <DropdownMenuContent
+                                                align="end"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                <DropdownMenuItem
+                                                    icon={<DownloadIcon />}
+                                                    label="Export"
+                                                    onClick={() =>
+                                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                                    }
+                                                />
+
+                                                {published && (
+                                                    <>
+                                                        <DropdownMenuSeparator />
+
+                                                        <DropdownMenuItem
+                                                            icon={<Trash2Icon />}
+                                                            label="Delete"
+                                                            onClick={() => setDeleteCandidateVersion(version)}
+                                                            variant="destructive"
+                                                        />
+                                                    </>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
 
                                     <p className="text-sm whitespace-pre-line">
