@@ -1,4 +1,6 @@
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
+import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -98,6 +100,20 @@ describe('LoadWorkflowVersionDialog', () => {
 
         expect(hoisted.clearWorkflowHistory).toHaveBeenCalled();
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('closes the node details panel after a successful load', () => {
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {name: 'dataStorage_1'} as NodeDataType,
+            workflowNodeDetailsPanelOpen: true,
+        });
+
+        renderDialog();
+
+        hoisted.mutationOptions.onSuccess(undefined, {id: 7, projectVersion: 1, workflowUuid: 'workflow-uuid'});
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
     });
 
     it('explains when the workflow has no published versions', () => {

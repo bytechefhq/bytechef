@@ -11,6 +11,7 @@ import {
 } from '@/components/Dialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import {clearWorkflowHistory} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useRestoreProjectVersionWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     ProjectVersionKeys,
@@ -42,6 +43,8 @@ const LoadWorkflowVersionDialog = ({onClose, projectId, workflowUuid}: LoadWorkf
     const restoreProjectVersionWorkflowMutation = useRestoreProjectVersionWorkflowMutation({
         onSuccess: (_, {projectVersion}) => {
             clearWorkflowHistory();
+
+            useWorkflowNodeDetailsPanelStore.getState().reset();
 
             void queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
             void queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(projectId)});

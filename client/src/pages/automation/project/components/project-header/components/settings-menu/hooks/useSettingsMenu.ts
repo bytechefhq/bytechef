@@ -7,6 +7,7 @@ import {
     useGetProjectGitConfigurationQuery,
 } from '@/ee/shared/mutations/automation/projectGit.queries';
 import {clearWorkflowHistory} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Project, ProjectApi, Workflow} from '@/shared/middleware/automation/configuration';
 import {
     useDeleteProjectMutation,
@@ -134,6 +135,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
             }
 
             clearWorkflowHistory();
+
+            useWorkflowNodeDetailsPanelStore.getState().reset();
 
             void queryClient.invalidateQueries({queryKey: ProjectKeys.project(id)});
             void queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(id)});

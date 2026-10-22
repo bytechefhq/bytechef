@@ -1,4 +1,6 @@
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
+import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -127,6 +129,24 @@ describe('useSettingsMenu', () => {
         expect(hoisted.clearWorkflowHistory).toHaveBeenCalled();
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projectVersions', 'projects', 7]});
         expect(hoisted.toast).toHaveBeenCalledWith('Version V1 applied to the draft.');
+    });
+
+    it('closes the node details panel after a version is restored', async () => {
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
+
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {name: 'dataStorage_1'} as NodeDataType,
+            workflowNodeDetailsPanelOpen: true,
+        });
+
+        renderSettingsMenu();
+
+        await act(async () => {
+            await hoisted.restoreProjectVersionOptions.onSuccess(undefined, {id: 7, projectVersion: 1});
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
+        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
     });
 
     it('opens the first restored workflow when the restored version no longer contains the current one', async () => {
