@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,11 @@ import java.util.Optional;
  * @author Igor Beslic
  */
 public interface TaskExecutionRepository {
+
+    long countByJobId(long jobId);
+
+    long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+        long parentId, int taskNumber, Instant createdDate, long id);
 
     void deleteById(long id);
 
@@ -67,6 +73,20 @@ public interface TaskExecutionRepository {
      * @return
      */
     List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId);
+
+    List<TaskExecution> findAllByIdIn(List<Long> ids);
+
+    List<TaskExecution> findAllByJobIdAndErrorNotNullOrderByCreatedDate(long jobId);
+
+    List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset);
+
+    List<Long> findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(long parentId, int taskNumber);
+
+    List<Long> findAllIdsByParentIdOrderByCreatedDate(long parentId);
+
+    List<Long> findAllParentIdsByParentIdIn(List<Long> parentIds);
+
+    List<Long> findAllParentIdsByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.

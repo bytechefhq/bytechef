@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,6 +60,100 @@ class InMemoryTaskExecutionRepositoryTest {
     @AfterEach
     void tearDown() {
         TenantContext.resetCurrentTenantId();
+    }
+
+    @Test
+    void testFindAllIdsByParentIdOrderByCreatedDate() {
+        List<Long> childIds = saveChildren(401L, 400L);
+
+        assertEquals(childIds, inMemoryTaskExecutionRepository.findAllIdsByParentIdOrderByCreatedDate(400L));
+        assertEquals(
+            List.of(childIds.get(0), childIds.get(2), childIds.get(4)),
+            inMemoryTaskExecutionRepository.findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(400L, 0));
+    }
+
+    @Test
+    void testFindAllByParentIdOrderByCreatedDatePagesChildren() {
+        List<Long> childIds = saveChildren(402L, 410L);
+
+        List<TaskExecution> taskExecutions =
+            inMemoryTaskExecutionRepository.findAllByParentIdOrderByCreatedDate(410L, 2, 2);
+
+        assertEquals(
+            List.of(childIds.get(2), childIds.get(3)),
+            taskExecutions.stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    @Test
+    void testFindAllParentIdsByParentIdIn() {
+        saveChildren(403L, 420L);
+
+        assertEquals(5, inMemoryTaskExecutionRepository.findAllParentIdsByParentIdIn(List.of(420L))
+            .size());
+        assertEquals(
+            3,
+            inMemoryTaskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(420L), 0)
+                .size());
+    }
+
+    @Test
+    void testFindAllByIdInAndCounts() {
+        List<Long> childIds = saveChildren(404L, 430L);
+
+        assertEquals(
+            2, inMemoryTaskExecutionRepository.findAllByIdIn(List.of(childIds.get(1), childIds.get(3)))
+                .size());
+        assertEquals(5, inMemoryTaskExecutionRepository.countByJobId(404L));
+        assertEquals(
+            2,
+            inMemoryTaskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+                430L, 0, null, childIds.get(2)));
+    }
+
+    @Test
+    void testFindAllByJobIdAndErrorNotNullOrderByCreatedDate() {
+        saveChildren(405L, 440L);
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setJobId(406L);
+        failedTaskExecution.setError(new ExecutionError("failed", List.of()));
+
+        TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(failedTaskExecution);
+
+        TaskExecution healthyTaskExecution = new TaskExecution();
+
+        healthyTaskExecution.setJobId(406L);
+
+        inMemoryTaskExecutionRepository.save(healthyTaskExecution);
+
+        assertEquals(
+            List.of(savedTaskExecution.getId()),
+            inMemoryTaskExecutionRepository.findAllByJobIdAndErrorNotNullOrderByCreatedDate(406L)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    private List<Long> saveChildren(long jobId, long parentId) {
+        List<Long> childIds = new ArrayList<>();
+
+        for (int taskNumber : new int[] {
+            0, 1, 0, 1, 0
+        }) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(jobId);
+            taskExecution.setParentId(parentId);
+            taskExecution.setTaskNumber(taskNumber);
+
+            childIds.add(inMemoryTaskExecutionRepository.save(taskExecution)
+                .getId());
+        }
+
+        return childIds;
     }
 
     @Test

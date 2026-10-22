@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -40,8 +41,55 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
+    private static final Comparator<TaskExecution> CREATED_DATE_COMPARATOR = Comparator.comparing(
+        TaskExecution::getCreatedDate, Comparator.nullsFirst(Comparator.naturalOrder()));
+
     private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+
+    @Override
+    public long countByJobId(long jobId) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        ReentrantLock lock = obtainLock(getJobLockKey(jobId));
+
+        try {
+            lock.lock();
+
+            return store.getJobTaskExecutions(jobId)
+                .size();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+        long parentId, int taskNumber, Instant createdDate, long id) {
+
+        List<TaskExecution> children = getOrderedChildren(parentId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
+            .toList();
+
+        if (createdDate == null) {
+            long count = 0;
+
+            for (TaskExecution taskExecution : children) {
+                count++;
+
+                if (Objects.equals(taskExecution.getId(), id)) {
+                    return count;
+                }
+            }
+
+            return 0;
+        }
+
+        return children.stream()
+            .filter(taskExecution -> isBeforeOrEqual(taskExecution, createdDate, id))
+            .count();
+    }
 
     @Override
     public void deleteById(long id) {
@@ -223,6 +271,70 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public List<TaskExecution> findAllByIdIn(List<Long> ids) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        return ids.stream()
+            .map(store.byId::get)
+            .filter(Objects::nonNull)
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByJobIdAndErrorNotNullOrderByCreatedDate(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getError() != null)
+            .sorted(CREATED_DATE_COMPARATOR)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .skip(offset)
+            .limit(limit)
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(long parentId, int taskNumber) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
+            .map(TaskExecution::getId)
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllIdsByParentIdOrderByCreatedDate(long parentId) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .map(TaskExecution::getId)
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllParentIdsByParentIdIn(List<Long> parentIds) {
+        return parentIds.stream()
+            .flatMap(parentId -> getOrderedChildren(parentId).stream())
+            .map(TaskExecution::getParentId)
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllParentIdsByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber) {
+        return parentIds.stream()
+            .flatMap(parentId -> getOrderedChildren(parentId).stream())
+            .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
+            .map(TaskExecution::getParentId)
+            .toList();
+    }
+
+    @Override
     public Optional<TaskExecution> findById(long id) {
         Store store = cache.computeIfAbsent(getStoreKey(), (key1) -> new Store());
 
@@ -382,6 +494,35 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         }
 
         return taskExecution;
+    }
+
+    private List<TaskExecution> getOrderedChildren(long parentId) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        ReentrantLock lock = obtainLock(getParentLockKey(parentId));
+
+        try {
+            lock.lock();
+
+            return new ArrayList<>(store.getParentTaskExecutions(parentId))
+                .stream()
+                .sorted(CREATED_DATE_COMPARATOR)
+                .toList();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static boolean isBeforeOrEqual(TaskExecution taskExecution, Instant createdDate, long id) {
+        Instant taskExecutionCreatedDate = taskExecution.getCreatedDate();
+
+        if (taskExecutionCreatedDate == null) {
+            return false;
+        }
+
+        int comparison = taskExecutionCreatedDate.compareTo(createdDate);
+
+        return comparison < 0 || (comparison == 0 && Objects.requireNonNull(taskExecution.getId()) <= id);
     }
 
     private TaskExecution clone(TaskExecution taskExecution) {
