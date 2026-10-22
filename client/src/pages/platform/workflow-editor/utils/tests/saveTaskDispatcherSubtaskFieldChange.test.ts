@@ -94,4 +94,12 @@ describe('saveTaskDispatcherSubtaskFieldChange', () => {
         expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
         expect(hasPendingSaves('workflow-1')).toBe(false);
     });
+
+    it('clears the in-progress flag of an operation switch when the save fails', () => {
+        callSave();
+
+        saveWorkflowDefinitionMock.mock.calls[0][0].onError();
+
+        expect(panelState.setOperationChangeInProgress).toHaveBeenCalledWith(false);
+    });
 });

@@ -116,6 +116,7 @@ export default function saveClusterElementFieldChange({
     saveWorkflowDefinition({
         decorative: true,
         nodeData: updatedMainRootData,
+        onError: () => useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false),
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,

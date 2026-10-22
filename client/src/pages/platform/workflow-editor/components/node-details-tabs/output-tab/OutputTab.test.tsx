@@ -39,6 +39,10 @@ vi.mock('@/pages/platform/workflow-editor/components/node-details-tabs/output-ta
     default: () => null,
 }));
 
+vi.mock('@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons', () => ({
+    OutputTabSkeleton: () => <div data-testid="output-tab-skeleton" />,
+}));
+
 const currentNode = {
     componentName: 'dataStorage',
     name: 'dataStorage_1',
@@ -62,7 +66,7 @@ beforeEach(() => {
         testOutputError: undefined,
         testReturnedNoOutput: false,
         testing: false,
-        workflowNodeOutputIsFetching: false,
+        workflowNodeOutputLoading: false,
     };
 });
 
@@ -71,6 +75,24 @@ afterEach(() => {
 });
 
 describe('OutputTab', () => {
+    it('shows a skeleton instead of the output while the output is loading', () => {
+        hoisted.outputTabState.workflowNodeOutputLoading = true;
+
+        renderOutputTab({outputDefined: true});
+
+        expect(screen.getByTestId('output-tab-skeleton')).toBeInTheDocument();
+        expect(screen.queryByTestId('output-schema-creation-controls')).not.toBeInTheDocument();
+    });
+
+    it('keeps showing a running test while the output is loading', () => {
+        hoisted.outputTabState.testing = true;
+        hoisted.outputTabState.workflowNodeOutputLoading = true;
+
+        renderOutputTab({outputDefined: true});
+
+        expect(screen.queryByTestId('output-tab-skeleton')).not.toBeInTheDocument();
+    });
+
     it('shows neither an error alert nor a notice when the last test neither failed nor came back empty', () => {
         renderOutputTab({outputDefined: true});
 

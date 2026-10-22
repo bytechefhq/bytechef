@@ -294,6 +294,7 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
     }
 
     saveWorkflowDefinition({
+        onError: () => useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false),
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,

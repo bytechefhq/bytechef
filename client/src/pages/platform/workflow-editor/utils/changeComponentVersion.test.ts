@@ -156,6 +156,15 @@ describe('changeComponentVersion', () => {
         });
     });
 
+    it('should clear the in-progress flag when saving the workflow fails', async () => {
+        vi.mocked(saveWorkflowDefinition).mockImplementation(async ({onError}) => onError?.());
+
+        await changeComponentVersion(buildDependencies());
+
+        expect(mockSetOperationChangeInProgress).toHaveBeenNthCalledWith(1, true);
+        expect(mockSetOperationChangeInProgress).toHaveBeenLastCalledWith(false);
+    });
+
     it('should clear the in-progress flag once the workflow is saved', async () => {
         await changeComponentVersion(buildDependencies());
 

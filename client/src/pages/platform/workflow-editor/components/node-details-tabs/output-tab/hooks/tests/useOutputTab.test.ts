@@ -1,3 +1,4 @@
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ResponseError, TriggerType} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {act, renderHook, waitFor} from '@testing-library/react';
@@ -7,6 +8,7 @@ type MutateOptionsType = {onError?: (error: unknown) => void; onSuccess?: () => 
 
 const hoisted = vi.hoisted(() => ({
     clusterMutate: vi.fn(),
+    clusterOutputQuery: vi.fn(),
     deleteMutate: vi.fn(),
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
@@ -14,6 +16,7 @@ const hoisted = vi.hoisted(() => ({
     webhookTriggerTestApi: undefined as
         | {startWebhookTriggerTest: ReturnType<typeof vi.fn>; stopWebhookTriggerTest: ReturnType<typeof vi.fn>}
         | undefined,
+    workflowNodeOutputQuery: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', async () => ({
@@ -46,8 +49,16 @@ vi.mock('@/shared/queries/platform/workflowNodeOutputs.queries', () => ({
         workflowNodeOutput: () => ['workflowNodeOutput'],
         workflowNodeOutputs: ['workflowNodeOutputs'],
     },
-    useGetClusterElementOutputQuery: () => ({data: undefined, isFetching: false, refetch: vi.fn()}),
-    useGetWorkflowNodeOutputQuery: () => ({data: undefined, isFetching: false, refetch: vi.fn()}),
+    useGetClusterElementOutputQuery: (request: unknown, enabled: boolean) => {
+        hoisted.clusterOutputQuery(enabled);
+
+        return {data: undefined, isFetching: false, refetch: vi.fn()};
+    },
+    useGetWorkflowNodeOutputQuery: (request: unknown, enabled: boolean) => {
+        hoisted.workflowNodeOutputQuery(enabled);
+
+        return {data: undefined, isFetching: false, refetch: vi.fn()};
+    },
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeTestOutputs.queries', () => ({
@@ -105,10 +116,62 @@ describe('useOutputTab', () => {
         vi.clearAllMocks();
 
         hoisted.webhookTriggerTestApi = undefined;
+
+        useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: false});
     });
 
     afterEach(() => {
         vi.useRealTimers();
+    });
+
+    it('loads the output of the node once no operation switch is in progress', () => {
+        const {result} = renderHook(() =>
+            useOutputTab({currentNode: {name: 'dataStorage_1'} as NodeDataType, workflowId: 'wf-1'})
+        );
+
+        expect(hoisted.workflowNodeOutputQuery).toHaveBeenLastCalledWith(true);
+        expect(result.current.workflowNodeOutputLoading).toBe(false);
+    });
+
+    it('holds the output queries and reports loading while an operation switch is saving', () => {
+        useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: true});
+
+        const {result} = renderHook(() =>
+            useOutputTab({currentNode: {name: 'dataStorage_1'} as NodeDataType, workflowId: 'wf-1'})
+        );
+
+        expect(hoisted.workflowNodeOutputQuery).toHaveBeenLastCalledWith(false);
+        expect(hoisted.clusterOutputQuery).toHaveBeenLastCalledWith(false);
+        expect(result.current.workflowNodeOutputLoading).toBe(true);
+
+        act(() => {
+            useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: false});
+        });
+
+        expect(hoisted.workflowNodeOutputQuery).toHaveBeenLastCalledWith(true);
+        expect(result.current.workflowNodeOutputLoading).toBe(false);
+    });
+
+    it('holds the cluster element output query while an operation switch is saving', () => {
+        useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: true});
+
+        renderHook(() =>
+            useOutputTab({
+                clusterElementType: 'tools',
+                currentNode: {name: 'dataStorage_1', workflowNodeName: 'dataStorage_1'} as NodeDataType,
+                parentWorkflowNodeName: 'aiAgent_1',
+                workflowId: 'wf-1',
+            })
+        );
+
+        expect(hoisted.clusterOutputQuery).toHaveBeenLastCalledWith(false);
+
+        act(() => {
+            useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: false});
+        });
+
+        expect(hoisted.clusterOutputQuery).toHaveBeenLastCalledWith(true);
+        expect(hoisted.workflowNodeOutputQuery).toHaveBeenLastCalledWith(false);
     });
 
     it('re-runs the workflow validation after the node test output is reset', () => {
