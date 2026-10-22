@@ -47,36 +47,30 @@ const OutputSchemaCreationControls = ({
 }: OutputSchemaCreationControlsProps) => {
     const operationLabel = clusterElementType === 'tools' ? 'Tool' : trigger ? 'Trigger' : 'Action';
 
+    const title =
+        clusterElementType === 'tools'
+            ? 'Explore Output Schema'
+            : outputDefined
+              ? 'Define Output Schema'
+              : `${operationLabel} Test`;
+
+    const description =
+        clusterElementType === 'tools'
+            ? 'Explore the expected output schema by testing the tool'
+            : outputDefined
+              ? testable
+                  ? 'Define the expected output schema with one of the methods'
+                  : 'Define the expected output schema by uploading sample output data'
+              : `Test the ${operationLabel.toLowerCase()} to see the expected behavior as this ${operationLabel.toLowerCase()} does not define the output.`;
+
     return (
-        <div className="flex size-full items-center justify-center">
-            <div className="flex flex-col items-center gap-8">
-                {clusterElementType === 'tools' ? (
-                    <div className="flex w-full flex-col gap-1">
-                        <div className="self-center">Explore Output Schema</div>
+        <div className="flex w-full pt-4">
+            <div className="flex w-full flex-col gap-6">
+                <div className="flex flex-col gap-1">
+                    <h3 className="text-sm font-medium">{title}</h3>
 
-                        <p className="text-sm text-muted-foreground">
-                            Explore the expected output schema by testing the tool
-                        </p>
-                    </div>
-                ) : outputDefined ? (
-                    <div className="flex w-full flex-col gap-1">
-                        <div className="self-center">Define Output Schema</div>
-
-                        <p className="text-sm text-muted-foreground">
-                            {testable
-                                ? 'Define the expected output schema with one of the methods'
-                                : 'Define the expected output schema by uploading sample output data'}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="flex w-full flex-col gap-1 text-center">
-                        <div className="self-center">{operationLabel} Test</div>
-
-                        <p className="text-sm text-muted-foreground">
-                            {`Test the ${operationLabel.toLowerCase()} to see the expected behavior as this ${operationLabel.toLowerCase()} does not define the output.`}
-                        </p>
-                    </div>
-                )}
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                </div>
 
                 <div className="flex w-full flex-col gap-4">
                     {testable && (

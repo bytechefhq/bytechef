@@ -198,23 +198,23 @@ const OutputTab = ({
                         </div>
                     }
                 >
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-4">
+                    <div className="absolute inset-0 flex flex-col gap-6 px-4 pt-4">
                         <div
                             className={twMerge(
                                 'flex',
                                 currentNode.trigger &&
                                     currentNode.triggerType !== TriggerType.Polling &&
                                     currentNode.triggerType !== TriggerType.Hybrid &&
-                                    'w-full justify-between pl-2',
+                                    'w-full items-center justify-between',
                                 (currentNode.triggerType === TriggerType.Polling ||
                                     currentNode.triggerType === TriggerType.Hybrid) &&
                                     'flex-col gap-2'
                             )}
                         >
-                            <div className="mt-1 flex items-center justify-center">
+                            <div className="flex items-center">
                                 <LoadingIcon />
 
-                                <span className="text-lg">{`Testing ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
+                                <span className="text-sm font-medium">{`Testing ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
                             </div>
 
                             {currentNode.trigger &&
