@@ -47,4 +47,12 @@ public record JobDTO(
             job.getMetadata(), outputs, job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(),
             job.getStatus(), taskExecutions, job.getVersion(), job.getWebhooks(), job.getWorkflowId());
     }
+
+    public static JobDTO shallow(Job job) {
+        return new JobDTO(
+            job.getCreatedBy(), job.getCreatedDate(), job.getCurrentTask(), job.getEndDate(), job.getError(),
+            job.getId(), Map.of(), job.getLabel(), job.getLastModifiedBy(), job.getLastModifiedDate(), Map.of(),
+            Map.of(), job.getParentTaskExecutionId(), job.getPriority(), job.getStartDate(), job.getStatus(), List.of(),
+            job.getVersion(), List.of(), job.getWorkflowId());
+    }
 }

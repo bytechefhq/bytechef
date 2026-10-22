@@ -44,6 +44,8 @@ public interface JobService {
 
     List<Long> getChildJobIds(long parentJobId);
 
+    List<Job> getChildJobs(List<Long> parentTaskExecutionIds);
+
     Job getJob(long id);
 
     List<Job> getJobs(List<Long> ids);

@@ -86,6 +86,22 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
+    public List<Job> findAllByParentTaskExecutionIdIn(List<Long> parentTaskExecutionIds) {
+        if (parentTaskExecutionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return cache.values()
+            .stream()
+            .filter(job -> {
+                Long parentTaskExecutionId = job.getParentTaskExecutionId();
+
+                return parentTaskExecutionId != null && parentTaskExecutionIds.contains(parentTaskExecutionId);
+            })
+            .toList();
+    }
+
+    @Override
     public List<Job> findAllByWorkflowId(String workflowId) {
         throw new UnsupportedOperationException();
     }

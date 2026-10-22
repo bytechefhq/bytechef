@@ -29,6 +29,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
@@ -72,8 +73,15 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution subflowTaskExecution = createTaskExecution(3L, null, "subflow", "subflow/v1/run", 2);
 
         Job childJob = new Job(50L);
+        ExecutionError childJobError = new ExecutionError("Subflow failed", List.of());
 
+        childJob.setError(childJobError);
+        childJob.setInputs(Map.of("input", "value"));
+        childJob.setLabel("Child");
+        childJob.setMetadata(Map.of("key", "value"));
         childJob.setParentTaskExecutionId(3L);
+        childJob.setStatus(Job.Status.FAILED);
+        childJob.setWorkflowId("subflow-workflow");
 
         when(taskExecutionService.getJobTopLevelTaskExecutions(JOB_ID))
             .thenReturn(List.of(loopTaskExecution, plainTaskExecution, subflowTaskExecution));
@@ -81,9 +89,7 @@ class LazyTaskExecutionTreeBuilderTest {
             .thenReturn(Map.of(1L, 291L, 2L, 387L));
         when(taskExecutionService.getIterationCounts(List.of(1L, 2L, 3L)))
             .thenReturn(Map.of(1L, 97L));
-        when(jobService.getChildJobIds(JOB_ID))
-            .thenReturn(List.of(50L));
-        when(jobService.getJobs(List.of(50L)))
+        when(jobService.getChildJobs(List.of(1L, 2L, 3L)))
             .thenReturn(List.of(childJob));
 
         List<TaskExecutionDTO> taskExecutionDTOs = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutions(JOB_ID);
@@ -94,6 +100,7 @@ class LazyTaskExecutionTreeBuilderTest {
         assertThat(taskExecutionDTOs)
             .extracting(TaskExecutionDTO::childCount)
             .containsExactly(97, 387, 0);
+
         TaskExecutionDTO firstTaskExecutionDTO = taskExecutionDTOs.get(0);
 
         assertThat(firstTaskExecutionDTO.childJob()).isNull();
@@ -104,7 +111,40 @@ class LazyTaskExecutionTreeBuilderTest {
 
         assertThat(childJobDTO).isNotNull();
         assertThat(childJobDTO.id()).isEqualTo(50L);
+        assertThat(childJobDTO.label()).isEqualTo("Child");
+        assertThat(childJobDTO.status()).isEqualTo(Job.Status.FAILED);
+        assertThat(childJobDTO.error()).isSameAs(childJobError);
+        assertThat(childJobDTO.workflowId()).isEqualTo("subflow-workflow");
         assertThat(childJobDTO.taskExecutions()).isEmpty();
+        assertThat(childJobDTO.inputs()).isEmpty();
+        assertThat(childJobDTO.metadata()).isEmpty();
+        assertThat(childJobDTO.webhooks()).isEmpty();
+
+        verify(jobService, never()).getChildJobIds(anyLong());
+        verify(jobService, never()).getJobs(argThat(ids -> true));
+    }
+
+    @Test
+    void getChildJobPicksTheLatestChildJobWhenATaskHasSeveral() {
+        Job firstChildJob = new Job(50L);
+
+        firstChildJob.setParentTaskExecutionId(3L);
+
+        Job latestChildJob = new Job(52L);
+
+        latestChildJob.setParentTaskExecutionId(3L);
+
+        Job secondChildJob = new Job(51L);
+
+        secondChildJob.setParentTaskExecutionId(3L);
+
+        when(jobService.getChildJobs(List.of(3L)))
+            .thenReturn(List.of(firstChildJob, latestChildJob, secondChildJob));
+
+        JobDTO childJobDTO = lazyTaskExecutionTreeBuilder.getChildJob(3L);
+
+        assertThat(childJobDTO).isNotNull();
+        assertThat(childJobDTO.id()).isEqualTo(52L);
     }
 
     @Test

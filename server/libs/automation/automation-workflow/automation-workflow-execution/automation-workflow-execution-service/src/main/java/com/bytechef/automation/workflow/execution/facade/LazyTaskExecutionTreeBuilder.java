@@ -27,6 +27,7 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,11 +41,15 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 class LazyTaskExecutionTreeBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(LazyTaskExecutionTreeBuilder.class);
 
     private static final String ON_ERROR_BRANCH = "on-error-branch";
     private static final int ON_ERROR_BRANCH_COUNT = 2;
@@ -63,14 +68,14 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     List<TaskExecutionDTO> getTopLevelTaskExecutions(long jobId) {
-        return decorate(getTopLevelTaskExecutionRows(jobId), jobId);
+        return decorate(getTopLevelTaskExecutionRows(jobId));
     }
 
     List<TaskExecution> getTopLevelTaskExecutionRows(long jobId) {
         return taskExecutionService.getJobTopLevelTaskExecutions(jobId);
     }
 
-    List<TaskExecutionDTO> decorate(List<TaskExecution> taskExecutions, long jobId) {
+    List<TaskExecutionDTO> decorate(List<TaskExecution> taskExecutions) {
         if (taskExecutions.isEmpty()) {
             return List.of();
         }
@@ -81,7 +86,7 @@ class LazyTaskExecutionTreeBuilder {
 
         Map<Long, Long> childCounts = taskExecutionService.getChildCounts(ids);
         Map<Long, Long> iterationCounts = taskExecutionService.getIterationCounts(ids);
-        Map<Long, Job> childJobMap = getChildJobMap(jobId);
+        Map<Long, Job> childJobMap = getChildJobMap(ids);
 
         BiFunction<TaskExecution, JobDTO, TaskExecutionDTO> toTaskExecutionDTO = taskExecutionDTOConverterFactory.get();
 
@@ -91,13 +96,22 @@ class LazyTaskExecutionTreeBuilder {
             Job childJob = childJobMap.get(taskExecution.getId());
 
             TaskExecutionDTO taskExecutionDTO = toTaskExecutionDTO.apply(
-                taskExecution, childJob == null ? null : new JobDTO(childJob));
+                taskExecution, childJob == null ? null : JobDTO.shallow(childJob));
 
             taskExecutionDTOs.add(
                 taskExecutionDTO.withChildCount(getChildCount(taskExecution, childCounts, iterationCounts)));
         }
 
         return taskExecutionDTOs;
+    }
+
+    @Nullable
+    JobDTO getChildJob(long taskExecutionId) {
+        Map<Long, Job> childJobMap = getChildJobMap(List.of(taskExecutionId));
+
+        Job childJob = childJobMap.get(taskExecutionId);
+
+        return childJob == null ? null : JobDTO.shallow(childJob);
     }
 
     TaskExecutionChildrenPageDTO getChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
@@ -182,19 +196,22 @@ class LazyTaskExecutionTreeBuilder {
         return Math.toIntExact(childCounts.getOrDefault(id, 0L));
     }
 
-    private Map<Long, Job> getChildJobMap(long jobId) {
-        List<Long> childJobIds = jobService.getChildJobIds(jobId);
-
-        if (childJobIds.isEmpty()) {
-            return Map.of();
-        }
-
-        return jobService.getJobs(childJobIds)
+    private Map<Long, Job> getChildJobMap(List<Long> taskExecutionIds) {
+        return jobService.getChildJobs(taskExecutionIds)
             .stream()
             .filter(childJob -> childJob.getParentTaskExecutionId() != null)
             .collect(
                 Collectors.toMap(
-                    Job::getParentTaskExecutionId, Function.identity(), (firstJob, otherJob) -> firstJob));
+                    Job::getParentTaskExecutionId, Function.identity(), LazyTaskExecutionTreeBuilder::getLatestJob));
+    }
+
+    private static Job getLatestJob(Job job, Job otherJob) {
+        log.warn(
+            "Task execution id={} has more than one child job, ids={} and {}", job.getParentTaskExecutionId(),
+            job.getId(), otherJob.getId());
+
+        return Comparator.nullsFirst(Comparator.<Long>naturalOrder())
+            .compare(job.getId(), otherJob.getId()) >= 0 ? job : otherJob;
     }
 
     private @Nullable Integer getIterationIndex(TaskExecution taskExecution, @Nullable TaskExecution parent) {
@@ -256,8 +273,7 @@ class LazyTaskExecutionTreeBuilder {
                 taskExecutionService.getTaskExecutions(
                     pageIterationIds.stream()
                         .flatMap(List::stream)
-                        .toList()),
-                Objects.requireNonNull(parent.getJobId()));
+                        .toList()));
 
         Map<Long, TaskExecutionDTO> taskExecutionDTOMap = taskExecutionDTOs.stream()
             .collect(Collectors.toMap(TaskExecutionDTO::id, Function.identity()));
@@ -287,8 +303,7 @@ class LazyTaskExecutionTreeBuilder {
 
         List<TaskExecution> childTaskExecutions = taskExecutionService.getTaskExecutions(childIds);
 
-        List<TaskExecutionDTO> childTaskExecutionDTOs = decorate(
-            childTaskExecutions, Objects.requireNonNull(parent.getJobId()));
+        List<TaskExecutionDTO> childTaskExecutionDTOs = decorate(childTaskExecutions);
 
         List<TaskExecutionDTO> mainBranchTaskExecutionDTOs = new ArrayList<>();
         List<TaskExecutionDTO> errorBranchTaskExecutionDTOs = new ArrayList<>();
@@ -310,8 +325,7 @@ class LazyTaskExecutionTreeBuilder {
         long parentId = Objects.requireNonNull(parent.getId());
 
         List<TaskExecutionDTO> children = decorate(
-            taskExecutionService.getParentTaskExecutions(parentId, pageNumber, pageSize),
-            Objects.requireNonNull(parent.getJobId()));
+            taskExecutionService.getParentTaskExecutions(parentId, pageNumber, pageSize));
 
         Map<Long, Long> childCounts = taskExecutionService.getChildCounts(List.of(parentId));
 
