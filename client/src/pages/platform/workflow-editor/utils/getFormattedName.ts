@@ -73,16 +73,17 @@ export default function getFormattedName(componentName: string, reservedNames?: 
 
     const allExistingNodes = [...existingNodes, ...existingClusterElementNodes, ...reservedMatchingNames];
 
-    if (!allExistingNodes.length) {
+    const numberedNamePrefix = `${itemName}_`;
+
+    const allNumbers = allExistingNodes
+        .filter((name: string) => name.startsWith(numberedNamePrefix))
+        .map((name: string) => name.slice(numberedNamePrefix.length))
+        .filter((numberSuffix: string) => /^\d+$/.test(numberSuffix))
+        .map((numberSuffix: string) => parseInt(numberSuffix, 10));
+
+    if (!allNumbers.length) {
         return `${itemName}_1`;
     }
-
-    const allNumbers = allExistingNodes.map((name: string) => {
-        const nodeNameSplit = name.split('_');
-        const lastSegmentIndex = nodeNameSplit.length - 1;
-
-        return parseInt(nodeNameSplit[lastSegmentIndex]);
-    });
 
     const maxExistingNumber = Math.max(...allNumbers);
 
