@@ -49,7 +49,13 @@ export interface DeleteProjectRequest {
 }
 
 export interface DeleteProjectVersionRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The version of a project.
+     */
     projectVersion: number;
 }
 
@@ -65,6 +71,10 @@ export interface ExportProjectRequest {
      * The id of a project.
      */
     id: number;
+    /**
+     * The version of a project to export. Defaults to the latest version.
+     */
+    projectVersion?: number;
 }
 
 export interface GetProjectRequest {
@@ -135,7 +145,13 @@ export interface PublishProjectOperationRequest {
 }
 
 export interface RestoreProjectVersionRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The version of a project.
+     */
     projectVersion: number;
 }
 
@@ -367,6 +383,10 @@ export class ProjectApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['projectVersion'] != null) {
+            queryParameters['projectVersion'] = requestParameters['projectVersion'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
