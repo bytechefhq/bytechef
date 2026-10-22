@@ -1,6 +1,7 @@
 import {
     DeleteWorkflowNodeTestOutputRequest,
     SaveWorkflowNodeTestOutputRequest,
+    UploadWorkflowNodeSampleFileRequest,
     UploadWorkflowNodeSampleOutputRequest,
     WorkflowNodeTestOutput,
     WorkflowNodeTestOutputApi,
@@ -33,6 +34,20 @@ export const useSaveWorkflowNodeTestOutputMutation = (mutationProps?: SaveWorkfl
     useMutation({
         mutationFn: (request: SaveWorkflowNodeTestOutputRequest) => {
             return new WorkflowNodeTestOutputApi().saveWorkflowNodeTestOutput(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UploadSampleFileRequestProps {
+    onSuccess?: (result: WorkflowNodeTestOutput, variables: UploadWorkflowNodeSampleFileRequest) => void;
+    onError?: (error: Error, variables: UploadWorkflowNodeSampleFileRequest) => void;
+}
+
+export const useUploadSampleFileRequestMutation = (mutationProps?: UploadSampleFileRequestProps) =>
+    useMutation({
+        mutationFn: (request: UploadWorkflowNodeSampleFileRequest) => {
+            return new WorkflowNodeTestOutputApi().uploadWorkflowNodeSampleFile(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

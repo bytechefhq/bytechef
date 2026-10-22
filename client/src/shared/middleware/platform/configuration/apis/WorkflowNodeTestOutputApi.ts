@@ -73,6 +73,25 @@ export interface SaveWorkflowNodeTestOutputRequest {
     environmentId: number;
 }
 
+export interface UploadWorkflowNodeSampleFileRequest {
+    /**
+     * The id of a workflow.
+     */
+    id: string;
+    /**
+     * The name of a workflow node for which to create test output objects.
+     */
+    workflowNodeName: string;
+    /**
+     * The id of an environment.
+     */
+    environmentId: number;
+    /**
+     * 
+     */
+    file: Blob;
+}
+
 export interface UploadWorkflowNodeSampleOutputRequest {
     /**
      * The id of a workflow.
@@ -303,6 +322,100 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
             default:
                 return await response.value();
         }
+    }
+
+    /**
+     * Creates request options for uploadWorkflowNodeSampleFile without sending the request
+     */
+    async uploadWorkflowNodeSampleFileRequestOpts(requestParameters: UploadWorkflowNodeSampleFileRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadWorkflowNodeSampleFile().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling uploadWorkflowNodeSampleFile().'
+            );
+        }
+
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling uploadWorkflowNodeSampleFile().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadWorkflowNodeSampleFile().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+
+        let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-file`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        };
+    }
+
+    /**
+     * Upload a sample file to create a new or update existing workflow node test output with a file entry.
+     * Upload a sample file to create a new or update existing workflow node test output with a file entry
+     */
+    async uploadWorkflowNodeSampleFileRaw(requestParameters: UploadWorkflowNodeSampleFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowNodeTestOutput>> {
+        const requestOptions = await this.uploadWorkflowNodeSampleFileRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowNodeTestOutputFromJSON(jsonValue));
+    }
+
+    /**
+     * Upload a sample file to create a new or update existing workflow node test output with a file entry.
+     * Upload a sample file to create a new or update existing workflow node test output with a file entry
+     */
+    async uploadWorkflowNodeSampleFile(requestParameters: UploadWorkflowNodeSampleFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput> {
+        const response = await this.uploadWorkflowNodeSampleFileRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

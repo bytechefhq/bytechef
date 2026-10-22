@@ -7,6 +7,7 @@ All URIs are relative to */api/platform/internal*
 | [**checkWorkflowNodeTestOutputExists**](WorkflowNodeTestOutputApi.md#checkworkflownodetestoutputexists) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/exists | Check if a workflow node test output exists |
 | [**deleteWorkflowNodeTestOutput**](WorkflowNodeTestOutputApi.md#deleteworkflownodetestoutput) | **DELETE** /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs | Delete existing workflow node test output |
 | [**saveWorkflowNodeTestOutput**](WorkflowNodeTestOutputApi.md#saveworkflownodetestoutput) | **PUT** /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs | Create a new or update existing workflow node test output |
+| [**uploadWorkflowNodeSampleFile**](WorkflowNodeTestOutputApi.md#uploadworkflownodesamplefile) | **POST** /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-file | Upload a sample file to create a new or update existing workflow node test output with a file entry |
 | [**uploadWorkflowNodeSampleOutput**](WorkflowNodeTestOutputApi.md#uploadworkflownodesampleoutput) | **PUT** /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-output | Upload a sample output to create a new or update existing workflow node test output |
 
 
@@ -230,6 +231,82 @@ No authorization required
 |-------------|-------------|------------------|
 | **200** | The workflow node test output object. |  -  |
 | **204** | The test ran but produced no output, so nothing was saved. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## uploadWorkflowNodeSampleFile
+
+> WorkflowNodeTestOutput uploadWorkflowNodeSampleFile(id, workflowNodeName, environmentId, file)
+
+Upload a sample file to create a new or update existing workflow node test output with a file entry
+
+Upload a sample file to create a new or update existing workflow node test output with a file entry.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowNodeTestOutputApi,
+} from '';
+import type { UploadWorkflowNodeSampleFileRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowNodeTestOutputApi();
+
+  const body = {
+    // string | The id of a workflow.
+    id: id_example,
+    // string | The name of a workflow node for which to create test output objects.
+    workflowNodeName: workflowNodeName_example,
+    // number | The id of an environment.
+    environmentId: 789,
+    // Blob
+    file: BINARY_DATA_HERE,
+  } satisfies UploadWorkflowNodeSampleFileRequest;
+
+  try {
+    const data = await api.uploadWorkflowNodeSampleFile(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` | The id of a workflow. | [Defaults to `undefined`] |
+| **workflowNodeName** | `string` | The name of a workflow node for which to create test output objects. | [Defaults to `undefined`] |
+| **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
+| **file** | `Blob` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**WorkflowNodeTestOutput**](WorkflowNodeTestOutput.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `multipart/form-data`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The workflow node test output object. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

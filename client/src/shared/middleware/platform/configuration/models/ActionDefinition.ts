@@ -59,6 +59,10 @@ export interface ActionDefinition {
      */
     outputDefined: boolean;
     /**
+     * Does action define a file entry as its output schema.
+     */
+    outputFileEntry?: boolean;
+    /**
      * Does action defines output function.
      */
     outputFunctionDefined: boolean;
@@ -116,6 +120,7 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFileEntry': json['outputFileEntry'] == null ? undefined : json['outputFileEntry'],
         'outputFunctionDefined': json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
@@ -143,6 +148,7 @@ export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ign
         'help': HelpToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFileEntry': value['outputFileEntry'],
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
