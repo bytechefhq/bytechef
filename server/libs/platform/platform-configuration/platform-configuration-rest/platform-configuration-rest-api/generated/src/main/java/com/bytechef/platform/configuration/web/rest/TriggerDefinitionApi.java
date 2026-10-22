@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T18:23:01.108240+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "trigger-definition", description = "The Platform Trigger Definition Internal API")
 public interface TriggerDefinitionApi {
@@ -77,7 +77,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"description\" : \"description\", \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"outputDefined\" : true, \"outputFunctionDefined\" : true, \"outputSchemaDefined\" : true, \"properties\" : [ { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" }, { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" } ], \"title\" : \"title\", \"type\" : \"CALLABLE\", \"workflowNodeDescriptionDefined\" : true }";
+                    String exampleString = "{ \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"description\" : \"description\", \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"outputDefined\" : true, \"outputFileEntry\" : true, \"outputFunctionDefined\" : true, \"outputSchemaDefined\" : true, \"properties\" : [ { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" }, { \"advancedOption\" : false, \"description\" : \"description\", \"displayCondition\" : \"displayCondition\", \"expressionEnabled\" : true, \"hidden\" : false, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"required\" : false, \"type\" : \"ARRAY\" } ], \"title\" : \"title\", \"type\" : \"CALLABLE\", \"workflowNodeDescriptionDefined\" : true }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
