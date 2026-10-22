@@ -16,6 +16,9 @@
 
 package com.bytechef.automation.workflow.execution.web.rest;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,8 +33,10 @@ import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.web.rest.error.GlobalResponseEntityExceptionHandler;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -47,6 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * @author Ivica Cardic
  */
+@Import(GlobalResponseEntityExceptionHandler.class)
 @WebMvcTest(value = WorkflowExecutionApiController.class)
 class WorkflowExecutionApiControllerIntTest {
 
@@ -90,6 +97,50 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(jsonPath("$.totalPages").value(3));
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutionTaskExecutionChildren(5L, 9L, 0, 50);
+    }
+
+    @Test
+    void getWorkflowExecutionTaskExecutionChildrenRejectsOutOfRangePaging() throws Exception {
+        List<Map<String, String>> invalidQueryParams = List.of(
+            Map.of("pageNumber", "-1"), Map.of("pageSize", "0"), Map.of("pageSize", "201"));
+
+        for (Map<String, String> invalidQueryParam : invalidQueryParams) {
+            Map.Entry<String, String> entry = invalidQueryParam.entrySet()
+                .iterator()
+                .next();
+
+            mockMvc.perform(
+                get("/internal/workflow-executions/5/task-executions/9/children")
+                    .queryParam(entry.getKey(), entry.getValue())
+                    .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        }
+
+        verify(projectWorkflowExecutionFacade, never())
+            .getWorkflowExecutionTaskExecutionChildren(anyLong(), anyLong(), anyInt(), anyInt());
+    }
+
+    @Test
+    void getWorkflowExecutionTaskExecutionChildrenReportsMissingTaskExecutionAsNotFound() throws Exception {
+        when(projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(5L, 9L, 0, 50))
+            .thenThrow(new NoSuchElementException("Task execution 9 not found"));
+
+        mockMvc.perform(
+            get("/internal/workflow-executions/5/task-executions/9/children")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getWorkflowExecutionTaskExecutionChildrenRejectsTaskExecutionOfAnotherWorkflowExecution() throws Exception {
+        when(projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(5L, 9L, 0, 50))
+            .thenThrow(
+                new IllegalArgumentException("Task execution 9 does not belong to workflow execution 5"));
+
+        mockMvc.perform(
+            get("/internal/workflow-executions/5/task-executions/9/children")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
