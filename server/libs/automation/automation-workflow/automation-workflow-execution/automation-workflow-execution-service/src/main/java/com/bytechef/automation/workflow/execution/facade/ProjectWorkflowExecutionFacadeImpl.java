@@ -68,6 +68,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -176,17 +177,23 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
         }
 
+        long rootJobId = getRootJobId(job);
+        Project project = projectService.getWorkflowProject(jobDTO.workflowId());
+
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
-            Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
+            rootJobId, PlatformType.AUTOMATION);
+
+        ProjectDeployment projectDeployment = projectDeploymentIdOptional
+            .map(projectDeploymentService::getProjectDeployment)
+            .filter(rootProjectDeployment -> rootJobId == id ||
+                Objects.equals(rootProjectDeployment.getProjectId(), project.getId()))
+            .orElse(null);
 
         return new WorkflowExecutionDTO(
-            jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
-            projectDeploymentIdOptional
-                .map(projectDeploymentService::getProjectDeployment)
-                .orElse(null),
-            getProjectVersion(jobDTO.workflowId()), jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
+            jobDTO.id(), project, projectDeployment, getProjectVersion(jobDTO.workflowId()), jobDTO,
+            workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
-                projectDeploymentIdOptional.orElse(null),
+                projectDeployment == null ? null : projectDeploymentIdOptional.orElse(null),
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
                 job),
@@ -233,6 +240,35 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
     }
 
+    private long getRootJobId(Job job) {
+        Job currentJob = job;
+        Long parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        Set<Long> visitedJobIds = new HashSet<>();
+
+        while (parentTaskExecutionId != null) {
+            if (!visitedJobIds.add(Validate.notNull(currentJob.getId(), "id"))) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJob.getId());
+            }
+
+            Optional<Job> parentJobOptional = taskExecutionService.fetchTaskExecution(parentTaskExecutionId)
+                .map(TaskExecution::getJobId)
+                .flatMap(jobService::fetchJob);
+
+            if (parentJobOptional.isEmpty()) {
+                log.warn(
+                    "Parent job of job id={} not found through parent task execution id={}", currentJob.getId(),
+                    parentTaskExecutionId);
+
+                break;
+            }
+
+            currentJob = parentJobOptional.get();
+            parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        }
+
+        return Validate.notNull(currentJob.getId(), "id");
+    }
+
     private TaskExecution getRequestedTaskExecution(long taskExecutionId) {
         return taskExecutionService.fetchTaskExecution(taskExecutionId)
             .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
@@ -240,8 +276,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
         long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
+        Set<Long> visitedJobIds = new HashSet<>();
 
         while (currentJobId != id) {
+            if (!visitedJobIds.add(currentJobId)) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJobId);
+            }
+
             Job job = jobService.getJob(currentJobId);
 
             Long parentTaskExecutionId = job.getParentTaskExecutionId();

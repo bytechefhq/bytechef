@@ -44,6 +44,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -90,8 +91,10 @@ public class ProjectWorkflowExecutionFacadeTest {
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private JobService jobService;
+    private PrincipalJobService principalJobService;
     private ProjectDeploymentService projectDeploymentService;
     private ProjectFacade projectFacade;
+    private ProjectService projectService;
     private ProjectWorkflowService projectWorkflowService;
     private TaskExecution taskExecution;
     private TaskExecutionService taskExecutionService;
@@ -107,8 +110,10 @@ public class ProjectWorkflowExecutionFacadeTest {
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
         jobService = mock(JobService.class);
+        principalJobService = mock(PrincipalJobService.class);
         projectDeploymentService = mock(ProjectDeploymentService.class);
         projectFacade = mock(ProjectFacade.class);
+        projectService = mock(ProjectService.class);
         projectWorkflowService = mock(ProjectWorkflowService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
@@ -118,8 +123,8 @@ public class ProjectWorkflowExecutionFacadeTest {
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
             contextService, evaluator, mock(EnvironmentService.class),
-            workflowExecutionRowService, jobService, mock(PrincipalJobService.class), projectFacade,
-            projectDeploymentService, mock(ProjectService.class), projectWorkflowService,
+            workflowExecutionRowService, jobService, principalJobService, projectFacade,
+            projectDeploymentService, projectService, projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
 
@@ -412,8 +417,31 @@ public class ProjectWorkflowExecutionFacadeTest {
             .workflowTask(workflowTask)
             .build();
 
+        Project project = new Project();
+
+        project.setId(3L);
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setProjectId(3L);
+
         when(jobService.getJob(30L))
             .thenReturn(childJob);
+        when(projectService.getWorkflowProject("subflow-workflow"))
+            .thenReturn(project);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.of(new Job(20L)));
+        when(principalJobService.fetchJobPrincipalId(20L, PlatformType.AUTOMATION))
+            .thenReturn(Optional.of(7L));
+        when(projectDeploymentService.getProjectDeployment(7L))
+            .thenReturn(projectDeployment);
         when(taskExecutionService.getJobTopLevelTaskExecutions(30L))
             .thenReturn(List.of(topLevelTaskExecution));
         when(taskExecutionService.fetchLastJobTaskExecution(30L))
@@ -423,7 +451,7 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
 
-        assertThat(workflowExecutionDTO.projectDeployment()).isNull();
+        assertThat(workflowExecutionDTO.projectDeployment()).isSameAs(projectDeployment);
         assertThat(workflowExecutionDTO.triggerExecution()).isNull();
         assertThat(workflowExecutionDTO.focusPath()).containsExactly(new FocusPathElementDTO(1L, null, null));
         assertThat(workflowExecutionDTO.taskExecutionCount()).isEqualTo(5L);
@@ -435,6 +463,216 @@ public class ProjectWorkflowExecutionFacadeTest {
             .containsExactly(tuple(1L, 0));
 
         verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
+    }
+
+    @Test
+    public void getWorkflowExecutionWalksNestedSubflowsUpToTheRootJob() {
+        Job grandchildJob = new Job(40L);
+
+        grandchildJob.setParentTaskExecutionId(98L);
+        grandchildJob.setWorkflowId("subflow-workflow");
+
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        Project project = new Project();
+
+        project.setId(3L);
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setProjectId(3L);
+
+        when(jobService.getJob(40L))
+            .thenReturn(grandchildJob);
+        when(projectService.getWorkflowProject("subflow-workflow"))
+            .thenReturn(project);
+        when(taskExecutionService.fetchTaskExecution(98L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(98L)
+                        .jobId(30L)
+                        .build()));
+        when(jobService.fetchJob(30L))
+            .thenReturn(Optional.of(childJob));
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.of(new Job(20L)));
+        when(principalJobService.fetchJobPrincipalId(20L, PlatformType.AUTOMATION))
+            .thenReturn(Optional.of(7L));
+        when(projectDeploymentService.getProjectDeployment(7L))
+            .thenReturn(projectDeployment);
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(40L, true);
+
+        assertThat(workflowExecutionDTO.projectDeployment()).isSameAs(projectDeployment);
+    }
+
+    @Test
+    public void getWorkflowExecutionOmitsTheRootDeploymentOfASubflowFromAnotherProject() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        Project subflowProject = new Project();
+
+        subflowProject.setId(4L);
+
+        ProjectDeployment rootProjectDeployment = new ProjectDeployment();
+
+        rootProjectDeployment.setProjectId(3L);
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(projectService.getWorkflowProject("subflow-workflow"))
+            .thenReturn(subflowProject);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.of(new Job(20L)));
+        when(principalJobService.fetchJobPrincipalId(20L, PlatformType.AUTOMATION))
+            .thenReturn(Optional.of(7L));
+        when(projectDeploymentService.getProjectDeployment(7L))
+            .thenReturn(rootProjectDeployment);
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
+
+        assertThat(workflowExecutionDTO.project()).isSameAs(subflowProject);
+        assertThat(workflowExecutionDTO.projectDeployment()).isNull();
+    }
+
+    @Test
+    public void getWorkflowExecutionFailsOnACyclicSubflowJobChain() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        Job parentJob = new Job(31L);
+
+        parentJob.setParentTaskExecutionId(98L);
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(31L)
+                        .build()));
+        when(jobService.fetchJob(31L))
+            .thenReturn(Optional.of(parentJob));
+        when(taskExecutionService.fetchTaskExecution(98L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(98L)
+                        .jobId(30L)
+                        .build()));
+        when(jobService.fetchJob(30L))
+            .thenReturn(Optional.of(childJob));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecution(30L, true))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    public void getWorkflowExecutionTaskExecutionFailsOnACyclicSubflowJobChain() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        Job parentJob = new Job(31L);
+
+        parentJob.setParentTaskExecutionId(98L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(1L)
+                        .jobId(30L)
+                        .build()));
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getTaskExecution(99L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(99L)
+                    .jobId(31L)
+                    .build());
+        when(jobService.getJob(31L))
+            .thenReturn(parentJob);
+        when(taskExecutionService.getTaskExecution(98L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(98L)
+                    .jobId(30L)
+                    .build());
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(20L, 1L))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    public void getWorkflowExecutionLoadsSubflowWhoseParentTaskExecutionIsMissing() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(Optional.empty());
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
+
+        assertThat(workflowExecutionDTO.id()).isEqualTo(30L);
+        assertThat(workflowExecutionDTO.projectDeployment()).isNull();
+
+        verify(principalJobService).fetchJobPrincipalId(30L, PlatformType.AUTOMATION);
+    }
+
+    @Test
+    public void getWorkflowExecutionLoadsSubflowWhoseParentJobIsMissing() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.empty());
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, false);
+
+        assertThat(workflowExecutionDTO.id()).isEqualTo(30L);
+
+        verify(principalJobService).fetchJobPrincipalId(30L, PlatformType.AUTOMATION);
     }
 
     @Test
