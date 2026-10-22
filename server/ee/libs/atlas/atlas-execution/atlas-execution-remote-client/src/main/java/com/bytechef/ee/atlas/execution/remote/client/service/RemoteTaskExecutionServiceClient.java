@@ -140,6 +140,11 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public List<TaskExecution> getJobTopLevelTaskExecutions(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public int getIterationIndex(TaskExecution taskExecution) {
         throw new UnsupportedOperationException();
     }

@@ -146,6 +146,18 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
+    public void testFindAllByJobIdAndParentIdIsNullOrderByCreatedDate() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        Assertions.assertEquals(
+            List.of(fixture.parentId()),
+            taskExecutionRepository.findAllByJobIdAndParentIdIsNullOrderByCreatedDate(fixture.jobId())
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    @Test
     public void testCountByJobId() {
         ChildrenFixture fixture = saveChildrenFixture();
 

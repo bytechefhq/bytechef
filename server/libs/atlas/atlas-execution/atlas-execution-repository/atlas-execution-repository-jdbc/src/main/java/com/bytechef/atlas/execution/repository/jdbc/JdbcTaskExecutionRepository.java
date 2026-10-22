@@ -69,6 +69,10 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> findAllByJobIdAndErrorNotNullOrderByCreatedDate(@Param("jobId") long jobId);
 
     @Override
+    @Query("SELECT * FROM task_execution WHERE job_id = :jobId AND parent_id IS NULL ORDER BY created_date ASC, id ASC")
+    List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(@Param("jobId") long jobId);
+
+    @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
     @Override

@@ -67,10 +67,7 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     List<TaskExecution> getTopLevelTaskExecutionRows(long jobId) {
-        return taskExecutionService.getJobTaskExecutions(jobId)
-            .stream()
-            .filter(taskExecution -> taskExecution.getParentId() == null)
-            .toList();
+        return taskExecutionService.getJobTopLevelTaskExecutions(jobId);
     }
 
     List<TaskExecutionDTO> decorate(List<TaskExecution> taskExecutions, long jobId) {

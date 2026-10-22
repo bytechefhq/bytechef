@@ -300,7 +300,7 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         when(jobService.getJob(30L))
             .thenReturn(childJob);
-        when(taskExecutionService.getJobTaskExecutions(30L))
+        when(taskExecutionService.getJobTopLevelTaskExecutions(30L))
             .thenReturn(List.of(topLevelTaskExecution));
         when(taskExecutionService.fetchLastJobTaskExecution(30L))
             .thenReturn(Optional.of(topLevelTaskExecution));
@@ -319,6 +319,8 @@ public class ProjectWorkflowExecutionFacadeTest {
         assertThat(jobDTO.taskExecutions())
             .extracting(TaskExecutionDTO::id, TaskExecutionDTO::childCount)
             .containsExactly(tuple(1L, 0));
+
+        verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
     }
 
     @Test

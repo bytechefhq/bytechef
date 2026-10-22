@@ -17,7 +17,10 @@
 package com.bytechef.automation.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -65,14 +68,13 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
         TaskExecution plainTaskExecution = createTaskExecution(2L, null, "parallel", "parallel/v1", 1);
         TaskExecution subflowTaskExecution = createTaskExecution(3L, null, "subflow", "subflow/v1/run", 2);
-        TaskExecution nestedTaskExecution = createTaskExecution(4L, 1L, "nested", "myComponent/v1/myAction", 0);
 
         Job childJob = new Job(50L);
 
         childJob.setParentTaskExecutionId(3L);
 
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
-            .thenReturn(List.of(loopTaskExecution, plainTaskExecution, subflowTaskExecution, nestedTaskExecution));
+        when(taskExecutionService.getJobTopLevelTaskExecutions(JOB_ID))
+            .thenReturn(List.of(loopTaskExecution, plainTaskExecution, subflowTaskExecution));
         when(taskExecutionService.getChildCounts(List.of(1L, 2L, 3L)))
             .thenReturn(Map.of(1L, 291L, 2L, 387L));
         when(taskExecutionService.getIterationCounts(List.of(1L, 2L, 3L)))
@@ -106,7 +108,7 @@ class LazyTaskExecutionTreeBuilderTest {
         TaskExecution onErrorTaskExecution = createOnErrorTaskExecution(1L, null);
         TaskExecution emptyOnErrorTaskExecution = createOnErrorTaskExecution(2L, null);
 
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+        when(taskExecutionService.getJobTopLevelTaskExecutions(JOB_ID))
             .thenReturn(List.of(onErrorTaskExecution, emptyOnErrorTaskExecution));
         when(taskExecutionService.getChildCounts(List.of(1L, 2L)))
             .thenReturn(Map.of(1L, 1L));
@@ -116,6 +118,25 @@ class LazyTaskExecutionTreeBuilderTest {
         assertThat(taskExecutionDTOs)
             .extracting(TaskExecutionDTO::childCount)
             .containsExactly(2, 0);
+    }
+
+    @Test
+    void topLevelAndFocusPathNeverLoadEveryTaskExecutionOfTheJob() {
+        TaskExecution topLevelTaskExecution = createTaskExecution(1L, null, "a", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getJobTopLevelTaskExecutions(JOB_ID))
+            .thenReturn(List.of(topLevelTaskExecution));
+        when(taskExecutionService.fetchLastJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(topLevelTaskExecution));
+
+        lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutions(JOB_ID);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutionRows(JOB_ID));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null));
+
+        verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
     }
 
     @Test

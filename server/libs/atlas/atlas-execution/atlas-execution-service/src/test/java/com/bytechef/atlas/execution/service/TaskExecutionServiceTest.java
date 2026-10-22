@@ -155,6 +155,18 @@ class TaskExecutionServiceTest {
     }
 
     @Test
+    void getJobTopLevelTaskExecutionsReadsOnlyTopLevelRows() {
+        TaskExecution taskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findAllByJobIdAndParentIdIsNullOrderByCreatedDate(7L))
+            .thenReturn(List.of(taskExecution));
+
+        assertThat(taskExecutionService.getJobTopLevelTaskExecutions(7L)).containsExactly(taskExecution);
+
+        verify(taskExecutionRepository, never()).findAllByJobIdOrderByCreatedDate(7L);
+    }
+
+    @Test
     void getParentTaskExecutionsUsesPageOffset() {
         taskExecutionService.getParentTaskExecutions(9L, 2, 50);
 

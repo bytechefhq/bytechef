@@ -152,6 +152,29 @@ class InMemoryTaskExecutionRepositoryTest {
     }
 
     @Test
+    void testFindAllByJobIdAndParentIdIsNullOrderByCreatedDate() {
+        List<Long> topLevelIds = new ArrayList<>();
+
+        for (int index = 0; index < 3; index++) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(409L);
+
+            topLevelIds.add(inMemoryTaskExecutionRepository.save(taskExecution)
+                .getId());
+        }
+
+        saveChildren(409L, topLevelIds.getFirst());
+
+        assertEquals(
+            topLevelIds,
+            inMemoryTaskExecutionRepository.findAllByJobIdAndParentIdIsNullOrderByCreatedDate(409L)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    @Test
     void testChildrenWithoutCreatedDateKeepInsertionOrder() {
         List<Long> childIds = new ArrayList<>();
         List<Long> failedIds = new ArrayList<>();

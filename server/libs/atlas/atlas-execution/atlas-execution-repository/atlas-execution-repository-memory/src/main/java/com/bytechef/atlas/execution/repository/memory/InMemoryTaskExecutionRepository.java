@@ -293,6 +293,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getParentId() == null)
+            .sorted(CREATED_DATE_COMPARATOR)
+            .toList();
+    }
+
+    @Override
     public List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset) {
         return getOrderedChildren(parentId)
             .stream()

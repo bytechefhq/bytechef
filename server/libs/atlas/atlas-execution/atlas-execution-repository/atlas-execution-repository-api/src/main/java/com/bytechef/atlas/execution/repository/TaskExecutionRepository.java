@@ -78,6 +78,8 @@ public interface TaskExecutionRepository {
 
     List<TaskExecution> findAllByJobIdAndErrorNotNullOrderByCreatedDate(long jobId);
 
+    List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(long jobId);
+
     List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset);
 
     List<Long> findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(long parentId, int taskNumber);
