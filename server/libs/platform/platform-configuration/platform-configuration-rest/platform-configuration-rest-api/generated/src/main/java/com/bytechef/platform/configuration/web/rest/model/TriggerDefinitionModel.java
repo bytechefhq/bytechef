@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T18:23:01.108240+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TriggerDefinitionModel {
 
   private @Nullable String componentName;
@@ -43,6 +43,8 @@ public class TriggerDefinitionModel {
   private String name;
 
   private Boolean outputDefined;
+
+  private @Nullable Boolean outputFileEntry;
 
   private Boolean outputFunctionDefined;
 
@@ -196,6 +198,27 @@ public class TriggerDefinitionModel {
     this.outputDefined = outputDefined;
   }
 
+  public TriggerDefinitionModel outputFileEntry(@Nullable Boolean outputFileEntry) {
+    this.outputFileEntry = outputFileEntry;
+    return this;
+  }
+
+  /**
+   * Does trigger define a file entry as its output schema.
+   * @return outputFileEntry
+   */
+  
+  @Schema(name = "outputFileEntry", description = "Does trigger define a file entry as its output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputFileEntry")
+  public @Nullable Boolean getOutputFileEntry() {
+    return outputFileEntry;
+  }
+
+  @JsonProperty("outputFileEntry")
+  public void setOutputFileEntry(@Nullable Boolean outputFileEntry) {
+    this.outputFileEntry = outputFileEntry;
+  }
+
   public TriggerDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
     this.outputFunctionDefined = outputFunctionDefined;
     return this;
@@ -345,6 +368,7 @@ public class TriggerDefinitionModel {
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
+        Objects.equals(this.outputFileEntry, triggerDefinition.outputFileEntry) &&
         Objects.equals(this.outputFunctionDefined, triggerDefinition.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, triggerDefinition.outputSchemaDefined) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
@@ -355,7 +379,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, outputSchemaDefined, properties, title, type, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFileEntry, outputFunctionDefined, outputSchemaDefined, properties, title, type, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -368,6 +392,7 @@ public class TriggerDefinitionModel {
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFileEntry: ").append(toIndentedString(outputFileEntry)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
