@@ -20,6 +20,7 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentNodeIndex: number;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
+    onError?: () => void;
     parameters?: NonNullable<NodeDataType['parameters']>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
@@ -30,6 +31,7 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
         currentNodeIndex,
         currentOperationProperties,
         fieldUpdate,
+        onError,
         parameters,
         updateWorkflowMutation,
     } = props;
@@ -39,6 +41,8 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!currentNode || !workflow.definition) {
+        onError?.();
+
         return;
     }
 
@@ -177,11 +181,15 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
             break;
         }
         default: {
+            onError?.();
+
             return;
         }
     }
 
     if (!taskDispatcherContext || !taskDispatcherComponentName) {
+        onError?.();
+
         return;
     }
 
@@ -196,6 +204,8 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
 
     if (!parentTaskDispatcherTask) {
         console.error(`No parent task dispatcher found for ${taskDispatcherContext?.taskDispatcherId}`);
+
+        onError?.();
 
         return;
     }
@@ -294,7 +304,7 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
     }
 
     saveWorkflowDefinition({
-        onError: () => useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false),
+        onError,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,

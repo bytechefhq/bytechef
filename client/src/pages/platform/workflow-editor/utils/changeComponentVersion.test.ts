@@ -13,11 +13,13 @@ const mockSetCurrentNode = vi.fn();
 const mockSetOperationChangeInProgress = vi.fn();
 
 let mockCurrentNode: NodeDataType | undefined;
+let mockOperationChangeInProgress = false;
 
 vi.mock('../stores/useWorkflowNodeDetailsPanelStore', () => ({
     default: {
         getState: () => ({
             currentNode: mockCurrentNode,
+            operationChangeInProgress: mockOperationChangeInProgress,
             setCurrentNode: mockSetCurrentNode,
             setOperationChangeInProgress: mockSetOperationChangeInProgress,
         }),
@@ -92,6 +94,7 @@ describe('changeComponentVersion', () => {
         vi.clearAllMocks();
 
         mockCurrentNode = buildNode();
+        mockOperationChangeInProgress = false;
 
         mockGetComponentDefinition.mockResolvedValue(versionTwoDefinition);
 
@@ -206,6 +209,38 @@ describe('changeComponentVersion', () => {
             parameters: {channel: '#general', format: 'markdown'},
         });
         expect(saveWorkflowDefinition).not.toHaveBeenCalled();
+    });
+
+    it('should ignore a version change while another operation change is saving', async () => {
+        mockOperationChangeInProgress = true;
+
+        const dependencies = buildDependencies();
+
+        await changeComponentVersion(dependencies);
+
+        expect(mockSetOperationChangeInProgress).not.toHaveBeenCalled();
+        expect(dependencies.fetchActionDefinition).not.toHaveBeenCalled();
+        expect(saveWorkflowDefinition).not.toHaveBeenCalled();
+    });
+
+    it('should clear the in-progress flag when the cluster element save fails', async () => {
+        mockCurrentNode = buildNode({clusterElementType: 'model'});
+
+        await changeComponentVersion(buildDependencies());
+
+        vi.mocked(saveClusterElementFieldChange).mock.calls[0][0].onError?.();
+
+        expect(mockSetOperationChangeInProgress).toHaveBeenLastCalledWith(false);
+    });
+
+    it('should clear the in-progress flag when the subtask save fails', async () => {
+        mockCurrentNode = buildNode({conditionData: {conditionCase: 'caseTrue', conditionId: 'condition_1', index: 0}});
+
+        await changeComponentVersion(buildDependencies());
+
+        vi.mocked(saveTaskDispatcherSubtaskFieldChange).mock.calls[0][0].onError?.();
+
+        expect(mockSetOperationChangeInProgress).toHaveBeenLastCalledWith(false);
     });
 
     it('should route a task dispatcher subtask through the subtask save path', async () => {

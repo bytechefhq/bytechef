@@ -42,18 +42,55 @@ describe('saveClusterElementFieldChange', () => {
         });
     });
 
-    it('clears the in-progress flag of an operation switch when the save fails', () => {
-        useWorkflowNodeDetailsPanelStore.setState({operationChangeInProgress: true});
+    it('reports a failed save to the caller', () => {
+        const onError = vi.fn();
 
         saveClusterElementFieldChange({
             currentComponentDefinition: {name: 'agileCrm', version: 1} as ComponentDefinition,
             fieldUpdate: {field: 'operation', value: 'createContact'},
+            onError,
             updateWorkflowMutation: {mutate: vi.fn()} as never,
         });
 
         saveWorkflowDefinitionMock.mock.calls[0][0].onError();
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().operationChangeInProgress).toBe(false);
+        expect(onError).toHaveBeenCalledOnce();
+    });
+
+    it('reports a save it cannot start to the caller', () => {
+        const onError = vi.fn();
+
+        useWorkflowDataStore.setState({workflow: {definition: undefined, id: 'workflow-1'}} as Parameters<
+            typeof useWorkflowDataStore.setState
+        >[0]);
+
+        saveClusterElementFieldChange({
+            currentComponentDefinition: {name: 'agileCrm', version: 1} as ComponentDefinition,
+            fieldUpdate: {field: 'operation', value: 'createContact'},
+            onError,
+            updateWorkflowMutation: {mutate: vi.fn()} as never,
+        });
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledOnce();
+    });
+
+    it('reports a save whose cluster root is not in the definition to the caller', () => {
+        const onError = vi.fn();
+
+        useWorkflowDataStore.setState({
+            workflow: {definition: JSON.stringify({tasks: []}), id: 'workflow-1'},
+        } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+
+        saveClusterElementFieldChange({
+            currentComponentDefinition: {name: 'agileCrm', version: 1} as ComponentDefinition,
+            fieldUpdate: {field: 'operation', value: 'createContact'},
+            onError,
+            updateWorkflowMutation: {mutate: vi.fn()} as never,
+        });
+
+        expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+        expect(onError).toHaveBeenCalledOnce();
     });
 
     it('saves a label change against the root resolved from the node when no root is in the store', () => {

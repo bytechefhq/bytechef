@@ -1031,7 +1031,12 @@ export default function useWorkflowNodeDetailsPanel({
 
     const handleOperationSelectChange = useCallback(
         async (newOperationName: string) => {
-            if (currentOperationName === newOperationName || !currentComponentDefinition || !currentNode) {
+            if (
+                currentOperationName === newOperationName ||
+                !currentComponentDefinition ||
+                !currentNode ||
+                useWorkflowNodeDetailsPanelStore.getState().operationChangeInProgress
+            ) {
                 return;
             }
 
@@ -1097,6 +1102,7 @@ export default function useWorkflowNodeDetailsPanel({
                             field: 'operation',
                             value: newOperationName,
                         },
+                        onError: () => setOperationChangeInProgress(false),
                         updateWorkflowMutation,
                     });
 
@@ -1111,6 +1117,7 @@ export default function useWorkflowNodeDetailsPanel({
                             field: 'operation',
                             value: newOperationName,
                         },
+                        onError: () => setOperationChangeInProgress(false),
                         updateWorkflowMutation,
                     });
 
