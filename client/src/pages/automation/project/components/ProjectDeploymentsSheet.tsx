@@ -93,7 +93,7 @@ const ProjectDeploymentsSheet = ({
     const handleOpenInDeploymentsClick = () => {
         onSheetOpenChange(false);
 
-        navigate(`/automation/deployments?projectId=${project.id}`);
+        void navigate(`/automation/deployments?projectId=${project.id}`);
     };
 
     return (
