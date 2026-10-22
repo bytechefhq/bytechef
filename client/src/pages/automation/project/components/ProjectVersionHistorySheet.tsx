@@ -130,12 +130,12 @@ const ProjectVersionHistorySheet = ({
 
                                 <div
                                     className={twMerge(
-                                        'flex flex-1 flex-col gap-y-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
+                                        'flex flex-1 items-center gap-x-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
                                         published && 'hover:border-stroke-brand-secondary-hover',
                                         selected && 'border-stroke-brand-primary hover:border-stroke-brand-primary'
                                     )}
                                 >
-                                    <div className="flex items-center justify-between gap-x-2">
+                                    <div className="flex min-w-0 flex-1 flex-col gap-y-2">
                                         <div className="flex items-center gap-x-2">
                                             {published ? (
                                                 <Badge
@@ -160,51 +160,48 @@ const ProjectVersionHistorySheet = ({
                                             )}
                                         </div>
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-label={`Version ${version} actions`}
-                                                    className="size-6"
-                                                    icon={<EllipsisVerticalIcon />}
-                                                    onClick={(event) => event.stopPropagation()}
-                                                    onKeyDown={(event) => event.stopPropagation()}
-                                                    size="icon"
-                                                    variant="ghost"
-                                                />
-                                            </DropdownMenuTrigger>
-
-                                            <DropdownMenuContent
-                                                align="end"
-                                                onClick={(event) => event.stopPropagation()}
-                                            >
-                                                <DropdownMenuItem
-                                                    icon={<DownloadIcon />}
-                                                    label="Export"
-                                                    onClick={() =>
-                                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
-                                                    }
-                                                />
-
-                                                {published && (
-                                                    <>
-                                                        <DropdownMenuSeparator />
-
-                                                        <DropdownMenuItem
-                                                            icon={<Trash2Icon />}
-                                                            label="Delete"
-                                                            onClick={() => setDeleteCandidateVersion(version)}
-                                                            variant="destructive"
-                                                        />
-                                                    </>
-                                                )}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <p className="text-sm whitespace-pre-line">
+                                            {projectVersion.description ||
+                                                (published ? 'No description.' : 'Current working version.')}
+                                        </p>
                                     </div>
 
-                                    <p className="text-sm whitespace-pre-line">
-                                        {projectVersion.description ||
-                                            (published ? 'No description.' : 'Current working version.')}
-                                    </p>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-label={`Version ${version} actions`}
+                                                className="size-6"
+                                                icon={<EllipsisVerticalIcon />}
+                                                onClick={(event) => event.stopPropagation()}
+                                                onKeyDown={(event) => event.stopPropagation()}
+                                                size="icon"
+                                                variant="ghost"
+                                            />
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
+                                            <DropdownMenuItem
+                                                icon={<DownloadIcon />}
+                                                label="Export"
+                                                onClick={() =>
+                                                    (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                                }
+                                            />
+
+                                            {published && (
+                                                <>
+                                                    <DropdownMenuSeparator />
+
+                                                    <DropdownMenuItem
+                                                        icon={<Trash2Icon />}
+                                                        label="Delete"
+                                                        onClick={() => setDeleteCandidateVersion(version)}
+                                                        variant="destructive"
+                                                    />
+                                                </>
+                                            )}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </li>
                         );
