@@ -25,6 +25,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -74,6 +75,7 @@ public class WorkflowExecutionRepositoryIntTestConfiguration {
                 new ExecutionErrorToStringConverter(objectMapper),
                 new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
+                new StringToExecutionErrorConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper),
                 new StringToWebhooksConverter(objectMapper),

@@ -23,11 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -39,10 +45,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class InMemoryTaskExecutionRepositoryTest {
 
     private InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
@@ -59,6 +67,510 @@ class InMemoryTaskExecutionRepositoryTest {
     @AfterEach
     void tearDown() {
         TenantContext.resetCurrentTenantId();
+    }
+
+    @Test
+    void testFindAllIdsByParentIdOrderByCreatedDate() {
+        List<Long> childIds = saveChildren(401L, 400L);
+
+        assertEquals(childIds, inMemoryTaskExecutionRepository.findAllIdsByParentIdOrderByCreatedDate(400L));
+    }
+
+    @Test
+    void testFindAllByParentIdAndTaskNumberOrderByCreatedDate() {
+        List<Long> childIds = saveChildren(411L, 412L);
+
+        assertEquals(
+            List.of(childIds.get(2), childIds.get(4)),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(412L, 0, 3, 1)));
+        assertEquals(
+            List.of(childIds.get(0)),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(412L, 0, 1, 0)));
+    }
+
+    @Test
+    void testFindAllByParentIdAndCreatedDateBetweenAndFromOrderByCreatedDate() {
+        Instant baseDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        List<Long> childIds = saveChildren(413L, 414L, baseDate);
+
+        assertEquals(
+            List.of(childIds.get(2), childIds.get(3)),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+                414L, baseDate.plusSeconds(2), childIds.get(2), baseDate.plusSeconds(4), childIds.get(4))));
+        assertEquals(
+            List.of(childIds.get(2), childIds.get(3), childIds.get(4)),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+                414L, baseDate.plusSeconds(2), childIds.get(2))));
+    }
+
+    @Test
+    void testChildRangesBreakTiedCreatedDatesById() {
+        Instant createdDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        saveChildren(415L, 416L, createdDate, 0);
+
+        List<TaskExecution> orderedTaskExecutions = inMemoryTaskExecutionRepository
+            .findAllByParentIdOrderByCreatedDate(416L, 5, 0);
+
+        List<Long> orderedIds = toIds(orderedTaskExecutions);
+
+        assertEquals(
+            orderedIds.stream()
+                .sorted()
+                .toList(),
+            orderedIds);
+
+        List<Long> iterationStartIds = orderedTaskExecutions.stream()
+            .filter(taskExecution -> taskExecution.getTaskNumber() == 0)
+            .map(TaskExecution::getId)
+            .toList();
+
+        assertEquals(
+            iterationStartIds.subList(1, 3),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(416L, 0, 2, 1)));
+        assertEquals(
+            orderedIds.subList(1, 3),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+                416L, createdDate, orderedIds.get(1), createdDate, orderedIds.get(3))));
+        assertEquals(
+            orderedIds.subList(3, 5),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+                416L, createdDate, orderedIds.get(3))));
+    }
+
+    @Test
+    void testFindAllByParentIdOrderByCreatedDatePagesChildren() {
+        List<Long> childIds = saveChildren(402L, 410L);
+
+        List<TaskExecution> taskExecutions =
+            inMemoryTaskExecutionRepository.findAllByParentIdOrderByCreatedDate(410L, 2, 2);
+
+        assertEquals(
+            List.of(childIds.get(2), childIds.get(3)),
+            taskExecutions.stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    @Test
+    void testCountAllByParentIdIn() {
+        saveChildren(403L, 420L);
+        saveChildren(403L, 421L);
+
+        assertEquals(
+            Map.of(420L, 5L, 421L, 5L),
+            inMemoryTaskExecutionRepository.countAllByParentIdIn(List.of(420L, 421L, 422L)));
+        assertEquals(
+            Map.of(420L, 3L),
+            inMemoryTaskExecutionRepository.countAllByParentIdInAndTaskNumber(List.of(420L, 422L), 0));
+        assertTrue(inMemoryTaskExecutionRepository.countAllByParentIdIn(List.of())
+            .isEmpty());
+    }
+
+    @Test
+    void testFindAllByIdInAndCounts() {
+        List<Long> childIds = saveChildren(404L, 430L);
+
+        assertEquals(
+            2, inMemoryTaskExecutionRepository.findAllByIdIn(List.of(childIds.get(1), childIds.get(3)))
+                .size());
+    }
+
+    @Test
+    void testCountLatestAttemptsByJobId() {
+        TaskExecution retriedLoopTaskExecution = saveTaskExecution(404L, null, true);
+
+        saveTaskExecution(404L, retriedLoopTaskExecution.getId(), false);
+        saveTaskExecution(404L, retriedLoopTaskExecution.getId(), false);
+
+        TaskExecution loopRetryTaskExecution = saveRetryTaskExecution(404L, null);
+
+        saveTaskExecution(404L, loopRetryTaskExecution.getId(), false);
+        saveTaskExecution(404L, loopRetryTaskExecution.getId(), true);
+        saveRetryTaskExecution(404L, loopRetryTaskExecution.getId());
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(404L, List.of()));
+        assertEquals(0, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(405L, List.of()));
+    }
+
+    @Test
+    void testCountLatestAttemptsByJobIdExcludesSupersededAttempts() {
+        TaskExecution resumedLoopTaskExecution = saveFailedTaskExecution(408L, null);
+
+        TaskExecution resumedIterationTaskExecution = saveTaskExecution(
+            408L, resumedLoopTaskExecution.getId(), false);
+
+        saveTaskExecution(408L, resumedIterationTaskExecution.getId(), false);
+        saveTaskExecution(408L, resumedLoopTaskExecution.getId(), true);
+        saveRetryTaskExecution(408L, resumedLoopTaskExecution.getId());
+
+        TaskExecution loopTaskExecution = saveTaskExecution(408L, null, false);
+
+        saveTaskExecution(408L, loopTaskExecution.getId(), false);
+
+        assertEquals(
+            2, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(
+                408L, List.of(resumedLoopTaskExecution.getId())));
+        assertEquals(6, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(408L, List.of()));
+    }
+
+    @Test
+    void testFailedOnErrorTaskWithRetriesLeftIsNotRetriedAttempt() {
+        TaskExecution onErrorTaskExecution = saveTaskExecution(409L, null, true);
+
+        saveTaskExecution(409L, onErrorTaskExecution.getId(), false);
+
+        TaskExecution failedErrorBranchTaskExecution = saveFailedTaskExecution(409L, onErrorTaskExecution.getId());
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(409L, List.of()));
+        assertEquals(
+            List.of(failedErrorBranchTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                409L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testFailedAttemptIsNotRetriedByARetryOfADifferentSiblingTask() {
+        TaskExecution parentTaskExecution = saveTaskExecution(511L, null, false);
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setError(new ExecutionError("failed", List.of()));
+        failedTaskExecution.setJobId(511L);
+        failedTaskExecution.setMaxRetries(1);
+        failedTaskExecution.setParentId(parentTaskExecution.getId());
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        failedTaskExecution = inMemoryTaskExecutionRepository.save(failedTaskExecution);
+
+        TaskExecution siblingRetryTaskExecution = new TaskExecution();
+
+        siblingRetryTaskExecution.setJobId(511L);
+        siblingRetryTaskExecution.setParentId(parentTaskExecution.getId());
+        siblingRetryTaskExecution.setRetryAttempts(1);
+        siblingRetryTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "b", "type", "test/v1")));
+
+        inMemoryTaskExecutionRepository.save(siblingRetryTaskExecution);
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(511L, List.of()));
+        assertEquals(
+            List.of(failedTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                511L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testFailedAttemptIsRetriedByALaterCreatedRetrySavedBeforeIt() {
+        Instant createdDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        TaskExecution parentTaskExecution = saveTaskExecution(512L, null, false);
+
+        TaskExecution retryTaskExecution = new TaskExecution();
+
+        retryTaskExecution.setJobId(512L);
+        retryTaskExecution.setParentId(parentTaskExecution.getId());
+        retryTaskExecution.setRetryAttempts(1);
+        retryTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        setCreatedDate(retryTaskExecution, createdDate.plusSeconds(10));
+
+        inMemoryTaskExecutionRepository.save(retryTaskExecution);
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setError(new ExecutionError("failed", List.of()));
+        failedTaskExecution.setJobId(512L);
+        failedTaskExecution.setMaxRetries(1);
+        failedTaskExecution.setParentId(parentTaskExecution.getId());
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        setCreatedDate(failedTaskExecution, createdDate);
+
+        inMemoryTaskExecutionRepository.save(failedTaskExecution);
+
+        assertEquals(2, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(512L, List.of()));
+    }
+
+    @Test
+    void testLatestAttemptQueriesExcludeDescendantsOfARetriedAttemptAtAnyDepth() {
+        TaskExecution loopTaskExecution = saveTaskExecution(480L, null, false);
+        TaskExecution retriedTaskExecution = saveTaskExecution(480L, loopTaskExecution.getId(), true);
+        TaskExecution childTaskExecution = saveTaskExecution(480L, retriedTaskExecution.getId(), false);
+
+        saveFailedTaskExecution(480L, childTaskExecution.getId());
+
+        TaskExecution retryTaskExecution = saveRetryTaskExecution(480L, loopTaskExecution.getId());
+
+        TaskExecution failedLeafTaskExecution = saveFailedTaskExecution(480L, retryTaskExecution.getId());
+
+        assertEquals(3, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(480L, List.of()));
+        assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                480L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testFindAllLatestAttemptFailedLeavesByJobIdExcludesSupersededAttempts() {
+        TaskExecution resumedTaskExecution = saveTaskExecution(481L, null, false);
+        TaskExecution resumedIterationTaskExecution = saveTaskExecution(481L, resumedTaskExecution.getId(), false);
+        TaskExecution supersededFailedLeafTaskExecution = saveFailedTaskExecution(
+            481L, resumedIterationTaskExecution.getId());
+        TaskExecution latestTaskExecution = saveTaskExecution(481L, null, false);
+        TaskExecution failedLeafTaskExecution = saveFailedTaskExecution(481L, latestTaskExecution.getId());
+
+        assertEquals(
+            List.of(failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                481L, List.of(resumedTaskExecution.getId()), 10, 0)));
+        assertEquals(
+            List.of(supersededFailedLeafTaskExecution.getId(), failedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                481L, List.of(), 10, 0)));
+    }
+
+    @Test
+    void testCountByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual() {
+        Instant baseDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        List<Long> childIds = saveChildren(407L, 450L, baseDate);
+
+        assertEquals(
+            2,
+            inMemoryTaskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+                450L, 0, baseDate.plusSeconds(2), childIds.get(2)));
+        assertEquals(
+            0,
+            inMemoryTaskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+                450L, 0, baseDate.minusSeconds(1), childIds.get(0)));
+    }
+
+    @Test
+    void testCountByParentIdAndCreatedDateBeforeOrEqual() {
+        Instant baseDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        List<Long> childIds = saveChildren(408L, 455L, baseDate);
+
+        assertEquals(
+            3,
+            inMemoryTaskExecutionRepository.countByParentIdAndCreatedDateBeforeOrEqual(
+                455L, baseDate.plusSeconds(2), childIds.get(2)));
+        assertEquals(
+            0,
+            inMemoryTaskExecutionRepository.countByParentIdAndCreatedDateBeforeOrEqual(
+                455L, baseDate.minusSeconds(1), childIds.get(0)));
+    }
+
+    @Test
+    void testFindAllIdsByIdInAndFirstChildTaskNumberNot() {
+        saveChildren(409L, 456L);
+
+        TaskExecution leadingTaskExecution = new TaskExecution();
+
+        leadingTaskExecution.setJobId(409L);
+        leadingTaskExecution.setParentId(457L);
+        leadingTaskExecution.setTaskNumber(1);
+
+        inMemoryTaskExecutionRepository.save(leadingTaskExecution);
+
+        assertEquals(
+            List.of(457L),
+            inMemoryTaskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(List.of(456L, 457L, 458L), 0));
+        assertEquals(List.of(),
+            inMemoryTaskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(List.of(), 0));
+    }
+
+    @Test
+    void testFindAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate() {
+        saveChildren(405L, 440L);
+
+        TaskExecution retriedLoopTaskExecution = saveTaskExecution(406L, null, true);
+
+        saveFailedTaskExecution(406L, retriedLoopTaskExecution.getId());
+
+        TaskExecution loopTaskExecution = saveRetryTaskExecution(406L, null);
+
+        saveTaskExecution(406L, loopTaskExecution.getId(), true);
+
+        TaskExecution firstFailedLeafTaskExecution = saveFailedTaskExecution(406L, loopTaskExecution.getId(), 1);
+        TaskExecution failedParentTaskExecution = saveFailedTaskExecution(406L, loopTaskExecution.getId());
+
+        saveTaskExecution(406L, failedParentTaskExecution.getId(), false);
+
+        TaskExecution secondFailedLeafTaskExecution = saveFailedTaskExecution(406L, null);
+
+        saveTaskExecution(406L, null, false);
+
+        assertEquals(
+            List.of(firstFailedLeafTaskExecution.getId(), secondFailedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                406L, List.of(), 10, 0)));
+        assertEquals(
+            List.of(secondFailedLeafTaskExecution.getId()),
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                406L, List.of(), 1, 1)));
+    }
+
+    @Test
+    void testFindAllByJobIdAndParentIdIsNullOrderByCreatedDate() {
+        List<Long> topLevelIds = new ArrayList<>();
+
+        for (int index = 0; index < 3; index++) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(409L);
+
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            topLevelIds.add(savedTaskExecution.getId());
+        }
+
+        saveChildren(409L, topLevelIds.getFirst());
+
+        assertEquals(
+            topLevelIds,
+            inMemoryTaskExecutionRepository.findAllByJobIdAndParentIdIsNullOrderByCreatedDate(409L)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+    }
+
+    @Test
+    void testChildrenWithoutCreatedDateKeepInsertionOrder() {
+        List<Long> childIds = new ArrayList<>();
+        List<Long> failedIds = new ArrayList<>();
+
+        for (int index = 0; index < 20; index++) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(408L);
+            taskExecution.setParentId(460L);
+            taskExecution.setTaskNumber(index % 2);
+
+            if (index % 3 == 0) {
+                taskExecution.setError(new ExecutionError("failed", List.of()));
+            }
+
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            childIds.add(savedTaskExecution.getId());
+
+            if (index % 3 == 0) {
+                failedIds.add(savedTaskExecution.getId());
+            }
+        }
+
+        assertEquals(childIds, inMemoryTaskExecutionRepository.findAllIdsByParentIdOrderByCreatedDate(460L));
+        assertEquals(
+            childIds.subList(5, 9),
+            inMemoryTaskExecutionRepository.findAllByParentIdOrderByCreatedDate(460L, 4, 5)
+                .stream()
+                .map(TaskExecution::getId)
+                .toList());
+        assertEquals(
+            childIds.subList(5, 9),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+                460L, null, childIds.get(5), null, childIds.get(9))));
+        assertEquals(
+            childIds.subList(15, 20),
+            toIds(inMemoryTaskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+                460L, null, childIds.get(15))));
+        assertEquals(
+            failedIds,
+            toIds(inMemoryTaskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+                408L, List.of(), 100, 0)));
+    }
+
+    @Test
+    void testFindLastStartedByJobId() {
+        TaskExecution firstStartedTaskExecution = new TaskExecution();
+
+        firstStartedTaskExecution.setJobId(470L);
+        firstStartedTaskExecution.setStartDate(Instant.parse("2026-01-01T00:00:00Z"));
+
+        inMemoryTaskExecutionRepository.save(firstStartedTaskExecution);
+
+        TaskExecution lastStartedTaskExecution = new TaskExecution();
+
+        lastStartedTaskExecution.setJobId(470L);
+        lastStartedTaskExecution.setStartDate(Instant.parse("2026-01-01T00:00:01Z"));
+
+        TaskExecution savedLastStartedTaskExecution = inMemoryTaskExecutionRepository.save(lastStartedTaskExecution);
+
+        TaskExecution createdTaskExecution = new TaskExecution();
+
+        createdTaskExecution.setJobId(470L);
+
+        TaskExecution savedCreatedTaskExecution = inMemoryTaskExecutionRepository.save(createdTaskExecution);
+
+        assertEquals(
+            savedCreatedTaskExecution.getId(), inMemoryTaskExecutionRepository.findLastByJobId(470L)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+        assertEquals(
+            savedLastStartedTaskExecution.getId(), inMemoryTaskExecutionRepository.findLastStartedByJobId(470L)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        TaskExecution notStartedTaskExecution = new TaskExecution();
+
+        notStartedTaskExecution.setJobId(471L);
+
+        inMemoryTaskExecutionRepository.save(notStartedTaskExecution);
+
+        assertTrue(inMemoryTaskExecutionRepository.findLastStartedByJobId(471L)
+            .isEmpty());
+    }
+
+    private List<Long> saveChildren(long jobId, long parentId) {
+        return saveChildren(jobId, parentId, Instant.parse("2026-01-01T00:00:00Z"));
+    }
+
+    private List<Long> saveChildren(long jobId, long parentId, Instant baseDate) {
+        return saveChildren(jobId, parentId, baseDate, 1);
+    }
+
+    private List<Long> saveChildren(long jobId, long parentId, Instant baseDate, long createdDateStepSeconds) {
+        List<Long> childIds = new ArrayList<>();
+        int[] taskNumbers = {
+            0, 1, 0, 1, 0
+        };
+
+        for (int index = 0; index < taskNumbers.length; index++) {
+            TaskExecution taskExecution = new TaskExecution();
+
+            taskExecution.setJobId(jobId);
+            taskExecution.setParentId(parentId);
+            taskExecution.setTaskNumber(taskNumbers[index]);
+
+            setCreatedDate(taskExecution, baseDate.plusSeconds(index * createdDateStepSeconds));
+
+            TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+            childIds.add(savedTaskExecution.getId());
+        }
+
+        return childIds;
+    }
+
+    private static void setCreatedDate(TaskExecution taskExecution, Instant createdDate) {
+        try {
+            Field createdDateField = TaskExecution.class.getDeclaredField("createdDate");
+
+            createdDateField.setAccessible(true);
+            createdDateField.set(taskExecution, createdDate);
+        } catch (ReflectiveOperationException reflectiveOperationException) {
+            throw new IllegalStateException(reflectiveOperationException);
+        }
+    }
+
+    private static List<Long> toIds(List<TaskExecution> taskExecutions) {
+        return taskExecutions.stream()
+            .map(TaskExecution::getId)
+            .toList();
     }
 
     @Test
@@ -622,6 +1134,47 @@ class InMemoryTaskExecutionRepositoryTest {
 
             assertEquals(7, taskExecutions.size());
         });
+    }
+
+    private TaskExecution saveTaskExecution(long jobId, Long parentId, boolean retried) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setParentId(parentId);
+
+        if (retried) {
+            taskExecution.setError(new ExecutionError("failed", List.of()));
+            taskExecution.setMaxRetries(1);
+            taskExecution.setStatus(TaskExecution.Status.FAILED);
+        }
+
+        return inMemoryTaskExecutionRepository.save(taskExecution);
+    }
+
+    private TaskExecution saveRetryTaskExecution(long jobId, Long parentId) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setParentId(parentId);
+        taskExecution.setRetryAttempts(1);
+
+        return inMemoryTaskExecutionRepository.save(taskExecution);
+    }
+
+    private TaskExecution saveFailedTaskExecution(long jobId, Long parentId) {
+        return saveFailedTaskExecution(jobId, parentId, 0);
+    }
+
+    private TaskExecution saveFailedTaskExecution(long jobId, Long parentId, int retryAttempts) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setError(new ExecutionError("failed", List.of()));
+        taskExecution.setJobId(jobId);
+        taskExecution.setParentId(parentId);
+        taskExecution.setRetryAttempts(retryAttempts);
+        taskExecution.setStatus(TaskExecution.Status.FAILED);
+
+        return inMemoryTaskExecutionRepository.save(taskExecution);
     }
 
     private static List<Long> getIds(List<TaskExecution> list) {

@@ -12,4 +12,5 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.springframework:spring-test")
+    testImplementation(project(":server:libs:test:test-support"))
 }

@@ -18,19 +18,27 @@
 
 package com.bytechef.atlas.execution.repository.memory;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.comparator.Comparators;
 
 /**
@@ -40,8 +48,136 @@ import org.springframework.util.comparator.Comparators;
  */
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
+    private static final Comparator<TaskExecution> CREATED_DATE_COMPARATOR = (first, second) -> {
+        Instant firstCreatedDate = first.getCreatedDate();
+        Instant secondCreatedDate = second.getCreatedDate();
+
+        if (firstCreatedDate == null || secondCreatedDate == null) {
+            if (firstCreatedDate == secondCreatedDate) {
+                return 0;
+            }
+
+            return firstCreatedDate == null ? -1 : 1;
+        }
+
+        int comparison = firstCreatedDate.compareTo(secondCreatedDate);
+
+        if (comparison != 0) {
+            return comparison;
+        }
+
+        return Comparator.nullsFirst(Comparator.<Long>naturalOrder())
+            .compare(first.getId(), second.getId());
+    };
+
+    private static final Comparator<TaskExecution> START_DATE_COMPARATOR = Comparator
+        .comparing(TaskExecution::getStartDate)
+        .thenComparing(TaskExecution::getId, Comparator.nullsFirst(Comparator.naturalOrder()));
+
     private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
+
+    @Override
+    public Map<Long, Long> countAllByParentIdIn(List<Long> parentIds) {
+        return countByParentId(parentIds, taskExecution -> true);
+    }
+
+    @Override
+    public Map<Long, Long> countAllByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber) {
+        return countByParentId(parentIds, taskExecution -> taskExecution.getTaskNumber() == taskNumber);
+    }
+
+    @Override
+    public long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        ReentrantLock lock = obtainLock(getJobLockKey(jobId));
+
+        try {
+            lock.lock();
+
+            List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(jobId)
+                .stream()
+                .sorted(CREATED_DATE_COMPARATOR)
+                .toList();
+
+            Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
+
+            for (TaskExecution taskExecution : jobTaskExecutions) {
+                taskExecutionMap.put(taskExecution.getId(), taskExecution);
+            }
+
+            return jobTaskExecutions.stream()
+                .filter(taskExecution -> !isInRetriedAttempt(
+                    taskExecution, taskExecutionMap, jobTaskExecutions, supersededIds))
+                .count();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static boolean hasLaterRetry(TaskExecution taskExecution, List<TaskExecution> jobTaskExecutions) {
+        int index = jobTaskExecutions.indexOf(taskExecution);
+
+        return jobTaskExecutions.subList(index + 1, jobTaskExecutions.size())
+            .stream()
+            .anyMatch(laterTaskExecution -> Objects.equals(
+                laterTaskExecution.getParentId(), taskExecution.getParentId()) &&
+                laterTaskExecution.getRetryAttempts() == taskExecution.getRetryAttempts() + 1 &&
+                Objects.equals(getTaskName(laterTaskExecution), getTaskName(taskExecution)));
+    }
+
+    private static @Nullable String getTaskName(TaskExecution taskExecution) {
+        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+        return workflowTask == null ? null : workflowTask.getName();
+    }
+
+    private static boolean isInRetriedAttempt(
+        TaskExecution taskExecution, Map<Long, TaskExecution> taskExecutionMap,
+        List<TaskExecution> jobTaskExecutions, List<Long> supersededIds) {
+
+        TaskExecution currentTaskExecution = taskExecution;
+
+        while (currentTaskExecution != null) {
+            if (supersededIds.contains(currentTaskExecution.getId())) {
+                return true;
+            }
+
+            if (currentTaskExecution.getStatus() == TaskExecution.Status.FAILED &&
+                currentTaskExecution.getError() != null &&
+                currentTaskExecution.getRetryAttempts() < currentTaskExecution.getMaxRetries() &&
+                hasLaterRetry(currentTaskExecution, jobTaskExecutions)) {
+
+                return true;
+            }
+
+            Long parentId = currentTaskExecution.getParentId();
+
+            currentTaskExecution = parentId == null ? null : taskExecutionMap.get(parentId);
+        }
+
+        return false;
+    }
+
+    @Override
+    public long countByParentIdAndCreatedDateBeforeOrEqual(long parentId, Instant createdDate, long id) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .filter(taskExecution -> isBeforeOrEqual(taskExecution, createdDate, id))
+            .count();
+    }
+
+    @Override
+    public long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+        long parentId, int taskNumber, Instant createdDate, long id) {
+
+        return getOrderedChildren(parentId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
+            .filter(taskExecution -> isBeforeOrEqual(taskExecution, createdDate, id))
+            .count();
+    }
 
     @Override
     public void deleteById(long id) {
@@ -223,6 +359,131 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public List<TaskExecution> findAllByIdIn(List<Long> ids) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        return ids.stream()
+            .map(store.byId::get)
+            .filter(Objects::nonNull)
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getParentId() == null)
+            .sorted(CREATED_DATE_COMPARATOR)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+        long jobId, List<Long> supersededIds, int limit, long offset) {
+
+        List<TaskExecution> jobTaskExecutions = findAllByJobIdOrderByCreatedDate(jobId);
+
+        Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
+        Set<Long> parentIds = new HashSet<>();
+
+        for (TaskExecution taskExecution : jobTaskExecutions) {
+            taskExecutionMap.put(taskExecution.getId(), taskExecution);
+
+            if (taskExecution.getParentId() != null) {
+                parentIds.add(taskExecution.getParentId());
+            }
+        }
+
+        return jobTaskExecutions.stream()
+            .filter(taskExecution -> taskExecution.getError() != null)
+            .filter(taskExecution -> !parentIds.contains(taskExecution.getId()))
+            .filter(taskExecution -> !isInRetriedAttempt(
+                taskExecution, taskExecutionMap, jobTaskExecutions, supersededIds))
+            .sorted(CREATED_DATE_COMPARATOR)
+            .skip(offset)
+            .limit(limit)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentIdOrderByCreatedDate(long parentId, int limit, long offset) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .skip(offset)
+            .limit(limit)
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+        long parentId, Instant fromCreatedDate, long fromId, Instant toCreatedDate, long toId) {
+
+        List<TaskExecution> orderedChildren = getOrderedChildren(parentId);
+
+        int fromIndex = getBoundIndex(orderedChildren, fromCreatedDate, fromId);
+        int toIndex = Math.max(fromIndex, getBoundIndex(orderedChildren, toCreatedDate, toId));
+
+        return orderedChildren.subList(fromIndex, toIndex)
+            .stream()
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+        long parentId, Instant fromCreatedDate, long fromId) {
+
+        List<TaskExecution> orderedChildren = getOrderedChildren(parentId);
+
+        int fromIndex = getBoundIndex(orderedChildren, fromCreatedDate, fromId);
+
+        return orderedChildren.subList(fromIndex, orderedChildren.size())
+            .stream()
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<TaskExecution> findAllByParentIdAndTaskNumberOrderByCreatedDate(
+        long parentId, int taskNumber, int limit, long offset) {
+
+        return getOrderedChildren(parentId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
+            .skip(offset)
+            .limit(limit)
+            .map(this::clone)
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllIdsByIdInAndFirstChildTaskNumberNot(List<Long> ids, int taskNumber) {
+        return ids.stream()
+            .filter(id -> {
+                List<TaskExecution> orderedChildren = getOrderedChildren(id);
+
+                if (orderedChildren.isEmpty()) {
+                    return false;
+                }
+
+                TaskExecution firstChildTaskExecution = orderedChildren.getFirst();
+
+                return firstChildTaskExecution.getTaskNumber() != taskNumber;
+            })
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllIdsByParentIdOrderByCreatedDate(long parentId) {
+        return getOrderedChildren(parentId)
+            .stream()
+            .map(TaskExecution::getId)
+            .toList();
+    }
+
+    @Override
     public Optional<TaskExecution> findById(long id) {
         Store store = cache.computeIfAbsent(getStoreKey(), (key1) -> new Store());
 
@@ -275,6 +536,14 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Optional<TaskExecution> findLastStartedByJobId(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getStartDate() != null)
+            .max(START_DATE_COMPARATOR);
     }
 
     @Override
@@ -382,6 +651,79 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         }
 
         return taskExecution;
+    }
+
+    private static int getBoundIndex(List<TaskExecution> orderedChildren, Instant createdDate, long id) {
+        for (int index = 0; index < orderedChildren.size(); index++) {
+            TaskExecution taskExecution = orderedChildren.get(index);
+
+            if (Objects.equals(taskExecution.getId(), id)) {
+                return index;
+            }
+        }
+
+        return Math.toIntExact(
+            orderedChildren.stream()
+                .filter(taskExecution -> isBefore(taskExecution, createdDate, id))
+                .count());
+    }
+
+    private Map<Long, Long> countByParentId(List<Long> parentIds, Predicate<TaskExecution> taskExecutionPredicate) {
+        Map<Long, Long> counts = new HashMap<>();
+
+        for (Long parentId : parentIds) {
+            long count = getOrderedChildren(parentId)
+                .stream()
+                .filter(taskExecutionPredicate)
+                .count();
+
+            if (count > 0) {
+                counts.put(parentId, count);
+            }
+        }
+
+        return counts;
+    }
+
+    private List<TaskExecution> getOrderedChildren(long parentId) {
+        Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
+
+        ReentrantLock lock = obtainLock(getParentLockKey(parentId));
+
+        try {
+            lock.lock();
+
+            return new ArrayList<>(store.getParentTaskExecutions(parentId))
+                .stream()
+                .sorted(CREATED_DATE_COMPARATOR)
+                .toList();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static boolean isBefore(TaskExecution taskExecution, Instant createdDate, long id) {
+        Instant taskExecutionCreatedDate = taskExecution.getCreatedDate();
+
+        if (taskExecutionCreatedDate == null || createdDate == null) {
+            return false;
+        }
+
+        int comparison = taskExecutionCreatedDate.compareTo(createdDate);
+
+        return comparison < 0 || (comparison == 0 && Objects.requireNonNull(taskExecution.getId()) < id);
+    }
+
+    private static boolean isBeforeOrEqual(TaskExecution taskExecution, Instant createdDate, long id) {
+        Instant taskExecutionCreatedDate = taskExecution.getCreatedDate();
+
+        if (taskExecutionCreatedDate == null || createdDate == null) {
+            return false;
+        }
+
+        int comparison = taskExecutionCreatedDate.compareTo(createdDate);
+
+        return comparison < 0 || (comparison == 0 && Objects.requireNonNull(taskExecution.getId()) <= id);
     }
 
     private TaskExecution clone(TaskExecution taskExecution) {
