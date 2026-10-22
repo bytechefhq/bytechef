@@ -6,12 +6,6 @@ logging:
     format:
       console: ecs
 
-management:
-  prometheus:
-    metrics:
-      export:
-        enabled: false
-
 spring:
   devtools:
     restart:
