@@ -38,7 +38,7 @@ const LazyTaskExecutionChildren = ({
 
     const iterations = useMemo(
         () =>
-            pages.some((page) => page.iterations !== undefined)
+            pages.some((page) => (page.iterations?.length || 0) > 0)
                 ? pages.flatMap((page) => page.iterations || [])
                 : undefined,
         [pages]

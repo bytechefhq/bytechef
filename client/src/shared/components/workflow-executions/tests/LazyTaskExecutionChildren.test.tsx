@@ -1,4 +1,8 @@
-import {TaskExecution} from '@/shared/middleware/automation/workflow/execution';
+import {
+    TaskExecution,
+    TaskExecutionChildrenPage,
+    TaskExecutionChildrenPageFromJSON,
+} from '@/shared/middleware/automation/workflow/execution';
 import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -21,6 +25,60 @@ const loopTaskExecution = {
     title: 'Loop',
     type: 'loop/v1',
 } as TaskExecution;
+
+const plainTaskExecution = {
+    id: '5',
+    jobId: '7',
+    priority: 0,
+    status: 'COMPLETED',
+    title: 'Parallel',
+    type: 'parallel/v1',
+} as TaskExecution;
+
+const createPlainPage = (childCount: number, totalElements: number): TaskExecutionChildrenPage =>
+    TaskExecutionChildrenPageFromJSON({
+        children: Array.from({length: childCount}, (_, index) => ({
+            childCount: 0,
+            id: `${200 + index}`,
+            jobId: '7',
+            priority: 0,
+            status: 'COMPLETED',
+            title: `Child task ${index + 1}`,
+        })),
+        iterations: [],
+        number: 0,
+        numberOfElements: childCount,
+        size: 50,
+        totalElements,
+        totalPages: Math.ceil(totalElements / 50),
+    });
+
+const mockPlainQueryResult = ({
+    childCount,
+    fetchNextPage = vi.fn(),
+    hasNextPage = false,
+    isFetchNextPageError = false,
+    isFetchingNextPage = false,
+    totalElements,
+}: {
+    childCount: number;
+    fetchNextPage?: () => void;
+    hasNextPage?: boolean;
+    isFetchNextPageError?: boolean;
+    isFetchingNextPage?: boolean;
+    totalElements: number;
+}) => {
+    hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
+        data: {pages: [createPlainPage(childCount, totalElements)]},
+        fetchNextPage,
+        hasNextPage,
+        isFetchNextPageError,
+        isFetchingNextPage,
+        isLoading: false,
+    });
+
+    return fetchNextPage;
+};
 
 const createIteration = (index: number) => [
     {id: `${100 + index}`, jobId: '7', priority: 0, status: 'COMPLETED', title: `Row task ${index + 1}`},
@@ -210,5 +268,22 @@ describe('LazyTaskExecutionChildren', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Retry'}));
 
         expect(fetchNextPage).toHaveBeenCalledTimes(1);
+    });
+
+    it('rendersChildrenOfAPlainPageWithAnEmptyIterationsArray', () => {
+        mockPlainQueryResult({childCount: 2, totalElements: 2});
+
+        render(
+            <LazyTaskExecutionChildren
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId=""
+            />
+        );
+
+        expect(screen.getByText('Child task 1')).toBeInTheDocument();
+        expect(screen.getByText('Child task 2')).toBeInTheDocument();
+        expect(screen.queryByText(/Loop iteration/)).not.toBeInTheDocument();
     });
 });
