@@ -1,5 +1,6 @@
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
 import {fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectVersionHistorySheet from '../ProjectVersionHistorySheet';
@@ -24,6 +25,8 @@ describe('ProjectVersionHistorySheet', () => {
         onDeleteProjectVersion.mockReset();
         onRestoreProjectVersion.mockReset();
         onSheetOpenChange.mockReset();
+
+        Object.defineProperty(window, 'location', {value: {href: ''}, writable: true});
     });
 
     const renderSheet = () =>
@@ -32,6 +35,7 @@ describe('ProjectVersionHistorySheet', () => {
                 onDeleteProjectVersion={onDeleteProjectVersion}
                 onRestoreProjectVersion={onRestoreProjectVersion}
                 onSheetOpenChange={onSheetOpenChange}
+                projectId={7}
                 projectVersions={projectVersions}
                 sheetOpen
             />
@@ -82,12 +86,34 @@ describe('ProjectVersionHistorySheet', () => {
         expect(onSheetOpenChange).toHaveBeenCalledWith(false);
     });
 
-    it('offers delete only for published versions and deletes after confirmation', () => {
+    it('exports the chosen version from its actions menu', async () => {
+        const user = userEvent.setup();
+
         renderSheet();
 
-        expect(screen.queryByRole('button', {name: 'Delete version 3'})).not.toBeInTheDocument();
+        await user.click(screen.getByRole('button', {name: 'Version 3 actions'}));
+        await user.click(screen.getByRole('menuitem', {name: 'Export'}));
 
-        fireEvent.click(screen.getByRole('button', {name: 'Delete version 2'}));
+        expect(window.location.href).toBe('/api/automation/internal/projects/7/export?projectVersion=3');
+        expect(screen.getByRole('option', {name: 'Version 3'})).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('offers delete only for published versions and deletes after confirmation', async () => {
+        const user = userEvent.setup();
+
+        renderSheet();
+
+        await user.click(screen.getByRole('button', {name: 'Version 3 actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Export'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+
+        await user.keyboard('{Escape}');
+
+        await user.click(screen.getByRole('button', {name: 'Version 2 actions'}));
+        await user.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+        expect(screen.getByRole('option', {hidden: true, name: 'Version 2'})).toHaveAttribute('aria-selected', 'false');
 
         expect(screen.getByText('Delete version V2?')).toBeInTheDocument();
         expect(screen.getByRole('button', {hidden: true, name: 'Apply selected version'})).toBeDisabled();

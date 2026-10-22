@@ -266,6 +266,7 @@ const SettingsMenu = ({
                     onDeleteProjectVersion={handleDeleteProjectVersion}
                     onRestoreProjectVersion={handleRestoreProjectVersion}
                     onSheetOpenChange={setShowProjectVersionHistorySheet}
+                    projectId={project.id!}
                     projectVersions={projectVersions}
                     restoreProjectVersionPending={restoreProjectVersionPending}
                     sheetOpen={showProjectVersionHistorySheet}
