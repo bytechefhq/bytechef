@@ -23,6 +23,7 @@ interface TriggerDataI {
 interface WorkflowTriggerAndComponentsRowProps {
     className?: string;
     filteredComponentNames?: string[];
+    fitToWidth?: boolean;
     maxIcons?: number;
     workflow: WorkflowTriggerSourceI;
     workflowComponentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
@@ -32,6 +33,7 @@ interface WorkflowTriggerAndComponentsRowProps {
 const WorkflowTriggerAndComponentsRow = ({
     className,
     filteredComponentNames,
+    fitToWidth,
     maxIcons,
     workflow,
     workflowComponentDefinitions,
@@ -95,7 +97,7 @@ const WorkflowTriggerAndComponentsRow = ({
     );
 
     return (
-        <div className={twMerge('flex items-center gap-1', className)}>
+        <div className={twMerge('flex items-center gap-1', fitToWidth && 'min-w-0', className)}>
             {triggerData && (
                 <div className="flex shrink-0 items-center gap-1">
                     <Tooltip>
@@ -133,6 +135,7 @@ const WorkflowTriggerAndComponentsRow = ({
 
             <WorkflowComponentsList
                 filteredComponentNames={taskOnlyComponentNames}
+                fitToWidth={fitToWidth}
                 maxIcons={maxIcons}
                 workflowComponentDefinitions={workflowComponentDefinitions}
                 workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
