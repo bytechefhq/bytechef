@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -39,6 +41,9 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(classes = WorkflowExecutionRepositoryIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 public class JdbcTaskExecutionRepositoryIntTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private JdbcJobRepository jobRepository;
@@ -61,14 +66,76 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllIdsByParentIdAndTaskNumberOrderByCreatedDate() {
+    public void testFindAllByParentIdAndTaskNumberOrderByCreatedDate() {
         ChildrenFixture fixture = saveChildrenFixture();
 
         List<Long> childIds = fixture.childIds();
 
         Assertions.assertEquals(
-            List.of(childIds.get(0), childIds.get(2), childIds.get(4)),
-            taskExecutionRepository.findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(fixture.parentId(), 0));
+            List.of(childIds.get(2), childIds.get(4)),
+            toIds(taskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(
+                fixture.parentId(), 0, 3, 1)));
+        Assertions.assertEquals(
+            List.of(childIds.get(0)),
+            toIds(taskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(
+                fixture.parentId(), 0, 1, 0)));
+    }
+
+    @Test
+    public void testFindAllByParentIdAndCreatedDateBetweenOrderByCreatedDate() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        List<Long> childIds = fixture.childIds();
+
+        TaskExecution fromTaskExecution = getTaskExecution(childIds.get(2));
+        TaskExecution toTaskExecution = getTaskExecution(childIds.get(4));
+
+        Assertions.assertEquals(
+            List.of(childIds.get(2), childIds.get(3)),
+            toIds(taskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+                fixture.parentId(), Objects.requireNonNull(fromTaskExecution.getCreatedDate()), childIds.get(2),
+                Objects.requireNonNull(toTaskExecution.getCreatedDate()), childIds.get(4))));
+    }
+
+    @Test
+    public void testFindAllByParentIdAndCreatedDateFromOrderByCreatedDate() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        List<Long> childIds = fixture.childIds();
+
+        TaskExecution fromTaskExecution = getTaskExecution(childIds.get(2));
+
+        Assertions.assertEquals(
+            List.of(childIds.get(2), childIds.get(3), childIds.get(4)),
+            toIds(taskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+                fixture.parentId(), Objects.requireNonNull(fromTaskExecution.getCreatedDate()), childIds.get(2))));
+    }
+
+    @Test
+    public void testChildRangesBreakTiedCreatedDatesById() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        List<Long> childIds = fixture.childIds();
+
+        Instant createdDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        for (Long childId : childIds) {
+            jdbcTemplate.update(
+                "UPDATE task_execution SET created_date = ? WHERE id = ?", Timestamp.from(createdDate), childId);
+        }
+
+        Assertions.assertEquals(
+            List.of(childIds.get(2), childIds.get(4)),
+            toIds(taskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(
+                fixture.parentId(), 0, 2, 1)));
+        Assertions.assertEquals(
+            List.of(childIds.get(2), childIds.get(3)),
+            toIds(taskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+                fixture.parentId(), createdDate, childIds.get(2), createdDate, childIds.get(4))));
+        Assertions.assertEquals(
+            List.of(childIds.get(3), childIds.get(4)),
+            toIds(taskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+                fixture.parentId(), createdDate, childIds.get(3))));
     }
 
     @Test
@@ -88,15 +155,21 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllParentIdsByParentIdIn() {
+    public void testCountAllByParentIdIn() {
         ChildrenFixture fixture = saveChildrenFixture();
+        ChildrenFixture otherFixture = saveChildrenFixture();
 
-        Assertions.assertEquals(5, taskExecutionRepository.findAllParentIdsByParentIdIn(List.of(fixture.parentId()))
-            .size());
+        long childlessParentId = fixture.childIds()
+            .getFirst();
+
         Assertions.assertEquals(
-            3,
-            taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(fixture.parentId()), 0)
-                .size());
+            Map.of(fixture.parentId(), 5L, otherFixture.parentId(), 5L),
+            taskExecutionRepository.countAllByParentIdIn(
+                List.of(fixture.parentId(), otherFixture.parentId(), childlessParentId)));
+        Assertions.assertEquals(
+            Map.of(fixture.parentId(), 3L),
+            taskExecutionRepository.countAllByParentIdInAndTaskNumber(
+                List.of(fixture.parentId(), childlessParentId), 0));
     }
 
     @Test
@@ -120,31 +193,47 @@ public class JdbcTaskExecutionRepositoryIntTest {
     public void testEmptyInputListsReturnEmptyResults() {
         Assertions.assertTrue(taskExecutionRepository.findAllByIdIn(List.of())
             .isEmpty());
-        Assertions.assertTrue(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of())
+        Assertions.assertTrue(taskExecutionRepository.countAllByParentIdIn(List.of())
             .isEmpty());
-        Assertions.assertTrue(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(), 0)
+        Assertions.assertTrue(taskExecutionRepository.countAllByParentIdInAndTaskNumber(List.of(), 0)
+            .isEmpty());
+        Assertions.assertTrue(taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(List.of(), 0)
             .isEmpty());
     }
 
     @Test
-    public void testFindAllByJobIdAndErrorNotNullOrderByCreatedDate() {
+    public void testFindAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate() {
         saveChildrenFixture();
 
-        long secondJobId = saveJob();
+        long jobId = saveJob();
 
-        TaskExecution failedTaskExecution =
-            saveTaskExecution(secondJobId, null, 0, new ExecutionError("failed", List.of()));
+        ExecutionError executionError = new ExecutionError("failed", List.of());
 
-        saveTaskExecution(secondJobId, null, 1, null);
+        TaskExecution retriedLoopTaskExecution = saveRetriedTaskExecution(jobId, null, 0);
 
-        List<TaskExecution> taskExecutions =
-            taskExecutionRepository.findAllByJobIdAndErrorNotNullOrderByCreatedDate(secondJobId);
+        saveTaskExecution(jobId, retriedLoopTaskExecution.getId(), 0, executionError);
+
+        TaskExecution loopTaskExecution = saveTaskExecution(jobId, null, 0, null, 1);
+
+        saveRetriedTaskExecution(jobId, loopTaskExecution.getId(), 0);
+
+        TaskExecution firstFailedLeafTaskExecution = saveTaskExecution(
+            jobId, loopTaskExecution.getId(), 0, executionError);
+        TaskExecution failedParentTaskExecution = saveTaskExecution(
+            jobId, loopTaskExecution.getId(), 1, executionError);
+
+        saveTaskExecution(jobId, failedParentTaskExecution.getId(), 0, null);
+
+        TaskExecution secondFailedLeafTaskExecution = saveTaskExecution(jobId, null, 1, executionError);
+
+        saveTaskExecution(jobId, null, 2, null);
 
         Assertions.assertEquals(
-            List.of(failedTaskExecution.getId()),
-            taskExecutions.stream()
-                .map(TaskExecution::getId)
-                .toList());
+            List.of(firstFailedLeafTaskExecution.getId(), secondFailedLeafTaskExecution.getId()),
+            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, 10, 0)));
+        Assertions.assertEquals(
+            List.of(secondFailedLeafTaskExecution.getId()),
+            toIds(taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(jobId, 1, 1)));
     }
 
     @Test
@@ -222,6 +311,39 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
+    public void testCountByParentIdAndCreatedDateBeforeOrEqual() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        TaskExecution thirdTaskExecution = getTaskExecution(fixture.childIds()
+            .get(2));
+
+        Assertions.assertEquals(
+            3,
+            taskExecutionRepository.countByParentIdAndCreatedDateBeforeOrEqual(
+                fixture.parentId(), Objects.requireNonNull(thirdTaskExecution.getCreatedDate()),
+                Objects.requireNonNull(thirdTaskExecution.getId())));
+    }
+
+    @Test
+    public void testFindAllIdsByIdInAndFirstChildTaskNumberNot() {
+        ChildrenFixture fixture = saveChildrenFixture();
+
+        TaskExecution leadingParentTaskExecution = saveTaskExecution(fixture.jobId(), null, 0, null);
+        TaskExecution childlessTaskExecution = saveTaskExecution(fixture.jobId(), null, 0, null);
+
+        long leadingParentId = Objects.requireNonNull(leadingParentTaskExecution.getId());
+
+        saveTaskExecutionId(fixture.jobId(), leadingParentId, 1);
+        saveTaskExecutionId(fixture.jobId(), leadingParentId, 0);
+
+        Assertions.assertEquals(
+            List.of(leadingParentId),
+            taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(
+                List.of(fixture.parentId(), leadingParentId, Objects.requireNonNull(childlessTaskExecution.getId())),
+                0));
+    }
+
+    @Test
     public void testFindLastStartedByJobId() {
         long jobId = saveJob();
 
@@ -266,6 +388,11 @@ public class JdbcTaskExecutionRepositoryIntTest {
             saveTaskExecutionId(jobId, parentId, 0));
 
         return new ChildrenFixture(jobId, parentId, childIds);
+    }
+
+    private TaskExecution getTaskExecution(long id) {
+        return taskExecutionRepository.findById(id)
+            .orElseThrow();
     }
 
     private long saveJob() {
@@ -316,6 +443,12 @@ public class JdbcTaskExecutionRepositoryIntTest {
             .build();
 
         return taskExecutionRepository.save(taskExecution);
+    }
+
+    private static List<Long> toIds(List<TaskExecution> taskExecutions) {
+        return taskExecutions.stream()
+            .map(TaskExecution::getId)
+            .toList();
     }
 
     private record ChildrenFixture(long jobId, long parentId, List<Long> childIds) {

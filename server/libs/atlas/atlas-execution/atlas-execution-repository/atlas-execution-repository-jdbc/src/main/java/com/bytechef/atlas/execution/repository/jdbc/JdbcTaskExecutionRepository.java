@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -34,6 +35,24 @@ import org.springframework.stereotype.Repository;
 public interface JdbcTaskExecutionRepository
     extends ListPagingAndSortingRepository<TaskExecution, Long>, ListCrudRepository<TaskExecution, Long>,
     TaskExecutionRepository {
+
+    @Override
+    default Map<Long, Long> countAllByParentIdIn(List<Long> parentIds) {
+        if (parentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return selectCountsByParentIdIn(parentIds);
+    }
+
+    @Override
+    default Map<Long, Long> countAllByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber) {
+        if (parentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return selectCountsByParentIdInAndTaskNumber(parentIds, taskNumber);
+    }
 
     @Override
     default long countLatestAttemptsByJobId(long jobId, List<Long> supersededIds) {
@@ -76,6 +95,15 @@ public interface JdbcTaskExecutionRepository
     @Override
     @Query("""
         SELECT COUNT(*) FROM task_execution
+        WHERE parent_id = :parentId
+        AND (created_date < :createdDate OR (created_date = :createdDate AND id <= :id))
+        """)
+    long countByParentIdAndCreatedDateBeforeOrEqual(
+        @Param("parentId") long parentId, @Param("createdDate") Instant createdDate, @Param("id") long id);
+
+    @Override
+    @Query("""
+        SELECT COUNT(*) FROM task_execution
         WHERE parent_id = :parentId AND task_number = :taskNumber
         AND (created_date < :createdDate OR (created_date = :createdDate AND id <= :id))
         """)
@@ -99,12 +127,26 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> selectAllByIdIn(@Param("ids") List<Long> ids);
 
     @Override
-    @Query("SELECT * FROM task_execution WHERE job_id = :jobId AND error IS NOT NULL ORDER BY created_date ASC, id ASC")
-    List<TaskExecution> findAllByJobIdAndErrorNotNullOrderByCreatedDate(@Param("jobId") long jobId);
-
-    @Override
     @Query("SELECT * FROM task_execution WHERE job_id = :jobId AND parent_id IS NULL ORDER BY created_date ASC, id ASC")
     List<TaskExecution> findAllByJobIdAndParentIdIsNullOrderByCreatedDate(@Param("jobId") long jobId);
+
+    @Override
+    @Query("""
+        WITH RECURSIVE retried_task_execution AS (
+            SELECT id FROM task_execution
+            WHERE job_id = :jobId AND status = 3 AND error IS NOT NULL AND retry_attempts < max_retries
+            UNION
+            SELECT task_execution.id FROM task_execution
+            JOIN retried_task_execution ON task_execution.parent_id = retried_task_execution.id
+        )
+        SELECT * FROM task_execution
+        WHERE job_id = :jobId AND error IS NOT NULL
+        AND id NOT IN (SELECT id FROM retried_task_execution)
+        AND NOT EXISTS (SELECT 1 FROM task_execution child WHERE child.parent_id = task_execution.id)
+        ORDER BY created_date ASC, id ASC LIMIT :limit OFFSET :offset
+        """)
+    List<TaskExecution> findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+        @Param("jobId") long jobId, @Param("limit") int limit, @Param("offset") long offset);
 
     @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
@@ -125,39 +167,72 @@ public interface JdbcTaskExecutionRepository
 
     @Override
     @Query("""
-        SELECT id FROM task_execution WHERE parent_id = :parentId AND task_number = :taskNumber
+        SELECT * FROM task_execution WHERE parent_id = :parentId
+        AND (created_date > :fromCreatedDate OR (created_date = :fromCreatedDate AND id >= :fromId))
+        AND (created_date < :toCreatedDate OR (created_date = :toCreatedDate AND id < :toId))
         ORDER BY created_date ASC, id ASC
         """)
-    List<Long> findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(
-        @Param("parentId") long parentId, @Param("taskNumber") int taskNumber);
+    List<TaskExecution> findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+        @Param("parentId") long parentId, @Param("fromCreatedDate") Instant fromCreatedDate,
+        @Param("fromId") long fromId, @Param("toCreatedDate") Instant toCreatedDate, @Param("toId") long toId);
+
+    @Override
+    @Query("""
+        SELECT * FROM task_execution WHERE parent_id = :parentId
+        AND (created_date > :fromCreatedDate OR (created_date = :fromCreatedDate AND id >= :fromId))
+        ORDER BY created_date ASC, id ASC
+        """)
+    List<TaskExecution> findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+        @Param("parentId") long parentId, @Param("fromCreatedDate") Instant fromCreatedDate,
+        @Param("fromId") long fromId);
+
+    @Override
+    @Query("""
+        SELECT * FROM task_execution WHERE parent_id = :parentId AND task_number = :taskNumber
+        ORDER BY created_date ASC, id ASC LIMIT :limit OFFSET :offset
+        """)
+    List<TaskExecution> findAllByParentIdAndTaskNumberOrderByCreatedDate(
+        @Param("parentId") long parentId, @Param("taskNumber") int taskNumber, @Param("limit") int limit,
+        @Param("offset") long offset);
+
+    @Override
+    default List<Long> findAllIdsByIdInAndFirstChildTaskNumberNot(List<Long> ids, int taskNumber) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return selectAllIdsByIdInAndFirstChildTaskNumberNot(ids, taskNumber);
+    }
+
+    @Query("""
+        SELECT parent.id FROM task_execution parent WHERE parent.id IN (:ids)
+        AND (
+            SELECT child.task_number FROM task_execution child WHERE child.parent_id = parent.id
+            ORDER BY child.created_date ASC, child.id ASC LIMIT 1
+        ) <> :taskNumber
+        """)
+    List<Long> selectAllIdsByIdInAndFirstChildTaskNumberNot(
+        @Param("ids") List<Long> ids, @Param("taskNumber") int taskNumber);
 
     @Override
     @Query("SELECT id FROM task_execution WHERE parent_id = :parentId ORDER BY created_date ASC, id ASC")
     List<Long> findAllIdsByParentIdOrderByCreatedDate(@Param("parentId") long parentId);
 
-    @Override
-    default List<Long> findAllParentIdsByParentIdIn(List<Long> parentIds) {
-        if (parentIds.isEmpty()) {
-            return List.of();
-        }
+    @Query(
+        value = """
+            SELECT parent_id, COUNT(*) AS child_count FROM task_execution
+            WHERE parent_id IN (:parentIds) GROUP BY parent_id
+            """,
+        resultSetExtractorClass = ParentIdCountsResultSetExtractor.class)
+    Map<Long, Long> selectCountsByParentIdIn(@Param("parentIds") List<Long> parentIds);
 
-        return selectAllParentIdsByParentIdIn(parentIds);
-    }
-
-    @Override
-    default List<Long> findAllParentIdsByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber) {
-        if (parentIds.isEmpty()) {
-            return List.of();
-        }
-
-        return selectAllParentIdsByParentIdInAndTaskNumber(parentIds, taskNumber);
-    }
-
-    @Query("SELECT parent_id FROM task_execution WHERE parent_id IN (:parentIds)")
-    List<Long> selectAllParentIdsByParentIdIn(@Param("parentIds") List<Long> parentIds);
-
-    @Query("SELECT parent_id FROM task_execution WHERE parent_id IN (:parentIds) AND task_number = :taskNumber")
-    List<Long> selectAllParentIdsByParentIdInAndTaskNumber(
+    @Query(
+        value = """
+            SELECT parent_id, COUNT(*) AS child_count FROM task_execution
+            WHERE parent_id IN (:parentIds) AND task_number = :taskNumber GROUP BY parent_id
+            """,
+        resultSetExtractorClass = ParentIdCountsResultSetExtractor.class)
+    Map<Long, Long> selectCountsByParentIdInAndTaskNumber(
         @Param("parentIds") List<Long> parentIds, @Param("taskNumber") int taskNumber);
 
     @Override

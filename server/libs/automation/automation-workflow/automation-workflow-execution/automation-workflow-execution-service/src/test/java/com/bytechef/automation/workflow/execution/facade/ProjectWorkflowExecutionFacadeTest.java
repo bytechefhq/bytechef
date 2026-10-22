@@ -69,6 +69,7 @@ import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowServ
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -192,8 +193,8 @@ public class ProjectWorkflowExecutionFacadeTest {
 
     @Test
     public void testGetWorkflowExecutionTaskExecutionLoadsTaskData() {
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         doReturn(Map.of("context", true))
             .when(taskFileStorage)
             .readContextValue(any());
@@ -217,8 +218,8 @@ public class ProjectWorkflowExecutionFacadeTest {
         childJob.setParentTaskExecutionId(1L);
         childJob.setStatus(Job.Status.COMPLETED);
 
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getChildJobs(List.of(1L)))
             .thenReturn(List.of(childJob));
 
@@ -237,8 +238,8 @@ public class ProjectWorkflowExecutionFacadeTest {
 
     @Test
     public void testGetWorkflowExecutionTaskExecutionWithoutChildJob() {
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getChildJobs(List.of(1L)))
             .thenReturn(List.of());
 
@@ -258,8 +259,8 @@ public class ProjectWorkflowExecutionFacadeTest {
             .jobId(5L)
             .build();
 
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getJob(10L))
             .thenReturn(childJob);
         when(taskExecutionService.getTaskExecution(99L))
@@ -302,8 +303,8 @@ public class ProjectWorkflowExecutionFacadeTest {
 
     @Test
     public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getJob(10L))
             .thenReturn(new Job(10L));
 
@@ -424,7 +425,7 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         assertThat(workflowExecutionDTO.projectDeployment()).isNull();
         assertThat(workflowExecutionDTO.triggerExecution()).isNull();
-        assertThat(workflowExecutionDTO.focusPath()).containsExactly(new FocusPathElementDTO(1L, null));
+        assertThat(workflowExecutionDTO.focusPath()).containsExactly(new FocusPathElementDTO(1L, null, null));
         assertThat(workflowExecutionDTO.taskExecutionCount()).isEqualTo(5L);
 
         JobDTO jobDTO = Objects.requireNonNull(workflowExecutionDTO.job());
@@ -506,7 +507,8 @@ public class ProjectWorkflowExecutionFacadeTest {
             .containsExactly(tuple(2L, null));
 
         verify(taskExecutionService, never()).countJobTaskExecutions(anyLong(), anyList());
-        verify(taskExecutionService, never()).getFailedJobTaskExecutions(anyLong());
+        verify(taskExecutionService, never()).getLatestAttemptFailedLeafJobTaskExecutions(anyLong(), anyInt(),
+            anyInt());
     }
 
     @Test
@@ -517,8 +519,8 @@ public class ProjectWorkflowExecutionFacadeTest {
             .workflowTask(workflowTask)
             .build();
 
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(foreignTaskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(foreignTaskExecution));
         when(jobService.getJob(20L))
             .thenReturn(new Job(20L));
 
@@ -526,6 +528,17 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isInstanceOf(IllegalArgumentException.class);
 
         verify(taskExecutionService, never()).getParentTaskExecutions(anyLong(), anyInt(), anyInt());
+    }
+
+    @Test
+    public void getWorkflowExecutionTaskExecutionChildrenReportsMissingTaskAsNotFound() {
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecutionChildren(10L, 1L, 0, 50))
+            .isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(10L, 1L))
+            .isInstanceOf(NoSuchElementException.class);
     }
 
     @Nested

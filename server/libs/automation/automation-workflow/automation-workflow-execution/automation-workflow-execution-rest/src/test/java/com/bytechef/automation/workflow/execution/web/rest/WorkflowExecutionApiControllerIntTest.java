@@ -149,7 +149,7 @@ class WorkflowExecutionApiControllerIntTest {
         JobDTO jobDTO = new JobDTO(job, Map.of(), List.of(createTaskExecutionDTO(1L, 2, null)));
 
         List<FocusPathElementDTO> focusPath = List.of(
-            new FocusPathElementDTO(1L, null), new FocusPathElementDTO(7L, 3));
+            new FocusPathElementDTO(1L, null, null), new FocusPathElementDTO(7L, 3, null));
 
         when(projectWorkflowExecutionFacade.getWorkflowExecution(5L, true))
             .thenReturn(new WorkflowExecutionDTO(5L, null, null, null, jobDTO, null, null, focusPath, 120L));

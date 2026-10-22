@@ -127,19 +127,59 @@ class TaskExecutionServiceTest {
     }
 
     @Test
-    void getChildCountsCountsRowsPerParent() {
-        when(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of(7L, 8L)))
-            .thenReturn(List.of(7L, 7L, 8L));
+    void getChildCountsReadsGroupedCountsPerParent() {
+        when(taskExecutionRepository.countAllByParentIdIn(List.of(7L, 8L)))
+            .thenReturn(Map.of(7L, 2L, 8L, 1L));
 
         assertThat(taskExecutionService.getChildCounts(List.of(7L, 8L))).isEqualTo(Map.of(7L, 2L, 8L, 1L));
     }
 
     @Test
-    void getIterationCountsCountsIterationStartRowsPerParent() {
-        when(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(7L, 8L), 0))
-            .thenReturn(List.of(7L, 8L, 8L));
+    void getIterationCountsReadsGroupedIterationStartCountsPerParent() {
+        when(taskExecutionRepository.countAllByParentIdInAndTaskNumber(List.of(7L, 8L), 0))
+            .thenReturn(Map.of(7L, 1L, 8L, 2L));
 
         assertThat(taskExecutionService.getIterationCounts(List.of(7L, 8L))).isEqualTo(Map.of(7L, 1L, 8L, 2L));
+    }
+
+    @Test
+    void getParentIterationStartTaskExecutionsReadsTaskNumberZeroRowsAtOffset() {
+        TaskExecution iterationStartTaskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(9L, 0, 51, 100L))
+            .thenReturn(List.of(iterationStartTaskExecution));
+
+        assertThat(taskExecutionService.getParentIterationStartTaskExecutions(9L, 100L, 51))
+            .containsExactly(iterationStartTaskExecution);
+    }
+
+    @Test
+    void getParentTaskExecutionsBetweenReadsHalfOpenRange() {
+        Instant fromCreatedDate = Instant.parse("2026-09-25T10:00:00Z");
+        Instant toCreatedDate = Instant.parse("2026-09-25T10:00:05Z");
+
+        TaskExecution childTaskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+            9L, fromCreatedDate, 1L, toCreatedDate, 2L)).thenReturn(List.of(childTaskExecution));
+
+        assertThat(
+            taskExecutionService.getParentTaskExecutionsBetween(
+                9L, createTaskExecution(1L, fromCreatedDate), createTaskExecution(2L, toCreatedDate)))
+                    .containsExactly(childTaskExecution);
+    }
+
+    @Test
+    void getParentTaskExecutionsFromReadsOpenEndedRange() {
+        Instant fromCreatedDate = Instant.parse("2026-09-25T10:00:00Z");
+
+        TaskExecution childTaskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(9L, fromCreatedDate, 1L))
+            .thenReturn(List.of(childTaskExecution));
+
+        assertThat(taskExecutionService.getParentTaskExecutionsFrom(9L, createTaskExecution(1L, fromCreatedDate)))
+            .containsExactly(childTaskExecution);
     }
 
     @Test
@@ -156,6 +196,28 @@ class TaskExecutionServiceTest {
     }
 
     @Test
+    void getTaskExecutionsSkipsIdsThatAreNotFound() {
+        TaskExecution second = new TaskExecution();
+
+        second.setId(2L);
+
+        when(taskExecutionRepository.findAllByIdIn(List.of(1L, 2L))).thenReturn(List.of(second));
+
+        assertThat(taskExecutionService.getTaskExecutions(List.of(1L, 2L))).containsExactly(second);
+    }
+
+    @Test
+    void getTaskExecutionsQueriesEachIdOnce() {
+        TaskExecution first = new TaskExecution();
+
+        first.setId(1L);
+
+        when(taskExecutionRepository.findAllByIdIn(List.of(1L))).thenReturn(List.of(first));
+
+        assertThat(taskExecutionService.getTaskExecutions(List.of(1L, 1L))).containsExactly(first, first);
+    }
+
+    @Test
     void getIterationIndexIsZeroBasedCount() {
         Instant createdDate = Instant.parse("2026-09-25T10:00:00Z");
 
@@ -168,6 +230,57 @@ class TaskExecutionServiceTest {
             5L, 0, createdDate, TASK_EXECUTION_ID)).thenReturn(3L);
 
         assertThat(taskExecutionService.getIterationIndex(taskExecution)).isEqualTo(2);
+    }
+
+    @Test
+    void getIterationIndexCountsTheLeadingIteration() {
+        Instant createdDate = Instant.parse("2026-09-25T10:00:00Z");
+
+        TaskExecution taskExecution = mock(TaskExecution.class);
+
+        when(taskExecution.getId()).thenReturn(TASK_EXECUTION_ID);
+        when(taskExecution.getParentId()).thenReturn(5L);
+        when(taskExecution.getCreatedDate()).thenReturn(createdDate);
+        when(taskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+            5L, 0, createdDate, TASK_EXECUTION_ID)).thenReturn(0L);
+        when(taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(List.of(5L), 0))
+            .thenReturn(List.of(5L));
+
+        assertThat(taskExecutionService.getIterationIndex(taskExecution)).isZero();
+    }
+
+    @Test
+    void getIterationCountsAddTheLeadingIteration() {
+        when(taskExecutionRepository.countAllByParentIdInAndTaskNumber(List.of(7L, 8L, 9L), 0))
+            .thenReturn(Map.of(7L, 1L, 8L, 2L));
+        when(taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(List.of(7L, 8L, 9L), 0))
+            .thenReturn(List.of(8L, 9L));
+
+        assertThat(taskExecutionService.getIterationCounts(List.of(7L, 8L, 9L)))
+            .isEqualTo(Map.of(7L, 1L, 8L, 3L, 9L, 1L));
+    }
+
+    @Test
+    void getChildIndexIsZeroBasedPosition() {
+        Instant createdDate = Instant.parse("2026-09-25T10:00:00Z");
+
+        TaskExecution taskExecution = mock(TaskExecution.class);
+
+        when(taskExecution.getId()).thenReturn(TASK_EXECUTION_ID);
+        when(taskExecution.getParentId()).thenReturn(5L);
+        when(taskExecution.getCreatedDate()).thenReturn(createdDate);
+        when(taskExecutionRepository.countByParentIdAndCreatedDateBeforeOrEqual(5L, createdDate, TASK_EXECUTION_ID))
+            .thenReturn(74L);
+
+        assertThat(taskExecutionService.getChildIndex(taskExecution)).isEqualTo(73);
+    }
+
+    @Test
+    void fetchTaskExecutionIsEmptyForMissingRow() {
+        when(taskExecutionRepository.findById(TASK_EXECUTION_ID))
+            .thenReturn(Optional.empty());
+
+        assertThat(taskExecutionService.fetchTaskExecution(TASK_EXECUTION_ID)).isEmpty();
     }
 
     @Test
@@ -187,6 +300,15 @@ class TaskExecutionServiceTest {
         taskExecutionService.getParentTaskExecutions(9L, 2, 50);
 
         verify(taskExecutionRepository).findAllByParentIdOrderByCreatedDate(9L, 50, 100L);
+    }
+
+    private static TaskExecution createTaskExecution(long id, Instant createdDate) {
+        TaskExecution taskExecution = mock(TaskExecution.class);
+
+        when(taskExecution.getId()).thenReturn(id);
+        when(taskExecution.getCreatedDate()).thenReturn(createdDate);
+
+        return taskExecution;
     }
 
     private TaskExecution stubTaskExecution(TaskExecution.Status status) {

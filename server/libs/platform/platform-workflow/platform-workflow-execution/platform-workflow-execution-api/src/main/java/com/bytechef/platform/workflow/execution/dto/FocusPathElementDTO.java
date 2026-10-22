@@ -17,11 +17,20 @@
 package com.bytechef.platform.workflow.execution.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public record FocusPathElementDTO(
-    @JsonFormat(shape = JsonFormat.Shape.STRING) long taskExecutionId, @Nullable Integer iterationIndex) {
+    @JsonFormat(shape = JsonFormat.Shape.STRING) long taskExecutionId, @Nullable Integer iterationIndex,
+    @Nullable Integer childIndex) {
+
+    public FocusPathElementDTO {
+        Validate.isTrue(iterationIndex == null || iterationIndex >= 0, "iterationIndex must not be negative");
+        Validate.isTrue(childIndex == null || childIndex >= 0, "childIndex must not be negative");
+        Validate.isTrue(
+            iterationIndex == null || childIndex == null, "iterationIndex and childIndex must not both be set");
+    }
 }

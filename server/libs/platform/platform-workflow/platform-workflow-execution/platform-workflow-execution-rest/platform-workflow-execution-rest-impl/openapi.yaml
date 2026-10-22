@@ -420,13 +420,17 @@ components:
           type: "string"
           readOnly: true
     FocusPathElement:
-      description: "An element of the path from the root task executions to the task execution to focus."
+      description: "An element of the path from a top-level task execution to the task execution to focus."
       type: "object"
       required:
         - "taskExecutionId"
       properties:
+        childIndex:
+          description: "The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; set only when the previous element is neither a loop nor an on-error task."
+          type: "integer"
+          format: "int32"
         iterationIndex:
-          description: "The index of the loop iteration that contains the next element of the path."
+          description: "The index of the loop iteration, or of the on-error branch (0 for the try branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks."
           type: "integer"
           format: "int32"
         taskExecutionId:
@@ -598,21 +602,29 @@ components:
           description: "The job associated with the task execution."
           $ref: "#/components/schemas/Job"
         childCount:
-          description: "The number of direct children of the task execution, set when the children are loaded on demand."
+          description: "The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page."
           type: "integer"
           format: "int32"
           readOnly: true
     TaskExecutionChildrenPage:
-      description: "A page of the direct children of a task execution."
+      description: "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page."
       type: "object"
+      required:
+        - "children"
+        - "iterations"
+        - "number"
+        - "numberOfElements"
+        - "size"
+        - "totalElements"
+        - "totalPages"
       properties:
         children:
-          description: "The child task executions on this page."
+          description: "The child task executions on this page, filled for a task that is neither a loop nor an on-error task."
           type: "array"
           items:
             $ref: "#/components/schemas/TaskExecution"
         iterations:
-          description: "The loop iterations on this page, each a list of task executions."
+          description: "The loop iterations or on-error branches on this page, each a list of task executions."
           type: "array"
           items:
             type: "array"
@@ -623,7 +635,7 @@ components:
           type: "integer"
           format: "int32"
         numberOfElements:
-          description: "The number of elements on this page."
+          description: "The number of children, iterations or branches on this page."
           type: "integer"
           format: "int32"
         size:
@@ -631,7 +643,7 @@ components:
           type: "integer"
           format: "int32"
         totalElements:
-          description: "The total number of elements."
+          description: "The total number of children, iterations or branches."
           type: "integer"
           format: "int64"
         totalPages:

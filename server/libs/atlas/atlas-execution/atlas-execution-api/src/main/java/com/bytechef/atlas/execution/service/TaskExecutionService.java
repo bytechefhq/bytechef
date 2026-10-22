@@ -42,19 +42,28 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId);
 
+    Optional<TaskExecution> fetchTaskExecution(long id);
+
     Map<Long, Long> getChildCounts(List<Long> parentIds);
 
-    List<TaskExecution> getFailedJobTaskExecutions(long jobId);
+    int getChildIndex(TaskExecution taskExecution);
 
     int getIterationIndex(TaskExecution taskExecution);
 
     Map<Long, Long> getIterationCounts(List<Long> parentIds);
 
-    List<Long> getParentIterationStartIds(long parentId);
+    List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize);
+
+    List<TaskExecution> getParentIterationStartTaskExecutions(long parentId, long offset, int limit);
 
     List<Long> getParentTaskExecutionIds(long parentId);
 
     List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize);
+
+    List<TaskExecution> getParentTaskExecutionsBetween(
+        long parentId, TaskExecution fromTaskExecution, TaskExecution toTaskExecution);
+
+    List<TaskExecution> getParentTaskExecutionsFrom(long parentId, TaskExecution fromTaskExecution);
 
     TaskExecution getTaskExecution(long id);
 

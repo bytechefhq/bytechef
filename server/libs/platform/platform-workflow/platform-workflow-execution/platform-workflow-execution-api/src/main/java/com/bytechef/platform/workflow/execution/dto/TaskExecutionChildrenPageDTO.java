@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.execution.dto;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -26,4 +27,8 @@ import java.util.List;
 public record TaskExecutionChildrenPageDTO(
     List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations, int number, int size,
     int numberOfElements, long totalElements, int totalPages) {
+
+    public TaskExecutionChildrenPageDTO {
+        Validate.isTrue(children.isEmpty() || iterations.isEmpty(), "children and iterations must not both be set");
+    }
 }

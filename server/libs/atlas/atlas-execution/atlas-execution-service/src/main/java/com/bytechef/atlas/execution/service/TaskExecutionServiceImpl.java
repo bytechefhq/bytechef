@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -34,6 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class TaskExecutionServiceImpl implements TaskExecutionService {
+
+    private static final Logger log = LoggerFactory.getLogger(TaskExecutionServiceImpl.class);
+
+    private static final int ITERATION_START_TASK_NUMBER = 0;
 
     private final TaskExecutionRepository taskExecutionRepository;
 
@@ -127,37 +133,69 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<Long, Long> getChildCounts(List<Long> parentIds) {
-        return countByParentId(taskExecutionRepository.findAllParentIdsByParentIdIn(parentIds));
+    public Optional<TaskExecution> fetchTaskExecution(long id) {
+        return taskExecutionRepository.findById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskExecution> getFailedJobTaskExecutions(long jobId) {
-        return taskExecutionRepository.findAllByJobIdAndErrorNotNullOrderByCreatedDate(jobId);
+    public Map<Long, Long> getChildCounts(List<Long> parentIds) {
+        return taskExecutionRepository.countAllByParentIdIn(parentIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getChildIndex(TaskExecution taskExecution) {
+        long precedingCount = taskExecutionRepository.countByParentIdAndCreatedDateBeforeOrEqual(
+            Validate.notNull(taskExecution.getParentId(), "parentId"),
+            Validate.notNull(taskExecution.getCreatedDate(), "createdDate"),
+            Validate.notNull(taskExecution.getId(), "id"));
+
+        return Math.toIntExact(precedingCount - 1);
     }
 
     @Override
     @Transactional(readOnly = true)
     public int getIterationIndex(TaskExecution taskExecution) {
+        long parentId = Validate.notNull(taskExecution.getParentId(), "parentId");
+
         long precedingCount = taskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
-            Validate.notNull(taskExecution.getParentId(), "parentId"), 0,
-            Validate.notNull(taskExecution.getCreatedDate(), "createdDate"),
+            parentId, ITERATION_START_TASK_NUMBER, Validate.notNull(taskExecution.getCreatedDate(), "createdDate"),
             Validate.notNull(taskExecution.getId(), "id"));
 
-        return (int) precedingCount - 1;
+        List<Long> leadingIterationParentIds = taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(
+            List.of(parentId), ITERATION_START_TASK_NUMBER);
+
+        return Math.toIntExact(precedingCount + leadingIterationParentIds.size() - 1);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Map<Long, Long> getIterationCounts(List<Long> parentIds) {
-        return countByParentId(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(parentIds, 0));
+        Map<Long, Long> iterationCounts = new HashMap<>(
+            taskExecutionRepository.countAllByParentIdInAndTaskNumber(parentIds, ITERATION_START_TASK_NUMBER));
+
+        for (long parentId : taskExecutionRepository.findAllIdsByIdInAndFirstChildTaskNumberNot(
+            parentIds, ITERATION_START_TASK_NUMBER)) {
+
+            iterationCounts.merge(parentId, 1L, Long::sum);
+        }
+
+        return iterationCounts;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Long> getParentIterationStartIds(long parentId) {
-        return taskExecutionRepository.findAllIdsByParentIdAndTaskNumberOrderByCreatedDate(parentId, 0);
+    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize) {
+        return taskExecutionRepository.findAllLatestAttemptFailedLeavesByJobIdOrderByCreatedDate(
+            jobId, pageSize, (long) pageNumber * pageSize);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskExecution> getParentIterationStartTaskExecutions(long parentId, long offset, int limit) {
+        return taskExecutionRepository.findAllByParentIdAndTaskNumberOrderByCreatedDate(
+            parentId, ITERATION_START_TASK_NUMBER, limit, offset);
     }
 
     @Override
@@ -175,6 +213,23 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<TaskExecution> getParentTaskExecutionsBetween(
+        long parentId, TaskExecution fromTaskExecution, TaskExecution toTaskExecution) {
+
+        return taskExecutionRepository.findAllByParentIdAndCreatedDateBetweenOrderByCreatedDate(
+            parentId, fromTaskExecution.getCreatedDate(), Validate.notNull(fromTaskExecution.getId(), "fromId"),
+            toTaskExecution.getCreatedDate(), Validate.notNull(toTaskExecution.getId(), "toId"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TaskExecution> getParentTaskExecutionsFrom(long parentId, TaskExecution fromTaskExecution) {
+        return taskExecutionRepository.findAllByParentIdAndCreatedDateFromOrderByCreatedDate(
+            parentId, fromTaskExecution.getCreatedDate(), Validate.notNull(fromTaskExecution.getId(), "fromId"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
             .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
@@ -183,10 +238,21 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getTaskExecutions(List<Long> ids) {
+        List<Long> distinctIds = ids.stream()
+            .distinct()
+            .toList();
+
         Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
 
-        for (TaskExecution taskExecution : taskExecutionRepository.findAllByIdIn(ids)) {
+        for (TaskExecution taskExecution : taskExecutionRepository.findAllByIdIn(distinctIds)) {
             taskExecutionMap.put(taskExecution.getId(), taskExecution);
+        }
+
+        if (taskExecutionMap.size() < distinctIds.size() && log.isWarnEnabled()) {
+            log.warn(
+                "Task executions not found, ids={}", distinctIds.stream()
+                    .filter(id -> !taskExecutionMap.containsKey(id))
+                    .toList());
         }
 
         return ids.stream()
@@ -248,15 +314,5 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         } finally {
             taskExecutionRepository.unlockForUpdate(id);
         }
-    }
-
-    private static Map<Long, Long> countByParentId(List<Long> parentIds) {
-        Map<Long, Long> counts = new HashMap<>();
-
-        for (Long parentId : parentIds) {
-            counts.merge(parentId, 1L, Long::sum);
-        }
-
-        return counts;
     }
 }

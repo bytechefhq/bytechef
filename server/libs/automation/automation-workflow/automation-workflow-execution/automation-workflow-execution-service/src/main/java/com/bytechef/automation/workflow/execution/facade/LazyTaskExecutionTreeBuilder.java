@@ -49,6 +49,9 @@ import org.slf4j.LoggerFactory;
  */
 class LazyTaskExecutionTreeBuilder {
 
+    static final int FOCUS_CANDIDATE_PAGE_SIZE = 100;
+    static final int MAX_PAGE_SIZE = 200;
+
     private static final Logger log = LoggerFactory.getLogger(LazyTaskExecutionTreeBuilder.class);
 
     private static final String ON_ERROR_BRANCH = "on-error-branch";
@@ -128,11 +131,12 @@ class LazyTaskExecutionTreeBuilder {
     TaskExecutionChildrenPageDTO getChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
         Validate.isTrue(pageNumber >= 0, "pageNumber must not be negative");
         Validate.isTrue(pageSize > 0, "pageSize must be positive");
+        Validate.isTrue(pageSize <= MAX_PAGE_SIZE, "pageSize must not exceed " + MAX_PAGE_SIZE);
 
         String type = parent.getType();
 
         if (TaskExecutionDTO.isOnErrorType(type)) {
-            return getOnErrorChildrenPage(parent, pageSize);
+            return getOnErrorChildrenPage(parent, pageNumber, pageSize);
         }
 
         if (TaskExecutionDTO.isLoopType(type)) {
@@ -144,17 +148,13 @@ class LazyTaskExecutionTreeBuilder {
 
     List<FocusPathElementDTO> getFocusPath(long jobId, List<TaskExecution> topLevelTaskExecutions) {
         Set<Long> latestAttemptIds = getLatestAttemptIds(topLevelTaskExecutions);
-        Map<Long, TaskExecution> ancestorCache = new HashMap<>();
+        Map<Long, Optional<TaskExecution>> ancestorCache = new HashMap<>();
 
-        for (TaskExecution failedTaskExecution : taskExecutionService.getFailedJobTaskExecutions(jobId)) {
-            List<TaskExecution> ancestry = getAncestry(failedTaskExecution, ancestorCache);
+        Optional<List<TaskExecution>> failedAncestryOptional = fetchFailedLeafAncestry(
+            jobId, latestAttemptIds, ancestorCache);
 
-            TaskExecution topLevelTaskExecution = ancestry.getFirst();
-
-            if (latestAttemptIds.contains(topLevelTaskExecution.getId()) && !hasRetriedAttempt(ancestry) &&
-                isLeaf(failedTaskExecution)) {
-                return toFocusPath(ancestry);
-            }
+        if (failedAncestryOptional.isPresent()) {
+            return toFocusPath(failedAncestryOptional.get());
         }
 
         Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService
@@ -162,11 +162,46 @@ class LazyTaskExecutionTreeBuilder {
             .or(() -> taskExecutionService.fetchLastJobTaskExecution(jobId));
 
         return lastTaskExecutionOptional
-            .map(lastTaskExecution -> toFocusPath(getAncestry(lastTaskExecution, ancestorCache)))
+            .flatMap(lastTaskExecution -> fetchAncestry(lastTaskExecution, ancestorCache))
+            .map(this::toFocusPath)
             .orElse(List.of());
     }
 
-    private List<TaskExecution> getAncestry(TaskExecution taskExecution, Map<Long, TaskExecution> ancestorCache) {
+    private Optional<List<TaskExecution>> fetchFailedLeafAncestry(
+        long jobId, Set<Long> latestAttemptIds, Map<Long, Optional<TaskExecution>> ancestorCache) {
+
+        int pageNumber = 0;
+        List<TaskExecution> failedTaskExecutions;
+
+        do {
+            failedTaskExecutions = taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(
+                jobId, pageNumber, FOCUS_CANDIDATE_PAGE_SIZE);
+
+            for (TaskExecution failedTaskExecution : failedTaskExecutions) {
+                Optional<List<TaskExecution>> ancestryOptional = fetchAncestry(failedTaskExecution, ancestorCache);
+
+                if (ancestryOptional.isEmpty()) {
+                    continue;
+                }
+
+                List<TaskExecution> ancestry = ancestryOptional.get();
+
+                TaskExecution topLevelTaskExecution = ancestry.getFirst();
+
+                if (latestAttemptIds.contains(topLevelTaskExecution.getId())) {
+                    return Optional.of(ancestry);
+                }
+            }
+
+            pageNumber++;
+        } while (failedTaskExecutions.size() == FOCUS_CANDIDATE_PAGE_SIZE);
+
+        return Optional.empty();
+    }
+
+    private Optional<List<TaskExecution>> fetchAncestry(
+        TaskExecution taskExecution, Map<Long, Optional<TaskExecution>> ancestorCache) {
+
         List<TaskExecution> ancestry = new ArrayList<>();
 
         TaskExecution currentTaskExecution = taskExecution;
@@ -174,30 +209,27 @@ class LazyTaskExecutionTreeBuilder {
         ancestry.add(currentTaskExecution);
 
         while (currentTaskExecution.getParentId() != null) {
-            currentTaskExecution = ancestorCache.computeIfAbsent(
-                currentTaskExecution.getParentId(), taskExecutionService::getTaskExecution);
+            Long parentId = currentTaskExecution.getParentId();
+
+            Optional<TaskExecution> parentOptional = ancestorCache.computeIfAbsent(
+                parentId, taskExecutionService::fetchTaskExecution);
+
+            if (parentOptional.isEmpty()) {
+                log.warn(
+                    "Parent task execution id={} of task execution id={} not found", parentId,
+                    currentTaskExecution.getId());
+
+                return Optional.empty();
+            }
+
+            currentTaskExecution = parentOptional.get();
 
             ancestry.add(currentTaskExecution);
         }
 
         Collections.reverse(ancestry);
 
-        return ancestry;
-    }
-
-    private static boolean hasRetriedAttempt(List<TaskExecution> ancestry) {
-        return ancestry.stream()
-            .anyMatch(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.FAILED &&
-                taskExecution.getError() != null &&
-                taskExecution.getRetryAttempts() < taskExecution.getMaxRetries());
-    }
-
-    private boolean isLeaf(TaskExecution taskExecution) {
-        long id = Objects.requireNonNull(taskExecution.getId());
-
-        Map<Long, Long> childCounts = taskExecutionService.getChildCounts(List.of(id));
-
-        return childCounts.getOrDefault(id, 0L) == 0;
+        return Optional.of(ancestry);
     }
 
     private int getChildCount(
@@ -233,6 +265,20 @@ class LazyTaskExecutionTreeBuilder {
 
         return Comparator.nullsFirst(Comparator.<Long>naturalOrder())
             .compare(job.getId(), otherJob.getId()) >= 0 ? job : otherJob;
+    }
+
+    private @Nullable Integer getChildIndex(TaskExecution taskExecution, @Nullable TaskExecution parent) {
+        if (parent == null) {
+            return null;
+        }
+
+        String parentType = parent.getType();
+
+        if (TaskExecutionDTO.isLoopType(parentType) || TaskExecutionDTO.isOnErrorType(parentType)) {
+            return null;
+        }
+
+        return taskExecutionService.getChildIndex(taskExecution);
     }
 
     private @Nullable Integer getIterationIndex(TaskExecution taskExecution, @Nullable TaskExecution parent) {
@@ -279,45 +325,75 @@ class LazyTaskExecutionTreeBuilder {
     private TaskExecutionChildrenPageDTO getLoopChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
         long parentId = Objects.requireNonNull(parent.getId());
 
-        List<List<Long>> iterationIds = splitIterations(
-            taskExecutionService.getParentTaskExecutionIds(parentId),
-            new HashSet<>(taskExecutionService.getParentIterationStartIds(parentId)));
+        List<TaskExecution> firstChildTaskExecutions = taskExecutionService.getParentTaskExecutions(parentId, 0, 1);
 
-        int fromIndex = (int) Math.min((long) pageNumber * pageSize, iterationIds.size());
-        int toIndex = (int) Math.min((long) fromIndex + pageSize, iterationIds.size());
+        if (firstChildTaskExecutions.isEmpty()) {
+            return new TaskExecutionChildrenPageDTO(List.of(), List.of(), pageNumber, pageSize, 0, 0, 0);
+        }
 
-        List<List<Long>> pageIterationIds = iterationIds.subList(fromIndex, toIndex);
+        TaskExecution firstChildTaskExecution = firstChildTaskExecutions.getFirst();
 
-        List<TaskExecutionDTO> taskExecutionDTOs = pageIterationIds.isEmpty()
-            ? List.of()
-            : decorate(
-                taskExecutionService.getTaskExecutions(
-                    pageIterationIds.stream()
-                        .flatMap(List::stream)
-                        .toList()));
+        int leadingIterationCount = isIterationStart(firstChildTaskExecution) ? 0 : 1;
 
-        Map<Long, TaskExecutionDTO> taskExecutionDTOMap = taskExecutionDTOs.stream()
-            .collect(Collectors.toMap(TaskExecutionDTO::id, Function.identity()));
+        Map<Long, Long> iterationCounts = taskExecutionService.getIterationCounts(List.of(parentId));
 
-        List<List<TaskExecutionDTO>> iterations = pageIterationIds.stream()
-            .map(iteration -> iteration.stream()
-                .map(taskExecutionDTOMap::get)
-                .filter(Objects::nonNull)
-                .toList())
-            .toList();
+        long totalElements = iterationCounts.getOrDefault(parentId, 0L);
+        long fromIndex = (long) pageNumber * pageSize;
+
+        List<List<TaskExecutionDTO>> iterations = fromIndex < totalElements
+            ? getLoopPageIterations(parentId, firstChildTaskExecution, leadingIterationCount, fromIndex, pageSize)
+            : List.of();
 
         return new TaskExecutionChildrenPageDTO(
-            List.of(), iterations, pageNumber, pageSize, iterations.size(), iterationIds.size(),
-            getTotalPages(iterationIds.size(), pageSize));
+            List.of(), iterations, pageNumber, pageSize, iterations.size(), totalElements,
+            getTotalPages(totalElements, pageSize));
     }
 
-    private TaskExecutionChildrenPageDTO getOnErrorChildrenPage(TaskExecution parent, int pageSize) {
+    private List<List<TaskExecutionDTO>> getLoopPageIterations(
+        long parentId, TaskExecution firstChildTaskExecution, int leadingIterationCount, long fromIndex,
+        int pageSize) {
+
+        boolean startsAtFirstChild = fromIndex < leadingIterationCount;
+
+        long iterationStartOffset = startsAtFirstChild ? 0 : fromIndex - leadingIterationCount;
+        int pageIterationStartCount = startsAtFirstChild ? pageSize - leadingIterationCount : pageSize;
+
+        List<TaskExecution> iterationStartTaskExecutions = taskExecutionService.getParentIterationStartTaskExecutions(
+            parentId, iterationStartOffset, pageIterationStartCount + 1);
+
+        if (!startsAtFirstChild && iterationStartTaskExecutions.isEmpty()) {
+            return List.of();
+        }
+
+        TaskExecution fromTaskExecution = startsAtFirstChild
+            ? firstChildTaskExecution : iterationStartTaskExecutions.getFirst();
+
+        List<TaskExecution> pageTaskExecutions;
+
+        if (iterationStartTaskExecutions.size() > pageIterationStartCount) {
+            pageTaskExecutions = taskExecutionService.getParentTaskExecutionsBetween(
+                parentId, fromTaskExecution, iterationStartTaskExecutions.get(pageIterationStartCount));
+        } else {
+            pageTaskExecutions = taskExecutionService.getParentTaskExecutionsFrom(parentId, fromTaskExecution);
+        }
+
+        List<List<TaskExecutionDTO>> iterations = splitIterations(pageTaskExecutions, decorate(pageTaskExecutions));
+
+        return iterations.size() > pageSize ? iterations.subList(0, pageSize) : iterations;
+    }
+
+    private TaskExecutionChildrenPageDTO getOnErrorChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
         long parentId = Objects.requireNonNull(parent.getId());
 
         List<Long> childIds = taskExecutionService.getParentTaskExecutionIds(parentId);
 
         if (childIds.isEmpty()) {
-            return new TaskExecutionChildrenPageDTO(List.of(), List.of(), 0, pageSize, 0, 0, 0);
+            return new TaskExecutionChildrenPageDTO(List.of(), List.of(), pageNumber, pageSize, 0, 0, 0);
+        }
+
+        if (pageNumber > 0) {
+            return new TaskExecutionChildrenPageDTO(
+                List.of(), List.of(), pageNumber, pageSize, 0, ON_ERROR_BRANCH_COUNT, 1);
         }
 
         Set<String> errorBranchTaskNames = getErrorBranchTaskNames(parent);
@@ -338,7 +414,7 @@ class LazyTaskExecutionTreeBuilder {
         }
 
         return new TaskExecutionChildrenPageDTO(
-            List.of(), List.of(mainBranchTaskExecutionDTOs, errorBranchTaskExecutionDTOs), 0, pageSize,
+            List.of(), List.of(mainBranchTaskExecutionDTOs, errorBranchTaskExecutionDTOs), pageNumber, pageSize,
             ON_ERROR_BRANCH_COUNT, ON_ERROR_BRANCH_COUNT, 1);
     }
 
@@ -373,18 +449,24 @@ class LazyTaskExecutionTreeBuilder {
         return workflowTaskName != null && errorBranchTaskNames.contains(workflowTaskName);
     }
 
-    private static List<List<Long>> splitIterations(List<Long> childIds, Set<Long> iterationStartIds) {
-        List<List<Long>> iterations = new ArrayList<>();
-        List<Long> currentIteration = new ArrayList<>();
+    private static boolean isIterationStart(TaskExecution taskExecution) {
+        return taskExecution.getTaskNumber() == 0;
+    }
 
-        for (Long childId : childIds) {
-            if (iterationStartIds.contains(childId) && !currentIteration.isEmpty()) {
+    private static List<List<TaskExecutionDTO>> splitIterations(
+        List<TaskExecution> taskExecutions, List<TaskExecutionDTO> taskExecutionDTOs) {
+
+        List<List<TaskExecutionDTO>> iterations = new ArrayList<>();
+        List<TaskExecutionDTO> currentIteration = new ArrayList<>();
+
+        for (int index = 0; index < taskExecutions.size(); index++) {
+            if (isIterationStart(taskExecutions.get(index)) && !currentIteration.isEmpty()) {
                 iterations.add(currentIteration);
 
                 currentIteration = new ArrayList<>();
             }
 
-            currentIteration.add(childId);
+            currentIteration.add(taskExecutionDTOs.get(index));
         }
 
         if (!currentIteration.isEmpty()) {
@@ -402,7 +484,8 @@ class LazyTaskExecutionTreeBuilder {
         for (TaskExecution taskExecution : ancestry) {
             focusPath.add(
                 new FocusPathElementDTO(
-                    Objects.requireNonNull(taskExecution.getId()), getIterationIndex(taskExecution, parent)));
+                    Objects.requireNonNull(taskExecution.getId()), getIterationIndex(taskExecution, parent),
+                    getChildIndex(taskExecution, parent)));
 
             parent = taskExecution;
         }

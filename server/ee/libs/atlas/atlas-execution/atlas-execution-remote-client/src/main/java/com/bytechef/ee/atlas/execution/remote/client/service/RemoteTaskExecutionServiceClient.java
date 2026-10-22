@@ -135,12 +135,17 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public Optional<TaskExecution> fetchTaskExecution(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Map<Long, Long> getChildCounts(List<Long> parentIds) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<TaskExecution> getFailedJobTaskExecutions(long jobId) {
+    public int getChildIndex(TaskExecution taskExecution) {
         throw new UnsupportedOperationException();
     }
 
@@ -160,7 +165,12 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
-    public List<Long> getParentIterationStartIds(long parentId) {
+    public List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(long jobId, int pageNumber, int pageSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getParentIterationStartTaskExecutions(long parentId, long offset, int limit) {
         throw new UnsupportedOperationException();
     }
 
@@ -171,6 +181,18 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getParentTaskExecutionsBetween(
+        long parentId, TaskExecution fromTaskExecution, TaskExecution toTaskExecution) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskExecution> getParentTaskExecutionsFrom(long parentId, TaskExecution fromTaskExecution) {
         throw new UnsupportedOperationException();
     }
 

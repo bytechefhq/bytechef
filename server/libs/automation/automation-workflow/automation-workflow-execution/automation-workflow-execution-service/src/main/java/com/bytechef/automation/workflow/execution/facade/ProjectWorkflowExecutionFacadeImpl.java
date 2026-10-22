@@ -212,7 +212,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
-        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
@@ -226,11 +226,16 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
         long id, long taskExecutionId, int pageNumber, int pageSize) {
 
-        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
         return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
+    }
+
+    private TaskExecution getRequestedTaskExecution(long taskExecutionId) {
+        return taskExecutionService.fetchTaskExecution(taskExecutionId)
+            .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
     }
 
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
