@@ -13,6 +13,7 @@ Name | Type
 `help` | [Help](Help.md)
 `name` | string
 `outputDefined` | boolean
+`outputFileEntry` | boolean
 `outputFunctionDefined` | boolean
 `outputSchemaDefined` | boolean
 `properties` | [Array&lt;Property&gt;](Property.md)
@@ -34,6 +35,7 @@ const example = {
   "help": null,
   "name": null,
   "outputDefined": null,
+  "outputFileEntry": null,
   "outputFunctionDefined": null,
   "outputSchemaDefined": null,
   "properties": null,
