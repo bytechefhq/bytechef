@@ -253,4 +253,41 @@ describe('useWorkflowExecutionDetail', () => {
         expect(result.current.workflowExecutionLoading).toBe(false);
         expect(result.current.selectedItem?.id).toBe('9');
     });
+
+    it('keeps the applied focus while a running execution moves its focus to a newly started task', () => {
+        const runningExecution = (lastTaskExecutionId: number) => ({
+            data: {
+                focusPath: [{taskExecutionId: 1}, {taskExecutionId: lastTaskExecutionId}],
+                id: 3,
+                job: {id: '3', status: 'STARTED', taskExecutions: [{childCount: 2, id: '1', jobId: '3'}]},
+            },
+            isLoading: false,
+        });
+        const startedTaskExecution = {id: '9', jobId: '3', status: 'STARTED'};
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 3, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue(runningExecution(9));
+        taskExecutionQueryMock.mockImplementation((request: {id: number; taskExecutionId: number}) => ({
+            data: request.taskExecutionId === 9 ? startedTaskExecution : undefined,
+            isError: false,
+        }));
+
+        const {rerender, result} = renderHook(() => useWorkflowExecutionDetail(3, true));
+
+        expect(result.current.focusedExecution?.path).toEqual(['1', '9']);
+
+        const appliedFocusedExecution = result.current.focusedExecution;
+
+        executionQueryMock.mockReturnValue(runningExecution(10));
+
+        rerender();
+
+        expect(taskExecutionQueryMock).not.toHaveBeenCalledWith(
+            expect.objectContaining({taskExecutionId: 10}),
+            expect.anything()
+        );
+        expect(result.current.focusedExecution).toBe(appliedFocusedExecution);
+        expect(result.current.focusedExecution?.path).toEqual(['1', '9']);
+        expect(result.current.selectedItem?.id).toBe('9');
+    });
 });
