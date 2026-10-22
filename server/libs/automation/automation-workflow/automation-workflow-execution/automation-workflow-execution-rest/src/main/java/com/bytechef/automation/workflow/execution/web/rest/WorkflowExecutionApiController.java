@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
@@ -57,10 +58,11 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
+    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id, Boolean lazy) {
         return ResponseEntity.ok(
             conversionService.convert(
-                projectWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+                projectWorkflowExecutionFacade.getWorkflowExecution(id, Boolean.TRUE.equals(lazy)),
+                WorkflowExecutionModel.class));
     }
 
     @Override
@@ -69,6 +71,17 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
             conversionService.convert(
                 projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(id, taskExecutionId),
                 TaskExecutionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<TaskExecutionChildrenPageModel> getWorkflowExecutionTaskExecutionChildren(
+        Long id, Long taskExecutionId, Integer pageNumber, Integer pageSize) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(
+                    id, taskExecutionId, pageNumber, pageSize),
+                TaskExecutionChildrenPageModel.class));
     }
 
     @Override

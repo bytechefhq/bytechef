@@ -150,6 +150,13 @@ paths:
         schema:
           type: "integer"
           format: "int64"
+      - name: "lazy"
+        description: "If only the top-level task executions should be returned, with their child counts, the focus path and the total task execution count."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+          default: false
       responses:
         "200":
           description: "The execution object."
@@ -208,6 +215,51 @@ paths:
             application/json:
               schema:
                 $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
+  /workflow-executions/{id}/task-executions/{taskExecutionId}/children:
+    get:
+      description: "Get a page of the direct children of a task execution."
+      summary: "Get a page of task execution children"
+      tags:
+      - "workflow-execution"
+      operationId: "getWorkflowExecutionTaskExecutionChildren"
+      parameters:
+      - name: "id"
+        description: "The id of an execution."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "taskExecutionId"
+        description: "The id of a task execution."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "pageNumber"
+        description: "The number of the page to return."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int32"
+          default: 0
+      - name: "pageSize"
+        description: "The number of children or loop iterations per page."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int32"
+          default: 50
+      responses:
+        "200":
+          description: "The page of task execution children."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TaskExecutionChildrenPage"
 components:
   schemas:
     Page:
@@ -221,6 +273,11 @@ components:
         - "projectDeployment"
         - "workflow"
       properties:
+        focusPath:
+          description: "The path from the root task executions to the task execution to focus, set when the execution is loaded lazily."
+          type: "array"
+          items:
+            $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/FocusPathElement"
         id:
           description: "The id of a workflow execution."
           type: "integer"
@@ -235,6 +292,11 @@ components:
         projectVersion:
           description: "The version of the project the workflow execution ran."
           type: "integer"
+          readOnly: true
+        taskExecutionCount:
+          description: "The total number of task executions of the job and its subflow jobs, set when the execution is loaded lazily."
+          type: "integer"
+          format: "int64"
           readOnly: true
         triggerExecution:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"

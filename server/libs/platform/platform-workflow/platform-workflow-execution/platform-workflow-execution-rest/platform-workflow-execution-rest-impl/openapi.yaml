@@ -419,6 +419,20 @@ components:
         workflowId:
           type: "string"
           readOnly: true
+    FocusPathElement:
+      description: "An element of the path from the root task executions to the task execution to focus."
+      type: "object"
+      required:
+        - "taskExecutionId"
+      properties:
+        iterationIndex:
+          description: "The index of the loop iteration that contains the next element of the path."
+          type: "integer"
+          format: "int32"
+        taskExecutionId:
+          description: "The id of a task execution."
+          type: "integer"
+          format: "int64"
     JobConnection:
       description: "The connection used in a particular task."
       type: "object"
@@ -583,6 +597,47 @@ components:
         childJob:
           description: "The job associated with the task execution."
           $ref: "#/components/schemas/Job"
+        childCount:
+          description: "The number of direct children of the task execution, set when the children are loaded on demand."
+          type: "integer"
+          format: "int32"
+          readOnly: true
+    TaskExecutionChildrenPage:
+      description: "A page of the direct children of a task execution."
+      type: "object"
+      properties:
+        children:
+          description: "The child task executions on this page."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TaskExecution"
+        iterations:
+          description: "The loop iterations on this page, each a list of task executions."
+          type: "array"
+          items:
+            type: "array"
+            items:
+              $ref: "#/components/schemas/TaskExecution"
+        number:
+          description: "The number of the page."
+          type: "integer"
+          format: "int32"
+        numberOfElements:
+          description: "The number of elements on this page."
+          type: "integer"
+          format: "int32"
+        size:
+          description: "The size of the page."
+          type: "integer"
+          format: "int32"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+          format: "int64"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+          format: "int32"
     TriggerExecution:
       description: "Adds execution semantics to a trigger."
       type: "object"
