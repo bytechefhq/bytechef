@@ -73,6 +73,14 @@ export const DataPillPanelSkeleton = ({
     </div>
 );
 
+export const OutputTabSkeleton = () => (
+    <div className="flex flex-col gap-4 p-4">
+        <Skeleton className="h-6 w-1/3" />
+
+        <Skeleton className="h-40 w-full" />
+    </div>
+);
+
 export const PropertiesTabSkeleton = () => (
     <div className="flex flex-col gap-4 p-4">
         {Array.from({length: 4}).map((_, index) => (

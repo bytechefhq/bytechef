@@ -202,6 +202,7 @@ export default async function changeComponentVersion({
                 version: newComponentVersion,
                 workflowNodeName,
             },
+            onError: () => setOperationChangeInProgress(false),
             onSuccess: () => {
                 setCurrentNode({
                     ...currentNode,
