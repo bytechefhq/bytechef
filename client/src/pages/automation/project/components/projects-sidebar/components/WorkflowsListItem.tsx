@@ -1,11 +1,10 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowsListItemDropdownMenu from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItemDropdownMenu';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import WorkflowsSidebarListItem from '@/shared/components/workflow/WorkflowsSidebarListItem';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {MouseEvent, useMemo} from 'react';
-import {twMerge} from 'tailwind-merge';
+import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowsListItemProps {
@@ -66,63 +65,37 @@ const WorkflowsListItem = ({
         [calculateTimeDifference, workflow?.lastModifiedDate]
     );
 
-    const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
-        if (!event.currentTarget.contains(event.target as Node)) {
-            return;
-        }
-
+    const handleCardClick = () => {
         onProjectClick(projectId, projectWorkflowId);
 
         setSelectedProjectId(projectId);
     };
 
     return (
-        <li
-            className={twMerge(
-                'w-full cursor-pointer rounded-md border border-transparent py-3 pr-1 pl-3 hover:bg-background',
-                workflow.id === currentWorkflowId && 'border-stroke-brand-primary bg-background'
-            )}
-            key={workflow.id}
-            onClick={handleCardClick}
-        >
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-hidden">
-                    <WorkflowTriggerAndComponentsRow
-                        filteredComponentNames={filteredComponentNames}
-                        fitToWidth
-                        workflow={workflow}
-                        workflowComponentDefinitions={workflowComponentDefinitions}
-                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                    />
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex flex-col gap-1 text-start">
-                                <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
-
-                                <div className="flex gap-1 text-xs text-content-neutral-secondary">
-                                    <span>Edited</span>
-
-                                    {timeAgo}
-                                </div>
-                            </div>
-                        </TooltipTrigger>
-
-                        {workflow.label && workflow.label.length > 40 && (
-                            <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
-                        )}
-                    </Tooltip>
-                </div>
-
-                {project && (
+        <WorkflowsSidebarListItem
+            active={workflow.id === currentWorkflowId}
+            components={
+                <WorkflowTriggerAndComponentsRow
+                    filteredComponentNames={filteredComponentNames}
+                    fitToWidth
+                    workflow={workflow}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
+            }
+            editedTimeAgo={timeAgo}
+            label={workflow.label}
+            menu={
+                project && (
                     <WorkflowsListItemDropdownMenu
                         currentWorkflowId={currentWorkflowId}
                         project={project}
                         workflow={workflow}
                     />
-                )}
-            </div>
-        </li>
+                )
+            }
+            onClick={handleCardClick}
+        />
     );
 };
 
