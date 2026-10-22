@@ -7,8 +7,9 @@ import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    error: null as Error | null,
     navigate: vi.fn(),
-    projectDeployments: [] as ProjectDeployment[],
+    projectDeployments: [] as ProjectDeployment[] | undefined,
     refetch: vi.fn(),
     savedEnvironmentId: 0,
 }));
@@ -21,6 +22,7 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
     useGetWorkspaceProjectDeploymentsQuery: () => ({
         data: hoisted.projectDeployments,
+        error: hoisted.error,
         isFetching: false,
         isLoading: false,
         refetch: hoisted.refetch,
@@ -84,7 +86,7 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
             <button
                 onClick={() => {
                     hoisted.projectDeployments = [
-                        ...hoisted.projectDeployments,
+                        ...(hoisted.projectDeployments ?? []),
                         {
                             enabled: true,
                             environmentId: hoisted.savedEnvironmentId,
@@ -116,6 +118,7 @@ const renderProjectDeploymentsSheet = () =>
 
 describe('ProjectDeploymentsSheet', () => {
     beforeEach(() => {
+        hoisted.error = null;
         hoisted.navigate.mockReset();
         hoisted.refetch.mockReset();
         hoisted.projectDeployments = [
@@ -223,6 +226,30 @@ describe('ProjectDeploymentsSheet', () => {
 
         expect(screen.getByText('Publish the project to deploy it')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+    });
+
+    it('shows an error with a retry instead of offering to deploy when the deployments fail to load', () => {
+        hoisted.error = new Error('Request failed');
+        hoisted.projectDeployments = undefined;
+
+        renderProjectDeploymentsSheet();
+
+        expect(screen.getByText('Failed to load deployments')).toBeInTheDocument();
+        expect(screen.queryByText('No deployments in DEVELOPMENT')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
+
+        expect(hoisted.refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps showing the loaded deployments when a refresh fails', () => {
+        hoisted.error = new Error('Request failed');
+
+        renderProjectDeploymentsSheet();
+
+        expect(screen.getByText('Orders Dev')).toBeInTheDocument();
+        expect(screen.queryByText('Failed to load deployments')).not.toBeInTheDocument();
     });
 
     it('refreshes the deployments from the header', () => {

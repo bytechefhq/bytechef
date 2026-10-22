@@ -16,7 +16,7 @@ import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/proj
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ExternalLinkIcon, Layers3Icon, RefreshCwIcon, RocketIcon, SendIcon} from 'lucide-react';
+import {AlertTriangleIcon, ExternalLinkIcon, Layers3Icon, RefreshCwIcon, RocketIcon, SendIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -54,6 +54,7 @@ const ProjectDeploymentsSheet = ({
 
     const {
         data: projectDeployments,
+        error: projectDeploymentsError,
         isFetching: projectDeploymentsIsFetching,
         isLoading: projectDeploymentsIsLoading,
         refetch: refetchProjectDeployments,
@@ -86,6 +87,8 @@ const ProjectDeploymentsSheet = ({
     );
 
     const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
+
+    const projectDeploymentsLoadFailed = !!projectDeploymentsError && projectDeployments === undefined;
 
     const handleOpenInDeploymentsClick = () => {
         onSheetOpenChange(false);
@@ -141,7 +144,19 @@ const ProjectDeploymentsSheet = ({
                         </div>
                     )}
 
+                    {projectDeploymentsLoadFailed && (
+                        <EmptyState
+                            actions={
+                                <Button label="Retry" onClick={() => refetchProjectDeployments()} variant="outline" />
+                            }
+                            description="The deployments of this project could not be loaded. Please try again."
+                            icon={<AlertTriangleIcon />}
+                            title="Failed to load deployments"
+                        />
+                    )}
+
                     {!projectDeploymentsIsLoading &&
+                        !projectDeploymentsLoadFailed &&
                         environmentProjectDeployments.length === 0 &&
                         (isPublished ? (
                             <EmptyState
