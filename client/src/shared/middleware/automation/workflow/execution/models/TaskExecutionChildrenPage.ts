@@ -44,7 +44,7 @@ export interface TaskExecutionChildrenPage {
      */
     numberOfElements: number;
     /**
-     * The size of the page.
+     * The requested page size.
      */
     size: number;
     /**

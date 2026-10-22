@@ -103,7 +103,7 @@ async function example() {
   const body = {
     // number | The id of an execution.
     id: 789,
-    // boolean | If only the top-level task executions should be returned, with their child counts, the focus path and the first-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. (optional)
+    // boolean | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. (optional)
     lazy: true,
   } satisfies GetWorkflowExecutionRequest;
 
@@ -125,7 +125,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
-| **lazy** | `boolean` | If only the top-level task executions should be returned, with their child counts, the focus path and the first-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. | [Optional] [Defaults to `false`] |
+| **lazy** | `boolean` | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. | [Optional] [Defaults to `false`] |
 
 ### Return type
 

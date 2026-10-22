@@ -63,7 +63,7 @@ import {
  */
 export interface WorkflowExecution {
     /**
-     * The path from the root task executions to the task execution to focus, set when the execution is loaded lazily.
+     * The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint.
      */
     focusPath?: Array<FocusPathElement>;
     /**
@@ -87,7 +87,7 @@ export interface WorkflowExecution {
      */
     readonly projectVersion?: number;
     /**
-     * The total number of task executions of the job and its subflow jobs, set when the execution is loaded lazily.
+     * The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily.
      */
     readonly taskExecutionCount?: number;
     /**

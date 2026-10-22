@@ -9,7 +9,7 @@ Name | Type
 ------------ | -------------
 `childIndex` | number
 `iterationIndex` | number
-`taskExecutionId` | number
+`taskExecutionId` | string
 
 ## Example
 

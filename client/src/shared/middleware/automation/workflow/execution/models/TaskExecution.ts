@@ -158,7 +158,7 @@ export interface TaskExecution {
      */
     childJob?: Job;
     /**
-     * The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task. Set only on the task executions of a lazily loaded workflow execution and of a children page.
+     * The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task, and 0 when it has no children. Set only on the task executions of a lazily loaded workflow execution and of a children page.
      */
     readonly childCount?: number;
 }

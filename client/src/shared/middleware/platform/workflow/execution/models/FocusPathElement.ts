@@ -20,17 +20,17 @@ import { mapValues } from '../runtime';
  */
 export interface FocusPathElement {
     /**
-     * The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; set only when the previous element is neither a loop nor an on-error task.
+     * The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; absent for the first element and set only when the previous element is neither a loop nor an on-error task.
      */
     childIndex?: number;
     /**
-     * The index of the loop iteration, or of the on-error branch (0 for the try branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.
+     * The index of the loop iteration, or of the on-error branch (0 for the main branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.
      */
     iterationIndex?: number;
     /**
      * The id of a task execution.
      */
-    taskExecutionId: number;
+    taskExecutionId: string;
 }
 
 /**

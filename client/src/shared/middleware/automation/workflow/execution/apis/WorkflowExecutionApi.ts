@@ -47,7 +47,7 @@ export interface GetWorkflowExecutionRequest {
      */
     id: number;
     /**
-     * If only the top-level task executions should be returned, with their child counts, the focus path and the first-attempt task execution count. Child jobs of subflow tasks are returned without their task executions.
+     * Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions.
      */
     lazy?: boolean;
 }
