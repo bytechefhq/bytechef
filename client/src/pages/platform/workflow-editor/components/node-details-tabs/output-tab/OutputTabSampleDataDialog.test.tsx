@@ -215,19 +215,20 @@ describe('OutputTabSampleDataDialog', () => {
     });
 
     describe('file upload mode', () => {
-        it('should not render the File tab when file upload is not enabled', async () => {
+        it('should not render the file picker when file upload is not enabled', async () => {
             renderDialog();
 
             await screen.findByRole('dialog');
 
-            expect(screen.queryByRole('tab', {name: 'File'})).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Sample file')).not.toBeInTheDocument();
         });
 
-        it('should open on the File tab with Upload disabled until a file is chosen', async () => {
+        it('should show only the file picker, with Upload disabled until a file is chosen', async () => {
             renderDialog({fileUploadEnabled: true});
 
-            expect(await screen.findByRole('tab', {name: 'File'})).toHaveAttribute('aria-selected', 'true');
-            expect(screen.getByLabelText('Sample file')).toBeInTheDocument();
+            expect(await screen.findByLabelText('Sample file')).toBeInTheDocument();
+            expect(screen.queryByTestId('mock-monaco-editor')).not.toBeInTheDocument();
+            expect(screen.queryByRole('tab')).not.toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Upload'})).toBeDisabled();
         });
 
@@ -244,22 +245,6 @@ describe('OutputTabSampleDataDialog', () => {
 
             expect(mockOnFileUpload).toHaveBeenCalledWith(file);
             expect(mockOnUpload).not.toHaveBeenCalled();
-        });
-
-        it('should upload JSON when the JSON tab is selected', async () => {
-            const mockOnFileUpload = vi.fn();
-            const user = userEvent.setup();
-
-            renderDialog({fileUploadEnabled: true, onFileUpload: mockOnFileUpload});
-
-            await user.click(await screen.findByRole('tab', {name: 'JSON'}));
-
-            fireEvent.change(await screen.findByTestId('mock-monaco-editor'), {target: {value: '{"test": 1}'}});
-
-            await user.click(screen.getByRole('button', {name: 'Upload'}));
-
-            expect(mockOnUpload).toHaveBeenCalledWith('{"test":1}');
-            expect(mockOnFileUpload).not.toHaveBeenCalled();
         });
     });
 });
