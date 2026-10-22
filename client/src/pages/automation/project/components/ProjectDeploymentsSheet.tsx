@@ -124,7 +124,7 @@ const ProjectDeploymentsSheet = ({
                                             className={twMerge(projectDeploymentsIsFetching && 'animate-spin')}
                                         />
                                     }
-                                    onClick={() => refetchProjectDeployments()}
+                                    onClick={() => void refetchProjectDeployments()}
                                     size="icon"
                                     variant="ghost"
                                 />
@@ -147,7 +147,11 @@ const ProjectDeploymentsSheet = ({
                     {projectDeploymentsLoadFailed && (
                         <EmptyState
                             actions={
-                                <Button label="Retry" onClick={() => refetchProjectDeployments()} variant="outline" />
+                                <Button
+                                    label="Retry"
+                                    onClick={() => void refetchProjectDeployments()}
+                                    variant="outline"
+                                />
                             }
                             description="The deployments of this project could not be loaded. Please try again."
                             icon={<AlertTriangleIcon />}
