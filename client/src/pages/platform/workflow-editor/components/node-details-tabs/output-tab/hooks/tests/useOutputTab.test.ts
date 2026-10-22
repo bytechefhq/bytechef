@@ -13,6 +13,7 @@ const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
     saveMutate: vi.fn(),
+    uploadSampleFileMutate: vi.fn(),
     webhookTriggerTestApi: undefined as
         | {startWebhookTriggerTest: ReturnType<typeof vi.fn>; stopWebhookTriggerTest: ReturnType<typeof vi.fn>}
         | undefined,
@@ -37,6 +38,7 @@ vi.mock('@/shared/mutations/platform/workflowNodeTestOutputs.mutations', () => (
         };
     },
     useSaveWorkflowNodeTestOutputMutation: () => ({mutate: hoisted.saveMutate}),
+    useUploadSampleFileRequestMutation: () => ({isPending: false, mutate: hoisted.uploadSampleFileMutate}),
     useUploadSampleOutputRequestMutation: () => ({mutate: vi.fn()}),
 }));
 
@@ -131,6 +133,25 @@ describe('useOutputTab', () => {
 
         expect(hoisted.workflowNodeOutputQuery).toHaveBeenLastCalledWith(true);
         expect(result.current.workflowNodeOutputLoading).toBe(false);
+    });
+
+    it('uploads a sample file for the current node in the current environment', () => {
+        const {result} = renderHook(() =>
+            useOutputTab({currentNode: {name: 'awsS3_1'} as NodeDataType, workflowId: 'wf-1'})
+        );
+
+        const file = new File(['a,b'], 'sample.csv', {type: 'text/csv'});
+
+        act(() => {
+            result.current.handleSampleDataDialogFileUpload(file);
+        });
+
+        expect(hoisted.uploadSampleFileMutate).toHaveBeenCalledWith({
+            environmentId: 2,
+            file,
+            id: 'wf-1',
+            workflowNodeName: 'awsS3_1',
+        });
     });
 
     it('holds the output queries and reports loading while an operation switch is saving', () => {
