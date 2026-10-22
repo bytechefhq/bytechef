@@ -58,6 +58,7 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -335,7 +336,7 @@ public class ProjectFacadeIntTest {
 
         projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
-        byte[] exportedData = projectFacade.exportProject(projectDTO.id());
+        byte[] exportedData = projectFacade.exportProject(projectDTO.id(), null);
 
         assertThat(exportedData).isNotNull();
         assertThat(exportedData.length).isGreaterThan(0);
@@ -365,10 +366,33 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testExportProjectVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        assertThat(countExportedWorkflows(projectFacade.exportProject(projectDTO.id(), 1))).isEqualTo(1);
+        assertThat(countExportedWorkflows(projectFacade.exportProject(projectDTO.id(), 2))).isEqualTo(2);
+        assertThat(countExportedWorkflows(projectFacade.exportProject(projectDTO.id(), null))).isEqualTo(2);
+    }
+
+    @Test
+    public void testExportProjectUnknownVersion() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        assertThatThrownBy(() -> projectFacade.exportProject(projectDTO.id(), 5))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
     public void testExportProjectInvalidId() {
         Assertions.assertThrows(
             Exception.class,
-            () -> projectFacade.exportProject(999999L));
+            () -> projectFacade.exportProject(999999L, null));
     }
 
     @Test
@@ -710,6 +734,26 @@ public class ProjectFacadeIntTest {
 
         assertThat(allWorkflows.size()).isEqualTo(initialWorkflowsCount);
 
+    }
+
+    private int countExportedWorkflows(byte[] exportedData) {
+        int count = 0;
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(exportedData))) {
+            ZipEntry zipEntry;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                String name = zipEntry.getName();
+
+                if (name.startsWith("workflow-")) {
+                    count++;
+                }
+            }
+        } catch (IOException ioException) {
+            Assertions.fail("Failed to read exported ZIP file", ioException);
+        }
+
+        return count;
     }
 
     private List<String> getProjectVersionWorkflowIds(long projectId, int projectVersion) {
@@ -1207,7 +1251,8 @@ public class ProjectFacadeIntTest {
             assertRequiresBothScopes(
                 PROJECT_ID, "Project", "WORKFLOW_VIEW", "WORKFLOW_CREATE",
                 () -> projectFacade.duplicateProject(PROJECT_ID));
-            assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_VIEW", () -> projectFacade.exportProject(PROJECT_ID));
+            assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_VIEW",
+                () -> projectFacade.exportProject(PROJECT_ID, null));
             assertRequiresScope(
                 PROJECT_ID, "Project", "PROJECT_SETTINGS",
                 () -> projectFacade.exportSharedProject(PROJECT_ID, "description"));

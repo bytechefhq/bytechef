@@ -70,6 +70,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -251,8 +252,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
-    public byte[] exportProject(long id) {
-        return createTemplate(id, null, false);
+    public byte[] exportProject(long id, @Nullable Integer projectVersion) {
+        return createTemplate(id, projectVersion, null, false);
     }
 
     @Override
@@ -262,7 +263,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         String fileName = "project_" + project.getUuid() + ".zip";
 
-        byte[] projectData = createTemplate(id, description, true);
+        byte[] projectData = createTemplate(id, null, description, true);
 
         FileEntry fileEntry =
             sharedTemplateFileStorage.storeFileContent(fileName, new ByteArrayInputStream(projectData));
@@ -568,11 +569,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
         return newWorkflowIds;
     }
 
-    private byte[] createTemplate(long id, String description, boolean sharedTemplate) {
+    private byte[] createTemplate(
+        long id, @Nullable Integer projectVersion, @Nullable String description, boolean sharedTemplate) {
+
         Project project = projectService.getProject(id);
 
+        int exportedProjectVersion = projectVersion == null ? project.getLastProjectVersion() : projectVersion;
+
+        project.fetchProjectVersion(exportedProjectVersion)
+            .orElseThrow(() -> new ConfigurationException(
+                "Project version v=%s not found".formatted(exportedProjectVersion),
+                ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            id, project.getLastProjectVersion());
+            id, exportedProjectVersion);
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {

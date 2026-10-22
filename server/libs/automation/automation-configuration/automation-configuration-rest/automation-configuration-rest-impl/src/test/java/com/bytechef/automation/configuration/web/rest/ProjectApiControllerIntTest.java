@@ -254,7 +254,7 @@ public class ProjectApiControllerIntTest {
             ProjectDTO projectDTO = getProjectDTO();
             byte[] mockProjectData = "mock zip data".getBytes(StandardCharsets.UTF_8);
 
-            when(projectFacade.exportProject(1L))
+            when(projectFacade.exportProject(1L, null))
                 .thenReturn(mockProjectData);
 
             Project project = new Project();
@@ -272,19 +272,48 @@ public class ProjectApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectHeader()
-                .valueEquals("Content-Disposition", "attachment; filename=\"name.zip\"")
+                .valueEquals("Content-Disposition", "attachment; filename=\"name_v1.zip\"")
                 .expectBody(byte[].class)
                 .isEqualTo(mockProjectData);
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
 
-        verify(projectFacade).exportProject(1L);
+        verify(projectFacade).exportProject(1L, null);
+    }
+
+    @Test
+    public void testExportProjectVersion() {
+        byte[] mockProjectData = "mock zip data".getBytes(StandardCharsets.UTF_8);
+
+        when(projectFacade.exportProject(1L, 2))
+            .thenReturn(mockProjectData);
+
+        Project project = new Project();
+
+        project.setId(1L);
+        project.setName("name");
+
+        when(projectService.getProject(1L))
+            .thenReturn(project);
+
+        this.webTestClient
+            .get()
+            .uri("/internal/projects/1/export?projectVersion=2")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-Disposition", "attachment; filename=\"name_v2.zip\"")
+            .expectBody(byte[].class)
+            .isEqualTo(mockProjectData);
+
+        verify(projectFacade).exportProject(1L, 2);
     }
 
     @Test
     public void testExportProjectNotFound() {
-        when(projectFacade.exportProject(999L))
+        when(projectFacade.exportProject(999L, null))
             .thenThrow(new RuntimeException("Project not found"));
 
         try {
@@ -299,7 +328,7 @@ public class ProjectApiControllerIntTest {
             Assertions.assertInstanceOf(ServletException.class, e.getCause());
         }
 
-        verify(projectFacade).exportProject(999L);
+        verify(projectFacade).exportProject(999L, null);
     }
 
     @Test
