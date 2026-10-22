@@ -18,6 +18,7 @@ package com.bytechef.automation.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import java.time.Instant;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,11 @@ import org.springframework.data.domain.Page;
  */
 public interface ProjectWorkflowExecutionFacade {
 
-    WorkflowExecutionDTO getWorkflowExecution(long id);
+    default WorkflowExecutionDTO getWorkflowExecution(long id) {
+        return getWorkflowExecution(id, false);
+    }
+
+    WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy);
 
     /**
      * The execution view of a trigger execution that produced no job - a failed webhook or poll - with no job and the
@@ -36,6 +41,9 @@ public interface ProjectWorkflowExecutionFacade {
     WorkflowExecutionDTO getTriggerExecutionWorkflowExecution(long triggerExecutionId);
 
     TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
+
+    TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
+        long id, long taskExecutionId, int pageNumber, int pageSize);
 
     default Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,

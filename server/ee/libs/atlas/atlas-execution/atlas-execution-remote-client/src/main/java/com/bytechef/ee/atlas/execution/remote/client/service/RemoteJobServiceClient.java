@@ -87,6 +87,11 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
+    public List<Job> getChildJobs(List<Long> parentTaskExecutionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Job> getJobs(List<Long> ids) {
         throw new UnsupportedOperationException();
     }
