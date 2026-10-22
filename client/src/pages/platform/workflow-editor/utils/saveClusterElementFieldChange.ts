@@ -19,6 +19,7 @@ interface SaveClusterElementFieldChangeProps {
     currentComponentDefinition: ComponentDefinition;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
+    onError?: () => void;
     parameters?: NonNullable<NodeDataType['parameters']>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
@@ -27,6 +28,7 @@ export default function saveClusterElementFieldChange({
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
+    onError,
     parameters,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
@@ -35,6 +37,8 @@ export default function saveClusterElementFieldChange({
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!currentNode || !workflow.definition) {
+        onError?.();
+
         return;
     }
 
@@ -44,6 +48,8 @@ export default function saveClusterElementFieldChange({
 
     if (!mainClusterRootName) {
         console.error('Cluster root could not be resolved for the current node');
+
+        onError?.();
 
         return;
     }
@@ -56,6 +62,8 @@ export default function saveClusterElementFieldChange({
     });
 
     if (!mainClusterRootTask) {
+        onError?.();
+
         return;
     }
 
@@ -63,6 +71,8 @@ export default function saveClusterElementFieldChange({
         mainClusterRootTask.type?.split('/')[0] || rootClusterElementNodeData?.componentName;
 
     if (!mainClusterRootComponentName) {
+        onError?.();
+
         return;
     }
 
@@ -89,6 +99,8 @@ export default function saveClusterElementFieldChange({
         const clusterElements = mainClusterRootTask.clusterElements;
 
         if (!clusterElements || Object.keys(clusterElements).length === 0) {
+            onError?.();
+
             return;
         }
 
@@ -110,13 +122,15 @@ export default function saveClusterElementFieldChange({
     } else {
         console.error('Unknown cluster element type or root element mismatch');
 
+        onError?.();
+
         return;
     }
 
     saveWorkflowDefinition({
         decorative: true,
         nodeData: updatedMainRootData,
-        onError: () => useWorkflowNodeDetailsPanelStore.getState().setOperationChangeInProgress(false),
+        onError,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {
                 componentName,
