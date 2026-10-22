@@ -66,6 +66,10 @@ export interface TriggerDefinition {
      */
     outputDefined: boolean;
     /**
+     * Does trigger define a file entry as its output schema.
+     */
+    outputFileEntry?: boolean;
+    /**
      * Does trigger defines output function.
      */
     outputFunctionDefined: boolean;
@@ -120,6 +124,7 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFileEntry': json['outputFileEntry'] == null ? undefined : json['outputFileEntry'],
         'outputFunctionDefined': json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
@@ -146,6 +151,7 @@ export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, i
         'help': HelpToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFileEntry': value['outputFileEntry'],
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
