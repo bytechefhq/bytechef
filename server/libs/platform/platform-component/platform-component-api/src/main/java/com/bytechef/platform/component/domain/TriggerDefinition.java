@@ -41,6 +41,7 @@ public final class TriggerDefinition {
     protected String name;
     protected boolean outputFunctionDefined;
     protected boolean outputDefined;
+    private boolean outputFileEntry;
     private OutputResponse outputResponse;
     private boolean outputSchemaDefined;
     private List<? extends Property> properties;
@@ -77,6 +78,7 @@ public final class TriggerDefinition {
         this.outputResponse = triggerDefinition.getOutputDefinition()
             .map(TriggerDefinition::toOutputResponse)
             .orElse(null);
+        this.outputFileEntry = outputResponse != null && outputResponse.outputSchema() instanceof FileEntryProperty;
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
         this.properties = CollectionUtils.map(
             triggerDefinition.getProperties()
@@ -168,6 +170,10 @@ public final class TriggerDefinition {
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFileEntry() {
+        return outputFileEntry;
     }
 
     public boolean isOutputFunctionDefined() {
