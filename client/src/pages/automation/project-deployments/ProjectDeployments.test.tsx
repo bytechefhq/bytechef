@@ -9,6 +9,7 @@ import ProjectDeployments from './ProjectDeployments';
 
 const hoisted = vi.hoisted(() => ({
     projectDeployments: [] as ProjectDeployment[],
+    refetchProjectDeployments: vi.fn(),
 }));
 
 const publishedProject: Project = {
@@ -41,7 +42,13 @@ vi.mock('@/shared/queries/automation/projects.queries', async (importOriginal) =
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/queries/automation/projectDeployments.queries')>()),
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: hoisted.projectDeployments, error: null, isLoading: false}),
+    useGetWorkspaceProjectDeploymentsQuery: () => ({
+        data: hoisted.projectDeployments,
+        error: null,
+        isFetching: false,
+        isLoading: false,
+        refetch: hoisted.refetchProjectDeployments,
+    }),
 }));
 
 vi.mock('@/shared/queries/automation/projectDeploymentTags.queries', () => ({
@@ -123,6 +130,8 @@ describe('ProjectDeployments expanded deployment', () => {
                 projectVersion: 1,
             },
         ];
+
+        hoisted.refetchProjectDeployments.mockClear();
     });
 
     it('should expand nothing when no deployment is handed over', () => {
@@ -143,5 +152,14 @@ describe('ProjectDeployments expanded deployment', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Finish deployment dialog'}));
 
         expect(screen.getByText('Expanded deployment: 9')).toBeInTheDocument();
+    });
+
+    it('should refetch deployments in place and keep the expanded deployment', async () => {
+        renderProjectDeployments([{pathname: '/', state: {projectDeploymentId: 2}}]);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Refresh deployments'}));
+
+        expect(hoisted.refetchProjectDeployments).toHaveBeenCalledTimes(1);
+        expect(screen.getByText('Expanded deployment: 2')).toBeInTheDocument();
     });
 });
