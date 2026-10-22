@@ -64,6 +64,28 @@ const LazyTaskExecutionChildren = ({
         return iterationIndexes.length > 0 ? Math.max(...iterationIndexes) : undefined;
     }, [defaultValue, parentTaskExecution.id]);
 
+    const focusedChildId = useMemo(() => {
+        if (children === undefined || !defaultValue) {
+            return undefined;
+        }
+
+        const parentIndex = defaultValue.indexOf(`${parentTaskExecution.id}`);
+        const nextValue = parentIndex === -1 ? undefined : defaultValue[parentIndex + 1];
+
+        if (nextValue === undefined || nextValue.startsWith(`${parentTaskExecution.id}-iteration-`)) {
+            return undefined;
+        }
+
+        return nextValue;
+    }, [children, defaultValue, parentTaskExecution.id]);
+
+    const isFocusedChildLoaded = useMemo(
+        () =>
+            focusedChildId === undefined ||
+            (children || []).some((childTaskExecution) => childTaskExecution.id === focusedChildId),
+        [children, focusedChildId]
+    );
+
     const handleLoadMore = useCallback(() => {
         if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
             fetchNextPage();
@@ -77,6 +99,14 @@ const LazyTaskExecutionChildren = ({
 
         handleLoadMore();
     }, [focusedIterationIndex, handleLoadMore, isLoading, loadedCount]);
+
+    useEffect(() => {
+        if (isFocusedChildLoaded || isLoading) {
+            return;
+        }
+
+        handleLoadMore();
+    }, [handleLoadMore, isFocusedChildLoaded, isLoading]);
 
     return (
         <>

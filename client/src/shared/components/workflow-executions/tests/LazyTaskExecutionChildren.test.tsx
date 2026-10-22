@@ -286,4 +286,110 @@ describe('LazyTaskExecutionChildren', () => {
         expect(screen.getByText('Child task 2')).toBeInTheDocument();
         expect(screen.queryByText(/Loop iteration/)).not.toBeInTheDocument();
     });
+
+    it('loadsPagesUntilFocusedPlainChildIsLoaded', () => {
+        const fetchNextPage = mockPlainQueryResult({childCount: 50, hasNextPage: true, totalElements: 387});
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '586']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="586"
+            />
+        );
+
+        expect(fetchNextPage).toHaveBeenCalledTimes(1);
+    });
+
+    it('doesNotLoadMorePagesWhenFocusedPlainChildIsLoaded', () => {
+        const fetchNextPage = mockPlainQueryResult({childCount: 50, hasNextPage: true, totalElements: 387});
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '210']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="210"
+            />
+        );
+
+        expect(fetchNextPage).not.toHaveBeenCalled();
+    });
+
+    it('doesNotLoadMorePagesWhenPlainParentIsNotOnTheFocusPath', () => {
+        const fetchNextPage = mockPlainQueryResult({childCount: 50, hasNextPage: true, totalElements: 387});
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['3', '586']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="586"
+            />
+        );
+
+        expect(fetchNextPage).not.toHaveBeenCalled();
+    });
+
+    it('doesNotLoadMorePagesForFocusedPlainChildWhileFetchingOrAfterAFailedFetch', () => {
+        const fetchingNextPage = mockPlainQueryResult({
+            childCount: 50,
+            hasNextPage: true,
+            isFetchingNextPage: true,
+            totalElements: 387,
+        });
+
+        const {unmount} = render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '586']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="586"
+            />
+        );
+
+        expect(fetchingNextPage).not.toHaveBeenCalled();
+
+        unmount();
+
+        const failedNextPage = mockPlainQueryResult({
+            childCount: 50,
+            hasNextPage: true,
+            isFetchNextPageError: true,
+            totalElements: 387,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '586']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="586"
+            />
+        );
+
+        expect(failedNextPage).not.toHaveBeenCalled();
+    });
+
+    it('doesNotLoadMorePagesForFocusedPlainChildWithoutANextPage', () => {
+        const fetchNextPage = mockPlainQueryResult({childCount: 50, hasNextPage: false, totalElements: 50});
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '586']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="586"
+            />
+        );
+
+        expect(fetchNextPage).not.toHaveBeenCalled();
+    });
 });
