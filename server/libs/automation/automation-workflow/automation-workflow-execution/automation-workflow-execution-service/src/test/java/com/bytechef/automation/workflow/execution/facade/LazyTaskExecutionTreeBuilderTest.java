@@ -1,0 +1,332 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.automation.workflow.execution.facade;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
+import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+/**
+ * @author Ivica Cardic
+ */
+@ExtendWith(ObjectMapperSetupExtension.class)
+class LazyTaskExecutionTreeBuilderTest {
+
+    private static final long JOB_ID = 1L;
+
+    private LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
+    private JobService jobService;
+    private TaskExecutionService taskExecutionService;
+
+    @BeforeEach
+    void beforeEach() {
+        jobService = mock(JobService.class);
+        taskExecutionService = mock(TaskExecutionService.class);
+
+        lazyTaskExecutionTreeBuilder = new LazyTaskExecutionTreeBuilder(
+            taskExecutionService, jobService,
+            () -> (taskExecution, childJob) -> new TaskExecutionDTO(taskExecution, "t", "i", null, null, childJob));
+    }
+
+    @Test
+    void getTopLevelTaskExecutionsSetsChildCountAndShallowChildJob() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution plainTaskExecution = createTaskExecution(2L, null, "parallel", "parallel/v1", 1);
+        TaskExecution subflowTaskExecution = createTaskExecution(3L, null, "subflow", "subflow/v1/run", 2);
+        TaskExecution nestedTaskExecution = createTaskExecution(4L, 1L, "nested", "myComponent/v1/myAction", 0);
+
+        Job childJob = new Job(50L);
+
+        childJob.setParentTaskExecutionId(3L);
+
+        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(loopTaskExecution, plainTaskExecution, subflowTaskExecution, nestedTaskExecution));
+        when(taskExecutionService.getChildCounts(List.of(1L, 2L, 3L)))
+            .thenReturn(Map.of(1L, 291L, 2L, 387L));
+        when(taskExecutionService.getIterationCounts(List.of(1L, 2L, 3L)))
+            .thenReturn(Map.of(1L, 97L));
+        when(jobService.getChildJobIds(JOB_ID))
+            .thenReturn(List.of(50L));
+        when(jobService.getJobs(List.of(50L)))
+            .thenReturn(List.of(childJob));
+
+        List<TaskExecutionDTO> taskExecutionDTOs = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutions(JOB_ID);
+
+        assertThat(taskExecutionDTOs)
+            .extracting(TaskExecutionDTO::id)
+            .containsExactly(1L, 2L, 3L);
+        assertThat(taskExecutionDTOs)
+            .extracting(TaskExecutionDTO::childCount)
+            .containsExactly(97, 387, 0);
+        assertThat(taskExecutionDTOs.get(0)
+            .childJob()).isNull();
+
+        JobDTO childJobDTO = taskExecutionDTOs.get(2)
+            .childJob();
+
+        assertThat(childJobDTO).isNotNull();
+        assertThat(childJobDTO.id()).isEqualTo(50L);
+        assertThat(childJobDTO.taskExecutions()).isEmpty();
+    }
+
+    @Test
+    void getTopLevelTaskExecutionsCountsBranchesOfOnErrorDispatcher() {
+        TaskExecution onErrorTaskExecution = createOnErrorTaskExecution(1L, null);
+        TaskExecution emptyOnErrorTaskExecution = createOnErrorTaskExecution(2L, null);
+
+        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(onErrorTaskExecution, emptyOnErrorTaskExecution));
+        when(taskExecutionService.getChildCounts(List.of(1L, 2L)))
+            .thenReturn(Map.of(1L, 1L));
+
+        List<TaskExecutionDTO> taskExecutionDTOs = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutions(JOB_ID);
+
+        assertThat(taskExecutionDTOs)
+            .extracting(TaskExecutionDTO::childCount)
+            .containsExactly(2, 0);
+    }
+
+    @Test
+    void getChildrenPageReturnsPlainChildren() {
+        TaskExecution parentTaskExecution = createTaskExecution(10L, null, "parallel", "parallel/v1", 0);
+        TaskExecution firstChildTaskExecution = createTaskExecution(11L, 10L, "first", "myComponent/v1/a", 0);
+        TaskExecution secondChildTaskExecution = createTaskExecution(12L, 10L, "second", "loop/v1", 1);
+
+        when(taskExecutionService.getParentTaskExecutions(10L, 1, 2))
+            .thenReturn(List.of(firstChildTaskExecution, secondChildTaskExecution));
+        when(taskExecutionService.getChildCounts(List.of(10L)))
+            .thenReturn(Map.of(10L, 5L));
+        when(taskExecutionService.getIterationCounts(List.of(11L, 12L)))
+            .thenReturn(Map.of(12L, 3L));
+
+        TaskExecutionChildrenPageDTO childrenPage = lazyTaskExecutionTreeBuilder.getChildrenPage(
+            parentTaskExecution, 1, 2);
+
+        assertThat(childrenPage.children())
+            .extracting(TaskExecutionDTO::id)
+            .containsExactly(11L, 12L);
+        assertThat(childrenPage.children())
+            .extracting(TaskExecutionDTO::childCount)
+            .containsExactly(0, 3);
+        assertThat(childrenPage.iterations()).isEmpty();
+        assertThat(childrenPage.number()).isEqualTo(1);
+        assertThat(childrenPage.size()).isEqualTo(2);
+        assertThat(childrenPage.numberOfElements()).isEqualTo(2);
+        assertThat(childrenPage.totalElements()).isEqualTo(5L);
+        assertThat(childrenPage.totalPages()).isEqualTo(3);
+    }
+
+    @Test
+    void getChildrenPageKeepsIterationsWholeAcrossPages() {
+        TaskExecution loopTaskExecution = createTaskExecution(10L, null, "loop", "loop/v1", 0);
+        TaskExecution a0TaskExecution = createTaskExecution(11L, 10L, "first", "myComponent/v1/a", 0);
+        TaskExecution a1TaskExecution = createTaskExecution(12L, 10L, "second", "myComponent/v1/a", 1);
+        TaskExecution b0TaskExecution = createTaskExecution(13L, 10L, "first", "myComponent/v1/a", 0);
+        TaskExecution b1TaskExecution = createTaskExecution(14L, 10L, "second", "myComponent/v1/a", 1);
+        TaskExecution c0TaskExecution = createTaskExecution(15L, 10L, "first", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getParentTaskExecutionIds(10L))
+            .thenReturn(List.of(11L, 12L, 13L, 14L, 15L));
+        when(taskExecutionService.getParentIterationStartIds(10L))
+            .thenReturn(List.of(11L, 13L, 15L));
+        when(taskExecutionService.getTaskExecutions(List.of(11L, 12L, 13L, 14L)))
+            .thenReturn(List.of(a0TaskExecution, a1TaskExecution, b0TaskExecution, b1TaskExecution));
+        when(taskExecutionService.getTaskExecutions(List.of(15L)))
+            .thenReturn(List.of(c0TaskExecution));
+
+        TaskExecutionChildrenPageDTO firstPage = lazyTaskExecutionTreeBuilder.getChildrenPage(loopTaskExecution, 0, 2);
+
+        assertThat(toIds(firstPage.iterations())).isEqualTo(List.of(List.of(11L, 12L), List.of(13L, 14L)));
+        assertThat(firstPage.children()).isEmpty();
+        assertThat(firstPage.number()).isZero();
+        assertThat(firstPage.size()).isEqualTo(2);
+        assertThat(firstPage.numberOfElements()).isEqualTo(2);
+        assertThat(firstPage.totalElements()).isEqualTo(3L);
+        assertThat(firstPage.totalPages()).isEqualTo(2);
+
+        TaskExecutionChildrenPageDTO secondPage = lazyTaskExecutionTreeBuilder.getChildrenPage(
+            loopTaskExecution, 1, 2);
+
+        assertThat(toIds(secondPage.iterations())).isEqualTo(List.of(List.of(15L)));
+        assertThat(secondPage.number()).isEqualTo(1);
+        assertThat(secondPage.numberOfElements()).isEqualTo(1);
+        assertThat(secondPage.totalElements()).isEqualTo(3L);
+        assertThat(secondPage.totalPages()).isEqualTo(2);
+    }
+
+    @Test
+    void getChildrenPageOnErrorReturnsTwoBranches() {
+        TaskExecution onErrorTaskExecution = createOnErrorTaskExecution(20L, null);
+        TaskExecution mainTaskExecution = createTaskExecution(21L, 20L, "mainTask", "myComponent/v1/a", 0);
+        TaskExecution errorTaskExecution = createTaskExecution(22L, 20L, "errorTask", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getParentTaskExecutionIds(20L))
+            .thenReturn(List.of(21L, 22L));
+        when(taskExecutionService.getTaskExecutions(List.of(21L, 22L)))
+            .thenReturn(List.of(mainTaskExecution, errorTaskExecution));
+
+        TaskExecutionChildrenPageDTO childrenPage = lazyTaskExecutionTreeBuilder.getChildrenPage(
+            onErrorTaskExecution, 0, 50);
+
+        assertThat(toIds(childrenPage.iterations())).isEqualTo(List.of(List.of(21L), List.of(22L)));
+        assertThat(childrenPage.children()).isEmpty();
+        assertThat(childrenPage.number()).isZero();
+        assertThat(childrenPage.numberOfElements()).isEqualTo(2);
+        assertThat(childrenPage.totalElements()).isEqualTo(2L);
+        assertThat(childrenPage.totalPages()).isEqualTo(1);
+    }
+
+    @Test
+    void getFocusPathPicksFirstFailureUnderLatestAttempt() {
+        TaskExecution firstTaskExecution = createTaskExecution(1L, null, "a", "myComponent/v1/a", 0);
+        TaskExecution loopTaskExecution = createTaskExecution(3L, null, "loop", "loop/v1", 1);
+        TaskExecution firstFailedTaskExecution = createTaskExecution(5L, 3L, "x", "myComponent/v1/a", 0);
+        TaskExecution secondFailedTaskExecution = createTaskExecution(6L, 3L, "x", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(loopTaskExecution, firstFailedTaskExecution, secondFailedTaskExecution));
+        when(taskExecutionService.getChildCounts(List.of(3L, 5L, 6L)))
+            .thenReturn(Map.of(3L, 2L));
+        when(taskExecutionService.getTaskExecution(3L))
+            .thenReturn(loopTaskExecution);
+        when(taskExecutionService.getIterationIndex(firstFailedTaskExecution))
+            .thenReturn(1);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(firstTaskExecution, loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(3L, null), new FocusPathElementDTO(5L, 1));
+    }
+
+    @Test
+    void focusPathSkipsRetriedTopLevelAttempt() {
+        TaskExecution firstAttemptTaskExecution = createTaskExecution(1L, null, "a", "parallel/v1", 0);
+        TaskExecution secondAttemptTaskExecution = createTaskExecution(2L, null, "a", "parallel/v1", 0);
+        TaskExecution otherTaskExecution = createTaskExecution(3L, null, "b", "parallel/v1", 1);
+        TaskExecution xTaskExecution = createTaskExecution(4L, 1L, "x", "myComponent/v1/a", 0);
+        TaskExecution yTaskExecution = createTaskExecution(5L, 3L, "y", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(xTaskExecution, yTaskExecution));
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(firstAttemptTaskExecution);
+        when(taskExecutionService.getTaskExecution(3L))
+            .thenReturn(otherTaskExecution);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(firstAttemptTaskExecution, secondAttemptTaskExecution, otherTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(3L, null), new FocusPathElementDTO(5L, null));
+    }
+
+    @Test
+    void getFocusPathFallsBackToLastCreatedTask() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution lastTaskExecution = createTaskExecution(9L, 1L, "x", "myComponent/v1/a", 1);
+
+        when(taskExecutionService.fetchLastJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(lastTaskExecution));
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(loopTaskExecution);
+        when(taskExecutionService.getIterationIndex(lastTaskExecution))
+            .thenReturn(2);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null), new FocusPathElementDTO(9L, 2));
+    }
+
+    @Test
+    void getFocusPathMarksOnErrorBranch() {
+        TaskExecution onErrorTaskExecution = createOnErrorTaskExecution(1L, null);
+        TaskExecution errorTaskExecution = createTaskExecution(3L, 1L, "errorTask", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(errorTaskExecution));
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(onErrorTaskExecution);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(onErrorTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null), new FocusPathElementDTO(3L, 1));
+    }
+
+    @Test
+    void getFocusPathIsEmptyWithoutTaskExecutions() {
+        when(taskExecutionService.fetchLastJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.empty());
+
+        assertThat(lazyTaskExecutionTreeBuilder.getFocusPath(JOB_ID, List.of())).isEmpty();
+    }
+
+    private static TaskExecution createOnErrorTaskExecution(long id, @Nullable Long parentId) {
+        WorkflowTask workflowTask = new WorkflowTask(
+            Map.of(
+                "name", "onError",
+                "type", "on-error/v1",
+                "parameters", Map.of(
+                    "main-branch", List.of(Map.of("name", "mainTask", "type", "myComponent/v1/a")),
+                    "on-error-branch", List.of(Map.of("name", "errorTask", "type", "myComponent/v1/a")))));
+
+        return TaskExecution.builder()
+            .id(id)
+            .jobId(JOB_ID)
+            .parentId(parentId)
+            .workflowTask(workflowTask)
+            .build();
+    }
+
+    private static TaskExecution createTaskExecution(
+        long id, @Nullable Long parentId, String name, String type, int taskNumber) {
+
+        return TaskExecution.builder()
+            .id(id)
+            .jobId(JOB_ID)
+            .parentId(parentId)
+            .taskNumber(taskNumber)
+            .workflowTask(new WorkflowTask(Map.of("name", name, "type", type)))
+            .build();
+    }
+
+    private static List<List<Long>> toIds(List<List<TaskExecutionDTO>> iterations) {
+        return iterations.stream()
+            .map(iteration -> iteration.stream()
+                .map(TaskExecutionDTO::id)
+                .toList())
+            .toList();
+    }
+}

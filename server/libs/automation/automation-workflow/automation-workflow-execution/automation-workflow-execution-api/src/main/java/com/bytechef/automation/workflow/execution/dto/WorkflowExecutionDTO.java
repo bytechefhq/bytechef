@@ -19,9 +19,11 @@ package com.bytechef.automation.workflow.execution.dto;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -30,7 +32,15 @@ import org.jspecify.annotations.Nullable;
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
     long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
-    @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
+    @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
+    @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount) {
+
+    public WorkflowExecutionDTO(
+        long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
+        @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
+
+        this(id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null);
+    }
 
     public boolean isTriggerOnly() {
         return job == null;

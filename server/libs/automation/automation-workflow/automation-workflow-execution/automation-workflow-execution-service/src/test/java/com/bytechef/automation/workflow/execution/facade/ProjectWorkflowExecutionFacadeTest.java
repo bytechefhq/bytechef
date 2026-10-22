@@ -18,6 +18,7 @@ package com.bytechef.automation.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -50,6 +51,7 @@ import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploym
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -57,6 +59,9 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
+import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -65,6 +70,7 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -78,6 +84,7 @@ import org.springframework.data.domain.Page;
  */
 public class ProjectWorkflowExecutionFacadeTest {
 
+    private ComponentDefinitionService componentDefinitionService;
     private ContextService contextService;
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
@@ -89,11 +96,12 @@ public class ProjectWorkflowExecutionFacadeTest {
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
     private WorkflowExecutionRowService workflowExecutionRowService;
+    private WorkflowTask workflowTask;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     public void setUp() {
-        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        componentDefinitionService = mock(ComponentDefinitionService.class);
 
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
@@ -129,7 +137,7 @@ public class ProjectWorkflowExecutionFacadeTest {
             .when(componentDefinitionService.getComponentDefinition(anyString(), any()))
             .thenReturn(componentDefinition);
 
-        WorkflowTask workflowTask = mock(WorkflowTask.class);
+        workflowTask = mock(WorkflowTask.class);
 
         lenient()
             .when(workflowTask.getType())
@@ -230,6 +238,30 @@ public class ProjectWorkflowExecutionFacadeTest {
     }
 
     @Test
+    public void testGetWorkflowExecutionTaskExecutionChildrenAcceptsTaskInDescendantJob() {
+        Job childJob = new Job(10L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getJob(10L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getTaskExecution(99L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(99L)
+                    .jobId(5L)
+                    .build());
+
+        TaskExecutionChildrenPageDTO taskExecutionChildrenPageDTO = facade.getWorkflowExecutionTaskExecutionChildren(
+            5L, 1L, 0, 50);
+
+        assertThat(taskExecutionChildrenPageDTO.number()).isZero();
+        assertThat(taskExecutionChildrenPageDTO.size()).isEqualTo(50);
+    }
+
+    @Test
     public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(taskExecution);
@@ -251,6 +283,134 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isEmpty();
 
         verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
+    }
+
+    @Test
+    public void getWorkflowExecutionLazyForChildJob() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        TaskExecution topLevelTaskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(30L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getJobTaskExecutions(30L))
+            .thenReturn(List.of(topLevelTaskExecution));
+        when(taskExecutionService.fetchLastJobTaskExecution(30L))
+            .thenReturn(Optional.of(topLevelTaskExecution));
+        when(taskExecutionService.countJobTaskExecutions(30L))
+            .thenReturn(5L);
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
+
+        assertThat(workflowExecutionDTO.projectDeployment()).isNull();
+        assertThat(workflowExecutionDTO.triggerExecution()).isNull();
+        assertThat(workflowExecutionDTO.focusPath()).containsExactly(new FocusPathElementDTO(1L, null));
+        assertThat(workflowExecutionDTO.taskExecutionCount()).isEqualTo(5L);
+
+        JobDTO jobDTO = Objects.requireNonNull(workflowExecutionDTO.job());
+
+        assertThat(jobDTO.taskExecutions())
+            .extracting(TaskExecutionDTO::id, TaskExecutionDTO::childCount)
+            .containsExactly(tuple(1L, 0));
+    }
+
+    @Test
+    public void getWorkflowExecutionLazyResolvesEachTaskTypeDefinitionOnce() {
+        Job job = new Job(30L);
+
+        job.setWorkflowId("workflow");
+
+        TaskExecution firstTaskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(30L)
+            .workflowTask(workflowTask)
+            .build();
+        TaskExecution secondTaskExecution = TaskExecution.builder()
+            .id(2L)
+            .jobId(30L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(jobService.getJob(30L))
+            .thenReturn(job);
+        when(taskExecutionService.getJobTopLevelTaskExecutions(30L))
+            .thenReturn(List.of(firstTaskExecution, secondTaskExecution));
+
+        facade.getWorkflowExecution(30L, true);
+
+        verify(componentDefinitionService, times(1)).getComponentDefinition(anyString(), any());
+    }
+
+    @Test
+    public void getWorkflowExecutionWithoutLazyIsUnchanged() {
+        Job job = new Job(30L);
+
+        job.setWorkflowId("workflow");
+
+        TaskExecution parentTaskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(30L)
+            .workflowTask(workflowTask)
+            .build();
+        TaskExecution childTaskExecution = TaskExecution.builder()
+            .id(2L)
+            .jobId(30L)
+            .parentId(1L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(jobService.getJob(30L))
+            .thenReturn(job);
+        when(taskExecutionService.getJobTaskExecutions(30L))
+            .thenReturn(List.of(parentTaskExecution, childTaskExecution));
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L);
+
+        assertThat(workflowExecutionDTO.focusPath()).isNull();
+        assertThat(workflowExecutionDTO.taskExecutionCount()).isNull();
+
+        List<TaskExecutionDTO> taskExecutionDTOs = Objects.requireNonNull(workflowExecutionDTO.job())
+            .taskExecutions();
+
+        assertThat(taskExecutionDTOs)
+            .extracting(TaskExecutionDTO::id)
+            .containsExactly(1L);
+
+        TaskExecutionDTO parentTaskExecutionDTO = taskExecutionDTOs.getFirst();
+
+        assertThat(parentTaskExecutionDTO.childCount()).isNull();
+        assertThat(parentTaskExecutionDTO.children())
+            .extracting(TaskExecutionDTO::id, TaskExecutionDTO::childCount)
+            .containsExactly(tuple(2L, null));
+
+        verify(taskExecutionService, never()).countJobTaskExecutions(anyLong());
+        verify(taskExecutionService, never()).getFailedJobTaskExecutions(anyLong());
+    }
+
+    @Test
+    public void getWorkflowExecutionTaskExecutionChildrenRejectsForeignTask() {
+        TaskExecution foreignTaskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(20L)
+            .workflowTask(workflowTask)
+            .build();
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(foreignTaskExecution);
+        when(jobService.getJob(20L))
+            .thenReturn(new Job(20L));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecutionChildren(10L, 1L, 0, 50))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        verify(taskExecutionService, never()).getParentTaskExecutions(anyLong(), anyInt(), anyInt());
     }
 
     @Nested

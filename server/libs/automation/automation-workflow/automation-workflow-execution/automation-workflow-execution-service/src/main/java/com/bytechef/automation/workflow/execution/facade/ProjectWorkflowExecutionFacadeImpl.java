@@ -53,7 +53,9 @@ import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
@@ -73,6 +75,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -100,6 +103,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final EnvironmentService environmentService;
     private final WorkflowExecutionRowService workflowExecutionRowService;
     private final JobService jobService;
+    private final LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -144,18 +148,33 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.workflowService = workflowService;
+
+        this.lazyTaskExecutionTreeBuilder = new LazyTaskExecutionTreeBuilder(
+            taskExecutionService, jobService, this::createListTaskExecutionDTOConverter);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecutionDTO getWorkflowExecution(long id) {
+    public WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy) {
         Job job = jobService.getJob(id);
 
         Map<String, ?> outputs = job.getOutputs() == null
             ? null
             : taskFileStorage.readJobOutputs(job.getOutputs());
 
-        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
+        JobDTO jobDTO;
+        List<FocusPathElementDTO> focusPath = null;
+        Long taskExecutionCount = null;
+
+        if (lazy) {
+            List<TaskExecution> topLevelTaskExecutions = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutionRows(id);
+
+            jobDTO = new JobDTO(job, outputs, lazyTaskExecutionTreeBuilder.decorate(topLevelTaskExecutions, id));
+            focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(id, topLevelTaskExecutions);
+            taskExecutionCount = taskExecutionService.countJobTaskExecutions(id);
+        } else {
+            jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
+        }
 
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
@@ -170,7 +189,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 projectDeploymentIdOptional.orElse(null),
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
-                job));
+                job),
+            focusPath, taskExecutionCount);
     }
 
     @Override
@@ -197,6 +217,18 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
         return toTaskExecutionDTO(taskExecution, null, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
+        long id, long taskExecutionId, int pageNumber, int pageSize) {
+
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+
+        validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
     }
 
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
@@ -770,6 +802,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private JobDTO toSubflowJobDTO(Job job) {
         return new JobDTO(job, null, getSubflowJobTaskExecutions(Objects.requireNonNull(job.getId())));
+    }
+
+    private BiFunction<TaskExecution, JobDTO, TaskExecutionDTO> createListTaskExecutionDTOConverter() {
+        Map<String, DefinitionResult> definitionResultCache = new HashMap<>();
+
+        return (taskExecution, childJob) -> toTaskExecutionDTO(taskExecution, childJob, false, definitionResultCache);
     }
 
     TaskExecutionDTO toTaskExecutionDTO(TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData) {
