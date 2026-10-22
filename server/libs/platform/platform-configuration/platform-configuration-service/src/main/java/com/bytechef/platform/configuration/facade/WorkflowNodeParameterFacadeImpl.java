@@ -453,7 +453,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             return false;
         }
 
-        displayCondition = replaceIndexes(displayCondition, parameterPathIndexes);
+        displayCondition = RequiredPropertyUtils.replaceIndexes(displayCondition, parameterPathIndexes);
 
         return displayCondition.contains(parameterPath);
     }
@@ -497,7 +497,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         } else {
             for (List<Integer> indexes : indexesList) {
                 String updatedDisplayCondition = displayCondition.contains("[index]")
-                    ? replaceIndexes(displayCondition, indexes) : displayCondition;
+                    ? RequiredPropertyUtils.replaceIndexes(displayCondition, indexes) : displayCondition;
 
                 if (displayConditionMap.containsKey(updatedDisplayCondition)) {
                     continue;
@@ -1061,16 +1061,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
-        try {
-            Map<String, Object> result = evaluator.evaluate(
-                Map.of("displayCondition", "=" + displayCondition), inputParameters, true);
-
-            Object displayConditionResult = result.get("displayCondition");
-
-            return displayConditionResult instanceof Boolean bool && bool;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+        return RequiredPropertyUtils.evaluate(displayCondition, inputParameters, evaluator);
     }
 
     private static List<Integer> extractIndexes(String expression) {
@@ -1318,93 +1309,11 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Set<String> missingRequiredProperties = new HashSet<>();
 
         if (parameterMap != null && properties != null) {
-            checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties, parameterMap, List.of());
+            missingRequiredProperties = RequiredPropertyUtils.getMissingRequiredProperties(
+                properties, parameterMap, evaluator);
         }
 
         return new WorkflowNodeStructure(operationType, parameterMap, properties, missingRequiredProperties, name);
-    }
-
-    private void checkRequiredProperties(
-        List<?> properties, Map<?, ?> parameterMap, String prefix, Set<String> missingRequiredProperties,
-        Map<String, ?> rootParameterMap, List<Integer> indexes) {
-
-        for (Object prop : properties) {
-            if (!(prop instanceof BaseProperty property)) {
-                continue;
-            }
-
-            if (isHidden(property, rootParameterMap, indexes)) {
-                continue;
-            }
-
-            String propertyName = property.getName();
-
-            String propertyPath = prefix.isEmpty() ? propertyName : prefix + "." + propertyName;
-
-            if (property.getRequired() && isRequiredValueMissing(parameterMap, propertyName)) {
-                missingRequiredProperties.add(propertyPath);
-            } else if (parameterMap.containsKey(propertyName)) {
-                // Check nested properties
-                if (property instanceof ObjectProperty objectProperty) {
-                    List<?> nestedProperties = objectProperty.getProperties();
-
-                    if (nestedProperties != null && !nestedProperties.isEmpty()) {
-                        Object value = parameterMap.get(propertyName);
-
-                        if (value instanceof Map) {
-                            checkRequiredProperties(
-                                nestedProperties, (Map<?, ?>) value, propertyPath, missingRequiredProperties,
-                                rootParameterMap, indexes);
-                        }
-                    }
-                } else if (property instanceof ArrayProperty arrayProperty) {
-                    List<?> items = arrayProperty.getItems();
-                    if (items != null && !items.isEmpty()) {
-                        Object value = parameterMap.get(propertyName);
-
-                        if (value instanceof List<?> list) {
-                            for (int i = 0; i < list.size(); i++) {
-                                Object item = list.get(i);
-
-                                if (item instanceof Map) {
-                                    List<Integer> itemIndexes = new ArrayList<>(indexes);
-
-                                    itemIndexes.add(i);
-
-                                    checkRequiredProperties(
-                                        items, (Map<?, ?>) item, propertyPath + "[" + i + "]",
-                                        missingRequiredProperties, rootParameterMap, itemIndexes);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean isHidden(BaseProperty property, Map<String, ?> rootParameterMap, List<Integer> indexes) {
-        String displayCondition = property.getDisplayCondition();
-
-        if (displayCondition == null || displayCondition.isEmpty()) {
-            return false;
-        }
-
-        if (displayCondition.contains("[index]")) {
-            displayCondition = replaceIndexes(displayCondition, indexes);
-        }
-
-        return !evaluate(displayCondition, rootParameterMap);
-    }
-
-    private static boolean isRequiredValueMissing(Map<?, ?> parameterMap, String propertyName) {
-        if (!parameterMap.containsKey(propertyName)) {
-            return true;
-        }
-
-        Object value = parameterMap.get(propertyName);
-
-        return value == null || (value instanceof String string && string.isBlank());
     }
 
     @SuppressWarnings("unchecked")
@@ -1541,21 +1450,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             }
         }
-    }
-
-    private static String replaceIndexes(String expression, List<Integer> indexes) {
-        Integer lastIndex = null;
-
-        for (Integer index : indexes) {
-            expression = expression.replaceFirst("\\[index]", "[" + index + "]");
-            lastIndex = index;
-        }
-
-        if (lastIndex != null && expression.contains("[index]")) {
-            expression = expression.replace("[index]", "[" + lastIndex + "]");
-        }
-
-        return expression;
     }
 
     @SuppressWarnings("unchecked")

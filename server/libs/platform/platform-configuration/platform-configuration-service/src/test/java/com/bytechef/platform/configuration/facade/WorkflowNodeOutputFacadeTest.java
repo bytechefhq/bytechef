@@ -19,16 +19,21 @@ package com.bytechef.platform.configuration.facade;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +46,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.ExpressionEvaluationException;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -778,6 +784,162 @@ class WorkflowNodeOutputFacadeTest {
         }
     }
 
+    @Test
+    void testGetWorkflowNodeOutputSkipsDynamicOutputWhenRequiredPropertyIsMissing() {
+        WorkflowTask workflowTask = new WorkflowTask(
+            Map.of("name", "dataStorage_1", "type", "dataStorage/v1/getValue", "parameters", Map.of()));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(workflowTask));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinitionService.getActionDefinition("dataStorage", 1, "getValue")).thenReturn(actionDefinition);
+        when(actionDefinition.getOutputResponse()).thenReturn(null);
+        doReturn(List.of(mockStringProperty("key", null))).when(actionDefinition)
+            .getProperties();
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            WorkflowNodeOutputDTO result = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID);
+
+            assertNotNull(result);
+            assertNull(result.outputResponse());
+            assertFalse(result.testOutputResponse());
+        }
+
+        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputRunsDynamicOutputWhenRequiredPropertiesAreSet() {
+        WorkflowTask workflowTask = new WorkflowTask(
+            Map.of(
+                "name", "dataStorage_1", "type", "dataStorage/v1/getValue", "parameters", Map.of("key", "counter")));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(workflowTask));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinitionService.getActionDefinition("dataStorage", 1, "getValue")).thenReturn(actionDefinition);
+        when(actionDefinition.getOutputResponse()).thenReturn(null);
+        doReturn(List.of(mockStringProperty("key", null))).when(actionDefinition)
+            .getProperties();
+        when(actionDefinitionService.isDynamicOutputDefined("dataStorage", 1, "getValue")).thenReturn(true);
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID)).thenReturn(List.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), any(), any()))
+            .thenReturn(new OutputResponse(null, 42));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            WorkflowNodeOutputDTO result = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID);
+
+            assertNotNull(result);
+            assertEquals(42, result.getSampleOutput());
+            assertTrue(result.testOutputResponse());
+        }
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputIgnoresMissingRequiredPropertyHiddenByDisplayCondition() {
+        WorkflowTask workflowTask = new WorkflowTask(
+            Map.of(
+                "name", "dataStorage_1", "type", "dataStorage/v1/getValue", "parameters", Map.of("type", "NUMBER")));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(workflowTask));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinitionService.getActionDefinition("dataStorage", 1, "getValue")).thenReturn(actionDefinition);
+        when(actionDefinition.getOutputResponse()).thenReturn(null);
+        doReturn(List.of(mockStringProperty("defaultValue", "type == 'STRING'"))).when(actionDefinition)
+            .getProperties();
+        when(actionDefinitionService.isDynamicOutputDefined("dataStorage", 1, "getValue")).thenReturn(true);
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID)).thenReturn(List.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> {
+                Map<String, ?> map = invocation.getArgument(0);
+
+                return map.containsKey("displayCondition") ? Map.of("displayCondition", false) : map;
+            });
+        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), any(), any()))
+            .thenReturn(new OutputResponse(null, 42));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            WorkflowNodeOutputDTO result = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID);
+
+            assertNotNull(result);
+            assertEquals(42, result.getSampleOutput());
+        }
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputOfTriggerSkipsDynamicOutputWhenRequiredPropertyIsMissing() {
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(
+            Map.of("name", "trigger_1", "type", "dataTable/v1/recordUpdated", "parameters", Map.of()));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "trigger_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(triggerDefinitionService.getTriggerDefinition("dataTable", 1, "recordUpdated"))
+            .thenReturn(triggerDefinition);
+        doReturn(List.of(mockStringProperty("table", null))).when(triggerDefinition)
+            .getProperties();
+        when(triggerDefinition.getOutputResponse())
+            .thenReturn(new OutputResponse(null, Map.of("row", "value"), null));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of(workflowTrigger));
+
+            WorkflowNodeOutputDTO result = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                WORKFLOW_ID, "trigger_1", ENVIRONMENT_ID);
+
+            assertNotNull(result);
+            assertEquals(Map.of("row", "value"), result.getSampleOutput());
+            assertFalse(result.testOutputResponse());
+        }
+
+        verify(triggerDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+    }
+
     private ClusterElementDefinition mockClusterElementWorkflow() {
         WorkflowTask workflowTask = new WorkflowTask(
             Map.of(
@@ -800,5 +962,17 @@ class WorkflowNodeOutputFacadeTest {
             .thenReturn(clusterElementDefinition);
 
         return clusterElementDefinition;
+    }
+
+    private static StringProperty mockStringProperty(String name, String displayCondition) {
+        StringProperty stringProperty = mock(StringProperty.class);
+
+        lenient().when(stringProperty.getName())
+            .thenReturn(name);
+        lenient().when(stringProperty.getRequired())
+            .thenReturn(true);
+        when(stringProperty.getDisplayCondition()).thenReturn(displayCondition);
+
+        return stringProperty;
     }
 }
