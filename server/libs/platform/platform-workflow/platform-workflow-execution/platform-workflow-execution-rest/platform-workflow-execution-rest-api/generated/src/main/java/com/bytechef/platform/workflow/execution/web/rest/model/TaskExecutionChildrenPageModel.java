@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecutionChildrenPage", description = "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page.")
 @JsonTypeName("TaskExecutionChildrenPage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T16:26:57.995256+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T23:22:06.180830+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionChildrenPageModel {
 
   private List<@Valid TaskExecutionModel> children = new ArrayList<>();
@@ -166,11 +166,11 @@ public class TaskExecutionChildrenPageModel {
   }
 
   /**
-   * The size of the page.
+   * The requested page size.
    * @return size
    */
   @NotNull 
-  @Schema(name = "size", description = "The size of the page.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "size", description = "The requested page size.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("size")
   public Integer getSize() {
     return size;

@@ -22,14 +22,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "FocusPathElement", description = "An element of the path from a top-level task execution to the task execution to focus.")
 @JsonTypeName("FocusPathElement")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T15:39:29.803561+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T23:22:06.180830+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class FocusPathElementModel {
 
   private @Nullable Integer childIndex;
 
   private @Nullable Integer iterationIndex;
 
-  private Long taskExecutionId;
+  private String taskExecutionId;
 
   public FocusPathElementModel() {
     super();
@@ -38,7 +38,7 @@ public class FocusPathElementModel {
   /**
    * Constructor with only required parameters
    */
-  public FocusPathElementModel(Long taskExecutionId) {
+  public FocusPathElementModel(String taskExecutionId) {
     this.taskExecutionId = taskExecutionId;
   }
 
@@ -48,11 +48,11 @@ public class FocusPathElementModel {
   }
 
   /**
-   * The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; set only when the previous element is neither a loop nor an on-error task.
+   * The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; absent for the first element and set only when the previous element is neither a loop nor an on-error task.
    * @return childIndex
    */
   
-  @Schema(name = "childIndex", description = "The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; set only when the previous element is neither a loop nor an on-error task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "childIndex", description = "The position of this task execution among the children of the previous element of the path, in the order the children endpoint returns them; absent for the first element and set only when the previous element is neither a loop nor an on-error task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("childIndex")
   public @Nullable Integer getChildIndex() {
     return childIndex;
@@ -69,11 +69,11 @@ public class FocusPathElementModel {
   }
 
   /**
-   * The index of the loop iteration, or of the on-error branch (0 for the try branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.
+   * The index of the loop iteration, or of the on-error branch (0 for the main branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.
    * @return iterationIndex
    */
   
-  @Schema(name = "iterationIndex", description = "The index of the loop iteration, or of the on-error branch (0 for the try branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "iterationIndex", description = "The index of the loop iteration, or of the on-error branch (0 for the main branch, 1 for the error branch), of the previous element of the path that contains this task execution; absent for the first element and for children of other tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("iterationIndex")
   public @Nullable Integer getIterationIndex() {
     return iterationIndex;
@@ -84,7 +84,7 @@ public class FocusPathElementModel {
     this.iterationIndex = iterationIndex;
   }
 
-  public FocusPathElementModel taskExecutionId(Long taskExecutionId) {
+  public FocusPathElementModel taskExecutionId(String taskExecutionId) {
     this.taskExecutionId = taskExecutionId;
     return this;
   }
@@ -96,12 +96,12 @@ public class FocusPathElementModel {
   @NotNull 
   @Schema(name = "taskExecutionId", description = "The id of a task execution.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("taskExecutionId")
-  public Long getTaskExecutionId() {
+  public String getTaskExecutionId() {
     return taskExecutionId;
   }
 
   @JsonProperty("taskExecutionId")
-  public void setTaskExecutionId(Long taskExecutionId) {
+  public void setTaskExecutionId(String taskExecutionId) {
     this.taskExecutionId = taskExecutionId;
   }
 
