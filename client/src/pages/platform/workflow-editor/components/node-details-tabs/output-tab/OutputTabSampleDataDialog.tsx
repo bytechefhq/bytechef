@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {Suspense, lazy, useEffect, useState} from 'react';
@@ -10,8 +9,6 @@ import {Suspense, lazy, useEffect, useState} from 'react';
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
-
-type SampleDataModeType = 'file' | 'json';
 
 interface OutputTabSampleDataDialogProps {
     fileUploadEnabled?: boolean;
@@ -33,9 +30,6 @@ const OutputTabSampleDataDialog = ({
     const [rawValue, setRawValue] = useState<string>('');
     const [parsedValue, setParsedValue] = useState<object | undefined>();
     const [sampleFile, setSampleFile] = useState<File | null>(null);
-    const [selectedMode, setSelectedMode] = useState<SampleDataModeType>('file');
-
-    const mode: SampleDataModeType = fileUploadEnabled ? selectedMode : 'json';
 
     const handleEditorOnChange = (editorValue: string | undefined) => {
         const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
@@ -79,7 +73,7 @@ const OutputTabSampleDataDialog = ({
     };
 
     const handleUploadClick = () => {
-        if (mode === 'file') {
+        if (fileUploadEnabled) {
             if (sampleFile && onFileUpload) {
                 onFileUpload(sampleFile);
             }
@@ -88,30 +82,7 @@ const OutputTabSampleDataDialog = ({
         }
     };
 
-    const uploadDisabled = mode === 'file' ? !sampleFile : !parsedValue;
-
-    const jsonEditor = (
-        <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
-            <div className="absolute inset-0">
-                <Suspense fallback={<MonacoEditorLoader />}>
-                    <MonacoEditor
-                        className="bg-transparent"
-                        defaultLanguage="json"
-                        onChange={handleEditorOnChange}
-                        onMount={handleEditorOnMount}
-                        value={rawValue}
-                    />
-                </Suspense>
-
-                <div
-                    className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
-                    id="monaco-placeholder"
-                >
-                    {EDITOR_PLACEHOLDER}
-                </div>
-            </div>
-        </div>
-    );
+    const uploadDisabled = fileUploadEnabled ? !sampleFile : !parsedValue;
 
     useEffect(() => {
         if (placeholder !== undefined && Object.keys(placeholder).length) {
@@ -131,7 +102,7 @@ const OutputTabSampleDataDialog = ({
                 <DialogMain>
                     <DialogHeader
                         description={
-                            mode === 'file'
+                            fileUploadEnabled
                                 ? "Choose a file to use as this step's output. Click Upload when you're done."
                                 : "Add sample value in JSON format. Click Upload when you're done."
                         }
@@ -140,36 +111,37 @@ const OutputTabSampleDataDialog = ({
 
                     <DialogBody>
                         {fileUploadEnabled ? (
-                            <Tabs
-                                className="flex flex-1 flex-col"
-                                onValueChange={(value) => setSelectedMode(value as SampleDataModeType)}
-                                value={mode}
-                            >
-                                <TabsList>
-                                    <TabsTrigger value="file">File</TabsTrigger>
+                            <fieldset className="mt-4 flex flex-col gap-1.5 border-0">
+                                <Label htmlFor="sampleFile">Sample file</Label>
 
-                                    <TabsTrigger value="json">JSON</TabsTrigger>
-                                </TabsList>
-
-                                <TabsContent className="mt-4" value="file">
-                                    <fieldset className="flex flex-col gap-1.5 border-0">
-                                        <Label htmlFor="sampleFile">Sample file</Label>
-
-                                        <Input
-                                            className="bg-background"
-                                            id="sampleFile"
-                                            onChange={(event) => setSampleFile(event.target.files?.[0] || null)}
-                                            type="file"
-                                        />
-                                    </fieldset>
-                                </TabsContent>
-
-                                <TabsContent className="flex flex-1 flex-col" value="json">
-                                    {jsonEditor}
-                                </TabsContent>
-                            </Tabs>
+                                <Input
+                                    className="bg-background"
+                                    id="sampleFile"
+                                    onChange={(event) => setSampleFile(event.target.files?.[0] || null)}
+                                    type="file"
+                                />
+                            </fieldset>
                         ) : (
-                            jsonEditor
+                            <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
+                                <div className="absolute inset-0">
+                                    <Suspense fallback={<MonacoEditorLoader />}>
+                                        <MonacoEditor
+                                            className="bg-transparent"
+                                            defaultLanguage="json"
+                                            onChange={handleEditorOnChange}
+                                            onMount={handleEditorOnMount}
+                                            value={rawValue}
+                                        />
+                                    </Suspense>
+
+                                    <div
+                                        className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
+                                        id="monaco-placeholder"
+                                    >
+                                        {EDITOR_PLACEHOLDER}
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </DialogBody>
 
