@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
@@ -9,15 +10,17 @@ vi.mock('./ClusterElementTestButton', () => ({
 
 const renderOutputSchemaCreationControls = (props: Partial<Parameters<typeof OutputSchemaCreationControls>[0]> = {}) =>
     render(
-        <OutputSchemaCreationControls
-            handleTestOperationClick={vi.fn()}
-            outputDefined
-            saveWorkflowNodeTestOutputMutationPending={false}
-            setShowUploadDialog={vi.fn()}
-            showUploadSampleOutputButton
-            uploadSampleOutputRequestMutationPending={false}
-            {...props}
-        />
+        <TooltipProvider>
+            <OutputSchemaCreationControls
+                handleTestOperationClick={vi.fn()}
+                outputDefined
+                saveWorkflowNodeTestOutputMutationPending={false}
+                setShowUploadDialog={vi.fn()}
+                showUploadSampleOutputButton
+                uploadSampleOutputRequestMutationPending={false}
+                {...props}
+            />
+        </TooltipProvider>
     );
 
 afterEach(() => {
@@ -32,6 +35,18 @@ describe('OutputSchemaCreationControls', () => {
         expect(screen.getByText('or')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Upload Sample Output Data'})).toBeInTheDocument();
         expect(screen.getByText('Define the expected output schema with one of the methods')).toBeInTheDocument();
+    });
+
+    it('disables Test Action when a required property is missing', () => {
+        renderOutputSchemaCreationControls({missingRequiredProperties: ['key']});
+
+        expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
+    });
+
+    it('disables Test Action when the connection is missing', () => {
+        renderOutputSchemaCreationControls({connectionMissing: true});
+
+        expect(screen.getByRole('button', {name: 'Test Action'})).toBeDisabled();
     });
 
     it('offers only Upload Sample Output Data for a node that cannot be tested', () => {

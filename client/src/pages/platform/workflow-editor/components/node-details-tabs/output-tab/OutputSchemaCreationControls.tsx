@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import ClusterElementTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestButton';
+import OutputTabTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestButton';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 
 interface OutputSchemaCreationControlsProps {
@@ -11,6 +12,7 @@ interface OutputSchemaCreationControlsProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleClusterElementTestSubmit?: (inputParameters: Record<string, any>, onSuccess?: () => void) => void;
     handleTestOperationClick: () => void;
+    missingRequiredProperties?: string[];
     outputDefined?: boolean;
     saveClusterElementTestOutputMutationPending?: boolean;
     saveWorkflowNodeTestOutputMutationPending: boolean;
@@ -29,6 +31,7 @@ const OutputSchemaCreationControls = ({
     currentOperationProperties,
     handleClusterElementTestSubmit,
     handleTestOperationClick,
+    missingRequiredProperties = [],
     outputDefined,
     saveClusterElementTestOutputMutationPending,
     saveWorkflowNodeTestOutputMutationPending,
@@ -88,11 +91,12 @@ const OutputSchemaCreationControls = ({
                                     saving={!!saveClusterElementTestOutputMutationPending}
                                 />
                             ) : (
-                                <Button
-                                    disabled={saveWorkflowNodeTestOutputMutationPending}
+                                <OutputTabTestButton
+                                    connectionMissing={!!connectionMissing}
                                     label={`Test ${operationLabel}`}
+                                    missingRequiredProperties={missingRequiredProperties}
                                     onClick={handleTestOperationClick}
-                                    type="button"
+                                    pending={saveWorkflowNodeTestOutputMutationPending}
                                 />
                             )}
 
