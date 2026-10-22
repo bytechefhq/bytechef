@@ -18,6 +18,46 @@ interface WorkflowComponentsListProps {
     workflowTaskDispatcherDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
 }
 
+interface WorkflowComponentsOverflowPillProps {
+    className?: string;
+    componentNames: string[];
+    workflowComponentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
+    workflowTaskDispatcherDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
+}
+
+const WorkflowComponentsOverflowPill = ({
+    className,
+    componentNames,
+    workflowComponentDefinitions,
+    workflowTaskDispatcherDefinitions,
+}: WorkflowComponentsOverflowPillProps) => (
+    <div className={className}>
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-background p-1">
+                    <span className="self-center text-xs font-medium text-content-neutral-secondary">
+                        +{componentNames.length}
+                    </span>
+                </div>
+            </TooltipTrigger>
+
+            <TooltipContent className="mt-1 text-pretty" side="bottom">
+                {componentNames.map((name) => (
+                    <div className="flex items-center gap-1 py-0.5" key={name}>
+                        <WorkflowComponentsIcon
+                            name={name}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                        />
+
+                        <span className="block">{name}</span>
+                    </div>
+                ))}
+            </TooltipContent>
+        </Tooltip>
+    </div>
+);
+
 const WorkflowComponentsList = ({
     filteredComponentNames,
     fitToWidth = false,
@@ -69,61 +109,21 @@ const WorkflowComponentsList = ({
             </div>
 
             {collapseOnSmallViewport && filteredComponentNames?.length > 0 && (
-                <div className="2xl:hidden">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-background p-1">
-                                <span className="self-center text-xs font-medium text-content-neutral-secondary">
-                                    +{filteredComponentNames.length}
-                                </span>
-                            </div>
-                        </TooltipTrigger>
-
-                        <TooltipContent className="mt-1 text-pretty" side="bottom">
-                            {filteredComponentNames.map((name) => (
-                                <div className="flex items-center gap-1 py-0.5" key={name}>
-                                    <WorkflowComponentsIcon
-                                        key={name}
-                                        name={name}
-                                        workflowComponentDefinitions={workflowComponentDefinitions}
-                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                    />
-
-                                    <span className="block">{name}</span>
-                                </div>
-                            ))}
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
+                <WorkflowComponentsOverflowPill
+                    className="2xl:hidden"
+                    componentNames={filteredComponentNames}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             )}
 
-            {filteredComponentNames?.length > visibleIconCount && (
-                <div className={twMerge(collapseOnSmallViewport && 'hidden 2xl:block')}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-background p-1">
-                                <span className="self-center text-xs font-medium text-content-neutral-secondary">
-                                    +{filteredComponentNames.length - visibleIconCount}
-                                </span>
-                            </div>
-                        </TooltipTrigger>
-
-                        <TooltipContent className="mt-1 text-pretty" side="bottom">
-                            {memoizedFilteredComponentNamesList.remainingComponents.map((name) => (
-                                <div className="flex items-center gap-1 py-0.5" key={name}>
-                                    <WorkflowComponentsIcon
-                                        key={name}
-                                        name={name}
-                                        workflowComponentDefinitions={workflowComponentDefinitions}
-                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                    />
-
-                                    <span className="block">{name}</span>
-                                </div>
-                            ))}
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
+            {memoizedFilteredComponentNamesList.remainingComponents.length > 0 && (
+                <WorkflowComponentsOverflowPill
+                    className={twMerge(collapseOnSmallViewport && 'hidden 2xl:block')}
+                    componentNames={memoizedFilteredComponentNamesList.remainingComponents}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             )}
         </div>
     );
