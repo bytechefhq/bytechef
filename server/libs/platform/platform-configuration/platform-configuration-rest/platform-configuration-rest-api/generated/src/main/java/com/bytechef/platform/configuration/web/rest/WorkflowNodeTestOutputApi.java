@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T18:23:01.108240+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
@@ -158,6 +158,54 @@ public interface WorkflowNodeTestOutputApi {
         @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"id\" : 0, \"workflowNodeName\" : \"workflowNodeName\", \"workflowId\" : \"workflowId\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPLOAD_WORKFLOW_NODE_SAMPLE_FILE = "/workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-file";
+    /**
+     * POST /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/sample-file : Upload a sample file to create a new or update existing workflow node test output with a file entry
+     * Upload a sample file to create a new or update existing workflow node test output with a file entry.
+     *
+     * @param id The id of a workflow. (required)
+     * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @param environmentId The id of an environment. (required)
+     * @param file  (required)
+     * @return The workflow node test output object. (status code 200)
+     */
+    @Operation(
+        operationId = "uploadWorkflowNodeSampleFile",
+        summary = "Upload a sample file to create a new or update existing workflow node test output with a file entry",
+        description = "Upload a sample file to create a new or update existing workflow node test output with a file entry.",
+        tags = { "workflow-node-test-output" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow node test output object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowNodeTestOutputModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = WorkflowNodeTestOutputApi.PATH_UPLOAD_WORKFLOW_NODE_SAMPLE_FILE,
+        produces = { "application/json" },
+        consumes = { "multipart/form-data" }
+    )
+    default ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleFile(
+        @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "file", description = "", required = true) @RequestPart(value = "file", required = true) MultipartFile file
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
