@@ -216,7 +216,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
-        return toTaskExecutionDTO(taskExecution, null, true);
+        JobDTO childJob = lazyTaskExecutionTreeBuilder.getChildJob(taskExecutionId);
+
+        return toTaskExecutionDTO(taskExecution, childJob, true);
     }
 
     @Override

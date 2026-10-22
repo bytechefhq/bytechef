@@ -209,6 +209,45 @@ public class ProjectWorkflowExecutionFacadeTest {
     }
 
     @Test
+    public void testGetWorkflowExecutionTaskExecutionAttachesShallowChildJob() {
+        Job childJob = new Job(20L);
+
+        childJob.setInputs(Map.of("input", "value"));
+        childJob.setLabel("Subflow");
+        childJob.setParentTaskExecutionId(1L);
+        childJob.setStatus(Job.Status.COMPLETED);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(jobService.getChildJobs(List.of(1L)))
+            .thenReturn(List.of(childJob));
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        JobDTO childJobDTO = Objects.requireNonNull(taskExecutionDTO.childJob());
+
+        assertThat(childJobDTO.id()).isEqualTo(20L);
+        assertThat(childJobDTO.label()).isEqualTo("Subflow");
+        assertThat(childJobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(childJobDTO.inputs()).isEmpty();
+        assertThat(childJobDTO.taskExecutions()).isEmpty();
+
+        verify(jobService, never()).getChildJobIds(anyLong());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionWithoutChildJob() {
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(jobService.getChildJobs(List.of(1L)))
+            .thenReturn(List.of());
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        assertThat(taskExecutionDTO.childJob()).isNull();
+    }
+
+    @Test
     public void testGetWorkflowExecutionTaskExecutionAcceptsTaskInDescendantJob() {
         Job childJob = new Job(10L);
 
