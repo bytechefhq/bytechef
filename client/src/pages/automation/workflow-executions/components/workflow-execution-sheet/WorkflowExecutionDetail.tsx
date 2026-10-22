@@ -21,8 +21,8 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
 
     const {
         activeTab,
-        deepestFailedExecution,
         dialogOpen,
+        focusedExecution,
         handleBreadcrumbNavigate,
         handleSeeExecutions,
         handleTaskClick,
@@ -30,12 +30,14 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
         job,
         jobFailedWithNoExecutions,
         jobFailureError,
+        lazy,
         rootJob,
         selectedItem,
         setActiveTab,
         setDialogOpen,
         subflowStack,
         taskExecutionAttempts,
+        taskExecutionCount,
         triggerExecution,
         workflowExecution,
         workflowExecutionLoading,
@@ -60,8 +62,8 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     {(job || triggerExecution) && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
-                            deepestFailedExecution={deepestFailedExecution}
                             dialogOpen={dialogOpen}
+                            focusedExecution={focusedExecution}
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}
                             handleSeeExecutions={handleSeeExecutions}
                             handleTaskClick={handleTaskClick}
@@ -88,14 +90,15 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             job={job}
                             jobFailedWithNoExecutions={jobFailedWithNoExecutions}
                             jobFailureError={jobFailureError}
+                            lazy={lazy}
                             rootJob={rootJob}
                             selectedItem={selectedItem}
                             setActiveTab={setActiveTab}
                             setDialogOpen={setDialogOpen}
                             subflowStack={subflowStack}
                             taskExecutionAttempts={taskExecutionAttempts}
+                            taskExecutionCount={taskExecutionCount}
                             triggerExecution={triggerExecution}
-                            workflowExecutionId={workflowExecutionId}
                         />
                     )}
                 </ResizablePanel>

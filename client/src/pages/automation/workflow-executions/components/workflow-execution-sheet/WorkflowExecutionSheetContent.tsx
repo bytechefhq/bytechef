@@ -1,6 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
     TruncatedLabel,
@@ -18,10 +19,12 @@ import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
 import {ReactNode, useCallback, useMemo} from 'react';
 
+import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
+
 interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
-    deepestFailedExecution: {execution: TaskExecution | TriggerExecution; path: string[]} | null;
     dialogOpen: boolean;
+    focusedExecution?: FocusedExecutionI;
     handleBreadcrumbNavigate: (index: number) => void;
     handleSeeExecutions: (childJob: Job) => void;
     handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
@@ -30,20 +33,21 @@ interface WorkflowExecutionSheetContentProps {
     job?: Job;
     jobFailedWithNoExecutions: boolean;
     jobFailureError: ExecutionError;
+    lazy: LazyTaskExecutionChildrenOptionsI;
     rootJob?: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
     setActiveTab: (tab: TabValueType) => void;
     setDialogOpen: (open: boolean) => void;
-    subflowStack: Array<{job: Job; label: string}>;
+    subflowStack: Array<{jobId: number; label: string}>;
     taskExecutionAttempts: TaskExecutionAttemptsI<TaskExecution>[];
+    taskExecutionCount?: number;
     triggerExecution?: TriggerExecution;
-    workflowExecutionId: number;
 }
 
 const WorkflowExecutionSheetContent = ({
     activeTab,
-    deepestFailedExecution,
     dialogOpen,
+    focusedExecution,
     handleBreadcrumbNavigate,
     handleSeeExecutions,
     handleTaskClick,
@@ -52,20 +56,21 @@ const WorkflowExecutionSheetContent = ({
     job,
     jobFailedWithNoExecutions,
     jobFailureError,
+    lazy,
     rootJob,
     selectedItem,
     setActiveTab,
     setDialogOpen,
     subflowStack,
     taskExecutionAttempts,
+    taskExecutionCount,
     triggerExecution,
-    workflowExecutionId,
 }: WorkflowExecutionSheetContentProps) => {
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(
-            {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
+            {id: lazy.workflowExecutionId, taskExecutionId: Number(selectedItem?.id)},
             isTaskSelected,
             false
         );
@@ -91,7 +96,12 @@ const WorkflowExecutionSheetContent = ({
 
     return (
         <div className="flex size-full flex-col">
-            <WorkflowExecutionsHeader actions={headerActions} job={job} triggerExecution={triggerExecution} />
+            <WorkflowExecutionsHeader
+                actions={headerActions}
+                job={job}
+                taskExecutionCount={taskExecutionCount}
+                triggerExecution={triggerExecution}
+            />
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">
@@ -127,15 +137,16 @@ const WorkflowExecutionSheetContent = ({
                             <Accordion
                                 className="ml-2 space-y-2 pb-4"
                                 defaultValue={
-                                    deepestFailedExecution?.path ||
+                                    focusedExecution?.path ||
                                     (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
                                 }
                                 type="multiple"
                             >
                                 {triggerExecution && (
                                     <WorkflowExecutionsAccordionItem
-                                        defaultValue={deepestFailedExecution?.path}
+                                        defaultValue={focusedExecution?.path}
                                         execution={triggerExecution}
+                                        lazy={lazy}
                                         onExecutionClick={handleTaskClick}
                                         selectedExecutionId={selectedItem?.id || ''}
                                     >
@@ -145,10 +156,11 @@ const WorkflowExecutionSheetContent = ({
 
                                 {taskExecutionAttempts.map(({latestTaskExecution, previousTaskExecutions}) => (
                                     <WorkflowExecutionsAccordionItem
-                                        defaultValue={deepestFailedExecution?.path}
+                                        defaultValue={focusedExecution?.path}
                                         execution={latestTaskExecution}
                                         jobStatus={job?.status}
                                         key={latestTaskExecution.id}
+                                        lazy={lazy}
                                         onExecutionClick={handleTaskClick}
                                         previousTaskExecutions={previousTaskExecutions}
                                         selectedExecutionId={selectedItem?.id || ''}

@@ -2,16 +2,23 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {executionQueryMock} = vi.hoisted(() => ({executionQueryMock: vi.fn()}));
+const {executionQueryMock, sheetContentPropsMock, taskExecutionQueryMock} = vi.hoisted(() => ({
+    executionQueryMock: vi.fn(),
+    sheetContentPropsMock: vi.fn(),
+    taskExecutionQueryMock: vi.fn(),
+}));
 
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
     useGetProjectWorkflowExecutionQuery: executionQueryMock,
+    useGetWorkflowExecutionTaskExecutionQuery: taskExecutionQueryMock,
 }));
 
 vi.mock('../WorkflowExecutionSheetContent', () => ({
-    default: ({headerActions}: {headerActions?: React.ReactNode}) => (
-        <div data-testid="sheet-content">{headerActions}</div>
-    ),
+    default: (props: {headerActions?: React.ReactNode}) => {
+        sheetContentPropsMock(props);
+
+        return <div data-testid="sheet-content">{props.headerActions}</div>;
+    },
 }));
 
 vi.mock('../WorkflowExecutionSheetWorkflowPanel', () => ({
@@ -31,6 +38,9 @@ const WorkflowExecutionDetail = (await import('../WorkflowExecutionDetail')).def
 describe('WorkflowExecutionDetail', () => {
     beforeEach(() => {
         executionQueryMock.mockReset();
+        sheetContentPropsMock.mockReset();
+        taskExecutionQueryMock.mockReset();
+        taskExecutionQueryMock.mockReturnValue({data: undefined, isError: false});
     });
 
     it('shows a loading state while the execution is loading', () => {
@@ -100,5 +110,32 @@ describe('WorkflowExecutionDetail', () => {
         render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
 
         expect(screen.queryByTestId('sheet-content')).not.toBeInTheDocument();
+    });
+
+    it('passes the lazy options, the focused task and the task execution count to the panel', () => {
+        const focusedTaskExecution = {error: {message: 'Order rejected'}, id: '9', jobId: '5', status: 'FAILED'};
+
+        executionQueryMock.mockReturnValue({
+            data: {
+                focusPath: [{taskExecutionId: 1}, {taskExecutionId: 9}],
+                id: 5,
+                job: {id: '5', status: 'FAILED', taskExecutions: [{childCount: 1, id: '1', jobId: '5'}]},
+                taskExecutionCount: 112464,
+                workflow: {label: 'Order intake'},
+            },
+            isLoading: false,
+        });
+        taskExecutionQueryMock.mockReturnValue({data: focusedTaskExecution, isError: false});
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        expect(sheetContentPropsMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                focusedExecution: {execution: focusedTaskExecution, path: ['1', '9']},
+                lazy: {refetchInterval: false, workflowExecutionId: 5},
+                selectedItem: focusedTaskExecution,
+                taskExecutionCount: 112464,
+            })
+        );
     });
 });

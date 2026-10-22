@@ -1,28 +1,47 @@
+import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
+import {
+    useGetProjectWorkflowExecutionQuery,
+    useGetWorkflowExecutionTaskExecutionQuery,
+} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
-import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {buildFocusPath} from '@/shared/util/buildFocusPath';
+import {useEffect, useMemo, useState} from 'react';
 
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
 
 const POLLING_INTERVAL_MS = 2000;
 
+export interface FocusedExecutionI {
+    execution: TaskExecution | TriggerExecution;
+    path: string[];
+}
+
 const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolean) => {
     const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [focusAppliedJobId, setFocusAppliedJobId] = useState<number | undefined>(undefined);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(undefined);
-    const [subflowStack, setSubflowStack] = useState<Array<{job: Job; label: string}>>([]);
-
-    const jobIdRef = useRef<string | undefined>(undefined);
+    const [subflowStack, setSubflowStack] = useState<Array<{jobId: number; label: string}>>([]);
 
     const workflowExecutionKind = useWorkflowExecutionSheetStore((state) => state.workflowExecutionKind);
 
+    const subflowOpen = subflowStack.length > 0;
+    const activeJobId = subflowStack.at(-1)?.jobId ?? workflowExecutionId;
+    const activeWorkflowExecutionKind = subflowOpen ? 'JOB' : workflowExecutionKind;
+
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
-        {id: workflowExecutionId},
+        {id: activeJobId, lazy: true},
         enabled,
+        undefined,
+        activeWorkflowExecutionKind
+    );
+
+    const {data: rootWorkflowExecutionData} = useGetProjectWorkflowExecutionQuery(
+        {id: workflowExecutionId, lazy: true},
+        enabled && subflowOpen,
         undefined,
         workflowExecutionKind
     );
@@ -36,54 +55,63 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     }, [workflowExecution]);
 
     useGetProjectWorkflowExecutionQuery(
-        {id: workflowExecutionId},
+        {id: activeJobId, lazy: true},
         enabled && isWorkflowRunning,
         POLLING_INTERVAL_MS,
-        workflowExecutionKind
+        activeWorkflowExecutionKind
     );
 
-    const rootJob = workflowExecution?.job;
-    const triggerExecution = workflowExecution?.triggerExecution;
+    const rootWorkflowExecution = subflowOpen ? rootWorkflowExecutionData : workflowExecution;
 
-    const activeJob = subflowStack.length > 0 ? subflowStack[subflowStack.length - 1].job : rootJob;
+    const job = workflowExecution?.job;
+    const rootJob = rootWorkflowExecution?.job;
+    const taskExecutionCount = workflowExecution?.taskExecutionCount;
+    const triggerExecution = rootWorkflowExecution?.triggerExecution;
 
-    const taskExecutionAttempts = useMemo(
-        () => groupTaskExecutionAttempts(activeJob?.taskExecutions || []),
-        [activeJob?.taskExecutions]
+    const focusPath = useMemo(() => workflowExecution?.focusPath || [], [workflowExecution?.focusPath]);
+
+    const triggerExecutionFailed = !!triggerExecution?.error;
+
+    const {data: focusedTaskExecution, isError: focusedTaskExecutionError} = useGetWorkflowExecutionTaskExecutionQuery(
+        {id: activeJobId, taskExecutionId: focusPath.at(-1)?.taskExecutionId ?? 0},
+        enabled && !!focusPath.length && !triggerExecutionFailed
     );
 
-    const deepestFailedExecution = useMemo(() => {
-        if (triggerExecution) {
-            const result = getDeepestFailedExecution({
-                currentPath: [],
-                execution: triggerExecution,
-                isTriggerExecution: true,
-            });
+    const taskExecutionAttempts = useMemo(() => groupTaskExecutionAttempts(job?.taskExecutions || []), [job]);
 
-            if (result) {
-                return result;
-            }
+    const focusedExecution = useMemo<FocusedExecutionI | undefined>(() => {
+        if (triggerExecution?.error) {
+            return {execution: triggerExecution, path: triggerExecution.id ? [triggerExecution.id] : []};
         }
 
-        for (const {latestTaskExecution} of taskExecutionAttempts) {
-            const result = getDeepestFailedExecution({currentPath: [], execution: latestTaskExecution});
-
-            if (result) {
-                return result;
-            }
+        if (!focusedTaskExecution || !focusPath.length) {
+            return undefined;
         }
 
-        return null;
-    }, [taskExecutionAttempts, triggerExecution]);
+        return {execution: focusedTaskExecution, path: buildFocusPath(focusPath)};
+    }, [focusPath, focusedTaskExecution, triggerExecution]);
 
-    const jobFailedWithNoExecutions = !activeJob?.taskExecutions?.length && activeJob?.status === JobStatusEnum.Failed;
+    const focusResolved =
+        triggerExecutionFailed || !focusPath.length || !!focusedExecution || focusedTaskExecutionError;
 
-    const jobFailureError = activeJob?.error ?? {
+    const initialFocusPending = !!job && focusAppliedJobId !== activeJobId;
+
+    const jobFailedWithNoExecutions = !job?.taskExecutions?.length && job?.status === JobStatusEnum.Failed;
+
+    const jobFailureError = job?.error ?? {
         message: 'Workflow execution failed before any executions were created.',
         stackTrace: [],
     };
 
     const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+
+    const lazy = useMemo<LazyTaskExecutionChildrenOptionsI>(
+        () => ({
+            refetchInterval: isWorkflowRunning ? POLLING_INTERVAL_MS : false,
+            workflowExecutionId: activeJobId,
+        }),
+        [activeJobId, isWorkflowRunning]
+    );
 
     const handleTaskClick = (taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'output');
@@ -94,7 +122,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     const handleSeeExecutions = (childJob: Job) => {
         const label = childJob.label ?? 'Subflow';
 
-        setSubflowStack((previousStack) => [...previousStack, {job: childJob, label}]);
+        setSubflowStack((previousStack) => [...previousStack, {jobId: +childJob.id!, label}]);
     };
 
     const handleBreadcrumbNavigate = (index: number) => {
@@ -114,43 +142,43 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     }, [rootJob, selectedItem?.id, triggerExecution]);
 
     useEffect(() => {
-        if (!activeJob?.id || activeJob.id === jobIdRef.current) {
+        if (!job?.id || activeJobId === focusAppliedJobId || !focusResolved) {
             return;
         }
 
-        jobIdRef.current = activeJob.id;
+        setFocusAppliedJobId(activeJobId);
 
-        const hasNoTaskExecutions = !activeJob.taskExecutions || activeJob.taskExecutions.length === 0;
-        const jobFailed = hasNoTaskExecutions && activeJob.status === JobStatusEnum.Failed;
-        const newActiveTab = jobFailed || deepestFailedExecution?.execution.error ? 'error' : 'output';
+        const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
+        const jobFailed = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+        const newActiveTab = jobFailed || focusedExecution?.execution.error ? 'error' : 'output';
 
         setActiveTab(newActiveTab);
 
-        setSelectedItem(
-            deepestFailedExecution?.execution || triggerExecution || activeJob.taskExecutions?.[0] || undefined
-        );
-    }, [deepestFailedExecution, activeJob, triggerExecution]);
+        setSelectedItem(focusedExecution?.execution || triggerExecution || job.taskExecutions?.[0] || undefined);
+    }, [activeJobId, focusAppliedJobId, focusResolved, focusedExecution, job, triggerExecution]);
 
     return {
         activeTab,
-        deepestFailedExecution,
         dialogOpen,
+        focusedExecution,
         handleBreadcrumbNavigate,
         handleSeeExecutions,
         handleTaskClick,
         isTriggerExecution,
-        job: activeJob,
+        job,
         jobFailedWithNoExecutions,
         jobFailureError,
+        lazy,
         rootJob,
         selectedItem,
         setActiveTab,
         setDialogOpen,
         subflowStack,
         taskExecutionAttempts,
+        taskExecutionCount,
         triggerExecution,
-        workflowExecution,
-        workflowExecutionLoading,
+        workflowExecution: rootWorkflowExecution,
+        workflowExecutionLoading: workflowExecutionLoading || initialFocusPending,
     };
 };
 

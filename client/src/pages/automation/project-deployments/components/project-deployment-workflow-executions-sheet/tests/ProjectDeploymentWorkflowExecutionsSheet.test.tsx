@@ -400,15 +400,15 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
 
         renderSheet();
 
-        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 0}, false, undefined, 'JOB');
+        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 0, lazy: true}, false, undefined, 'JOB');
 
         await user.click(screen.getByText('COMPLETED'));
 
-        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 5}, true, undefined, 'JOB');
+        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 5, lazy: true}, true, undefined, 'JOB');
 
         await user.click(screen.getByLabelText('Back to executions'));
 
-        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 5}, false, undefined, 'JOB');
+        expect(detailQueryMock).toHaveBeenLastCalledWith({id: 5, lazy: true}, false, undefined, 'JOB');
     });
 
     it('starts on the executions tab and the first page when another workflow is opened', async () => {
