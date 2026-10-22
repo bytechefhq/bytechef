@@ -20,6 +20,13 @@ import {
     WorkflowBasicToJSON,
     WorkflowBasicToJSONTyped,
 } from './WorkflowBasic';
+import type { FocusPathElement } from './FocusPathElement';
+import {
+    FocusPathElementFromJSON,
+    FocusPathElementFromJSONTyped,
+    FocusPathElementToJSON,
+    FocusPathElementToJSONTyped,
+} from './FocusPathElement';
 import type { TriggerExecution } from './TriggerExecution';
 import {
     TriggerExecutionFromJSON,
@@ -56,6 +63,10 @@ import {
  */
 export interface WorkflowExecution {
     /**
+     * The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint.
+     */
+    focusPath?: Array<FocusPathElement>;
+    /**
      * The id of a workflow execution.
      */
     readonly id: number;
@@ -75,6 +86,10 @@ export interface WorkflowExecution {
      * The version of the project the workflow execution ran.
      */
     readonly projectVersion?: number;
+    /**
+     * The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily.
+     */
+    readonly taskExecutionCount?: number;
     /**
      * 
      */
@@ -106,11 +121,13 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
+        'focusPath': json['focusPath'] == null ? undefined : ((json['focusPath'] as Array<any>).map(FocusPathElementFromJSON)),
         'id': json['id'],
         'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
         'project': ProjectBasicFromJSON(json['project']),
         'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'taskExecutionCount': json['taskExecutionCount'] == null ? undefined : json['taskExecutionCount'],
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
         'workflow': WorkflowBasicFromJSON(json['workflow']),
     };
@@ -120,13 +137,14 @@ export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
     return WorkflowExecutionToJSONTyped(json, false);
 }
 
-export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'|'taskExecutionCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'focusPath': value['focusPath'] == null ? undefined : ((value['focusPath'] as Array<any>).map(FocusPathElementToJSON)),
         'job': JobToJSON(value['job']),
         'project': ProjectBasicToJSON(value['project']),
         'projectDeployment': ProjectDeploymentBasicToJSON(value['projectDeployment']),

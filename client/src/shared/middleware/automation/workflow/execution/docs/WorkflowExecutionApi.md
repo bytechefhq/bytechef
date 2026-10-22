@@ -7,6 +7,7 @@ All URIs are relative to */api/automation/internal*
 | [**getTriggerExecutionWorkflowExecution**](WorkflowExecutionApi.md#gettriggerexecutionworkflowexecution) | **GET** /workflow-executions/trigger-executions/{triggerExecutionId} | Get a trigger execution\&#39;s workflow execution |
 | [**getWorkflowExecution**](WorkflowExecutionApi.md#getworkflowexecution) | **GET** /workflow-executions/{id} | Get workflow executions by id |
 | [**getWorkflowExecutionTaskExecution**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecution) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId} | Get a task execution by id |
+| [**getWorkflowExecutionTaskExecutionChildren**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecutionchildren) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId}/children | Get a page of task execution children |
 | [**getWorkflowExecutionsPage**](WorkflowExecutionApi.md#getworkflowexecutionspage) | **GET** /workspaces/{id}/workflow-executions | Get project workflow executions |
 
 
@@ -80,7 +81,7 @@ No authorization required
 
 ## getWorkflowExecution
 
-> WorkflowExecution getWorkflowExecution(id)
+> WorkflowExecution getWorkflowExecution(id, lazy)
 
 Get workflow executions by id
 
@@ -102,6 +103,8 @@ async function example() {
   const body = {
     // number | The id of an execution.
     id: 789,
+    // boolean | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. (optional)
+    lazy: true,
   } satisfies GetWorkflowExecutionRequest;
 
   try {
@@ -122,6 +125,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
+| **lazy** | `boolean` | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -215,9 +219,85 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## getWorkflowExecutionTaskExecutionChildren
+
+> TaskExecutionChildrenPage getWorkflowExecutionTaskExecutionChildren(id, taskExecutionId, pageNumber, pageSize)
+
+Get a page of task execution children
+
+Get a page of the children of a task execution of the execution or of one of its subflow jobs. A loop returns whole iterations, an on-error task returns its two branches on a single page.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowExecutionApi,
+} from '';
+import type { GetWorkflowExecutionTaskExecutionChildrenRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowExecutionApi();
+
+  const body = {
+    // number | The id of an execution.
+    id: 789,
+    // number | The id of a task execution.
+    taskExecutionId: 789,
+    // number | The zero-based number of the page to return. (optional)
+    pageNumber: 56,
+    // number | The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size. (optional)
+    pageSize: 56,
+  } satisfies GetWorkflowExecutionTaskExecutionChildrenRequest;
+
+  try {
+    const data = await api.getWorkflowExecutionTaskExecutionChildren(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
+| **taskExecutionId** | `number` | The id of a task execution. | [Defaults to `undefined`] |
+| **pageNumber** | `number` | The zero-based number of the page to return. | [Optional] [Defaults to `0`] |
+| **pageSize** | `number` | The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size. | [Optional] [Defaults to `50`] |
+
+### Return type
+
+[**TaskExecutionChildrenPage**](TaskExecutionChildrenPage.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The page of task execution children. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getWorkflowExecutionsPage
 
-> Page getWorkflowExecutionsPage(id, embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, workflowId, projectVersion, pageNumber)
+> Page getWorkflowExecutionsPage(id, embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, connectedUserId, workflowId, projectVersion, pageNumber)
 
 Get project workflow executions
 
@@ -253,6 +333,8 @@ async function example() {
     projectId: 789,
     // number | The id of a project deployment. (optional)
     projectDeploymentId: 789,
+    // number | The id of a connected user. Restricts embedded executions to those of the connected user\'s automation workflows, copied into the connected user\'s project or referenced from a catalog project. (optional)
+    connectedUserId: 789,
     // string | The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set. (optional)
     workflowId: workflowId_example,
     // number | The project version the workflow executions ran. Only applies together with workflowId. (optional)
@@ -286,6 +368,7 @@ example().catch(console.error);
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
 | **projectId** | `number` | The id of a project. | [Optional] [Defaults to `undefined`] |
 | **projectDeploymentId** | `number` | The id of a project deployment. | [Optional] [Defaults to `undefined`] |
+| **connectedUserId** | `number` | The id of a connected user. Restricts embedded executions to those of the connected user\&#39;s automation workflows, copied into the connected user\&#39;s project or referenced from a catalog project. | [Optional] [Defaults to `undefined`] |
 | **workflowId** | `string` | The id of a workflow. Executions of every version of the workflow are matched unless projectVersion is set. | [Optional] [Defaults to `undefined`] |
 | **projectVersion** | `number` | The project version the workflow executions ran. Only applies together with workflowId. | [Optional] [Defaults to `undefined`] |
 | **pageNumber** | `number` | The number of the page to return. | [Optional] [Defaults to `0`] |

@@ -3,6 +3,7 @@
 export * from './ComponentConnection';
 export * from './ExecutionError';
 export * from './FieldOption';
+export * from './FocusPathElement';
 export * from './Job';
 export * from './JobBasic';
 export * from './Page';
@@ -10,6 +11,7 @@ export * from './ProjectBasic';
 export * from './ProjectDeploymentBasic';
 export * from './ProjectStatus';
 export * from './TaskExecution';
+export * from './TaskExecutionChildrenPage';
 export * from './TriggerExecution';
 export * from './TriggerForm';
 export * from './TriggerFormInput';

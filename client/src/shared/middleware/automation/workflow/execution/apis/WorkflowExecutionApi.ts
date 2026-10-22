@@ -24,6 +24,11 @@ import {
     TaskExecutionToJSON,
 } from '../models/TaskExecution';
 import {
+    type TaskExecutionChildrenPage,
+    TaskExecutionChildrenPageFromJSON,
+    TaskExecutionChildrenPageToJSON,
+} from '../models/TaskExecutionChildrenPage';
+import {
     type WorkflowExecution,
     WorkflowExecutionFromJSON,
     WorkflowExecutionToJSON,
@@ -41,6 +46,10 @@ export interface GetWorkflowExecutionRequest {
      * The id of an execution.
      */
     id: number;
+    /**
+     * Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions.
+     */
+    lazy?: boolean;
 }
 
 export interface GetWorkflowExecutionTaskExecutionRequest {
@@ -52,6 +61,25 @@ export interface GetWorkflowExecutionTaskExecutionRequest {
      * The id of a task execution.
      */
     taskExecutionId: number;
+}
+
+export interface GetWorkflowExecutionTaskExecutionChildrenRequest {
+    /**
+     * The id of an execution.
+     */
+    id: number;
+    /**
+     * The id of a task execution.
+     */
+    taskExecutionId: number;
+    /**
+     * The zero-based number of the page to return.
+     */
+    pageNumber?: number;
+    /**
+     * The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size.
+     */
+    pageSize?: number;
 }
 
 export interface GetWorkflowExecutionsPageRequest {
@@ -170,6 +198,10 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters['lazy'] != null) {
+            queryParameters['lazy'] = requestParameters['lazy'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
 
@@ -256,6 +288,69 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      */
     async getWorkflowExecutionTaskExecution(requestParameters: GetWorkflowExecutionTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecution> {
         const response = await this.getWorkflowExecutionTaskExecutionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getWorkflowExecutionTaskExecutionChildren without sending the request
+     */
+    async getWorkflowExecutionTaskExecutionChildrenRequestOpts(requestParameters: GetWorkflowExecutionTaskExecutionChildrenRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowExecutionTaskExecutionChildren().'
+            );
+        }
+
+        if (requestParameters['taskExecutionId'] == null) {
+            throw new runtime.RequiredError(
+                'taskExecutionId',
+                'Required parameter "taskExecutionId" was null or undefined when calling getWorkflowExecutionTaskExecutionChildren().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['pageNumber'] != null) {
+            queryParameters['pageNumber'] = requestParameters['pageNumber'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['pageSize'] = requestParameters['pageSize'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-executions/{id}/task-executions/{taskExecutionId}/children`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{taskExecutionId}', encodeURIComponent(String(requestParameters['taskExecutionId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get a page of the children of a task execution of the execution or of one of its subflow jobs. A loop returns whole iterations, an on-error task returns its two branches on a single page.
+     * Get a page of task execution children
+     */
+    async getWorkflowExecutionTaskExecutionChildrenRaw(requestParameters: GetWorkflowExecutionTaskExecutionChildrenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskExecutionChildrenPage>> {
+        const requestOptions = await this.getWorkflowExecutionTaskExecutionChildrenRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskExecutionChildrenPageFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a page of the children of a task execution of the execution or of one of its subflow jobs. A loop returns whole iterations, an on-error task returns its two branches on a single page.
+     * Get a page of task execution children
+     */
+    async getWorkflowExecutionTaskExecutionChildren(requestParameters: GetWorkflowExecutionTaskExecutionChildrenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecutionChildrenPage> {
+        const response = await this.getWorkflowExecutionTaskExecutionChildrenRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
