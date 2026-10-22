@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import {devtools, persist} from 'zustand/middleware';
+import {devtools} from 'zustand/middleware';
 
 interface LeftSidebarStateI {
     projectLeftSidebarOpen: boolean;
@@ -7,20 +7,13 @@ interface LeftSidebarStateI {
 }
 
 const useProjectsLeftSidebarStore = create<LeftSidebarStateI>()(
-    devtools(
-        persist(
-            (set) => ({
-                projectLeftSidebarOpen: false,
-                setProjectLeftSidebarOpen: (projectLeftSidebarOpen) =>
-                    set(() => ({
-                        projectLeftSidebarOpen,
-                    })),
-            }),
-            {
-                name: 'bytechef.projects-left-sidebar',
-            }
-        )
-    )
+    devtools((set) => ({
+        projectLeftSidebarOpen: false,
+        setProjectLeftSidebarOpen: (projectLeftSidebarOpen) =>
+            set(() => ({
+                projectLeftSidebarOpen,
+            })),
+    }))
 );
 
 export default useProjectsLeftSidebarStore;
