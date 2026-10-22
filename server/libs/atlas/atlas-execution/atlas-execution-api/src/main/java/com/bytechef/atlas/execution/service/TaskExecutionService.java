@@ -40,6 +40,8 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
+    Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId);
+
     Map<Long, Long> getChildCounts(List<Long> parentIds);
 
     List<TaskExecution> getFailedJobTaskExecutions(long jobId);

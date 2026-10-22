@@ -121,6 +121,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId) {
+        return taskExecutionRepository.findLastStartedByJobId(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Map<Long, Long> getChildCounts(List<Long> parentIds) {
         return countByParentId(taskExecutionRepository.findAllParentIdsByParentIdIn(parentIds));
     }

@@ -168,5 +168,12 @@ public interface JdbcTaskExecutionRepository
     @Query("SELECT * FROM task_execution WHERE task_execution.job_id = :jobId ORDER BY task_execution.created_date DESC LIMIT 1")
     Optional<TaskExecution> findLastByJobId(@Param("jobId") long jobId);
 
+    @Override
+    @Query("""
+        SELECT * FROM task_execution WHERE job_id = :jobId AND start_date IS NOT NULL
+        ORDER BY start_date DESC, id DESC LIMIT 1
+        """)
+    Optional<TaskExecution> findLastStartedByJobId(@Param("jobId") long jobId);
+
     TaskExecution save(TaskExecution taskExecution);
 }

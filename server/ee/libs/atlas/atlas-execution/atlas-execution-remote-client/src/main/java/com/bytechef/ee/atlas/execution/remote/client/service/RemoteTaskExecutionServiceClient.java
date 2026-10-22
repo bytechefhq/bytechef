@@ -130,6 +130,11 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Map<Long, Long> getChildCounts(List<Long> parentIds) {
         throw new UnsupportedOperationException();
     }

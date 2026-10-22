@@ -256,6 +256,47 @@ class InMemoryTaskExecutionRepositoryTest {
                 .toList());
     }
 
+    @Test
+    void testFindLastStartedByJobId() {
+        TaskExecution firstStartedTaskExecution = new TaskExecution();
+
+        firstStartedTaskExecution.setJobId(470L);
+        firstStartedTaskExecution.setStartDate(Instant.parse("2026-01-01T00:00:00Z"));
+
+        inMemoryTaskExecutionRepository.save(firstStartedTaskExecution);
+
+        TaskExecution lastStartedTaskExecution = new TaskExecution();
+
+        lastStartedTaskExecution.setJobId(470L);
+        lastStartedTaskExecution.setStartDate(Instant.parse("2026-01-01T00:00:01Z"));
+
+        TaskExecution savedLastStartedTaskExecution = inMemoryTaskExecutionRepository.save(lastStartedTaskExecution);
+
+        TaskExecution createdTaskExecution = new TaskExecution();
+
+        createdTaskExecution.setJobId(470L);
+
+        TaskExecution savedCreatedTaskExecution = inMemoryTaskExecutionRepository.save(createdTaskExecution);
+
+        assertEquals(
+            savedCreatedTaskExecution.getId(), inMemoryTaskExecutionRepository.findLastByJobId(470L)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+        assertEquals(
+            savedLastStartedTaskExecution.getId(), inMemoryTaskExecutionRepository.findLastStartedByJobId(470L)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        TaskExecution notStartedTaskExecution = new TaskExecution();
+
+        notStartedTaskExecution.setJobId(471L);
+
+        inMemoryTaskExecutionRepository.save(notStartedTaskExecution);
+
+        assertTrue(inMemoryTaskExecutionRepository.findLastStartedByJobId(471L)
+            .isEmpty());
+    }
+
     private List<Long> saveChildren(long jobId, long parentId) {
         return saveChildren(jobId, parentId, Instant.parse("2026-01-01T00:00:00Z"));
     }

@@ -151,12 +151,15 @@ class LazyTaskExecutionTreeBuilder {
 
             TaskExecution topLevelTaskExecution = ancestry.getFirst();
 
-            if (latestAttemptIds.contains(topLevelTaskExecution.getId()) && isLeaf(failedTaskExecution)) {
+            if (latestAttemptIds.contains(topLevelTaskExecution.getId()) && !hasRetriedAttempt(ancestry) &&
+                isLeaf(failedTaskExecution)) {
                 return toFocusPath(ancestry);
             }
         }
 
-        Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
+        Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService
+            .fetchLastStartedJobTaskExecution(jobId)
+            .or(() -> taskExecutionService.fetchLastJobTaskExecution(jobId));
 
         return lastTaskExecutionOptional
             .map(lastTaskExecution -> toFocusPath(getAncestry(lastTaskExecution, ancestorCache)))
@@ -180,6 +183,13 @@ class LazyTaskExecutionTreeBuilder {
         Collections.reverse(ancestry);
 
         return ancestry;
+    }
+
+    private static boolean hasRetriedAttempt(List<TaskExecution> ancestry) {
+        return ancestry.stream()
+            .anyMatch(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.FAILED &&
+                taskExecution.getError() != null &&
+                taskExecution.getRetryAttempts() < taskExecution.getMaxRetries());
     }
 
     private boolean isLeaf(TaskExecution taskExecution) {

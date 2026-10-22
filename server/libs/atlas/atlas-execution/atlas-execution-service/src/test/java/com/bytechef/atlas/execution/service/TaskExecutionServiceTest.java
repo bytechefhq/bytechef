@@ -118,6 +118,15 @@ class TaskExecutionServiceTest {
     }
 
     @Test
+    void fetchLastStartedJobTaskExecutionReadsLastStartedRow() {
+        TaskExecution startedTaskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findLastStartedByJobId(7L)).thenReturn(Optional.of(startedTaskExecution));
+
+        assertThat(taskExecutionService.fetchLastStartedJobTaskExecution(7L)).containsSame(startedTaskExecution);
+    }
+
+    @Test
     void getChildCountsCountsRowsPerParent() {
         when(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of(7L, 8L)))
             .thenReturn(List.of(7L, 7L, 8L));

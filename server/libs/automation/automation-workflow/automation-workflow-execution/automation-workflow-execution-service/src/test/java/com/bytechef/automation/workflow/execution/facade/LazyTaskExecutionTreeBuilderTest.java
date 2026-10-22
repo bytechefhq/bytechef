@@ -359,7 +359,50 @@ class LazyTaskExecutionTreeBuilderTest {
     }
 
     @Test
-    void getFocusPathFallsBackToLastCreatedTask() {
+    void getFocusPathSkipsNestedFailureRecoveredByRetry() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution failedAttemptTaskExecution = createRetryableFailedTaskExecution(2L, 1L, 0);
+        TaskExecution retryTaskExecution = createTaskExecution(3L, 1L, "x", "myComponent/v1/a", -1);
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(failedAttemptTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(loopTaskExecution));
+        when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(retryTaskExecution));
+        when(taskExecutionService.getIterationIndex(retryTaskExecution))
+            .thenReturn(0);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(
+            new FocusPathElementDTO(1L, null, null), new FocusPathElementDTO(3L, 0, null));
+
+        verify(taskExecutionService, never()).getChildCounts(List.of(2L));
+    }
+
+    @Test
+    void getFocusPathKeepsFailureWhoseRetriesAreExhausted() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution failedTaskExecution = createRetryableFailedTaskExecution(2L, 1L, 1);
+
+        when(taskExecutionService.getFailedJobTaskExecutions(JOB_ID))
+            .thenReturn(List.of(failedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(loopTaskExecution));
+        when(taskExecutionService.getIterationIndex(failedTaskExecution))
+            .thenReturn(0);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(
+            new FocusPathElementDTO(1L, null, null), new FocusPathElementDTO(2L, 0, null));
+    }
+
+    @Test
+    void getFocusPathFallsBackToLastCreatedTaskWhenNoTaskStarted() {
         TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
         TaskExecution lastTaskExecution = createTaskExecution(9L, 1L, "x", "myComponent/v1/a", 1);
 
@@ -374,6 +417,22 @@ class LazyTaskExecutionTreeBuilderTest {
             JOB_ID, List.of(loopTaskExecution));
 
         assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null), new FocusPathElementDTO(9L, 2));
+    }
+
+    @Test
+    void getFocusPathFallsBackToLastStartedTaskBeforeNewerQueuedTask() {
+        TaskExecution startedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 0);
+        TaskExecution queuedTaskExecution = createTaskExecution(5L, null, "b", "myComponent/v1/a", 1);
+
+        when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(startedTaskExecution));
+        when(taskExecutionService.fetchLastJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(queuedTaskExecution));
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(startedTaskExecution, queuedTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(4L, null));
     }
 
     @Test
@@ -427,6 +486,23 @@ class LazyTaskExecutionTreeBuilderTest {
             .taskNumber(taskNumber)
             .workflowTask(new WorkflowTask(Map.of("name", name, "type", type)))
             .build();
+    }
+
+    private static TaskExecution createRetryableFailedTaskExecution(long id, long parentId, int retryAttempts) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(id)
+            .jobId(JOB_ID)
+            .maxRetries(1)
+            .parentId(parentId)
+            .retryAttempts(retryAttempts)
+            .status(TaskExecution.Status.FAILED)
+            .taskNumber(0)
+            .workflowTask(new WorkflowTask(Map.of("name", "x", "type", "myComponent/v1/a")))
+            .build();
+
+        taskExecution.setError(new ExecutionError("failed", List.of()));
+
+        return taskExecution;
     }
 
     private static List<List<Long>> toIds(List<List<TaskExecutionDTO>> iterations) {

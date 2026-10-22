@@ -221,6 +221,38 @@ public class JdbcTaskExecutionRepositoryIntTest {
                 fixture.parentId(), 0, secondCreatedDate, secondTaskExecutionId));
     }
 
+    @Test
+    public void testFindLastStartedByJobId() {
+        long jobId = saveJob();
+
+        TaskExecution startedTaskExecution = TaskExecution.builder()
+            .jobId(jobId)
+            .startDate(Instant.parse("2026-01-01T00:00:00Z"))
+            .taskNumber(0)
+            .workflowTask(new WorkflowTask(Map.of("name", "task0", "type", "test/v1")))
+            .build();
+
+        startedTaskExecution = taskExecutionRepository.save(startedTaskExecution);
+
+        TaskExecution createdTaskExecution = saveTaskExecution(jobId, null, 1, null);
+
+        Assertions.assertEquals(
+            createdTaskExecution.getId(), taskExecutionRepository.findLastByJobId(jobId)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+        Assertions.assertEquals(
+            startedTaskExecution.getId(), taskExecutionRepository.findLastStartedByJobId(jobId)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        long notStartedJobId = saveJob();
+
+        saveTaskExecution(notStartedJobId, null, 0, null);
+
+        Assertions.assertTrue(taskExecutionRepository.findLastStartedByJobId(notStartedJobId)
+            .isEmpty());
+    }
+
     private ChildrenFixture saveChildrenFixture() {
         long jobId = saveJob();
 

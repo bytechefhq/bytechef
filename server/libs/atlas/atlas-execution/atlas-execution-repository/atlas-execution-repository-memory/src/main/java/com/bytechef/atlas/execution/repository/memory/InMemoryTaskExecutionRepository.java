@@ -65,6 +65,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             .compare(first.getId(), second.getId());
     };
 
+    private static final Comparator<TaskExecution> START_DATE_COMPARATOR = Comparator
+        .comparing(TaskExecution::getStartDate)
+        .thenComparing(TaskExecution::getId, Comparator.nullsFirst(Comparator.naturalOrder()));
+
     private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
@@ -434,6 +438,14 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Optional<TaskExecution> findLastStartedByJobId(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getStartDate() != null)
+            .max(START_DATE_COMPARATOR);
     }
 
     @Override

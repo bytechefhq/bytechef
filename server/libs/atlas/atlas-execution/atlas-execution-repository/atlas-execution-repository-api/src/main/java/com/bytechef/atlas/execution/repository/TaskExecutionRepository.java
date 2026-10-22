@@ -102,6 +102,8 @@ public interface TaskExecutionRepository {
 
     Optional<TaskExecution> findLastByJobId(long jobId);
 
+    Optional<TaskExecution> findLastStartedByJobId(long jobId);
+
     /**
      * Creates a new persistent represenation of the given {@link TaskExecution}.
      *
