@@ -14,7 +14,7 @@ import {toast} from 'sonner';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
-const RESTARTABLE_JOB_STATUSES: string[] = ['FAILED', 'STOPPED'];
+const RESTARTABLE_JOB_STATUSES = new Set<string>(['FAILED', 'STOPPED']);
 
 const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecution}) => {
     const queryClient = useQueryClient();
@@ -42,7 +42,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
     });
 
     const restartDisabled =
-        !RESTARTABLE_JOB_STATUSES.includes(execution.job?.status ?? '') || execution.job?.parentTaskExecutionId != null;
+        !RESTARTABLE_JOB_STATUSES.has(execution.job?.status ?? '') || execution.job?.parentTaskExecutionId != null;
     const stopDisabled = execution.job?.status !== 'STARTED';
 
     const handleViewClick = () => {
