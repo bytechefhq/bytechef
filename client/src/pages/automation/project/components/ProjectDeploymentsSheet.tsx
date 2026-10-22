@@ -2,12 +2,13 @@ import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectDeploymentList from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -15,18 +16,16 @@ import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/proj
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ExternalLinkIcon, Layers3Icon, RocketIcon, SendIcon} from 'lucide-react';
+import {ExternalLinkIcon, Layers3Icon, RefreshCwIcon, RocketIcon, SendIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useShallow} from 'zustand/react/shallow';
+import {twMerge} from 'tailwind-merge';
 
 export interface ProjectDeploymentsSheetStateI {
-    environmentId?: number;
     expandedProjectDeploymentId?: number;
 }
 
 interface ProjectDeploymentsSheetProps {
-    environmentId?: number;
     expandedProjectDeploymentId?: number;
     onSheetOpenChange: (open: boolean) => void;
     project: Project;
@@ -34,28 +33,31 @@ interface ProjectDeploymentsSheetProps {
 }
 
 const ProjectDeploymentsSheet = ({
-    environmentId: initialEnvironmentId,
     expandedProjectDeploymentId: initialExpandedProjectDeploymentId,
     onSheetOpenChange,
     project,
     sheetOpen,
 }: ProjectDeploymentsSheetProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
-        useShallow((state) => ({
-            currentEnvironmentId: state.currentEnvironmentId,
-            setCurrentEnvironmentId: state.setCurrentEnvironmentId,
-        }))
-    );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const [environmentId, setEnvironmentId] = useState<number>(initialEnvironmentId ?? currentEnvironmentId);
     const [expandedProjectDeploymentId, setExpandedProjectDeploymentId] = useState<number | undefined>(
         initialExpandedProjectDeploymentId
     );
 
     const navigate = useNavigate();
 
-    const {data: projectDeployments, isLoading: projectDeploymentsIsLoading} = useGetWorkspaceProjectDeploymentsQuery(
+    const openSavedProjectDeployment = useOpenSavedProjectDeployment({
+        onDevelopmentDeploymentSaved: setExpandedProjectDeploymentId,
+        projectId: project.id,
+    });
+
+    const {
+        data: projectDeployments,
+        isFetching: projectDeploymentsIsFetching,
+        isLoading: projectDeploymentsIsLoading,
+        refetch: refetchProjectDeployments,
+    } = useGetWorkspaceProjectDeploymentsQuery(
         {
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
@@ -78,24 +80,14 @@ const ProjectDeploymentsSheet = ({
     const environmentProjectDeployments = useMemo(
         () =>
             (projectDeployments ?? [])
-                .filter((projectDeployment) => projectDeployment.environmentId === environmentId)
+                .filter((projectDeployment) => projectDeployment.environmentId === currentEnvironmentId)
                 .sort((deployment, otherDeployment) => deployment.name.localeCompare(otherDeployment.name)),
-        [environmentId, projectDeployments]
+        [currentEnvironmentId, projectDeployments]
     );
 
     const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
 
-    const handleDeploymentSaved = (projectDeploymentId: number, savedEnvironmentId?: number) => {
-        if (savedEnvironmentId !== undefined) {
-            setEnvironmentId(savedEnvironmentId);
-        }
-
-        setExpandedProjectDeploymentId(projectDeploymentId);
-    };
-
     const handleOpenInDeploymentsClick = () => {
-        setCurrentEnvironmentId(environmentId);
-
         onSheetOpenChange(false);
 
         navigate(`/automation/deployments?projectId=${project.id}`);
@@ -110,7 +102,7 @@ const ProjectDeploymentsSheet = ({
             >
                 <header
                     className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-sidebar-border bg-sidebar p-3"
-                    data-environment={ENVIRONMENT_CONFIGS[environmentId]?.sidebarTheme}
+                    data-environment={ENVIRONMENT_CONFIGS[currentEnvironmentId]?.sidebarTheme}
                 >
                     <div className="flex items-center gap-x-2">
                         <RocketIcon className="size-5" />
@@ -119,7 +111,24 @@ const ProjectDeploymentsSheet = ({
                     </div>
 
                     <div className="flex items-center gap-x-1">
-                        <EnvironmentSelect align="end" environmentId={environmentId} onChange={setEnvironmentId} />
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Refresh project deployments"
+                                    disabled={projectDeploymentsIsFetching}
+                                    icon={
+                                        <RefreshCwIcon
+                                            className={twMerge(projectDeploymentsIsFetching && 'animate-spin')}
+                                        />
+                                    }
+                                    onClick={() => refetchProjectDeployments()}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Refresh</TooltipContent>
+                        </Tooltip>
 
                         <SheetCloseButton />
                     </div>
@@ -139,9 +148,9 @@ const ProjectDeploymentsSheet = ({
                                 actions={
                                     <ProjectDeploymentDialog
                                         environmentEditable
-                                        onSuccess={handleDeploymentSaved}
+                                        onSuccess={openSavedProjectDeployment}
                                         projectDeployment={{
-                                            environmentId,
+                                            environmentId: currentEnvironmentId,
                                             name: project.name,
                                             projectId: project.id,
                                         }}
@@ -153,7 +162,7 @@ const ProjectDeploymentsSheet = ({
                                 }
                                 description="Deploy this project to run its workflows here."
                                 icon={<Layers3Icon />}
-                                title={`No deployments in ${ENVIRONMENT_CONFIGS[environmentId]?.label ?? 'this environment'}`}
+                                title={`No deployments in ${ENVIRONMENT_CONFIGS[currentEnvironmentId]?.label ?? 'this environment'}`}
                             />
                         ) : (
                             <EmptyState
