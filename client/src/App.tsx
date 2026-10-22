@@ -7,6 +7,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
+import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
@@ -219,6 +220,8 @@ function App() {
         }
     }, [account, helpHub, userGuiding]);
 
+    useOnLogout(() => analytics.reset());
+
     useLayoutEffect(() => {
         document.title =
             [...automationNavigation, ...embeddedNavigation, ...platformNavigation]
@@ -230,8 +233,6 @@ function App() {
 
     useEffect(() => {
         if (!authenticated) {
-            analytics.reset();
-
             helpHub.shutdown();
             userGuiding.shutdown();
 
