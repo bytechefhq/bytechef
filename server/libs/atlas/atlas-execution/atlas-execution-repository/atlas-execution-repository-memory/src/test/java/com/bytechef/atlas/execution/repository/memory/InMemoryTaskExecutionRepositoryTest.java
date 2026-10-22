@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.tenant.TenantContext;
+import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -106,10 +108,22 @@ class InMemoryTaskExecutionRepositoryTest {
             2, inMemoryTaskExecutionRepository.findAllByIdIn(List.of(childIds.get(1), childIds.get(3)))
                 .size());
         assertEquals(5, inMemoryTaskExecutionRepository.countByJobId(404L));
+    }
+
+    @Test
+    void testCountByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual() {
+        Instant baseDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        List<Long> childIds = saveChildren(407L, 450L, baseDate);
+
         assertEquals(
             2,
             inMemoryTaskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
-                430L, 0, null, childIds.get(2)));
+                450L, 0, baseDate.plusSeconds(2), childIds.get(2)));
+        assertEquals(
+            0,
+            inMemoryTaskExecutionRepository.countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
+                450L, 0, baseDate.minusSeconds(1), childIds.get(0)));
     }
 
     @Test
@@ -138,16 +152,30 @@ class InMemoryTaskExecutionRepositoryTest {
     }
 
     private List<Long> saveChildren(long jobId, long parentId) {
-        List<Long> childIds = new ArrayList<>();
+        return saveChildren(jobId, parentId, Instant.parse("2026-01-01T00:00:00Z"));
+    }
 
-        for (int taskNumber : new int[] {
+    private List<Long> saveChildren(long jobId, long parentId, Instant baseDate) {
+        List<Long> childIds = new ArrayList<>();
+        int[] taskNumbers = {
             0, 1, 0, 1, 0
-        }) {
+        };
+
+        for (int index = 0; index < taskNumbers.length; index++) {
             TaskExecution taskExecution = new TaskExecution();
 
             taskExecution.setJobId(jobId);
             taskExecution.setParentId(parentId);
-            taskExecution.setTaskNumber(taskNumber);
+            taskExecution.setTaskNumber(taskNumbers[index]);
+
+            try {
+                Field createdDateField = TaskExecution.class.getDeclaredField("createdDate");
+
+                createdDateField.setAccessible(true);
+                createdDateField.set(taskExecution, baseDate.plusSeconds(index));
+            } catch (ReflectiveOperationException reflectiveOperationException) {
+                throw new IllegalStateException(reflectiveOperationException);
+            }
 
             childIds.add(inMemoryTaskExecutionRepository.save(taskExecution)
                 .getId());

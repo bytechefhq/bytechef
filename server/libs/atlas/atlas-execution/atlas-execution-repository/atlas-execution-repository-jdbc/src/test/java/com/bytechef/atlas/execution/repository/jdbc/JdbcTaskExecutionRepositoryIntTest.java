@@ -115,6 +115,16 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
+    public void testEmptyInputListsReturnEmptyResults() {
+        Assertions.assertTrue(taskExecutionRepository.findAllByIdIn(List.of())
+            .isEmpty());
+        Assertions.assertTrue(taskExecutionRepository.findAllParentIdsByParentIdIn(List.of())
+            .isEmpty());
+        Assertions.assertTrue(taskExecutionRepository.findAllParentIdsByParentIdInAndTaskNumber(List.of(), 0)
+            .isEmpty());
+    }
+
+    @Test
     public void testFindAllByJobIdAndErrorNotNullOrderByCreatedDate() {
         saveChildrenFixture();
 

@@ -42,7 +42,8 @@ import org.springframework.util.comparator.Comparators;
 public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
     private static final Comparator<TaskExecution> CREATED_DATE_COMPARATOR = Comparator.comparing(
-        TaskExecution::getCreatedDate, Comparator.nullsFirst(Comparator.naturalOrder()));
+        TaskExecution::getCreatedDate, Comparator.nullsFirst(Comparator.<Instant>naturalOrder()))
+        .thenComparing(TaskExecution::getId, Comparator.nullsFirst(Comparator.<Long>naturalOrder()));
 
     private final ConcurrentHashMap<String, Store> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
@@ -67,26 +68,9 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     public long countByParentIdAndTaskNumberAndCreatedDateBeforeOrEqual(
         long parentId, int taskNumber, Instant createdDate, long id) {
 
-        List<TaskExecution> children = getOrderedChildren(parentId)
+        return getOrderedChildren(parentId)
             .stream()
             .filter(taskExecution -> taskExecution.getTaskNumber() == taskNumber)
-            .toList();
-
-        if (createdDate == null) {
-            long count = 0;
-
-            for (TaskExecution taskExecution : children) {
-                count++;
-
-                if (Objects.equals(taskExecution.getId(), id)) {
-                    return count;
-                }
-            }
-
-            return 0;
-        }
-
-        return children.stream()
             .filter(taskExecution -> isBeforeOrEqual(taskExecution, createdDate, id))
             .count();
     }
@@ -516,7 +500,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     private static boolean isBeforeOrEqual(TaskExecution taskExecution, Instant createdDate, long id) {
         Instant taskExecutionCreatedDate = taskExecution.getCreatedDate();
 
-        if (taskExecutionCreatedDate == null) {
+        if (taskExecutionCreatedDate == null || createdDate == null) {
             return false;
         }
 

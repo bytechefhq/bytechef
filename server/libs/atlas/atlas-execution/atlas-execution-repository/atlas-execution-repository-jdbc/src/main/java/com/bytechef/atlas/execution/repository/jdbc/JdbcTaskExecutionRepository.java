@@ -53,8 +53,16 @@ public interface JdbcTaskExecutionRepository
     void deleteById(long id);
 
     @Override
+    default List<TaskExecution> findAllByIdIn(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return selectAllByIdIn(ids);
+    }
+
     @Query("SELECT * FROM task_execution WHERE id IN (:ids)")
-    List<TaskExecution> findAllByIdIn(@Param("ids") List<Long> ids);
+    List<TaskExecution> selectAllByIdIn(@Param("ids") List<Long> ids);
 
     @Override
     @Query("SELECT * FROM task_execution WHERE job_id = :jobId AND error IS NOT NULL ORDER BY created_date ASC, id ASC")
@@ -90,12 +98,28 @@ public interface JdbcTaskExecutionRepository
     List<Long> findAllIdsByParentIdOrderByCreatedDate(@Param("parentId") long parentId);
 
     @Override
-    @Query("SELECT parent_id FROM task_execution WHERE parent_id IN (:parentIds)")
-    List<Long> findAllParentIdsByParentIdIn(@Param("parentIds") List<Long> parentIds);
+    default List<Long> findAllParentIdsByParentIdIn(List<Long> parentIds) {
+        if (parentIds.isEmpty()) {
+            return List.of();
+        }
+
+        return selectAllParentIdsByParentIdIn(parentIds);
+    }
 
     @Override
+    default List<Long> findAllParentIdsByParentIdInAndTaskNumber(List<Long> parentIds, int taskNumber) {
+        if (parentIds.isEmpty()) {
+            return List.of();
+        }
+
+        return selectAllParentIdsByParentIdInAndTaskNumber(parentIds, taskNumber);
+    }
+
+    @Query("SELECT parent_id FROM task_execution WHERE parent_id IN (:parentIds)")
+    List<Long> selectAllParentIdsByParentIdIn(@Param("parentIds") List<Long> parentIds);
+
     @Query("SELECT parent_id FROM task_execution WHERE parent_id IN (:parentIds) AND task_number = :taskNumber")
-    List<Long> findAllParentIdsByParentIdInAndTaskNumber(
+    List<Long> selectAllParentIdsByParentIdInAndTaskNumber(
         @Param("parentIds") List<Long> parentIds, @Param("taskNumber") int taskNumber);
 
     @Override
