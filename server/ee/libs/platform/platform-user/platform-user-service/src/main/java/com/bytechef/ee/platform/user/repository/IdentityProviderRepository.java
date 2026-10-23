@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.user.repository;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -34,4 +35,11 @@ public interface IdentityProviderRepository extends ListCrudRepository<IdentityP
     @Query("SELECT ip.* FROM identity_provider ip " +
         "WHERE ip.scim_api_key = :scimApiKey")
     Optional<IdentityProvider> findByScimApiKey(@Param("scimApiKey") String scimApiKey);
+
+    @Modifying
+    @Query("UPDATE identity_provider " +
+        "SET service_provider_signing_certificate = :certificate, service_provider_signing_key = :key " +
+        "WHERE id = :id AND service_provider_signing_certificate IS NULL")
+    int updateServiceProviderSigningCredentialIfAbsent(
+        @Param("id") long id, @Param("certificate") String certificate, @Param("key") String key);
 }
