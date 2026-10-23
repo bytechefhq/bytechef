@@ -29,6 +29,8 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.audit.AiProviderAuditEvents;
 import com.bytechef.platform.ai.provider.audit.AiProviderAuditMapper;
+import com.bytechef.platform.ai.provider.audit.WebSearchProviderAuditEvents;
+import com.bytechef.platform.ai.websearch.WebSearchProvider;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
@@ -71,6 +73,8 @@ class AiProviderFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
     private static final int ENVIRONMENT = 0;
+    private static final String BRAVE = WebSearchProvider.BRAVE.getName();
+    private static final String SECRET_API_KEY = "brave-secret-api-key";
     private static final String SECRET_URL = "https://user:pw@ollama.example.com:8443/api?token=t#f";
 
     @Autowired
@@ -90,6 +94,9 @@ class AiProviderFacadeAuditIntTest {
 
     @Autowired
     private PropertyService propertyService;
+
+    @Autowired
+    private WebSearchProviderFacade webSearchProviderFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -230,6 +237,71 @@ class AiProviderFacadeAuditIntTest {
             .noneMatch(value -> value.contains("user:pw"));
     }
 
+    @Test
+    void testWebSearchProviderDeleteRecordsTheProviderAndEnvironment() {
+        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, ENVIRONMENT);
+
+        persistenceAuditEventRepository.deleteAll();
+
+        webSearchProviderFacade.deleteWebSearchProvider(BRAVE, ENVIRONMENT);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            WebSearchProviderAuditEvents.WEB_SEARCH_PROVIDER_DELETED);
+
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo(ADMIN_LOGIN);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("webSearchProvider", BRAVE)
+            .containsEntry("environment", String.valueOf(ENVIRONMENT));
+        assertThat(propertyRepository.count()).isZero();
+    }
+
+    @Test
+    void testWebSearchProviderEnablingRecordsTheNewState() {
+        webSearchProviderFacade.enableWebSearchProvider(BRAVE, false, ENVIRONMENT);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            WebSearchProviderAuditEvents.WEB_SEARCH_PROVIDER_UPDATED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("webSearchProvider", BRAVE)
+            .containsEntry("enabled", "false")
+            .containsEntry("environment", String.valueOf(ENVIRONMENT));
+    }
+
+    @Test
+    void testWebSearchProviderKeyUpdateNeverRecordsTheApiKey() {
+        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, ENVIRONMENT);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            WebSearchProviderAuditEvents.WEB_SEARCH_PROVIDER_UPDATED);
+
+        Map<String, String> data = persistentAuditEvent.getData();
+
+        assertThat(data)
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("webSearchProvider", BRAVE)
+            .containsEntry("environment", String.valueOf(ENVIRONMENT))
+            .doesNotContainKey("apiKey");
+        assertThat(data.values()).noneMatch(value -> value.contains(SECRET_API_KEY));
+    }
+
+    @Test
+    void testWebSearchProviderDeleteByANonAdminIsRecordedAsDenied() {
+        authenticate(AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> webSearchProviderFacade.deleteWebSearchProvider(BRAVE, ENVIRONMENT))
+            .isInstanceOf(AccessDeniedException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            WebSearchProviderAuditEvents.WEB_SEARCH_PROVIDER_DELETED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "DENIED")
+            .containsEntry("webSearchProvider", BRAVE);
+    }
+
     private static void authenticate(String authority) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -262,7 +334,7 @@ class AiProviderFacadeAuditIntTest {
     @EnableMethodSecurity
     @Import({
         AiProviderAuditMapper.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class
+        AuditMapperResolver.class, WebSearchProviderFacadeImpl.class
     })
     static class AuditConfiguration {
     }
