@@ -131,6 +131,52 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
         assertThat(metadata.replaceAll("\\s", "")).contains(certificateBase64);
     }
 
+    @Test
+    void testVerifiesAssertionsAgainstTheMetadataCertificateByDefault() {
+        RelyingPartyRegistration relyingPartyRegistration = findWithStoredSigningCredential(samlIdentityProvider());
+
+        assertThat(relyingPartyRegistration.getAssertingPartyMetadata()
+            .getVerificationX509Credentials()).singleElement()
+                .extracting(credential -> credential.getCertificate()
+                    .getSubjectX500Principal()
+                    .getName())
+                .isEqualTo("CN=bytechef-e2e");
+    }
+
+    @Test
+    void testAPinnedSigningCertificateReplacesTheMetadataCertificates() {
+        PemCredential pinnedPemCredential = ServiceProviderSigningCredentials.generate("Pinned IdP");
+
+        IdentityProvider identityProvider = samlIdentityProvider();
+
+        identityProvider.setSigningCertificate(pinnedPemCredential.certificate());
+
+        RelyingPartyRegistration relyingPartyRegistration = findWithStoredSigningCredential(identityProvider);
+
+        assertThat(relyingPartyRegistration.getAssertingPartyMetadata()
+            .getVerificationX509Credentials()).singleElement()
+                .satisfies(credential -> {
+                    assertThat(credential.isVerificationCredential()).isTrue();
+                    assertThat(credential.getCertificate()
+                        .getSubjectX500Principal()
+                        .getName()).isEqualTo("CN=Pinned IdP");
+                });
+    }
+
+    private RelyingPartyRegistration findWithStoredSigningCredential(IdentityProvider identityProvider) {
+        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef " + REGISTRATION_ID);
+
+        identityProvider.setServiceProviderSigningCertificate(pemCredential.certificate());
+        identityProvider.setServiceProviderSigningKey("encrypted");
+
+        locate(identityProvider);
+
+        when(identityProviderService.getDecryptedServiceProviderSigningKey(identityProvider))
+            .thenReturn(pemCredential.privateKey());
+
+        return dynamicRelyingPartyRegistrationRepository.findByRegistrationId(REGISTRATION_ID);
+    }
+
     private void locate(IdentityProvider identityProvider) {
         when(identityProviderLocator.findByRegistrationId(REGISTRATION_ID))
             .thenReturn(Optional.of(new LocatedIdentityProvider(TenantContext.DEFAULT_TENANT_ID, identityProvider)));

@@ -9,6 +9,7 @@ package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.domain.IdentityProviderRegistrationId;
+import com.bytechef.ee.platform.user.domain.IdentityProviderSigningCertificate;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.ee.security.sso.IdentityProviderLocator;
 import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
@@ -95,13 +96,28 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         try {
             Saml2X509Credential signingCredential = getSigningCredential(registrationId, locatedIdentityProvider);
 
-            RelyingPartyRegistration relyingPartyRegistration = RelyingPartyRegistrations
+            RelyingPartyRegistration.Builder relyingPartyRegistrationBuilder = RelyingPartyRegistrations
                 .fromMetadataLocation(identityProvider.getMetadataUri())
                 .registrationId(registrationId)
                 .entityId("{baseUrl}/saml2/metadata/{registrationId}")
                 .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
-                .signingX509Credentials(signingCredentials -> signingCredentials.add(signingCredential))
-                .build();
+                .signingX509Credentials(signingCredentials -> signingCredentials.add(signingCredential));
+
+            String pinnedCertificate = identityProvider.getSigningCertificate();
+
+            if (pinnedCertificate != null && !pinnedCertificate.isBlank()) {
+                Saml2X509Credential verificationCredential = Saml2X509Credential.verification(
+                    IdentityProviderSigningCertificate.parse(pinnedCertificate));
+
+                relyingPartyRegistrationBuilder.assertingPartyMetadata(
+                    assertingPartyMetadata -> assertingPartyMetadata.verificationX509Credentials(
+                        verificationCredentials -> {
+                            verificationCredentials.clear();
+                            verificationCredentials.add(verificationCredential);
+                        }));
+            }
+
+            RelyingPartyRegistration relyingPartyRegistration = relyingPartyRegistrationBuilder.build();
 
             cachedRelyingPartyRegistrations.put(
                 registrationId, new CachedRelyingPartyRegistration(relyingPartyRegistration, version, Instant.now()));
