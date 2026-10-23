@@ -21,16 +21,6 @@ const hoisted = vi.hoisted(() => ({
     toast: vi.fn(),
 }));
 
-vi.mock('@/ee/shared/mutations/automation/projectGit.mutations', () => ({
-    usePullProjectFromGitMutation: hoisted.noopMutation,
-    useUpdateProjectGitConfigurationMutation: hoisted.noopMutation,
-}));
-
-vi.mock('@/ee/shared/mutations/automation/projectGit.queries', () => ({
-    ProjectGitConfigurationKeys: {projectGitConfiguration: (id: number) => ['projectGitConfiguration', id]},
-    useGetProjectGitConfigurationQuery: () => ({data: undefined}),
-}));
-
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
     clearWorkflowHistory: hoisted.clearWorkflowHistory,
 }));
@@ -174,5 +164,24 @@ describe('useSettingsMenu', () => {
         });
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
+    });
+
+    it('makes no Git requests when no edition registers the project Git API', () => {
+        const fetchSpy = vi.spyOn(globalThis, 'fetch');
+        const onSuccess = vi.fn();
+
+        const {result} = renderSettingsMenu();
+
+        result.current.handlePullProjectFromGitClick();
+        result.current.handleUpdateProjectGitConfigurationSubmit({
+            onSuccess,
+            projectGitConfiguration: {branch: 'main', enabled: true},
+        });
+
+        expect(result.current.projectGitConfiguration).toBeUndefined();
+        expect(fetchSpy).not.toHaveBeenCalled();
+        expect(onSuccess).not.toHaveBeenCalled();
+
+        fetchSpy.mockRestore();
     });
 });
