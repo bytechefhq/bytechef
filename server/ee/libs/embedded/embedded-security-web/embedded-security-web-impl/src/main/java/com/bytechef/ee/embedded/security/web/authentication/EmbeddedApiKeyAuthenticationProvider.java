@@ -13,6 +13,7 @@ import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -52,11 +53,20 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
         String externalUserId = embeddedApiKeyAuthenticationToken.getExternalUserId();
 
         ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
-            .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
+            .orElseGet(() -> createConnectedUser(externalUserId, environmentId));
 
         return new EmbeddedApiKeyAuthenticationToken(
             environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser),
             embeddedApiKeyAuthenticationToken.getSecretKey() != null);
+    }
+
+    private ConnectedUser createConnectedUser(String externalUserId, long environmentId) {
+        try {
+            return connectedUserService.createConnectedUser(externalUserId, environmentId);
+        } catch (DuplicateKeyException duplicateKeyException) {
+            return connectedUserService.fetchConnectedUser(externalUserId, environmentId)
+                .orElseThrow(() -> duplicateKeyException);
+        }
     }
 
     @Override
