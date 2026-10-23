@@ -452,17 +452,25 @@ public class WebhookBridgeAgent extends LocalAgent {
                     return;
                 }
 
-                Object parsed;
-
-                try {
-                    parsed = jsonMapper.readValue(payload, Map.class);
-                } catch (RuntimeException jsonException) {
-                    parsed = payload;
-                }
-
-                bridge.onEvent(parsed);
+                bridge.onEvent(parseResumeData(payload));
             });
         }
+    }
+
+    private Object parseResumeData(String payload) {
+        try {
+            Object value = jsonMapper.readValue(payload, Object.class);
+
+            if (value instanceof Map<?, ?> || value instanceof String) {
+                return value;
+            }
+        } catch (RuntimeException exception) {
+            if (log.isTraceEnabled()) {
+                log.trace("Workflow resume chunk is not JSON; streaming it as text", exception);
+            }
+        }
+
+        return payload;
     }
 
     private @Nullable Object parseResponseBody(@Nullable String body) {
