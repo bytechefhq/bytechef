@@ -74,6 +74,9 @@ public class AiTextConstants {
     public static final BiFunction<Ai.Provider, PropertyService, ModifiableStringProperty> PROVIDER_PROPERTY =
         (aiProvider, propertyService) -> string(PROVIDER)
             .label("Provider")
+            .description(
+                "The AI provider to use. The list only shows AI providers added and enabled in Settings > AI > " +
+                    "Providers, so add one there first.")
             .options(
                 (OptionsFunction<String>) (
                     inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiTextUtils
