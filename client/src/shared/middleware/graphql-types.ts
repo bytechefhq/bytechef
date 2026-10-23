@@ -1328,6 +1328,7 @@ export type IdentityProviderType = {
   registrationId: Scalars['String']['output'];
   scimEnabled: Scalars['Boolean']['output'];
   scopes?: Maybe<Scalars['String']['output']>;
+  serviceProviderCertificate?: Maybe<Scalars['String']['output']>;
   signingCertificate?: Maybe<Scalars['String']['output']>;
   type: Scalars['String']['output'];
 };
@@ -1837,6 +1838,7 @@ export type Mutation = {
    */
   inviteWorkspaceUser: WorkspaceUser;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  regenerateIdentityProviderServiceProviderCertificate: IdentityProviderType;
   removeDataTableColumn: Scalars['Boolean']['output'];
   /** Remove a user from the embedded members. */
   removeEmbeddedUser: Scalars['Boolean']['output'];
@@ -2517,6 +2519,11 @@ export type MutationInviteWorkspaceUserArgs = {
 
 export type MutationPublishAutomationWorkflowProjectArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationRegenerateIdentityProviderServiceProviderCertificateArgs = {
   id: Scalars['ID']['input'];
 };
 

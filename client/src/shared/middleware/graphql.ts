@@ -2292,7 +2292,7 @@ export type CreateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type CreateIdentityProviderMutation = { createIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type CreateIdentityProviderMutation = { createIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, serviceProviderCertificate: string | null, signingCertificate: string | null, type: string } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
   id: string | number;
@@ -2320,12 +2320,12 @@ export type IdentityProviderQueryVariables = Exact<{
 }>;
 
 
-export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, signingCertificate: string | null, type: string } | null };
+export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, serviceProviderCertificate: string | null, signingCertificate: string | null, type: string } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, signingCertificate: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, registrationId: string, scimEnabled: boolean, scopes: string | null, serviceProviderCertificate: string | null, signingCertificate: string | null, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
@@ -2336,13 +2336,20 @@ export type InviteUserMutationVariables = Exact<{
 
 export type InviteUserMutation = { inviteUser: boolean };
 
+export type RegenerateIdentityProviderServiceProviderCertificateMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RegenerateIdentityProviderServiceProviderCertificateMutation = { regenerateIdentityProviderServiceProviderCertificate: { id: string, serviceProviderCertificate: string | null } };
+
 export type UpdateIdentityProviderMutationVariables = Exact<{
   id: string | number;
   input: Types.IdentityProviderInput;
 }>;
 
 
-export type UpdateIdentityProviderMutation = { updateIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { updateIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, serviceProviderCertificate: string | null, signingCertificate: string | null, type: string } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: string;
@@ -10776,6 +10783,7 @@ export const CreateIdentityProviderDocument = new TypedDocumentString(`
     name
     nameIdFormat
     scopes
+    serviceProviderCertificate
     signingCertificate
     type
   }
@@ -10875,6 +10883,7 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     registrationId
     scimEnabled
     scopes
+    serviceProviderCertificate
     signingCertificate
     type
   }
@@ -10920,6 +10929,7 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     registrationId
     scimEnabled
     scopes
+    serviceProviderCertificate
     signingCertificate
     type
   }
@@ -10961,6 +10971,28 @@ export const useInviteUserMutation = <
   }
     )};
 
+export const RegenerateIdentityProviderServiceProviderCertificateDocument = new TypedDocumentString(`
+    mutation regenerateIdentityProviderServiceProviderCertificate($id: ID!) {
+  regenerateIdentityProviderServiceProviderCertificate(id: $id) {
+    id
+    serviceProviderCertificate
+  }
+}
+    `);
+
+export const useRegenerateIdentityProviderServiceProviderCertificateMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RegenerateIdentityProviderServiceProviderCertificateMutation, TError, RegenerateIdentityProviderServiceProviderCertificateMutationVariables, TContext>) => {
+    
+    return useMutation<RegenerateIdentityProviderServiceProviderCertificateMutation, TError, RegenerateIdentityProviderServiceProviderCertificateMutationVariables, TContext>(
+      {
+    mutationKey: ['regenerateIdentityProviderServiceProviderCertificate'],
+    mutationFn: (variables?: RegenerateIdentityProviderServiceProviderCertificateMutationVariables) => fetcher<RegenerateIdentityProviderServiceProviderCertificateMutation, RegenerateIdentityProviderServiceProviderCertificateMutationVariables>(RegenerateIdentityProviderServiceProviderCertificateDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
   updateIdentityProvider(id: $id, input: $input) {
@@ -10982,6 +11014,7 @@ export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     name
     nameIdFormat
     scopes
+    serviceProviderCertificate
     signingCertificate
     type
   }
