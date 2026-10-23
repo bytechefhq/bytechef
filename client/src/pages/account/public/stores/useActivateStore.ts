@@ -1,4 +1,4 @@
-import {getCookie} from '@/shared/util/cookie-utils';
+import {getXsrfToken} from '@/shared/util/cookie-utils';
 
 /* eslint-disable sort-keys */
 
@@ -17,7 +17,7 @@ const fetchActivate = async (key: string | null) => {
     return await fetch(`/api/activate?key=${key}`, {
         headers: {
             'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            'X-XSRF-TOKEN': await getXsrfToken(),
         },
         method: 'GET',
     }).then((response) => response);

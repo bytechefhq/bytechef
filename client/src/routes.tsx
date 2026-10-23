@@ -1,6 +1,7 @@
 import ImportApp from '@/ImportApp';
 import DevelopmentAutomationWorkflowConfigurationsRedirect from '@/ee/pages/embedded/automation-workflow-configurations/DevelopmentAutomationWorkflowConfigurationsRedirect';
 import DevelopmentIntegrationInstanceConfigurationsRedirect from '@/ee/pages/embedded/integration-instance-configurations/DevelopmentIntegrationInstanceConfigurationsRedirect';
+import AcceptInvitation from '@/pages/account/public/AcceptInvitation';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
 import OAuth2Consent from '@/pages/account/public/OAuth2Consent';
@@ -523,6 +524,14 @@ export const getRouter = (queryClient: QueryClient) =>
                 </AccessControl>
             ),
             path: '/activate',
+        },
+        {
+            element: (
+                <AccessControl requiresKey>
+                    <AcceptInvitation />
+                </AccessControl>
+            ),
+            path: '/accept-invitation',
         },
         {
             element: (
