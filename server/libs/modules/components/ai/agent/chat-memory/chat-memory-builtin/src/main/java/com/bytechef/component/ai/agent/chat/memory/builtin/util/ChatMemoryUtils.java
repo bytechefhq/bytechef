@@ -16,14 +16,10 @@
 
 package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
-
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import java.util.ArrayList;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryConversationOptions;
 import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
 
 /**
  * @author Marko Kriskovic
@@ -39,19 +35,7 @@ public class ChatMemoryUtils {
                 return List.of();
             }
 
-            List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
-
-            List<String> conversationIds = chatMemoryRepository.findConversationIds();
-
-            for (String conversationId : conversationIds) {
-                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
-
-                Message message = messages.getFirst();
-
-                options.add(option(conversationId, conversationId, message.getText()));
-            }
-
-            return options;
+            return ChatMemoryConversationOptions.getOptions(chatMemoryRepository, searchText);
         };
     }
 }
