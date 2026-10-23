@@ -65,6 +65,12 @@ Each saved provider has a **registration id** that ByteChef uses in the URLs you
 
 Save the provider first; the registration id exists only once it has been created.
 
+### SAML request signing
+
+ByteChef signs SAML authentication requests with a key of its own, one per SAML provider. The key's self-signed certificate (valid ten years) is published in the SP metadata and shown as **SP Signing Certificate** when you edit the provider; register it with IdPs that verify request signatures, such as Keycloak with *Client signature required* on. The private key never leaves the server and is stored encrypted.
+
+**Regenerate Certificate** replaces the key at once. IdPs that verify request signatures reject sign-ins until you register the new certificate with them, so update the IdP right after regenerating (or download the SP metadata again).
+
 ### MCP servers
 
 Identity providers configured here are used for signing in to ByteChef. Their tokens are not accepted on MCP servers yet. To connect an automation MCP client with a token from an external issuer, the installation must list that issuer in its configuration - see [MCP Servers → JWT from a trusted issuer](/platform/automation/deploy/mcp-servers#jwt-from-a-trusted-issuer-optional).
@@ -79,7 +85,7 @@ On the login page, a user who types an email on one of a provider's **Email Doma
 - **Identity attributes** - email, first name, and last name. For SAML, the email is read from the `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`, `email`, `mail`, or `urn:oid:0.9.2342.19200300.100.1.3` attribute, falling back to the NameID; names come from the `givenname`/`surname` claims or the `givenName`, `firstName`, `sn`, `surname`, and `lastName` attributes.
 - **Account linking** - a user is resolved inside the tenant that owns the provider. A returning user is matched by the subject (OIDC) or NameID (SAML) of *that* provider, so an identity from one provider can never sign in as an account linked through another. A first login matches an existing account by email, and creates one when **Auto-provision users on first SSO login** is on, with the provider's **Default Role**. The email must be on one of the provider's **Email Domains** before it can link to or create an account, so a provider cannot claim accounts outside its own domains.
 
-Group claims are not applied at sign-in: an SSO user gets the provider's **Default Role** when the account is created and keeps whatever [roles](/platform/settings/users#roles-and-permissions) are assigned in ByteChef afterwards. The group-to-authority mapping above applies only to MCP tokens.
+Group claims are not applied at sign-in: an SSO user gets the provider's **Default Role** when the account is created and keeps whatever [roles](/platform/settings/users#roles-and-permissions) are assigned in ByteChef afterwards.
 
 An OIDC identity whose provider reports `email_verified=false` is refused. When auto-provisioning is off, an unknown user is sent back to the login page with an explanation rather than an error.
 
