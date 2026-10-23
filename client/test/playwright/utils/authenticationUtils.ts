@@ -65,6 +65,23 @@ export async function graphql<T>(
     return body.data as T;
 }
 
+export async function graphqlErrors(
+    apiContext: APIRequestContext,
+    query: string,
+    variables: Record<string, unknown> = {}
+): Promise<{message: string}[]> {
+    const xsrfToken = await getXsrfToken(apiContext);
+
+    const response = await apiContext.post('/graphql', {
+        data: {query, variables},
+        headers: {'X-XSRF-TOKEN': xsrfToken},
+    });
+
+    const body = await response.json();
+
+    return body.errors || [];
+}
+
 const IDENTITY_PROVIDER_FIELDS = 'domains id name registrationId';
 
 export async function createOidcIdentityProvider(
@@ -109,7 +126,7 @@ export async function createOidcIdentityProvider(
 
 export async function createSamlIdentityProvider(
     apiContext: APIRequestContext,
-    options: {domain?: string; metadataUri?: string; namePrefix?: string} = {}
+    options: {domain?: string; metadataUri?: string; namePrefix?: string; signingCertificate?: string} = {}
 ): Promise<IdentityProviderI> {
     const domain = options.domain || 'example.com';
     const name = `${options.namePrefix || 'E2E SAML'} ${uniqueSuffix()}`;
@@ -127,12 +144,34 @@ export async function createSamlIdentityProvider(
                 enabled: true,
                 metadataUri: options.metadataUri || SAML_IDP_METADATA_URL,
                 name,
+                signingCertificate: options.signingCertificate,
                 type: 'SAML',
             },
         }
     );
 
     return {domain, issuerPath: '', name, ...data.createIdentityProvider};
+}
+
+/**
+ * The first signing certificate (base64 body) a SAML IdP publishes in its metadata.
+ */
+export async function fetchSamlSigningCertificate(metadataUrl = SAML_IDP_METADATA_URL): Promise<string> {
+    const metadataContext = await request.newContext();
+
+    try {
+        const response = await metadataContext.get(metadataUrl);
+
+        expect(response.ok(), `GET ${metadataUrl}: ${response.status()}`).toBeTruthy();
+
+        const match = (await response.text()).match(/<ds:X509Certificate>([^<]+)<\/ds:X509Certificate>/);
+
+        expect(match, `no certificate in ${metadataUrl}`).toBeTruthy();
+
+        return match![1].replace(/\s/g, '');
+    } finally {
+        await metadataContext.dispose();
+    }
 }
 
 export async function setIdentityProviderEnforced(
