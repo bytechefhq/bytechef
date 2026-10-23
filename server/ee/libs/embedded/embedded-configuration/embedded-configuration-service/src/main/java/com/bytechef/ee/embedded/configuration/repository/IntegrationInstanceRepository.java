@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -71,12 +72,26 @@ public interface IntegrationInstanceRepository
 
     @Query("""
         SELECT DISTINCT integration_instance.* FROM integration_instance
+        JOIN integration_instance_configuration ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        JOIN integration_workflow ON integration_workflow.integration_id = integration_instance_configuration.integration_id
+        AND integration_workflow.integration_version = integration_instance_configuration.integration_version
+        WHERE integration_workflow.uuid = :uuid
+        AND integration_instance_configuration.environment = :environment
+        AND integration_instance.connected_user_id = :connectedUserId
+        ORDER BY integration_instance.id DESC
+        """)
+    List<IntegrationInstance> findAllByConnectedUserIdAndWorkflowUuidAndEnvironment(
+        @Param("connectedUserId") long connectedUserId, @Param("uuid") UUID uuid,
+        @Param("environment") int environment);
+
+    @Query("""
+        SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration on integration_instance_configuration.integration_id = integration.id
         WHERE LOWER(integration.component_name) = LOWER(:componentName)
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
-        ORDER BY integration_instance.created_date DESC
+        ORDER BY integration_instance.enabled DESC, integration_instance.created_date DESC
         LIMIT 1
         """)
     Optional<IntegrationInstance> findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
@@ -90,7 +105,7 @@ public interface IntegrationInstanceRepository
         WHERE LOWER(integration.component_name) in (:componentNames)
         AND integration_instance_configuration.environment = :environment
         AND integration_instance.connected_user_id = :connectedUserId
-        ORDER BY integration_instance.created_date DESC
+        ORDER BY integration_instance.enabled DESC, integration_instance.created_date DESC
         LIMIT 1
         """)
     Optional<IntegrationInstance> findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
