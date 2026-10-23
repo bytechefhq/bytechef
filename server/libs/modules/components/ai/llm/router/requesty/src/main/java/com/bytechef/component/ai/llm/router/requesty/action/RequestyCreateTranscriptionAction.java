@@ -30,18 +30,17 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.Map;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author Thibault Jaigu
@@ -75,41 +74,34 @@ public class RequestyCreateTranscriptionAction {
     private RequestyCreateTranscriptionAction() {
     }
 
-    @SuppressWarnings("unchecked")
     public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        FileEntry fileEntry = inputParameters.getFileEntry(FILE);
-        byte[] audioBytes = context.file(file -> file.readAllBytes(fileEntry));
-        String filename = fileEntry.getName() != null ? fileEntry.getName() : "audio.wav";
+        Map<String, Object> formData = new HashMap<>();
 
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-
-        formData.add(FILE, new ByteArrayResource(audioBytes) {
-            @Override
-            public String getFilename() {
-                return filename;
-            }
-        });
-
-        formData.add(MODEL, inputParameters.getRequiredString(MODEL));
+        formData.put(FILE, inputParameters.getRequiredFileEntry(FILE));
+        formData.put(MODEL, inputParameters.getRequiredString(MODEL));
 
         String language = inputParameters.getString(LANGUAGE);
 
         if (language != null) {
-            formData.add(LANGUAGE, language);
+            formData.put(LANGUAGE, language);
         }
 
         Double temperature = inputParameters.getDouble(TEMPERATURE);
 
         if (temperature != null) {
-            formData.add(TEMPERATURE, String.valueOf(temperature));
+            formData.put(TEMPERATURE, String.valueOf(temperature));
         }
 
-        Context.Http.Response response1 = context.http(http -> http.post(BASE_URL + "/audio/transcriptions")
+        Map<String, String> body = context.http(http -> http.post(BASE_URL + "/audio/transcriptions")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
             .body(Context.Http.Body.of(formData, Context.Http.BodyContentType.FORM_DATA)))
-            .execute();
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        Map<String, String> body = response1.getBody(new TypeReference<Map<String, String>>() {});
+        if (body == null) {
+            throw new IllegalStateException("Transcription request returned an empty response");
+        }
 
         return body.get("text");
     }
