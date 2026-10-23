@@ -72,6 +72,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
+    post:
+      description: "Create a connected user."
+      summary: "Create a connected user"
+      tags:
+        - "connected-user"
+      operationId: "createConnectedUser"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConnectedUserRequest"
+      responses:
+        "200":
+          description: "The created connected user."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectedUser"
+  /connected-users/import:
+    post:
+      description: "Import connected users from a CSV file."
+      summary: "Import connected users from a CSV file"
+      tags:
+        - "connected-user"
+      operationId: "importConnectedUsers"
+      parameters:
+        - name: "environmentId"
+          description: "The environment id."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              required:
+                - "file"
+              properties:
+                file:
+                  description: "The CSV file."
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "The import result."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectedUserImportResult"
   /connected-users/{id}:
     get:
       description: "Get a connected user."
@@ -90,6 +144,33 @@ paths:
       responses:
         "200":
           description: "A connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectedUser"
+    put:
+      description: "Update a connected user."
+      summary: "Update a connected user"
+      tags:
+        - "connected-user"
+      operationId: "updateConnectedUser"
+      parameters:
+        - name: "id"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectedUserRequest"
+      responses:
+        "200":
+          description: "The updated connected user."
           content:
             application/json:
               schema:
@@ -228,6 +309,77 @@ components:
           readOnly: true
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
+    ConnectedUserImportResult:
+      type: "object"
+      properties:
+        createdCount:
+          description: "The number of created connected users."
+          type: "integer"
+          format: "int32"
+        rejectedRows:
+          description: "The rows that were rejected."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ConnectedUserImportRejectedRow"
+        skippedExternalIds:
+          description: "The external ids that already existed or were repeated."
+          type: "array"
+          items:
+            type: "string"
+    ConnectedUserImportRejectedRow:
+      type: "object"
+      properties:
+        reason:
+          description: "The reason the row was rejected."
+          type: "string"
+        rowNumber:
+          description: "The number of the rejected row."
+          type: "integer"
+          format: "int32"
+    CreateConnectedUserRequest:
+      type: "object"
+      required:
+        - "environmentId"
+        - "externalId"
+      properties:
+        email:
+          description: "The email address."
+          type: "string"
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
+        externalId:
+          description: "The connected user external id."
+          type: "string"
+        metadata:
+          description: "The metadata."
+          type: "object"
+          additionalProperties:
+            type: "string"
+        name:
+          description: "The name of a connected user."
+          type: "string"
+    UpdateConnectedUserRequest:
+      type: "object"
+      required:
+        - "version"
+      properties:
+        email:
+          description: "The email address."
+          type: "string"
+        metadata:
+          description: "The metadata."
+          type: "object"
+          additionalProperties:
+            type: "string"
+        name:
+          description: "The name of a connected user."
+          type: "string"
+        version:
+          description: "The version of the connected user being edited."
+          type: "integer"
+          format: "int32"
     CredentialStatus:
       $ref: "../../../../../libs/platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
     Page:

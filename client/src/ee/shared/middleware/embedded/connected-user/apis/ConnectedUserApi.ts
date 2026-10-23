@@ -19,6 +19,16 @@ import {
     ConnectedUserToJSON,
 } from '../models/ConnectedUser';
 import {
+    type ConnectedUserImportResult,
+    ConnectedUserImportResultFromJSON,
+    ConnectedUserImportResultToJSON,
+} from '../models/ConnectedUserImportResult';
+import {
+    type CreateConnectedUserRequest,
+    CreateConnectedUserRequestFromJSON,
+    CreateConnectedUserRequestToJSON,
+} from '../models/CreateConnectedUserRequest';
+import {
     type CredentialStatus,
     CredentialStatusFromJSON,
     CredentialStatusToJSON,
@@ -28,6 +38,18 @@ import {
     PageFromJSON,
     PageToJSON,
 } from '../models/Page';
+import {
+    type UpdateConnectedUserRequest,
+    UpdateConnectedUserRequestFromJSON,
+    UpdateConnectedUserRequestToJSON,
+} from '../models/UpdateConnectedUserRequest';
+
+export interface CreateConnectedUserOperationRequest {
+    /**
+     * 
+     */
+    createConnectedUserRequest: CreateConnectedUserRequest;
+}
 
 export interface DeleteConnectedUserRequest {
     /**
@@ -85,10 +107,81 @@ export interface GetConnectedUsersRequest {
     search?: string;
 }
 
+export interface ImportConnectedUsersRequest {
+    /**
+     * The environment id.
+     */
+    environmentId: number;
+    /**
+     * The CSV file.
+     */
+    file: Blob;
+}
+
+export interface UpdateConnectedUserOperationRequest {
+    /**
+     * The id of a connected user.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateConnectedUserRequest: UpdateConnectedUserRequest;
+}
+
 /**
  * 
  */
 export class ConnectedUserApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for createConnectedUser without sending the request
+     */
+    async createConnectedUserRequestOpts(requestParameters: CreateConnectedUserOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['createConnectedUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'createConnectedUserRequest',
+                'Required parameter "createConnectedUserRequest" was null or undefined when calling createConnectedUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/connected-users`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateConnectedUserRequestToJSON(requestParameters['createConnectedUserRequest']),
+        };
+    }
+
+    /**
+     * Create a connected user.
+     * Create a connected user
+     */
+    async createConnectedUserRaw(requestParameters: CreateConnectedUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUser>> {
+        const requestOptions = await this.createConnectedUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a connected user.
+     * Create a connected user
+     */
+    async createConnectedUser(requestParameters: CreateConnectedUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectedUser> {
+        const response = await this.createConnectedUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for deleteConnectedUser without sending the request
@@ -301,6 +394,141 @@ export class ConnectedUserApi extends runtime.BaseAPI {
      */
     async getConnectedUsers(requestParameters: GetConnectedUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
         const response = await this.getConnectedUsersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for importConnectedUsers without sending the request
+     */
+    async importConnectedUsersRequestOpts(requestParameters: ImportConnectedUsersRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling importConnectedUsers().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling importConnectedUsers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+
+        let urlPath = `/connected-users/import`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        };
+    }
+
+    /**
+     * Import connected users from a CSV file.
+     * Import connected users from a CSV file
+     */
+    async importConnectedUsersRaw(requestParameters: ImportConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUserImportResult>> {
+        const requestOptions = await this.importConnectedUsersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserImportResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Import connected users from a CSV file.
+     * Import connected users from a CSV file
+     */
+    async importConnectedUsers(requestParameters: ImportConnectedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectedUserImportResult> {
+        const response = await this.importConnectedUsersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for updateConnectedUser without sending the request
+     */
+    async updateConnectedUserRequestOpts(requestParameters: UpdateConnectedUserOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateConnectedUser().'
+            );
+        }
+
+        if (requestParameters['updateConnectedUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateConnectedUserRequest',
+                'Required parameter "updateConnectedUserRequest" was null or undefined when calling updateConnectedUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/connected-users/{id}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateConnectedUserRequestToJSON(requestParameters['updateConnectedUserRequest']),
+        };
+    }
+
+    /**
+     * Update a connected user.
+     * Update a connected user
+     */
+    async updateConnectedUserRaw(requestParameters: UpdateConnectedUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectedUser>> {
+        const requestOptions = await this.updateConnectedUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectedUserFromJSON(jsonValue));
+    }
+
+    /**
+     * Update a connected user.
+     * Update a connected user
+     */
+    async updateConnectedUser(requestParameters: UpdateConnectedUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectedUser> {
+        const response = await this.updateConnectedUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
