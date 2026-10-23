@@ -31,6 +31,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -379,6 +380,83 @@ class TestWorkflowExecutorIntTest {
         int eventCount = payloads.size();
 
         assertThat(sseStreamBridge.awaitPayloadCount(eventCount + 1, 1500, TimeUnit.MILLISECONDS)).isFalse();
+    }
+
+    @Test
+    void executeAsyncForwardsClusterElementCallEvents() throws Exception {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "agent", "type": "testComponent/v1/block", "parameters": {"gate": "agent"}}
+                    ]
+                }
+                """);
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
+            () -> testWorkflowExecutor.executeAsync(
+                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                (key, future) -> future.join(), key -> {}));
+
+        TaskGate taskGate = taskGates.get("agent");
+
+        assertThat(taskGate.awaitEntered(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+        assertThat(sseStreamBridge.awaitEvent(isEvent("task_started"), TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+
+        long jobId = getStartedJobId(sseStreamBridge);
+
+        List<Map<String, Object>> taskStartedPayloads = getTaskEventPayloads(sseStreamBridge, "task_started");
+
+        Map<String, Object> taskStartedPayload = taskStartedPayloads.getFirst();
+
+        long taskExecutionId = Long.parseLong((String) taskStartedPayload.get("taskExecutionId"));
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        try {
+            clusterElementCallRecorder.callStarted(jobId, taskExecutionId, "httpClient_1");
+            clusterElementCallRecorder.callFailed(jobId, taskExecutionId, "httpClient_1", "boom");
+
+            assertThat(
+                sseStreamBridge.awaitEvent(isEvent("cluster_element_failed"), TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                    .isTrue();
+
+            taskGate.release();
+
+            executeAsyncFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            clusterElementCallRecorder.callStarted(jobId, taskExecutionId, "slack_1");
+        } finally {
+            clusterElementCallRecorder.drain(taskExecutionId);
+        }
+
+        List<String> clusterElementEventNames = sseStreamBridge.getEventNames()
+            .stream()
+            .filter(eventName -> eventName.startsWith("cluster_element_"))
+            .toList();
+
+        assertThat(clusterElementEventNames).containsExactly("cluster_element_started", "cluster_element_failed");
+
+        List<Map<String, Object>> startedPayloads = getTaskEventPayloads(sseStreamBridge, "cluster_element_started");
+
+        Map<String, Object> startedPayload = startedPayloads.getFirst();
+
+        assertThat(startedPayload).containsEntry("status", "STARTED")
+            .doesNotContainKey("endDate")
+            .doesNotContainKey("error");
+
+        List<Map<String, Object>> failedPayloads = getTaskEventPayloads(sseStreamBridge, "cluster_element_failed");
+
+        Map<String, Object> failedPayload = failedPayloads.getFirst();
+
+        assertThat(failedPayload).containsEntry("name", "httpClient_1")
+            .containsEntry("status", "FAILED")
+            .containsEntry("error", "boom")
+            .containsEntry("taskExecutionId", String.valueOf(taskExecutionId))
+            .containsKey("startDate")
+            .containsKey("endDate");
     }
 
     @Test
