@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
+    implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:config:environment-config"))
     implementation(project(":server:libs:config:eval-config"))
     implementation(project(":server:libs:config:jackson-config"))

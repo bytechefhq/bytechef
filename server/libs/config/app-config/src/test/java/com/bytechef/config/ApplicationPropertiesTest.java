@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -170,6 +171,27 @@ class ApplicationPropertiesTest {
         ApplicationProperties.Embedded embedded = applicationProperties.getEmbedded();
 
         assertThat(embedded.getAllowedParentOrigins()).containsExactly("https://a.example", "https://b.example");
+    }
+
+    @Test
+    void testMailFailureNotificationThrottleWindowDefaultsToOneHour() {
+        ApplicationProperties applicationProperties = bind(new MapPropertySource("test", Map.of()));
+
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
+
+        assertThat(mail.getFailureNotificationThrottleWindow()).isEqualTo(Duration.ofHours(1));
+    }
+
+    @Test
+    void testMailFailureNotificationThrottleWindowBindsFromEnvironmentVariable() {
+        ApplicationProperties applicationProperties = bind(
+            new SystemEnvironmentPropertySource(
+                StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                Map.of("BYTECHEF_MAIL_FAILURE_NOTIFICATION_THROTTLE_WINDOW", "15m")));
+
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
+
+        assertThat(mail.getFailureNotificationThrottleWindow()).isEqualTo(Duration.ofMinutes(15));
     }
 
     private static ApplicationProperties bind(PropertySource<?> propertySource) {

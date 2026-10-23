@@ -18,6 +18,7 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -3715,6 +3716,12 @@ public class ApplicationProperties {
         private boolean debug;
 
         /**
+         * Minimum time between two job failed notifications for the same notification and workflow. Notifications in
+         * between are suppressed and counted. Zero disables throttling.
+         */
+        private Duration failureNotificationThrottleWindow = Duration.ofHours(1);
+
+        /**
          * Email address to use as sender
          */
         private String from;
@@ -3781,6 +3788,14 @@ public class ApplicationProperties {
 
         public void setDebug(boolean debug) {
             this.debug = debug;
+        }
+
+        public Duration getFailureNotificationThrottleWindow() {
+            return failureNotificationThrottleWindow;
+        }
+
+        public void setFailureNotificationThrottleWindow(Duration failureNotificationThrottleWindow) {
+            this.failureNotificationThrottleWindow = failureNotificationThrottleWindow;
         }
 
         public String getFrom() {
