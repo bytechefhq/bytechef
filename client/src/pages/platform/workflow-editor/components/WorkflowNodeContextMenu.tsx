@@ -10,7 +10,7 @@ import WorkflowNodeDeleteAlertDialog from '@/pages/platform/workflow-editor/comp
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
-import {ReactNode, useCallback, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -58,6 +58,8 @@ const WorkflowNodeContextMenu = ({
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [menuReady, setMenuReady] = useState(false);
 
+    const menuReadyTimeoutRef = useRef<{id?: ReturnType<typeof setTimeout>}>({});
+
     const copiedNode = useWorkflowEditorStore(useShallow((state) => state.copiedNode));
 
     const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
@@ -65,11 +67,12 @@ const WorkflowNodeContextMenu = ({
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
 
     const handleOpenChange = (open: boolean) => {
+        clearTimeout(menuReadyTimeoutRef.current.id);
+
+        setMenuReady(false);
+
         if (open) {
-            setMenuReady(false);
-            setTimeout(() => setMenuReady(true), 200);
-        } else {
-            setMenuReady(false);
+            menuReadyTimeoutRef.current.id = setTimeout(() => setMenuReady(true), 200);
         }
     };
 
@@ -116,6 +119,12 @@ const WorkflowNodeContextMenu = ({
             showReplaceAction,
         ]
     );
+
+    useEffect(() => {
+        const menuReadyTimeout = menuReadyTimeoutRef.current;
+
+        return () => clearTimeout(menuReadyTimeout.id);
+    }, []);
 
     return (
         <>
