@@ -4,11 +4,81 @@ All URIs are relative to */api/embedded/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**createConnectedUser**](ConnectedUserApi.md#createconnecteduseroperation) | **POST** /connected-users | Create a connected user |
 | [**deleteConnectedUser**](ConnectedUserApi.md#deleteconnecteduser) | **DELETE** /connected-users/{id} | Delete a connected user |
 | [**enableConnectedUser**](ConnectedUserApi.md#enableconnecteduser) | **PATCH** /connected-users/{id}/enable/{enable} | Enable/disable a connected user |
 | [**getConnectedUser**](ConnectedUserApi.md#getconnecteduser) | **GET** /connected-users/{id} | Get a connected user |
 | [**getConnectedUsers**](ConnectedUserApi.md#getconnectedusers) | **GET** /connected-users | Get all connected users |
+| [**importConnectedUsers**](ConnectedUserApi.md#importconnectedusers) | **POST** /connected-users/import | Import connected users from a CSV file |
+| [**updateConnectedUser**](ConnectedUserApi.md#updateconnecteduseroperation) | **PUT** /connected-users/{id} | Update a connected user |
 
+
+
+## createConnectedUser
+
+> ConnectedUser createConnectedUser(createConnectedUserRequest)
+
+Create a connected user
+
+Create a connected user.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectedUserApi,
+} from '';
+import type { CreateConnectedUserOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectedUserApi();
+
+  const body = {
+    // CreateConnectedUserRequest
+    createConnectedUserRequest: ...,
+  } satisfies CreateConnectedUserOperationRequest;
+
+  try {
+    const data = await api.createConnectedUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **createConnectedUserRequest** | [CreateConnectedUserRequest](CreateConnectedUserRequest.md) |  | |
+
+### Return type
+
+[**ConnectedUser**](ConnectedUser.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The created connected user. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## deleteConnectedUser
@@ -296,6 +366,146 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The page of connected users. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## importConnectedUsers
+
+> ConnectedUserImportResult importConnectedUsers(environmentId, file)
+
+Import connected users from a CSV file
+
+Import connected users from a CSV file.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectedUserApi,
+} from '';
+import type { ImportConnectedUsersRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectedUserApi();
+
+  const body = {
+    // number | The environment id.
+    environmentId: 789,
+    // Blob | The CSV file.
+    file: BINARY_DATA_HERE,
+  } satisfies ImportConnectedUsersRequest;
+
+  try {
+    const data = await api.importConnectedUsers(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **environmentId** | `number` | The environment id. | [Defaults to `undefined`] |
+| **file** | `Blob` | The CSV file. | [Defaults to `undefined`] |
+
+### Return type
+
+[**ConnectedUserImportResult**](ConnectedUserImportResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `multipart/form-data`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The import result. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateConnectedUser
+
+> ConnectedUser updateConnectedUser(id, updateConnectedUserRequest)
+
+Update a connected user
+
+Update a connected user.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectedUserApi,
+} from '';
+import type { UpdateConnectedUserOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectedUserApi();
+
+  const body = {
+    // number | The id of a connected user.
+    id: 789,
+    // UpdateConnectedUserRequest
+    updateConnectedUserRequest: ...,
+  } satisfies UpdateConnectedUserOperationRequest;
+
+  try {
+    const data = await api.updateConnectedUser(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a connected user. | [Defaults to `undefined`] |
+| **updateConnectedUserRequest** | [UpdateConnectedUserRequest](UpdateConnectedUserRequest.md) |  | |
+
+### Return type
+
+[**ConnectedUser**](ConnectedUser.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The updated connected user. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
