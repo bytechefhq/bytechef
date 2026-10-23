@@ -57,11 +57,13 @@ public class BillingUsageServiceImpl implements BillingUsageService {
 
     @Override
     public void reportUsage(Instant scheduledFireTime) {
-        for (String tenantId : tenantService.getTenantIds()) {
-            log.info("Reporting usage for tenant {}", tenantId);
+        log.info("Tenant usage report START");
 
+        for (String tenantId : tenantService.getTenantIds()) {
             TenantContext.runWithTenantId(tenantId, () -> doReportUsage(scheduledFireTime));
         }
+
+        log.info("Tenant usage report END");
     }
 
     private void doReportUsage(Instant scheduledFireTime) {
