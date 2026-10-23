@@ -44,6 +44,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -97,6 +98,8 @@ public final class AiHubAgentFixtures {
     public final ReadProjectTools readProjectTools = new ReadProjectTools(projectTools);
     public final ReadProjectWorkflowTools readProjectWorkflowTools = new ReadProjectWorkflowTools(projectWorkflowTools);
     public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
+    public final WebSearchToolCallbackProvider webSearchToolCallbackProvider =
+        mock(WebSearchToolCallbackProvider.class);
     public final AiHubSessionMemory sessionMemory = new AiHubSessionMemory(
         InMemorySessionRepository.builder()
             .build(),
@@ -178,7 +181,7 @@ public final class AiHubAgentFixtures {
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider);
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -191,7 +194,8 @@ public final class AiHubAgentFixtures {
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(), overrideChatClientResolverProvider);
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(), overrideChatClientResolverProvider,
+            webSearchToolCallbackProviderProvider());
     }
 
     @SuppressWarnings("unchecked")
@@ -201,6 +205,21 @@ public final class AiHubAgentFixtures {
         doAnswer(invocation -> {
             invocation.<Consumer<InFlightAiHubRunRegistry>>getArgument(0)
                 .accept(inFlightRunRegistry);
+
+            return null;
+        }).when(provider)
+            .ifAvailable(any());
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider() {
+        ObjectProvider<WebSearchToolCallbackProvider> provider = mock(ObjectProvider.class);
+
+        doAnswer(invocation -> {
+            invocation.<Consumer<WebSearchToolCallbackProvider>>getArgument(0)
+                .accept(webSearchToolCallbackProvider);
 
             return null;
         }).when(provider)

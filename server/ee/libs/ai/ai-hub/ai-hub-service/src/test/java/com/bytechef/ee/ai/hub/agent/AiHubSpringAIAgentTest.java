@@ -8,6 +8,9 @@
 package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.exception.AGUIException;
@@ -22,6 +25,7 @@ import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,8 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @version ee
@@ -99,6 +105,54 @@ class AiHubSpringAIAgentTest {
         assertThat(invocationContext.tenantId()).isEqualTo("acme");
         assertThat(toolContext).containsEntry(AiHubApprovalGateToolCallback.TOOL_CONTEXT_MODE_KEY, "BUILD");
         assertThat(toolContext).containsEntry(AiHubToolInvocationContext.TOOL_CONTEXT_THREAD_ID_KEY, "thread-1");
+    }
+
+    @Test
+    void testOffersTheWebSearchToolsOfTheVerifiedEnvironmentUnderTheirOwnNames() throws AGUIException {
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+        ToolCallback braveWebSearchToolCallback = mock(ToolCallback.class);
+
+        when(braveWebSearchToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("braveWebSearch")
+                .description("Search the web")
+                .inputSchema("{}")
+                .build());
+        when(webSearchToolCallbackProvider.getToolCallbacks(2)).thenReturn(List.of(braveWebSearchToolCallback));
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .webSearchToolCallbackProvider(webSearchToolCallbackProvider)
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_ENVIRONMENT_ID, 2L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state)))
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactly("braveWebSearch");
+        assertThat(agent.pinnedToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .doesNotContain("braveWebSearch");
+    }
+
+    @Test
+    void testOffersNoWebSearchToolsWithoutAVerifiedEnvironment() throws AGUIException {
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .webSearchToolCallbackProvider(webSearchToolCallbackProvider)
+            .build();
+
+        State state = verifiedState();
+
+        state.set("environmentId", 2L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state))).isEmpty();
+
+        verifyNoInteractions(webSearchToolCallbackProvider);
     }
 
     @Test
