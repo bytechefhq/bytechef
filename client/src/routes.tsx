@@ -73,6 +73,7 @@ const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
 const AiProviders = lazy(() => import('@/pages/settings/platform/ai-providers/AiProviders'));
+const WebSearchProviders = lazy(() => import('@/pages/settings/platform/web-search-providers/WebSearchProviders'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
 const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
@@ -253,6 +254,16 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'ai-providers',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <LazyLoadWrapper>
+                        <WebSearchProviders />
+                    </LazyLoadWrapper>
+                </PrivateRoute>
+            ),
+            path: 'ai/web-search',
         },
         {
             element: (
@@ -440,6 +451,10 @@ const platformSettingsRoutes = {
                 {
                     href: 'ai/memories',
                     title: 'Memories',
+                },
+                {
+                    href: 'ai/web-search',
+                    title: 'Web Search',
                 },
             ],
             title: 'AI',
