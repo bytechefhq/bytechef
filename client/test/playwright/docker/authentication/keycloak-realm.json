@@ -1,0 +1,22 @@
+{
+    "realm": "bytechef-e2e",
+    "enabled": true,
+    "sslRequired": "none",
+    "verifyEmail": false,
+    "registrationAllowed": false,
+    "clients": [
+        {
+            "clientId": "bytechef-e2e",
+            "name": "ByteChef E2E (OIDC)",
+            "protocol": "openid-connect",
+            "enabled": true,
+            "publicClient": false,
+            "secret": "bytechef-e2e-secret",
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": false,
+            "redirectUris": ["http://127.0.0.1:*", "http://localhost:*"],
+            "webOrigins": ["+"],
+            "defaultClientScopes": ["basic", "email", "profile", "roles", "web-origins", "acr"]
+        }
+    ]
+}
