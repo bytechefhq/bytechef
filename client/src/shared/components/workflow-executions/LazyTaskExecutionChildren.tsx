@@ -9,6 +9,7 @@ import {
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
 import {
+    TASK_EXECUTION_CHILDREN_MAX_PAGES,
     TASK_EXECUTION_CHILDREN_PAGE_SIZE,
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
 } from '@/shared/queries/automation/workflowExecutions.queries';
@@ -185,7 +186,11 @@ const LazyTaskExecutionChildren = ({
         }
 
         if (focusedChildIndex === undefined) {
-            handleLoadMore();
+            if (pages.length < TASK_EXECUTION_CHILDREN_MAX_PAGES) {
+                handleLoadMore();
+            } else {
+                focusedChildReachedRef.current = true;
+            }
         } else if (focusedChildIndex < startIndex) {
             handleLoadEarlier();
         } else if (focusedChildIndex >= endIndex) {
@@ -201,6 +206,7 @@ const LazyTaskExecutionChildren = ({
         handleLoadMore,
         isFocusedChildLoaded,
         isLoading,
+        pages.length,
         startIndex,
     ]);
 
@@ -246,7 +252,7 @@ const LazyTaskExecutionChildren = ({
                 <div className="flex items-center justify-center p-2">
                     <Button
                         disabled={isFetchingPreviousPage}
-                        label={`Show ${startIndex} earlier ${iterations === undefined ? 'tasks' : 'iterations'}`}
+                        label={`Show ${Math.min(startIndex, TASK_EXECUTION_CHILDREN_PAGE_SIZE)} earlier ${iterations === undefined ? 'tasks' : 'iterations'}`}
                         onClick={handleLoadEarlier}
                         size="xs"
                         variant="outline"

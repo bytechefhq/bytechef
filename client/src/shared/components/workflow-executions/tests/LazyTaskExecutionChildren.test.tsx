@@ -13,6 +13,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+    TASK_EXECUTION_CHILDREN_MAX_PAGES: 10,
     TASK_EXECUTION_CHILDREN_PAGE_SIZE: 50,
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery:
         hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
@@ -45,18 +46,18 @@ const plainTaskExecution = {
     type: 'parallel/v1',
 } as TaskExecution;
 
-const createPlainPage = (childCount: number, totalElements: number): TaskExecutionChildrenPage =>
+const createPlainPage = (childCount: number, totalElements: number, pageNumber = 0): TaskExecutionChildrenPage =>
     TaskExecutionChildrenPageFromJSON({
         children: Array.from({length: childCount}, (_, index) => ({
             childCount: 0,
-            id: `${200 + index}`,
+            id: `${200 + pageNumber * 50 + index}`,
             jobId: '7',
             priority: 0,
             status: 'COMPLETED',
             title: `Child task ${index + 1}`,
         })),
         iterations: [],
-        number: 0,
+        number: pageNumber,
         numberOfElements: childCount,
         size: 50,
         totalElements,
@@ -69,6 +70,7 @@ const mockPlainQueryResult = ({
     hasNextPage = false,
     isFetchNextPageError = false,
     isFetchingNextPage = false,
+    pageCount = 1,
     totalElements,
 }: {
     childCount: number;
@@ -76,10 +78,15 @@ const mockPlainQueryResult = ({
     hasNextPage?: boolean;
     isFetchNextPageError?: boolean;
     isFetchingNextPage?: boolean;
+    pageCount?: number;
     totalElements: number;
 }) => {
     hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
-        data: {pages: [createPlainPage(childCount, totalElements)]},
+        data: {
+            pages: Array.from({length: pageCount}, (_, pageNumber) =>
+                createPlainPage(childCount, totalElements, pageNumber)
+            ),
+        },
         fetchNextPage,
         hasNextPage,
         isFetchNextPageError,
@@ -514,6 +521,27 @@ describe('LazyTaskExecutionChildren', () => {
         expect(fetchNextPage).not.toHaveBeenCalled();
     });
 
+    it('stopsLoadingPagesForAFocusedPlainChildWithoutAnIndexOnceThePageLimitIsLoaded', () => {
+        const fetchNextPage = mockPlainQueryResult({
+            childCount: 50,
+            hasNextPage: true,
+            pageCount: 10,
+            totalElements: 5000,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['5', '4999']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId="4999"
+            />
+        );
+
+        expect(fetchNextPage).not.toHaveBeenCalled();
+    });
+
     it('startsOnThePageOfTheFocusedIteration', () => {
         mockQueryResult({iterationCount: 50, pageNumber: 2, totalElements: 300});
 
@@ -598,7 +626,7 @@ describe('LazyTaskExecutionChildren', () => {
             />
         );
 
-        await userEvent.click(screen.getByRole('button', {name: 'Show 100 earlier iterations'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Show 50 earlier iterations'}));
 
         expect(fetchPreviousPage).toHaveBeenCalledTimes(1);
     });
@@ -860,7 +888,7 @@ describe('LazyTaskExecutionChildren', () => {
             );
 
             expect(screen.getByText('Failed to load earlier task executions.')).toBeInTheDocument();
-            expect(screen.queryByRole('button', {name: 'Show 100 earlier iterations'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Show 50 earlier iterations'})).not.toBeInTheDocument();
             expect(screen.queryByText('Live updates failed.')).not.toBeInTheDocument();
 
             await userEvent.click(screen.getByRole('button', {name: 'Retry loading earlier task executions'}));
