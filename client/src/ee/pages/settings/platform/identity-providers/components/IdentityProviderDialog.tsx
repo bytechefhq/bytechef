@@ -217,8 +217,9 @@ const IdentityProviderDialog = () => {
                                             />
 
                                             <p className="text-xs text-muted-foreground">
-                                                PEM-encoded IdP signing certificate. Only needed if not included in the
-                                                metadata.
+                                                PEM-encoded IdP signing certificate. When set, only assertions signed
+                                                with it are accepted, instead of the certificates the metadata
+                                                publishes.
                                             </p>
                                         </fieldset>
 
