@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,14 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
     public ConnectedUser createConnectedUser(String externalId, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ConnectedUser createConnectedUser(
+        String externalId, Environment environment, @Nullable String name, @Nullable String email,
+        Map<String, String> metadata) {
+
         throw new UnsupportedOperationException();
     }
 
@@ -87,6 +96,13 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
     public void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ConnectedUser updateConnectedUser(
+        long id, @Nullable String name, @Nullable String email, Map<String, String> metadata, int version) {
+
         throw new UnsupportedOperationException();
     }
 }
