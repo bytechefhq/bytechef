@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
-import {type Control, Controller, type FieldValues, type Path, useFieldArray} from 'react-hook-form';
+import {type Control, Controller, type FieldValues, type Path, get, useFieldArray} from 'react-hook-form';
 
 export interface MetadataRowI {
     key: string;
@@ -18,6 +18,22 @@ export const metadataRowsToRecord = (metadataRows: MetadataRowI[] | undefined): 
     }
 
     return metadata;
+};
+
+const validateMetadataKey = (
+    key: string | undefined,
+    metadataRows: MetadataRowI[] | undefined,
+    index: number
+): string | true => {
+    if (!key) {
+        return metadataRows?.[index]?.value ? 'Key is required' : true;
+    }
+
+    const duplicate = (metadataRows ?? [])
+        .slice(0, index)
+        .some((previousMetadataRow) => previousMetadataRow.key === key);
+
+    return duplicate ? 'Duplicate key' : true;
 };
 
 export const recordToMetadataRows = (metadata: Record<string, string> | undefined): MetadataRowI[] =>
@@ -39,20 +55,37 @@ const ConnectedUserMetadataFields = <TFieldValues extends FieldValues>({
             <legend className="mb-1 text-sm font-medium">Metadata</legend>
 
             {fields.map((field, index) => (
-                <div className="flex items-center gap-2" key={field.id}>
+                <div className="flex items-start gap-2" key={field.id}>
                     <Controller
                         control={control}
                         name={`${name}.${index}.key` as Path<TFieldValues>}
-                        render={({field: keyField}) => (
-                            <Input aria-label={`Metadata key ${index + 1}`} placeholder="Key" {...keyField} />
+                        render={({field: keyField, fieldState}) => (
+                            <div className="flex flex-1 flex-col gap-1">
+                                <Input
+                                    aria-invalid={!!fieldState.error}
+                                    aria-label={`Metadata key ${index + 1}`}
+                                    placeholder="Key"
+                                    {...keyField}
+                                />
+
+                                {fieldState.error && (
+                                    <p className="text-sm text-destructive">{fieldState.error.message}</p>
+                                )}
+                            </div>
                         )}
+                        rules={{
+                            deps: [`${name}.${index}.value` as Path<TFieldValues>],
+                            validate: (key, formValues) => validateMetadataKey(key, get(formValues, name), index),
+                        }}
                     />
 
                     <Controller
                         control={control}
                         name={`${name}.${index}.value` as Path<TFieldValues>}
                         render={({field: valueField}) => (
-                            <Input aria-label={`Metadata value ${index + 1}`} placeholder="Value" {...valueField} />
+                            <div className="flex-1">
+                                <Input aria-label={`Metadata value ${index + 1}`} placeholder="Value" {...valueField} />
+                            </div>
                         )}
                     />
 

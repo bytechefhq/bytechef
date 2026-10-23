@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe('ConnectedUserCreateDialog', () => {
-    it('submits the entered values, drops empty metadata keys and opens the new user sheet', async () => {
+    it('submits the entered values, drops blank metadata rows and opens the new user sheet', async () => {
         const onClose = vi.fn();
 
         render(<ConnectedUserCreateDialog onClose={onClose} />);
@@ -46,7 +46,6 @@ describe('ConnectedUserCreateDialog', () => {
         await userEvent.type(screen.getByLabelText('Metadata value 1'), 'pro');
 
         await userEvent.click(screen.getByRole('button', {name: 'Add metadata'}));
-        await userEvent.type(screen.getByLabelText('Metadata value 2'), 'ignored');
 
         await userEvent.click(screen.getByRole('button', {name: 'Create'}));
 
@@ -66,6 +65,53 @@ describe('ConnectedUserCreateDialog', () => {
 
         expect(useConnectedUserSheetStore.getState().connectedUserId).toBe(77);
         expect(useConnectedUserSheetStore.getState().connectedUserSheetOpen).toBe(true);
+    });
+
+    it('blocks submit when a metadata row has a value but no key', async () => {
+        render(<ConnectedUserCreateDialog onClose={vi.fn()} />);
+
+        await userEvent.type(screen.getByLabelText(/External ID/), 'user-1');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add metadata'}));
+        await userEvent.type(screen.getByLabelText('Metadata value 1'), 'pro');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create'}));
+
+        expect(await screen.findByText('Key is required')).toBeInTheDocument();
+        expect(hoisted.createConnectedUserMock).not.toHaveBeenCalled();
+
+        await userEvent.type(screen.getByLabelText('Metadata key 1'), 'plan');
+
+        await waitFor(() => expect(screen.queryByText('Key is required')).not.toBeInTheDocument());
+    });
+
+    it('blocks submit on a duplicate metadata key and keeps keys verbatim', async () => {
+        render(<ConnectedUserCreateDialog onClose={vi.fn()} />);
+
+        await userEvent.type(screen.getByLabelText(/External ID/), 'user-1');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add metadata'}));
+        await userEvent.type(screen.getByLabelText('Metadata key 1'), 'plan');
+        await userEvent.type(screen.getByLabelText('Metadata value 1'), 'pro');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add metadata'}));
+        await userEvent.type(screen.getByLabelText('Metadata key 2'), 'plan');
+        await userEvent.type(screen.getByLabelText('Metadata value 2'), 'free');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create'}));
+
+        expect(await screen.findByText('Duplicate key')).toBeInTheDocument();
+        expect(hoisted.createConnectedUserMock).not.toHaveBeenCalled();
+
+        await userEvent.type(screen.getByLabelText('Metadata key 2'), ' ');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create'}));
+
+        await waitFor(() =>
+            expect(hoisted.createConnectedUserMock).toHaveBeenCalledWith({
+                createConnectedUserRequest: expect.objectContaining({metadata: {plan: 'pro', 'plan ': 'free'}}),
+            })
+        );
     });
 
     it('does not submit without an external ID', async () => {
