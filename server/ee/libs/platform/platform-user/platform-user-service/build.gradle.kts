@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
+    implementation(libs.org.bouncycastle.bcpkix.jdk18on)
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:encryption:encryption-api"))
