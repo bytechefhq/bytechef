@@ -14,13 +14,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.tenant.multi.security.MultiTenantUserDetailsService;
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUserDetails;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
@@ -28,7 +38,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
@@ -37,19 +47,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class MultiTenantAuthenticationSuccessHandlerTest {
 
-    private final TenantService tenantService = mock(TenantService.class);
-
-    @SuppressWarnings("unchecked")
-    private final ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider =
-        mock(ObjectProvider.class);
-
     private final RememberMeServices rememberMeServices = mock(RememberMeServices.class);
-
-    private final MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler =
-        new MultiTenantAuthenticationSuccessHandler(
-            rememberMeServices, tenantService, twoFactorAuthenticationCustomizerProvider);
 
     @AfterEach
     void afterEach() {
@@ -57,42 +58,82 @@ class MultiTenantAuthenticationSuccessHandlerTest {
     }
 
     @Test
-    void testSignInWithEmailOfUserWhoseLoginDiffersResolvesTenantByEmail() {
-        when(tenantService.getTenantIdsByUserEmail("jane@example.com")).thenReturn(List.of("000002"));
+    @SuppressWarnings("unchecked")
+    void testStoresTheTenantOfAUserWhoseLoginIsNotTheirEmail() {
+        ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider =
+            mock(ObjectProvider.class);
 
-        MockHttpServletRequest request = createLoginRequest("jane@example.com");
+        MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler =
+            new MultiTenantAuthenticationSuccessHandler(rememberMeServices, twoFactorAuthenticationCustomizerProvider);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(
-            request, response, createAuthentication("jane"));
+        TenantUserDetails principal = new TenantUserDetails("invited_member", "password", List.of(), "000001");
 
-        assertThat(response.getStatus()).isEqualTo(200);
+        multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(
+            request, response, new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+
         assertThat(request.getSession()
-            .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo("000002");
+            .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo("000001");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         verify(rememberMeServices, never()).loginFail(any(), any());
     }
 
     @Test
-    void testSignInWithLoginResolvesTenantByLogin() {
-        when(tenantService.getTenantIdsByUserLogin("jane")).thenReturn(List.of("000003"));
+    @SuppressWarnings("unchecked")
+    void testEmailSignInLandsInTheTenantWhosePasswordWasCheckedWhenTheLoginExistsInTwoTenants() {
+        TenantService tenantService = mock(TenantService.class);
+        UserService tenantOneUserService = mock(UserService.class);
+        ApplicationContext applicationContext = mock(ApplicationContext.class);
 
-        MockHttpServletRequest request = createLoginRequest("Jane");
-        MockHttpServletResponse response = new MockHttpServletResponse();
+        User tenantOneUser = new User();
+
+        tenantOneUser.setActivated(true);
+        tenantOneUser.setAuthorityIds(List.of());
+        tenantOneUser.setEmail("shared@tenant-one.com");
+        tenantOneUser.setLogin("shared");
+        tenantOneUser.setPassword("tenant-one-password");
+
+        when(applicationContext.getBean(UserService.class)).thenReturn(tenantOneUserService);
+        when(tenantService.getTenantIdsByUserEmail("shared@tenant-one.com")).thenReturn(List.of("000001"));
+        when(tenantService.getTenantIdsByUserLogin("shared")).thenReturn(List.of("000002", "000001"));
+        when(tenantOneUserService.fetchUserByEmail("shared@tenant-one.com"))
+            .thenAnswer(invocation -> "000001".equals(TenantContext.getCurrentTenantId())
+                ? Optional.of(tenantOneUser) : Optional.empty());
+
+        MultiTenantUserDetailsService multiTenantUserDetailsService =
+            new MultiTenantUserDetailsService(mock(AuthorityService.class), tenantService);
+
+        multiTenantUserDetailsService.setApplicationContext(applicationContext);
+
+        UserDetails principal = multiTenantUserDetailsService.loadUserByUsername("shared@tenant-one.com");
+
+        MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler =
+            new MultiTenantAuthenticationSuccessHandler(rememberMeServices, mock(ObjectProvider.class));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
 
         multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(
-            request, response, createAuthentication("jane"));
+            request, new MockHttpServletResponse(),
+            new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
 
-        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(principal.getUsername()).isEqualTo("shared");
         assertThat(request.getSession()
-            .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo("000003");
+            .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo("000001");
     }
 
     @Test
-    void testSignInWithoutTenantIsRejectedAndSignsOut() {
-        when(tenantService.getTenantIdsByUserEmail("jane@example.com")).thenReturn(List.of());
+    @SuppressWarnings("unchecked")
+    void testRejectsAPrincipalWithoutATenantAndSignsOut() {
+        MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler =
+            new MultiTenantAuthenticationSuccessHandler(rememberMeServices, mock(ObjectProvider.class));
 
-        Authentication authentication = createAuthentication("jane");
+        org.springframework.security.core.userdetails.User principal =
+            new org.springframework.security.core.userdetails.User("invited_member", "password", List.of());
+
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(principal, null, List.of());
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
@@ -100,11 +141,10 @@ class MultiTenantAuthenticationSuccessHandlerTest {
 
         SecurityContextHolder.setContext(securityContext);
 
-        MockHttpServletRequest request = createLoginRequest("jane@example.com");
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/authentication");
         MockHttpSession session = new MockHttpSession();
 
-        session.setAttribute(
-            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
         request.setSession(session);
 
@@ -112,25 +152,12 @@ class MultiTenantAuthenticationSuccessHandlerTest {
 
         multiTenantAuthenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication);
 
-        assertThat(response.getStatus()).isEqualTo(401);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
         assertThat(session.isInvalid()).isTrue();
 
         verify(rememberMeServices).loginFail(request, response);
 
         assertThat(SecurityContextHolder.getContext()
             .getAuthentication()).isNull();
-    }
-
-    private static Authentication createAuthentication(String login) {
-        return UsernamePasswordAuthenticationToken.authenticated(
-            new User(login, "", List.of()), null, List.of());
-    }
-
-    private static MockHttpServletRequest createLoginRequest(String username) {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/authentication");
-
-        request.setParameter("username", username);
-
-        return request;
     }
 }
