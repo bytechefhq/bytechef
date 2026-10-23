@@ -22,95 +22,113 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMA
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SPEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VOICE;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
-import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.http.MediaType;
 
 /**
  * @author Thibault Jaigu
  * @author Igor Beslic
  */
+@ExtendWith(MockContextSetupExtension.class)
 class RequestyCreateSpeechActionTest {
 
-    private final ArgumentCaptor<MediaType> mediaTypeArgumentCaptor = forClass(MediaType.class);
-    private final byte[] mockedByteArray = new byte[] {
-        1, 0
-    };
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(INPUT, "input", MODEL, "model", RESPONSE_FORMAT, "pcm", VOICE, "voice", SPEED, 0.0,
-            TOKEN, "token"));
-    private final Context.Http.Response mockedResponseSpec = mock(Context.Http.Response.class);
-    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
+        Map.of(INPUT, "input", MODEL, "model", RESPONSE_FORMAT, "pcm", VOICE, "voice", SPEED, 1.25, TOKEN, "token"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = forClass(InputStream.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<File, Executor>> fileFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final File mockedFile = mock(File.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedResponseSpec.getBody(byte[].class))
-            .thenReturn(mockedByteArray);
-
-        when(mockedExecutor.execute()).thenReturn(mockedResponseSpec);
-
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture())).thenReturn(mockedExecutor);
-
-        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<File, Executor> value = fileFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedFile);
-            });
-        when(mockedFile.storeContent(stringArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedFileEntry);
 
         FileEntry result = RequestyCreateSpeechAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedFileEntry, result);
-
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals(
-            List.of("https://router.requesty.ai/v1", "Authorization", "Bearer token", "/audio/speech",
-                "speech.pcm"),
+            List.of("https://router.requesty.ai/v1/audio/speech", "Authorization", "Bearer token"),
             stringArgumentCaptor.getAllValues());
 
-        assertEquals(MediaType.APPLICATION_JSON, mediaTypeArgumentCaptor.getValue());
-        InputStream inputStreamArgumentCaptorValue = inputStreamArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 
-        assertInstanceOf(ByteArrayInputStream.class, inputStreamArgumentCaptorValue);
-        assertArrayEquals(mockedByteArray, inputStreamArgumentCaptorValue.readAllBytes());
-        assertEquals(
-            Map.of("input", "input", "model", "model", "voice", "voice", "response_format", "pcm", SPEED, 0.0),
-            objectArgumentCaptor.getValue());
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.BINARY, configuration.getResponseType());
+        assertEquals("speech.pcm", configuration.getFilename());
+
+        Map<String, Object> expectedBody = Map.of(
+            INPUT, "input", MODEL, "model", "response_format", "pcm", VOICE, "voice", SPEED, 1.25);
+
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformWithoutSpeed(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters minimalParameters = MockParametersFactory.create(
+            Map.of(INPUT, "input", MODEL, "model", VOICE, "voice", TOKEN, "token"));
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedFileEntry);
+
+        FileEntry result = RequestyCreateSpeechAction.perform(minimalParameters, minimalParameters, mockedContext);
+
+        assertEquals(mockedFileEntry, result);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals("speech.pcm", configuration.getFilename());
+
+        Map<String, Object> expectedBody = Map.of(
+            INPUT, "input", MODEL, "model", "response_format", "pcm", VOICE, "voice");
+
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
