@@ -25,12 +25,12 @@ import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -62,7 +62,7 @@ class EmbeddedCopilotConfigurationTest {
             embeddedCopilotConfiguration.workflowEditorEmbeddedAskSpringAIAgent(
                 mock(ChatMemory.class), mock(ChatModel.class), new ReadIntegrationTools(integrationTools),
                 new ReadIntegrationWorkflowTools(integrationWorkflowTools), mock(ComponentTools.class),
-                mock(TaskTools.class), Optional.empty(), Optional.empty(), mock(WorkflowService.class),
+                mock(TaskTools.class), mock(WebSearchToolCallbackProvider.class), mock(WorkflowService.class),
                 mock(WorkflowNodeOutputFacade.class), mock(Advisor.class), mock(PermissionService.class),
                 mock(SecurityContextRehydrator.class), emptyProvider());
 
@@ -75,7 +75,7 @@ class EmbeddedCopilotConfigurationTest {
             embeddedCopilotConfiguration.workflowEditorEmbeddedAskSpringAIAgent(
                 mock(ChatMemory.class), mock(ChatModel.class), new ReadIntegrationTools(integrationTools),
                 new ReadIntegrationWorkflowTools(integrationWorkflowTools), mock(ComponentTools.class),
-                mock(TaskTools.class), Optional.empty(), Optional.empty(), mock(WorkflowService.class),
+                mock(TaskTools.class), mock(WebSearchToolCallbackProvider.class), mock(WorkflowService.class),
                 mock(WorkflowNodeOutputFacade.class), mock(Advisor.class), mock(PermissionService.class),
                 mock(SecurityContextRehydrator.class), emptyProvider());
 
