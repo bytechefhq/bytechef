@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -83,11 +83,11 @@ public record TaskExecutionDTO(
     }
 
     public static boolean isLoopType(@Nullable String type) {
-        return type != null && Strings.CS.contains(type.toLowerCase(), "loop");
+        return isTaskDispatcherType(type, "loop");
     }
 
     public static boolean isOnErrorType(@Nullable String type) {
-        return type != null && Strings.CS.contains(type.toLowerCase(), "on-error");
+        return isTaskDispatcherType(type, "on-error");
     }
 
     public static List<TaskExecutionDTO> buildHierarchy(List<TaskExecutionDTO> taskExecutionDTOS) {
@@ -198,5 +198,9 @@ public record TaskExecutionDTO(
             .stream()
             .map(WorkflowTask::getName)
             .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private static boolean isTaskDispatcherType(@Nullable String type, String name) {
+        return type != null && name.equalsIgnoreCase(StringUtils.substringBefore(type, "/"));
     }
 }

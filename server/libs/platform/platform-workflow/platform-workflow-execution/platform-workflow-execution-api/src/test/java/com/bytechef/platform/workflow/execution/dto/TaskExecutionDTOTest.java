@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -139,5 +140,21 @@ class TaskExecutionDTOTest {
             .getFirst()
             .workflowTask()
             .getName());
+    }
+
+    @Test
+    void isLoopTypeMatchesOnlyTheLoopTaskDispatcher() {
+        assertTrue(TaskExecutionDTO.isLoopType("loop/v1"));
+        assertTrue(TaskExecutionDTO.isLoopType("loop"));
+        assertFalse(TaskExecutionDTO.isLoopType("loopBreak/v1"));
+        assertFalse(TaskExecutionDTO.isLoopType("loops/v1/forEach"));
+        assertFalse(TaskExecutionDTO.isLoopType(null));
+    }
+
+    @Test
+    void isOnErrorTypeMatchesOnlyTheOnErrorTaskDispatcher() {
+        assertTrue(TaskExecutionDTO.isOnErrorType("on-error/v1"));
+        assertFalse(TaskExecutionDTO.isOnErrorType("on-error-handler/v1"));
+        assertFalse(TaskExecutionDTO.isOnErrorType(null));
     }
 }
