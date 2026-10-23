@@ -17,7 +17,9 @@
 package com.bytechef.platform.ai.provider.facade;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderConnection;
 import com.bytechef.platform.ai.provider.dto.WebSearchProviderDTO;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderTestResultDTO;
 import com.bytechef.platform.ai.websearch.WebSearchProvider;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -26,12 +28,18 @@ import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,22 +51,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(WebSearchProviderFacadeImpl.class);
+
     private static final String API_KEY = "apiKey";
     private static final String API_KEY_FROM_PROPERTIES = "apiKeyFromProperties";
+    private static final String BASE_URL = "baseUrl";
     private static final int MASK_VISIBLE_CHARACTERS = 4;
 
     private final ApplicationProperties applicationProperties;
     private final ComponentDefinitionService componentDefinitionService;
     private final PropertyService propertyService;
+    private final ObjectProvider<WebSearchProviderConnectionTester> webSearchProviderConnectionTesterProvider;
 
     @SuppressFBWarnings("EI")
     public WebSearchProviderFacadeImpl(
         ApplicationProperties applicationProperties, ComponentDefinitionService componentDefinitionService,
-        PropertyService propertyService) {
+        PropertyService propertyService,
+        ObjectProvider<WebSearchProviderConnectionTester> webSearchProviderConnectionTesterProvider) {
 
         this.applicationProperties = applicationProperties;
         this.componentDefinitionService = componentDefinitionService;
         this.propertyService = propertyService;
+        this.webSearchProviderConnectionTesterProvider = webSearchProviderConnectionTesterProvider;
     }
 
     @Override
@@ -71,12 +85,19 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public @Nullable String fetchEnabledApiKey(WebSearchProvider webSearchProvider, int environment) {
-        Optional<Property> propertyOptional = propertyService.fetchProperty(
-            webSearchProvider.getKey(), Scope.PLATFORM, null, (long) environment);
+    public @Nullable WebSearchProviderConnection fetchEnabledConnection(
+        WebSearchProvider webSearchProvider, int environment) {
+
+        Optional<Property> propertyOptional = fetchProperty(webSearchProvider, environment);
 
         if (propertyOptional.isEmpty()) {
-            return isEnabledByProperties(webSearchProvider) ? getPropertiesApiKey(webSearchProvider) : null;
+            String propertiesApiKey = getPropertiesApiKey(webSearchProvider);
+
+            if (!isEnabledByProperties(webSearchProvider) || propertiesApiKey == null) {
+                return null;
+            }
+
+            return new WebSearchProviderConnection(propertiesApiKey, getPropertiesBaseUrl(webSearchProvider));
         }
 
         Property property = propertyOptional.get();
@@ -85,9 +106,13 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
             return null;
         }
 
-        String savedApiKey = getSavedApiKey(property);
+        String apiKey = getCurrentApiKey(webSearchProvider, property);
 
-        return savedApiKey == null ? getPropertiesApiKey(webSearchProvider) : savedApiKey;
+        if (apiKey == null) {
+            return null;
+        }
+
+        return new WebSearchProviderConnection(apiKey, getBaseUrl(webSearchProvider, property));
     }
 
     @Override
@@ -115,9 +140,7 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
 
         long environmentId = environment;
 
-        if (propertyService.fetchProperty(webSearchProvider.getKey(), Scope.PLATFORM, null, environmentId)
-            .isEmpty()) {
-
+        if (fetchProperty(webSearchProvider, environment).isEmpty()) {
             propertyService.save(
                 webSearchProvider.getKey(), Map.of(API_KEY_FROM_PROPERTIES, true), Scope.PLATFORM, null,
                 environmentId);
@@ -128,15 +151,77 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public void updateWebSearchProvider(String name, String apiKey, int environment) {
+    @Transactional(readOnly = true)
+    public WebSearchProviderTestResultDTO testWebSearchProvider(
+        String name, @Nullable String apiKey, @Nullable String baseUrl, int environment) {
+
         WebSearchProvider webSearchProvider = WebSearchProvider.valueOfName(name);
 
-        if (apiKey == null || apiKey.isBlank()) {
+        Property property = fetchProperty(webSearchProvider, environment).orElse(null);
+
+        String resolvedApiKey = isBlank(apiKey) ? getCurrentApiKey(webSearchProvider, property) : apiKey.strip();
+
+        if (resolvedApiKey == null) {
+            return WebSearchProviderTestResultDTO.failure("Enter an API key to test.");
+        }
+
+        String resolvedBaseUrl;
+
+        try {
+            resolvedBaseUrl = isBlank(baseUrl) ? getPropertiesBaseUrl(webSearchProvider) : validateBaseUrl(baseUrl);
+        } catch (IllegalArgumentException exception) {
+            return WebSearchProviderTestResultDTO.failure(exception.getMessage());
+        }
+
+        WebSearchProviderConnectionTester webSearchProviderConnectionTester =
+            webSearchProviderConnectionTesterProvider.getIfAvailable();
+
+        if (webSearchProviderConnectionTester == null) {
+            return WebSearchProviderTestResultDTO.failure("This server cannot test web search providers.");
+        }
+
+        try {
+            webSearchProviderConnectionTester.test(
+                webSearchProvider, new WebSearchProviderConnection(resolvedApiKey, resolvedBaseUrl));
+
+            return WebSearchProviderTestResultDTO.succeeded();
+        } catch (RuntimeException exception) {
+            log.debug("Testing the {} web search provider failed", webSearchProvider.getLabel(), exception);
+
+            return WebSearchProviderTestResultDTO.failure(mostSpecificMessage(exception));
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void updateWebSearchProvider(
+        String name, @Nullable String apiKey, @Nullable String baseUrl, int environment) {
+
+        WebSearchProvider webSearchProvider = WebSearchProvider.valueOfName(name);
+
+        Property property = fetchProperty(webSearchProvider, environment).orElse(null);
+
+        String savedApiKey = isBlank(apiKey)
+            ? property == null ? null : getSavedValue(property, API_KEY)
+            : apiKey.strip();
+
+        if (savedApiKey == null && getPropertiesApiKey(webSearchProvider) == null) {
             throw new IllegalArgumentException("The API key of " + webSearchProvider.getLabel() + " is required");
         }
 
-        propertyService.save(
-            webSearchProvider.getKey(), Map.of(API_KEY, apiKey.strip()), Scope.PLATFORM, null, (long) environment);
+        Map<String, Object> value = new HashMap<>();
+
+        if (savedApiKey == null) {
+            value.put(API_KEY_FROM_PROPERTIES, true);
+        } else {
+            value.put(API_KEY, savedApiKey);
+        }
+
+        if (!isBlank(baseUrl)) {
+            value.put(BASE_URL, validateBaseUrl(baseUrl));
+        }
+
+        propertyService.save(webSearchProvider.getKey(), value, Scope.PLATFORM, null, (long) environment);
     }
 
     private static @Nullable Property findProperty(List<Property> properties, WebSearchProvider webSearchProvider) {
@@ -146,12 +231,16 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
             .orElse(null);
     }
 
-    private static @Nullable String getSavedApiKey(Property property) {
-        if (property.get(API_KEY) instanceof String apiKey && !apiKey.isBlank()) {
-            return apiKey;
+    private static @Nullable String getSavedValue(Property property, String key) {
+        if (property.get(key) instanceof String value && !value.isBlank()) {
+            return value;
         }
 
         return null;
+    }
+
+    private static boolean isBlank(@Nullable String value) {
+        return value == null || value.isBlank();
     }
 
     private static @Nullable String mask(@Nullable String apiKey) {
@@ -164,6 +253,56 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
         }
 
         return "*".repeat(8) + apiKey.substring(apiKey.length() - MASK_VISIBLE_CHARACTERS);
+    }
+
+    private static String mostSpecificMessage(Throwable throwable) {
+        String message = null;
+
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            if (!isBlank(current.getMessage())) {
+                message = current.getMessage();
+            }
+
+            if (current.getCause() == current) {
+                break;
+            }
+        }
+
+        return message == null ? "The test search failed." : message;
+    }
+
+    private static String validateBaseUrl(String baseUrl) {
+        String strippedBaseUrl = baseUrl.strip();
+
+        try {
+            URI uri = new URI(strippedBaseUrl);
+
+            String scheme = uri.getScheme();
+
+            if (uri.getHost() == null || !("https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme))) {
+                throw new IllegalArgumentException("The base URL must be an http or https URL.");
+            }
+        } catch (URISyntaxException exception) {
+            throw new IllegalArgumentException("The base URL must be an http or https URL.", exception);
+        }
+
+        return strippedBaseUrl;
+    }
+
+    private Optional<Property> fetchProperty(WebSearchProvider webSearchProvider, int environment) {
+        return propertyService.fetchProperty(webSearchProvider.getKey(), Scope.PLATFORM, null, (long) environment);
+    }
+
+    private String getBaseUrl(WebSearchProvider webSearchProvider, @Nullable Property property) {
+        String savedBaseUrl = property == null ? null : getSavedValue(property, BASE_URL);
+
+        return savedBaseUrl == null ? getPropertiesBaseUrl(webSearchProvider) : savedBaseUrl;
+    }
+
+    private @Nullable String getCurrentApiKey(WebSearchProvider webSearchProvider, @Nullable Property property) {
+        String savedApiKey = property == null ? null : getSavedValue(property, API_KEY);
+
+        return savedApiKey == null ? getPropertiesApiKey(webSearchProvider) : savedApiKey;
     }
 
     private @Nullable String getIcon(WebSearchProvider webSearchProvider) {
@@ -182,7 +321,18 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
                 .getApiKey();
         };
 
-        return apiKey == null || apiKey.isBlank() ? null : apiKey;
+        return isBlank(apiKey) ? null : apiKey;
+    }
+
+    private String getPropertiesBaseUrl(WebSearchProvider webSearchProvider) {
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        return switch (webSearchProvider) {
+            case BRAVE -> ai.getBrave()
+                .getBaseUrl();
+            case FIRECRAWL -> ai.getFirecrawl()
+                .getBaseUrl();
+        };
     }
 
     private boolean isEnabledByProperties(WebSearchProvider webSearchProvider) {
@@ -199,7 +349,7 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
     private WebSearchProviderDTO toWebSearchProviderDTO(
         WebSearchProvider webSearchProvider, @Nullable Property property) {
 
-        String savedApiKey = property == null ? null : getSavedApiKey(property);
+        String savedApiKey = property == null ? null : getSavedValue(property, API_KEY);
         String propertiesApiKey = getPropertiesApiKey(webSearchProvider);
 
         String apiKey = savedApiKey == null ? propertiesApiKey : savedApiKey;
@@ -210,6 +360,7 @@ public class WebSearchProviderFacadeImpl implements WebSearchProviderFacade {
 
         return new WebSearchProviderDTO(
             webSearchProvider.getName(), webSearchProvider.getLabel(), webSearchProvider.getDescription(),
-            getIcon(webSearchProvider), enabled, mask(apiKey), savedApiKey == null && propertiesApiKey != null);
+            getIcon(webSearchProvider), enabled, mask(apiKey), savedApiKey == null && propertiesApiKey != null,
+            getBaseUrl(webSearchProvider, property), getPropertiesBaseUrl(webSearchProvider));
     }
 }

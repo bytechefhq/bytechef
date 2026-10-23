@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.tool;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderConnection;
 import com.bytechef.platform.ai.provider.facade.WebSearchProviderFacade;
 import com.bytechef.platform.ai.websearch.WebSearchProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,10 +61,11 @@ public class WebSearchToolCallbackProvider {
         List<Object> tools = new ArrayList<>();
 
         for (WebSearchProvider webSearchProvider : WebSearchProvider.values()) {
-            String apiKey = fetchEnabledApiKey(webSearchProvider, environment);
+            WebSearchProviderConnection webSearchProviderConnection = fetchEnabledConnection(
+                webSearchProvider, environment);
 
-            if (apiKey != null) {
-                tools.add(createTools(webSearchProvider, apiKey));
+            if (webSearchProviderConnection != null) {
+                tools.add(createTools(webSearchProvider, webSearchProviderConnection));
             }
         }
 
@@ -74,30 +76,27 @@ public class WebSearchToolCallbackProvider {
         return List.of(ToolCallbacks.from(tools.toArray()));
     }
 
-    private Object createTools(WebSearchProvider webSearchProvider, String apiKey) {
-        ApplicationProperties.Ai ai = applicationProperties.getAi();
+    Object createTools(WebSearchProvider webSearchProvider, WebSearchProviderConnection webSearchProviderConnection) {
+        String apiKey = webSearchProviderConnection.apiKey();
+        String baseUrl = webSearchProviderConnection.baseUrl();
 
         return switch (webSearchProvider) {
-            case BRAVE -> new BraveWebSearchTools(
-                ai.getBrave()
-                    .getBaseUrl(),
-                apiKey, restClientBuilder.clone());
-            case FIRECRAWL -> new FirecrawlTools(
-                ai.getFirecrawl()
-                    .getBaseUrl(),
-                apiKey, restClientBuilder.clone());
+            case BRAVE -> new BraveWebSearchTools(baseUrl, apiKey, restClientBuilder.clone());
+            case FIRECRAWL -> new FirecrawlTools(baseUrl, apiKey, restClientBuilder.clone());
         };
     }
 
-    private @Nullable String fetchEnabledApiKey(WebSearchProvider webSearchProvider, int environment) {
+    private @Nullable WebSearchProviderConnection fetchEnabledConnection(
+        WebSearchProvider webSearchProvider, int environment) {
+
         WebSearchProviderFacade webSearchProviderFacade = webSearchProviderFacadeProvider.getIfAvailable();
 
         if (webSearchProviderFacade == null) {
-            return fetchPropertiesApiKey(webSearchProvider);
+            return fetchPropertiesConnection(webSearchProvider);
         }
 
         try {
-            return webSearchProviderFacade.fetchEnabledApiKey(webSearchProvider, environment);
+            return webSearchProviderFacade.fetchEnabledConnection(webSearchProvider, environment);
         } catch (RuntimeException exception) {
             log.warn(
                 "Could not resolve the {} API key for environment {}; its web search tools stay off for this run",
@@ -107,28 +106,30 @@ public class WebSearchToolCallbackProvider {
         }
     }
 
-    private @Nullable String fetchPropertiesApiKey(WebSearchProvider webSearchProvider) {
+    private @Nullable WebSearchProviderConnection fetchPropertiesConnection(WebSearchProvider webSearchProvider) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        boolean enabled;
-        String apiKey;
-
-        switch (webSearchProvider) {
+        return switch (webSearchProvider) {
             case BRAVE -> {
-                enabled = ai.getBrave()
-                    .isEnabled();
-                apiKey = ai.getBrave()
-                    .getApiKey();
+                ApplicationProperties.Ai.Brave brave = ai.getBrave();
+
+                yield toConnection(brave.isEnabled(), brave.getApiKey(), brave.getBaseUrl());
             }
             case FIRECRAWL -> {
-                enabled = ai.getFirecrawl()
-                    .isEnabled();
-                apiKey = ai.getFirecrawl()
-                    .getApiKey();
+                ApplicationProperties.Ai.Firecrawl firecrawl = ai.getFirecrawl();
+
+                yield toConnection(firecrawl.isEnabled(), firecrawl.getApiKey(), firecrawl.getBaseUrl());
             }
-            default -> throw new IllegalStateException("Unexpected web search provider: " + webSearchProvider);
+        };
+    }
+
+    private static @Nullable WebSearchProviderConnection toConnection(
+        boolean enabled, @Nullable String apiKey, String baseUrl) {
+
+        if (!enabled || apiKey == null || apiKey.isBlank()) {
+            return null;
         }
 
-        return enabled && apiKey != null && !apiKey.isBlank() ? apiKey : null;
+        return new WebSearchProviderConnection(apiKey, baseUrl);
     }
 }
