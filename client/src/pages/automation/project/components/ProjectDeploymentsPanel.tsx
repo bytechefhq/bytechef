@@ -8,6 +8,7 @@ import useOpenSavedProjectDeployment from '@/pages/automation/project-deployment
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
@@ -36,6 +37,8 @@ const ProjectDeploymentsPanel = ({
 }: ProjectDeploymentsPanelProps) => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const canCreateDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
 
     const openSavedProjectDeployment = useOpenSavedProjectDeployment({
         onDevelopmentDeploymentSaved: onProjectDeploymentSaved,
@@ -107,19 +110,21 @@ const ProjectDeploymentsPanel = ({
                 (isPublished ? (
                     <EmptyState
                         actions={
-                            <ProjectDeploymentDialog
-                                environmentEditable
-                                onSuccess={openSavedProjectDeployment}
-                                projectDeployment={{
-                                    environmentId: currentEnvironmentId,
-                                    name: project.name,
-                                    projectId: project.id,
-                                }}
-                                projectDeployments={projectDeployments}
-                                redirectOnSubmit={false}
-                                showTabs
-                                triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
-                            />
+                            canCreateDeployment && (
+                                <ProjectDeploymentDialog
+                                    environmentEditable
+                                    onSuccess={openSavedProjectDeployment}
+                                    projectDeployment={{
+                                        environmentId: currentEnvironmentId,
+                                        name: project.name,
+                                        projectId: project.id,
+                                    }}
+                                    projectDeployments={projectDeployments}
+                                    redirectOnSubmit={false}
+                                    showTabs
+                                    triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
+                                />
+                            )
                         }
                         description="Deploy this project to run its workflows here."
                         icon={<Layers3Icon />}
