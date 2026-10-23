@@ -18,8 +18,10 @@ package com.bytechef.platform.worker.config;
 
 import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
+import com.bytechef.platform.worker.task.ClusterElementCallsTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SseStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebSocketStreamTaskExecutionPostOutputProcessor;
@@ -57,12 +59,18 @@ public class PlatformWorkerConfiguration {
 
     @Bean
     @Order(4)
+    ClusterElementCallsTaskExecutionPostOutputProcessor clusterElementCallsTaskExecutionPostOutputProcessor() {
+        return new ClusterElementCallsTaskExecutionPostOutputProcessor(ClusterElementCallRecorder.getInstance());
+    }
+
+    @Bean
+    @Order(5)
     SuspendTaskExecutionPostOutputProcessor suspendTaskExecutionPostOutputProcessor(TriggerScheduler triggerScheduler) {
         return new SuspendTaskExecutionPostOutputProcessor(triggerScheduler);
     }
 
     @Bean
-    @Order(5)
+    @Order(6)
     WebhookResponseTaskExecutionPostOutputProcessor webhookResponseTaskExecutionPostOutputProcessor() {
         return new WebhookResponseTaskExecutionPostOutputProcessor();
     }

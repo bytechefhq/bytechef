@@ -24,4 +24,11 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 public interface TaskExecutionPostOutputProcessor {
 
     Object process(TaskExecution taskExecution, Object output);
+
+    /**
+     * Called once the task execution has finished, whether it produced output, produced none or failed, after every
+     * {@link #process(TaskExecution, Object)} call and before the outcome is published.
+     */
+    default void onTaskExecutionFinished(TaskExecution taskExecution) {
+    }
 }

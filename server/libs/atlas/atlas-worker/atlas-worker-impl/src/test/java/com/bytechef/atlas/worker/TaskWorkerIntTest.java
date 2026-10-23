@@ -105,6 +105,7 @@ import org.springframework.util.FileSystemUtils;
 class TaskWorkerIntTest {
 
     private static final long DEFAULT_TIMEOUT = 60_000L;
+    private static final String FINISHED = "finished";
     private static final Duration EVENT_TIMEOUT = Duration.ofSeconds(10);
     private static final ExecutorService CALLER_EXECUTOR_SERVICE = Executors.newCachedThreadPool();
     private static final AtomicLong ID_SEQUENCE = new AtomicLong(1000);
@@ -213,6 +214,33 @@ class TaskWorkerIntTest {
 
         assertThat(failedTaskExecution.getStartDate()).isNotNull();
         assertThat(failedTaskExecution.getEndDate()).isNotNull();
+    }
+
+    @Test
+    void testNotifiesPostOutputProcessorsBeforeTheErrorEventWhenTheTaskFails() {
+        TaskExecution taskExecution = createTaskExecution(Map.of(NAME, "name", TYPE, "badInput"));
+
+        sendTaskExecutionEvent(taskExecution);
+
+        TaskExecution failedTaskExecution = awaitFailedTaskExecution(taskExecution);
+
+        Map<String, ?> metadata = failedTaskExecution.getMetadata();
+
+        assertThat(metadata.get(FINISHED)).isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    void testNotifiesPostOutputProcessorsWhenTheTaskProducesNoOutput() {
+        TaskExecution taskExecution = createTaskExecution(Map.of(NAME, "name", TYPE, "streamed"));
+
+        sendTaskExecutionEvent(taskExecution);
+
+        TaskExecution completedTaskExecution = awaitCompletedTaskExecution(taskExecution);
+
+        Map<String, ?> metadata = completedTaskExecution.getMetadata();
+
+        assertThat(completedTaskExecution.getOutput()).isNull();
+        assertThat(metadata.get(FINISHED)).isEqualTo(Boolean.TRUE);
     }
 
     @Test
@@ -601,6 +629,22 @@ class TaskWorkerIntTest {
         @Bean
         MessageEventTracing messageEventTracing() {
             return new MessageEventTracing(Propagator.NOOP, Tracer.NOOP);
+        }
+
+        @Bean
+        TaskExecutionPostOutputProcessor finishedMarkingTaskExecutionPostOutputProcessor() {
+            return new TaskExecutionPostOutputProcessor() {
+
+                @Override
+                public Object process(TaskExecution taskExecution, Object output) {
+                    return output;
+                }
+
+                @Override
+                public void onTaskExecutionFinished(TaskExecution taskExecution) {
+                    taskExecution.putMetadata(FINISHED, true);
+                }
+            };
         }
 
         @Bean
