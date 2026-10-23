@@ -13,7 +13,8 @@ const mockSetWorkflowTestNodeState = vi.fn();
 
 let mockWorkflowIsRunning = false;
 let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
-let mockWorkflowTestNodeStates: Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}> = {};
+let mockWorkflowTestNodeStates: Record<string, {clusterElement?: boolean; status: 'RUNNING' | 'COMPLETED' | 'FAILED'}> =
+    {};
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
     // Lazy: the mock* consts are hoisted below this factory, so they must only be dereferenced at call time.
@@ -519,6 +520,114 @@ describe('useWorkflowTestStream', () => {
         expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'RUNNING'});
     });
 
+    it('should mark a cluster element running and then completed', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_started({
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'STARTED',
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenLastCalledWith('httpClient_1', {
+            clusterElement: true,
+            status: 'RUNNING',
+        });
+
+        act(() => {
+            eventHandlers.cluster_element_completed({
+                endDate: '2026-10-23T10:00:00.412Z',
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'COMPLETED',
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenLastCalledWith('httpClient_1', {
+            clusterElement: true,
+            durationMillis: 412,
+            status: 'COMPLETED',
+        });
+    });
+
+    it('should keep a cluster element failed across task executions', () => {
+        mockWorkflowTestNodeStates = {httpClient_1: {status: 'FAILED'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_completed({
+                endDate: '2026-10-23T10:00:05Z',
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:04Z',
+                status: 'COMPLETED',
+                taskExecutionId: '11',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenLastCalledWith(
+            'httpClient_1',
+            expect.objectContaining({status: 'FAILED'})
+        );
+    });
+
+    it('should mark a cluster element failed with its error', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_failed(
+                JSON.stringify({
+                    endDate: '2026-10-23T10:00:00.031Z',
+                    error: 'boom',
+                    name: 'httpClient_1',
+                    startDate: '2026-10-23T10:00:00Z',
+                    status: 'FAILED',
+                    taskExecutionId: '10',
+                })
+            );
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenLastCalledWith('httpClient_1', {
+            clusterElement: true,
+            durationMillis: 31,
+            error: 'boom',
+            status: 'FAILED',
+        });
+    });
+
+    it('should clear a cluster element left running when the run is stopped', () => {
+        const {result} = renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_started({
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'STARTED',
+                taskExecutionId: '10',
+            });
+        });
+
+        mockWorkflowTestNodeStates = {httpClient_1: {status: 'RUNNING'}};
+
+        act(() => {
+            result.current.close();
+        });
+
+        expect(mockRemoveWorkflowTestNodeState).toHaveBeenCalledWith('httpClient_1');
+    });
+
     it('should ignore task events without a name', () => {
         renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
@@ -563,6 +672,28 @@ describe('useWorkflowTestStream', () => {
 
         expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'COMPLETED'});
         expect(mockRemoveWorkflowTestNodeState).not.toHaveBeenCalled();
+    });
+
+    it('should clear a cluster element still running when the job completed instead of completing it', () => {
+        mockWorkflowTestNodeStates = {
+            subagent_1: {clusterElement: true, status: 'RUNNING'},
+            task_1: {status: 'RUNNING'},
+        };
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({job: {status: 'COMPLETED', taskExecutions: []}});
+        });
+
+        expect(mockRemoveWorkflowTestNodeState).toHaveBeenCalledWith('subagent_1');
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith(
+            'subagent_1',
+            expect.objectContaining({status: 'COMPLETED'})
+        );
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('task_1', {status: 'COMPLETED'});
     });
 
     it('should backfill task dispatchers nested in a loop iteration or a condition branch', () => {

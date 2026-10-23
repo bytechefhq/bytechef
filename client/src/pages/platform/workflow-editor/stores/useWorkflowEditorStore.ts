@@ -11,6 +11,7 @@ export interface PendingClusterElementDropI {
 }
 
 export interface WorkflowTestNodeStateI {
+    clusterElement?: boolean;
     durationMillis?: number;
     error?: string;
     status: 'RUNNING' | 'COMPLETED' | 'FAILED';
