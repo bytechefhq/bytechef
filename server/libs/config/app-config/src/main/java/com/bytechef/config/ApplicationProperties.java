@@ -1487,11 +1487,6 @@ public class ApplicationProperties {
             private String apiKey;
 
             /**
-             * Brave Search API base URL
-             */
-            private String baseUrl = "https://api.search.brave.com/res/v1";
-
-            /**
              * Whether Brave Search is enabled
              */
             private boolean enabled;
@@ -1502,14 +1497,6 @@ public class ApplicationProperties {
 
             public void setApiKey(String apiKey) {
                 this.apiKey = apiKey;
-            }
-
-            public String getBaseUrl() {
-                return baseUrl;
-            }
-
-            public void setBaseUrl(String baseUrl) {
-                this.baseUrl = baseUrl;
             }
 
             public boolean isEnabled() {
@@ -1575,6 +1562,7 @@ public class ApplicationProperties {
              * Whether knowledge base AI features are enabled
              */
             private boolean enabled;
+
             /**
              * Maximum total size in bytes of all knowledge base documents in a tenant. 0 means unlimited. Default 1 GB.
              */
@@ -1846,6 +1834,7 @@ public class ApplicationProperties {
              * Stability AI configuration
              */
             private Stability stability = new Stability();
+
             /**
              * Google Vertex AI Gemini configuration
              */
@@ -1930,6 +1919,7 @@ public class ApplicationProperties {
             public VertexGemini getVertexGemini() {
                 return vertexGemini;
             }
+
 //            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
 //                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
 //            }
