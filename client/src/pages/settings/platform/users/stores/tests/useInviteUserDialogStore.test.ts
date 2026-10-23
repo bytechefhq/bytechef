@@ -1,11 +1,7 @@
 import {act} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it} from 'vitest';
 
 import {useInviteUserDialogStore} from '../useInviteUserDialogStore';
-
-vi.mock('@/pages/settings/platform/users/util/password-utils', () => ({
-    generatePassword: vi.fn(() => 'generated-password-123'),
-}));
 
 describe('useInviteUserDialogStore', () => {
     beforeEach(() => {
@@ -25,12 +21,6 @@ describe('useInviteUserDialogStore', () => {
             const state = useInviteUserDialogStore.getState();
 
             expect(state.inviteEmail).toBe('');
-        });
-
-        it('has generated invitePassword', () => {
-            const state = useInviteUserDialogStore.getState();
-
-            expect(state.invitePassword).toBe('generated-password-123');
         });
 
         it('has inviteRole as null', () => {
@@ -76,18 +66,6 @@ describe('useInviteUserDialogStore', () => {
         });
     });
 
-    describe('regeneratePassword', () => {
-        it('regenerates the password', () => {
-            act(() => {
-                useInviteUserDialogStore.getState().regeneratePassword();
-            });
-
-            const state = useInviteUserDialogStore.getState();
-
-            expect(state.invitePassword).toBe('generated-password-123');
-        });
-    });
-
     describe('reset', () => {
         it('resets all state and closes dialog', () => {
             act(() => {
@@ -111,7 +89,6 @@ describe('useInviteUserDialogStore', () => {
             expect(state.open).toBe(false);
             expect(state.inviteEmail).toBe('');
             expect(state.inviteRole).toBeNull();
-            expect(state.invitePassword).toBe('generated-password-123');
         });
     });
 });

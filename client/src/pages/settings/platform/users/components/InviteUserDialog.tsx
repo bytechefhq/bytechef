@@ -20,11 +20,9 @@ const InviteUserDialog = () => {
         handleEmailChange,
         handleInvite,
         handleOpenChange,
-        handleRegeneratePassword,
         handleRoleChange,
         inviteDisabled,
         inviteEmail,
-        invitePassword,
         inviteRole,
         open,
         roleSelectVisible,
@@ -35,7 +33,7 @@ const InviteUserDialog = () => {
             <DialogContent>
                 <DialogMain>
                     <DialogHeader
-                        description="Enter the user email. A strong password is pre-generated according to the security rules. This password will be included in the invitation email."
+                        description="The invitee receives an email with a link on which they set their own password. The link expires after 3 days."
                         title="Invite User"
                     />
 
@@ -50,26 +48,6 @@ const InviteUserDialog = () => {
                                     type="email"
                                     value={inviteEmail}
                                 />
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-medium">Password</label>
-
-                                <Input readOnly type="text" value={invitePassword} />
-
-                                <div>
-                                    <Button
-                                        label="Regenerate"
-                                        onClick={handleRegeneratePassword}
-                                        size="sm"
-                                        variant="outline"
-                                    />
-                                </div>
-
-                                <p className="text-xs text-muted-foreground">
-                                    Password must be at least 8 characters and include at least 1 uppercase letter and 1
-                                    number.
-                                </p>
                             </div>
 
                             {roleSelectVisible && (

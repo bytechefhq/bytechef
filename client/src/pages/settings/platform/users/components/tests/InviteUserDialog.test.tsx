@@ -8,7 +8,6 @@ const hoisted = vi.hoisted(() => {
         handleClose: vi.fn(),
         handleEmailChange: vi.fn(),
         handleInvite: vi.fn(),
-        handleRegeneratePassword: vi.fn(),
         handleRoleChange: vi.fn(),
         mockUseInviteUserDialog: vi.fn(),
     };
@@ -24,11 +23,9 @@ const defaultMockReturn = {
     handleEmailChange: hoisted.handleEmailChange,
     handleInvite: hoisted.handleInvite,
     handleOpen: vi.fn(),
-    handleRegeneratePassword: hoisted.handleRegeneratePassword,
     handleRoleChange: hoisted.handleRoleChange,
     inviteDisabled: false,
     inviteEmail: 'test@example.com',
-    invitePassword: 'GeneratedPass1',
     inviteRole: 'ROLE_ADMIN',
     open: true,
     roleSelectVisible: true,
@@ -60,7 +57,7 @@ describe('InviteUserDialog', () => {
 
         expect(
             screen.getByText(
-                'Enter the user email. A strong password is pre-generated according to the security rules. This password will be included in the invitation email.'
+                'The invitee receives an email with a link on which they set their own password. The link expires after 3 days.'
             )
         ).toBeInTheDocument();
     });
@@ -71,10 +68,11 @@ describe('InviteUserDialog', () => {
         expect(screen.getByText('Email')).toBeInTheDocument();
     });
 
-    it('should display Password label', () => {
+    it('should not ask for a password', () => {
         renderInviteUserDialog();
 
-        expect(screen.getByText('Password')).toBeInTheDocument();
+        expect(screen.queryByText('Password')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Regenerate'})).not.toBeInTheDocument();
     });
 
     it('should display Role label', () => {
@@ -90,12 +88,6 @@ describe('InviteUserDialog', () => {
         expect(screen.getByRole('button', {name: 'Invite'})).toBeInTheDocument();
     });
 
-    it('should render Regenerate button', () => {
-        renderInviteUserDialog();
-
-        expect(screen.getByRole('button', {name: 'Regenerate'})).toBeInTheDocument();
-    });
-
     it('should call handleInvite when clicking Invite button', async () => {
         renderInviteUserDialog();
 
@@ -105,15 +97,6 @@ describe('InviteUserDialog', () => {
         expect(hoisted.handleInvite).toHaveBeenCalledTimes(1);
     });
 
-    it('should call handleRegeneratePassword when clicking Regenerate button', async () => {
-        renderInviteUserDialog();
-
-        const regenerateButton = screen.getByRole('button', {name: 'Regenerate'});
-        await userEvent.click(regenerateButton);
-
-        expect(hoisted.handleRegeneratePassword).toHaveBeenCalledTimes(1);
-    });
-
     it('should call handleClose when clicking Cancel button', async () => {
         renderInviteUserDialog();
 
@@ -121,14 +104,6 @@ describe('InviteUserDialog', () => {
         await userEvent.click(cancelButton);
 
         expect(hoisted.handleClose).toHaveBeenCalled();
-    });
-
-    it('should display password value', () => {
-        renderInviteUserDialog();
-
-        const passwordInput = screen.getByDisplayValue('GeneratedPass1');
-
-        expect(passwordInput).toBeInTheDocument();
     });
 
     it('should display current email value in input', () => {
@@ -148,11 +123,9 @@ describe('InviteUserDialog closed state', () => {
             handleEmailChange: hoisted.handleEmailChange,
             handleInvite: hoisted.handleInvite,
             handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
             handleRoleChange: hoisted.handleRoleChange,
             inviteDisabled: true,
             inviteEmail: '',
-            invitePassword: 'GeneratedPass1',
             inviteRole: null,
             open: false,
             roleSelectVisible: true,
@@ -174,11 +147,9 @@ describe('InviteUserDialog inviteDisabled state', () => {
             handleEmailChange: hoisted.handleEmailChange,
             handleInvite: hoisted.handleInvite,
             handleOpen: vi.fn(),
-            handleRegeneratePassword: hoisted.handleRegeneratePassword,
             handleRoleChange: hoisted.handleRoleChange,
             inviteDisabled: true,
             inviteEmail: '',
-            invitePassword: 'GeneratedPass1',
             inviteRole: 'ROLE_ADMIN',
             open: true,
             roleSelectVisible: true,
