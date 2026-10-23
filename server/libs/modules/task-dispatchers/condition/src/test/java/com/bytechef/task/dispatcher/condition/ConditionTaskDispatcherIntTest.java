@@ -178,7 +178,7 @@ public class ConditionTaskDispatcherIntTest {
         taskDispatcherJobTestExecutor.execute(
             EncodingUtils.base64EncodeToString(
                 "condition_v1-rawExpression-dateComparison".getBytes(StandardCharsets.UTF_8)),
-            Map.of("restDate", "2026-08-27T22:00:00Z"),
+            Map.of("restDate", "2026-08-29T22:00:00Z"),
             this::getTaskCompletionHandlerFactories,
             this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
