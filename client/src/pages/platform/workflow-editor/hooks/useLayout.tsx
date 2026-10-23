@@ -24,6 +24,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {useWorkflowExecutionOverlay} from '../providers/workflowExecutionOverlayContext';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
@@ -62,6 +63,11 @@ import {
     getTaskAncestry,
 } from '../utils/layoutUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
+import {
+    getReadOnlyFramedClusterRootIds,
+    toReadOnlyClusterFrameMembers,
+    toReadOnlyFramedClusterRoot,
+} from '../utils/readOnlyClusterFrames';
 import removeTrailingBranchPlaceholders from '../utils/removeTrailingBranchPlaceholders';
 import shiftNodesHorizontally from '../utils/shiftNodesHorizontally';
 import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
@@ -234,17 +240,36 @@ export default function useLayout({
         workflowId ? state.collapsedByWorkflowId[workflowId] : undefined
     );
 
-    const boxModeClusterRootIds = useMemo(
-        () =>
-            clusterElementsViewMode === 'box'
-                ? (tasks ?? [])
-                      .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
-                      .map((task) => task.name)
-                : [],
-        [clusterElementsViewMode, collapsedClusterRootIds, tasks]
-    );
+    const workflowExecutionOverlay = useWorkflowExecutionOverlay();
 
-    const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(boxModeClusterRootIds);
+    const isReadOnlyWorkflow = !!readOnlyWorkflow;
+    const readOnlyWorkflowTasks = readOnlyWorkflow?.tasks;
+
+    const framesReadOnlyClusterRoots = isReadOnlyWorkflow && !!workflowExecutionOverlay;
+
+    const boxModeClusterRootIds = useMemo(() => {
+        if (isReadOnlyWorkflow) {
+            return getReadOnlyFramedClusterRootIds(readOnlyWorkflowTasks, framesReadOnlyClusterRoots);
+        }
+
+        return clusterElementsViewMode === 'box'
+            ? (tasks ?? [])
+                  .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
+                  .map((task) => task.name)
+            : [];
+    }, [
+        clusterElementsViewMode,
+        collapsedClusterRootIds,
+        framesReadOnlyClusterRoots,
+        isReadOnlyWorkflow,
+        readOnlyWorkflowTasks,
+        tasks,
+    ]);
+
+    const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(
+        boxModeClusterRootIds,
+        framesReadOnlyClusterRoots ? readOnlyWorkflow?.definition : undefined
+    );
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
     const layoutRetryStateRef = useRef(createLayoutRetryState());
@@ -794,6 +819,10 @@ export default function useLayout({
 
         if (readOnlyWorkflow) {
             layoutNodes = allNodes.map((node) => {
+                if (boxModeClusterRootIds.includes(node.id) && nodesByRootId[node.id]?.length) {
+                    return toReadOnlyFramedClusterRoot(node, disabledTaskNames);
+                }
+
                 if (node.type === 'workflow' || node.type === 'clusterRoot') {
                     const nodeData = node.data as NodeDataType;
 
@@ -972,14 +1001,14 @@ export default function useLayout({
 
                 useLayoutEngineStore.getState().setLastAppliedLayoutEngine(layoutElements.engine);
 
-                const clusterMemberNodes = readOnlyWorkflow
-                    ? framedClusters.memberNodes.map((node) => ({...node, draggable: false}))
-                    : framedClusters.memberNodes;
+                const clusterMembers = readOnlyWorkflow
+                    ? toReadOnlyClusterFrameMembers(framedClusters.memberNodes, framedClusters.memberEdges)
+                    : {memberEdges: framedClusters.memberEdges, memberNodes: framedClusters.memberNodes};
 
                 const elements = {
                     ...layoutElements,
-                    edges: [...layoutElements.edges, ...framedClusters.memberEdges],
-                    nodes: [...layoutElements.nodes, ...clusterMemberNodes],
+                    edges: [...layoutElements.edges, ...clusterMembers.memberEdges],
+                    nodes: [...layoutElements.nodes, ...clusterMembers.memberNodes],
                 };
 
                 const targetNodes: Node[] = [
