@@ -2,6 +2,7 @@ package com.bytechef.platform.workflow.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.workflow.execution.web.rest.model.ClusterElementCallModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T23:56:46.804049+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -137,6 +138,8 @@ public class TaskExecutionModel {
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
   private @Nullable JobModel childJob;
+
+  private List<@Valid ClusterElementCallModel> clusterElementCalls = new ArrayList<>();
 
   public TaskExecutionModel() {
     super();
@@ -785,6 +788,35 @@ public class TaskExecutionModel {
     this.childJob = childJob;
   }
 
+  public TaskExecutionModel clusterElementCalls(List<@Valid ClusterElementCallModel> clusterElementCalls) {
+    this.clusterElementCalls = clusterElementCalls;
+    return this;
+  }
+
+  public TaskExecutionModel addClusterElementCallsItem(ClusterElementCallModel clusterElementCallsItem) {
+    if (this.clusterElementCalls == null) {
+      this.clusterElementCalls = new ArrayList<>();
+    }
+    this.clusterElementCalls.add(clusterElementCallsItem);
+    return this;
+  }
+
+  /**
+   * The calls the task made to the cluster elements it chooses to call, such as an AI agent's tools.
+   * @return clusterElementCalls
+   */
+  
+  @Schema(name = "clusterElementCalls", accessMode = Schema.AccessMode.READ_ONLY, description = "The calls the task made to the cluster elements it chooses to call, such as an AI agent's tools.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementCalls")
+  public List<@Valid ClusterElementCallModel> getClusterElementCalls() {
+    return clusterElementCalls;
+  }
+
+  @JsonProperty("clusterElementCalls")
+  public void setClusterElementCalls(List<@Valid ClusterElementCallModel> clusterElementCalls) {
+    this.clusterElementCalls = clusterElementCalls;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -822,12 +854,13 @@ public class TaskExecutionModel {
         Objects.equals(this.type, taskExecution.type) &&
         Objects.equals(this.children, taskExecution.children) &&
         Objects.equals(this.iterations, taskExecution.iterations) &&
-        Objects.equals(this.childJob, taskExecution.childJob);
+        Objects.equals(this.childJob, taskExecution.childJob) &&
+        Objects.equals(this.clusterElementCalls, taskExecution.clusterElementCalls);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob, clusterElementCalls);
   }
 
   @Override
@@ -863,6 +896,7 @@ public class TaskExecutionModel {
     sb.append("    children: ").append(toIndentedString(children)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    childJob: ").append(toIndentedString(childJob)).append("\n");
+    sb.append("    clusterElementCalls: ").append(toIndentedString(clusterElementCalls)).append("\n");
     sb.append("}");
     return sb.toString();
   }
