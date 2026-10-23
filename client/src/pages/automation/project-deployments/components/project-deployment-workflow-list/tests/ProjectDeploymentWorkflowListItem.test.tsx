@@ -14,13 +14,18 @@ vi.mock('@/shared/mutations/automation/projectDeploymentWorkflows.mutations', ()
     useEnableProjectDeploymentWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
-const {openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
+const {openInProjectState, openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
+    openInProjectState: {canOpenInProject: true},
     openProjectWorkflowMock: vi.fn(),
     rowPropsMock: vi.fn(),
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({openProject: vi.fn(), openProjectWorkflow: openProjectWorkflowMock}),
+    default: () => ({
+        canOpenInProject: openInProjectState.canOpenInProject,
+        openProject: vi.fn(),
+        openProjectWorkflow: openProjectWorkflowMock,
+    }),
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
@@ -73,6 +78,7 @@ const renderListItem = (projectName?: string, projectId?: number) =>
 
 describe('ProjectDeploymentWorkflowListItem', () => {
     beforeEach(() => {
+        openInProjectState.canOpenInProject = true;
         openProjectWorkflowMock.mockReset();
 
         useProjectDeploymentWorkflowSheetStore.setState({
@@ -159,6 +165,14 @@ describe('ProjectDeploymentWorkflowListItem', () => {
 
     it('hides the open in project icon without a project', () => {
         renderListItem('Subflow');
+
+        expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
+    });
+
+    it('hides the open in project icon from a member who may not view the project workflows', () => {
+        openInProjectState.canOpenInProject = false;
+
+        renderListItem('Subflow', 7);
 
         expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
     });

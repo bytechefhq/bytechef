@@ -53,7 +53,7 @@ const ProjectDeploymentListItem = ({
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
-    const {openProject} = useOpenInProject();
+    const {canOpenInProject, openProject} = useOpenInProject();
 
     const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
@@ -127,7 +127,7 @@ const ProjectDeploymentListItem = ({
         enableProjectDeploymentMutation.isPending ||
         (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
-    const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
+    const showOpenProject = canOpenInProject && !hideOpenInProject && projectDeployment.projectId != null;
 
     const environmentConfig =
         showEnvironment && projectDeployment.environmentId != null

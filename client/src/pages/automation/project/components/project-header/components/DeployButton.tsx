@@ -28,24 +28,11 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
         false
     );
 
-    // The dialog behind this button needs BOTH scopes, so gating on either one alone fails open:
-    // ProjectDeploymentFacadeImpl.createProjectDeployment is annotated hasPermission(#projectDeploymentDTO,
-    // 'WORKFLOW_EDIT'), and the ProjectDeploymentServiceImpl.create it delegates to is annotated
-    // hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_CREATE') (as is .update).
-    // The built-in roles put both at EDITOR rank so they always co-occur, but a custom role is an arbitrary scope
-    // set — a member granted only DEPLOYMENT_CREATE would otherwise fill in the whole dialog and be refused on submit.
-    // The four-state hook is used instead of the plain boolean one so that "not loaded yet", "check failed" and "the
-    // edition never resolved so nothing was ever asked" stay distinguishable from "denied"; see
-    // getDisabledControlTooltip.
     const deploymentCreateState = useWorkspaceScopeState(currentWorkspaceId, 'DEPLOYMENT_CREATE');
-    const workflowEditState = useWorkspaceScopeState(currentWorkspaceId, 'WORKFLOW_EDIT');
 
-    const canDeployProject = deploymentCreateState.granted && workflowEditState.granted;
+    const canDeployProject = deploymentCreateState.granted;
     const isDeployable = !!(project.lastPublishedDate && project.lastProjectVersion);
-    const permissionsError = deploymentCreateState.error || workflowEditState.error;
-    // An unresolved workspace id counts as "not yet known" rather than as a refusal, for the same reason.
-    const permissionsLoading = currentWorkspaceId == null || deploymentCreateState.loading || workflowEditState.loading;
-    const permissionsUnknown = deploymentCreateState.editionUnknown || workflowEditState.editionUnknown;
+    const permissionsLoading = currentWorkspaceId == null || deploymentCreateState.loading;
 
     const handleDeployClick = async (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -76,9 +63,9 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
                     {getDisabledControlTooltip({
                         deniedMessage: 'You do not have permission to deploy this project',
                         granted: canDeployProject,
-                        permissionsError,
+                        permissionsError: deploymentCreateState.error,
                         permissionsLoading,
-                        permissionsUnknown,
+                        permissionsUnknown: deploymentCreateState.editionUnknown,
                         unmetPreconditionMessage: 'Publish the project to enable deployment',
                     })}
                 </TooltipContent>
