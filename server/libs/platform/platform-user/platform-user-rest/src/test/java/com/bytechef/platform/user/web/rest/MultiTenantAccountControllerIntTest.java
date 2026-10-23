@@ -27,9 +27,12 @@ import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
 import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
+import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.platform.user.service.UserCleanup;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
@@ -40,7 +43,10 @@ import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.InetAddress;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +62,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -83,10 +90,19 @@ class MultiTenantAccountControllerIntTest {
     private MailService mailService;
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private UserCleanup userCleanup;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PersistentTokenRepository persistentTokenRepository;
 
     @Autowired
     private MockMvc restAccountMockMvc;
@@ -782,6 +798,87 @@ class MultiTenantAccountControllerIntTest {
 
             assertThat(updatedUser.getEmail()).isEqualTo("save-existing-email-1@example.com");
         });
+    }
+
+    @Test
+    void testUserCleanupRemovesExpiredInvitationsOfEveryTenant() {
+        String tenantId = tenantService.createTenant();
+
+        User expiredInvitee = createInvitee("expired-invitee@example.com", "expired-invitation-1");
+        User pendingInvitee = createInvitee("pending-invitee@example.com", "pending-invitation-1");
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            userRepository.save(expiredInvitee);
+            userRepository.save(pendingInvitee);
+
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+            jdbcTemplate.update(
+                "UPDATE \"user\" SET created_date = ? WHERE login = ?", LocalDateTime.now()
+                    .minusDays(4),
+                expiredInvitee.getLogin());
+        });
+
+        userCleanup.removeNotActivatedUsers();
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            assertThat(userRepository.findByLogin(expiredInvitee.getLogin())).isEmpty();
+            assertThat(userRepository.findByLogin(pendingInvitee.getLogin())).isPresent();
+        });
+    }
+
+    @Test
+    void testUserCleanupRemovesOldPersistentTokensOfEveryTenant() {
+        String tenantId = tenantService.createTenant();
+
+        User user = createInvitee("remembered-user@example.com", null);
+
+        user.setActivated(true);
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            userRepository.save(user);
+
+            savePersistentToken(user, "old-series", LocalDate.now()
+                .minusDays(32));
+            savePersistentToken(user, "fresh-series", LocalDate.now());
+        });
+
+        userCleanup.removeOldPersistentTokens();
+
+        TenantContext.runWithTenantId(tenantId,
+            () -> assertThat(persistentTokenRepository.findAllByUserId(user.getId()))
+                .extracting(PersistentToken::getSeries)
+                .containsExactly("fresh-series"));
+    }
+
+    private void savePersistentToken(User user, String series, LocalDate tokenDate) {
+        PersistentToken persistentToken = new PersistentToken();
+
+        persistentToken.setNew(true);
+        persistentToken.setSeries(series);
+        persistentToken.setUser(user);
+        persistentToken.setTokenValue(series + "-data");
+        persistentToken.setTokenDate(tokenDate);
+
+        InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+
+        persistentToken.setIpAddress(loopbackAddress.getHostAddress());
+        persistentToken.setUserAgent("Test agent");
+
+        persistentTokenRepository.save(persistentToken);
+    }
+
+    private static User createInvitee(String email, String activationKey) {
+        User user = new User();
+
+        user.setLogin(email);
+        user.setEmail(email);
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey(activationKey);
+        user.setInvited(activationKey != null);
+
+        return user;
     }
 
     @TestConfiguration
