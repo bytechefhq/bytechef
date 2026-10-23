@@ -248,6 +248,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
 
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById =
+            getInstanceConfigurations(integrationInstances, filteredConfiguration, connectedUser, mcpWorkflows);
+
         Authorization authorization = Objects.requireNonNull(connectionDefinition)
             .getAuthorizations()
             .stream()
@@ -285,7 +288,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
             authorization, connections, filteredConfiguration, integrationInstances,
-            integrationInstanceWorkflows, oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
+            integrationInstanceWorkflows, integrationInstanceConfigurationsById, oAuth2AuthorizationParameters,
+            oAuth2Service.getRedirectUri());
 
         return connectedUserIntegrationDTO.withMcp(
             getMcpTools(integrationDTO.componentName()), mcpWorkflows,
@@ -461,12 +465,43 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     .map(IntegrationInstance::getId)
                     .toList());
 
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById =
+            getInstanceConfigurations(integrationInstances, filteredConfiguration, connectedUser, mcpWorkflows);
+
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
-            connections, filteredConfiguration, integrationInstances, integrationInstanceWorkflows);
+            connections, filteredConfiguration, integrationInstances, integrationInstanceWorkflows,
+            integrationInstanceConfigurationsById);
 
         return connectedUserIntegrationDTO.withMcp(
             getMcpTools(integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+    }
+
+    private Map<Long, IntegrationInstanceConfigurationDTO> getInstanceConfigurations(
+        List<IntegrationInstance> integrationInstances, IntegrationInstanceConfigurationDTO selfServeConfiguration,
+        ConnectedUser connectedUser, List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows) {
+
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById = new HashMap<>();
+
+        integrationInstanceConfigurationsById.put(selfServeConfiguration.id(), selfServeConfiguration);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            Long integrationInstanceConfigurationId = integrationInstance.getIntegrationInstanceConfigurationId();
+
+            if (integrationInstanceConfigurationsById.containsKey(integrationInstanceConfigurationId)) {
+                continue;
+            }
+
+            IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(
+                    integrationInstanceConfigurationId);
+
+            integrationInstanceConfigurationsById.put(
+                integrationInstanceConfigurationId,
+                filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows));
+        }
+
+        return integrationInstanceConfigurationsById;
     }
 
     private List<IntegrationInstance> getIntegrationInstances(
@@ -642,7 +677,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
                 return new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                     integrationInstance.connection(), integrationInstance.integrationInstance(),
-                    integrationInstance.workflows(), mcpInstanceTools, mcpInstanceWorkflows);
+                    integrationInstance.workflows(), mcpInstanceTools, mcpInstanceWorkflows,
+                    integrationInstance.integrationInstanceConfiguration());
             })
             .toList();
     }

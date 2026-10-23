@@ -67,10 +67,14 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "name", source = "integrationInstanceConfiguration.integration.title")
         IntegrationBasicModel convert(ConnectedUserIntegrationDTO connectedUserIntegrationDTO);
 
+        @Mapping(target = "availableWorkflows", ignore = true)
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "connectionId", source = "integrationInstance.connectionId")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
+        @Mapping(
+            target = "integrationInstanceConfigurationId", source = "integrationInstanceConfiguration.id")
+        @Mapping(target = "integrationVersion", source = "integrationInstanceConfiguration.integrationVersion")
         @Mapping(target = "mcpTools", source = "mcpTools")
         @Mapping(target = "mcpWorkflows", source = "mcpWorkflows")
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);
@@ -142,10 +146,16 @@ public interface ConnectedUserIntegrationMapper {
 
         McpIntegrationInstanceToolModel map(ConnectedUserIntegrationDTO.McpInstanceToolInfo mcpInstanceToolInfo);
 
+        @Mapping(
+            target = "availableWorkflows",
+            source = "integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows")
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "connectionId", source = "integrationInstance.connectionId")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
+        @Mapping(
+            target = "integrationInstanceConfigurationId", source = "integrationInstanceConfiguration.id")
+        @Mapping(target = "integrationVersion", source = "integrationInstanceConfiguration.integrationVersion")
         @Mapping(target = "mcpTools", source = "mcpTools")
         @Mapping(target = "mcpWorkflows", source = "mcpWorkflows")
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);

@@ -425,13 +425,14 @@ class ConnectedUserIntegrationFacadeIntTest {
             String externalUserId = createConnectedUser(Map.of("plan", "free"));
 
             long integrationId = createIntegrationRow(null);
-            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
 
-            String gatedWorkflowUuid = addWorkflow(
-                integrationId, integrationInstanceConfigurationId, "gated", true, PRO_PLAN_PERMISSION_EXPRESSION)
+            String gatedWorkflowUuid = addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "gated", true,
+                PRO_PLAN_PERMISSION_EXPRESSION)
                     .getUuidAsString();
-            String openWorkflowUuid = addWorkflow(integrationId, integrationInstanceConfigurationId, "open", true, null)
-                .getUuidAsString();
+            String openWorkflowUuid =
+                addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "open", true, null)
+                    .getUuidAsString();
 
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId))
                 .containsExactly(openWorkflowUuid)
@@ -443,16 +444,16 @@ class ConnectedUserIntegrationFacadeIntTest {
             String externalUserId = createConnectedUser(Map.of());
 
             long integrationId = createIntegrationRow(null);
-            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
 
-            String visibleWorkflowUuid = addWorkflow(
-                integrationId, integrationInstanceConfigurationId, "enabled", true, null)
+            String visibleWorkflowUuid =
+                addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "enabled", true, null)
                     .getUuidAsString();
 
-            addWorkflow(integrationId, integrationInstanceConfigurationId, "disabled", false, null);
+            addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "disabled", false, null);
 
-            IntegrationWorkflow mcpIntegrationWorkflow = addWorkflow(
-                integrationId, integrationInstanceConfigurationId, "mcp", true, null);
+            IntegrationWorkflow mcpIntegrationWorkflow =
+                addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "mcp", true, null);
 
             exposeAsMcpWorkflow(integrationId, integrationInstanceConfigurationId, mcpIntegrationWorkflow);
 
@@ -472,7 +473,7 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             long connectedIntegrationId = createIntegrationRow(null);
             long connectedIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
-                connectedIntegrationId);
+                connectedIntegrationId, 1);
             long otherIntegrationId = createIntegration(null);
 
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
@@ -494,15 +495,90 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .isEmpty();
         }
 
+        @Test
+        void testPinnedInstanceCarriesItsOwnConfigurationWorkflows() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+            long version1ConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+            long version2ConfigurationId = createIntegrationInstanceConfiguration(integrationId, 2);
+
+            IntegrationWorkflow version1Workflow = addWorkflow(
+                integrationId, version1ConfigurationId, 1, "v1-only", true, null);
+            IntegrationWorkflow version2Workflow = addWorkflow(
+                integrationId, version2ConfigurationId, 2, "v2-only", true, null);
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance pinnedInstance = integrationInstanceService.create(
+                connectedUser.getId(), CONNECTION_ID, version1ConfigurationId);
+
+            stubConnection();
+
+            ConnectedUserIntegrationDTO integration = getConnectedUserIntegration(externalUserId, integrationId);
+
+            assertThat(integration.integrationInstanceConfiguration()
+                .integrationVersion()).isEqualTo(2);
+            assertThat(integration.integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(version2Workflow.getUuidAsString());
+
+            ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance instance =
+                integration.integrationInstances()
+                    .getFirst();
+
+            assertThat(instance.integrationInstance()
+                .getId()).isEqualTo(pinnedInstance.getId());
+            assertThat(instance.integrationInstanceConfiguration()
+                .integrationVersion()).isEqualTo(1);
+            assertThat(instance.integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(version1Workflow.getUuidAsString());
+        }
+
+        @Test
+        void testWorkflowToggleOnPinnedInstanceResolvesItsOwnVersion() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+            long version1ConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+            long version2ConfigurationId = createIntegrationInstanceConfiguration(integrationId, 2);
+
+            IntegrationWorkflow version1Workflow = addWorkflow(
+                integrationId, version1ConfigurationId, 1, "v1-only", true, null);
+
+            addWorkflow(integrationId, version2ConfigurationId, 2, "v2-only", true, null);
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance pinnedInstance = integrationInstanceService.create(
+                connectedUser.getId(), CONNECTION_ID, version1ConfigurationId);
+
+            assertThat(integrationWorkflowService.getWorkflowId(
+                pinnedInstance.getId(), version1Workflow.getUuidAsString()))
+                    .isEqualTo(version1Workflow.getWorkflowId());
+        }
+
+        private void stubConnection() {
+            Connection connection = mock(Connection.class);
+
+            when(connection.getId()).thenReturn(CONNECTION_ID);
+            when(connectionService.getConnections(anyList())).thenReturn(List.of(connection));
+        }
+
         private IntegrationWorkflow addWorkflow(
-            long integrationId, long integrationInstanceConfigurationId, String label, boolean enabled,
-            String permissionExpression) {
+            long integrationId, long integrationInstanceConfigurationId, int integrationVersion, String label,
+            boolean enabled, String permissionExpression) {
 
             Workflow workflow = workflowService.create(
                 WORKFLOW_DEFINITION.formatted(label), Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
             IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
-                integrationId, 1, workflow.getId());
+                integrationId, integrationVersion, workflow.getId());
 
             if (permissionExpression != null) {
                 integrationWorkflow = integrationWorkflowService.updatePermissionExpression(
@@ -537,18 +613,18 @@ class ConnectedUserIntegrationFacadeIntTest {
         private long createIntegration(String permissionExpression) {
             long integrationId = createIntegrationRow(permissionExpression);
 
-            createIntegrationInstanceConfiguration(integrationId);
+            createIntegrationInstanceConfiguration(integrationId, 1);
 
             return integrationId;
         }
 
-        private long createIntegrationInstanceConfiguration(long integrationId) {
+        private long createIntegrationInstanceConfiguration(long integrationId, int integrationVersion) {
             IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
             integrationInstanceConfiguration.setConnectionParameters(Map.of());
             integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
             integrationInstanceConfiguration.setIntegrationId(integrationId);
-            integrationInstanceConfiguration.setIntegrationVersion(1);
+            integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
             integrationInstanceConfiguration.setName("Slack");
 
             integrationInstanceConfiguration = integrationInstanceConfigurationService.create(

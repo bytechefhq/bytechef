@@ -27,6 +27,7 @@ import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -46,13 +47,14 @@ public record ConnectedUserIntegrationDTO(
     public ConnectedUserIntegrationDTO(
         List<Connection> connections, IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
         List<IntegrationInstance> integrationInstances,
-        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows,
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById) {
 
         this(
             null, integrationInstanceConfiguration,
             toIntegrationInstances(
-                connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
-                integrationInstances, integrationInstanceWorkflows),
+                connections, integrationInstanceConfigurationsById, integrationInstances,
+                integrationInstanceWorkflows),
             null, null, List.of(), List.of());
     }
 
@@ -60,6 +62,7 @@ public record ConnectedUserIntegrationDTO(
         Authorization authorization, List<Connection> connections,
         IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
         List<IntegrationInstance> integrationInstances, List<IntegrationInstanceWorkflow> integrationInstanceWorkflows,
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById,
         @Nullable OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
 
         this(
@@ -69,8 +72,8 @@ public record ConnectedUserIntegrationDTO(
                 authorization.getProperties()),
             integrationInstanceConfiguration,
             toIntegrationInstances(
-                connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
-                integrationInstances, integrationInstanceWorkflows),
+                connections, integrationInstanceConfigurationsById, integrationInstances,
+                integrationInstanceWorkflows),
             oAuth2AuthorizationParameters, redirectUri, List.of(), List.of());
     }
 
@@ -85,29 +88,38 @@ public record ConnectedUserIntegrationDTO(
 
     private static List<ConnectedUserIntegrationInstance> toIntegrationInstances(
         List<Connection> connections,
-        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
+        Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById,
         List<IntegrationInstance> integrationInstances,
         List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
 
         return integrationInstances.stream()
-            .map(integrationInstance -> new ConnectedUserIntegrationInstance(
-                getConnection(connections, integrationInstance), integrationInstance,
-                toIntegrationInstanceWorkflows(
-                    integrationInstanceConfigurationWorkflowDTOs, integrationInstance.getId(),
-                    integrationInstanceWorkflows)))
+            .map(integrationInstance -> {
+                IntegrationInstanceConfigurationDTO integrationInstanceConfiguration =
+                    integrationInstanceConfigurationsById
+                        .get(integrationInstance.getIntegrationInstanceConfigurationId());
+
+                return new ConnectedUserIntegrationInstance(
+                    getConnection(connections, integrationInstance), integrationInstance,
+                    toIntegrationInstanceWorkflows(
+                        integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
+                        integrationInstance.getId(), integrationInstanceWorkflows),
+                    integrationInstanceConfiguration);
+            })
             .toList();
     }
 
     public record ConnectedUserIntegrationInstance(
         Connection connection, IntegrationInstance integrationInstance,
         List<ConnectedUserIntegrationInstanceWorkflow> workflows, List<McpInstanceToolInfo> mcpTools,
-        List<ConnectedUserIntegrationInstanceWorkflow> mcpWorkflows) {
+        List<ConnectedUserIntegrationInstanceWorkflow> mcpWorkflows,
+        IntegrationInstanceConfigurationDTO integrationInstanceConfiguration) {
 
         public ConnectedUserIntegrationInstance(
             Connection connection, IntegrationInstance integrationInstance,
-            List<ConnectedUserIntegrationInstanceWorkflow> workflows) {
+            List<ConnectedUserIntegrationInstanceWorkflow> workflows,
+            IntegrationInstanceConfigurationDTO integrationInstanceConfiguration) {
 
-            this(connection, integrationInstance, workflows, List.of(), List.of());
+            this(connection, integrationInstance, workflows, List.of(), List.of(), integrationInstanceConfiguration);
         }
     }
 
