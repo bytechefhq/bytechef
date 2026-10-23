@@ -15,6 +15,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,6 +139,23 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     @Transactional(readOnly = true)
     public List<IntegrationInstance> getIntegrationInstances(List<Long> ids) {
         return integrationInstanceRepository.findAllById(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationInstance> getIntegrationInstancesByWorkflowUuid(
+        long connectedUserId, String workflowUuid, Environment environment) {
+
+        UUID uuid;
+
+        try {
+            uuid = UUID.fromString(workflowUuid);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return List.of();
+        }
+
+        return integrationInstanceRepository.findAllByConnectedUserIdAndWorkflowUuidAndEnvironment(
+            connectedUserId, uuid, environment.ordinal());
     }
 
     @Override
