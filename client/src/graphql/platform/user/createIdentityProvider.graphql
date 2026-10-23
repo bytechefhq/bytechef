@@ -18,6 +18,7 @@ mutation createIdentityProvider($input: IdentityProviderInput!) {
         name
         nameIdFormat
         scopes
+        serviceProviderCertificate
         signingCertificate
         type
     }
