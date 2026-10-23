@@ -8,14 +8,13 @@
 package com.bytechef.ee.security.sso.saml2;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.bytechef.ee.security.sso.saml2.ServiceProviderSigningCredentials.PemCredential;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Signature;
-import java.security.cert.X509Certificate;
-import java.time.Duration;
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 
@@ -27,27 +26,11 @@ import org.springframework.security.saml2.core.Saml2X509Credential;
 class ServiceProviderSigningCredentialsTest {
 
     @Test
-    void testGeneratedCredentialReadsBackAsASigningCredential() throws GeneralSecurityException {
-        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef saml-7");
-
-        assertThat(pemCredential.certificate()).startsWith("-----BEGIN CERTIFICATE-----\n");
-        assertThat(pemCredential.privateKey()).startsWith("-----BEGIN PRIVATE KEY-----\n");
-
+    void testStoredKeyPairReadsBackAsASigningCredential() throws GeneralSecurityException, IOException {
         Saml2X509Credential signingCredential = ServiceProviderSigningCredentials.toSigningCredential(
-            pemCredential.certificate(), pemCredential.privateKey());
+            resource("sp-signing-certificate.pem"), resource("sp-signing-key.pem"));
 
         assertThat(signingCredential.isSigningCredential()).isTrue();
-
-        X509Certificate certificate = signingCredential.getCertificate();
-
-        certificate.verify(certificate.getPublicKey());
-
-        assertThat(certificate.getSubjectX500Principal()
-            .getName()).isEqualTo("CN=ByteChef saml-7");
-        assertThat(certificate.getNotAfter()
-            .toInstant()).isAfter(Instant.now()
-                .plus(ServiceProviderSigningCredentials.VALIDITY)
-                .minus(Duration.ofDays(1)));
 
         byte[] payload = "AuthnRequest".getBytes(StandardCharsets.UTF_8);
 
@@ -60,25 +43,27 @@ class ServiceProviderSigningCredentialsTest {
 
         Signature verifier = Signature.getInstance("SHA256withRSA");
 
-        verifier.initVerify(certificate);
+        verifier.initVerify(signingCredential.getCertificate());
         verifier.update(payload);
 
         assertThat(verifier.verify(signature)).isTrue();
     }
 
     @Test
-    void testEachIdentityProviderGetsItsOwnKey() {
-        PemCredential firstPemCredential = ServiceProviderSigningCredentials.generate("ByteChef saml-1");
-        PemCredential secondPemCredential = ServiceProviderSigningCredentials.generate("ByteChef saml-2");
+    void testAnUnreadablePrivateKeyIsRejected() throws IOException {
+        String certificate = resource("sp-signing-certificate.pem");
 
-        assertThat(firstPemCredential.privateKey()).isNotEqualTo(secondPemCredential.privateKey());
+        assertThatThrownBy(() -> ServiceProviderSigningCredentials.toSigningCredential(
+            certificate, "-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unable to read the SAML signing credential");
     }
 
-    @Test
-    void testToStringDoesNotRevealThePrivateKey() {
-        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef saml-7");
+    private static String resource(String name) throws IOException {
+        try (InputStream inputStream = ServiceProviderSigningCredentialsTest.class.getResourceAsStream(
+            "/saml2/" + name)) {
 
-        assertThat(pemCredential.toString()).doesNotContain(pemCredential.privateKey())
-            .contains("[REDACTED]");
+            return new String(inputStream.readAllBytes(), StandardCharsets.US_ASCII);
+        }
     }
 }

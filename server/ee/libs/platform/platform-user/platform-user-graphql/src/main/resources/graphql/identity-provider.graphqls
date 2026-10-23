@@ -7,6 +7,7 @@ extend type Mutation {
     createIdentityProvider(input: IdentityProviderInput!): IdentityProviderType!
     deleteIdentityProvider(id: ID!): Boolean!
     generateIdentityProviderScimApiKey(id: ID!): String!
+    regenerateIdentityProviderServiceProviderCertificate(id: ID!): IdentityProviderType!
     updateIdentityProvider(id: ID!, input: IdentityProviderInput!): IdentityProviderType!
 }
 
@@ -31,6 +32,7 @@ type IdentityProviderType {
     registrationId: String!
     scimEnabled: Boolean!
     scopes: String
+    serviceProviderCertificate: String
     signingCertificate: String
     type: String!
 }

@@ -10,8 +10,10 @@ package com.bytechef.ee.platform.user.service;
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.domain.ScimApiKey;
 import com.bytechef.ee.platform.user.repository.IdentityProviderRepository;
+import com.bytechef.ee.platform.user.service.ServiceProviderSigningKeyPairs.PemKeyPair;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import java.util.Optional;
@@ -46,15 +48,19 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             identityProvider.setClientSecret(encryption.encrypt(clientSecret));
         }
 
+        if (UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType())) {
+            setServiceProviderSigningKeyPair(identityProvider, ServiceProviderSigningKeyPairs.generate());
+        }
+
         return identityProviderRepository.save(identityProvider);
     }
 
     @Override
-    public IdentityProvider createServiceProviderSigningCredentialIfAbsent(
-        long id, String certificate, String privateKey) {
+    public IdentityProvider createServiceProviderSigningCredentialIfAbsent(long id) {
+        PemKeyPair pemKeyPair = ServiceProviderSigningKeyPairs.generate();
 
         identityProviderRepository.updateServiceProviderSigningCredentialIfAbsent(
-            id, certificate, encryption.encrypt(privateKey));
+            id, pemKeyPair.certificate(), encryption.encrypt(pemKeyPair.privateKey()));
 
         return getIdentityProvider(id);
     }
@@ -137,8 +143,26 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     }
 
     @Override
+    public IdentityProvider regenerateServiceProviderSigningCredential(long id) {
+        IdentityProvider identityProvider = getIdentityProvider(id);
+
+        if (!UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType())) {
+            throw new IllegalArgumentException("Identity provider " + id + " is not a SAML identity provider");
+        }
+
+        setServiceProviderSigningKeyPair(identityProvider, ServiceProviderSigningKeyPairs.generate());
+
+        return identityProviderRepository.save(identityProvider);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public String getDecryptedServiceProviderSigningKey(IdentityProvider identityProvider) {
         return encryption.decrypt(identityProvider.getServiceProviderSigningKey());
+    }
+
+    private void setServiceProviderSigningKeyPair(IdentityProvider identityProvider, PemKeyPair pemKeyPair) {
+        identityProvider.setServiceProviderSigningCertificate(pemKeyPair.certificate());
+        identityProvider.setServiceProviderSigningKey(encryption.encrypt(pemKeyPair.privateKey()));
     }
 }

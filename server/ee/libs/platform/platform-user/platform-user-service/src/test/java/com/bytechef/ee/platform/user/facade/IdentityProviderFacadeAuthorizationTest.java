@@ -44,6 +44,11 @@ class IdentityProviderFacadeAuthorizationTest {
     }
 
     @Test
+    void testGenerateScimApiKeyRequiresAdmin() {
+        assertAdminOnly("generateScimApiKey");
+    }
+
+    @Test
     void testGetIdentityProviderRequiresAdmin() {
         assertAdminOnly("getIdentityProvider");
     }
@@ -51,6 +56,11 @@ class IdentityProviderFacadeAuthorizationTest {
     @Test
     void testGetIdentityProvidersRequiresAdmin() {
         assertAdminOnly("getIdentityProviders");
+    }
+
+    @Test
+    void testRegenerateServiceProviderSigningCredentialRequiresAdmin() {
+        assertAdminOnly("regenerateServiceProviderSigningCredential");
     }
 
     @Test

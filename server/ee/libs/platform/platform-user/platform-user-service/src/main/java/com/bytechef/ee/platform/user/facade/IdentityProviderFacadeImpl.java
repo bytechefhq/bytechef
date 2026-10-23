@@ -64,6 +64,12 @@ class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public IdentityProvider regenerateServiceProviderSigningCredential(Long id) {
+        return identityProviderService.regenerateServiceProviderSigningCredential(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProvider update(IdentityProvider identityProvider) {
         return identityProviderService.update(identityProvider);
     }
