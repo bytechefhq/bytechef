@@ -582,6 +582,26 @@ class LazyTaskExecutionTreeBuilderTest {
     }
 
     @Test
+    void getFocusPathSkipsFailureWhoseAncestryFormsACycle() {
+        TaskExecution failedTaskExecution = createTaskExecution(7L, 6L, "x", "myComponent/v1/a", 0);
+        TaskExecution cyclicParentTaskExecution = createTaskExecution(6L, 7L, "y", "myComponent/v1/a", 0);
+        TaskExecution startedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 0);
+
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(failedTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(6L))
+            .thenReturn(Optional.of(cyclicParentTaskExecution));
+        when(taskExecutionService.fetchLastStartedJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(startedTaskExecution));
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(startedTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(4L, null, null));
+    }
+
+    @Test
     void getFocusPathFallsBackToLastStartedTaskWhenTheFailureIndexIsInvalid() {
         TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
         TaskExecution failedTaskExecution = createTaskExecution(5L, 1L, "x", "myComponent/v1/a", 0);

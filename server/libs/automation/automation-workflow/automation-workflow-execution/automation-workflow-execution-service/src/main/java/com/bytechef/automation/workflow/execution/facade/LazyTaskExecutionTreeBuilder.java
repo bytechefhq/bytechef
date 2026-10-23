@@ -198,6 +198,14 @@ class LazyTaskExecutionTreeBuilder {
         while (currentTaskExecution.getParentId() != null) {
             Long parentId = currentTaskExecution.getParentId();
 
+            if (containsTaskExecution(ancestry, parentId)) {
+                log.warn(
+                    "Parent task execution id={} of task execution id={} forms a cycle", parentId,
+                    currentTaskExecution.getId());
+
+                return Optional.empty();
+            }
+
             Optional<TaskExecution> parentOptional = ancestorCache.computeIfAbsent(
                 parentId, taskExecutionService::fetchTaskExecution);
 
@@ -217,6 +225,11 @@ class LazyTaskExecutionTreeBuilder {
         Collections.reverse(ancestry);
 
         return Optional.of(ancestry);
+    }
+
+    private static boolean containsTaskExecution(List<TaskExecution> taskExecutions, Long taskExecutionId) {
+        return taskExecutions.stream()
+            .anyMatch(taskExecution -> Objects.equals(taskExecution.getId(), taskExecutionId));
     }
 
     private int getChildCount(
@@ -246,7 +259,7 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     private static Job getLatestJob(Job job, Job otherJob) {
-        log.warn(
+        log.debug(
             "Task execution id={} has more than one child job, ids={} and {}", job.getParentTaskExecutionId(),
             job.getId(), otherJob.getId());
 
