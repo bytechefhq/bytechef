@@ -44,6 +44,20 @@ function computeDurationMillis(startDate?: string, endDate?: string): number | u
 }
 
 /**
+ * Drops every node still marked RUNNING. A run that ends without a `result` event -- stopped by the user, aborted,
+ * or failed -- has no execution to backfill from, so its in-flight nodes would otherwise keep spinning.
+ */
+function clearRunningNodeStates() {
+    const {removeWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
+
+    for (const [name, nodeState] of Object.entries(workflowTestNodeStates)) {
+        if (nodeState.status === 'RUNNING') {
+            removeWorkflowTestNodeState(name);
+        }
+    }
+}
+
+/**
  * Drops a `progress` snapshot left behind by a run that ends without a `result` event. Such a snapshot still reads as
  * running, so keeping it would show a stopped run as in flight; a finished result is left alone.
  */
@@ -93,14 +107,7 @@ function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecuti
             }
         }
     } else if (jobStatus === 'FAILED' || jobStatus === 'STOPPED') {
-        const {removeWorkflowTestNodeState, workflowTestNodeStates: currentNodeStates} =
-            useWorkflowEditorStore.getState();
-
-        for (const [name, nodeState] of Object.entries(currentNodeStates)) {
-            if (nodeState.status === 'RUNNING') {
-                removeWorkflowTestNodeState(name);
-            }
-        }
+        clearRunningNodeStates();
     }
 }
 
@@ -184,6 +191,7 @@ export function useWorkflowTestStream({
                 setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
             error: (data) => {
+                clearRunningNodeStates();
                 setWorkflowIsRunning(false);
                 setWorkflowTestExecution(undefined);
                 setStreamRequest(null);
@@ -254,6 +262,8 @@ export function useWorkflowTestStream({
 
                     resetWorkflowTestNodeStates(workflowId);
 
+                    questionShownRef.current = false;
+
                     persistJobId(jobId);
 
                     if (onStart) {
@@ -322,6 +332,7 @@ export function useWorkflowTestStream({
 
     const close = useCallback(() => {
         closeSSE();
+        clearRunningNodeStates();
         clearProgressSnapshot();
     }, [closeSSE]);
 

@@ -94,6 +94,7 @@ export const useAutomationWorkflowEditorHeader = ({
 
     const handleWorkflowValueChange = (workflowUuid: string) => {
         setWorkflowTestExecution(undefined);
+        useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         setCurrentNode(undefined);
 
         navigate('/embedded/automation-workflows/' + workflowUuid + '/editor');
