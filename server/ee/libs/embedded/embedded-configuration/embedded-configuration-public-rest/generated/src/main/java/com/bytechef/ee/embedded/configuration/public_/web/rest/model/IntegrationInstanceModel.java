@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectionConfigModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
@@ -42,6 +43,8 @@ public class IntegrationInstanceModel {
   private Boolean enabled;
 
   private List<@Valid IntegrationWorkflowModel> availableWorkflows = new ArrayList<>();
+
+  private @Nullable ConnectionConfigModel connectionConfig;
 
   private @Nullable Long integrationInstanceConfigurationId;
 
@@ -175,6 +178,27 @@ public class IntegrationInstanceModel {
   @JsonProperty("availableWorkflows")
   public void setAvailableWorkflows(List<@Valid IntegrationWorkflowModel> availableWorkflows) {
     this.availableWorkflows = availableWorkflows;
+  }
+
+  public IntegrationInstanceModel connectionConfig(@Nullable ConnectionConfigModel connectionConfig) {
+    this.connectionConfig = connectionConfig;
+    return this;
+  }
+
+  /**
+   * Get connectionConfig
+   * @return connectionConfig
+   */
+  @Valid 
+  @Schema(name = "connectionConfig", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionConfig")
+  public @Nullable ConnectionConfigModel getConnectionConfig() {
+    return connectionConfig;
+  }
+
+  @JsonProperty("connectionConfig")
+  public void setConnectionConfig(@Nullable ConnectionConfigModel connectionConfig) {
+    this.connectionConfig = connectionConfig;
   }
 
   public IntegrationInstanceModel integrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
@@ -320,6 +344,7 @@ public class IntegrationInstanceModel {
         Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
         Objects.equals(this.availableWorkflows, integrationInstance.availableWorkflows) &&
+        Objects.equals(this.connectionConfig, integrationInstance.connectionConfig) &&
         Objects.equals(this.integrationInstanceConfigurationId, integrationInstance.integrationInstanceConfigurationId) &&
         Objects.equals(this.integrationVersion, integrationInstance.integrationVersion) &&
         Objects.equals(this.mcpTools, integrationInstance.mcpTools) &&
@@ -329,7 +354,7 @@ public class IntegrationInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, connectionId, credentialStatus, enabled, availableWorkflows, integrationInstanceConfigurationId, integrationVersion, mcpTools, mcpWorkflows, workflows);
+    return Objects.hash(id, connectionId, credentialStatus, enabled, availableWorkflows, connectionConfig, integrationInstanceConfigurationId, integrationVersion, mcpTools, mcpWorkflows, workflows);
   }
 
   @Override
@@ -341,6 +366,7 @@ public class IntegrationInstanceModel {
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    availableWorkflows: ").append(toIndentedString(availableWorkflows)).append("\n");
+    sb.append("    connectionConfig: ").append(toIndentedString(connectionConfig)).append("\n");
     sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    mcpTools: ").append(toIndentedString(mcpTools)).append("\n");

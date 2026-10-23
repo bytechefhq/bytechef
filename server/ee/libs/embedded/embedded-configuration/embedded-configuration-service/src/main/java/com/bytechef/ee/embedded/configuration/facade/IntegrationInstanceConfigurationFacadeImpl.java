@@ -361,20 +361,29 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         .findFirst()
                         .orElseThrow();
 
-                    return toIntegrationInstanceConfigurationDTO(
-                        integrationDTO,
-                        integrationInstanceConfiguration,
-                        integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                            integrationInstanceConfiguration.getId()),
-                        integrationWorkflowService.getIntegrationWorkflows(
-                            integrationInstanceConfiguration.getIntegrationId(),
-                            integrationInstanceConfiguration.getIntegrationVersion()),
-                        filterTags(tags, integrationInstanceConfiguration));
+                    return toConnectedUserIntegrationInstanceConfigurationDTO(
+                        integrationDTO, integrationInstanceConfiguration, tags);
                 })
                 .toList();
         }
 
         return integrationInstanceConfigurationDTOs;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
+    public IntegrationInstanceConfigurationDTO getConnectedUserIntegrationInstanceConfiguration(long id) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(id);
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations = List.of(
+            integrationInstanceConfiguration);
+
+        List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
+
+        return toConnectedUserIntegrationInstanceConfigurationDTO(
+            integrationDTOs.getFirst(), integrationInstanceConfiguration, getTags(integrationInstanceConfigurations));
     }
 
     @Override
@@ -848,6 +857,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .findFirst()
             .map(IntegrationWorkflow::getUuidAsString)
             .orElseThrow();
+    }
+
+    private IntegrationInstanceConfigurationDTO toConnectedUserIntegrationInstanceConfigurationDTO(
+        IntegrationDTO integrationDTO, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        List<Tag> tags) {
+
+        return toIntegrationInstanceConfigurationDTO(
+            integrationDTO, integrationInstanceConfiguration,
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfiguration.getId()),
+            integrationWorkflowService.getIntegrationWorkflows(
+                integrationInstanceConfiguration.getIntegrationId(),
+                integrationInstanceConfiguration.getIntegrationVersion()),
+            filterTags(tags, integrationInstanceConfiguration));
     }
 
     private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(

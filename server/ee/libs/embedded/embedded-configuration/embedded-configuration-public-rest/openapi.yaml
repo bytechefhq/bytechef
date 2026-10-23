@@ -2256,6 +2256,8 @@ components:
               items:
                 $ref: '#/components/schemas/IntegrationWorkflow'
               readOnly: true
+            connectionConfig:
+              $ref: "#/components/schemas/ConnectionConfig"
             integrationInstanceConfigurationId:
               description: "The id of the integration instance configuration this instance belongs to."
               type: "integer"

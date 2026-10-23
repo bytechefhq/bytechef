@@ -68,6 +68,7 @@ public interface ConnectedUserIntegrationMapper {
         IntegrationBasicModel convert(ConnectedUserIntegrationDTO connectedUserIntegrationDTO);
 
         @Mapping(target = "availableWorkflows", ignore = true)
+        @Mapping(target = "connectionConfig", ignore = true)
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "connectionId", source = "integrationInstance.connectionId")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")

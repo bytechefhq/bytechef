@@ -28,6 +28,10 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -50,6 +54,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -97,16 +102,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -563,6 +576,131 @@ class ConnectedUserIntegrationFacadeIntTest {
                     .isEqualTo(version1Workflow.getWorkflowId());
         }
 
+        @Test
+        void testPinnedInstanceThroughSingleIntegrationReadCarriesItsOwnConfiguration() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            stubSlackConnectionDefinition();
+
+            long integrationId = createIntegrationRow(null);
+            long version1ConfigurationId = createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.BEARER_TOKEN);
+            long version2ConfigurationId = createIntegrationInstanceConfiguration(
+                integrationId, 2, AuthorizationType.API_KEY);
+
+            IntegrationWorkflow version1Workflow = addWorkflow(
+                integrationId, version1ConfigurationId, 1, "v1-only", true, null);
+            IntegrationWorkflow version2Workflow = addWorkflow(
+                integrationId, version2ConfigurationId, 2, "v2-only", true, null);
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance pinnedInstance = integrationInstanceService.create(
+                connectedUser.getId(), CONNECTION_ID, version1ConfigurationId);
+
+            stubConnection();
+
+            ConnectedUserIntegrationDTO integration = connectedUserIntegrationFacade.getConnectedUserIntegration(
+                externalUserId, integrationId, true, Environment.PRODUCTION);
+
+            assertThat(integration.integrationInstanceConfiguration()
+                .integrationVersion()).isEqualTo(2);
+            assertThat(integration.integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(version2Workflow.getUuidAsString());
+            assertThat(integration.connectionConfig()
+                .authorizationType()).isEqualTo(AuthorizationType.API_KEY);
+
+            ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance instance =
+                integration.integrationInstances()
+                    .getFirst();
+
+            assertThat(instance.integrationInstance()
+                .getId()).isEqualTo(pinnedInstance.getId());
+            assertThat(instance.integrationInstanceConfiguration()
+                .integrationVersion()).isEqualTo(1);
+            assertThat(instance.integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(version1Workflow.getUuidAsString());
+            assertThat(instance.connectionConfig()
+                .authorizationType()).isEqualTo(AuthorizationType.BEARER_TOKEN);
+            assertThat(instance.connectionConfig()
+                .inputs())
+                    .extracting(ConnectedUserIntegrationDTO.Input::name)
+                    .containsExactly("token");
+        }
+
+        private void stubSlackConnectionDefinition() {
+            when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+                .thenReturn(
+                    new ComponentDefinition(
+                        ComponentDsl.component("slack")
+                            .connection(
+                                ComponentDsl.connection()
+                                    .authorizations(
+                                        ComponentDsl.authorization(AuthorizationType.BEARER_TOKEN)
+                                            .properties(ComponentDsl.string("token")),
+                                        ComponentDsl.authorization(AuthorizationType.API_KEY)
+                                            .properties(ComponentDsl.string("key"))))));
+        }
+
+        @Nested
+        @ContextConfiguration(classes = MethodSecurity.MethodSecurityConfiguration.class)
+        @MockitoBean(types = PermissionService.class)
+        class MethodSecurity {
+
+            @AfterEach
+            void afterEach() {
+                SecurityContextHolder.clearContext();
+            }
+
+            @Test
+            void testConnectedUserReadsPinnedInstanceConfigurationWithoutTenantAdmin() {
+                String externalUserId = createConnectedUser(Map.of());
+
+                long integrationId = createIntegrationRow(null);
+                long version1ConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+
+                createIntegrationInstanceConfiguration(integrationId, 2);
+
+                ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                    externalUserId, Environment.PRODUCTION);
+
+                integrationInstanceService.create(connectedUser.getId(), CONNECTION_ID, version1ConfigurationId);
+
+                stubConnection();
+
+                SecurityContextHolder.getContext()
+                    .setAuthentication(
+                        new EmbeddedApiKeyAuthenticationToken(
+                            Environment.PRODUCTION.ordinal(), connectedUser.getId(),
+                            new User(externalUserId, "", List.of()), false));
+
+                ConnectedUserIntegrationDTO integration = getConnectedUserIntegration(externalUserId, integrationId);
+
+                assertThat(integration.integrationInstances()).hasSize(1);
+                assertThat(integration.integrationInstances()
+                    .getFirst()
+                    .integrationInstanceConfiguration()
+                    .integrationVersion()).isEqualTo(1);
+            }
+
+            @Configuration
+            @EnableMethodSecurity
+            static class MethodSecurityConfiguration {
+
+                @Bean
+                static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                    @Lazy PermissionService permissionService) {
+
+                    return new AutomationMethodSecurityExpressionHandler(permissionService);
+                }
+            }
+        }
+
         private void stubConnection() {
             Connection connection = mock(Connection.class);
 
@@ -619,7 +757,17 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         private long createIntegrationInstanceConfiguration(long integrationId, int integrationVersion) {
+            return createIntegrationInstanceConfiguration(integrationId, integrationVersion, null);
+        }
+
+        private long createIntegrationInstanceConfiguration(
+            long integrationId, int integrationVersion, AuthorizationType authorizationType) {
+
             IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+            if (authorizationType != null) {
+                integrationInstanceConfiguration.setAuthorizationType(authorizationType);
+            }
 
             integrationInstanceConfiguration.setConnectionParameters(Map.of());
             integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
