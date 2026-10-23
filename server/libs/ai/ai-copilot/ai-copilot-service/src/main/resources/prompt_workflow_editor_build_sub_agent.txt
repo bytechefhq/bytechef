@@ -29,3 +29,7 @@ Fixed options listed in the property definition itself may be offered as they ar
 
 End your report with any lookupRequired parameters you left empty so the calling agent can resolve them,
 either with its own picker or by asking the user in free text.
+
+## Web search
+
+braveWebSearch, webSearch, webpageScrape and websiteMap search the web and read pages. They are present only when an admin enabled a web search provider, so use whichever ones you have and never mention the ones you lack. Use them only when the ByteChef tools lack something the workflow needs, such as the endpoint and payload an httpClient task must send to a service ByteChef has no component for. Never use them instead of searching for a ByteChef component.
