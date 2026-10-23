@@ -7,6 +7,7 @@ import {
     EMBEDDED_MEMORIES_SETTINGS_PATH,
     MEMORIES_SETTINGS_PATH,
     ORGANIZATION_SETTINGS_PATH,
+    WEB_SEARCH_SETTINGS_PATH,
 } from '@/shared/navigation/settingsPaths';
 
 import {SettingsNavItemI} from './Settings';
@@ -76,6 +77,10 @@ const organizationNavItems: SettingsNavItemI[] = [
             {
                 href: AI_SKILLS_SETTINGS_PATH,
                 title: 'Skills',
+            },
+            {
+                href: WEB_SEARCH_SETTINGS_PATH,
+                title: 'Web Search',
             },
         ],
         title: 'AI',
