@@ -47,6 +47,8 @@ Use the **Refresh** button in the page header to reload the executions list with
 From a row's **⋮** menu:
 
 - **View** - open the execution detail described below.
+- **Restart** - run a failed or stopped run again. The item is disabled unless the run's status is
+  `FAILED` or `STOPPED`. It is also disabled for a run started by a subflow.
 - **Stop** - cancel a run that is still going. The item is disabled unless the run's status is
   `STARTED`.
 
