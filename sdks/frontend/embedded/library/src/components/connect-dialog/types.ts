@@ -38,9 +38,11 @@ export interface MergedWorkflowType {
 
 export interface IntegrationInstanceType {
     id: number;
+    availableWorkflows?: IntegrationWorkflowType[];
     connectionId?: number;
     enabled: boolean;
     credentialStatus: string;
+    integrationVersion?: number;
     mcpTools?: McpIntegrationInstanceToolType[];
     mcpWorkflows?: IntegrationInstanceWorkflowType[];
     workflows: IntegrationInstanceWorkflowType[];

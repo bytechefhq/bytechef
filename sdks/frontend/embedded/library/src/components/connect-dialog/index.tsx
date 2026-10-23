@@ -147,15 +147,17 @@ export default function useConnectDialog({
 
     // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
     const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
-        if (!integration?.workflows) {
-            return [];
-        }
-
-        const currentInstance = integration.integrationInstances?.find(
+        const currentInstance = integration?.integrationInstances?.find(
             (instance: IntegrationInstanceType) => instance.id === currentIntegrationInstanceId
         );
 
-        return integration.workflows.map((workflow) => {
+        const availableWorkflows = currentInstance?.availableWorkflows ?? integration?.workflows;
+
+        if (!availableWorkflows) {
+            return [];
+        }
+
+        return availableWorkflows.map((workflow) => {
             const instanceWorkflow = currentInstance?.workflows?.find(
                 (currentWorkflow) => currentWorkflow.workflowUuid === workflow.workflowUuid
             );
