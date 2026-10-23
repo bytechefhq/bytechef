@@ -123,6 +123,30 @@ Project is now deployed.
 </Steps>
 
 
+## View a Project's Deployments
+
+You don't have to leave a project to check on its deployments. The **Project Deployments** button
+(rocket icon) sits next to **Deploy** in the project editor header, and next to **Deploy** on each
+published project on the Projects page. It opens a side panel listing the project's deployments in
+the current environment; the panel header takes the environment's color.
+
+Each row is the same as on the Project Deployments page: the enable toggle, the **⋮** menu, the
+tags, and the arrow that expands the deployment's workflows. Clicking a workflow opens its
+[workflow executions](/platform/automation/monitor/workflow-executions). The **Refresh** button in
+the header reloads the list, and **Open in Deployments** in the footer opens the Project
+Deployments page filtered to this project.
+
+When the project has no deployment in the current environment, the panel shows a **Deploy** button
+instead. A project that has never been published shows "Publish the project to deploy it", since a
+deployment always runs a published version.
+
+Where you land after saving a deployment depends on its environment:
+
+- **Development** - you stay where you are, and the panel opens with the new deployment expanded.
+- **Staging** or **Production** - ByteChef switches to that environment and opens the Project
+  Deployments page with the new deployment expanded.
+
+
 ## Update Project Version
 
 <Steps>
