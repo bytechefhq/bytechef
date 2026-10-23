@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -22,8 +23,10 @@ import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConsta
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -105,6 +108,63 @@ class OneTimeTaskListenerTest {
         OneTimeTaskListener oneTimeTaskListener = new OneTimeTaskListener(eventPublisher, jobResumeFacade);
 
         assertThrows(IllegalArgumentException.class, () -> oneTimeTaskListener.onSchedule("poll:42"));
+    }
+
+    @Test
+    void testOnScheduleResumesTheExpiredSuspendInTheTenantTheMessageCarries() {
+        AtomicReference<String> facadeTenantId = new AtomicReference<>();
+
+        when(jobResumeFacade.resumeExpiredJob(JOB_RESUME_ID)).thenAnswer(invocation -> {
+            facadeTenantId.set(TenantContext.getCurrentTenantId());
+
+            return JobResumeOutcome.OK;
+        });
+
+        String message = AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX + "000002:" + JOB_ID +
+            AwsTriggerSchedulerConstants.SPLITTER +
+            JsonUtils.write(Map.of(JobResumeId.TIMEOUT_TASK_PARAMETER, JOB_RESUME_ID));
+
+        new OneTimeTaskListener(eventPublisher, jobResumeFacade).onSchedule(message);
+
+        assertEquals("000002", facadeTenantId.get());
+        assertEquals(TenantContext.DEFAULT_TENANT_ID, TenantContext.getCurrentTenantId());
+    }
+
+    @Test
+    void testOnSchedulePublishesTheResumeJobEventInTheTenantTheMessageCarries() {
+        AtomicReference<String> eventTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            eventTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(eventPublisher)
+            .publishEvent(any(ResumeJobEvent.class));
+
+        new OneTimeTaskListener(eventPublisher, null).onSchedule(
+            AwsTriggerSchedulerConstants.ONE_TIME_TASK_MESSAGE_PREFIX + "000002:" + JOB_ID);
+
+        verifyResumeJobEventPublished();
+
+        assertEquals("000002", eventTenantId.get());
+    }
+
+    @Test
+    void testOnSchedulePublishesTheResumeJobEventInTheCurrentTenantForALegacyMessage() {
+        AtomicReference<String> eventTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            eventTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(eventPublisher)
+            .publishEvent(any(ResumeJobEvent.class));
+
+        new OneTimeTaskListener(eventPublisher, null).onSchedule(createMessage(false));
+
+        verifyResumeJobEventPublished();
+
+        assertEquals(TenantContext.DEFAULT_TENANT_ID, eventTenantId.get());
     }
 
     private static String createMessage(boolean withJobResumeId) {
