@@ -17,6 +17,7 @@ import {Node, NodeChange, XYPosition} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import ClusterElementEdge from '../../cluster-element-editor/edges/ClusterElementEdge';
 import LabeledClusterElementsEdge from '../../cluster-element-editor/edges/LabeledClusterElementsEdge';
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
@@ -198,6 +199,7 @@ const useWorkflowEditorCanvas = ({
 
     const edgeTypes = useMemo(
         () => ({
+            clusterElement: ClusterElementEdge,
             labeledBranchCase: LabeledBranchCaseEdge,
             labeledClusterElementsEdge: LabeledClusterElementsEdge,
             placeholder: PlaceholderEdge,

@@ -8,6 +8,7 @@ import {useWorkflowEditor} from '../../workflow-editor/providers/workflowEditorP
 import useWorkflowDataStore from '../../workflow-editor/stores/useWorkflowDataStore';
 import clearAllClusterElementPositions from '../../workflow-editor/utils/clearAllClusterElementPositions';
 import saveClusterElementNodesPosition from '../../workflow-editor/utils/saveClusterElementNodesPosition';
+import ClusterElementEdge from '../edges/ClusterElementEdge';
 import LabeledClusterElementsEdge from '../edges/LabeledClusterElementsEdge';
 import useClusterElementsLayout from '../hooks/useClusterElementsLayout';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
@@ -88,6 +89,7 @@ const useClusterElementsWorkflowEditor = () => {
     };
 
     const clusterElementsEdgeTypes = {
+        clusterElement: ClusterElementEdge,
         labeledClusterElementsEdge: LabeledClusterElementsEdge,
     };
 
