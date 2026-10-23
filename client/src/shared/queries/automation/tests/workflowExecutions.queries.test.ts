@@ -243,6 +243,15 @@ describe('lazy workflow execution keys and children query', () => {
         expect(
             WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9).slice(0, childrenOfJobKey.length)
         ).toEqual(childrenOfJobKey);
+        expect(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 30).slice(0, childrenOfJobKey.length)
+        ).toEqual(childrenOfJobKey);
+    });
+
+    it('builds a separate children key per start page', () => {
+        expect(WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 0)).not.toEqual(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 30)
+        );
     });
 
     it('pages children with the page size and computes the next page', async () => {
@@ -305,6 +314,36 @@ describe('lazy workflow execution keys and children query', () => {
         const previousPageResult = await result.current.fetchPreviousPage();
 
         expect(previousPageResult.data?.pages.map((page) => page.number)).toEqual([2, 3]);
+    });
+
+    it('starts on the requested page although the children were cached from another start page', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockImplementation(({pageNumber}: {pageNumber: number}) =>
+            Promise.resolve({number: pageNumber, totalPages: 40})
+        );
+
+        const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        const queryClientWrapper = ({children}: {children: ReactNode}) =>
+            createElement(QueryClientProvider, {client: queryClient}, children);
+
+        const {result: firstStartResult, unmount} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true),
+            {wrapper: queryClientWrapper}
+        );
+
+        await waitFor(() => expect(firstStartResult.current.isSuccess).toBe(true));
+
+        unmount();
+
+        const {result: focusedStartResult} = renderHook(
+            () =>
+                useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true, false, 30),
+            {wrapper: queryClientWrapper}
+        );
+
+        await waitFor(() => expect(focusedStartResult.current.isSuccess).toBe(true));
+
+        expect(focusedStartResult.current.data?.pages.map((page) => page.number)).toEqual([30]);
     });
 
     it('has no previous page on the first page', async () => {

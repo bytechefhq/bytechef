@@ -35,9 +35,10 @@ export const WorkflowExecutionKeys = {
 
         return lazy ? [...baseKey, 'lazy'] : baseKey;
     },
-    workflowExecutionTaskExecutionChildren: (id: number, taskExecutionId: number) => [
+    workflowExecutionTaskExecutionChildren: (id: number, taskExecutionId: number, initialPageNumber: number = 0) => [
         ...WorkflowExecutionKeys.workflowExecutionTaskExecutionChildrenOfJob(id),
         taskExecutionId,
+        initialPageNumber,
     ],
     workflowExecutionTaskExecutionChildrenOfJob: (id: number) => [
         ...WorkflowExecutionKeys.workflowExecutions,
@@ -128,7 +129,11 @@ export const useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery = (
                 pageSize: TASK_EXECUTION_CHILDREN_PAGE_SIZE,
                 taskExecutionId: request.taskExecutionId,
             }),
-        queryKey: WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(request.id, request.taskExecutionId),
+        queryKey: WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(
+            request.id,
+            request.taskExecutionId,
+            initialPageNumber
+        ),
         enabled,
         refetchInterval,
     });
