@@ -278,7 +278,7 @@ public abstract class AbstractAiAgentChatAction {
                 try {
                     result = execution.get();
                 } catch (RuntimeException exception) {
-                    if (!isToolSuspensionFailure(exception)) {
+                    if (!ToolSuspension.isToolSuspensionFailure(exception)) {
                         logToolFailure(toolDefinition.name(), inputs, exception, context);
                     }
 
@@ -707,20 +707,6 @@ public abstract class AbstractAiAgentChatAction {
                 return propagateToolSuspensionFailure(() -> delegate.call(toolInput, toolContext));
             }
         };
-    }
-
-    private static boolean isToolSuspensionFailure(Throwable throwable) {
-        Throwable cause = throwable;
-
-        while (cause != null) {
-            if (cause instanceof ToolSuspensionException) {
-                return true;
-            }
-
-            cause = cause.getCause();
-        }
-
-        return false;
     }
 
     private static void logToolFailure(

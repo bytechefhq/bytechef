@@ -76,6 +76,20 @@ public final class ToolSuspension {
             ? suspendedToolResult : null;
     }
 
+    public static boolean isToolSuspensionFailure(@Nullable Throwable throwable) {
+        Throwable cause = throwable;
+
+        while (cause != null) {
+            if (cause instanceof ToolSuspensionException) {
+                return true;
+            }
+
+            cause = cause.getCause();
+        }
+
+        return false;
+    }
+
     public static boolean isSuspendedToolResult(@Nullable String toolResult, @Nullable Suspend suspend) {
         return isSuspendedToolResult(toolResult, getSuspendedToolResult(suspend));
     }
