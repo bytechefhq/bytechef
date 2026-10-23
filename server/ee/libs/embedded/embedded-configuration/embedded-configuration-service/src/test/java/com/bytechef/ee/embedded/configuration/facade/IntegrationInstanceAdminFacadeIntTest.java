@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthen
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,9 @@ class IntegrationInstanceAdminFacadeIntTest {
 
     @Autowired
     private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
+
+    @MockitoBean
+    private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
     @MockitoBean
     private IntegrationInstanceFacade integrationInstanceFacade;
@@ -109,6 +113,74 @@ class IntegrationInstanceAdminFacadeIntTest {
         integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(INTEGRATION_INSTANCE_ID, WORKFLOW_ID, true);
 
         verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(INTEGRATION_INSTANCE_ID, WORKFLOW_ID, true);
+    }
+
+    @Test
+    void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
+        authenticate(
+            new EmbeddedApiKeyAuthenticationToken(
+                Environment.PRODUCTION.ordinal(), 1L, new User("external-user-1", "", List.of()), false));
+
+        assertThatThrownBy(
+            () -> integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+        authenticate(
+            new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(connectedUserIntegrationFacade);
+    }
+
+    @Test
+    void testProvisionIntegrationInstanceDelegatesForTenantAdmin() {
+        authenticate(
+            new UsernamePasswordAuthenticationToken(
+                "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+
+        integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
+
+        verify(connectedUserIntegrationFacade).provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
+    }
+
+    @Test
+    void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndNonAdmins() {
+        authenticate(
+            new EmbeddedApiKeyAuthenticationToken(
+                Environment.PRODUCTION.ordinal(), 1L, new User("external-user-1", "", List.of()), false));
+
+        assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(1L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        authenticate(
+            new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+
+        assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(1L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(connectedUserIntegrationFacade);
+    }
+
+    @Test
+    void testGetProvisionableIntegrationsDelegatesForTenantAdmin() {
+        authenticate(
+            new UsernamePasswordAuthenticationToken(
+                "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+
+        integrationInstanceAdminFacade.getProvisionableIntegrations(1L);
+
+        verify(connectedUserIntegrationFacade).getProvisionableIntegrations(1L);
     }
 
     private static void authenticate(Authentication authentication) {
