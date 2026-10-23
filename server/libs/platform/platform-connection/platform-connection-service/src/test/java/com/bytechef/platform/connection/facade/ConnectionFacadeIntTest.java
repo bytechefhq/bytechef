@@ -34,6 +34,7 @@ import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSha
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
@@ -82,6 +83,9 @@ class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private TagRepository tagRepository;
@@ -404,6 +408,41 @@ class ConnectionFacadeIntTest {
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
                 .isEqualTo("name"));
+    }
+
+    @Test
+    void testReauthorizeAndDeleteByTheReassignedCreatorAreAllowed() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        connectionService.updateCreatedBy(connectionId, "external-user-id");
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getCreatedBy())
+                .isEqualTo("external-user-id"));
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext
+            .setAuthentication(new TestingAuthenticationToken("external-user-id", null, AuthorityConstants.USER));
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getCreatedBy())
+                .isEqualTo("external-user-id"));
+
+        connectionFacade.delete(connectionId);
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .isEmpty();
     }
 
     @ComponentScan(basePackages = {

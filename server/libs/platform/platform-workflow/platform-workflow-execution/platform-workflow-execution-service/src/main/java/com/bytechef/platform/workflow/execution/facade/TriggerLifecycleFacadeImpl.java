@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -117,12 +118,24 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                         workflowExecutionId.toString(), connectionId, webhookUrl, environmentId);
 
                 if (output != null) {
-                    triggerStateService.save(workflowExecutionId, output);
+                    boolean stateSaved = false;
 
-                    if (output.webhookExpirationDate() != null) {
-                        triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
-                            output.webhookExpirationDate(), triggerWorkflowNodeType.name(),
-                            triggerWorkflowNodeType.version(), workflowExecutionId, connectionId);
+                    try {
+                        triggerStateService.save(workflowExecutionId, output);
+
+                        stateSaved = true;
+
+                        if (output.webhookExpirationDate() != null) {
+                            triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
+                                output.webhookExpirationDate(), triggerWorkflowNodeType.name(),
+                                triggerWorkflowNodeType.version(), workflowExecutionId, connectionId);
+                        }
+                    } catch (RuntimeException exception) {
+                        rollbackWebhookEnable(
+                            triggerDefinition, workflowExecutionId, triggerWorkflowNodeType, triggerParameters,
+                            connectionId, output, stateSaved, exception);
+
+                        throw exception;
                     }
                 }
             }
@@ -139,6 +152,39 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             log.debug(
                 "Trigger type='{}', name='{}', workflowExecutionId={} enabled",
                 triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId);
+        }
+    }
+
+    private void rollbackWebhookEnable(
+        TriggerDefinition triggerDefinition, WorkflowExecutionId workflowExecutionId,
+        WorkflowNodeType triggerWorkflowNodeType, Map<String, ?> triggerParameters, Long connectionId,
+        WebhookEnableOutput output, boolean stateSaved, RuntimeException enableFailure) {
+
+        if (triggerDefinition.getType() != TriggerType.STATIC_WEBHOOK) {
+            Map<String, ?> outputParameters = output.parameters() == null ? Map.of() : output.parameters();
+
+            try {
+                triggerDefinitionFacade.executeWebhookDisable(
+                    triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                    triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
+                    outputParameters, connectionId);
+            } catch (RuntimeException exception) {
+                enableFailure.addSuppressed(exception);
+            }
+
+            try {
+                triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
+            } catch (RuntimeException exception) {
+                enableFailure.addSuppressed(exception);
+            }
+        }
+
+        if (stateSaved) {
+            try {
+                triggerStateService.delete(workflowExecutionId);
+            } catch (RuntimeException exception) {
+                enableFailure.addSuppressed(exception);
+            }
         }
     }
 }

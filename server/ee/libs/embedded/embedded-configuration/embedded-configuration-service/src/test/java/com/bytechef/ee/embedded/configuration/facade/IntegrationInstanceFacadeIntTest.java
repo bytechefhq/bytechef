@@ -9,6 +9,15 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -133,6 +142,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 class IntegrationInstanceFacadeIntTest {
 
+    private static final String TWO_TRIGGER_WORKFLOW_DEFINITION = """
+        {"label":"Two triggers","inputs":[],"triggers":[\
+        {"name":"trigger_1","type":"slack/v1/newMessage"},{"name":"trigger_2","type":"slack/v1/newMessage"}],\
+        "tasks":[]}
+        """;
+
     private static final String WORKFLOW_DEFINITION = """
         {"label":"Sync contacts","inputs":[],"triggers":[],"tasks":[]}
         """;
@@ -165,13 +180,18 @@ class IntegrationInstanceFacadeIntTest {
     private PermissionService permissionService;
 
     @Autowired
+    private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @Autowired
     private WorkflowService workflowService;
 
     private ConnectedUser connectedUserA;
     private ConnectedUser developmentConnectedUserA;
     private String externalUserAId;
+    private long integrationId;
     private long integrationInstanceAId;
     private long integrationInstanceBId;
+    private long integrationInstanceConfigurationId;
     private String workflowId;
 
     @BeforeEach
@@ -192,6 +212,8 @@ class IntegrationInstanceFacadeIntTest {
 
         integration = integrationService.create(integration);
 
+        integrationId = integration.getId();
+
         Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         workflowId = workflow.getId();
@@ -209,7 +231,9 @@ class IntegrationInstanceFacadeIntTest {
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
 
-        integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
+        integrationInstanceConfigurationId = integrationInstanceConfiguration.getId();
+
+        integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfigurationId, true);
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
@@ -292,6 +316,50 @@ class IntegrationInstanceFacadeIntTest {
                 .isInstanceOf(AccessDeniedException.class);
 
         assertThat(fetchIntegrationInstanceWorkflow(integrationInstanceAId)).isEmpty();
+    }
+
+    @Test
+    void testEnableIntegrationInstanceWorkflowDisablesTheAlreadyEnabledTriggersWhenALaterTriggerFailsToEnable() {
+        Workflow twoTriggerWorkflow = workflowService.create(
+            TWO_TRIGGER_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        String twoTriggerWorkflowId = twoTriggerWorkflow.getId();
+
+        integrationWorkflowService.addWorkflow(integrationId, 1, twoTriggerWorkflowId);
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(twoTriggerWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+        IllegalStateException enableFailure = new IllegalStateException("trigger_2 failed to enable");
+
+        doThrow(enableFailure)
+            .when(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                eq(twoTriggerWorkflowId),
+                argThat(workflowExecutionId -> "trigger_2".equals(workflowExecutionId.getTriggerName())),
+                any(), anyMap(), any(), anyString(), anyLong());
+
+        authenticate(createTenantAdminAuthentication());
+
+        assertThatThrownBy(() -> integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            integrationInstanceAId, twoTriggerWorkflowId, true))
+                .isSameAs(enableFailure);
+
+        verify(triggerLifecycleFacade).executeTriggerDisable(
+            eq(twoTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_1".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any());
+        verify(triggerLifecycleFacade, never()).executeTriggerDisable(
+            eq(twoTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_2".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any());
     }
 
     @Test
