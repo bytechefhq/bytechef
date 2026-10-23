@@ -77,6 +77,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
 
     const handleProjectWorkflowValueChange = (projectWorkflowId: number) => {
         setWorkflowTestExecution(undefined);
+        useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         setCurrentNode(undefined);
 
         navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);

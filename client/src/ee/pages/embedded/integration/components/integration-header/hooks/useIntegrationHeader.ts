@@ -94,6 +94,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
 
     const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
         setWorkflowTestExecution(undefined);
+        useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         setCurrentNode(undefined);
 
         navigate(
