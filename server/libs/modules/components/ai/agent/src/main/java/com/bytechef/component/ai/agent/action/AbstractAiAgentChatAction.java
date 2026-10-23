@@ -44,6 +44,7 @@ import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementCallObservingToolCallback;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -640,21 +641,20 @@ public abstract class AbstractAiAgentChatAction {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
-            toolCallbacks.addAll(
-                clusterElementToolCallbacks.build(
-                    clusterElement, connectionParameters, getSubagentConversationId(clusterElement, conversationId),
-                    context));
-        }
+            List<ToolCallback> clusterElementCallbacks = clusterElementToolCallbacks.build(
+                clusterElement, connectionParameters, getSubagentConversationId(clusterElement, conversationId),
+                context);
 
-        if (toolSimulations != null && !toolSimulations.isEmpty()) {
-            List<ToolCallback> simulatedCallbacks = new ArrayList<>();
-
-            for (ToolCallback toolCallback : toolCallbacks) {
-                simulatedCallbacks.add(
-                    createSimulationAwareToolCallback(toolCallback, toolSimulations, chatModel, context));
+            if (toolSimulations != null && !toolSimulations.isEmpty()) {
+                clusterElementCallbacks = clusterElementCallbacks.stream()
+                    .map(toolCallback -> createSimulationAwareToolCallback(
+                        toolCallback, toolSimulations, chatModel, context))
+                    .toList();
             }
 
-            toolCallbacks = simulatedCallbacks;
+            toolCallbacks.addAll(
+                ClusterElementCallObservingToolCallback.wrap(
+                    clusterElementCallbacks, clusterElement.getWorkflowNodeName(), context));
         }
 
         if (toolExecutionListener == null) {
