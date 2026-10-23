@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,8 +26,11 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -39,6 +43,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,6 +81,12 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
+
+    @Autowired
+    private ConnectedUserService connectedUserService;
+
+    @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
 
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
@@ -154,6 +165,53 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                 secondIntegrationInstanceConfigurationId)
                 .getIntegrationVersion())
                     .isEqualTo(lockVersion);
+    }
+
+    @Test
+    void testIntegrationsReadReturnsOneEntryPerIntegrationOnTheHighestEnabledVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        long integrationId = integration.getId();
+
+        long versionOneConfigurationId = integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+            newIntegrationInstanceConfigurationDTO(integrationId, 1));
+        long versionTwoConfigurationId = integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+            newIntegrationInstanceConfigurationDTO(integrationId, 2));
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfiguration(versionOneConfigurationId, true);
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfiguration(versionTwoConfigurationId, true);
+
+        List<IntegrationInstanceConfigurationDTO> integrations =
+            integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegrations(
+                true, Environment.STAGING);
+
+        assertThat(integrations)
+            .filteredOn(integrationInstanceConfigurationDTO -> integrationInstanceConfigurationDTO
+                .integrationId() == integrationId)
+            .hasSize(1)
+            .first()
+            .extracting(IntegrationInstanceConfigurationDTO::integrationVersion)
+            .isEqualTo(2);
+        String externalUserId = "external-user-" + UUID.randomUUID();
+
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        when(connectedUserService.fetchConnectedUser(externalUserId, Environment.STAGING))
+            .thenReturn(Optional.of(connectedUser));
+        when(embeddedPermissionEvaluator.evaluate(any(), eq(connectedUser))).thenReturn(true);
+
+        authenticate(
+            new EmbeddedApiKeyAuthenticationToken(
+                Environment.STAGING.ordinal(), 1L, new User(externalUserId, "", List.of()), false));
+
+        assertThat(
+            integrationInstanceConfigurationFacade
+                .getIntegrationInstanceConfigurationIntegration(integrationId, true, Environment.STAGING)
+                .integrationVersion()).isEqualTo(2);
     }
 
     @Test

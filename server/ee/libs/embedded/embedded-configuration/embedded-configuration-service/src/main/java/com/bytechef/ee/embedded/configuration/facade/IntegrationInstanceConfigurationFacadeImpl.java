@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
@@ -63,9 +64,11 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -332,8 +335,19 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs = List.of();
 
+        Map<Long, Optional<IntegrationInstanceConfiguration>> selfServeConfigurationsByIntegrationId =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true)
+                .stream()
+                .collect(
+                    Collectors.groupingBy(
+                        IntegrationInstanceConfiguration::getIntegrationId, LinkedHashMap::new,
+                        Collectors.maxBy(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)));
+
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
+            selfServeConfigurationsByIntegrationId.values()
+                .stream()
+                .flatMap(Optional::stream)
+                .toList();
 
         if (!integrationInstanceConfigurations.isEmpty()) {
             List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
