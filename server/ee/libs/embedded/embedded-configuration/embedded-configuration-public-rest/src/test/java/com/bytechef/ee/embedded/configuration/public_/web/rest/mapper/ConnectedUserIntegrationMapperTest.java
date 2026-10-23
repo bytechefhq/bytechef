@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyGroupModel;
@@ -139,11 +140,55 @@ class ConnectedUserIntegrationMapperTest {
 
         IntegrationInstanceModel integrationInstanceModel = generatedMapper.map(
             new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
-                new Connection(), integrationInstance, List.of(), List.of(), List.of()));
+                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null));
 
         assertEquals(5L, integrationInstanceModel.getId());
         assertEquals(77L, integrationInstanceModel.getConnectionId());
         assertEquals(Boolean.TRUE, integrationInstanceModel.getEnabled());
+    }
+
+    @Test
+    void testIntegrationInstanceMapsItsOwnConfigurationVersionAndAvailableWorkflows() {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(5L);
+        integrationInstance.setConnectionId(77L);
+        integrationInstance.setEnabled(true);
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getLabel()).thenReturn("L");
+
+        IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO =
+            new IntegrationInstanceConfigurationWorkflowDTO(
+                List.of(), null, null, Map.of(), true, 1L, null, null, null, 77L, 0, workflow, "workflow-1", "u-1",
+                Map.of());
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .id(77L)
+                .integrationVersion(3)
+                .integrationInstanceConfigurationWorkflows(List.of(integrationInstanceConfigurationWorkflowDTO))
+                .build();
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        IntegrationInstanceModel integrationInstanceModel = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(), List.of(), List.of(),
+                integrationInstanceConfigurationDTO));
+
+        assertEquals(3, integrationInstanceModel.getIntegrationVersion());
+        assertEquals(77L, integrationInstanceModel.getIntegrationInstanceConfigurationId());
+        assertEquals(1, integrationInstanceModel.getAvailableWorkflows()
+            .size());
+        assertEquals("u-1", integrationInstanceModel.getAvailableWorkflows()
+            .getFirst()
+            .getWorkflowUuid());
+        assertEquals("L", integrationInstanceModel.getAvailableWorkflows()
+            .getFirst()
+            .getLabel());
     }
 
     @Test
@@ -159,7 +204,7 @@ class ConnectedUserIntegrationMapperTest {
 
         IntegrationInstanceModel integrationInstanceModel = generatedBasicMapper.map(
             new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
-                new Connection(), integrationInstance, List.of(), List.of(), List.of()));
+                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null));
 
         assertEquals(6L, integrationInstanceModel.getId());
         assertEquals(78L, integrationInstanceModel.getConnectionId());
