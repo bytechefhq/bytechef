@@ -262,6 +262,39 @@ class InMemoryTaskExecutionRepositoryTest {
     }
 
     @Test
+    void testFailedAttemptIsRetriedByALaterCreatedRetrySavedBeforeIt() {
+        Instant createdDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        TaskExecution parentTaskExecution = saveTaskExecution(512L, null, false);
+
+        TaskExecution retryTaskExecution = new TaskExecution();
+
+        retryTaskExecution.setJobId(512L);
+        retryTaskExecution.setParentId(parentTaskExecution.getId());
+        retryTaskExecution.setRetryAttempts(1);
+        retryTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        setCreatedDate(retryTaskExecution, createdDate.plusSeconds(10));
+
+        inMemoryTaskExecutionRepository.save(retryTaskExecution);
+
+        TaskExecution failedTaskExecution = new TaskExecution();
+
+        failedTaskExecution.setError(new ExecutionError("failed", List.of()));
+        failedTaskExecution.setJobId(512L);
+        failedTaskExecution.setMaxRetries(1);
+        failedTaskExecution.setParentId(parentTaskExecution.getId());
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setWorkflowTask(new WorkflowTask(Map.of("name", "a", "type", "test/v1")));
+
+        setCreatedDate(failedTaskExecution, createdDate);
+
+        inMemoryTaskExecutionRepository.save(failedTaskExecution);
+
+        assertEquals(2, inMemoryTaskExecutionRepository.countLatestAttemptsByJobId(512L, List.of()));
+    }
+
+    @Test
     void testLatestAttemptQueriesExcludeDescendantsOfARetriedAttemptAtAnyDepth() {
         TaskExecution loopTaskExecution = saveTaskExecution(480L, null, false);
         TaskExecution retriedTaskExecution = saveTaskExecution(480L, loopTaskExecution.getId(), true);
@@ -513,14 +546,7 @@ class InMemoryTaskExecutionRepositoryTest {
             taskExecution.setParentId(parentId);
             taskExecution.setTaskNumber(taskNumbers[index]);
 
-            try {
-                Field createdDateField = TaskExecution.class.getDeclaredField("createdDate");
-
-                createdDateField.setAccessible(true);
-                createdDateField.set(taskExecution, baseDate.plusSeconds(index * createdDateStepSeconds));
-            } catch (ReflectiveOperationException reflectiveOperationException) {
-                throw new IllegalStateException(reflectiveOperationException);
-            }
+            setCreatedDate(taskExecution, baseDate.plusSeconds(index * createdDateStepSeconds));
 
             TaskExecution savedTaskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
 
@@ -528,6 +554,17 @@ class InMemoryTaskExecutionRepositoryTest {
         }
 
         return childIds;
+    }
+
+    private static void setCreatedDate(TaskExecution taskExecution, Instant createdDate) {
+        try {
+            Field createdDateField = TaskExecution.class.getDeclaredField("createdDate");
+
+            createdDateField.setAccessible(true);
+            createdDateField.set(taskExecution, createdDate);
+        } catch (ReflectiveOperationException reflectiveOperationException) {
+            throw new IllegalStateException(reflectiveOperationException);
+        }
     }
 
     private static List<Long> toIds(List<TaskExecution> taskExecutions) {

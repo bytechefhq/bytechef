@@ -96,7 +96,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         try {
             lock.lock();
 
-            List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(jobId);
+            List<TaskExecution> jobTaskExecutions = store.getJobTaskExecutions(jobId)
+                .stream()
+                .sorted(CREATED_DATE_COMPARATOR)
+                .toList();
 
             Map<Long, TaskExecution> taskExecutionMap = new HashMap<>();
 
