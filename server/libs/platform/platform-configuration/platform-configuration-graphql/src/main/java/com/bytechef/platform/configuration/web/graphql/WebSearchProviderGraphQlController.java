@@ -18,9 +18,11 @@ package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.ai.provider.dto.WebSearchProviderDTO;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderTestResultDTO;
 import com.bytechef.platform.ai.provider.facade.WebSearchProviderFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -60,10 +62,19 @@ class WebSearchProviderGraphQlController {
     }
 
     @MutationMapping
-    public boolean updateWebSearchProvider(
-        @Argument String apiKey, @Argument Long environment, @Argument String name) {
+    public WebSearchProviderTestResultDTO testWebSearchProvider(
+        @Argument @Nullable String apiKey, @Argument @Nullable String baseUrl, @Argument Long environment,
+        @Argument String name) {
 
-        webSearchProviderFacade.updateWebSearchProvider(name, apiKey, environment.intValue());
+        return webSearchProviderFacade.testWebSearchProvider(name, apiKey, baseUrl, environment.intValue());
+    }
+
+    @MutationMapping
+    public boolean updateWebSearchProvider(
+        @Argument @Nullable String apiKey, @Argument @Nullable String baseUrl, @Argument Long environment,
+        @Argument String name) {
+
+        webSearchProviderFacade.updateWebSearchProvider(name, apiKey, baseUrl, environment.intValue());
 
         return true;
     }

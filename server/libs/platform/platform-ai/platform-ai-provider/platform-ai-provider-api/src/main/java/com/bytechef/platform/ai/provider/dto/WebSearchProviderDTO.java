@@ -21,10 +21,11 @@ import org.jspecify.annotations.Nullable;
 /**
  * A web search provider as admins see it. The API key is never returned; {@code maskedApiKey} shows its last
  * characters, and {@code apiKeyFromProperties} tells that the key comes from the application properties.
+ * {@code baseUrl} is the URL the tools call, either the saved one or {@code defaultBaseUrl} from the properties.
  *
  * @author Ivica Cardic
  */
 public record WebSearchProviderDTO(
     String name, String label, String description, @Nullable String icon, boolean enabled,
-    @Nullable String maskedApiKey, boolean apiKeyFromProperties) {
+    @Nullable String maskedApiKey, boolean apiKeyFromProperties, String baseUrl, String defaultBaseUrl) {
 }

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderConnection;
 import com.bytechef.platform.ai.provider.facade.WebSearchProviderFacade;
 import com.bytechef.platform.ai.websearch.WebSearchProvider;
 import java.util.List;
@@ -41,8 +42,8 @@ class WebSearchToolCallbackProviderTest {
 
     @Test
     void testOffersOnlyTheToolsOfEnabledProviders() {
-        when(webSearchProviderFacade.fetchEnabledApiKey(WebSearchProvider.BRAVE, ENVIRONMENT))
-            .thenReturn("brave-key");
+        when(webSearchProviderFacade.fetchEnabledConnection(WebSearchProvider.BRAVE, ENVIRONMENT))
+            .thenReturn(new WebSearchProviderConnection("brave-key", "https://example.com"));
 
         assertThat(toolNames(provider(webSearchProviderFacade).getToolCallbacks(ENVIRONMENT)))
             .containsExactly("braveWebSearch");
@@ -50,10 +51,10 @@ class WebSearchToolCallbackProviderTest {
 
     @Test
     void testOffersTheToolsOfEveryEnabledProvider() {
-        when(webSearchProviderFacade.fetchEnabledApiKey(WebSearchProvider.BRAVE, ENVIRONMENT))
-            .thenReturn("brave-key");
-        when(webSearchProviderFacade.fetchEnabledApiKey(WebSearchProvider.FIRECRAWL, ENVIRONMENT))
-            .thenReturn("firecrawl-key");
+        when(webSearchProviderFacade.fetchEnabledConnection(WebSearchProvider.BRAVE, ENVIRONMENT))
+            .thenReturn(new WebSearchProviderConnection("brave-key", "https://example.com"));
+        when(webSearchProviderFacade.fetchEnabledConnection(WebSearchProvider.FIRECRAWL, ENVIRONMENT))
+            .thenReturn(new WebSearchProviderConnection("firecrawl-key", "https://example.com"));
 
         assertThat(toolNames(provider(webSearchProviderFacade).getToolCallbacks(ENVIRONMENT)))
             .containsExactlyInAnyOrder("braveWebSearch", "webSearch", "webpageScrape", "websiteMap");
@@ -66,10 +67,10 @@ class WebSearchToolCallbackProviderTest {
 
     @Test
     void testSkipsAProviderWhoseKeyLookupFails() {
-        when(webSearchProviderFacade.fetchEnabledApiKey(WebSearchProvider.BRAVE, ENVIRONMENT))
+        when(webSearchProviderFacade.fetchEnabledConnection(WebSearchProvider.BRAVE, ENVIRONMENT))
             .thenThrow(new IllegalStateException("database unavailable"));
-        when(webSearchProviderFacade.fetchEnabledApiKey(WebSearchProvider.FIRECRAWL, ENVIRONMENT))
-            .thenReturn("firecrawl-key");
+        when(webSearchProviderFacade.fetchEnabledConnection(WebSearchProvider.FIRECRAWL, ENVIRONMENT))
+            .thenReturn(new WebSearchProviderConnection("firecrawl-key", "https://example.com"));
 
         assertThat(toolNames(provider(webSearchProviderFacade).getToolCallbacks(ENVIRONMENT)))
             .containsExactlyInAnyOrder("webSearch", "webpageScrape", "websiteMap");

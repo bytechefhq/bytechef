@@ -5,15 +5,23 @@ extend type Query {
 extend type Mutation {
     deleteWebSearchProvider(environment: ID!, name: String!): Boolean
     enableWebSearchProvider(enabled: Boolean!, environment: ID!, name: String!): Boolean
-    updateWebSearchProvider(apiKey: String!, environment: ID!, name: String!): Boolean
+    testWebSearchProvider(apiKey: String, baseUrl: String, environment: ID!, name: String!): WebSearchProviderTestResult!
+    updateWebSearchProvider(apiKey: String, baseUrl: String, environment: ID!, name: String!): Boolean
 }
 
 type WebSearchProvider {
     apiKeyFromProperties: Boolean!
+    baseUrl: String!
+    defaultBaseUrl: String!
     description: String!
     enabled: Boolean!
     icon: String
     label: String!
     maskedApiKey: String
     name: String!
+}
+
+type WebSearchProviderTestResult {
+    errorMessage: String
+    success: Boolean!
 }

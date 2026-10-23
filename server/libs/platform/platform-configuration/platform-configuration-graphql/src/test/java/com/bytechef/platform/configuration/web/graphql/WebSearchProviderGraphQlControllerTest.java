@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.provider.dto.WebSearchProviderDTO;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderTestResultDTO;
 import com.bytechef.platform.ai.provider.facade.WebSearchProviderFacade;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,8 @@ class WebSearchProviderGraphQlControllerTest {
     @Test
     void testWebSearchProvidersDelegatesToTheFacade() {
         WebSearchProviderDTO brave = new WebSearchProviderDTO(
-            "brave", "Brave Search", "Web search", null, true, "********1234", false);
+            "brave", "Brave Search", "Web search", null, true, "********1234", false, "https://brave",
+            "https://brave");
 
         when(webSearchProviderFacade.getWebSearchProviders(2)).thenReturn(List.of(brave));
 
@@ -56,12 +58,23 @@ class WebSearchProviderGraphQlControllerTest {
     }
 
     @Test
+    void testTestWebSearchProviderReturnsTheFacadeResult() {
+        when(webSearchProviderFacade.testWebSearchProvider("firecrawl", "key", "https://firecrawl.internal", 2))
+            .thenReturn(WebSearchProviderTestResultDTO.succeeded());
+
+        assertThat(
+            webSearchProviderGraphQlController.testWebSearchProvider(
+                "key", "https://firecrawl.internal", 2L, "firecrawl"))
+                    .isEqualTo(WebSearchProviderTestResultDTO.succeeded());
+    }
+
+    @Test
     void testMutationsDelegateToTheFacade() {
-        assertThat(webSearchProviderGraphQlController.updateWebSearchProvider("key", 2L, "brave")).isTrue();
+        assertThat(webSearchProviderGraphQlController.updateWebSearchProvider("key", null, 2L, "brave")).isTrue();
         assertThat(webSearchProviderGraphQlController.enableWebSearchProvider(false, 2L, "brave")).isTrue();
         assertThat(webSearchProviderGraphQlController.deleteWebSearchProvider(2L, "firecrawl")).isTrue();
 
-        verify(webSearchProviderFacade).updateWebSearchProvider("brave", "key", 2);
+        verify(webSearchProviderFacade).updateWebSearchProvider("brave", "key", null, 2);
         verify(webSearchProviderFacade).enableWebSearchProvider("brave", false, 2);
         verify(webSearchProviderFacade).deleteWebSearchProvider("firecrawl", 2);
     }
