@@ -285,13 +285,13 @@ public class UserGraphQlControllerIntTest {
     void testInviteUser() {
         // Given
         doNothing().when(userManagementFacade)
-            .inviteUser(anyString(), anyString(), anyString());
+            .inviteUser(anyString(), anyString());
 
-        // When & Then - password meets requirements: 8+ chars, uppercase, digit
+        // When & Then
         this.graphQlTester
             .document("""
                 mutation {
-                    inviteUser(email: "newuser@example.com", password: "Password123", role: "ROLE_USER")
+                    inviteUser(email: "newuser@example.com", role: "ROLE_USER")
                 }
                 """)
             .execute()
@@ -299,7 +299,7 @@ public class UserGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(userManagementFacade).inviteUser("newuser@example.com", "Password123", "ROLE_USER");
+        verify(userManagementFacade).inviteUser("newuser@example.com", "ROLE_USER");
     }
 
     @Test

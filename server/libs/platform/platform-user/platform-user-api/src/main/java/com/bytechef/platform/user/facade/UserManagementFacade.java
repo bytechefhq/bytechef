@@ -35,7 +35,7 @@ public interface UserManagementFacade {
 
     void deleteUser(String login);
 
-    void inviteUser(String email, String password, String role);
+    void inviteUser(String email, String role);
 
     Optional<UserWithAuthorities> fetchUser(String login);
 

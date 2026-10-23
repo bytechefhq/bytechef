@@ -544,6 +544,149 @@ class AccountControllerIntTest {
 
     @Test
     @Transactional
+    void testAcceptInvitation() throws Exception {
+        User user = new User();
+
+        user.setLogin("accept-invitation");
+        user.setEmail("accept-invitation@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("invitation key");
+        user.setInvited(true);
+
+        userRepository.save(user);
+
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey(user.getActivationKey());
+        keyAndPassword.setNewPassword("NewPassword1");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isOk());
+
+        User updatedUser = userRepository.findByLogin(user.getLogin())
+            .orElseThrow();
+
+        assertThat(updatedUser.isActivated()).isTrue();
+        assertThat(updatedUser.getActivationKey()).isNull();
+        assertThat(updatedUser.isInvited()).isFalse();
+        assertThat(passwordEncoder.matches(keyAndPassword.getNewPassword(), updatedUser.getPassword())).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void testAcceptInvitationRefusesAPendingSignUp() throws Exception {
+        User user = new User();
+
+        user.setLogin("accept-invitation-sign-up");
+        user.setEmail("accept-invitation-sign-up@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("sign-up key");
+
+        userRepository.save(user);
+
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey(user.getActivationKey());
+        keyAndPassword.setNewPassword("NewPassword1");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isInternalServerError());
+
+        User unchangedUser = userRepository.findByLogin(user.getLogin())
+            .orElseThrow();
+
+        assertThat(unchangedUser.isActivated()).isFalse();
+        assertThat(unchangedUser.getActivationKey()).isEqualTo("sign-up key");
+    }
+
+    @Test
+    @Transactional
+    void testActivateAccountRefusesAnInvitationKey() throws Exception {
+        User user = new User();
+
+        user.setLogin("activate-invitation");
+        user.setEmail("activate-invitation@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("invitation key 3");
+        user.setInvited(true);
+
+        userRepository.save(user);
+
+        restAccountMockMvc.perform(get("/api/activate?key={activationKey}", user.getActivationKey()))
+            .andExpect(status().isInternalServerError());
+
+        User unchangedUser = userRepository.findByLogin(user.getLogin())
+            .orElseThrow();
+
+        assertThat(unchangedUser.isActivated()).isFalse();
+        assertThat(unchangedUser.getActivationKey()).isEqualTo("invitation key 3");
+        assertThat(unchangedUser.isInvited()).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void testAcceptInvitationWithInvalidPassword() throws Exception {
+        User user = new User();
+
+        user.setLogin("accept-invitation-invalid-password");
+        user.setEmail("accept-invitation-invalid-password@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("invitation key 2");
+        user.setInvited(true);
+
+        userRepository.save(user);
+
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey(user.getActivationKey());
+        keyAndPassword.setNewPassword("123");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isBadRequest());
+
+        User updatedUser = userRepository.findByLogin(user.getLogin())
+            .orElseThrow();
+
+        assertThat(updatedUser.isActivated()).isFalse();
+    }
+
+    @Test
+    void testAcceptInvitationWithWrongKey() throws Exception {
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey("wrong invitation key");
+        keyAndPassword.setNewPassword("NewPassword1");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @Transactional
     void testActivateAccountWithWrongKey() throws Exception {
         restAccountMockMvc.perform(get("/api/activate?key=wrongActivationKey"))
             .andExpect(status().isInternalServerError());
