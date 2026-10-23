@@ -77,6 +77,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | **Signing keys (embedded)** | `SIGNING_KEY_CREATED`, `SIGNING_KEY_UPDATED`, `SIGNING_KEY_DELETED` |
 | **Connected users (embedded)** | `CONNECTED_USER_CREATED`, `CONNECTED_USER_UPDATED`, `CONNECTED_USER_ENABLED_UPDATED`, `CONNECTED_USER_DELETED`, `CONNECTED_USERS_IMPORTED` - an import records how many users were created, skipped and rejected |
 | **AI providers** | `AI_PROVIDER_UPDATED`, `AI_PROVIDER_DELETED` - the provider's API key is never recorded, and its URL is recorded without user info, query or fragment |
+| **Web search providers** | `WEB_SEARCH_PROVIDER_UPDATED`, `WEB_SEARCH_PROVIDER_DELETED` - enabling or disabling records `enabled` as `true` or `false`; the provider's API key is never recorded |
 | **Custom components** | `CUSTOM_COMPONENT_ENABLED`, `CUSTOM_COMPONENT_DISABLED`, `CUSTOM_COMPONENT_PUBLISHED`, `CUSTOM_COMPONENT_SAVED` - an uploaded component, created or replaced, with its id, name, version and language |
 | **Data tables** | `DATA_TABLE_CREATED`, `DATA_TABLE_DUPLICATED`, `DATA_TABLE_RENAMED`, `DATA_TABLE_DELETED`, `DATA_TABLE_COLUMN_ADDED`, `DATA_TABLE_COLUMN_RENAMED`, `DATA_TABLE_COLUMN_REMOVED` - changes to a table's structure; deleting a table that does not exist is not recorded; rows are data and are not recorded |
 | **Knowledge bases** | `KB_CREATED`, `KB_CLONED`, `KB_UPDATED`, `KB_DELETED`, `KB_DOCUMENT_CREATED`, `KB_DOCUMENT_DELETED` - the workspace is recorded on `KB_CREATED` and `KB_CLONED` |
