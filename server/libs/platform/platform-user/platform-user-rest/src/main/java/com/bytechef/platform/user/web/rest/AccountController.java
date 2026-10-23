@@ -162,6 +162,42 @@ public class AccountController {
     }
 
     /**
+     * {@code POST  /account/accept-invitation} : set the password of an invited user and activate the account.
+     *
+     * @param keyAndPassword the activation key from the invitation email and the new password.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
+     * @throws AccountResourceException {@code 500 (Internal Server Error)} if no pending invitation holds the key.
+     */
+    @PostMapping("/account/accept-invitation")
+    public void acceptInvitation(@RequestBody KeyAndPasswordVM keyAndPassword) {
+        String key = keyAndPassword.getKey();
+        String newPassword = keyAndPassword.getNewPassword();
+
+        PasswordValidator.validate(newPassword);
+
+        Optional<User> userOptional;
+
+        if (tenantService.isMultiTenantEnabled()) {
+            String tenantId = tenantService.getTenantIdByUserActivationKey(key);
+
+            if (tenantId == null) {
+                throw new AccountResourceException(
+                    "No pending invitation was found for this key", AccountErrorType.USER_NOT_FOUND);
+            }
+
+            userOptional = TenantContext.callWithTenantId(
+                tenantId, () -> userService.activateInvitation(key, newPassword));
+        } else {
+            userOptional = userService.activateInvitation(key, newPassword);
+        }
+
+        if (userOptional.isEmpty()) {
+            throw new AccountResourceException(
+                "No pending invitation was found for this key", AccountErrorType.USER_NOT_FOUND);
+        }
+    }
+
+    /**
      * {@code GET  /activate} : activate the registered user.
      *
      * @param key the activation key.
