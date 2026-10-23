@@ -4,7 +4,7 @@ import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefini
 import {ClusterElementItemType, ClusterElementsType, NestedClusterRootComponentDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsViewMode from '../../workflow-editor/hooks/useClusterElementsViewMode';
@@ -33,7 +33,10 @@ function nestedFailureKey(componentName: string): string {
     return `nested:${componentName}`;
 }
 
-export default function useClusterElementNodes(clusterRootIds: string[]): UseClusterElementNodesResultI {
+export default function useClusterElementNodes(
+    clusterRootIds: string[],
+    readOnlyDefinition?: string
+): UseClusterElementNodesResultI {
     const {
         clusterRootComponentDefinitions,
         nestedClusterRootsComponentDefinitions,
@@ -51,13 +54,17 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
     );
     const clusterElementsViewMode = useClusterElementsViewMode();
 
-    const {workflow} = useWorkflowDataStore(
+    const {workflow: editorWorkflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
         }))
     );
 
     const [failedDefinitionKeys, setFailedDefinitionKeys] = useState<Record<string, true>>({});
+
+    const requestedRootDefinitionKeysRef = useRef(new Set<string>());
+
+    const workflow = readOnlyDefinition === undefined ? editorWorkflow : {definition: readOnlyDefinition};
 
     const queryClient = useQueryClient();
 
@@ -140,21 +147,34 @@ export default function useClusterElementNodes(clusterRootIds: string[]): UseClu
         const parameters: Array<{clusterRootId: string; componentName: string; componentVersion: number}> = [];
 
         for (const clusterRootId of clusterRootIds) {
-            if (clusterRootComponentDefinitions[clusterRootId] || failedDefinitionKeys[rootFailureKey(clusterRootId)]) {
+            if (failedDefinitionKeys[rootFailureKey(clusterRootId)]) {
                 continue;
             }
 
             const task = getTask({tasks: workflowDefinitionTasks, workflowNodeName: clusterRootId});
 
-            if (!task) {
+            const cachedDefinition = clusterRootComponentDefinitions[clusterRootId];
+
+            if (!task || (cachedDefinition && !task.type)) {
                 continue;
             }
 
-            parameters.push({
-                clusterRootId,
-                componentName: task.type.split('/')[0],
-                componentVersion: Number(task.type?.split('/')[1]?.replace(/^v/, '')) || 1,
-            });
+            const componentName = task.type.split('/')[0];
+            const componentVersion = Number(task.type?.split('/')[1]?.replace(/^v/, '')) || 1;
+
+            const requestedRootDefinitionKey = `${clusterRootId}:${componentName}/${componentVersion}`;
+
+            if (
+                cachedDefinition &&
+                ((cachedDefinition.name === componentName && cachedDefinition.version === componentVersion) ||
+                    requestedRootDefinitionKeysRef.current.has(requestedRootDefinitionKey))
+            ) {
+                continue;
+            }
+
+            requestedRootDefinitionKeysRef.current.add(requestedRootDefinitionKey);
+
+            parameters.push({clusterRootId, componentName, componentVersion});
         }
 
         return parameters;

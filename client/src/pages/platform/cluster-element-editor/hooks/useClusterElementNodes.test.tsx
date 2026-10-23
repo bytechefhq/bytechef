@@ -192,6 +192,38 @@ describe('useClusterElementNodes', () => {
         expect(result.current.nodesByRootId.aiAgent_1.map((node) => node.id)).not.toContain('aiAgent_1');
     });
 
+    it('builds member nodes from the given read-only definition instead of the editor workflow', async () => {
+        useWorkflowDataStore.setState({
+            workflow: {definition: '{}', id: 'workflow_1'},
+        } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+
+        const {result} = renderHook(() => useClusterElementNodes(CLUSTER_ROOT_IDS, WORKFLOW_DEFINITION), {wrapper});
+
+        await waitFor(() => {
+            expect(result.current.definitionsReady).toBe(true);
+        });
+
+        expect(result.current.nodesByRootId.aiAgent_1.map((node) => node.id)).toContain('model_1');
+    });
+
+    it("refetches a root's definition the editor cached for another version of the component", async () => {
+        useWorkflowEditorStore.setState({
+            clusterRootComponentDefinitions: {aiAgent_1: {...AI_AGENT_DEFINITION, version: 2}},
+        });
+
+        const {result} = renderHook(() => useClusterElementNodes(CLUSTER_ROOT_IDS, WORKFLOW_DEFINITION), {wrapper});
+
+        await waitFor(() => {
+            expect(useWorkflowEditorStore.getState().clusterRootComponentDefinitions.aiAgent_1.version).toBe(1);
+        });
+
+        expect(getComponentDefinitionCallsMock).toHaveBeenCalledWith('aiAgent');
+
+        await waitFor(() => {
+            expect(result.current.definitionsReady).toBe(true);
+        });
+    });
+
     it('returns no nodes at all for a root whose own definition has not resolved yet', () => {
         useWorkflowEditorStore.setState({clusterRootComponentDefinitions: {}});
 

@@ -30,6 +30,7 @@ import useOverlayPanelsViewport from '../hooks/useOverlayPanelsViewport';
 import useStickyNotes from '../hooks/useStickyNotes';
 import ClusterRootNode from '../nodes/ClusterRootNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
+import ReadOnlyClusterElementNode from '../nodes/ReadOnlyClusterElementNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
 import StickyNoteNode from '../nodes/StickyNoteNode';
@@ -186,6 +187,7 @@ const useWorkflowEditorCanvas = ({
             clusterRoot: ClusterRootNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
+            readonlyClusterElement: ReadOnlyClusterElementNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
             stickyNote: StickyNoteNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
