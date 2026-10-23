@@ -1514,6 +1514,10 @@
       "name": "model",
       "options": [ {
         "description": null,
+        "label": "google/gemma-4-31b-it",
+        "value": "google/gemma-4-31b-it"
+      }, {
+        "description": null,
         "label": "openai/tts-1",
         "value": "openai/tts-1"
       }, {
