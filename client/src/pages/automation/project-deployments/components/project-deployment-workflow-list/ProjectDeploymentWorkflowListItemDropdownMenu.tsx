@@ -25,7 +25,7 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
 
     const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
-    if (!canEditDeployment) {
+    if (!canEditDeployment && !onOpenInProjectClick) {
         return null;
     }
 
@@ -41,12 +41,14 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
-                    icon={<EditIcon />}
-                    label="Edit"
-                    onClick={onEditClick}
-                />
+                {canEditDeployment && (
+                    <DropdownMenuItem
+                        disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
+                        icon={<EditIcon />}
+                        label="Edit"
+                        onClick={onEditClick}
+                    />
+                )}
 
                 {onOpenInProjectClick && (
                     <DropdownMenuItem

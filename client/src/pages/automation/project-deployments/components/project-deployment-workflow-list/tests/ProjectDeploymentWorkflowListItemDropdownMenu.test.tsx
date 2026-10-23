@@ -98,7 +98,16 @@ describe('ProjectDeploymentWorkflowListItemDropdownMenu', () => {
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
     });
 
-    it('hides the menu without DEPLOYMENT_EDIT', () => {
+    it('offers only Open in Project without DEPLOYMENT_EDIT', async () => {
+        hoistedScope.canEditDeployment = false;
+
+        await openMenu(undefined, handlers.onOpenInProjectClick);
+
+        expect(screen.getByRole('menuitem', {name: 'Open in Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+    });
+
+    it('hides the menu without DEPLOYMENT_EDIT when the workflow cannot be opened in its project', () => {
         hoistedScope.canEditDeployment = false;
 
         render(
