@@ -1,6 +1,7 @@
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 docs/AuthorizationType.md
+docs/ClusterElementCall.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
 docs/FocusPathElement.md
@@ -29,6 +30,7 @@ docs/WorkflowTask.md
 docs/WorkflowTrigger.md
 index.ts
 models/AuthorizationType.ts
+models/ClusterElementCall.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
 models/FocusPathElement.ts
