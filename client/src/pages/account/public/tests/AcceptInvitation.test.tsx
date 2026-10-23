@@ -96,3 +96,15 @@ it('should not submit a password that breaks the password rules', async () => {
 
     expect(fetchSpy).not.toHaveBeenCalled();
 });
+
+it('should not submit a password longer than the server accepts', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    renderAcceptInvitationPage();
+
+    await userEvent.click(screen.getByLabelText('Password'));
+    await userEvent.paste(`Password1${'x'.repeat(92)}`);
+    await userEvent.click(screen.getByRole('button', {name: 'Activate account'}));
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+});
