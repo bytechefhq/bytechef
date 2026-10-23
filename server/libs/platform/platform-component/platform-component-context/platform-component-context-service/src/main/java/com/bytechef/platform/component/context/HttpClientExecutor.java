@@ -24,6 +24,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -34,6 +35,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.OperationDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -465,7 +467,7 @@ class HttpClientExecutor {
                 if (componentOperationName == null) {
                     operationDefinitionService = connectionDefinitionService;
                 } else {
-                    operationDefinitionService = getOperationDefinitionService(!(context instanceof TriggerContext));
+                    operationDefinitionService = getOperationDefinitionService(context);
                 }
 
                 if ((httpResponse.statusCode() > 199) && (httpResponse.statusCode() < 400)) {
@@ -509,16 +511,16 @@ class HttpClientExecutor {
             BodyPublishers.ofString(JsonUtils.write(body.getContent())), MediaType.APPLICATION_JSON);
     }
 
-    private OperationDefinitionService getOperationDefinitionService(boolean isAction) {
-        OperationDefinitionService operationDefinitionService;
-
-        if (isAction) {
-            operationDefinitionService = applicationContext.getBean(ActionDefinitionService.class);
-        } else {
-            operationDefinitionService = applicationContext.getBean(TriggerDefinitionService.class);
+    private OperationDefinitionService getOperationDefinitionService(Context context) {
+        if (context instanceof TriggerContext) {
+            return applicationContext.getBean(TriggerDefinitionService.class);
         }
 
-        return operationDefinitionService;
+        if (context instanceof ClusterElementContext) {
+            return applicationContext.getBean(ClusterElementDefinitionService.class);
+        }
+
+        return applicationContext.getBean(ActionDefinitionService.class);
     }
 
     private BodyPublisher getStringBodyPublisher(Body body) {
