@@ -21,10 +21,9 @@ import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
-import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.FirecrawlTools;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -35,7 +34,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -84,7 +82,7 @@ public class EmbeddedCopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorEmbeddedAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadIntegrationTools readIntegrationTools,
         ReadIntegrationWorkflowTools readIntegrationWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        Optional<FirecrawlTools> firecrawlTools, Optional<BraveWebSearchTools> braveWebSearchTools,
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider,
         WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         @Qualifier("questionAnswerAdvisor") Advisor questionAnswerAdvisor, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
@@ -95,10 +93,7 @@ public class EmbeddedCopilotConfiguration {
                 readIntegrationTools, readIntegrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
                 workflowInstructionTools));
 
-        firecrawlTools.ifPresent(tools::add);
-        braveWebSearchTools.ifPresent(tools::add);
-
-        return WorkflowEditorSpringAIAgent.builder()
+        WorkflowEditorSpringAIAgent springAIAgent = WorkflowEditorSpringAIAgent.builder()
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -112,6 +107,10 @@ public class EmbeddedCopilotConfiguration {
             .securityContextRehydrator(securityContextRehydrator)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
     }
 
     @Bean
