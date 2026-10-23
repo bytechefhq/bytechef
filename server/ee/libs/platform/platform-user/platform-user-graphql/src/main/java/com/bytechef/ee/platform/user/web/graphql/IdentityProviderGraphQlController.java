@@ -11,7 +11,9 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.domain.IdentityProviderDomain;
 import com.bytechef.ee.platform.user.domain.IdentityProviderRegistrationId;
+import com.bytechef.ee.platform.user.domain.IdentityProviderSigningCertificate;
 import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
+import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.constant.UserConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -88,14 +90,14 @@ public class IdentityProviderGraphQlController {
     private static void validateRequiredFields(IdentityProviderInput input) {
         if (UserConstants.AUTH_PROVIDER_SAML.equals(input.type())) {
             if (isBlank(input.metadataUri())) {
-                throw new IllegalArgumentException("metadataUri is required for a SAML identity provider");
+                throw new GraphQlBadRequestException("metadataUri is required for a SAML identity provider");
             }
 
             return;
         }
 
         if (isBlank(input.issuerUri()) || isBlank(input.clientId()) || isBlank(input.clientSecret())) {
-            throw new IllegalArgumentException(
+            throw new GraphQlBadRequestException(
                 "issuerUri, clientId and clientSecret are required for an OIDC identity provider");
         }
     }
@@ -201,8 +203,14 @@ public class IdentityProviderGraphQlController {
             identityProvider.setScopes(input.scopes());
         }
 
-        if (input.signingCertificate() != null) {
-            identityProvider.setSigningCertificate(input.signingCertificate());
+        if (!isBlank(input.signingCertificate())) {
+            try {
+                identityProvider.setSigningCertificate(
+                    IdentityProviderSigningCertificate.normalize(input.signingCertificate()));
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new GraphQlBadRequestException(
+                    illegalArgumentException.getMessage(), illegalArgumentException);
+            }
         }
 
         if (input.type() != null) {
