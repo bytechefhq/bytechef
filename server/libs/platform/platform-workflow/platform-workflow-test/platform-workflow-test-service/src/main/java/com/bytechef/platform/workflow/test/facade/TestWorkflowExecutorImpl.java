@@ -39,6 +39,9 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -522,9 +525,51 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 }
             }));
 
+        handles.add(
+            ClusterElementCallRecorder.getInstance()
+                .addListener(
+                    jobId, (event) -> {
+                        sseStreamBridge.onEvent(
+                            Map.of(
+                                "event", getClusterElementEventName(event.type()),
+                                "payload", getClusterElementCallPayload(event)));
+
+                        jobProgressPublisher.requestSnapshot();
+                    }));
+
         handles.add(jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge));
 
         return handles;
+    }
+
+    private static Map<String, Object> getClusterElementCallPayload(ClusterElementCallEvent clusterElementCallEvent) {
+        ClusterElementCall clusterElementCall = clusterElementCallEvent.call();
+
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("name", clusterElementCall.workflowNodeName());
+        payload.put("taskExecutionId", String.valueOf(clusterElementCallEvent.taskExecutionId()));
+        payload.put("status", clusterElementCall.status()
+            .name());
+        payload.put("startDate", String.valueOf(clusterElementCall.startDate()));
+
+        if (clusterElementCall.endDate() != null) {
+            payload.put("endDate", String.valueOf(clusterElementCall.endDate()));
+        }
+
+        if (clusterElementCall.error() != null) {
+            payload.put("error", clusterElementCall.error());
+        }
+
+        return payload;
+    }
+
+    private static String getClusterElementEventName(ClusterElementCallEvent.Type type) {
+        return switch (type) {
+            case STARTED -> "cluster_element_started";
+            case COMPLETED -> "cluster_element_completed";
+            case FAILED -> "cluster_element_failed";
+        };
     }
 
     private Map<String, Object> getTaskStartedPayload(long taskExecutionId) {

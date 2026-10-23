@@ -37,6 +37,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -471,6 +472,84 @@ public class TestWorkflowExecutorTest {
         verify(jobSyncExecutor).addErrorListener(anyLong(), any());
         verify(jobSyncExecutor).addSseStreamBridge(anyLong(), any());
         verify(mockHandle, times(5)).close();
+    }
+
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void testForwardsClusterElementCallEvents() throws Exception {
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(7L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenAnswer(invocation -> {
+            clusterElementCallRecorder.callStarted(7L, 70L, "httpClient_1");
+            clusterElementCallRecorder.callFailed(7L, 70L, "httpClient_1", "boom");
+
+            return job;
+        });
+        when(job.getId()).thenReturn(7L);
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        SseStreamBridge mockSseStreamBridge = mock(SseStreamBridge.class);
+
+        try {
+            testWorkflowExecutor.executeAsync(
+                WORKFLOW_ID, Map.of(), ENVIRONMENT_ID, key -> {}, key -> mockSseStreamBridge,
+                (key, future) -> future.join(), key -> {});
+
+            clusterElementCallRecorder.callStarted(7L, 70L, "slack_1");
+        } finally {
+            clusterElementCallRecorder.drain(70L);
+        }
+
+        ArgumentCaptor<Map> eventCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(mockSseStreamBridge, org.mockito.Mockito.atLeastOnce()).onEvent(eventCaptor.capture());
+
+        List<Map> clusterElementEvents = eventCaptor.getAllValues()
+            .stream()
+            .filter(event -> String.valueOf(event.get("event"))
+                .startsWith("cluster_element_"))
+            .toList();
+
+        assertThat(clusterElementEvents).extracting(event -> event.get("event"))
+            .containsExactly("cluster_element_started", "cluster_element_failed");
+
+        Map<String, Object> failedPayload = (Map<String, Object>) clusterElementEvents.get(1)
+            .get("payload");
+
+        assertThat(failedPayload).containsEntry("name", "httpClient_1")
+            .containsEntry("status", "FAILED")
+            .containsEntry("error", "boom")
+            .containsEntry("taskExecutionId", "70")
+            .containsKey("startDate")
+            .containsKey("endDate");
+
+        Map<String, Object> startedPayload = (Map<String, Object>) clusterElementEvents.get(0)
+            .get("payload");
+
+        assertThat(startedPayload).containsEntry("status", "STARTED")
+            .doesNotContainKey("endDate")
+            .doesNotContainKey("error");
     }
 
     @Test
