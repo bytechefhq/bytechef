@@ -67,6 +67,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
+    private static final int NOT_ACTIVATED_USER_RETENTION_DAYS = 3;
 
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
@@ -92,10 +93,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> activateInvitation(String key, String newPassword) {
+        log.debug("Activating invited user for activation key {}", key);
+
+        return userRepository.findByActivationKey(key)
+            .filter(User::isInvited)
+            .filter(user -> {
+                Instant createdDate = user.getCreatedDate();
+
+                return createdDate != null && createdDate.isAfter(
+                    Instant.now()
+                        .minus(NOT_ACTIVATED_USER_RETENTION_DAYS, ChronoUnit.DAYS));
+            })
+            .map(user -> {
+                user.setActivated(true);
+                user.setActivationKey(null);
+                user.setInvited(false);
+                user.setPassword(passwordEncoder.encode(newPassword));
+
+                user = userRepository.save(user);
+
+                this.clearUserCaches(user);
+
+                return user;
+            });
+    }
+
+    @Override
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
 
         return userRepository.findByActivationKey(key)
+            .filter(user -> !user.isInvited())
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
@@ -654,7 +683,7 @@ public class UserServiceImpl implements UserService {
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
                 LocalDateTimeUtils.toLocalDateTime(
                     Instant.now()
-                        .minus(3, ChronoUnit.DAYS)))
+                        .minus(NOT_ACTIVATED_USER_RETENTION_DAYS, ChronoUnit.DAYS)))
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
 
