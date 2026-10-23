@@ -54,7 +54,7 @@ public class ScrapeUnblockerGetPageSourceAction {
                 .label("Wait Seconds")
                 .description("Number of seconds to wait after the page loads before the HTML is captured.")
                 .required(false))
-        .help("", "https://developers.scrapeunblocker.com")
+        .help("", "https://docs.scrapeunblocker.com")
         .output(
             outputSchema(
                 string()

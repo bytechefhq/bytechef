@@ -47,7 +47,7 @@ public class ScrapeUnblockerGetParsedDataAction {
                 .label("Proxy Country")
                 .description("Two-letter country code for the proxy exit location (e.g. US, DE).")
                 .required(false))
-        .help("", "https://developers.scrapeunblocker.com")
+        .help("", "https://docs.scrapeunblocker.com")
         .output(
             outputSchema(
                 string()
