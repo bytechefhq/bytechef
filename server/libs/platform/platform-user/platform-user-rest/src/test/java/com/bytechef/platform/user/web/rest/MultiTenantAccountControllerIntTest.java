@@ -367,6 +367,108 @@ class MultiTenantAccountControllerIntTest {
     }
 
     @Test
+    void testAcceptInvitationOfTenantUser() throws Exception {
+        String tenantId = tenantService.createTenant();
+
+        User user = new User();
+
+        user.setLogin("accept-invitation@example.com");
+        user.setEmail("accept-invitation@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("tenant-invitation-1");
+        user.setInvited(true);
+
+        TenantContext.runWithTenantId(tenantId, () -> userRepository.save(user));
+
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey(user.getActivationKey());
+        keyAndPassword.setNewPassword("NewPassword1");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isOk());
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            User updatedUser = userRepository.findByLogin(user.getLogin())
+                .orElseThrow();
+
+            assertThat(updatedUser.isActivated()).isTrue();
+            assertThat(updatedUser.getActivationKey()).isNull();
+            assertThat(passwordEncoder.matches(keyAndPassword.getNewPassword(), updatedUser.getPassword())).isTrue();
+        });
+
+        assertThat(tenantService.getTenantIds()).containsExactly(tenantId);
+    }
+
+    @Test
+    void testActivateAccountRefusesAnInvitationKeyOfTenantUser() throws Exception {
+        String tenantId = tenantService.createTenant();
+
+        User user = new User();
+
+        user.setLogin("activate-invitation@example.com");
+        user.setEmail("activate-invitation@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("tenant-invitation-2");
+        user.setInvited(true);
+
+        TenantContext.runWithTenantId(tenantId, () -> userRepository.save(user));
+
+        restAccountMockMvc.perform(get("/api/activate?key={activationKey}", user.getActivationKey()))
+            .andExpect(status().isInternalServerError());
+
+        TenantContext.runWithTenantId(tenantId, () -> {
+            User unchangedUser = userRepository.findByLogin(user.getLogin())
+                .orElseThrow();
+
+            assertThat(unchangedUser.isActivated()).isFalse();
+            assertThat(unchangedUser.getActivationKey()).isEqualTo("tenant-invitation-2");
+        });
+
+        assertThat(tenantService.getTenantIds()).containsExactly(tenantId);
+    }
+
+    @Test
+    void testAcceptInvitationRefusesAPendingSignUp() throws Exception {
+        User user = new User();
+
+        user.setLogin("pending-sign-up@example.com");
+        user.setEmail("pending-sign-up@example.com");
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setActivationKey("sign-up-activation-1");
+
+        userRepository.save(user);
+
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
+
+        keyAndPassword.setKey(user.getActivationKey());
+        keyAndPassword.setNewPassword("NewPassword1");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/accept-invitation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(keyAndPassword))
+                    .with(csrf()))
+            .andExpect(status().isInternalServerError());
+
+        User unchangedUser = userRepository.findByLogin(user.getLogin())
+            .orElseThrow();
+
+        assertThat(unchangedUser.isActivated()).isFalse();
+
+        userRepository.delete(unchangedUser);
+    }
+
+    @Test
     void testActivateAccountWithWrongKey() throws Exception {
         restAccountMockMvc.perform(get("/api/activate?key=wrongActivationKey"))
             .andExpect(status().isInternalServerError());

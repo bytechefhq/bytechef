@@ -17,6 +17,9 @@
 package com.bytechef.platform.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
@@ -29,8 +32,10 @@ import com.bytechef.platform.user.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +43,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -48,17 +55,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class UserServiceIntTest {
 
+    private static final String ACTIVATION_KEY = "invitation-key";
     private static final String DEFAULT_LOGIN = "johndoe";
     private static final String DEFAULT_EMAIL = "johndoe@localhost";
     private static final String DEFAULT_FIRSTNAME = "john";
     private static final String DEFAULT_LASTNAME = "doe";
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
     private static final String DEFAULT_LANGKEY = "dummy";
+    private static final String NEW_PASSWORD = "new-password";
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private UserRepository userRepository;
 
     @Autowired
@@ -85,6 +97,22 @@ class UserServiceIntTest {
         user.setLangKey(DEFAULT_LANGKEY);
 
         when(dateTimeProvider.getNow()).thenReturn(Optional.of(LocalDateTime.now()));
+    }
+
+    @Test
+    @Transactional
+    void testClearActivationKeyClaimsAKeyOnlyOnce() {
+        user.setActivated(false);
+        user.setActivationKey("invitation-key");
+        user.setInvited(true);
+
+        User savedUser = userRepository.save(user);
+
+        long userId = savedUser.getId();
+
+        assertThat(userRepository.clearActivationKey(userId, "invitation-key")).isEqualTo(1);
+        assertThat(userRepository.clearActivationKey(userId, "invitation-key")).isZero();
+        assertThat(userRepository.findByActivationKey("invitation-key")).isEmpty();
     }
 
     @Test
@@ -278,6 +306,159 @@ class UserServiceIntTest {
         Optional<User> maybeDbUser = userRepository.findById(dbUser.getId());
 
         assertThat(maybeDbUser).contains(dbUser);
+    }
+
+    @Test
+    @Transactional
+    void testActivateInvitationSetsThePasswordAndActivatesTheAccount() {
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), true);
+
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, NEW_PASSWORD)).isPresent();
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(invitee.isActivated()).isTrue();
+        assertThat(invitee.getActivationKey()).isNull();
+        assertThat(invitee.isInvited()).isFalse();
+        assertThat(passwordEncoder.matches(NEW_PASSWORD, invitee.getPassword())).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void testActivateInvitationRefusesAKeyAnotherRequestClaimedFirst() {
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), true);
+
+        String originalPassword = user.getPassword();
+
+        doReturn(0).when(userRepository)
+            .clearActivationKey(anyLong(), anyString());
+
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, NEW_PASSWORD)).isEmpty();
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(invitee.isActivated()).isFalse();
+        assertThat(invitee.getPassword()).isEqualTo(originalPassword);
+    }
+
+    @Test
+    @Transactional
+    void testActivateInvitationRefusesAPendingSignUp() {
+        long userId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), false);
+
+        String originalPassword = user.getPassword();
+
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, NEW_PASSWORD)).isEmpty();
+
+        User pendingUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(pendingUser.isActivated()).isFalse();
+        assertThat(pendingUser.getActivationKey()).isEqualTo(ACTIVATION_KEY);
+        assertThat(pendingUser.getPassword()).isEqualTo(originalPassword);
+    }
+
+    @Test
+    @Transactional
+    void testActivateRegistrationRefusesAnInvitationKey() {
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), true);
+
+        assertThat(userService.activateRegistration(ACTIVATION_KEY)).isEmpty();
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(invitee.isActivated()).isFalse();
+        assertThat(invitee.getActivationKey()).isEqualTo(ACTIVATION_KEY);
+    }
+
+    @Test
+    @Transactional
+    void testActivateRegistrationActivatesAPendingSignUp() {
+        long userId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), false);
+
+        assertThat(userService.activateRegistration(ACTIVATION_KEY)).isPresent();
+
+        User activatedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(activatedUser.isActivated()).isTrue();
+        assertThat(activatedUser.getActivationKey()).isNull();
+    }
+
+    @Test
+    @Transactional
+    void testExpiredInvitationIsRefusedAndTheAccountStaysInactive() {
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(4, ChronoUnit.DAYS), true);
+
+        String originalPassword = user.getPassword();
+
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, NEW_PASSWORD)).isEmpty();
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(invitee.isActivated()).isFalse();
+        assertThat(invitee.getActivationKey()).isEqualTo(ACTIVATION_KEY);
+        assertThat(invitee.getPassword()).isEqualTo(originalPassword);
+    }
+
+    @Test
+    @Transactional
+    void testUsedInvitationCannotBeUsedASecondTime() {
+        long inviteeId = saveInvitee(Instant.now()
+            .minus(1, ChronoUnit.HOURS), true);
+
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, NEW_PASSWORD)).isPresent();
+        assertThat(userService.activateInvitation(ACTIVATION_KEY, "attacker-password")).isEmpty();
+
+        User invitee = userRepository.findById(inviteeId)
+            .orElseThrow();
+
+        assertThat(passwordEncoder.matches(NEW_PASSWORD, invitee.getPassword())).isTrue();
+    }
+
+    @Test
+    @Transactional
+    void testUsedResetKeyCannotBeUsedASecondTime() {
+        String resetKey = RandomUtils.generateResetKey();
+
+        user.setResetDate(Instant.now()
+            .minus(1, ChronoUnit.HOURS));
+        user.setResetKey(resetKey);
+
+        User savedUser = userRepository.save(user);
+
+        long userId = Objects.requireNonNull(savedUser.getId());
+
+        assertThat(userService.completePasswordReset(NEW_PASSWORD, resetKey)).isPresent();
+        assertThat(userService.completePasswordReset("attacker-password", resetKey)).isEmpty();
+
+        User resetUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(passwordEncoder.matches(NEW_PASSWORD, resetUser.getPassword())).isTrue();
+    }
+
+    private long saveInvitee(Instant createdDate, boolean invited) {
+        when(dateTimeProvider.getNow()).thenReturn(
+            Optional.of(LocalDateTime.ofInstant(createdDate, ZoneId.systemDefault())));
+
+        user.setActivated(false);
+        user.setActivationKey(ACTIVATION_KEY);
+        user.setInvited(invited);
+
+        User savedUser = userRepository.save(user);
+
+        return Objects.requireNonNull(savedUser.getId());
     }
 
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")

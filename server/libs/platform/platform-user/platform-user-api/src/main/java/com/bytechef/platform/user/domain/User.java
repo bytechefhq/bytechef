@@ -71,6 +71,9 @@ public class User {
     @Column("image_url")
     private String imageUrl;
 
+    @Column
+    private boolean invited;
+
     @Column("lang_key")
     private String langKey;
 
@@ -218,6 +221,10 @@ public class User {
         return activated;
     }
 
+    public boolean isInvited() {
+        return invited;
+    }
+
     public boolean isTotpEnabled() {
         return totpEnabled;
     }
@@ -268,6 +275,10 @@ public class User {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void setInvited(boolean invited) {
+        this.invited = invited;
     }
 
     public void setLangKey(String langKey) {
