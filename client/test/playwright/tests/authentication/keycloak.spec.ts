@@ -12,6 +12,8 @@ import {
     deleteIdentityProvider,
     expectSignInRefused,
     expectSignedInto,
+    fetchSamlSigningCertificate,
+    graphqlErrors,
     uniqueSuffix,
 } from '../../utils/authenticationUtils';
 import {
@@ -129,12 +131,17 @@ test.describe('Single sign-on with Keycloak (#1040)', () => {
     });
 
     test.describe('SAML', () => {
-        test('the first sign-in provisions an account from the assertion attributes', async ({page}) => {
-            identityProvider = await createSamlIdentityProvider(adminApiContext, {
+        async function createKeycloakSamlIdentityProvider(signingCertificate?: string): Promise<IdentityProviderI> {
+            return createSamlIdentityProvider(adminApiContext, {
                 domain: `saml-${uniqueSuffix()}.e2e.example.com`,
                 metadataUri: KEYCLOAK_SAML_METADATA_URI,
                 namePrefix: 'E2E Keycloak SAML',
+                signingCertificate,
             });
+        }
+
+        test('the first sign-in provisions an account from the assertion attributes', async ({page}) => {
+            identityProvider = await createKeycloakSamlIdentityProvider();
 
             keycloakSamlClientId = await createKeycloakSamlClient(identityProvider);
 
@@ -152,6 +159,57 @@ test.describe('Single sign-on with Keycloak (#1040)', () => {
             expect(account.authorities).toEqual(['ROLE_USER']);
             expect(account.firstName).toBe(keycloakUser.firstName);
             expect(account.lastName).toBe(keycloakUser.lastName);
+        });
+
+        test('a pinned signing certificate accepts assertions Keycloak signs with it', async ({page}) => {
+            identityProvider = await createKeycloakSamlIdentityProvider(
+                await fetchSamlSigningCertificate(KEYCLOAK_SAML_METADATA_URI)
+            );
+
+            keycloakSamlClientId = await createKeycloakSamlClient(identityProvider);
+
+            keycloakUser = await createKeycloakUser(identityProvider.domain);
+
+            await continueWithSso(page, keycloakUser.email, identityProvider);
+
+            await signInAtKeycloak(page, keycloakUser);
+
+            await expectSignedInto(page);
+        });
+
+        test('a pinned signing certificate refuses assertions signed by another key', async ({page}) => {
+            identityProvider = await createKeycloakSamlIdentityProvider(await fetchSamlSigningCertificate());
+
+            keycloakSamlClientId = await createKeycloakSamlClient(identityProvider);
+
+            keycloakUser = await createKeycloakUser(identityProvider.domain);
+
+            await continueWithSso(page, keycloakUser.email, identityProvider);
+
+            await signInAtKeycloak(page, keycloakUser);
+
+            await expectSignInRefused(page, /Failed to sign in with your identity provider/);
+        });
+
+        test('a signing certificate that is not a certificate cannot be saved', async () => {
+            const errors = await graphqlErrors(
+                adminApiContext,
+                `mutation CreateIdentityProvider($input: IdentityProviderInput!) {
+                    createIdentityProvider(input: $input) { id }
+                }`,
+                {
+                    input: {
+                        domains: [`saml-${uniqueSuffix()}.e2e.example.com`],
+                        enabled: true,
+                        metadataUri: KEYCLOAK_SAML_METADATA_URI,
+                        name: `E2E Keycloak SAML ${uniqueSuffix()}`,
+                        signingCertificate: 'not a certificate',
+                        type: 'SAML',
+                    },
+                }
+            );
+
+            expect(errors.map((error) => error.message).join('\n')).toMatch(/not a valid X\.509 certificate/);
         });
     });
 });
