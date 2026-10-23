@@ -88,11 +88,9 @@ beforeEach(() => {
         handleEmailChange: vi.fn(),
         handleInvite: vi.fn(),
         handleOpen: hoisted.handleInviteDialogOpen,
-        handleRegeneratePassword: vi.fn(),
         handleRoleChange: vi.fn(),
         inviteDisabled: true,
         inviteEmail: '',
-        invitePassword: '',
         inviteRole: null,
         open: false,
     });

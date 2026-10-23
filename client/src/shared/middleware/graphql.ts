@@ -2397,7 +2397,6 @@ export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision:
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
-  password: string;
   role: string;
 }>;
 
@@ -11450,8 +11449,8 @@ export const useIdentityProvidersQuery = <
     )};
 
 export const InviteUserDocument = new TypedDocumentString(`
-    mutation inviteUser($email: String!, $password: String!, $role: String!) {
-  inviteUser(email: $email, password: $password, role: $role)
+    mutation inviteUser($email: String!, $role: String!) {
+  inviteUser(email: $email, role: $role)
 }
     `);
 
