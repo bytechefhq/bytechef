@@ -23,5 +23,5 @@ import org.jspecify.annotations.Nullable;
  */
 public record WebSearchProviderDTO(
     String name, String label, String description, @Nullable String icon, boolean enabled,
-    @Nullable String maskedApiKey, boolean apiKeyFromProperties) {
+    @Nullable String maskedApiKey, boolean apiKeyFromProperties, String baseUrl, String defaultBaseUrl) {
 }
