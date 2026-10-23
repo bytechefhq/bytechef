@@ -161,7 +161,7 @@ Only a tenant admin can rotate an embedded MCP server's secret key. Editors with
 
 ## Notable rules
 
-- **No last-Admin rule.** An Admin may step down to a lower role, even when no other Admin remains. Tenant admins always have full access, so the embedded side cannot be locked out.
+- **Every environment keeps an Admin.** A change that would leave an environment that has an embedded Admin without one is refused: removing a member, changing their role, or setting or removing one of their environment roles. An Admin can step down while another Admin remains in that environment. The rule applies to tenant admins too, so add another Admin before removing the last one.
 - **Hub and connected users' projects are not visible to automation workspace roles.** Automation Hub templates and the projects of connected users are not covered by automation workspace roles.
 - A request the member lacks permission for is refused: the REST API returns HTTP **403**, and GraphQL returns an error of type `FORBIDDEN`.
 
