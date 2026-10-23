@@ -65,6 +65,12 @@ Each saved provider has a **registration id** that ByteChef uses in the URLs you
 
 Save the provider first; the registration id exists only once it has been created.
 
+### SAML request signing
+
+ByteChef signs SAML authentication requests with a key of its own, one per SAML provider. The key's self-signed certificate (valid ten years) is published in the SP metadata and shown as **SP Signing Certificate** when you edit the provider; register it with IdPs that verify request signatures, such as Keycloak with *Client signature required* on. The private key never leaves the server and is stored encrypted.
+
+**Regenerate Certificate** replaces the key at once. IdPs that verify request signatures reject sign-ins until you register the new certificate with them, so update the IdP right after regenerating (or download the SP metadata again).
+
 ### Using a provider for MCP endpoints
 
 OIDC providers additionally expose three per-surface toggles:
