@@ -6,6 +6,7 @@ dependencies {
     api(project(":sdks:backend:java:component-api"))
     api(project(":server:libs:core:exception:exception-api"))
 
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")
     implementation("org.springframework:spring-core")
