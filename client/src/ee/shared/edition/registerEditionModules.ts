@@ -18,10 +18,10 @@ registerProjectGitApi({
 
         const mutation = useUpdateProjectGitConfigurationMutation({
             onSuccess: (result, variables) => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(variables.id!),
                 });
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ProjectGitConfigurationKeys.projectGitConfigurations,
                 });
 
