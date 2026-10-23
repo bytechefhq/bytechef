@@ -25,6 +25,7 @@ import com.agui.core.state.State;
 import com.agui.server.EventFactory;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
+import com.bytechef.ai.copilot.tool.WebSearchToolCallbacks;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.tool.ToolCallback;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +54,7 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     private static final Logger log = LoggerFactory.getLogger(CopilotSpringAIAgent.class);
 
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
+    private @Nullable WebSearchToolCallbacks webSearchToolCallbackProvider;
 
     protected CopilotSpringAIAgent(
         SpringAIAgent.Builder builder, @Nullable OverrideChatClientResolver overrideChatClientResolver)
@@ -81,6 +84,27 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         }
 
         runWithTenant(tenantId, () -> runWithEnvironment(input, () -> super.run(input, decoratedSubscriber)));
+    }
+
+    public void setWebSearchToolCallbackProvider(
+        @Nullable WebSearchToolCallbacks webSearchToolCallbackProvider) {
+
+        this.webSearchToolCallbackProvider = webSearchToolCallbackProvider;
+    }
+
+    @Override
+    protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
+        if (webSearchToolCallbackProvider == null) {
+            return super.additionalToolCallbacks(input);
+        }
+
+        Integer environmentId = getEnvironmentId(input);
+
+        if (environmentId == null) {
+            return super.additionalToolCallbacks(input);
+        }
+
+        return webSearchToolCallbackProvider.getToolCallbacks(environmentId);
     }
 
     protected AgentSubscriber decorateSubscriber(AgentSubscriber subscriber) {

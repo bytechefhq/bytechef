@@ -24,7 +24,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.support.ToolCallbacks;
@@ -39,7 +38,11 @@ import org.springframework.web.client.RestClient;
  */
 class BraveWebSearchToolsTest {
 
-    private static final String SEARCH_URL = "https://api.search.brave.com/res/v1/web/search";
+    private static final String API_KEY = "test-key";
+
+    private static final String BASE_URL = "https://api.search.brave.com/res/v1";
+
+    private static final String SEARCH_URL = BASE_URL + "/web/search";
 
     private static final String RESPONSE_BODY = """
         {
@@ -67,11 +70,10 @@ class BraveWebSearchToolsTest {
 
         server.expect(requestTo(SEARCH_URL + "?q=bytechef"))
             .andExpect(method(HttpMethod.GET))
-            .andExpect(header("X-Subscription-Token", "test-key"))
+            .andExpect(header("X-Subscription-Token", API_KEY))
             .andRespond(withSuccess(RESPONSE_BODY, MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         BraveWebSearchTools.BraveSearchResult result = braveWebSearchTools.braveWebSearch(
             "bytechef", null, null, null);
@@ -99,8 +101,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef&count=20"))
             .andRespond(withSuccess(RESPONSE_BODY, MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         braveWebSearchTools.braveWebSearch("bytechef", 50, null, null);
 
@@ -116,8 +117,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef&count=1"))
             .andRespond(withSuccess(RESPONSE_BODY, MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         braveWebSearchTools.braveWebSearch("bytechef", 0, null, null);
 
@@ -133,8 +133,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=how%20to%20use%20%24%7BtaskName.property%7D"))
             .andRespond(withSuccess(RESPONSE_BODY, MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         braveWebSearchTools.braveWebSearch("how to use ${taskName.property}", null, null, null);
 
@@ -150,8 +149,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef&country=DE&freshness=pw"))
             .andRespond(withSuccess(RESPONSE_BODY, MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         braveWebSearchTools.braveWebSearch("bytechef", null, "DE", "pw");
 
@@ -167,8 +165,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef"))
             .andRespond(withSuccess("{\"type\":\"search\"}", MediaType.APPLICATION_JSON));
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         BraveWebSearchTools.BraveSearchResult result = braveWebSearchTools.braveWebSearch(
             "bytechef", null, null, null);
@@ -185,8 +182,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef"))
             .andRespond(withSuccess());
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         BraveWebSearchTools.BraveSearchResult result = braveWebSearchTools.braveWebSearch(
             "bytechef", null, null, null);
@@ -204,8 +200,7 @@ class BraveWebSearchToolsTest {
         server.expect(requestTo(SEARCH_URL + "?q=bytechef"))
             .andRespond(withServerError());
 
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), restClientBuilder);
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, restClientBuilder);
 
         assertThatThrownBy(() -> braveWebSearchTools.braveWebSearch("bytechef", null, null, null))
             .isInstanceOf(ExecutionException.class);
@@ -213,8 +208,7 @@ class BraveWebSearchToolsTest {
 
     @Test
     void testToolCallbackIsNamedBraveWebSearch() {
-        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(
-            applicationProperties(), RestClient.builder());
+        BraveWebSearchTools braveWebSearchTools = new BraveWebSearchTools(BASE_URL, API_KEY, RestClient.builder());
 
         ToolCallback[] toolCallbacks = ToolCallbacks.from(braveWebSearchTools);
 
@@ -222,16 +216,5 @@ class BraveWebSearchToolsTest {
         assertThat(
             toolCallbacks[0].getToolDefinition()
                 .name()).isEqualTo("braveWebSearch");
-    }
-
-    private static ApplicationProperties applicationProperties() {
-        ApplicationProperties applicationProperties = new ApplicationProperties();
-
-        ApplicationProperties.Ai.Brave brave = applicationProperties.getAi()
-            .getBrave();
-
-        brave.setApiKey("test-key");
-
-        return applicationProperties;
     }
 }
