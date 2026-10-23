@@ -9,6 +9,7 @@
     "identity-providers",
     "connections",
     "ai-providers",
+    "web-search",
     "mcp-server",
     "oauth2-clients",
     "components",
