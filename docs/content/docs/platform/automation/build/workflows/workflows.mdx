@@ -522,11 +522,19 @@ project you're currently editing.
 ### Deploy
 
 **Deploy** opens the same [Create Deployment](/platform/automation/build/workflows/projects) dialog
-used from the Project Deployments page, pre-scoped to the current project. It's disabled - with a
-"Publish the project to enable deployment" tooltip - until the project has at least one published
-version, since a deployment always targets a published version, never a draft. Its **New** tab
-creates a fresh deployment (**Environment**, **Version**, **Name**, **Description**, **Tags**); its
-**Change Version** tab repoints an existing deployment at a different published version.
+used from the Project Deployments page, pre-scoped to the current project. Its tooltip reads
+"Deploy the published project version". It's disabled - with a "Publish the project to enable
+deployment" tooltip - until the project has at least one published version, since a deployment
+always targets a published version, never a draft. Its **New** tab creates a fresh deployment
+(**Environment**, **Version**, **Name**, **Description**, **Tags**); its **Change Version** tab
+repoints an existing deployment at a different published version.
+
+### Project Deployments
+
+The rocket icon button next to **Deploy** (tooltip: "Project Deployments") opens a side panel
+listing the project's deployments in the current environment, so you can enable a deployment,
+change its version, or open a workflow's executions without leaving the editor. See
+[View a Project's Deployments](/platform/automation/deploy/workflows#view-a-projects-deployments).
 
 ### Run, Test, and the Output panel
 
