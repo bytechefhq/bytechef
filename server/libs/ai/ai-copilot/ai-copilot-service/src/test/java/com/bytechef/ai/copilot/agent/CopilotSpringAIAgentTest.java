@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.agent.AgentSubscriber;
@@ -36,6 +37,7 @@ import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.platform.ai.llm.NoChatProviderActivatedException;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
@@ -62,6 +64,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.core.task.TaskExecutor;
 
 /**
@@ -564,6 +567,44 @@ class CopilotSpringAIAgentTest {
 
             assertThat(capturedEnvironment.get()).isNull();
             assertThat(EnvironmentContext.fetchCurrentEnvironment()).isNull();
+        }
+    }
+
+    @Nested
+    class WebSearchToolsTest {
+
+        @Test
+        void testOffersTheWebSearchToolsOfTheRunEnvironment() throws AGUIException {
+            WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+            ToolCallback webSearchToolCallback = mock(ToolCallback.class);
+
+            when(webSearchToolCallbackProvider.getToolCallbacks(2)).thenReturn(List.of(webSearchToolCallback));
+
+            CopilotSpringAIAgent copilotSpringAIAgent = newConverterAgent(null);
+
+            copilotSpringAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+            assertThat(copilotSpringAIAgent.additionalToolCallbacks(newInput(stateWithEnvironmentId(2))))
+                .containsExactly(webSearchToolCallback);
+        }
+
+        @Test
+        void testOffersNoWebSearchToolsWithoutAnEnvironment() throws AGUIException {
+            WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+
+            CopilotSpringAIAgent copilotSpringAIAgent = newConverterAgent(null);
+
+            copilotSpringAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+            assertThat(copilotSpringAIAgent.additionalToolCallbacks(newInput(new State()))).isEmpty();
+
+            verifyNoInteractions(webSearchToolCallbackProvider);
+        }
+
+        @Test
+        void testOffersNoWebSearchToolsToAnAgentWithoutTheProvider() throws AGUIException {
+            assertThat(newConverterAgent(null).additionalToolCallbacks(newInput(stateWithEnvironmentId(2))))
+                .isEmpty();
         }
     }
 

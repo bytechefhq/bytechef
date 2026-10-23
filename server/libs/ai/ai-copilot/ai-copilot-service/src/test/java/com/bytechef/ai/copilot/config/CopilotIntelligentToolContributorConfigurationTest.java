@@ -48,10 +48,9 @@ import com.bytechef.automation.ai.tool.SkillsTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.platform.ai.tool.BraveWebSearchTools;
 import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.FirecrawlTools;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -60,11 +59,12 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -307,6 +307,67 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         }
     }
 
+    @Test
+    void testTheAskFactoryAddsTheWebSearchToolsOfTheCurrentEnvironment() {
+        CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
+        ChatModel chatModel = mock(ChatModel.class);
+        ComponentTools componentTools = mock(ComponentTools.class);
+        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+
+        when(webSearchToolCallbackProvider.getToolCallbacks(Environment.STAGING.ordinal()))
+            .thenReturn(List.of(mock(ToolCallback.class)));
+
+        ChatClient beanClient = copilotConfiguration.codeEditorAskSubAgentChatClient(
+            chatModel, readProjectWorkflowTools, componentTools);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.codeEditorAskSubAgentChatClientFactory(
+            beanClient, chatModel, readProjectWorkflowTools, componentTools, webSearchToolCallbackProvider);
+
+        EnvironmentContext.set(Environment.STAGING);
+
+        try {
+            assertThat(factory.get(null)).isNotSameAs(beanClient);
+        } finally {
+            EnvironmentContext.clear();
+        }
+
+        assertThat(factory.get(null)).isSameAs(beanClient);
+
+        verify(webSearchToolCallbackProvider).getToolCallbacks(Environment.STAGING.ordinal());
+    }
+
+    @Test
+    void testTheBuildWorkflowFactoryAddsTheWebSearchToolsOfTheCurrentEnvironment() {
+        CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
+        ChatModel chatModel = mock(ChatModel.class);
+        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
+        ScriptTools scriptTools = mock(ScriptTools.class);
+        TaskTools taskTools = mock(TaskTools.class);
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider = emptySubAgentAskRelayProvider();
+
+        when(webSearchToolCallbackProvider.getToolCallbacks(Environment.PRODUCTION.ordinal()))
+            .thenReturn(List.of(mock(ToolCallback.class)));
+
+        ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
+            chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
+
+        IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider,
+            webSearchToolCallbackProvider);
+
+        EnvironmentContext.set(Environment.PRODUCTION);
+
+        try {
+            assertThat(factory.get(null)).isNotSameAs(beanClient);
+        } finally {
+            EnvironmentContext.clear();
+        }
+
+        assertThat(factory.get(null)).isSameAs(beanClient);
+    }
+
     private List<IntelligentToolDefinition> definitionsWithAllProvidersPresent() {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             present(mock(IntelligentToolChatClientFactory.class)),
@@ -370,17 +431,15 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ComponentTools componentTools = mock(ComponentTools.class);
         TaskTools taskTools = mock(TaskTools.class);
-        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
-        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
         Advisor questionAnswerAdvisor = mock(Advisor.class);
 
         ChatClient beanClient = copilotConfiguration.workflowEditorAskSubAgentChatClient(
-            chatModel, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools,
-            braveWebSearchTools, questionAnswerAdvisor);
+            chatModel, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, questionAnswerAdvisor);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorAskSubAgentChatClientFactory(
-            beanClient, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools,
-            braveWebSearchTools, questionAnswerAdvisor);
+            beanClient, chatModel, readProjectTools, readProjectWorkflowTools, componentTools, taskTools,
+            webSearchToolCallbackProvider, questionAnswerAdvisor);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -398,7 +457,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider,
+            mock(WebSearchToolCallbackProvider.class));
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -414,7 +474,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             chatModel, projectWorkflowTools, taskTools, scriptTools);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.converterBuildSubAgentChatClientFactory(
-            beanClient, projectWorkflowTools, taskTools, scriptTools);
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools,
+            mock(WebSearchToolCallbackProvider.class));
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -425,14 +486,13 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ComponentTools componentTools = mock(ComponentTools.class);
         TaskTools taskTools = mock(TaskTools.class);
-        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
-        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
 
         ChatClient beanClient = copilotConfiguration.clusterElementAskSubAgentChatClient(
-            chatModel, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools, braveWebSearchTools);
+            chatModel, readProjectWorkflowTools, componentTools, taskTools);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.clusterElementAskSubAgentChatClientFactory(
-            beanClient, readProjectWorkflowTools, componentTools, taskTools, firecrawlTools, braveWebSearchTools);
+            beanClient, chatModel, readProjectWorkflowTools, componentTools, taskTools, webSearchToolCallbackProvider);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -459,14 +519,13 @@ final class CopilotIntelligentToolContributorConfigurationTest {
 
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ComponentTools componentTools = mock(ComponentTools.class);
-        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
-        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
 
         ChatClient beanClient = copilotConfiguration.codeEditorAskSubAgentChatClient(
-            chatModel, readProjectWorkflowTools, componentTools, firecrawlTools, braveWebSearchTools);
+            chatModel, readProjectWorkflowTools, componentTools);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.codeEditorAskSubAgentChatClientFactory(
-            beanClient, readProjectWorkflowTools, componentTools, firecrawlTools, braveWebSearchTools);
+            beanClient, chatModel, readProjectWorkflowTools, componentTools, webSearchToolCallbackProvider);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -491,16 +550,14 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ReadSkillsTools readSkillsTools = mock(ReadSkillsTools.class);
-        Optional<FirecrawlTools> firecrawlTools = Optional.empty();
-        Optional<BraveWebSearchTools> braveWebSearchTools = Optional.empty();
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
 
         ChatClient beanClient = copilotConfiguration.skillsAskSubAgentChatClient(
-            chatModel, readProjectTools, readProjectWorkflowTools, readSkillsTools, firecrawlTools,
-            braveWebSearchTools);
+            chatModel, readProjectTools, readProjectWorkflowTools, readSkillsTools);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.skillsAskSubAgentChatClientFactory(
-            beanClient, readProjectTools, readProjectWorkflowTools, readSkillsTools, firecrawlTools,
-            braveWebSearchTools);
+            beanClient, chatModel, readProjectTools, readProjectWorkflowTools, readSkillsTools,
+            webSearchToolCallbackProvider);
 
         return new DelegateFixture(beanClient, factory);
     }
