@@ -44,7 +44,7 @@ The dialog is titled **Add Identity Provider** (or **Edit Identity Provider**) a
 | **Client ID** / **Client Secret** | OIDC | OAuth client credentials. The secret can be left blank on edit to keep the current one. |
 | **Scopes** | OIDC | Requested scopes, e.g. `openid,profile,email`. |
 | **Metadata URI** | SAML | IdP metadata URL used to auto-configure endpoints and certificates. A SAML provider needs no client ID or secret. |
-| **Signing Certificate** | SAML | Optional PEM certificate, when not carried in the metadata. |
+| **Signing Certificate** | SAML | Optional PEM certificate. When set, assertions are verified only against it, not against the certificates in the metadata. Update or clear it when the IdP rotates its signing key, or sign-ins fail. |
 | **NameID Format** | SAML | Optional NameID format - Email Address, Persistent, Transient, Unspecified, or the metadata default. |
 | **Email Domains** | Both | Domains that route users to this provider at login, added and removed as chips. |
 | **Default Role** | Both | `ROLE_USER` or `ROLE_ADMIN` granted to users arriving from this provider. |
