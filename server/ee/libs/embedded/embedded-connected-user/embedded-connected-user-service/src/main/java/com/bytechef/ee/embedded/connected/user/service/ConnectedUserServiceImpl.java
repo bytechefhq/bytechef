@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,25 +62,21 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         connectedUser.setEnvironment(environment);
         connectedUser.setExternalId(externalId);
 
-        return connectedUserRepository.save(connectedUser);
+        return save(connectedUser);
     }
 
     @Override
     public ConnectedUser createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
-        Map<String, String> metadata) {
+        @Nullable Map<String, String> metadata) {
 
         validateExternalId(externalId);
 
         String normalizedName = normalizeName(name);
         String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
 
-        validateMetadata(metadata);
-
-        if (fetchConnectedUser(externalId, environment).isPresent()) {
-            throw new IllegalArgumentException(
-                "A connected user with externalId '%s' already exists".formatted(externalId));
-        }
+        validateMetadata(normalizedMetadata);
 
         ConnectedUser connectedUser = new ConnectedUser();
 
@@ -86,10 +84,15 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         connectedUser.setEnabled(true);
         connectedUser.setEnvironment(environment);
         connectedUser.setExternalId(externalId);
-        connectedUser.setMetadata(metadata);
+        connectedUser.setMetadata(normalizedMetadata);
         connectedUser.setName(normalizedName);
 
-        return connectedUserRepository.save(connectedUser);
+        try {
+            return save(connectedUser);
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw new IllegalArgumentException(
+                "A connected user with externalId '%s' already exists".formatted(externalId), duplicateKeyException);
+        }
     }
 
     @Override
@@ -182,7 +185,7 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     public ConnectedUser updateConnectedUser(
-        long id, @Nullable String name, @Nullable String email, Map<String, String> metadata, int version) {
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
 
         ConnectedUser connectedUser = getConnectedUser(id);
 
@@ -192,14 +195,27 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
         String normalizedName = normalizeName(name);
         String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
 
-        validateMetadata(metadata);
+        validateMetadata(normalizedMetadata);
 
         connectedUser.setEmail(normalizedEmail);
-        connectedUser.setMetadata(metadata);
+        connectedUser.setMetadata(normalizedMetadata);
         connectedUser.setName(normalizedName);
 
         return connectedUserRepository.save(connectedUser);
+    }
+
+    private ConnectedUser save(ConnectedUser connectedUser) {
+        try {
+            return connectedUserRepository.save(connectedUser);
+        } catch (DbActionExecutionException dbActionExecutionException) {
+            if (dbActionExecutionException.getCause() instanceof DuplicateKeyException duplicateKeyException) {
+                throw duplicateKeyException;
+            }
+
+            throw dbActionExecutionException;
+        }
     }
 
     public static void validateExternalId(String externalId) {
@@ -212,8 +228,9 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
                 .formatted(externalId));
         }
 
-        if (externalId.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException("externalId must not be longer than " + MAX_LENGTH + " characters");
+        if (externalId.length() > ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH) {
+            throw new IllegalArgumentException(
+                "externalId must not be longer than " + ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH + " characters");
         }
 
         validateNotReserved(externalId);

@@ -29,7 +29,7 @@ public interface ConnectedUserService {
 
     ConnectedUser createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
-        Map<String, String> metadata);
+        @Nullable Map<String, String> metadata);
 
     void deleteConnectedUser(long id);
 
@@ -54,5 +54,5 @@ public interface ConnectedUserService {
     void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata);
 
     ConnectedUser updateConnectedUser(
-        long id, @Nullable String name, @Nullable String email, Map<String, String> metadata, int version);
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version);
 }
