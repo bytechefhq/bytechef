@@ -46,6 +46,7 @@ import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -109,7 +110,8 @@ public class AiHubConfiguration {
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -122,7 +124,8 @@ public class AiHubConfiguration {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, toolCallbacks, aiHubSessionMemory, chatModel,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider);
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider,
+            webSearchToolCallbackProviderProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -136,7 +139,8 @@ public class AiHubConfiguration {
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         SecurityContextRehydrator securityContextRehydrator,
         AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -159,7 +163,7 @@ public class AiHubConfiguration {
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, toolCallbacks, aiHubSessionMemory,
             chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
-            overrideChatClientResolverProvider);
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider);
     }
 
     /**
@@ -257,7 +261,8 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -277,6 +282,7 @@ public class AiHubConfiguration {
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
+        webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
 
         return builder.build();
     }
