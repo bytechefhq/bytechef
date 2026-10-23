@@ -34,7 +34,6 @@ import com.bytechef.component.hubspot.unified.HubspotUnifiedApi;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -63,15 +62,13 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
     public ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
-        Optional<List<? extends Authorization>> optionalAuthorizations =
-            modifiableConnectionDefinition.getAuthorizations();
+        List<? extends Authorization> authorizations = modifiableConnectionDefinition.getAuthorizations();
 
-        if (optionalAuthorizations.isPresent()) {
-            List<? extends Authorization> authorizations = optionalAuthorizations.get();
+        if (!authorizations.isEmpty()) {
             ModifiableAuthorization modifiableAuthorization = (ModifiableAuthorization) authorizations.getFirst();
 
-            Optional<List<? extends Property>> optionalProperties = modifiableAuthorization.getProperties();
-            List<Property> properties = new ArrayList<>(optionalProperties.orElse(List.of()));
+            List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
+            List<Property> properties = new ArrayList<>(existingProperties);
 
             properties.addLast(
                 string(HAPIKEY)

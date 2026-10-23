@@ -36,10 +36,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinitio
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -57,8 +55,7 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
     @Override
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
-            Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-            List<Property> properties = new ArrayList<>(propertiesOptional.orElse(Collections.emptyList()));
+            List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
             if (Objects.equals(modifiableActionDefinition.getName(), "createList")) {
                 properties.addAll(0, List.of(WORKSPACE_ID_PROPERTY, SPACE_ID_PROPERTY));

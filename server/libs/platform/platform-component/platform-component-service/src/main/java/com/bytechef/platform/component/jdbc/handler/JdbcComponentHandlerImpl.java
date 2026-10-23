@@ -317,7 +317,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     public JdbcComponentHandlerImpl(JdbcComponentDefinition jdbcComponentDefinition) {
         jdbcComponentDefinition.getResources()
-            .map(Resources::documentationUrl)
+            .map(Resources::getDocumentationUrl)
             .ifPresent(this::setHelp);
 
         this.urlTemplate = jdbcComponentDefinition.getUrlTemplate();

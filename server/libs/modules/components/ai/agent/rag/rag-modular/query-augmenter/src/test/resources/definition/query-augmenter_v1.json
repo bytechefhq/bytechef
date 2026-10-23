@@ -1,5 +1,5 @@
 {
-  "actions": null,
+  "actions": [ ],
   "clusterElements": [ {
     "name": "contextualQueryAugmenter",
     "description": "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
@@ -7,7 +7,7 @@
     "help": null,
     "outputDefinition": null,
     "processErrorResponse": null,
-    "properties": null,
+    "properties": [ ],
     "title": "Contextual Query Augmenter",
     "type": {
       "name": "QUERY_AUGMENTER",
@@ -23,17 +23,17 @@
     "label": "Artificial Intelligence"
   } ],
   "connection": null,
-  "customAction": null,
+  "customAction": false,
   "customActionHelp": null,
   "description": "Query Augmenter.",
   "icon": "path:assets/query-augmenter.svg",
-  "inputs": null,
-  "metadata": null,
+  "inputs": [ ],
+  "metadata": { },
   "name": "queryAugmenter",
   "resources": null,
-  "tags": null,
+  "tags": [ ],
   "title": "Query Augmenter",
-  "triggers": null,
+  "triggers": [ ],
   "unifiedApi": null,
   "version": 1
 }

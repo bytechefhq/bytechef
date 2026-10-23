@@ -252,7 +252,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 List<?> sampleOutput = (List<?>) outputResponse.sampleOutput();
 
                 outputResponse = new OutputResponse(
-                    (BaseProperty) items.getFirst(), sampleOutput.getFirst(), outputResponse.placeholder());
+                    (BaseProperty) items.getFirst(), sampleOutput == null ? null : sampleOutput.getFirst(),
+                    outputResponse.placeholder());
             }
         }
 

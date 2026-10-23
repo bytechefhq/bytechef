@@ -58,8 +58,8 @@ class RedisChatMemoryV2ComponentHandlerTest {
         ComponentDefinition componentDefinition =
             new RedisChatMemoryV2ComponentHandler(clusterElementDefinitionService).getDefinition();
 
-        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions = componentDefinition.getClusterElements()
-            .orElseThrow();
+        List<? extends ClusterElementDefinition<?>> clusterElementDefinitions =
+            componentDefinition.getClusterElements();
 
         ChatMemoryFunction chatMemoryFunction = (ChatMemoryFunction) clusterElementDefinitions.getFirst()
             .getElement();
