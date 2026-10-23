@@ -61,11 +61,35 @@ const AiHubHomePanel = () => {
                             <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
 
                             <p className="text-sm text-content-neutral-secondary">
-                                Enable an AI provider to start using the AI Hub.
+                                Enable an AI provider to chat with the AI Hub assistant.
                             </p>
                         </div>
 
                         <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
+
+                        {workflowChats.length > 0 && (
+                            <fieldset className="mt-4 flex w-full max-w-md flex-col gap-2 border-0">
+                                <legend className="mb-2 text-sm text-content-neutral-secondary">
+                                    Workflow chats run your workflows and need no AI provider:
+                                </legend>
+
+                                {workflowChats.map((workflowChat) => (
+                                    <Button
+                                        key={`${workflowChat.projectDeploymentId}-${workflowChat.workflowExecutionId}`}
+                                        onClick={() =>
+                                            onSelectWorkflowChat(
+                                                workflowChat.workflowExecutionId,
+                                                workflowChat.projectDeploymentId,
+                                                workflowChat.label
+                                            )
+                                        }
+                                        variant="outline"
+                                    >
+                                        {workflowChat.label}
+                                    </Button>
+                                ))}
+                            </fieldset>
+                        )}
                     </div>
                 ) : (
                     <div className="flex w-full max-w-2xl flex-col gap-6">
