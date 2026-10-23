@@ -17,6 +17,7 @@
 package com.bytechef.security.web.rememberme;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,8 +29,11 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.config.RememberMeKey;
+import com.bytechef.security.web.authentication.TenantUserDetails;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import jakarta.servlet.http.Cookie;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -118,8 +122,52 @@ class PersistentTokenRememberMeServicesTest {
         verify(persistentTokenService, never()).delete(anyString());
     }
 
+    @Test
+    void testLoginSuccessStoresTheTokenInTheAuthenticatedTenantWhenTheLoginExistsInTwoTenants() {
+        User tenantOneUser = createUser(1L);
+        User tenantTwoUser = createUser(2L);
+
+        List<String> savedTenantIds = new ArrayList<>();
+        List<Long> savedUserIds = new ArrayList<>();
+
+        when(tenantService.getTenantIdsByUserLogin("shared")).thenReturn(List.of("000002", "000001"));
+        when(userService.fetchUserByLogin("shared"))
+            .thenAnswer(invocation -> "000001".equals(TenantContext.getCurrentTenantId())
+                ? Optional.of(tenantOneUser) : Optional.of(tenantTwoUser));
+        when(persistentTokenService.save(any(PersistentToken.class)))
+            .thenAnswer(invocation -> {
+                PersistentToken persistentToken = invocation.getArgument(0);
+
+                savedTenantIds.add(TenantContext.getCurrentTenantId());
+                savedUserIds.add(persistentToken.getUserId());
+
+                return persistentToken;
+            });
+
+        TenantUserDetails principal = new TenantUserDetails("shared", "password", List.of(), "000001");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.addHeader("User-Agent", "test-agent");
+
+        persistentTokenRememberMeServices.onLoginSuccess(
+            request, new MockHttpServletResponse(),
+            new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+
+        assertThat(savedTenantIds).containsExactly("000001");
+        assertThat(savedUserIds).containsExactly(1L);
+    }
+
     private static Authentication createAuthentication() {
         return UsernamePasswordAuthenticationToken.authenticated(
             new org.springframework.security.core.userdetails.User("jane", "", List.of()), null, List.of());
+    }
+
+    private static User createUser(Long id) {
+        User user = new User();
+
+        user.setId(id);
+        user.setLogin("shared");
+
+        return user;
     }
 }
