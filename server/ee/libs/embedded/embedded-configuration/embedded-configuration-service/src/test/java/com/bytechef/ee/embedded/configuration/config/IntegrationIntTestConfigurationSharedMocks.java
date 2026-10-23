@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -86,7 +87,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class, OAuth2ParametersFacade.class,
     ProjectDeploymentFacade.class, ProjectDeploymentService.class,
     ProjectDeploymentWorkflowService.class,
-    ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
+    ProjectFacade.class, ProjectService.class, ProjectWorkflowCreator.class, ProjectWorkflowFacade.class,
+    ProjectWorkflowService.class,
     WebhookTriggerTestFacade.class, WorkflowCacheManager.class, WorkflowService.class,
     WorkflowTestConfigurationFacade.class
 })

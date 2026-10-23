@@ -27,6 +27,8 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(103);
     public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_EXISTS =
         new IntegrationInstanceConfigurationErrorType(104);
+    public static final IntegrationInstanceConfigurationErrorType AUTHORIZATION_TYPE_REQUIRED =
+        new IntegrationInstanceConfigurationErrorType(105);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

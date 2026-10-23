@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -324,7 +325,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, automationMcpToolId, true))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("does not belong to integration instance");
+            .hasMessageContaining("MCP tool not found");
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }
@@ -389,7 +390,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
     @EnableCaching
     @EnableMethodSecurity
     @Import({
-        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
+        ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class, EmbeddedMcpReader.class,
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
@@ -400,7 +401,12 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         @Bean
         PermissionService permissionService() {
-            return mock(PermissionService.class);
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.isAuthorizationSkipped())
+                .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
+
+            return permissionService;
         }
     }
 }

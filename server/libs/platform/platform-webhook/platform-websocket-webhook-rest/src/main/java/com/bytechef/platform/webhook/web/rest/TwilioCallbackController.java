@@ -17,6 +17,7 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry;
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry.CallSession;
 import com.bytechef.platform.webhook.web.websocket.WorkflowContinuationHelper;
@@ -113,7 +114,12 @@ class TwilioCallbackController {
                         subJobId);
 
                     try {
-                        jobFacade.stopJob(subJobId);
+                        // A hang-up arrives without a user, so the guarded stop runs as the system.
+                        SecurityUtils.runAsSystem(() -> {
+                            jobFacade.stopJob(subJobId);
+
+                            return null;
+                        });
                     } catch (Exception exception) {
                         log.warn("Failed to stop sub-workflow: callSid={}, subJobId={}", callSid, subJobId,
                             exception);

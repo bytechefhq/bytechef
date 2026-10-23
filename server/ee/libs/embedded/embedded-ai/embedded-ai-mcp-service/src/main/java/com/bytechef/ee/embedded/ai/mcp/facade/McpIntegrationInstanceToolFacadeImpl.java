@@ -21,8 +21,6 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
-import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,39 +38,38 @@ import org.springframework.transaction.annotation.Transactional;
 class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceToolFacade {
 
     private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
+    private final EmbeddedMcpReader embeddedMcpReader;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
-    private final McpServerService mcpServerService;
-    private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceToolFacadeImpl(
         ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
+        EmbeddedMcpReader embeddedMcpReader,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        McpComponentService mcpComponentService, McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
-        McpServerService mcpServerService, McpToolService mcpToolService) {
+        McpComponentService mcpComponentService, McpIntegrationInstanceToolService mcpIntegrationInstanceToolService) {
 
         this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
+        this.embeddedMcpReader = embeddedMcpReader;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
-        this.mcpServerService = mcpServerService;
-        this.mcpToolService = mcpToolService;
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE') or " +
+        "isConnectedUser()")
     public void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable) {
         connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
 
-        McpTool mcpTool = mcpToolService.fetchMcpTool(mcpToolId)
+        McpTool mcpTool = embeddedMcpReader.fetchMcpTool(mcpToolId)
             .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + mcpToolId));
 
         if (!mcpTool.isEnabled()) {
@@ -96,7 +93,7 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
     private boolean belongsToIntegrationInstance(McpTool mcpTool, long integrationInstanceId) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
-        McpServer mcpServer = mcpServerService.getMcpServer(mcpComponent.getMcpServerId());
+        McpServer mcpServer = embeddedMcpReader.getMcpServer(mcpComponent.getMcpServerId());
 
         if (mcpServer.getType() != PlatformType.EMBEDDED) {
             return false;

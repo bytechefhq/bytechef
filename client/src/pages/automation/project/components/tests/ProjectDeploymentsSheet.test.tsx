@@ -8,6 +8,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     error: null as Error | null,
+    grantedScopes: ['DEPLOYMENT_CREATE'] as string[],
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[] | undefined,
     refetch: vi.fn(),
@@ -17,6 +18,10 @@ const hoisted = vi.hoisted(() => ({
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) => hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
@@ -119,6 +124,7 @@ const renderProjectDeploymentsSheet = () =>
 describe('ProjectDeploymentsSheet', () => {
     beforeEach(() => {
         hoisted.error = null;
+        hoisted.grantedScopes = ['DEPLOYMENT_CREATE'];
         hoisted.navigate.mockReset();
         hoisted.refetch.mockReset();
         hoisted.projectDeployments = [
@@ -178,6 +184,17 @@ describe('ProjectDeploymentsSheet', () => {
         expect(screen.getByText('No deployments in DEVELOPMENT')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
         expect(screen.getByText('Deploy dialog for environment 0')).toBeInTheDocument();
+    });
+
+    it('hides the deploy action in the empty state without DEPLOYMENT_CREATE', () => {
+        hoisted.grantedScopes = [];
+        hoisted.projectDeployments = [];
+
+        renderProjectDeploymentsSheet();
+
+        expect(screen.getByText('No deployments in DEVELOPMENT')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Deploy dialog for environment 0')).not.toBeInTheDocument();
     });
 
     it('expands a development deployment created from the empty state', () => {

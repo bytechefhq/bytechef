@@ -44,9 +44,12 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service"))
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
@@ -59,6 +62,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
+    testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-graphql"))
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
@@ -66,7 +70,10 @@ dependencies {
     testImplementation(project(":server:libs:test:test-support"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
 }
 

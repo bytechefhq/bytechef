@@ -4,6 +4,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-jackson")
     implementation("org.springframework.data:spring-data-commons")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:encryption:encryption-api"))
     implementation(project(":server:libs:core:rest:rest-api"))
 

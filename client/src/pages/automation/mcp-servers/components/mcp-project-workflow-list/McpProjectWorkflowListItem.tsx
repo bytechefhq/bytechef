@@ -2,9 +2,11 @@ import AlertDialog from '@/components/AlertDialog';
 import Switch from '@/components/Switch/Switch';
 import {Popover} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
 import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
@@ -15,6 +17,10 @@ interface McpProjectWorkflowListItemProps {
 }
 
 const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
@@ -43,27 +49,29 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                 <div className="flex items-center gap-2 py-0.5">
                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                        <McpToolConfigureButton
-                            anchorsPopover
-                            label={workflowLabel}
-                            onClick={() => openPopover(popoverId)}
-                        />
+                    {canEditMcpServer && (
+                        <div className="flex shrink-0 items-center gap-2">
+                            <McpToolConfigureButton
+                                anchorsPopover
+                                label={workflowLabel}
+                                onClick={() => openPopover(popoverId)}
+                            />
 
-                        <Switch
-                            aria-label={`Enable ${workflowLabel}`}
-                            checked={mcpProjectWorkflow.enabled}
-                            className="mr-2"
-                            disabled={isEnablePending}
-                            onCheckedChange={handleEnabledChange}
-                        />
+                            <Switch
+                                aria-label={`Enable ${workflowLabel}`}
+                                checked={mcpProjectWorkflow.enabled}
+                                className="mr-2"
+                                disabled={isEnablePending}
+                                onCheckedChange={handleEnabledChange}
+                            />
 
-                        <McpToolActionsMenu
-                            label={workflowLabel}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                        />
-                    </div>
+                            <McpToolActionsMenu
+                                label={workflowLabel}
+                                onDeleteClick={() => setShowDeleteDialog(true)}
+                                onEditClick={() => setShowEditWorkflowDialog(true)}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {isPopoverOpen && (

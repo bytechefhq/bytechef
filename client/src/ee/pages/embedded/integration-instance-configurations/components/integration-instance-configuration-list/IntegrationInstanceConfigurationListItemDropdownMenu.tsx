@@ -9,16 +9,24 @@ import {
 import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationListItemDropdownMenuProps {
+    canDelete: boolean;
+    canEdit: boolean;
     onDeleteClick: () => void;
     onEditClick: () => void;
     onUpdateIntegrationVersionClick: () => void;
 }
 
 const IntegrationInstanceConfigurationListItemDropdownMenu = ({
+    canDelete,
+    canEdit,
     onDeleteClick,
     onEditClick,
     onUpdateIntegrationVersionClick,
 }: IntegrationInstanceConfigurationListItemDropdownMenuProps) => {
+    if (!canEdit && !canDelete) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -26,17 +34,28 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+                {canEdit && (
+                    <>
+                        <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
-                <DropdownMenuItem
-                    icon={<RefreshCcwIcon />}
-                    label="Update Integration Version"
-                    onClick={onUpdateIntegrationVersionClick}
-                />
+                        <DropdownMenuItem
+                            icon={<RefreshCcwIcon />}
+                            label="Update Integration Version"
+                            onClick={onUpdateIntegrationVersionClick}
+                        />
+                    </>
+                )}
 
-                <DropdownMenuSeparator />
+                {canEdit && canDelete && <DropdownMenuSeparator />}
 
-                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+                {canDelete && (
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={onDeleteClick}
+                        variant="destructive"
+                    />
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -56,6 +56,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingConnectionExcepti
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -189,7 +190,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -432,7 +433,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -459,7 +460,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
@@ -640,7 +641,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 case "createIssue1" -> List.of(new ComponentConnection("jira", 1, "createIssue1", "jira", true));
                 default -> List.of();
             });
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
@@ -839,7 +840,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId))
@@ -889,10 +890,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
 
-        when(connectedUserConnectionFacade.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(concurrentConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException(
                 "Failed to execute DbAction", new OptimisticLockingFailureException("Row was updated concurrently")));
-        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+        when(connectedUserConnectionReader.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
         ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
@@ -1215,7 +1216,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn("slack");
-        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+        when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of(connectionDTO));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))

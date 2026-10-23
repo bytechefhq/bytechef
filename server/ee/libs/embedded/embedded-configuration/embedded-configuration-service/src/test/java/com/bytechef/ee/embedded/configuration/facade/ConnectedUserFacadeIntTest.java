@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -295,8 +296,8 @@ class ConnectedUserFacadeIntTest {
                 .executeTriggerDisable(eq(enabledWorkflowId), any(), any(), any(), any());
         }
 
-        verify(connectionFacade).delete(OWN_CONNECTION_ID);
-        verify(connectionFacade).delete(INSTANCE_CONNECTION_ID);
+        verify(connectionFacade).delete(eq(OWN_CONNECTION_ID), any());
+        verify(connectionFacade).delete(eq(INSTANCE_CONNECTION_ID), any());
     }
 
     private void createIntegrationInstance(long connectedUserId) {
@@ -322,11 +323,21 @@ class ConnectedUserFacadeIntTest {
     }
 
     private void stubCollaborators() {
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(anyLong(), any());
+
         Connection connection = new Connection();
 
         connection.setComponentName("slack");
         connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
         connection.setId(OWN_CONNECTION_ID);
+        connection.setType(PlatformType.EMBEDDED);
 
         ComponentConnection slot = new ComponentConnection("slack", 1, "postMessage1", "slack", true);
 
@@ -344,6 +355,7 @@ class ConnectedUserFacadeIntTest {
                     .id(OWN_CONNECTION_ID)
                     .build()));
         when(connectionService.getConnection(OWN_CONNECTION_ID)).thenReturn(connection);
+        when(connectionService.getConnections(anyList())).thenReturn(List.of(connection));
         when(connectionService.getConnections(PlatformType.EMBEDDED)).thenReturn(List.of());
         when(embeddedPermissionEvaluator.evaluate(any(), any())).thenReturn(true);
         when(environmentService.getEnvironment(ENVIRONMENT_ID)).thenReturn(Environment.PRODUCTION);

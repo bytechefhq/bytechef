@@ -25,6 +25,13 @@ import org.springframework.stereotype.Repository;
 public interface IntegrationInstanceRepository
     extends ListPagingAndSortingRepository<IntegrationInstance, Long>, ListCrudRepository<IntegrationInstance, Long> {
 
+    @Query("""
+        SELECT COUNT(*) > 0
+        FROM integration_instance
+        WHERE connection_id = :connectionId
+        """)
+    boolean existsByConnectionId(@Param("connectionId") long connectionId);
+
     List<IntegrationInstance> findAllByConnectedUserId(long connectedUserId);
 
     @Query("""

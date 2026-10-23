@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
@@ -42,7 +41,6 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Service
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserReferenceRolloutManager {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);

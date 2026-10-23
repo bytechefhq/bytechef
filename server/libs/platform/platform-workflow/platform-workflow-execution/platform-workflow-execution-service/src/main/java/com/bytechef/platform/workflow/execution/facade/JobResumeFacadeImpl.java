@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -111,7 +112,12 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID);
 
             if (taskExecutionResumeId == null) {
-                jobFacade.resumeJob(jobResumeId.getJobId());
+                // The resume callback is permit-all and carries no user, so the guarded restart runs as the system.
+                SecurityUtils.runAsSystem(() -> {
+                    jobFacade.resumeJob(jobResumeId.getJobId());
+
+                    return null;
+                });
             } else {
                 jobFacade.resumeJob(jobResumeId.getJobId(), taskExecutionResumeId, null);
             }

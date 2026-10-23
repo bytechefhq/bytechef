@@ -580,6 +580,18 @@ export type BooleanProperty = Property & {
   type: PropertyType;
 };
 
+/**
+ * A fixed role tier and everything it grants. The tiers nest (VIEWER ⊆ EDITOR ⊆ ADMIN), so `scopes` is
+ * the full set a role holds, inherited scopes included, not the delta over the tier below.
+ */
+export type BuiltInRole = {
+  __typename?: 'BuiltInRole';
+  /** The role: VIEWER, EDITOR or ADMIN */
+  name: Scalars['String']['output'];
+  /** Every scope name the role grants, in the catalogue's order */
+  scopes: Array<Scalars['String']['output']>;
+};
+
 export type Category = {
   __typename?: 'Category';
   id?: Maybe<Scalars['ID']['output']>;
@@ -851,12 +863,24 @@ export type CreateApiConnectorInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateCustomRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  /** Permission scope names to grant (must be names registered by the server's PermissionScopeProvider SPI) */
+  scopes: Array<Scalars['String']['input']>;
+};
+
 export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateEmbeddedApiKeyInput = {
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type CreateEmbeddedMcpServerInput = {
@@ -931,6 +955,17 @@ export type CustomComponentTriggerDefinition = {
   description?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   title?: Maybe<Scalars['String']['output']>;
+};
+
+/** A custom permission role (EE) with a user-defined set of permission scopes */
+export type CustomRole = {
+  __typename?: 'CustomRole';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  /** Permission scope names granted by this role (e.g., WORKFLOW_VIEW, PROJECT_CREATE) */
+  scopes: Array<Scalars['String']['output']>;
 };
 
 export type DataTable = {
@@ -1071,6 +1106,24 @@ export type DynamicPropertiesProperty = Property & {
   propertiesDataSource?: Maybe<PropertiesDataSource>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
+};
+
+export type EmbeddedUser = {
+  __typename?: 'EmbeddedUser';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  /** Custom role ID, null if using a built-in role */
+  customRoleId?: Maybe<Scalars['ID']['output']>;
+  /** Built-in embedded role, null if using a custom role */
+  embeddedRole?: Maybe<WorkspaceRole>;
+  /** The environment this role applies to, or null when it applies to every environment */
+  environment?: Maybe<EnvironmentEnum>;
+  /** Membership row id, or null for an inherited entry which has no row */
+  id?: Maybe<Scalars['ID']['output']>;
+  /** True when the entry is a tenant admin, who administers the embedded side and has no row */
+  inherited: Scalars['Boolean']['output'];
+  /** The person behind the membership, or null when no account answers to `userId` */
+  user?: Maybe<WorkspaceUserInfo>;
+  userId: Scalars['ID']['output'];
 };
 
 export type EndpointDefinitionInput = {
@@ -1651,6 +1704,23 @@ export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
   addDataTableColumn: Scalars['Boolean']['output'];
+  /** Add a user as an embedded member with a built-in role. */
+  addEmbeddedUser: EmbeddedUser;
+  /** Add an existing user, found by email, as an embedded member with a built-in role. */
+  addEmbeddedUserByEmail: EmbeddedUser;
+  /**
+   * Add a user to a workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of the
+   * workspace, so a member holding it in only some of them is denied. Supply exactly one of `role` or
+   * `customRoleId`. Every custom role is tenant-global and assignable in any workspace, so the only
+   * requirement on `customRoleId` is that the role exists.
+   */
+  addWorkspaceUser: WorkspaceUser;
+  /**
+   * Replace a member's built-in role with a custom one. The role must exist; every custom role is
+   * tenant-global and assignable in any workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every
+   * environment of the workspace.
+   */
+  assignWorkspaceUserCustomRole: WorkspaceUser;
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
@@ -1668,7 +1738,10 @@ export type Mutation = {
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationWorkflowProject: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
+  /** Create a tenant-global custom role, assignable in every workspace. Requires tenant admin. */
+  createCustomRole: CustomRole;
   createDataTable: Scalars['Boolean']['output'];
+  createEmbeddedApiKey?: Maybe<Scalars['String']['output']>;
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
@@ -1705,7 +1778,10 @@ export type Mutation = {
   deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
+  /** Delete a custom role. Fails if it is still assigned to any member. Requires tenant admin. */
+  deleteCustomRole: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  deleteEmbeddedApiKey?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpTool?: Maybe<Scalars['Boolean']['output']>;
@@ -1745,15 +1821,54 @@ export type Mutation = {
   importProjectTemplate: Scalars['ID']['output'];
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
+  /**
+   * Invite a user, who sets their own password on the mailed invitation link.
+   * Optionally place the invitee into workspaces; an empty or omitted list provisions an account
+   * belonging to no workspace, which is how a second tenant admin is created.
+   */
   inviteUser: Scalars['Boolean']['output'];
+  /**
+   * Invite someone into a workspace by email, provisioning a tenant account and mailing a claim link
+   * when no account exists yet. An address that already has an account is reused, not rejected.
+   * Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of the workspace.
+   */
+  inviteWorkspaceUser: WorkspaceUser;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
+  /** Remove a user from the embedded members. */
+  removeEmbeddedUser: Scalars['Boolean']['output'];
+  /** Remove an embedded member's role in one environment. */
+  removeEmbeddedUserEnvironmentRole: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
+  /**
+   * Remove a user from a workspace. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of
+   * the workspace.
+   */
+  removeWorkspaceUser: Scalars['Boolean']['output'];
+  /**
+   * Remove a member's role in one environment, denying them there. Removing their last
+   * environment role turns it into a workspace-wide role, so the member keeps that role in
+   * every environment; that widening requires the WORKSPACE_MEMBER_MANAGE scope in every
+   * environment. Fails when the member holds no role specific to that environment, including
+   * a member whose access there comes from a workspace-wide role. Requires the
+   * WORKSPACE_MEMBER_MANAGE scope in the named environment.
+   */
+  removeWorkspaceUserEnvironmentRole: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  /** Give an embedded member a role in one environment. */
+  setEmbeddedUserEnvironmentRole: EmbeddedUser;
+  /**
+   * Give a member a role in one environment. The first such call switches the member from a
+   * single workspace-wide role to per-environment roles, deleting their workspace-wide row.
+   * Environments the member has no row for are then denied. Fails when the user is not a member
+   * of the workspace; add them first. Supply exactly one of `role` or `customRoleId`. Requires
+   * the WORKSPACE_MEMBER_MANAGE scope in the named environment.
+   */
+  setWorkspaceUserEnvironmentRole: WorkspaceUser;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -1788,14 +1903,19 @@ export type Mutation = {
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  /** Update a custom role. Requires tenant admin. */
+  updateCustomRole: CustomRole;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  updateEmbeddedApiKey?: Maybe<ApiKey>;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
   updateEmbeddedMcpServer?: Maybe<McpServer>;
   updateEmbeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateEmbeddedMcpServerUrl?: Maybe<McpServer>;
   updateEmbeddedMcpTool?: Maybe<McpTool>;
   updateEmbeddedMcpToolEnabled?: Maybe<McpTool>;
+  /** Update an embedded member's role. */
+  updateEmbeddedUserRole: EmbeddedUser;
   updateIdentityProvider: IdentityProviderType;
   updateIntegrationWorkflowPermissionExpression?: Maybe<IntegrationWorkflow>;
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
@@ -1817,11 +1937,43 @@ export type Mutation = {
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
+  /**
+   * Update a workspace user's role. Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of
+   * the workspace.
+   */
+  updateWorkspaceUserRole: WorkspaceUser;
 };
 
 
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
+};
+
+
+export type MutationAddEmbeddedUserArgs = {
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationAddEmbeddedUserByEmailArgs = {
+  email: Scalars['String']['input'];
+  role: WorkspaceRole;
+};
+
+
+export type MutationAddWorkspaceUserArgs = {
+  customRoleId?: InputMaybe<Scalars['ID']['input']>;
+  role?: InputMaybe<WorkspaceRole>;
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationAssignWorkspaceUserCustomRoleArgs = {
+  customRoleId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -1945,8 +2097,18 @@ export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
 };
 
 
+export type MutationCreateCustomRoleArgs = {
+  input: CreateCustomRoleInput;
+};
+
+
 export type MutationCreateDataTableArgs = {
   input: CreateDataTableInput;
+};
+
+
+export type MutationCreateEmbeddedApiKeyArgs = {
+  input: CreateEmbeddedApiKeyInput;
 };
 
 
@@ -2108,8 +2270,18 @@ export type MutationDeleteCustomComponentArgs = {
 };
 
 
+export type MutationDeleteCustomRoleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteEmbeddedApiKeyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2323,6 +2495,15 @@ export type MutationInsertDataTableRowArgs = {
 export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
   role: Scalars['String']['input'];
+  workspaces?: InputMaybe<Array<WorkspaceAssignmentInput>>;
+};
+
+
+export type MutationInviteWorkspaceUserArgs = {
+  customRoleId?: InputMaybe<Scalars['ID']['input']>;
+  email: Scalars['String']['input'];
+  role?: InputMaybe<WorkspaceRole>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2337,9 +2518,33 @@ export type MutationRemoveDataTableColumnArgs = {
 };
 
 
+export type MutationRemoveEmbeddedUserArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveEmbeddedUserEnvironmentRoleArgs = {
+  environment: EnvironmentEnum;
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveFileInSkillArgs = {
   id: Scalars['ID']['input'];
   path: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveWorkspaceUserArgs = {
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveWorkspaceUserEnvironmentRoleArgs = {
+  environment: EnvironmentEnum;
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2380,6 +2585,22 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetEmbeddedUserEnvironmentRoleArgs = {
+  environment: EnvironmentEnum;
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetWorkspaceUserEnvironmentRoleArgs = {
+  customRoleId?: InputMaybe<Scalars['ID']['input']>;
+  environment: EnvironmentEnum;
+  role?: InputMaybe<WorkspaceRole>;
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2561,6 +2782,12 @@ export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionA
 };
 
 
+export type MutationUpdateCustomRoleArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateCustomRoleInput;
+};
+
+
 export type MutationUpdateDataTableRowArgs = {
   input: UpdateRowInput;
 };
@@ -2568,6 +2795,11 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
+};
+
+
+export type MutationUpdateEmbeddedApiKeyArgs = {
+  input: UpdateEmbeddedApiKeyInput;
 };
 
 
@@ -2603,6 +2835,12 @@ export type MutationUpdateEmbeddedMcpToolArgs = {
 export type MutationUpdateEmbeddedMcpToolEnabledArgs = {
   enabled: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateEmbeddedUserRoleArgs = {
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -2721,6 +2959,13 @@ export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
   id: Scalars['ID']['input'];
 };
 
+
+export type MutationUpdateWorkspaceUserRoleArgs = {
+  role: WorkspaceRole;
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type NodeValidationIssue = {
   __typename?: 'NodeValidationIssue';
   kind: WorkflowIssueKind;
@@ -2823,6 +3068,18 @@ export enum ParameterType {
   Object = 'OBJECT',
   String = 'STRING'
 }
+
+/**
+ * The permission scopes one module contributed, so a role editor groups them under the module's heading
+ * instead of presenting one undifferentiated list.
+ */
+export type PermissionScopeGroup = {
+  __typename?: 'PermissionScopeGroup';
+  /** The owning module, as a scope-style name (e.g. WORKSPACE, API_KEY) */
+  name: Scalars['String']['output'];
+  /** The module's scope names, in the order the module declares them */
+  scopes: Array<Scalars['String']['output']>;
+};
 
 export enum PlatformType {
   Automation = 'AUTOMATION',
@@ -3038,6 +3295,12 @@ export type Query = {
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
   automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
   automationWorkflowProjects: Array<AutomationWorkflowProject>;
+  /**
+   * The built-in workspace roles and every scope each grants, least privileged first. Requires
+   * authentication: like the scope catalogue, this is static metadata about what the server was built
+   * with, identical for every tenant.
+   */
+  builtInRoles: Array<BuiltInRole>;
   clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
@@ -3061,6 +3324,13 @@ export type Query = {
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponents: Array<CustomComponent>;
+  /**
+   * List every custom role in the tenant. Roles are tenant-global: defined once, assignable in any
+   * workspace. Pass a workspaceId to read as that workspace's member manager (requires the
+   * WORKSPACE_MEMBER_MANAGE scope there — the id is authorization context, not a filter), or omit it
+   * for the tenant-admin management view.
+   */
+  customRoles: Array<CustomRole>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableTags: Array<Tag>;
@@ -3070,10 +3340,14 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  embeddedApiKey?: Maybe<ApiKey>;
+  embeddedApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
   embeddedMcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  /** List the embedded members of the tenant. Requires the embedded member view scope. */
+  embeddedUsers: Array<EmbeddedUser>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
@@ -3119,6 +3393,25 @@ export type Query = {
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
+  /**
+   * Returns the embedded scope names the current user holds. With `environment`, only the scopes held in that
+   * environment. Without it, the scopes held in at least one environment.
+   */
+  myEmbeddedScopes: Array<Scalars['String']['output']>;
+  /** Returns the workspace role name for the current user in the given workspace */
+  myWorkspaceRole?: Maybe<Scalars['String']['output']>;
+  /**
+   * Returns the permission scope names the current user has in the given workspace. With `environment`, only the
+   * scopes the user holds in that environment, and none when they hold no role there. Without it, the scopes held
+   * in any environment.
+   */
+  myWorkspaceScopes: Array<Scalars['String']['output']>;
+  /**
+   * Every permission scope the server recognises, grouped by the module that owns it, for composing a
+   * role. Requires authentication: this is static metadata about what the server was built with,
+   * identical for every tenant.
+   */
+  permissionScopeGroups: Array<PermissionScopeGroup>;
   preBuiltProjectTemplates: Array<ProjectTemplate>;
   preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
   project?: Maybe<Project>;
@@ -3153,6 +3446,8 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+  /** List all users of a workspace. Requires the WORKSPACE_VIEW scope. */
+  workspaceUsers: Array<WorkspaceUser>;
 };
 
 
@@ -3487,6 +3782,11 @@ export type QueryCustomComponentDefinitionArgs = {
 };
 
 
+export type QueryCustomRolesArgs = {
+  workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type QueryDataTableRowsArgs = {
   environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
@@ -3498,6 +3798,18 @@ export type QueryDataTableRowsPageArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTableTagsArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTableTagsByTableArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3529,6 +3841,16 @@ export type QueryEditorJobFileLogsExistArgs = {
 export type QueryEditorTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedApiKeyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedApiKeysArgs = {
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -3626,6 +3948,18 @@ export type QueryKnowledgeBaseEmbeddingActiveArgs = {
 };
 
 
+export type QueryKnowledgeBaseTagsArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseTagsByKnowledgeBaseArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryKnowledgeBasesArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
@@ -3709,6 +4043,22 @@ export type QueryMcpToolArgs = {
 
 export type QueryMcpToolsByComponentIdArgs = {
   mcpComponentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMyEmbeddedScopesArgs = {
+  environment?: InputMaybe<EnvironmentEnum>;
+};
+
+
+export type QueryMyWorkspaceRoleArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryMyWorkspaceScopesArgs = {
+  environment?: InputMaybe<EnvironmentEnum>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3897,6 +4247,11 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
   tagId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceUsersArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4131,9 +4486,21 @@ export type UpdateApiConnectorInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateCustomRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  /** Permission scope names to grant (must be names registered by the server's PermissionScopeProvider SPI) */
+  scopes: Array<Scalars['String']['input']>;
+};
+
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateEmbeddedApiKeyInput = {
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
 };
 
 export type UpdateKnowledgeBaseDocumentTagsInput = {
@@ -4279,4 +4646,46 @@ export type WorkflowValidationResult = {
   errors: Array<Scalars['String']['output']>;
   nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
+};
+
+export type WorkspaceAssignmentInput = {
+  /** WorkspaceRole name, e.g. ADMIN, EDITOR or VIEWER */
+  roleName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+export enum WorkspaceRole {
+  Admin = 'ADMIN',
+  Editor = 'EDITOR',
+  Viewer = 'VIEWER'
+}
+
+export type WorkspaceUser = {
+  __typename?: 'WorkspaceUser';
+  createdDate?: Maybe<Scalars['String']['output']>;
+  /** Custom role ID (EE only), null if using a built-in role */
+  customRoleId?: Maybe<Scalars['ID']['output']>;
+  /** The environment this role applies to, or null when it applies to every environment */
+  environment?: Maybe<EnvironmentEnum>;
+  /** Membership row id, or null for an inherited entry which has no row */
+  id?: Maybe<Scalars['ID']['output']>;
+  /**
+   * True when the entry is not a stored membership but a tenant admin, who administers every workspace.
+   * Such entries are locked: their role cannot be changed and they cannot be removed, because there is
+   * no row to change. Revoke tenant admin instead.
+   */
+  inherited: Scalars['Boolean']['output'];
+  /** The person behind the membership, or null when no account answers to `userId` */
+  user?: Maybe<WorkspaceUserInfo>;
+  userId: Scalars['ID']['output'];
+  workspaceId: Scalars['ID']['output'];
+  /** Built-in workspace role, null if using a custom role */
+  workspaceRole?: Maybe<WorkspaceRole>;
+};
+
+export type WorkspaceUserInfo = {
+  __typename?: 'WorkspaceUserInfo';
+  email: Scalars['String']['output'];
+  firstName?: Maybe<Scalars['String']['output']>;
+  lastName?: Maybe<Scalars['String']['output']>;
 };

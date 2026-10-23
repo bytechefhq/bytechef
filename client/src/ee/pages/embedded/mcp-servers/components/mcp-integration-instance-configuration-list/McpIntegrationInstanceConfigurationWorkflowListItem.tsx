@@ -4,6 +4,7 @@ import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embed
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
@@ -18,6 +19,9 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
     componentName,
     mcpIntegrationInstanceConfigurationWorkflow,
 }: McpIntegrationInstanceConfigurationWorkflowListItemProps) => {
+    const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
@@ -45,13 +49,17 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
                     <div className="flex items-center gap-2 py-0.5">
                         <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
-                        <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
+                        {canEditConfiguration && (
+                            <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
+                        )}
 
-                        <McpToolActionsMenu
-                            label={workflowLabel}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                        />
+                        {(canEditConfiguration || canDeleteConfiguration) && (
+                            <McpToolActionsMenu
+                                label={workflowLabel}
+                                onDeleteClick={canDeleteConfiguration ? () => setShowDeleteDialog(true) : undefined}
+                                onEditClick={canEditConfiguration ? () => setShowEditWorkflowDialog(true) : undefined}
+                            />
+                        )}
                     </div>
                 </PopoverAnchor>
 

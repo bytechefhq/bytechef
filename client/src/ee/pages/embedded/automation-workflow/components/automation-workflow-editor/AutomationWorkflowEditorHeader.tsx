@@ -14,15 +14,19 @@ import AutomationWorkflowDialog, {
 import AutomationWorkflowProjectDialog, {
     AutomationWorkflowProjectFormValuesI,
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-dialog/AutomationWorkflowProjectDialog';
+import {useEmbeddedWorkflowViewOnlyNotice} from '@/ee/pages/embedded/shared/hooks/useEmbeddedWorkflowViewOnlyNotice';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     useAutomationWorkflowProjectCategoriesQuery,
     useAutomationWorkflowProjectTagsQuery,
@@ -88,6 +92,11 @@ const AutomationWorkflowEditorHeader = ({
     useCopilotCompactHeader();
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useEmbeddedWorkflowViewOnlyNotice();
+    const canManageSettings = useHasEmbeddedScope('INTEGRATION_SETTINGS', UNION_ENVIRONMENT_ID);
+    const canEditWorkflowOnUnion = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -214,6 +223,14 @@ const AutomationWorkflowEditorHeader = ({
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
+                    if (!canManageSettings) {
+                        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+
+                        setShowWorkflowEditDialog(false);
+
+                        return;
+                    }
+
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid: currentWorkflowId},
                         {
@@ -331,6 +348,8 @@ const AutomationWorkflowEditorHeader = ({
                     }
                     project={project}
                 />
+
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex items-center gap-1">
@@ -338,14 +357,17 @@ const AutomationWorkflowEditorHeader = ({
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <PublishPopover
-                    isPending={publishProjectMutationIsPending}
-                    onPublishProjectSubmit={handlePublishProjectSubmit}
-                />
+                {canEditWorkflowOnUnion && canPublishScope && (
+                    <PublishPopover
+                        isPending={publishProjectMutationIsPending}
+                        onPublishProjectSubmit={handlePublishProjectSubmit}
+                    />
+                )}
 
                 <OutputButton onShowOutputClick={handleShowOutputClick} />
 

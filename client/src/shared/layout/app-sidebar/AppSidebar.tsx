@@ -13,9 +13,13 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useAccessibleEmbeddedEnvironmentIds} from '@/shared/hooks/useAccessibleEmbeddedEnvironmentIds';
+import {useAccessibleEnvironmentIds} from '@/shared/hooks/useAccessibleEnvironmentIds';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon, PanelLeftIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -42,6 +46,17 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const {isMobile, state, toggleSidebar} = useSidebar();
 
     const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
+    const setCurrentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.setCurrentEnvironmentId);
+    const currentType = usePlatformTypeStore((platformTypeState) => platformTypeState.currentType);
+    const currentWorkspaceId = useWorkspaceStore((workspaceState) => workspaceState.currentWorkspaceId);
+
+    const accessibleAutomationEnvironmentIds = useAccessibleEnvironmentIds(
+        currentType === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
+    );
+    const accessibleEmbeddedEnvironmentIds = useAccessibleEmbeddedEnvironmentIds(currentType === PlatformType.EMBEDDED);
+
+    const accessibleEnvironmentIds =
+        currentType === PlatformType.EMBEDDED ? accessibleEmbeddedEnvironmentIds : accessibleAutomationEnvironmentIds;
 
     const collapsed = state === 'collapsed' && !isMobile;
 
@@ -60,6 +75,23 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             navigate('/embedded/configurations');
         }
     };
+
+    useEffect(() => {
+        if (
+            !accessibleEnvironmentIds ||
+            accessibleEnvironmentIds.length === 0 ||
+            accessibleEnvironmentIds.includes(currentEnvironmentId)
+        ) {
+            return;
+        }
+
+        const [firstAccessibleEnvironmentId] = accessibleEnvironmentIds;
+
+        setCurrentEnvironmentId(firstAccessibleEnvironmentId);
+
+        handleEnvironmentChange(firstAccessibleEnvironmentId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [accessibleEnvironmentIds, currentEnvironmentId, setCurrentEnvironmentId]);
 
     useEffect(() => {
         const {documentElement} = document;
@@ -82,7 +114,11 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                 <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-3">
                     <AppSidebarWorkspaceSelect />
 
-                    <EnvironmentSelect onChange={handleEnvironmentChange} variant="icon" />
+                    <EnvironmentSelect
+                        onChange={handleEnvironmentChange}
+                        variant="icon"
+                        visibleEnvironmentIds={accessibleEnvironmentIds}
+                    />
 
                     {!collapsed && (
                         <Tooltip>

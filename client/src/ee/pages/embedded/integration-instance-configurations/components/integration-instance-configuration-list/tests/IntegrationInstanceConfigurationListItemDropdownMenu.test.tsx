@@ -10,7 +10,7 @@ const handlers = {
 };
 
 const openMenu = async () => {
-    render(<IntegrationInstanceConfigurationListItemDropdownMenu {...handlers} />);
+    render(<IntegrationInstanceConfigurationListItemDropdownMenu canDelete canEdit {...handlers} />);
 
     await userEvent.click(screen.getByRole('button'));
 };

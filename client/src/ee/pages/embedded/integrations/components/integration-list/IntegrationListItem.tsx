@@ -24,7 +24,9 @@ import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.q
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -57,6 +59,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishIntegrationScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
+
+    const canPublishIntegration = canEditIntegration && canPublishIntegrationScope;
 
     const navigate = useNavigate();
 
@@ -214,49 +223,51 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <ButtonGroup aria-label="Workflow Creation Actions">
-                                    <Button
-                                        aria-label="Create Workflow"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
+                                {canCreateWorkflow && (
+                                    <ButtonGroup aria-label="Workflow Creation Actions">
+                                        <Button
+                                            aria-label="Create Workflow"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                            setShowWorkflowDialog(true);
-                                        }}
-                                        size="xs"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon />
-                                        Workflow
-                                    </Button>
+                                                setShowWorkflowDialog(true);
+                                            }}
+                                            size="xs"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon />
+                                            Workflow
+                                        </Button>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                icon={<ChevronDownIcon />}
-                                                size="xs"
-                                                variant="outline"
-                                            >
-                                                {' '}
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label="More Workflow Creation Actions"
+                                                    icon={<ChevronDownIcon />}
+                                                    size="xs"
+                                                    variant="outline"
+                                                >
+                                                    {' '}
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                aria-label="Import Workflow"
-                                                icon={<UploadIcon />}
-                                                label="Import Workflow"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    aria-label="Import Workflow"
+                                                    icon={<UploadIcon />}
+                                                    label="Import Workflow"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
 
-                                                    if (hiddenFileInputRef.current) {
-                                                        hiddenFileInputRef.current.click();
-                                                    }
-                                                }}
-                                            />
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
+                                                        if (hiddenFileInputRef.current) {
+                                                            hiddenFileInputRef.current.click();
+                                                        }
+                                                    }}
+                                                />
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                )}
 
                                 <div onClick={(event) => event.preventDefault()}>
                                     {integration.tags && (
@@ -268,6 +279,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                                 },
                                             })}
                                             id={integration.id!}
+                                            readOnly={!canEditIntegration}
                                             remainingTags={remainingTags}
                                             tags={integration.tags}
                                             updateTagsMutation={updateIntegrationTagsMutation}
@@ -325,11 +337,13 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => setShowEditDialog(true)}
-                                />
+                                {canEditIntegration && (
+                                    <DropdownMenuItem
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
+                                )}
 
                                 {integration?.integrationWorkflowIds &&
                                     integration?.integrationWorkflowIds.length > 0 && (
@@ -344,20 +358,26 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         />
                                     )}
 
-                                <DropdownMenuItem
-                                    icon={<SendIcon />}
-                                    label="Publish"
-                                    onClick={() => setShowPublishIntegrationDialog(true)}
-                                />
+                                {canPublishIntegration && (
+                                    <DropdownMenuItem
+                                        icon={<SendIcon />}
+                                        label="Publish"
+                                        onClick={() => setShowPublishIntegrationDialog(true)}
+                                    />
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteIntegration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

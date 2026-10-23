@@ -14,6 +14,8 @@ interface McpServerToolsPanelProps extends Omit<McpServerToolsContentProps, 'mcp
 
 const McpServerToolsPanel = ({
     activeToolsTab,
+    canAddWorkflows,
+    canEdit = true,
     componentList,
     isComponentListEmpty,
     isWorkflowListEmpty,
@@ -25,7 +27,7 @@ const McpServerToolsPanel = ({
         return isComponentListEmpty ? (
             <div className="flex justify-center py-8">
                 <EmptyList
-                    button={<Button label="Add Component" onClick={onAddComponentClick} />}
+                    button={canEdit && <Button label="Add Component" onClick={onAddComponentClick} />}
                     icon={<ComponentIcon className="size-24 text-gray-300" />}
                     message="No components added to this server."
                     title="No Components"
@@ -39,7 +41,7 @@ const McpServerToolsPanel = ({
     return isWorkflowListEmpty ? (
         <div className="flex justify-center py-8">
             <EmptyList
-                button={<Button label="Add Workflows" onClick={onAddWorkflowsClick} />}
+                button={(canAddWorkflows ?? canEdit) && <Button label="Add Workflows" onClick={onAddWorkflowsClick} />}
                 icon={<WorkflowIcon className="size-24 text-gray-300" />}
                 message="No workflows added to this server."
                 title="No Workflows"

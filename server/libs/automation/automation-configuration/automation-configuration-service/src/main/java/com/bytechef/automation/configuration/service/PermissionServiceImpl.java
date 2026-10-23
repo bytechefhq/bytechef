@@ -16,9 +16,11 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.service.UserService;
@@ -29,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,7 +52,7 @@ import org.springframework.stereotype.Service;
 public class PermissionServiceImpl implements PermissionService {
 
     private final UserService userService;
-    private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
+    private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
@@ -58,7 +60,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         this.userService = userService;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
-            .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
+            .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
     }
 
     @Override
@@ -83,8 +85,33 @@ public class PermissionServiceImpl implements PermissionService {
         return SecurityUtils.isAuthenticated();
     }
 
+    /**
+     * Community Edition has no authorization boundary between workspace members, so per-environment roles do not exist
+     * here and this matches the environment-unaware overload exactly.
+     */
+    @Override
+    public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         return SecurityUtils.isAuthenticated();
     }
 
@@ -98,13 +125,11 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        ResourceOwnershipResolver resolver = resourceOwnershipResolvers.get(resourceType);
-
-        if (resolver == null) {
+        if (!resourceOwnershipResolvers.containsKey(resourceType)) {
             return false;
         }
 
-        ResourceOwner resourceOwner = resolver.resolveOwner(id);
+        ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
@@ -114,6 +139,24 @@ public class PermissionServiceImpl implements PermissionService {
 
         return resourceOwner.workspaceId()
             .isPresent();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature, so
+     * naming an environment cannot change the answer and this matches the environment-unaware overload exactly. It
+     * still delegates rather than returning {@code isAuthenticated()}: owner isolation for user-owned resources is
+     * enforced in CE too, and skipping it here would make the environment-aware guard the weaker of the two.
+     */
+    @Override
+    public boolean hasResourceScopeInEnvironment(
+        Serializable id, String resourceType, String scope, Environment environment) {
+
+        return hasResourceScope(id, resourceType, scope);
+    }
+
+    @Override
+    public boolean isAuthorizationSkipped() {
+        return AutomationAuthorizationContext.isSkipChecks();
     }
 
     @Override
@@ -132,7 +175,32 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    @Override
+    public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    @Override
+    public boolean canUseConnectionInWorkflow(long connectionId, String workflowId, Environment environment) {
+        return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
+    }
+
+    @Override
+    public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
+        return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getMyWorkspaceScopes(long workspaceId, Environment environment) {
         return Collections.emptySet();
     }
 
@@ -147,5 +215,50 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void evictAllWorkspaceScopeCache() {
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope) {
+        return false;
+    }
+
+    @Override
+    public boolean hasEmbeddedScope(String scope, Environment environment) {
+        return false;
+    }
+
+    @Override
+    public boolean hasEmbeddedScopeInEveryEnvironment(String scope) {
+        return false;
+    }
+
+    @Override
+    public boolean isEmbeddedMember() {
+        return false;
+    }
+
+    @Override
+    public Set<String> getMyEmbeddedScopes(@Nullable Environment environment) {
+        return Set.of();
+    }
+
+    @Override
+    public void evictEmbeddedScopeCache(long userId) {
+    }
+
+    @Override
+    public void evictAllEmbeddedScopeCache() {
+    }
+
+    private ResourceOwner resolveOwner(String resourceType, Serializable id) {
+        for (ResourceOwnershipResolver resourceOwnershipResolver : resourceOwnershipResolvers.get(resourceType)) {
+            ResourceOwner resourceOwner = resourceOwnershipResolver.resolveOwner(id);
+
+            if (!resourceOwner.isUnknown()) {
+                return resourceOwner;
+            }
+        }
+
+        return ResourceOwner.unknown();
     }
 }

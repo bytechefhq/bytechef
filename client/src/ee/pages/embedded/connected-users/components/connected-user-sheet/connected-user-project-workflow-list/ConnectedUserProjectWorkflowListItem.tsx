@@ -5,6 +5,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     ConnectedUserProjectsQuery,
     useDeleteConnectedUserProjectWorkflowMutation,
@@ -28,6 +29,9 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
+    const canDeleteConnectedUser = useHasEmbeddedScope('CONNECTED_USER_DELETE');
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
+
     const queryClient = useQueryClient();
 
     const deleteConnectedUserProjectWorkflowMutation = useDeleteConnectedUserProjectWorkflowMutation({
@@ -116,6 +120,7 @@ const ConnectedUserProjectWorkflowListItem = ({
 
                                 <Switch
                                     checked={connectedUserProjectWorkflow.enabled}
+                                    disabled={!canManageConnectedUser}
                                     onCheckedChange={(value) => {
                                         enableConnectedUserProjectWorkflowMutation.mutate({
                                             enable: value,
@@ -141,7 +146,9 @@ const ConnectedUserProjectWorkflowListItem = ({
                         </div>
                     </div>
 
-                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                    {canDeleteConnectedUser && (
+                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                    )}
                 </div>
             </li>
 

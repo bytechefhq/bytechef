@@ -1,4 +1,6 @@
-import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfigurationDialog';
@@ -6,9 +8,17 @@ import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfig
 const hoisted = vi.hoisted(() => ({
     connectionDefinition: undefined as {authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
+    grantedScopes: undefined as string[] | undefined,
     integration: undefined as {componentName: string} | undefined,
     updateMutate: vi.fn(),
     workflows: [] as {id: string; workflowUuid: string}[],
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: (scope: string) =>
+        hoisted.grantedScopes === undefined || hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -97,7 +107,9 @@ vi.mock('../IntegrationInstanceConfigurationDialogWorkflowsStep', () => ({
 }));
 
 vi.mock('@/shared/components/connection/ConnectionParameters', () => ({
-    default: () => <div data-testid="connection-parameters" />,
+    default: ({credentialsHidden}: {credentialsHidden?: boolean}) => (
+        <div data-credentials-hidden={String(!!credentialsHidden)} data-testid="connection-parameters" />
+    ),
 }));
 
 const onClose = vi.fn();
@@ -107,10 +119,15 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    act(() => {
+        authenticationStore.setState({account: undefined, authenticated: false});
+    });
+
     resetAll();
     vi.clearAllMocks();
 
     hoisted.connectionDefinition = undefined;
+    hoisted.grantedScopes = undefined;
     hoisted.integration = undefined;
     hoisted.workflows = [];
 });
@@ -128,6 +145,36 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
             expect(screen.getByTestId('basic-step')).toBeInTheDocument();
+        });
+    });
+
+    describe('create scope', () => {
+        it('should offer Save for a new configuration only with the create scope', async () => {
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_EDIT'];
+
+            const withoutCreateRender = render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2, integrationVersion: 1, name: 'New'}}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+
+            withoutCreateRender.unmount();
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_CREATE'];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2, integrationVersion: 1, name: 'New'}}
+                    onClose={onClose}
+                />
+            );
+
+            expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
     });
 
@@ -258,6 +305,132 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(screen.getByRole('heading', {name: /Edit Instance Configuration/})).toBeInTheDocument();
+        });
+
+        it('should offer Save only with the edit scope', () => {
+            const existingConfiguration = {id: 1, integrationId: 2, integrationVersion: 1, name: 'Existing'};
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_CREATE'];
+
+            const withoutEditRender = render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+
+            withoutEditRender.unmount();
+
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_EDIT'];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+        });
+
+        it('should show withheld credentials as hidden without the edit scope and never send them back', async () => {
+            const user = userEvent.setup();
+
+            const existingConfiguration = {
+                authorizationType: 'API_KEY',
+                connectionAuthorizationParameters: {value: 'secret-api-key-value'},
+                connectionConnectionParameters: {subdomain: 'acme-subdomain'},
+                connectionParameters: {subdomain: 'acme-subdomain', value: 'secret-api-key-value'},
+                createdBy: 'creator@localhost.com',
+                id: 1,
+                integrationId: 2,
+                integrationVersion: 1,
+                name: 'Existing',
+            } as unknown as IntegrationInstanceConfiguration;
+
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_USER'], login: 'creator@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.grantedScopes = ['INTEGRATION_INSTANCE_CONFIGURATION_VIEW'];
+
+            const viewerRender = render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('connection-parameters')).toHaveAttribute('data-credentials-hidden', 'true');
+
+            viewerRender.unmount();
+
+            hoisted.grantedScopes = [
+                'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+                'INTEGRATION_INSTANCE_CONFIGURATION_VIEW',
+            ];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('connection-parameters')).toHaveAttribute('data-credentials-hidden', 'false');
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+            const payload = hoisted.updateMutate.mock.calls[0][0];
+
+            ['connectionAuthorizationParameters', 'connectionConnectionParameters', 'connectionParameters'].forEach(
+                (credentialKey) => expect(payload).not.toHaveProperty(credentialKey)
+            );
+            expect(JSON.stringify(payload)).not.toContain('secret-api-key-value');
+            expect(payload).toMatchObject({id: 1, name: 'Existing'});
+        });
+
+        it('should show credentials as hidden to an admin who did not create the configuration', () => {
+            const existingConfiguration = {
+                authorizationType: 'API_KEY',
+                connectionParameters: {value: 'secret-api-key-value'},
+                createdBy: 'creator@localhost.com',
+                id: 1,
+                integrationId: 2,
+                integrationVersion: 1,
+                name: 'Existing',
+            } as unknown as IntegrationInstanceConfiguration;
+
+            act(() => {
+                authenticationStore.setState({
+                    account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'} as never,
+                    authenticated: true,
+                });
+            });
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.grantedScopes = [
+                'INTEGRATION_INSTANCE_CONFIGURATION_EDIT',
+                'INTEGRATION_INSTANCE_CONFIGURATION_VIEW',
+            ];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={existingConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('connection-parameters')).toHaveAttribute('data-credentials-hidden', 'true');
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
 
         it('should keep the stored authorization type when saving', async () => {

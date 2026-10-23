@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnCEVersion
 public class WorkspaceFacadeImpl implements WorkspaceFacade {
 
     private final PermissionService permissionService;

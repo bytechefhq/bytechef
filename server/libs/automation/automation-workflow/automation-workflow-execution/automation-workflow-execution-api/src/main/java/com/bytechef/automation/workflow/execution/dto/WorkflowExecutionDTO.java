@@ -32,6 +32,12 @@ public record WorkflowExecutionDTO(
     long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
     @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
 
+    public WorkflowExecutionDTO withoutDetails() {
+        return new WorkflowExecutionDTO(
+            id, project, projectDeployment, projectVersion, job == null ? null : job.withoutDetails(), workflow,
+            triggerExecution == null ? null : triggerExecution.withoutDetails());
+    }
+
     public boolean isTriggerOnly() {
         return job == null;
     }

@@ -1,0 +1,8 @@
+mutation UpdateCustomRole($id: ID!, $input: UpdateCustomRoleInput!) {
+    updateCustomRole(id: $id, input: $input) {
+        id
+        name
+        description
+        scopes
+    }
+}

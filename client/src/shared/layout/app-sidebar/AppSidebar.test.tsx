@@ -1,4 +1,5 @@
 import {SidebarProvider} from '@/components/ui/sidebar';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {render, screen} from '@/shared/util/test-utils';
 import {fireEvent} from '@testing-library/react';
 import {FolderIcon, MessagesSquareIcon} from 'lucide-react';
@@ -7,7 +8,25 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebar} from './AppSidebar';
 
-const hoisted = vi.hoisted(() => ({currentEnvironmentId: 0}));
+const hoisted = vi.hoisted(() => ({
+    accessibleEmbeddedEnvironmentIds: undefined as number[] | undefined,
+    accessibleEnvironmentIds: undefined as number[] | undefined,
+    currentEnvironmentId: 0,
+    embeddedHookActiveArguments: [] as boolean[],
+    setCurrentEnvironmentId: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useAccessibleEmbeddedEnvironmentIds', () => ({
+    useAccessibleEmbeddedEnvironmentIds: (active?: boolean) => {
+        hoisted.embeddedHookActiveArguments.push(active ?? true);
+
+        return hoisted.accessibleEmbeddedEnvironmentIds;
+    },
+}));
+
+vi.mock('@/shared/hooks/useAccessibleEnvironmentIds', () => ({
+    useAccessibleEnvironmentIds: () => hoisted.accessibleEnvironmentIds,
+}));
 
 // AppSidebarFooter pulls in stores/queries; stub it so this test stays focused on nav.
 vi.mock('./AppSidebarFooter', () => ({
@@ -19,9 +38,19 @@ vi.mock('./AppSidebarWorkspaceSelect', () => ({
 }));
 
 vi.mock('@/shared/components/EnvironmentSelect', () => ({
-    default: ({onChange, variant}: {onChange?: (environmentId: number) => void; variant?: string}) => (
+    default: ({
+        onChange,
+        variant,
+        visibleEnvironmentIds,
+    }: {
+        onChange?: (environmentId: number) => void;
+        variant?: string;
+        visibleEnvironmentIds?: number[];
+    }) => (
         <div data-testid="environment-select">
             {variant}
+
+            <span data-testid="visible-environments">{visibleEnvironmentIds?.join(',') ?? 'all'}</span>
 
             <button onClick={() => onChange?.(0)} type="button">
                 Switch to development
@@ -36,7 +65,10 @@ vi.mock('@/shared/components/EnvironmentSelect', () => ({
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: (selector: (state: Record<string, unknown>) => unknown) =>
-        selector({currentEnvironmentId: hoisted.currentEnvironmentId}),
+        selector({
+            currentEnvironmentId: hoisted.currentEnvironmentId,
+            setCurrentEnvironmentId: hoisted.setCurrentEnvironmentId,
+        }),
 }));
 
 const navigation = [
@@ -63,7 +95,12 @@ const renderSidebar = (open = true, pathname = '/automation/projects') =>
 
 describe('AppSidebar', () => {
     beforeEach(() => {
+        hoisted.accessibleEmbeddedEnvironmentIds = undefined;
+        hoisted.embeddedHookActiveArguments = [];
+        hoisted.accessibleEnvironmentIds = undefined;
         hoisted.currentEnvironmentId = 0;
+        usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+        hoisted.setCurrentEnvironmentId.mockClear();
     });
 
     it('renders a menu item for each navigation entry', () => {
@@ -159,6 +196,65 @@ describe('AppSidebar', () => {
             fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
 
             expect(screen.getByTestId('location')).toHaveTextContent('/automation/connections');
+        });
+
+        it('offers only the environments the member has access to', () => {
+            hoisted.accessibleEnvironmentIds = [0, 2];
+
+            renderSidebar(true);
+
+            expect(screen.getByTestId('visible-environments')).toHaveTextContent('0,2');
+        });
+
+        it('offers every environment while access is unknown', () => {
+            renderSidebar(true);
+
+            expect(screen.getByTestId('visible-environments')).toHaveTextContent('all');
+        });
+
+        it('switches to the first accessible environment when the selected one is not accessible', () => {
+            hoisted.accessibleEnvironmentIds = [2];
+
+            renderSidebar(true, '/automation/projects');
+
+            expect(hoisted.setCurrentEnvironmentId).toHaveBeenCalledWith(2);
+            expect(screen.getByTestId('location')).toHaveTextContent('/automation/deployments');
+        });
+
+        it('testTheEnvironmentSelectorOffersOnlyAccessibleEmbeddedEnvironments', () => {
+            hoisted.accessibleEmbeddedEnvironmentIds = [1, 2];
+            hoisted.accessibleEnvironmentIds = [0];
+            hoisted.currentEnvironmentId = 1;
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            renderSidebar(true, '/embedded/configurations');
+
+            expect(screen.getByTestId('visible-environments')).toHaveTextContent('1,2');
+        });
+
+        it('does not activate the embedded scope queries on automation pages', () => {
+            renderSidebar(true, '/automation/projects');
+
+            expect(hoisted.embeddedHookActiveArguments.length).toBeGreaterThan(0);
+            expect(hoisted.embeddedHookActiveArguments.every((active) => !active)).toBe(true);
+        });
+
+        it('switches an embedded member to the first accessible embedded environment', () => {
+            hoisted.accessibleEmbeddedEnvironmentIds = [2];
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            renderSidebar(true, '/embedded/integrations');
+
+            expect(hoisted.setCurrentEnvironmentId).toHaveBeenCalledWith(2);
+            expect(screen.getByTestId('location')).toHaveTextContent('/embedded/configurations');
+        });
+
+        it('keeps the selected environment when it is accessible', () => {
+            hoisted.accessibleEnvironmentIds = [0, 2];
+
+            renderSidebar(true);
+
+            expect(hoisted.setCurrentEnvironmentId).not.toHaveBeenCalled();
         });
 
         it('stays in the workflow editor when switching to development', () => {

@@ -45,7 +45,9 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -117,11 +119,22 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
         lenient().when(componentDefinitionService.getComponentDefinition(anyString(), any()))
             .thenReturn(componentDefinition);
 
+        PermissionService permissionService = mock(PermissionService.class);
+
+        // Permissive on purpose: these tests cover DTO assembly, not authorization. The facade's in-body narrowing
+        // checks run here even without a proxy -- only the @PreAuthorize annotations need one -- so a default mock
+        // returning false would fail every listing that names a project, deployment or workflow.
+        lenient().when(permissionService.hasResourceScope(any(), anyString(), anyString()))
+            .thenReturn(true);
+        lenient().when(permissionService.hasWorkflowScope(anyString(), anyString()))
+            .thenReturn(true);
+
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
-            mock(ContextService.class), mock(Evaluator.class),
-            mock(EnvironmentService.class), workflowExecutionRowService, jobService,
+            mock(ContextService.class), new StaticListableBeanFactory().getBeanProvider(EmbeddedResourceResolver.class),
+            mock(Evaluator.class),
+            mock(EnvironmentService.class), workflowExecutionRowService, jobService, permissionService,
             mock(PrincipalJobService.class), mock(ProjectFacade.class), projectDeploymentService, projectService,
             projectWorkflowService, mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),
             mock(TaskFileStorage.class), triggerExecutionService, mock(TriggerFileStorage.class), workflowService);

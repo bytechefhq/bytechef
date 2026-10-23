@@ -28,4 +28,13 @@ public interface UserInvitationService {
      * nobody is told, and mails the link on which the invitee sets their own password.
      */
     User inviteUser(String email, String role);
+
+    /**
+     * Tells an existing account holder they were added to a workspace. That recipient has a password already, so the
+     * invitation link would be both useless and alarming.
+     *
+     * @param user          the existing account holder
+     * @param workspaceName the workspace they were added to, for the message body
+     */
+    void notifyAddedToWorkspace(User user, String workspaceName);
 }

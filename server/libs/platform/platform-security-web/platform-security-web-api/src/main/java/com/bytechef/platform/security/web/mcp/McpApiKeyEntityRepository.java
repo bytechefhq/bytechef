@@ -51,9 +51,18 @@ public class McpApiKeyEntityRepository implements ApiKeyEntityRepository<McpApiK
     @Nullable
     public McpApiKeyEntity findByKeyId(String keyId) {
         return apiKeyService.fetchApiKey(keyId)
-            .flatMap(apiKey -> userService.fetchUser(apiKey.getUserId())
-                .filter(User::isActivated)
-                .map(user -> new McpApiKeyEntity(apiKey, user.getLogin(), getGrantedAuthorities(user))))
+            .flatMap(apiKey -> {
+                Long userId = apiKey.getUserId();
+
+                // A key with no owner authenticates as nobody.
+                if (userId == null) {
+                    return Optional.empty();
+                }
+
+                return userService.fetchUser(userId)
+                    .filter(User::isActivated)
+                    .map(user -> new McpApiKeyEntity(apiKey, user.getLogin(), getGrantedAuthorities(user)));
+            })
             .orElse(null);
     }
 

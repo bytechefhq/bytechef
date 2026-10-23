@@ -13,7 +13,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
 import com.bytechef.ee.embedded.security.config.EmbeddedSecurityIntTestConfiguration;
@@ -29,6 +31,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,8 +58,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
-    PermissionScopeRegistry.class, ProjectRepository.class, UserService.class, WorkspaceScopeCacheService.class,
-    WorkspaceUserRepository.class
+    EmbeddedScopeCacheService.class, EmbeddedUserRepository.class, PermissionScopeRegistry.class,
+    ProjectRepository.class, UserService.class, WorkspaceScopeCacheService.class, WorkspaceUserRepository.class
 })
 class SigningKeyFacadeIntTest {
 
@@ -87,6 +90,8 @@ class SigningKeyFacadeIntTest {
         when(userService.getCurrentUser()).thenAnswer(invocation -> user(
             SecurityUtils.fetchCurrentUserLogin()
                 .orElseThrow()));
+        when(userService.fetchUserByLogin(anyString()))
+            .thenAnswer(invocation -> Optional.of(user(invocation.getArgument(0))));
         when(userService.getUser(anyString())).thenAnswer(invocation -> user(invocation.getArgument(0)));
     }
 

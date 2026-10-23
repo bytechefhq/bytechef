@@ -10,6 +10,10 @@ const hoisted = vi.hoisted(() => ({
     updateMutate: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useDeleteMcpProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),

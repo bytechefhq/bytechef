@@ -7,6 +7,12 @@ import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {onlineManager} from '@tanstack/react-query';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    UNION_ENVIRONMENT_ID: -1,
+    useEmbeddedScopeState: () => ({editionUnknown: false, error: false, granted: true, loading: false}),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     integration: {current: {id: 5, name: 'Gmail'} as {id: number; name: string} | undefined},
     isMutating: vi.fn(() => 0),

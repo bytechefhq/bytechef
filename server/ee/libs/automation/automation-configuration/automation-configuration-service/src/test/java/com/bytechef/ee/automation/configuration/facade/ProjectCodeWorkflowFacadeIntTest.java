@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -111,20 +112,18 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     @Test
-    void testSaveIsAdminOnly() {
-        assertRequiresAdminAuthority(() -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA));
-    }
+    void testSaveNeedsProjectCreateAndProjectPublishInTheWorkspace() {
+        ThrowingCallable save = () -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
 
-    private void assertRequiresAdminAuthority(ThrowingCallable call) {
-        authenticate(AuthorityConstants.USER);
+        assertDenied(save);
 
-        assertDenied(call);
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE")).thenReturn(true);
 
-        authenticate(AuthorityConstants.ADMIN);
+        assertDenied(save);
 
-        assertNotDenied(call);
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_PUBLISH")).thenReturn(true);
 
-        authenticate(AuthorityConstants.USER);
+        assertNotDenied(save);
     }
 
     private static void assertDenied(ThrowingCallable call) {

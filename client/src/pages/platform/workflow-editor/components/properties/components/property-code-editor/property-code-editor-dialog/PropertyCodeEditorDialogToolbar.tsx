@@ -5,6 +5,7 @@ import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     PanelRightCloseIcon,
@@ -55,53 +56,64 @@ const PropertyCodeEditorDialogToolbar = ({
 
     const ff_2504 = useFeatureFlagsStore()('ff-2504');
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <div className="flex flex-row items-center justify-between space-y-0 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
             <span className="text-lg font-semibold">Edit Script</span>
 
             <div className="flex items-center gap-2">
-                <ButtonGroup>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div>
-                                <Button
-                                    className="rounded-r-none"
-                                    disabled={!dirty || saving}
-                                    icon={saving ? <LoadingIcon /> : <SaveIcon />}
-                                    onClick={handleSaveClick}
-                                    size="icon"
-                                    type="submit"
-                                />
-                            </div>
-                        </TooltipTrigger>
-
-                        <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
-                    </Tooltip>
-
-                    <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
-
-                    {!scriptIsRunning && (
+                {!readOnly && (
+                    <ButtonGroup>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <span tabIndex={0}>
+                                <div>
                                     <Button
-                                        className="rounded-l-none"
-                                        disabled={dirty}
-                                        icon={<PlayIcon />}
-                                        label="Test"
-                                        onClick={handleRunClick}
+                                        aria-label="Save script"
+                                        className="rounded-r-none"
+                                        disabled={!dirty || saving}
+                                        icon={saving ? <LoadingIcon /> : <SaveIcon />}
+                                        onClick={handleSaveClick}
+                                        size="icon"
+                                        type="submit"
                                     />
-                                </span>
+                                </div>
                             </TooltipTrigger>
 
-                            <TooltipContent>Run the current workflow</TooltipContent>
+                            <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
                         </Tooltip>
-                    )}
 
-                    {scriptIsRunning && (
-                        <Button icon={<SquareIcon />} label="Stop" onClick={handleStopClick} variant="destructive" />
-                    )}
-                </ButtonGroup>
+                        <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+
+                        {!scriptIsRunning && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span tabIndex={0}>
+                                        <Button
+                                            aria-label="Run script"
+                                            className="rounded-l-none"
+                                            disabled={dirty}
+                                            icon={<PlayIcon />}
+                                            label="Test"
+                                            onClick={handleRunClick}
+                                        />
+                                    </span>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Run the current workflow</TooltipContent>
+                            </Tooltip>
+                        )}
+
+                        {scriptIsRunning && (
+                            <Button
+                                icon={<SquareIcon />}
+                                label="Stop"
+                                onClick={handleStopClick}
+                                variant="destructive"
+                            />
+                        )}
+                    </ButtonGroup>
+                )}
 
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -116,7 +128,7 @@ const PropertyCodeEditorDialogToolbar = ({
                     <TooltipContent>{rightPanelOpen ? 'Hide side panel' : 'Show side panel'}</TooltipContent>
                 </Tooltip>
 
-                {ff_2504 && copilotEnabled && (
+                {!readOnly && ff_2504 && copilotEnabled && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button

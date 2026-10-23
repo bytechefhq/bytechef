@@ -20,7 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.SystemProjects;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -47,17 +47,17 @@ import org.springframework.stereotype.Controller;
 public class ProjectDeploymentGraphQlController {
 
     private final EnvironmentService environmentService;
-    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectService projectService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentGraphQlController(
-        EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
         ProjectService projectService, TagService tagService) {
 
         this.environmentService = environmentService;
-        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectService = projectService;
         this.tagService = tagService;
     }
@@ -116,8 +116,8 @@ public class ProjectDeploymentGraphQlController {
 
         Environment environment = environmentService.getEnvironment(environmentId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, projectId, tagId, workspaceId);
+        List<ProjectDeployment> projectDeployments = projectDeploymentFacade.getProjectDeployments(
+            workspaceId, environment, projectId, tagId);
 
         Set<Long> systemProjectIds = projectService
             .getProjects(

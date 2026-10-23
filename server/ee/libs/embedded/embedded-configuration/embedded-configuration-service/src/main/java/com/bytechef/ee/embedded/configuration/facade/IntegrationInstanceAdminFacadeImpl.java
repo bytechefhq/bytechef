@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAdminFacade {
 
     private final IntegrationInstanceFacade integrationInstanceFacade;
@@ -30,6 +29,7 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceId, workflowId, enable);
     }

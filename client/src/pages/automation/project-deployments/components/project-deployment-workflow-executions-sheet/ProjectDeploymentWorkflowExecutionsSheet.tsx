@@ -18,6 +18,7 @@ import {
     useGetProjectWorkflowExecutionQuery,
     useGetWorkspaceProjectWorkflowExecutionsQuery,
 } from '@/shared/queries/automation/workflowExecutions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon, ArrowLeftIcon, RefreshCwIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 import {useCallback, useMemo, useState} from 'react';
@@ -48,6 +49,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
     const [activeTab, setActiveTab] = useState<ProjectDeploymentWorkflowSheetTabType>('executions');
     const [pageNumber, setPageNumber] = useState(0);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionKind, workflowExecutionSheetOpen} =
@@ -69,7 +71,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
         setProjectDeploymentWorkflowSheetOpen(false);
     }, [setProjectDeploymentWorkflowSheetOpen, setWorkflowExecutionSheetOpen]);
 
-    const {openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
+    const {canOpenInProject, openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
 
     const {data: workflowExecution} = useGetProjectWorkflowExecutionQuery(
         {id: workflowExecutionId},
@@ -86,6 +88,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
         refetch: refetchWorkflowExecutions,
     } = useGetWorkspaceProjectWorkflowExecutionsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
             pageNumber,
             projectDeploymentId,
@@ -106,7 +109,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
     const executionsTabActive = activeTab === 'executions';
     const workflowExecutionDetailOpen = enabled && executionsTabActive && workflowExecutionSheetOpen;
 
-    const showOpenInProject = projectId != null;
+    const showOpenInProject = canOpenInProject && projectId != null;
 
     let headerProjectVersion = projectVersion;
 

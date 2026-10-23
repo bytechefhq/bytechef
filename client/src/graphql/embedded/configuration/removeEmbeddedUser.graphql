@@ -1,0 +1,3 @@
+mutation RemoveEmbeddedUser($userId: ID!) {
+    removeEmbeddedUser(userId: $userId)
+}

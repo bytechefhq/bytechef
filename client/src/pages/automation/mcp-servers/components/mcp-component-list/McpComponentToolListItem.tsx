@@ -1,10 +1,13 @@
 import AlertDialog from '@/components/AlertDialog';
 import Switch from '@/components/Switch/Switch';
 import {Popover} from '@/components/ui/popover';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     McpTool,
     useUpdateEmbeddedMcpToolEnabledMutation,
@@ -38,6 +41,11 @@ const McpComponentToolListItem = ({
 }: McpComponentToolListItemProps) => {
     const [isEnablePending, setIsEnablePending] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditWorkspaceMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+    const canEditEmbeddedMcpServer = useHasEmbeddedScope('MCP_EDIT');
+
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpProjectComponentToolDropdownMenu({
             embedded,
@@ -51,6 +59,8 @@ const McpComponentToolListItem = ({
     const updateEmbeddedMcpToolEnabledMutation = useUpdateEmbeddedMcpToolEnabledMutation();
     const updateWorkspaceMcpToolEnabledMutation = useUpdateWorkspaceMcpToolEnabledMutation();
 
+    const canEditMcpServer = embedded ? canEditEmbeddedMcpServer : canEditWorkspaceMcpServer;
+    const enabledSwitchShown = embedded || (canEditMcpServer && enabledSwitchVisible);
     const popoverId = `component-tool-${mcpTool.id}`;
     const toolLabel = mcpTool.title || mcpTool.name;
     const isPopoverOpen = activePopoverId === popoverId;
@@ -91,25 +101,31 @@ const McpComponentToolListItem = ({
                         {description && <span className="truncate text-xs text-muted-foreground">{description}</span>}
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
-                        <McpToolConfigureButton
-                            anchorsPopover
-                            label={toolLabel}
-                            onClick={() => openPopover(popoverId)}
-                        />
+                    {(canEditMcpServer || enabledSwitchShown) && (
+                        <div className="flex shrink-0 items-center gap-2">
+                            {canEditMcpServer && (
+                                <McpToolConfigureButton
+                                    anchorsPopover
+                                    label={toolLabel}
+                                    onClick={() => openPopover(popoverId)}
+                                />
+                            )}
 
-                        {(embedded || enabledSwitchVisible) && (
-                            <Switch
-                                aria-label={`Enable ${toolLabel}`}
-                                checked={mcpTool.enabled}
-                                className="mr-2"
-                                disabled={isEnablePending}
-                                onCheckedChange={handleEnabledChange}
-                            />
-                        )}
+                            {enabledSwitchShown && (
+                                <Switch
+                                    aria-label={`Enable ${toolLabel}`}
+                                    checked={mcpTool.enabled}
+                                    className="mr-2"
+                                    disabled={isEnablePending || !canEditMcpServer}
+                                    onCheckedChange={handleEnabledChange}
+                                />
+                            )}
 
-                        <McpToolActionsMenu label={toolLabel} onDeleteClick={() => setShowDeleteDialog(true)} />
-                    </div>
+                            {canEditMcpServer && (
+                                <McpToolActionsMenu label={toolLabel} onDeleteClick={() => setShowDeleteDialog(true)} />
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {isPopoverOpen && (

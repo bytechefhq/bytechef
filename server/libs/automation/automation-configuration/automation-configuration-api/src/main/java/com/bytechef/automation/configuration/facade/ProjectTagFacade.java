@@ -24,7 +24,7 @@ import java.util.List;
  */
 public interface ProjectTagFacade {
 
-    List<Tag> getProjectTags();
+    List<Tag> getProjectTags(long workspaceId);
 
     void updateProjectTags(long id, List<Tag> tags);
 }

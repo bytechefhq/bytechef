@@ -64,6 +64,13 @@ public record IntegrationInstanceConfigurationDTO(
             CollectionUtils.sort(integrationInstanceWorkflows), tags, integrationInstanceConfiguration.getVersion());
     }
 
+    public IntegrationInstanceConfigurationDTO withoutCredentials() {
+        return new IntegrationInstanceConfigurationDTO(
+            authorizationType, Map.of(), Map.of(), Map.of(), createdBy, createdDate, description, enabled, environment,
+            id, lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion, name,
+            integrationInstanceConfigurationWorkflows, tags, version);
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -106,8 +113,11 @@ public record IntegrationInstanceConfigurationDTO(
         integrationInstance.setIntegrationVersion(integrationVersion);
         integrationInstance.setName(name);
         integrationInstance.setTags(tags);
-        integrationInstance.setAuthorizationType(authorizationType);
         integrationInstance.setVersion(version);
+
+        if (authorizationType != null) {
+            integrationInstance.setAuthorizationType(authorizationType);
+        }
 
         return integrationInstance;
     }

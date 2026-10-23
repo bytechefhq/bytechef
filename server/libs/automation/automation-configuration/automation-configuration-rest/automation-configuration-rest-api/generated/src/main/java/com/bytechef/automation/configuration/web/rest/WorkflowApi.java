@@ -7,8 +7,8 @@ package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
-import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import org.springframework.lang.Nullable;
+import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -398,6 +398,47 @@ public interface WorkflowApi {
     )
     default ResponseEntity<List<WorkflowModel>> getWorkflows(
         
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connectionsCount\" : 0, \"definition\" : \"definition\", \"description\" : \"description\", \"format\" : \"JSON\", \"id\" : \"id\", \"inputs\" : [ { \"internalOnly\" : false, \"label\" : \"label\", \"name\" : \"name\", \"objectName\" : \"objectName\", \"required\" : false, \"type\" : \"string\", \"componentReference\" : { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"groupName\" : \"groupName\" } }, { \"internalOnly\" : false, \"label\" : \"label\", \"name\" : \"name\", \"objectName\" : \"objectName\", \"required\" : false, \"type\" : \"string\", \"componentReference\" : { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"groupName\" : \"groupName\" } } ], \"inputsCount\" : 1, \"label\" : \"label\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"sourceType\" : \"CLASSPATH\", \"maxRetries\" : 5, \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"tasks\" : [ { \"clusterRoot\" : false, \"clusterElements\" : { \"key\" : \"\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"maxRetries\" : 2, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"node\" : \"node\", \"parameters\" : { \"key\" : \"\" }, \"post\" : [ null, null ], \"pre\" : [ null, null ], \"timeout\" : \"timeout\", \"type\" : \"type\" }, { \"clusterRoot\" : false, \"clusterElements\" : { \"key\" : \"\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"maxRetries\" : 2, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"node\" : \"node\", \"parameters\" : { \"key\" : \"\" }, \"post\" : [ null, null ], \"pre\" : [ null, null ], \"timeout\" : \"timeout\", \"type\" : \"type\" } ], \"triggers\" : [ { \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"label\" : \"label\", \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"parameters\" : { \"key\" : \"\" }, \"timeout\" : \"timeout\", \"type\" : \"type\" }, { \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"label\" : \"label\", \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"parameters\" : { \"key\" : \"\" }, \"timeout\" : \"timeout\", \"type\" : \"type\" } ], \"__version\" : 7, \"projectWorkflowId\" : 9, \"sseStreamResponse\" : true, \"workflowUuid\" : \"workflowUuid\" }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connectionsCount\" : 0, \"definition\" : \"definition\", \"description\" : \"description\", \"format\" : \"JSON\", \"id\" : \"id\", \"inputs\" : [ { \"internalOnly\" : false, \"label\" : \"label\", \"name\" : \"name\", \"objectName\" : \"objectName\", \"required\" : false, \"type\" : \"string\", \"componentReference\" : { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"groupName\" : \"groupName\" } }, { \"internalOnly\" : false, \"label\" : \"label\", \"name\" : \"name\", \"objectName\" : \"objectName\", \"required\" : false, \"type\" : \"string\", \"componentReference\" : { \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"groupName\" : \"groupName\" } } ], \"inputsCount\" : 1, \"label\" : \"label\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"sourceType\" : \"CLASSPATH\", \"maxRetries\" : 5, \"workflowTaskComponentNames\" : [ \"workflowTaskComponentNames\", \"workflowTaskComponentNames\" ], \"workflowTriggerComponentNames\" : [ \"workflowTriggerComponentNames\", \"workflowTriggerComponentNames\" ], \"tasks\" : [ { \"clusterRoot\" : false, \"clusterElements\" : { \"key\" : \"\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"maxRetries\" : 2, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"node\" : \"node\", \"parameters\" : { \"key\" : \"\" }, \"post\" : [ null, null ], \"pre\" : [ null, null ], \"timeout\" : \"timeout\", \"type\" : \"type\" }, { \"clusterRoot\" : false, \"clusterElements\" : { \"key\" : \"\" }, \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"maxRetries\" : 2, \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"node\" : \"node\", \"parameters\" : { \"key\" : \"\" }, \"post\" : [ null, null ], \"pre\" : [ null, null ], \"timeout\" : \"timeout\", \"type\" : \"type\" } ], \"triggers\" : [ { \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"label\" : \"label\", \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"parameters\" : { \"key\" : \"\" }, \"timeout\" : \"timeout\", \"type\" : \"type\" }, { \"connections\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 5, \"key\" : \"key\", \"required\" : true, \"workflowNodeName\" : \"workflowNodeName\" } ], \"description\" : \"description\", \"label\" : \"label\", \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"parameters\" : { \"key\" : \"\" }, \"timeout\" : \"timeout\", \"type\" : \"type\" } ], \"__version\" : 7, \"projectWorkflowId\" : 9, \"sseStreamResponse\" : true, \"workflowUuid\" : \"workflowUuid\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_WORKSPACE_WORKFLOWS = "/workspaces/{id}/workflows";
+    /**
+     * GET /workspaces/{id}/workflows : Get workflows for particular workspace.
+     * Get workflows for particular workspace.
+     *
+     * @param id The id of a workspace. (required)
+     * @return The array of workspace workflows. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkspaceWorkflows",
+        summary = "Get workflows for particular workspace.",
+        description = "Get workflows for particular workspace.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The array of workspace workflows.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = WorkflowApi.PATH_GET_WORKSPACE_WORKFLOWS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<WorkflowModel>> getWorkspaceWorkflows(
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

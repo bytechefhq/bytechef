@@ -23,6 +23,8 @@ public final class SystemProjects {
 
     public static final String EMBEDDED_AUTOMATION_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
+    public static final String EMBEDDED_CONNECTED_USER_NAME_PREFIX = "__EMBEDDED__";
+
     public static final String A2A_SERVER_DEPLOYMENT_NAME_PREFIX = "__A2A_SERVER__";
 
     private SystemProjects() {
@@ -37,6 +39,6 @@ public final class SystemProjects {
             return false;
         }
 
-        return name.startsWith(EMBEDDED_AUTOMATION_NAME_PREFIX);
+        return name.startsWith(EMBEDDED_AUTOMATION_NAME_PREFIX) || name.startsWith(EMBEDDED_CONNECTED_USER_NAME_PREFIX);
     }
 }

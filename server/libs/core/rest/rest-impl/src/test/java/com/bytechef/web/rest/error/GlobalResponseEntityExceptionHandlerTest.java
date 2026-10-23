@@ -22,13 +22,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Verifies that {@link GlobalResponseEntityExceptionHandler#handleAnyException} silently drops client disconnects and
@@ -92,6 +99,59 @@ class GlobalResponseEntityExceptionHandlerTest {
                 webRequest);
 
         assertNull(secondResponse);
+    }
+
+    @Test
+    void testHandleAccessDeniedExceptionReturnsForbidden() {
+        ResponseEntity<ProblemDetail> responseEntity =
+            exceptionHandler.handleAccessDeniedException(new AccessDeniedException("Access Denied"), newRequest());
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testHandleAccessDeniedExceptionAnswersWithTheBodyTheClientMatchesAsAPermissionDenial() {
+        ResponseEntity<ProblemDetail> responseEntity = exceptionHandler.handleAccessDeniedException(
+            new AccessDeniedException("Project id=42"), newRequest());
+
+        assertAccessDeniedBody(responseEntity);
+    }
+
+    @Test
+    void testHandleAnyExceptionReturnsForbiddenOnWrappedAccessDenied() {
+        Throwable throwable = new IllegalStateException("gate failed", new AccessDeniedException("Access Denied"));
+
+        ResponseEntity<ProblemDetail> responseEntity = exceptionHandler.handleAnyException(throwable, newRequest());
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertAccessDeniedBody(responseEntity);
+    }
+
+    private static void assertAccessDeniedBody(ResponseEntity<ProblemDetail> responseEntity) {
+        ProblemDetail problemDetail = responseEntity.getBody();
+
+        assertNotNull(problemDetail);
+        assertEquals("Access denied", problemDetail.getDetail());
+        assertEquals(HttpStatus.FORBIDDEN.value(), problemDetail.getStatus());
+
+        JacksonJsonHttpMessageConverter messageConverter = new JacksonJsonHttpMessageConverter();
+        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+
+        try {
+            messageConverter.write(problemDetail, MediaType.APPLICATION_PROBLEM_JSON, outputMessage);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException(ioException);
+        }
+
+        JsonMapper jsonMapper = new JsonMapper();
+
+        JsonNode bodyJsonNode = jsonMapper.readTree(outputMessage.getBodyAsString());
+
+        assertEquals("Access denied", bodyJsonNode.path("detail")
+            .asString());
+        assertEquals(HttpStatus.FORBIDDEN.value(), bodyJsonNode.path("status")
+            .asInt());
     }
 
     private static WebRequest newRequest() {

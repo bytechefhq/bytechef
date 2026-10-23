@@ -9,6 +9,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationCategoriesQuery} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {useGetIntegrationTagsQuery} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -33,6 +34,8 @@ const Integrations = () => {
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
     const unifiedApiCategory = searchParams.get('unifiedApiCategory') ?? undefined;
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -72,6 +75,7 @@ const Integrations = () => {
                         centerTitle={true}
                         position="main"
                         right={
+                            canCreateIntegration &&
                             integrations &&
                             integrations.length > 0 && (
                                 <Button
@@ -117,14 +121,20 @@ const Integrations = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <Button
-                                aria-label="Create Integration"
-                                label="Create Integration"
-                                onClick={() => setShowIntegrationDialog(true)}
-                            />
+                            canCreateIntegration && (
+                                <Button
+                                    aria-label="Create Integration"
+                                    label="Create Integration"
+                                    onClick={() => setShowIntegrationDialog(true)}
+                                />
+                            )
                         }
                         icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new integrations."
+                        message={
+                            canCreateIntegration
+                                ? 'Get started by creating a new integrations.'
+                                : 'There are no integrations yet.'
+                        }
                         title="No Integrations"
                     />
                 )}

@@ -12,8 +12,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +24,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -104,8 +108,6 @@ class ConnectionAdminFacadeIntTest {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
-
         assertEveryOperationIsDenied();
     }
 
@@ -119,22 +121,36 @@ class ConnectionAdminFacadeIntTest {
             .componentName("slack")
             .build();
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        grantEveryEmbeddedScope();
+
         when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(eq(7L), any());
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
+        when(connectionFacade.getConnection(7L)).thenReturn(connectionDTO);
 
         assertThat(connectionAdminFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 
         connectionAdminFacade.deleteConnection(7L);
         connectionAdminFacade.getConnection(7L);
+        connectionAdminFacade.getConnectionTags();
         connectionAdminFacade.getConnections("slack", 1, 2L, 3L);
         connectionAdminFacade.getSharedConnectionIds();
         connectionAdminFacade.updateConnection(7L, "name", List.of(), true, 0);
+        connectionAdminFacade.updateConnectionTags(7L, List.of());
 
-        verify(connectionFacade).delete(7L);
+        verify(connectionFacade).delete(eq(7L), any());
         verify(connectionFacade).getConnection(7L);
+        verify(connectionService).getConnections(PlatformType.EMBEDDED);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(connectionFacade).update(7L, "name", List.of(), 0);
+        verify(connectionFacade).update(7L, List.of());
         verify(connectedUserConnectionService, times(2)).updateShared(7L, true);
         verify(connectedUserConnectionService).deleteByConnectionId(7L);
         verify(connectedUserConnectionService).getSharedConnectionIds();
@@ -151,14 +167,25 @@ class ConnectionAdminFacadeIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getConnection(7L))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> connectionAdminFacade.getConnectionTags())
+            .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getConnections(null, null, null, null))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getSharedConnectionIds())
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.updateConnection(7L, "name", List.of(), null, 0))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> connectionAdminFacade.updateConnectionTags(7L, List.of()))
+            .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(connectionFacade, connectionService, connectedUserConnectionService);
+    }
+
+    private void grantEveryEmbeddedScope() {
+        when(permissionService.hasResourceScope(anyLong(), eq("Connection"), anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString())).thenReturn(true);
+        when(permissionService.hasEmbeddedScope(anyString(), any(Environment.class))).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment(anyString())).thenReturn(true);
     }
 
     private static Connection connection(long id, PlatformType type) {
@@ -187,7 +214,8 @@ class ConnectionAdminFacadeIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
-            when(permissionService.isTenantAdmin()).thenReturn(true);
+            grantEveryEmbeddedScope();
+
             when(connectionService.fetchConnection(AUTOMATION_CONNECTION_ID))
                 .thenReturn(Optional.of(connection(AUTOMATION_CONNECTION_ID, PlatformType.AUTOMATION)));
             when(connectionService.fetchConnection(UNKNOWN_CONNECTION_ID)).thenReturn(Optional.empty());
@@ -198,7 +226,7 @@ class ConnectionAdminFacadeIntTest {
             assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(AUTOMATION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).delete(anyLong());
+            verify(connectionFacade, never()).delete(anyLong(), any());
             verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
         }
 
@@ -221,6 +249,14 @@ class ConnectionAdminFacadeIntTest {
         }
 
         @Test
+        void testUpdateConnectionTagsRejectsAutomationConnection() {
+            assertThatThrownBy(() -> connectionAdminFacade.updateConnectionTags(AUTOMATION_CONNECTION_ID, List.of()))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
+        }
+
+        @Test
         void testUnknownConnectionIsRejectedLikeAnAutomationConnection() {
             assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(UNKNOWN_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class)
@@ -228,7 +264,7 @@ class ConnectionAdminFacadeIntTest {
             assertThatThrownBy(() -> connectionAdminFacade.getConnection(AUTOMATION_CONNECTION_ID))
                 .hasMessage("Connection id=%s not found".formatted(AUTOMATION_CONNECTION_ID));
 
-            verify(connectionFacade, never()).delete(anyLong());
+            verify(connectionFacade, never()).delete(anyLong(), any());
         }
     }
 
@@ -240,7 +276,12 @@ class ConnectionAdminFacadeIntTest {
         static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
             @Lazy PermissionService permissionService) {
 
-            return new AutomationMethodSecurityExpressionHandler(permissionService);
+            AutomationMethodSecurityExpressionHandler handler =
+                new AutomationMethodSecurityExpressionHandler(permissionService);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }

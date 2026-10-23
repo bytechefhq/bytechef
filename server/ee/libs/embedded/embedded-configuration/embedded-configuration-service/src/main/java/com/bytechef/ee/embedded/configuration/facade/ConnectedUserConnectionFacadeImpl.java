@@ -7,10 +7,12 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -22,8 +24,11 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +41,7 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,32 +59,41 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserConnectionFacadeImpl.class);
 
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
+    private final ConnectedUserConnectionReader connectedUserConnectionReader;
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionFacade connectionFacade;
+    private final ConnectionOwnershipExemption connectionOwnershipExemption;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
+        ConnectedUserConnectionReader connectedUserConnectionReader,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
+        ConnectionOwnershipExemption connectionOwnershipExemption,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceService integrationInstanceService) {
+        IntegrationInstanceService integrationInstanceService, @Lazy PermissionService permissionService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
+        this.connectedUserConnectionReader = connectedUserConnectionReader;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserService = connectedUserService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionFacade = connectionFacade;
+        this.connectionOwnershipExemption = connectionOwnershipExemption;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
+        this.permissionService = permissionService;
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
@@ -88,21 +103,24 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
 
-        connectedUserConnectionService.deleteByConnectionId(connectionId);
-
-        connectionFacade.delete(connectionId);
+        connectionFacade.delete(
+            connectionId, () -> connectedUserConnectionService.deleteByConnectionId(connectionId));
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        return getConnections(connectedUserId, componentName, connectionIds);
+        return withoutCredentialsUnlessManaged(
+            connectedUserId,
+            connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds));
     }
 
     @Override
@@ -112,30 +130,23 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        return getConnections(connectedUser.getId(), componentName, connectionIds);
+        return connectedUserConnectionReader.getConnections(connectedUser.getId(), componentName, connectionIds);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
-
-        Set<Long> entitledConnectionIds = connectedUserConnectionMembership.getConnectionIds(
-            connectedUser.getId(), connectedUser.getEnvironment());
-
-        List<Long> allowedConnectionIds = entitledConnectionIds.stream()
-            .filter(connectionId -> connectionIds.isEmpty() || connectionIds.contains(connectionId))
-            .toList();
-
-        return connectionFacade.getConnections(new ArrayList<>(allowedConnectionIds), PlatformType.EMBEDDED)
-            .stream()
-            .filter(connectionDTO -> componentName == null || componentName.equals(connectionDTO.componentName()))
-            .toList();
+        return withoutCredentialsUnlessManaged(
+            connectedUserId,
+            connectedUserConnectionReader.getConnections(connectedUserId, componentName, connectionIds));
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
         ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);
 
@@ -144,6 +155,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public Set<Long> getOwnedConnectionIds(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -160,8 +173,35 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScope('CONNECTION_VIEW') or isConnectedUser()")
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
+    }
+
+    private List<ConnectionDTO> withoutCredentialsUnlessManaged(
+        long connectedUserId, List<ConnectionDTO> connectionDTOs) {
+
+        boolean currentConnectedUser = ConnectedUserAuthentications.fetchCurrent()
+            .map(connectedUserAuthentication -> connectedUserAuthentication.connectedUserId() == connectedUserId)
+            .orElse(false);
+
+        if (currentConnectedUser) {
+            return connectionDTOs;
+        }
+
+        if (!permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE")) {
+            return CollectionUtils.map(connectionDTOs, ConnectionDTO::withoutCredentials);
+        }
+
+        return CollectionUtils.map(
+            connectionDTOs,
+            connectionDTO -> isMemberCreated(connectionDTO) ? connectionDTO : connectionDTO.withoutCredentials());
+    }
+
+    private boolean isMemberCreated(ConnectionDTO connectionDTO) {
+        return ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy()) &&
+            !connectionOwnershipExemption.isConnectedUserOwned(
+                Objects.requireNonNull(connectionDTO.id(), "connection id"));
     }
 
     private ConnectionDTO requireOwned(long connectedUserId, long connectionId) {

@@ -3,10 +3,22 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import Settings, {SettingsNavItemI} from './Settings';
+import Settings, {SettingsNavItemI, isNavItemCurrent} from './Settings';
 
 const hoisted = vi.hoisted(() => ({
+    billingEnabled: false,
+    embeddedScopes: [] as string[],
     enabledFeatureFlags: [] as string[],
+    isTenantAdmin: true,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => hoisted.isTenantAdmin || hoisted.embeddedScopes.includes(scope),
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
 }));
 
 vi.mock('@/shared/layout/Header', () => ({
@@ -18,7 +30,7 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => false,
+    useApplicationInfoStore: () => hoisted.billingEnabled,
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -40,9 +52,134 @@ const aiNavGroup: SettingsNavItemI = {
     title: 'AI',
 };
 
+const embeddedNavItems: SettingsNavItemI[] = [
+    {href: '/embedded/settings/members', title: 'Members'},
+    {href: '/embedded/settings/signing-keys', title: 'Signing Keys'},
+    {href: '/embedded/settings/api-keys', title: 'Embedded API Keys'},
+];
+
+const tenantAdminNavItems: SettingsNavItemI[] = [
+    {href: '/automation/settings/workspaces', title: 'Workspaces'},
+    {href: 'git-configuration', title: 'Git Configuration'},
+    {href: 'workspace-api-keys', title: 'Workspace API Keys'},
+    {href: 'users', title: 'Organization Users'},
+    {href: 'global-custom-roles', title: 'Roles'},
+    {href: 'billing', title: 'Billing'},
+    {href: 'ai-providers', title: 'Providers'},
+    {href: 'notifications', title: 'Notifications'},
+    {href: 'identity-providers', title: 'Identity Providers'},
+    {href: 'audit-events', title: 'Audit Events'},
+];
+
 describe('Settings', () => {
     beforeEach(() => {
+        hoisted.billingEnabled = false;
+        hoisted.embeddedScopes = [];
         hoisted.enabledFeatureFlags = [];
+        hoisted.isTenantAdmin = true;
+    });
+
+    it('shows every tenant-admin-only entry to a tenant admin', () => {
+        hoisted.billingEnabled = true;
+        hoisted.enabledFeatureFlags = ['ff-1025', 'ff-1039', 'ff-1040'];
+
+        renderSettings(tenantAdminNavItems);
+
+        tenantAdminNavItems.forEach((navItem) => expect(screen.getByText(navItem.title)).toBeInTheDocument());
+    });
+
+    it('hides every tenant-admin-only entry from a user who is not a tenant admin', () => {
+        hoisted.billingEnabled = true;
+        hoisted.enabledFeatureFlags = ['ff-1025', 'ff-1039', 'ff-1040'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([{href: 'workspace-users', title: 'Workspace Users'}, ...tenantAdminNavItems]);
+
+        tenantAdminNavItems.forEach((navItem) => expect(screen.queryByText(navItem.title)).not.toBeInTheDocument());
+        expect(screen.getByText('Workspace Users')).toBeInTheDocument();
+    });
+
+    it('shows the embedded entries to a tenant admin', () => {
+        renderSettings(embeddedNavItems);
+
+        embeddedNavItems.forEach((navItem) => expect(screen.getByText(navItem.title)).toBeInTheDocument());
+    });
+
+    it('testMembersNeedEmbeddedView', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['API_KEY_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.queryByText('Members')).not.toBeInTheDocument();
+
+        hoisted.embeddedScopes = ['EMBEDDED_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.getByText('Members')).toBeInTheDocument();
+    });
+
+    it('testSigningKeysNeedEmbeddedSettingsManage', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['API_KEY_VIEW'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.queryByText('Signing Keys')).not.toBeInTheDocument();
+        expect(screen.getByText('Embedded API Keys')).toBeInTheDocument();
+    });
+
+    it('shows Signing Keys to a member holding EMBEDDED_SETTINGS_MANAGE and hides API Keys without API_KEY_VIEW', () => {
+        hoisted.isTenantAdmin = false;
+        hoisted.embeddedScopes = ['EMBEDDED_SETTINGS_MANAGE'];
+
+        renderSettings(embeddedNavItems);
+
+        expect(screen.getByText('Signing Keys')).toBeInTheDocument();
+        expect(screen.queryByText('Embedded API Keys')).not.toBeInTheDocument();
+    });
+
+    it('shows the MCP Server entry to a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-2197'];
+
+        renderSettings([{href: 'mcp-server', title: 'MCP Server'}]);
+
+        expect(screen.getByText('MCP Server')).toBeInTheDocument();
+    });
+
+    it('shows the MCP Server entry to a user who is not a tenant admin, whose route admits any user', () => {
+        hoisted.enabledFeatureFlags = ['ff-2197'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([
+            {href: 'workspace-users', title: 'Users'},
+            {href: 'mcp-server', title: 'MCP Server'},
+        ]);
+
+        expect(screen.getByText('MCP Server')).toBeInTheDocument();
+        expect(screen.getByText('Users')).toBeInTheDocument();
+    });
+
+    it('shows the API Connectors entry to a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-207'];
+
+        renderSettings([{href: 'api-connectors', title: 'API Connectors'}]);
+
+        expect(screen.getByText('API Connectors')).toBeInTheDocument();
+    });
+
+    it('hides the API Connectors entry from a user who is not a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-207'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([
+            {href: 'workspace-users', title: 'Users'},
+            {href: 'api-connectors', title: 'API Connectors'},
+        ]);
+
+        expect(screen.queryByText('API Connectors')).not.toBeInTheDocument();
+        expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
     it('hides a section heading when every item below it is hidden by a feature flag', () => {
@@ -154,5 +291,31 @@ describe('Settings', () => {
         );
 
         expect(document.title).toBe('Signing Keys');
+    });
+});
+
+describe('isNavItemCurrent', () => {
+    it('matches the item whose segment the route ends with', () => {
+        expect(isNavItemCurrent('/automation/settings/users', 'users')).toBe(true);
+    });
+
+    // The regression: `pathname.includes(href)` lit up both the workspace and the organization
+    // entry at once, because `users` is a substring of `workspace-users`.
+    it('does not match a longer segment that merely contains the item', () => {
+        expect(isNavItemCurrent('/automation/settings/workspace-users', 'users')).toBe(false);
+        expect(isNavItemCurrent('/automation/settings/global-custom-roles', 'custom-roles')).toBe(false);
+    });
+
+    it('still matches the longer item on its own route', () => {
+        expect(isNavItemCurrent('/automation/settings/workspace-users', 'workspace-users')).toBe(true);
+        expect(isNavItemCurrent('/automation/settings/global-custom-roles', 'global-custom-roles')).toBe(true);
+    });
+
+    it('treats a nested route as inside its nav item', () => {
+        expect(isNavItemCurrent('/automation/settings/ai/guardrails/detail', 'ai/guardrails')).toBe(true);
+    });
+
+    it('matches an absolute href', () => {
+        expect(isNavItemCurrent('/automation/settings/workspaces', '/automation/settings/workspaces')).toBe(true);
     });
 });

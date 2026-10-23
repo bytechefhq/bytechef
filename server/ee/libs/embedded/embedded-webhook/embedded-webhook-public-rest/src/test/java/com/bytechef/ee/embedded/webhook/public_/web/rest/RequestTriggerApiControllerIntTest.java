@@ -34,6 +34,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.config.EmbeddedWebhookPublicRestSharedMocks;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.config.EmbeddedWebhookPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -51,7 +52,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
@@ -115,7 +115,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testIntegrationWorkflowResolutionIsUnchangedWhenOneExists() {
         stubConnectedUser("user-1", 1L);
         stubIntegrationWorkflow();
@@ -133,7 +133,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testIntegrationWorkflowWithoutARequestTriggerIsRefusedWithAMessageNamingTheProblem() {
         stubConnectedUser("user-1", 1L);
         stubIntegrationWorkflow();
@@ -159,7 +159,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testAutomationBridgeUnsupportedOperationExceptionReturnsNotFoundAndIsLoggedOnceAcrossTwoCalls() {
         stubConnectedUser("user-1", 1L);
 
@@ -176,7 +176,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testUnsupportedOperationExceptionPastTheReferenceFacadeIsNotReportedAsNotFound() {
         stubConnectedUser("user-1", 1L);
 
@@ -194,7 +194,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testUnknownWorkflowFallsThroughToTheAutomationBridge() {
         stubConnectedUser("user-1", 1L);
 
@@ -209,7 +209,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testExistingReferenceDispatchesAgainstTheAutomationWorkflowWithAutomationWorkflowExecutionId() {
         stubConnectedUser("user-1", 1L);
 
@@ -237,7 +237,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testDisabledAndDanglingReferencesReturnByteIdenticalNotFoundResponses() {
         stubConnectedUser("user-1", 1L);
 
@@ -258,7 +258,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testEnabledNonDanglingReferenceWithNullProjectDeploymentIdReturnsNotFound() {
         stubConnectedUser("user-1", 1L);
 
@@ -273,7 +273,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "login-a")
+    @WithMockConnectedUser(externalUserId = "login-a")
     void testCrossUserResolutionUsesOnlyTheCallersConnectedUserIdentity() {
         stubConnectedUser("login-a", 10L);
 
@@ -296,7 +296,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testOwnCopyModeWorkflowUuidDispatchesDirectly() {
         stubConnectedUser("user-1", 1L);
 
@@ -331,7 +331,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testOwnCopyResolutionWinsOverAReferenceAndACopyOfTheSameUuid() {
         stubConnectedUser("user-1", 1L);
 
@@ -376,7 +376,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testReferenceResolutionWinsOverACopyMadeFromTheSameTemplate() {
         stubConnectedUser("user-1", 1L);
 
@@ -409,7 +409,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testAutomationWorkflowUuidOfAnExistingCopyDispatchesThatCopy() {
         stubConnectedUser("user-1", 1L);
 
@@ -450,7 +450,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user-1")
+    @WithMockConnectedUser(externalUserId = "user-1")
     void testUnactivatedAutomationWorkflowTemplateReturnsTheSameNotFoundAsAnUnknownUuidAndProvisionsNothing() {
         stubConnectedUser("user-1", 1L);
 
@@ -483,7 +483,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-1")
+    @WithMockConnectedUser(externalUserId = "ext-1")
     void testExecuteWorkflowForAnExternalUserIdRunsAsThatConnectedUser() {
         stubConnectedUser("ext-1", 1L);
         stubIntegrationWorkflow();
@@ -500,7 +500,7 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-1")
+    @WithMockConnectedUser(externalUserId = "ext-1")
     void testExecuteWorkflowRefusesAnExternalUserIdOtherThanTheAuthenticatedOne() {
         Throwable throwable = catchThrowable(
             () -> mockMvc.perform(post(EXTERNAL_USER_WORKFLOW_PATH, "ext-2", "uuid-1")));

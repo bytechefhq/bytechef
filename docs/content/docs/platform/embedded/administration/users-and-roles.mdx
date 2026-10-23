@@ -1,0 +1,177 @@
+---
+title: Users and Roles
+description: Give people access to the embedded side of ByteChef with built-in roles, permission scopes and per-environment roles.
+---
+
+<EEBadge />
+
+<Callout title="Availability">
+    Embedded roles are an Enterprise Edition feature. The page that manages them is **Embedded → Settings → Members**.
+</Callout>
+
+Embedded access is separate from [workspace access](/platform/settings/users#roles-and-permissions). A person can be an Admin in an automation workspace and have no access to the embedded side, or the other way round.
+
+---
+
+## Embedded members
+
+Membership is opt-in. Being a user in the organization does not give anyone access to the embedded side; an administrator adds them.
+
+- **Tenant admins** always have full access to everything embedded. They are listed as inherited members and cannot be edited or removed here.
+- **Everyone else** has no embedded access until they are added as a member with a role.
+- Members are added by email. Only people who already have an account in the organization can be added; invite new people first from [Settings → Users](/platform/settings/users).
+
+---
+
+## Built-in roles
+
+| Role | What it allows |
+|---|---|
+| **Admin** | Every permission scope, including the destructive deletes, integration settings, signing keys and managing members. |
+| **Editor** | Everything Viewer has, plus creating and publishing integrations, creating and editing workflows, instance configurations, connected users, app events, connections and MCP servers, managing API keys, reading run details, and deleting workflows and connections. |
+| **Viewer** | Read-only. Sees integrations, workflows, configurations, connected users and runs with their status, but not run details, API keys or credentials. |
+
+Roles are ranked, so Viewer is contained in Editor and Editor is contained in Admin.
+
+---
+
+## Permission scopes
+
+Each action needs a permission scope. A role holds every scope whose minimum role it meets.
+
+| Scope | Minimum role |
+|---|---|
+| `EMBEDDED_VIEW` | Viewer |
+| `EMBEDDED_MEMBER_MANAGE`, `EMBEDDED_SETTINGS_MANAGE` | Admin |
+| `INTEGRATION_CREATE`, `INTEGRATION_PUBLISH` | Editor |
+| `INTEGRATION_SETTINGS`, `INTEGRATION_DELETE` | Admin |
+| `WORKFLOW_VIEW` | Viewer |
+| `WORKFLOW_CREATE`, `WORKFLOW_EDIT`, `WORKFLOW_DELETE` | Editor |
+| `INTEGRATION_INSTANCE_CONFIGURATION_VIEW` | Viewer |
+| `INTEGRATION_INSTANCE_CONFIGURATION_CREATE`, `INTEGRATION_INSTANCE_CONFIGURATION_EDIT` | Editor |
+| `INTEGRATION_INSTANCE_CONFIGURATION_DELETE` | Admin |
+| `CONNECTED_USER_VIEW`, `APP_EVENT_VIEW` | Viewer |
+| `CONNECTED_USER_MANAGE`, `APP_EVENT_CREATE`, `APP_EVENT_EDIT` | Editor |
+| `CONNECTED_USER_DELETE`, `APP_EVENT_DELETE` | Admin |
+| `EXECUTION_VIEW` | Viewer |
+| `EXECUTION_DETAILS_VIEW` | Editor |
+| `EXECUTION_DELETE` | Admin |
+| `CONNECTION_VIEW`, `MCP_VIEW` | Viewer |
+| `CONNECTION_CREATE`, `CONNECTION_EDIT`, `CONNECTION_DELETE` | Editor |
+| `MCP_CREATE`, `MCP_EDIT` | Editor |
+| `MCP_DELETE` | Admin |
+| `API_KEY_VIEW`, `API_KEY_CREATE`, `API_KEY_DELETE` | Editor |
+
+---
+
+## Per-environment roles
+
+A member has **either** one role that applies in every [environment](/platform/automation/deploy/environments) **or** a separate role for each of Development, Staging and Production. In an environment where they have no role, they are denied.
+
+| Action | Result |
+|---|---|
+| Give a member with one role for every environment a role in a single environment | The member switches to per-environment roles. Their existing role is kept in each other environment; change or remove each of those as its own step if the member should not have that access there. |
+| Remove one environment role while others remain | The member is denied in that environment. Their other roles are unchanged. |
+| Remove the member's last environment role | The role becomes a role for every environment again, the same role in all environments. |
+
+Who may make each change:
+
+- Adding or removing a member, and changing a role that applies in every environment, need `EMBEDDED_MEMBER_MANAGE` in every environment.
+- Once a member has per-environment roles, setting or removing the role for one environment needs `EMBEDDED_MEMBER_MANAGE` in that environment only.
+- A per-environment Admin cannot remove their own membership, because removal needs `EMBEDDED_MEMBER_MANAGE` in every environment.
+
+{/* TODO screenshot: Embedded → Settings → Members - one member with Editor in every environment and one with Viewer in Development and Admin in Production */}
+
+---
+
+## What follows the selected environment
+
+What a member can do depends on the environment selected in the [environment selector](/platform/automation/deploy/environments#choosing-an-environment). Controls are shown or hidden to match, and the server applies the same rule.
+
+Integration-level operations do not depend on the environment: creating, publishing, changing settings and deleting an integration are allowed for any environment where the member holds the scope.
+
+Resources that live in an environment are checked in that environment:
+
+- instance configurations
+- connected users
+- connections
+- MCP servers
+- signing keys
+- API keys
+- runs
+
+For example, a member who is Viewer in Development and Admin in Production can change a Production instance configuration only while looking at Production.
+
+---
+
+## Workflow editors (read-only)
+
+Workflows are built in Development, so workflow edits are checked in Development whichever environment is selected. A member without `WORKFLOW_EDIT` in Development can still open an integration workflow, but the editor opens read-only: nodes and their properties can be inspected but not changed, and the controls that would change or run the workflow are not offered.
+
+Publishing an integration needs `WORKFLOW_EDIT` as well as `INTEGRATION_PUBLISH`.
+
+---
+
+## Run details
+
+A member with `EXECUTION_VIEW` but not `EXECUTION_DETAILS_VIEW` (a Viewer) sees the list of runs with their status and timing. The inputs, outputs, errors, trigger data and logs of a run need `EXECUTION_DETAILS_VIEW` in the run's environment, which is Editor and above.
+
+Runs of connected users' automation workflows also need `CONNECTED_USER_VIEW` in the run's environment, for the list and for each run. Both scopes come with Viewer, so the built-in roles are unaffected; a custom role needs both to see these runs.
+
+---
+
+## Credentials
+
+A connection's secret values are shown and can be replaced only by the member who created it, and only while that member holds the edit scope. Tenant admins can use, rename, tag and delete connections they do not own, but cannot see or replace their secrets. Everyone else sees the resource with its secrets left out.
+
+| Connection | View and replace its secrets | Use it | Rename, tag and delete it |
+|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even a tenant admin | Yes | Tenant admins |
+| An embedded connection created for a connected user | No ByteChef user; only the connected user, through the [frontend endpoints](/platform/embedded/build/connections#frontend-endpoints) | That connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+
+Other resources that carry secrets:
+
+| Resource | Secrets shown to |
+|---|---|
+| Instance configuration | Its creator, with `INTEGRATION_INSTANCE_CONFIGURATION_EDIT` |
+| MCP server secret key and URL | Members with `MCP_EDIT` |
+
+Run responses never include connection parameters, whatever the role.
+
+---
+
+## Embedded API keys are shared
+
+[API keys](/platform/embedded/administration/api-keys) belong to an environment, not to the member who created them. A member with `API_KEY_VIEW` (Editor and above) sees every embedded API key in that environment, and `API_KEY_CREATE` and `API_KEY_DELETE` apply to all of them.
+
+<Callout type="warn" title="Removing a member does not revoke keys">
+    Removing a member does not delete the API keys they created. Delete those keys yourself if the member should no longer be able to use them.
+</Callout>
+
+Connections that belong to connected users are managed by scope: a member who holds `CONNECTION_EDIT` or `CONNECTION_DELETE` can edit or delete them. Connections a member created can be changed only by that member or a tenant admin.
+
+---
+
+## What stays tenant admin only
+
+Only a tenant admin can rotate an embedded MCP server's secret key. Editors with `MCP_EDIT` can change the rest of the server, but rotation is not delegated.
+
+---
+
+## Notable rules
+
+- **Every environment keeps an Admin.** A change that would leave an environment that has an embedded Admin without one is refused: removing a member, changing their role, or setting or removing one of their environment roles. An Admin can step down while another Admin remains in that environment. The rule applies to tenant admins too, so add another Admin before removing the last one.
+- **Hub and connected users' projects are not visible to automation workspace roles.** Automation Hub templates and the projects of connected users are not covered by automation workspace roles.
+- A request the member lacks permission for is refused: the REST API returns HTTP **403**, and GraphQL returns an error of type `FORBIDDEN`.
+
+## What gets logged
+
+Embedded membership changes are recorded in the [audit log](/platform/settings/audit-events) as `EMBEDDED_USER_ADDED`, `EMBEDDED_USER_ROLE_UPDATED`, `EMBEDDED_USER_REMOVED`, `EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED` and `EMBEDDED_USER_ENVIRONMENT_ROLE_REMOVED`. Each event records the user, and where they apply the environment, the new role, the previous role, and whether removing the last environment role widened the member to a role for every environment.
+
+## See also
+
+- [Users](/platform/settings/users) - organization members and workspace roles.
+- [Signing Keys](/platform/embedded/administration/signing-keys) - who can manage them.
+- [API Keys](/platform/embedded/administration/api-keys) - who can use them.
+- [MCP Servers](/platform/embedded/configure/mcp-servers)
