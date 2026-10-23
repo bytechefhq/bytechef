@@ -4,8 +4,17 @@ import {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
  * The fields of a task execution this reads. Structural rather than a generated model because loop
  * `iterations` are left as raw JSON by the generated converters: their dates are still ISO strings.
  */
+export interface ExecutedClusterElementCallI {
+    endDate?: Date | string;
+    error?: string;
+    name?: string;
+    startDate?: Date | string;
+    status?: string;
+}
+
 export interface ExecutedTaskI {
     children?: ExecutedTaskI[];
+    clusterElementCalls?: ExecutedClusterElementCallI[];
     endDate?: Date | string;
     error?: {message?: string};
     iterations?: ExecutedTaskI[][];
@@ -68,6 +77,7 @@ function mergeNodeState(
             : (existingNodeState.durationMillis ?? 0) + (nodeState.durationMillis ?? 0);
 
     return {
+        ...((existingNodeState.clusterElement || nodeState.clusterElement) && {clusterElement: true}),
         durationMillis,
         error: existingNodeState.error ?? nodeState.error,
         status,
@@ -81,7 +91,8 @@ function mergeNodeState(
  * another workflow and is left alone.
  *
  * A node that ran more than once (a loop body, a revisited graph member) gets one merged state: failed
- * wins over running, running over completed, and the durations add up to the node's total time.
+ * wins over running, running over completed, and the durations add up to the node's total time. The cluster
+ * elements a task called (an AI agent's tools) get states of their own the same way.
  */
 export default function buildNodeStatesFromTaskExecutions(
     taskExecutions: ExecutedTaskI[] | undefined,
@@ -103,6 +114,22 @@ export default function buildNodeStatesFromTaskExecutions(
                     error: status === 'FAILED' ? taskExecution.error?.message : undefined,
                     status,
                 });
+            }
+
+            for (const clusterElementCall of taskExecution.clusterElementCalls ?? []) {
+                const clusterElementStatus = toNodeStatus(clusterElementCall.status, running);
+
+                if (clusterElementCall.name && clusterElementStatus) {
+                    nodeStates[clusterElementCall.name] = mergeNodeState(nodeStates[clusterElementCall.name], {
+                        clusterElement: true,
+                        durationMillis:
+                            clusterElementStatus === 'RUNNING'
+                                ? undefined
+                                : toDurationMillis(clusterElementCall.startDate, clusterElementCall.endDate),
+                        error: clusterElementStatus === 'FAILED' ? clusterElementCall.error : undefined,
+                        status: clusterElementStatus,
+                    });
+                }
             }
 
             visit([...(taskExecution.children ?? []), ...(taskExecution.iterations ?? []).flat()]);
