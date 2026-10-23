@@ -516,23 +516,41 @@ describe('useConnectDialog workflows view', () => {
 
         await act(async () => result.current.openDialog());
 
-        return lastRenderedProps(renderMock).mergedWorkflows.map(
-            (workflow: {workflowUuid: string}) => workflow.workflowUuid
-        );
+        return lastRenderedProps(renderMock);
     };
 
+    const getWorkflowUuids = (props: {mergedWorkflows: Array<{workflowUuid: string}>}) =>
+        props.mergedWorkflows.map((workflow) => workflow.workflowUuid);
+
     it("uses the current instance's availableWorkflows instead of the integration workflows", async () => {
-        const workflowUuids = await openOnInstance({
-            availableWorkflows: [{label: 'V1', workflowUuid: 'w-v1'}],
-            workflows: [{enabled: true, workflowUuid: 'w-v1'}],
-        });
+        const workflowUuids = getWorkflowUuids(
+            await openOnInstance({
+                availableWorkflows: [{label: 'V1', workflowUuid: 'w-v1'}],
+                workflows: [{enabled: true, workflowUuid: 'w-v1'}],
+            })
+        );
 
         expect(workflowUuids).toEqual(['w-v1']);
     });
 
     it('falls back to the integration workflows when the instance has no availableWorkflows', async () => {
-        const workflowUuids = await openOnInstance({workflows: []});
+        const workflowUuids = getWorkflowUuids(await openOnInstance({workflows: []}));
 
         expect(workflowUuids).toEqual(['w-v2']);
+    });
+
+    it("uses the current instance's connectionConfig instead of the integration one", async () => {
+        const props = await openOnInstance({
+            connectionConfig: {authorizationType: 'API_KEY', inputs: [{label: 'Key', name: 'key', required: true}]},
+            workflows: [],
+        });
+
+        expect(props.properties).toEqual([{label: 'Key', name: 'key', required: true}]);
+    });
+
+    it('falls back to the integration connectionConfig when the instance has none', async () => {
+        const props = await openOnInstance({workflows: []});
+
+        expect(props.properties).toEqual([]);
     });
 });
