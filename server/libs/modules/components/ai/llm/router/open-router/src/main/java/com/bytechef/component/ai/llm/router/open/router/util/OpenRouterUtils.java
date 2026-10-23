@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TypeReference;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,10 @@ import java.util.stream.Collectors;
  * @author Marko Kriskovic
  */
 public class OpenRouterUtils {
+
+    private static final List<String> MINIMAX_TEXT_MODELS = List.of(
+        "minimax/minimax-m3.1-flash:free", "minimax/minimax-m3");
+
     public static OptionsFunction<String> getOpenRouterModels(String outputType) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             List<String> supportedParametersArray = inputParameters.getList(SUPPORTED_PARAMETERS, String.class);
@@ -49,11 +54,18 @@ public class OpenRouterUtils {
             ModelsResponse response = executor.execute()
                 .getBody(new TypeReference<>() {});
 
-            return response.data()
+            List<OpenRouterModel> models = response.data()
                 .stream()
                 .sorted(Comparator.comparingDouble((OpenRouterModel model) -> model.pricing()
                     .totalCost())
                     .thenComparing(OpenRouterModel::name))
+                .toList();
+
+            if ("text".equals(outputType)) {
+                models = getTextModels(models);
+            }
+
+            return models.stream()
                 .map(model -> option(model.name() + " - $" + formatCost(model.pricing()
                     .totalCost()), model.id(), model.description()))
                 .collect(Collectors.toList());
@@ -76,6 +88,29 @@ public class OpenRouterUtils {
                     .totalCost()), model.id(), model.description()))
                 .collect(Collectors.toList());
         };
+    }
+
+    private static List<OpenRouterModel> getTextModels(List<OpenRouterModel> models) {
+        List<OpenRouterModel> miniMaxModels = models.stream()
+            .filter(model -> MINIMAX_TEXT_MODELS.contains(model.id()))
+            .sorted(Comparator.comparingInt(model -> MINIMAX_TEXT_MODELS.indexOf(model.id())))
+            .toList();
+        List<OpenRouterModel> textModels = new ArrayList<>();
+        boolean miniMaxAdded = false;
+
+        for (OpenRouterModel model : models) {
+            if (model.id()
+                .startsWith("minimax/")) {
+                if (!miniMaxAdded) {
+                    textModels.addAll(miniMaxModels);
+                    miniMaxAdded = true;
+                }
+            } else {
+                textModels.add(model);
+            }
+        }
+
+        return textModels;
     }
 
     private static String formatCost(double cost) {
