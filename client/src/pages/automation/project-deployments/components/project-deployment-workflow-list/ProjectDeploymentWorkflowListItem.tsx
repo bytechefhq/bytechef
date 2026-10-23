@@ -78,7 +78,7 @@ const ProjectDeploymentWorkflowListItem = ({
         (state) => state.setWorkflowExecutionSheetOpen
     );
 
-    const {openProjectWorkflow} = useOpenInProject();
+    const {canOpenInProject, openProjectWorkflow} = useOpenInProject();
 
     const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
@@ -116,7 +116,7 @@ const ProjectDeploymentWorkflowListItem = ({
         }
     };
 
-    const showOpenInProject = !hideOpenInProject && projectId != null;
+    const showOpenInProject = canOpenInProject && !hideOpenInProject && projectId != null;
 
     const handleOpenInProjectClick = () => {
         if (projectId != null) {
@@ -264,26 +264,28 @@ const ProjectDeploymentWorkflowListItem = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-x-6">
-                    <div className="min-w-[36px]">
-                        {canEditDeployment &&
-                            (!workflow.triggers?.length ||
-                                workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            aria-label="Run Workflow"
-                                            disabled={!projectDeploymentEnabled || !enabled}
-                                            icon={<PlayIcon className="text-success" />}
-                                            onClick={handleRunWorkflowClick}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
-                                    </TooltipTrigger>
+                <div className="flex items-center gap-x-4">
+                    <div className="flex items-center gap-x-1">
+                        {showRunSlot && (
+                            <div className="size-9 shrink-0">
+                                {canEditDeployment && canRunWorkflowManually(workflow) && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                aria-label="Run workflow manually"
+                                                disabled={!projectDeploymentEnabled || !enabled}
+                                                icon={<PlayIcon className="text-success" />}
+                                                onClick={handleRunWorkflowClick}
+                                                size="icon"
+                                                variant="ghost"
+                                            />
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Run workflow manually</TooltipContent>
-                                </Tooltip>
-                            )}
+                                        <TooltipContent>Run workflow manually</TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        )}
 
                         {showTriggerUrlSlot && (
                             <div className="size-9 shrink-0">
