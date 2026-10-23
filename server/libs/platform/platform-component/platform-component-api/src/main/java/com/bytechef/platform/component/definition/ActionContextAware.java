@@ -107,6 +107,14 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
     Long getJobId();
 
     /**
+     * Retrieves the unique identifier of the task execution the action runs in, if available.
+     *
+     * @return the task execution ID as a {@link Long}, or {@code null} if the task execution ID is not set.
+     */
+    @Nullable
+    Long getTaskExecutionId();
+
+    /**
      * Retrieves the platform type for the current context.
      *
      * @return the {@link PlatformType} if available,

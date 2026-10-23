@@ -127,6 +127,23 @@ class ActionContextImplTest {
         assertEquals(TENANT_ID, approvalId.getTenantId());
     }
 
+    @Test
+    void testGetTaskExecutionId() {
+        ActionContextImpl actionContext = ActionContextImpl.builder(
+            "approval", 1, "requestApproval", false, mock(CacheManager.class), mock(DataStorage.class),
+            mock(ApplicationEventPublisher.class), mock(HttpClientExecutor.class), mock(TempFileStorage.class), null)
+            .jobId(200L)
+            .taskExecutionId(42L)
+            .build();
+
+        assertEquals(42L, actionContext.getTaskExecutionId());
+    }
+
+    @Test
+    void testGetTaskExecutionIdWhenUnset() {
+        assertNull(createActionContext().getTaskExecutionId());
+    }
+
     private static ActionContextImpl createActionContext() {
         return ActionContextImpl.builder(
             "approval", 1, "requestApproval", false, mock(CacheManager.class), mock(DataStorage.class),

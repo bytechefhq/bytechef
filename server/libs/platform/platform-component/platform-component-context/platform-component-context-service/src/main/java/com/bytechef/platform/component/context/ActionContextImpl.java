@@ -415,6 +415,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @Override
     @Nullable
+    public Long getTaskExecutionId() {
+        return taskExecutionId == 0 ? null : taskExecutionId;
+    }
+
+    @Override
+    @Nullable
     public PlatformType getPlatformType() {
         return type;
     }
