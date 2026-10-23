@@ -375,7 +375,7 @@ public class ProjectWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetSubflowJobTaskExecutionsSkipsChildJobWithMissingParentTaskExecution() {
+    public void testGetSubflowJobTaskExecutionsFailsWhenParentTaskExecutionIsMissing() {
         Job firstChildJob = new Job(41L);
 
         firstChildJob.setParentTaskExecutionId(11L);
@@ -399,9 +399,9 @@ public class ProjectWorkflowExecutionFacadeTest {
         when(taskExecutionService.getTaskExecutions(List.of(11L, 12L)))
             .thenReturn(List.of(secondParentTaskExecution));
 
-        assertThat(facade.getSubflowJobTaskExecutions(33911L))
-            .extracting(TaskExecutionDTO::id)
-            .containsExactly(12L);
+        assertThatThrownBy(() -> facade.getSubflowJobTaskExecutions(33911L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("'11'");
     }
 
     @Test

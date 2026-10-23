@@ -804,24 +804,22 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .collect(Collectors.toMap(TaskExecution::getId, Function.identity(), (first, second) -> first));
 
         return childJobs.stream()
-            .filter(childJob -> hasParentTaskExecution(childJob, parentTaskExecutionMap))
             .map(childJob -> toTaskExecutionDTO(
-                parentTaskExecutionMap.get(childJob.getParentTaskExecutionId()), toSubflowJobDTO(childJob), false))
+                getParentTaskExecution(childJob, parentTaskExecutionMap), toSubflowJobDTO(childJob), false))
             .toList();
     }
 
-    private static boolean hasParentTaskExecution(Job childJob, Map<Long, TaskExecution> parentTaskExecutionMap) {
-        if (parentTaskExecutionMap.containsKey(childJob.getParentTaskExecutionId())) {
-            return true;
+    private static TaskExecution getParentTaskExecution(
+        Job childJob, Map<Long, TaskExecution> parentTaskExecutionMap) {
+
+        TaskExecution parentTaskExecution = parentTaskExecutionMap.get(childJob.getParentTaskExecutionId());
+
+        if (parentTaskExecution == null) {
+            throw new IllegalStateException(
+                String.format("TaskExecution with id '%s' not found", childJob.getParentTaskExecutionId()));
         }
 
-        if (log.isWarnEnabled()) {
-            log.warn(
-                "Skipping child job id={}: parent task execution id={} not found", childJob.getId(),
-                childJob.getParentTaskExecutionId());
-        }
-
-        return false;
+        return parentTaskExecution;
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
